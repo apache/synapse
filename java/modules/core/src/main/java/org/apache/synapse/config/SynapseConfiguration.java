@@ -118,6 +118,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
      */
     private Map<String, SynapseEventSource> eventSources = new HashMap<String, SynapseEventSource>();
 
+    /**
+     * The list of registered configuration observers
+     */
+    private List<SynapseObserver> observers = new ArrayList<SynapseObserver>();
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -131,6 +135,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public void addSequence(String key, Mediator mediator) {
         assertAlreadyExists(key,SEQUENCE);
         localRegistry.put(key, mediator);
+
+        for (SynapseObserver o : observers) {
+            o.sequenceAdded(mediator);
+        }
     }
 
     /**
@@ -254,6 +262,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
         Object sequence = localRegistry.get(key);
         if (sequence instanceof Mediator) {
             localRegistry.remove(key);
+            for (SynapseObserver o : observers) {
+                o.sequenceRemoved((Mediator) sequence);
+            }
         } else {
             handleException("No sequence exists by the key/name : " + key);
         }
@@ -302,12 +313,18 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 entry.setValue(SynapseConfigUtils.getOMElementFromURL(entry.getSrc()
                         .toString()));
                 localRegistry.put(key, entry);
+                for (SynapseObserver o : observers) {
+                    o.entryAdded(entry);
+                }
             } catch (IOException e) {
                 handleException("Can not read from source URL : "
                         + entry.getSrc());
             }
         } else {
             localRegistry.put(key, entry);
+            for (SynapseObserver o : observers) {
+                o.entryAdded(entry);
+            }
         }
     }
 
@@ -421,6 +438,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
         Object entry = localRegistry.get(key);
         if (entry instanceof Entry) {
             localRegistry.remove(key);
+            for (SynapseObserver o : observers) {
+                o.entryRemoved((Entry) entry);    
+            }
         } else {
             handleException("No entry exists by the key : " + key);
         }
@@ -467,6 +487,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public void addEndpoint(String key, Endpoint endpoint) {
         assertAlreadyExists(key, ENDPOINT);
         localRegistry.put(key, endpoint);
+        for (SynapseObserver o : observers) {
+            o.endpointAdded(endpoint);
+        }
     }
 
     /**
@@ -568,6 +591,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
         Object endpoint = localRegistry.get(key);
         if (endpoint instanceof Endpoint) {
             localRegistry.remove(key);
+            for (SynapseObserver o : observers) {
+                o.endpointRemoved((Endpoint) endpoint);
+            }
         } else {
             handleException("No endpoint exists by the key/name : " + key);
         }
@@ -585,6 +611,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public void addProxyService(String name, ProxyService proxy) {
         if (!proxyServices.containsKey(name)) {
             proxyServices.put(name, proxy);
+            for (SynapseObserver o : observers) {
+                o.proxyServiceAdded(proxy);
+            }
         } else {
             handleException("Duplicate proxy service by the name : " + name);
         }
@@ -609,8 +638,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            of the Proxy Service to be deleted
      */
     public void removeProxyService(String name) {
-        Object o = proxyServices.get(name);
-        if (o == null) {
+        ProxyService proxy = proxyServices.get(name);
+        if (proxy == null) {
             handleException("Unknown proxy service for name : " + name);
         } else {
             try {
@@ -623,6 +652,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
                     getAxisConfiguration().removeService(name);
                 }
                 proxyServices.remove(name);
+                for (SynapseObserver o : observers) {
+                    o.proxyServiceRemoved(proxy);
+                }
             } catch (AxisFault axisFault) {
                 handleException(axisFault.getMessage());
             }
@@ -759,6 +791,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public void addStartup(Startup startup) {
         if (!startups.containsKey(startup.getName())) {
             startups.put(startup.getName(), startup);
+            for (SynapseObserver o : observers) {
+                o.startupAdded(startup);
+            }
         } else {
             handleException("Duplicate startup by the name : " + startup.getName());
         }
@@ -771,8 +806,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param name - name of the startup that needs to be removed
      */
     public void removeStartup(String name) {
-        if (startups.containsKey(name)) {
+        Startup startup = startups.get(name);
+        if (startup != null) {
             startups.remove(name);
+            for (SynapseObserver o : observers) {
+                o.startupRemoved(startup);
+            }
         } else {
             handleException("No startup exists by the name : " + name);
         }
@@ -1000,6 +1039,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public void addEventSource(String name, SynapseEventSource eventSource) {
         if (!eventSources.containsKey(name)) {
             eventSources.put(name, eventSource);
+            for (SynapseObserver o : observers) {
+                o.eventSourceAdded(eventSource);
+            }
         } else {
             handleException("Duplicate event source by the name : " + name);
         }
@@ -1016,8 +1058,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param name name of the event source to be removed
      */
     public void removeEventSource(String name) {
-        if (eventSources.containsKey(name)) {
+        SynapseEventSource eventSource = eventSources.get(name);
+        if (eventSource != null) {
             eventSources.remove(name);
+            for (SynapseObserver o : observers) {
+                o.eventSourceRemoved(eventSource);
+            }
         } else {
             handleException("No event source exists by the name : " + name);
         }
@@ -1029,6 +1075,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public void setEventSources(Map<String, SynapseEventSource> eventSources) {
         this.eventSources = eventSources;
+    }
+
+    public void registerObserver(SynapseObserver o) {
+        if (!observers.contains(o)) {
+            observers.add(o);
+        }
     }
 
     private void assertAlreadyExists(String key, String type) {

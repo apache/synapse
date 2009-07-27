@@ -98,7 +98,7 @@ public class MultiXMLConfigurationBuilder {
             log.debug("Building Synapse configuration from the directory heirarchy at : " + root);
         }
 
-        SynapseConfiguration synapseConfig = new SynapseConfiguration();
+        SynapseConfiguration synapseConfig = SynapseConfigUtils.newConfiguration();
         synapseConfig.setDefaultQName(XMLConfigConstants.DEFINITIONS_ELT);
 
         try {

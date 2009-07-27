@@ -49,7 +49,7 @@ public class SynapseConfigurationBuilder {
      */
     public static SynapseConfiguration getDefaultConfiguration() {
         // programatically create an empty configuration which just log and drop the messages 
-        SynapseConfiguration config = new SynapseConfiguration();
+        SynapseConfiguration config = SynapseConfigUtils.newConfiguration();
         SequenceMediator mainmediator = new SequenceMediator();
         mainmediator.addChild(new LogMediator());
         mainmediator.addChild(new DropMediator());

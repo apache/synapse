@@ -714,7 +714,7 @@ public class SynapseConfigUtils {
     public static SynapseConfiguration newConfiguration() {
         SynapseConfiguration synConfig = new SynapseConfiguration();
         Properties synapseProps = SynapsePropertiesLoader.loadSynapseProperties();
-        String propValue = synapseProps.getProperty("initial.observers");
+        String propValue = synapseProps.getProperty("synapse.observers");
         if (propValue != null) {
             String[] observerNames = propValue.split(",");
             for (String observer : observerNames) {

@@ -702,5 +702,33 @@ public class SynapseConfigUtils {
         }
         return null;
     }
+
+    /**
+     * Construct a fresh SynapseConfiguration instance and registers the observers
+     * with it as specified in the synapse.properties file. Use the initial.observers
+     * property in the synapse.properties file to specify observers as a comma separated
+     * list.
+     *
+     * @return a SynapseConfiguration instance
+     */
+    public static SynapseConfiguration newConfiguration() {
+        SynapseConfiguration synConfig = new SynapseConfiguration();
+        Properties synapseProps = SynapsePropertiesLoader.loadSynapseProperties();
+        String propValue = synapseProps.getProperty("synapse.observers");
+        if (propValue != null) {
+            String[] observerNames = propValue.split(",");
+            for (String observer : observerNames) {
+                try {
+                    Class clazz = SynapseConfigUtils.class.getClassLoader().
+                            loadClass(observer.trim());
+                    SynapseObserver o = (SynapseObserver) clazz.newInstance();
+                    synConfig.registerObserver(o);
+                } catch (Exception e) {
+                    handleException("Error while initializing Synapse observers", e);
+                }
+            }
+        }
+        return synConfig;
+    }
 }
 

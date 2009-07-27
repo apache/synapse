@@ -1083,6 +1083,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
         }
     }
 
+    public List<SynapseObserver> getObservers() {
+        return Collections.unmodifiableList(observers);
+    }
+
     private void assertAlreadyExists(String key, String type) {
 
         if (key == null || "".equals(key)) {

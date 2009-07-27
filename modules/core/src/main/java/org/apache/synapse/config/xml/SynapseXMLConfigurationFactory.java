@@ -58,7 +58,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             throw new SynapseException(
                     "Wrong QName for this configuration factory " + definitions.getQName());
         }
-        SynapseConfiguration config = new SynapseConfiguration();
+        SynapseConfiguration config = SynapseConfigUtils.newConfiguration();               
         config.setDefaultQName(definitions.getQName());
 
         SequenceMediator rootSequence = new SequenceMediator();

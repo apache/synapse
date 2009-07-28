@@ -58,11 +58,13 @@ public class HandlerUtil {
     }
 
     public static boolean mediateInMessage(Log log, MessageContext messageContext,
-                                           org.apache.synapse.MessageContext synCtx) throws AxisFault {
+                                           org.apache.synapse.MessageContext synCtx)
+            throws AxisFault {
 
         AxisService service = messageContext.getAxisService();
         if (service != null) {
-            Parameter inMediationParam = service.getParameter(HandlerConstants.IN_SEQUENCE_PARAM_NAME);
+            Parameter inMediationParam
+                    = service.getParameter(HandlerConstants.IN_SEQUENCE_PARAM_NAME);
             if (inMediationParam != null && inMediationParam.getValue() != null) {
                 if (inMediationParam.getValue() instanceof Mediator) {
                     Mediator inMessageSequence = (Mediator) inMediationParam.getValue();
@@ -73,12 +75,14 @@ public class HandlerUtil {
                     return inMessageSequence.mediate(synCtx);
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("The provided in message mediation sequence is not a proper mediator");
+                        log.debug("The provided in message mediation " +
+                                "sequence is not a proper mediator");
                     }
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Couldn't find the incoming mediation for the service " + service.getName());
+                    log.debug("Couldn't find the incoming mediation for the service "
+                            + service.getName());
                 }
             }
         } else {
@@ -91,11 +95,13 @@ public class HandlerUtil {
     }
 
     public static boolean mediateOutMessage(Log log, MessageContext messageContext,
-                                           org.apache.synapse.MessageContext synCtx) throws AxisFault {
+                                           org.apache.synapse.MessageContext synCtx)
+            throws AxisFault {
 
         AxisService service = messageContext.getAxisService();
         if (service != null) {
-            Parameter inMediationParam = service.getParameter(HandlerConstants.OUT_SEQUENCE_PARAM_NAME);
+            Parameter inMediationParam
+                    = service.getParameter(HandlerConstants.OUT_SEQUENCE_PARAM_NAME);
             if (inMediationParam != null && inMediationParam.getValue() != null) {
                 if (inMediationParam.getValue() instanceof Mediator) {
                     Mediator inMessageSequence = (Mediator) inMediationParam.getValue();
@@ -106,12 +112,14 @@ public class HandlerUtil {
                     return inMessageSequence.mediate(synCtx);
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("The provided out message mediation sequence is not a proper mediator");
+                        log.debug("The provided out message mediation " +
+                                "sequence is not a proper mediator");
                     }
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Couldn't find the outgoing mediation for the service " + service.getName());
+                    log.debug("Couldn't find the outgoing mediation for the service "
+                            + service.getName());
                 }
             }
         } else {

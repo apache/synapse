@@ -28,10 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.synapse.ServerConfigurationInformation;
-import org.apache.synapse.ServerConfigurationInformationFactory;
-import org.apache.synapse.ServerContextInformation;
-import org.apache.synapse.ServerManager;
+import org.apache.synapse.*;
 
 /**
  * This will be the Module class for the Synapse handler based mediations inside axis2 server. This
@@ -56,14 +53,19 @@ public class SynapseModule implements Module {
     public void init(ConfigurationContext configurationContext, AxisModule axisModule)
             throws AxisFault {
 
-        log.info("Initializing the Synapse as a handler");
-        ServerConfigurationInformation configurationInformation =
-                ServerConfigurationInformationFactory.createServerConfigurationInformation(
-                        configurationContext.getAxisConfiguration());
         ServerManager serverManager = ServerManager.getInstance();
-        ServerContextInformation contextInfo = new ServerContextInformation(configurationContext);
-        serverManager.init(configurationInformation, contextInfo);
-        serverManager.start();
+        if (!(serverManager.getServerState() == ServerState.STARTED)) {
+            log.info("Initializing the Synapse as a handler");
+            ServerConfigurationInformation configurationInformation =
+                    ServerConfigurationInformationFactory.createServerConfigurationInformation(
+                            configurationContext.getAxisConfiguration());
+            ServerContextInformation contextInfo
+                    = new ServerContextInformation(configurationContext);
+            serverManager.init(configurationInformation, contextInfo);
+            serverManager.start();
+        } else {
+            log.info("Detected an already strated synapse instance using that for the mediation");
+        }
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {}

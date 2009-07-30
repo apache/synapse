@@ -790,6 +790,8 @@
     </modules>
 
     <properties>
+        <!-- Sets the source encoding to UTF-8 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Synapse and related components -->
         <synapse.version>SNAPSHOT</synapse.version>
         <synapse.bundle.version>0.0.0</synapse.bundle.version>

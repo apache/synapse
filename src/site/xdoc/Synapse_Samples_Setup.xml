@@ -1038,7 +1038,7 @@ synapse.datasources.reportds.maxWait=10000</pre>
         </strong>
     </p>
     <pre>ciphertool.bat -source synapse -keystore lib\trust.jks -storepass password -alias synapse -outencode base64 -trusted
-        Using SYNAPSE_HOME: C:\Project\apache\synapse\trunck2\modules\distribution\target\synapse-1.3.0.SNAPSHOT
+        Using SYNAPSE_HOME: C:\Project\apache\synapse\trunck2\modules\distribution\target\synapse-1.3.0-SNAPSHOT
         Using JAVA_HOME: C:\Program Files\Java\jdk1.5.0_14
         Output : VbwH1pePwf4XmUtCdIvO0MA/EZPl8YK+E0kGkMpFd7CbWKpR2h1evTv902zoVorbJbHsVDNXfuvUUGmQAptUl4GknAm4bgZsgQ/pbsRbXivRkNzg9JVqw3FzWkR2uN2ZCHSacC4IdUwOjSDOTQ+kH7se
         58kt2xqJSax2a9pdL1w=

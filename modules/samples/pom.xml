@@ -396,7 +396,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Private-Package>samples.*</Private-Package>
                     </instructions>
                 </configuration>

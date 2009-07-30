@@ -135,7 +135,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Export-Package>
                             org.apache.synapse,
                             org.apache.synapse.aspects.*,

@@ -50,8 +50,6 @@
                             org.apache.synapse.transport.vfs.*,
                         </Export-Package>
                         <Import-Package>
-                            !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
                             !org.apache.commons.io.output,
                             org.apache.commons.io.output; version=0.0.0,
                             *; resolution:=optional

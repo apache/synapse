@@ -53,7 +53,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Export-Package>
                             org.apache.synapse.format.hessian.*,
                             org.apache.synapse.format.syslog.*,

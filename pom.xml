@@ -32,7 +32,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
-    <version>SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -793,7 +793,7 @@
         <!-- Sets the source encoding to UTF-8 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Synapse and related components -->
-        <synapse.version>SNAPSHOT</synapse.version>
+        <synapse.version>1.4.0-SNAPSHOT</synapse.version>
         <synapse.bundle.version>0.0.0</synapse.bundle.version>
         <commons.dbcp.version>1.2.2</commons.dbcp.version>
         <commons.pool.version>1.3</commons.pool.version>

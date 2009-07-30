@@ -22,16 +22,16 @@
         <archetype>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-package-archetype</artifactId>
-            <version>1.3</version>
+            <version>1.3.0</version>
             <repository>http://repo1.maven.org/maven2</repository>
-            <description>Create a Synapse 1.3 custom package</description>
+            <description>Create a Synapse 1.3.0 custom package</description>
         </archetype>
         <archetype>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-package-archetype</artifactId>
-            <version>SNAPSHOT</version>
+            <version>1.3.0.SNAPSHOT</version>
             <repository>http://people.apache.org/repo/m2-snapshot-repository</repository>
-            <description>Create a Synapse SNAPSHOT custom package</description>
+            <description>Create a Synapse 1.3.0.SNAPSHOT custom package</description>
         </archetype>
     </archetypes>
 </archetype-catalog>

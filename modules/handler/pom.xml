@@ -48,7 +48,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Version>${synapse.bundle.version}</Bundle-Version>
                         <Private-Package>
                             org.apache.synapse.handler.util,
                             org.apache.synapse.handler,

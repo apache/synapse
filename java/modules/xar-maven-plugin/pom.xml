@@ -29,6 +29,7 @@
     <description>Maven 2 plugin to create Synapse extension archives</description>
     
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.version>2.0.7</maven.version>
         <maven.artifact.version>2.0.8</maven.artifact.version>
         <maven.archiver.version>2.2</maven.archiver.version>

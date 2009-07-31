@@ -21,13 +21,24 @@ package org.apache.synapse.transport.nhttp;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
+import org.apache.http.impl.nio.reactor.SSLIOSession;
 import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.nio.NHttpClientIOTarget;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.params.HttpParams;
 
+import java.net.InetSocketAddress;
+import java.util.Map;
+
+/**
+ * This custom SSLClientIOEventDispatch can keep a map of SSLContexts and use the correct
+ * SSLContext when connecting to different servers. If a SSLContext cannot be found for a
+ * particular server from the specified map it uses the default SSLContext.
+ */
 public class SSLClientIOEventDispatch 
     extends org.apache.http.impl.nio.SSLClientIOEventDispatch {
+
+    private Map<String, SSLContext> contextMap;
 
     public SSLClientIOEventDispatch(
             final NHttpClientHandler handler,
@@ -36,15 +47,29 @@ public class SSLClientIOEventDispatch
             final HttpParams params) {
         super(LoggingUtils.decorate(handler), sslcontext, sslHandler, params);
     }
-    
-    public SSLClientIOEventDispatch(
-            final NHttpClientHandler handler,
-            final SSLContext sslcontext,
-            final HttpParams params) {
-        this(handler, sslcontext, null, params);
+
+    public void setContextMap(Map<String,SSLContext> contextMap) {
+        this.contextMap = contextMap;
     }
-    
-    @Override
+
+    protected SSLIOSession createSSLIOSession(IOSession ioSession, SSLContext sslContext,
+                                              SSLIOSessionHandler sslioSessionHandler) {
+
+        InetSocketAddress address = (InetSocketAddress) ioSession.getRemoteAddress();
+        String host = address.getHostName() + ":" + address.getPort();
+        SSLContext customContext = null;
+        if (contextMap != null) {
+            // See if there's a custom SSL profile configured for this server
+            customContext = contextMap.get(host);
+        }
+
+        if (customContext == null) {
+            customContext = sslContext;
+        }
+        
+        return super.createSSLIOSession(ioSession, customContext, sslioSessionHandler);
+    }
+
     protected NHttpClientIOTarget createConnection(IOSession session) {
         return LoggingUtils.decorate(
                 super.createConnection(LoggingUtils.decorate(session, "sslclient")));

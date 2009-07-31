@@ -175,7 +175,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         handler = new ClientHandler(cfgCtx, params, metrics);
         final IOEventDispatch ioEventDispatch = getEventDispatch(
-            handler, sslContext, sslIOSessionHandler, params);
+            handler, sslContext, sslIOSessionHandler, params, transportOut);
 
         // start the Sender in a new seperate thread
         Thread t = new Thread(new Runnable() {
@@ -209,9 +209,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @param params
      * @return
      */
-    protected IOEventDispatch getEventDispatch(
-        NHttpClientHandler handler, SSLContext sslContext,
-        SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
+    protected IOEventDispatch getEventDispatch(NHttpClientHandler handler, SSLContext sslContext,
+        SSLIOSessionHandler sslIOSessionHandler, HttpParams params,
+        TransportOutDescription trpOut) throws AxisFault {
+
         return new PlainClientIOEventDispatch(handler, params);
     }
 

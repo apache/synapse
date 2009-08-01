@@ -218,7 +218,9 @@
 <li>
 <a href="#Sample261">Sample 261: Switch between FIX versions </a></li>
 <li>
-<a href="#Sample262">Sample 262: CBR of FIX messages </a></li></ul></li>
+<a href="#Sample262">Sample 262: CBR of FIX messages </a></li>
+<li>
+<a href="#Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></li></ul></li>
 <li>
 <a href="#Task">Introduction to Synapse tasks</a>
 <ul>
@@ -2757,6 +2759,80 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>Synapse will not forward the orders with other symbols to any endpoint. (default case has kept blank in the configuration)</p>
 <p>To get an idea about the various transport parameters being used in this sample see 
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
+
+<h2>
+<a name="Sample263" id="Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></h2>
+<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+
+    <proxy name="StockQuoteProxy" transports="jms">
+        <target>
+            <inSequence>
+                <property action="set" name="OUT_ONLY" value="true"/>
+            </inSequence>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+            <outSequence>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <jmsProperty>contentType</jmsProperty>
+                <default>application/xml</default>
+            </rules>
+        </parameter>
+    </proxy>
+
+</definitions>]]></pre>
+<p>
+<strong>Objective: Introduction to switching transports with proxy services. The JMS provider will be <a href="http://jboss.org/jbossmessaging/">JBoss Messaging(JBM).</a></strong> </p>
+<p>
+<strong>Prerequisites:</strong>
+<br></br> Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+<br></br> <a href="http://jboss.org/jbossmessaging/">Download</a>, install and start JBM server, and configure Synapse to listen on JBM (refer notes below)
+<br></br> Start the Synapse configuration numbered 250: i.e. synapse -sample 250
+<br></br> We need to configure the required queues in JBM. Add the following entry to JBM jms configuration inside file-config/stand-alone/non-clustered/jbm-jms.xml.
+    Once JBM is installed and started you should get a message as follows: </p>
+<pre xml:space="preserve">
+&lt;queue name=&quot;StockQuoteProxy&quot;&gt;
+    &lt;entry name=&quot;StockQuoteProxy&quot;/&gt;
+&lt;/queue&gt;
+</pre>
+<p>Once you started the JBM server with the above changes you'll be able to see the following on STDOUT.</p>
+<pre xml:space="preserve">10:18:02,673 INFO [org.jboss.messaging.core.server.impl.MessagingServerImpl]  JBoss Messaging Server version 2.0.0.BETA3 (maggot, 104) started </pre>
+<p>You will now need to configure the Axis2 instance used by Synapse (not the sample Axis2 server) to enable JMS support using the above provider. Refer to the Axis2 documentation on setting up JMS for more details (http://ws.apache.org/axis2/1_1/jms-transport.html). You will also need to copy the jbm-core-client.jar, jbm-jms-client.jar, jnp-client.jar(these jars are inside client folder ) and
+    jbm-transports.jar, netty.jar(these jars are from lib folder) jars from JBM into the lib directory to allow Synapse to connect to the JBM JMS provider. This was tested with JBM 2.0.0.BETA3 </p>
+
+<p>You need to add the following configuration for Axis2 transport listener in axis2.xml found at repository/conf/axis2.xml.</p>
+<pre xml:space="preserve">
+&lt;transportReceiver name=&quot;jms&quot; class=&quot;org.apache.axis2.transport.jms.JMSListener&quot;&gt;
+    &lt;parameter name=&quot;java.naming.factory.initial&quot;&gt;org.jnp.interfaces.NamingContextFactory&lt;/parameter&gt;
+    &lt;parameter name=&quot;java.naming.provider.url&quot;&gt;jnp://localhost:1099&lt;/parameter&gt;
+    &lt;parameter name=&quot;java.naming.factory.url.pkgs&quot;&gt;org.jboss.naming:org.jnp.interfaces&lt;/parameter&gt;
+    &lt;parameter name=&quot;transport.jms.ConnectionFactoryJNDIName&quot;&gt;ConnectionFactory&lt;/parameter&gt;
+&lt;/transportReceiver&gt;
+</pre>
+<p>And also uncomment the section for JMS transport sender.</p>
+<p>Once you start the Synapse configuration and request for the WSDL of the proxy service (http://localhost:8280/services/StockQuoteProxy?wsdl) you will notice that its exposed only on the JMS transport. This is because the configuration specified this requirement in the proxy service definition. </p>
+<p>Now lets send a stock quote request on JMS, using the dumb stock quote client as follows: </p>
+<pre xml:space="preserve">ant jmsclient -Djms_type=pox -Djms_dest=StockQuoteProxy -Djms_payload=MSFT -Djava.naming.provider.url=jnp://localhost:1099 -Djava.naming.factory.initial=org.jnp.interfaces.NamingContextFactory -D=java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces</pre>
+<p>On the Synapse debug log you will notice that the JMS listener received the request message as: </p>
+<pre xml:space="preserve">[JMSWorker-1] DEBUG ProxyServiceMessageReceiver -Proxy Service StockQuoteProxy received a new message...</pre>
+<p>Now if you examine the console running the sample Axis2 server, you will see a message indicating that the server has accepted an order as follows: </p>
+<pre xml:space="preserve">Accepted order for : 16517 stocks of MSFT at $ 169.14622538721846</pre>
+<p>In this sample, the client sends the request message to the proxy service exposed over JMS in Synsape. Synapse forwards this message to the HTTP EPR of the simple stock quote service hosted on the sample Axis2 server.
+Note that the operation is out-only and no response is sent back to the client. The transport.jms.ContentType property
+is necessary to allow the JMS transport to determine the content type of incoming messages. With the given configuration
+it will first try to read the content type from the 'contentType' message property and fall back to 'application/xml'
+(i.e. POX) if this property is not set. Note that the JMS client used in this example doesn't send any content type information.</p>
+<p>Note: It is possible to instruct a JMS proxy service to listen to an already existing destination without creating a new one. To do this, use the parameter elements on the proxy service definition to specify the destination and connection factory etc. </p>
+<p>e.g. </p>
+<pre xml:space="preserve">&lt;parameter name=&quot;transport.jms.Destination&quot;&gt;dynamicTopics/something.TestTopic&lt;/parameter&gt;</pre>
+
+
+
 <h1>
 <a name="Task" id="Task">Introduction to Synapse Tasks</a> </h1>
 <h2>

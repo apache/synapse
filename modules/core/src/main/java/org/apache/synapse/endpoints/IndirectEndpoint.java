@@ -110,7 +110,7 @@ public class IndirectEndpoint extends AbstractEndpoint {
 
     @Override
     public String toString() {
-        return "[Indirect Endpoint [ " + key + "]]";
+        return "Indirect Endpoint [" + key + "]";
     }
 
     /**

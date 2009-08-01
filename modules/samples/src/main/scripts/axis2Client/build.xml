@@ -37,6 +37,7 @@
             [-Dprxurl=http://localhost:8280]
             [-Drest=true]
             [-Dwsrm=true]
+            [-Dwsrm11=true]
             [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
 
         Mode :
@@ -126,6 +127,7 @@
     <property name="policy" value=""/>
     <property name="rest" value=""/>
     <property name="wsrm" value=""/>
+    <property name="wsrm11" value=""/>
     <property name="itr" value=""/>
     <property name="jms_dest" value=""/>
     <property name="jms_type" value=""/>
@@ -170,6 +172,7 @@
             <sysproperty key="policy" value="${policy}"/>
             <sysproperty key="rest" value="${rest}"/>
             <sysproperty key="wsrm" value="${wsrm}"/>
+            <sysproperty key="wsrm11" value="${wsrm11}"/>
             <sysproperty key="itr" value="${itr}"/>
             <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>

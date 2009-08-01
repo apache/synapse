@@ -28,6 +28,7 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
@@ -44,6 +45,9 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.util.MessageHelper;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.Sandesha2Constants;
 
 import javax.xml.namespace.QName;
 
@@ -340,7 +344,18 @@ public class Axis2FlexibleMEPClient {
         originalInMsgCtx.getOperationContext().setProperty(
             org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
 
-        mepClient.execute(true);        
+        mepClient.execute(true);
+        if (wsRMEnabled) {
+            Object rm11 = clientOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+            if ( (rm11 != null) && rm11.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){
+                ServiceClient serviceClient = new ServiceClient(
+                        axisOutMsgCtx.getConfigurationContext(), axisOutMsgCtx.getAxisService());
+                serviceClient.setTargetEPR(new EndpointReference(endpoint.getAddress()));
+                serviceClient.setOptions(clientOptions);
+                serviceClient.getOptions().setTo(new EndpointReference(endpoint.getAddress()));
+                SandeshaClient.terminateSequence(serviceClient);
+            }
+        }
    }
 
     private static MessageContext cloneForSend(MessageContext ori, String preserveAddressing)

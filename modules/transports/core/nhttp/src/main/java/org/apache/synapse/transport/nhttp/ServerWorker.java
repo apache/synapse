@@ -258,9 +258,9 @@ public class ServerWorker implements Runnable {
         // is received to synapse. Otherwise we will not be able to support the single channel
         // invocation within the actual service and synapse for a dual channel request from the
         // client. This condition is a bit complex but cannot simplify any further.
-        if (msgContext != null &&
-            msgContext.getOperationContext() != null &&
-            !msgContext.getOperationContext().getAxisOperation().isControlOperation()) {
+        if (msgContext != null && msgContext.getOperationContext() != null &&
+                (!msgContext.getOperationContext().getAxisOperation().isControlOperation() ||
+                        msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED))) {
 
             String respWritten = (String)
                 msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);

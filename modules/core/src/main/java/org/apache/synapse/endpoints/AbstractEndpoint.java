@@ -158,9 +158,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
         if (children != null) {
             for (Endpoint e : children) {
-                if (e instanceof ManagedLifecycle) {
-                    ((ManagedLifecycle) e).init(synapseEnvironment);
-                }
+                e.init(synapseEnvironment);
             }
         }
     }
@@ -241,8 +239,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
             } else {
                 if (definition.getTimeoutErrorCodes().contains(errorCode)) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Encountered a mark for suspension error : " + errorCode + " defined " +
-                            "error codes are : " + definition.getTimeoutErrorCodes());    
+                        log.debug("Encountered a mark for suspension error : " + errorCode
+                                + " defined " + "error codes are : "
+                                + definition.getTimeoutErrorCodes());    
                     }
                     return true;
                 }
@@ -250,8 +249,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Encountered a non-timeout error sending to endpoint : " + endpointName +
-                " error code : " + errorCode);
+            log.debug("Encountered a non-timeout error sending to " + this.toString() +
+                ", error code : " + errorCode);
         }
         return false;
     }
@@ -267,7 +266,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
             if (definition.getSuspendErrorCodes().isEmpty()) {
                 // if suspend codes are not defined, any error will be fatal for the endpoint
                 if (log.isDebugEnabled()) {
-                    log.debug("Endpoint : " + endpointName + " encountered a fatal error : " + errorCode);
+                    log.debug(this.toString() + " encountered a fatal error : " + errorCode);
                 }
                 return true;
 
@@ -283,8 +282,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Encountered a non-fatal error sending to endpoint : " + endpointName +
-                " error code : " + errorCode + " Error will be handled, but endpoint will not fail");
+            log.debug("Encountered a non-fatal error sending to " + this.toString()
+                    + ", error code : " + errorCode
+                    + ". Error will be handled, but endpoint will not fail");
         }
         return false;
     }
@@ -380,9 +380,10 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     protected void logOnChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         if (log.isDebugEnabled()) {
-            log.debug(this + " Detect a Failure in a child endpoint : " + endpoint);
-            log.debug(this + " Retry Attempt for Request with [Message ID : " + synMessageContext.getMessageID()
-                    + "], [To : " + synMessageContext.getTo() + "]");
+            log.debug(this.toString() + " detected a failure in a child endpoint : " + endpoint);
+            log.debug(this.toString() + " retrying request [[Message ID : "
+                    + synMessageContext.getMessageID() + "], [To : "
+                    + synMessageContext.getTo() + "]]");
         }
     }
 

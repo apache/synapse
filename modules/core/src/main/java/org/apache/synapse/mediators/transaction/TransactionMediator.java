@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.transaction;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.transaction.TransactionConfiguration;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
@@ -159,15 +160,21 @@ public class TransactionMediator extends AbstractMediator {
     private TransactionManager getTransactionManager(MessageContext synCtx) {
 
         TransactionManager transactionManager = null;
-        try {
-            transactionManager = synCtx.getConfiguration().getAxisConfiguration()
-                    .getTransactionConfiguration().getTransactionManager();
+
+        try {    
+            TransactionConfiguration transactionConfiguration = synCtx.getConfiguration()
+                    .getAxisConfiguration().getTransactionConfiguration();
+
+            if (transactionConfiguration != null) {
+                transactionManager = transactionConfiguration.getTransactionManager();
+            } else {
+                handleException("TransactionConfiguration has not been found. " +
+                        "Please check the axis2.xml and uncomment/enable the " +
+                        "transaction configuration.", synCtx);
+            }
+            
         } catch (AxisFault ex) {
             handleException("Unable to get Transaction Manager", ex, synCtx);
-        }
-
-        if (transactionManager == null) {
-            handleException("Unable to get Transaction Manager", synCtx);
         }
 
         return transactionManager;

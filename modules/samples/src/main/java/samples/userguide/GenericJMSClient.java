@@ -19,20 +19,13 @@
 
 package samples.userguide;
 
-import javax.jms.BytesMessage;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.TextMessage;
+import javax.jms.*;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.util.Properties;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class GenericJMSClient {
     private QueueConnection connection;
@@ -84,7 +77,12 @@ public class GenericJMSClient {
     }
 
     private void connect(String destName) throws Exception {
+
         Properties env = new Properties();
+        String factoryURL = System.getProperty("java.naming.factory.url.pkgs");
+        String connectionFactoryName
+                = getProperty("transport.jms.ConnectionFactoryJNDIName", "ConnectionFactory");
+
         if (System.getProperty("java.naming.provider.url") == null) {
             env.put("java.naming.provider.url", "tcp://localhost:61616");
         }
@@ -92,6 +90,13 @@ public class GenericJMSClient {
             env.put("java.naming.factory.initial",
                 "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         }
+        if (connectionFactoryName != null) {
+            env.put("transport.jms.ConnectionFactoryJNDIName", connectionFactoryName);
+        }
+        if (factoryURL != null) {
+            env.put("java.naming.factory.url.pkgs", factoryURL);
+        }
+        
         InitialContext ic = new InitialContext(env);
         QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
         connection = confac.createQueueConnection();

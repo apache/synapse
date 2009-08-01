@@ -1189,8 +1189,8 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
         (instead of the default 1.1)
       </li>
       <li>
-        POST_TO_PATH - forces outgoing http/s messages to use the PATH segment in a POST
-        (instead of the default full URL)
+        POST_TO_URI - forces outgoing http/s messages to use the full URI
+          in a POST (instead of the default PATH)
       </li>
     </ul>
     <h5>

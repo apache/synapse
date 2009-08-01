@@ -61,7 +61,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
     public void send(MessageContext synCtx) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Load-balance Endpoint :  " + getName());
+            log.debug("Sending using Load-balance " + toString());
         }
 
         Endpoint endpoint = getNextChild(synCtx); 
@@ -85,8 +85,8 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
 
         } else {
             // if this is not a retry
-            informFailure(synCtx, SynapseConstants.ENDPOINT_LB_NONE_READY, "Loadbalance endpoint : " +
-                    getName() + " - no ready child endpoints");
+            informFailure(synCtx, SynapseConstants.ENDPOINT_LB_NONE_READY,
+                    "Load-balance " + this.toString() + " - no child endpoints at ready state");
         }
     }
 
@@ -102,13 +102,15 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
         for (Endpoint endpoint : getChildren()) {
             if (endpoint.readyToSend()) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Endpoint : " + getName() + " has at least one ready endpoint");
+                    log.debug("Load-balance " + this.toString()
+                            + " has at least one endpoint at ready state");
                 }
                 return true;
             }
         }
 
-        log.warn("Endpoint : " + getName() + " has no ready endpoints to process message");
+        log.warn("Load-balance " + this.toString()
+                + " has no endpoints at ready state to process message");
 
         return false;
     }
@@ -146,7 +148,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
 
     public void setAlgorithm(LoadbalanceAlgorithm algorithm) {
         if (log.isDebugEnabled()) {
-            log.debug("Endpoint : " + getName() + " will be using the "
+            log.debug("Load-balance " + this.toString() + " will be using the algorithm "
                 + algorithm.getName() + " for load distribution");
         }
         this.algorithm = algorithm;

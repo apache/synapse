@@ -34,6 +34,8 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.synapse.util.UUIDGenerator;
 import samples.common.StockQuoteHandler;
 
@@ -114,6 +116,7 @@ public class StockQuoteClient {
         String svcPolicy = getProperty("policy", null);
         String rest = getProperty("rest", null);
         String wsrm = getProperty("wsrm", null);
+        String wsrm11 = getProperty("wsrm11", null);
         String itr = getProperty("itr", "1");
         int iterations = 1;
         boolean infinite = false;
@@ -207,12 +210,14 @@ public class StockQuoteClient {
             System.out.println("Sending as REST");
             options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
         }
-        if (Boolean.parseBoolean(wsrm)) {
+        if (Boolean.parseBoolean(wsrm) || Boolean.parseBoolean(wsrm11)) {
             System.out.println("Using WS-RM");
             serviceClient.engageModule("sandesha2");
+            if (Boolean.parseBoolean(wsrm11)){
+               options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, Sandesha2Constants.SPEC_VERSIONS.v1_1);
+            }
             options.setProperty(SandeshaClientConstants.LAST_MESSAGE, Constants.VALUE_TRUE);
-            options.setProperty(
-                    SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
+            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
         }
 
         if ("soap12".equals(soapVer)) {
@@ -239,8 +244,11 @@ public class StockQuoteClient {
                 InnerStruct.RESULT = serviceClient.sendReceive(payload);
                 i++;
                 printResult();
-                if (Boolean.parseBoolean(wsrm)) {
+                if (Boolean.parseBoolean(wsrm) || Boolean.parseBoolean(wsrm11)) {
                     // give some time for RM to terminate normally
+                    if (Boolean.parseBoolean(wsrm11)){
+                        SandeshaClient.terminateSequence(serviceClient);
+                    }
                     Thread.sleep(5000);
                     if (configContext != null) {
                         configContext.getListenerManager().stop();

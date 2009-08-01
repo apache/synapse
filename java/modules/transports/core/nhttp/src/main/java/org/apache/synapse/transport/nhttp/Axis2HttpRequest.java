@@ -21,8 +21,6 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.description.WSDL2Constants;
-import org.apache.axis2.description.WSDL20DefaultValueHolder;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
@@ -155,8 +153,8 @@ public class Axis2HttpRequest {
 
             httpRequest = new BasicHttpEntityEnclosingRequest(
                 httpMethod,
-                msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH) ?
-                    new URL(epr.getAddress()).getPath() : epr.getAddress(),
+                msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
+                    epr.getAddress() : new URL(epr.getAddress()).getPath(),
                 msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
                     HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
 
@@ -199,8 +197,8 @@ public class Axis2HttpRequest {
 
             httpRequest = new BasicHttpRequest(
                 httpMethod,
-                msgContext.isPropertyTrue(NhttpConstants.POST_TO_PATH) ?
-                    new URL(epr.getAddress()).getPath() : epr.getAddress(),
+                msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
+                    epr.getAddress() : new URL(epr.getAddress()).getPath(),
                 msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
                     HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
         }

@@ -31,7 +31,7 @@ public class NhttpConstants {
     public static final String HTTP_SC = "HTTP_SC";
     public static final String FORCE_HTTP_1_0 = "FORCE_HTTP_1.0";
     public static final String DISABLE_CHUNKING = "DISABLE_CHUNKING";
-    public static final String POST_TO_PATH = "POST_TO_PATH";
+    public static final String POST_TO_URI = "POST_TO_URI";
     public static final String NO_KEEPALIVE = "NO_KEEPALIVE";
     public static final String DISABLE_KEEPALIVE = "http.connection.disable.keepalive";
     public static final String IGNORE_SC_ACCEPTED = "IGNORE_SC_ACCEPTED";

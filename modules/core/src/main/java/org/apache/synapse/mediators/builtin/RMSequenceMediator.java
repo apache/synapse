@@ -75,14 +75,11 @@ public class RMSequenceMediator extends AbstractMediator {
             orgMessageCtx.getOptions().setProperty(
                 SandeshaClientConstants.RM_SPEC_VERSION, version);
 
+            // always we need to start a new sequence if there is an terminated sequence
+            orgMessageCtx.getOptions().setProperty(
+                        SandeshaClientConstants.AUTO_START_NEW_SEQUENCE, "true");
+
             if (isSingle()) {
-//                String sequenceID = UUIDGenerator.getUUID();
-//                String offeredSeqID = UUIDGenerator.getUUID();
-//
-//                orgMessageCtx.getOptions().setProperty(
-//                    SynapseConstants.MERCURY_SEQUENCE_KEY, sequenceID);
-//                orgMessageCtx.getOptions().setProperty(
-//                    MercuryClientConstants.SEQUENCE_OFFER, offeredSeqID);
                 orgMessageCtx.getOptions().setProperty(
                     SandeshaClientConstants.LAST_MESSAGE, "true");
 

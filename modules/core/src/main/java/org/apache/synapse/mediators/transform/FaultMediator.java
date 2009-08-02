@@ -242,7 +242,7 @@ public class FaultMediator extends AbstractMediator {
 
         // create the fault element  if it is need
         SOAPFault fault = faultEnvelope.getBody().getFault();
-        if(fault == null){
+        if (fault == null) {
             fault = factory.createSOAPFault();
         }
 
@@ -319,7 +319,7 @@ public class FaultMediator extends AbstractMediator {
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
-        switch(soapVersion){
+        switch(soapVersion) {
             case SOAP11:
                 code.setText(fault_code);
                 break;
@@ -343,7 +343,7 @@ public class FaultMediator extends AbstractMediator {
         }
 
         SOAPFaultReason reason = factory.createSOAPFaultReason();
-        switch(soapVersion){
+        switch(soapVersion) {
             case SOAP11:
                 reason.setText(reasonString);
                 break;

@@ -64,7 +64,20 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            *;resolution:=optional
+                            !org.apache.commons.io,
+                            org.apache.commons.io; version=0.0.0,
+                            javax.script,
+                            net.sf.saxon.javax.xml.xquery,
+                            net.sf.saxon.xqj,
+                            org.apache.axis2.clustering.context,
+                            org.apache.axis2.transport.http.util,
+                            org.apache.bsf.xml,
+                            org.springframework.beans.factory.support,
+                            org.springframework.beans.factory.xml,
+                            org.springframework.context,
+                            org.springframework.context.support,
+                            org.springframework.core.io,
+                            org.wso2.throttle,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Fragment-Host>org.apache.synapse.synapse-core</Fragment-Host>

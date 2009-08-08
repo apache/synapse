@@ -41,10 +41,6 @@ public class VFSTransportTest extends TestCase {
         // TODO: the VFS listener doesn't like reuseResources == true...
         ManagedTestSuite suite = new ManagedTestSuite(VFSTransportTest.class, false);
         
-        // The VFS sender doesn't create files atomically. This can cause the
-        // listener to start reading files that are not completely written yet.
-        suite.addExclude("(&(client=axis)(endpoint=axis))");
-        
         // Since VFS has no Content-Type header, SwA is not supported.
         suite.addExclude("(test=AsyncSwA)");
         

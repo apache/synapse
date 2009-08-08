@@ -194,17 +194,26 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 if (children == null || children.length == 0) {
 
                     if (fileObject.getType() == FileType.FILE) {
-                        try {
-                            processFile(entry, fileObject);
-                            entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
-                            metrics.incrementMessagesReceived();
-                            
-                        } catch (AxisFault e) {
-                            entry.setLastPollState(PollTableEntry.FAILED);
-                            metrics.incrementFaultsReceiving();
-                        }
+                        if (VFSUtils.acquireLock(fsManager, fileObject)) {
+                            try {
+                                processFile(entry, fileObject);
+                                entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+                                metrics.incrementMessagesReceived();
 
-                        moveOrDeleteAfterProcessing(entry, fileObject);
+                            } catch (AxisFault e) {
+                                VFSUtils.releaseLock(fsManager, fileObject);
+                                logException("Error processing File URI : "
+                                        + fileObject.getName(), e);
+                                entry.setLastPollState(PollTableEntry.FAILED);
+                                metrics.incrementFaultsReceiving();
+                            }
+
+                            moveOrDeleteAfterProcessing(entry, fileObject);
+                            VFSUtils.releaseLock(fsManager, fileObject);
+                        } else {
+                            log.debug("Couldn't get the lock for processing the file : "
+                                    + fileObject.getName());
+                        }
                     }
 
                 } else {
@@ -212,14 +221,15 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     int successCount = 0;
 
                     if (log.isDebugEnabled()) {
-                        log.debug("File name pattern :" + entry.getFileNamePattern());
+                        log.debug("File name pattern : " + entry.getFileNamePattern());
                     }
                     for (FileObject child : children) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Matching file :" + child.getName().getBaseName());
+                            log.debug("Matching file : " + child.getName().getBaseName());
                         }
-                        if ((entry.getFileNamePattern() != null)
-                                && (child.getName().getBaseName().matches(entry.getFileNamePattern()))) {
+                        if ((entry.getFileNamePattern() != null) && (
+                                child.getName().getBaseName().matches(entry.getFileNamePattern()))
+                                && VFSUtils.acquireLock(fsManager, child)) {
                             try {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Processing file :" + child);
@@ -231,6 +241,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                 metrics.incrementMessagesReceived();
 
                             } catch (Exception e) {
+                                VFSUtils.releaseLock(fsManager, child);
                                 logException("Error processing File URI : " + child.getName(), e);
                                 failCount++;
                                 // tell moveOrDeleteAfterProcessing() file failed
@@ -239,7 +250,12 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                             }
 
                             moveOrDeleteAfterProcessing(entry, child);
+                            VFSUtils.releaseLock(fsManager, child);
+                        } else {
+                            log.debug("Couldn't get the lock for processing the file : "
+                                    + child.getName());
                         }
+
                     }
 
                     if (failCount == 0 && successCount > 0) {
@@ -265,7 +281,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
         } catch (FileSystemException e) {
             processFailure("Error checking for existence and readability : " + fileURI, e, entry);
         }
-
     }
 
     /**

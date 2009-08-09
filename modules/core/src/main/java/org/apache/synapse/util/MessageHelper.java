@@ -91,7 +91,8 @@ public class MessageHelper {
         }
 
         if (log.isDebugEnabled()) {
-            log.info("Parent's Fault Stack : " + faultStack + " : Child's Fault Stack :" + newCtx.getFaultStack());
+            log.info("Parent's Fault Stack : " + faultStack
+                    + " : Child's Fault Stack :" + newCtx.getFaultStack());
         }
         
         return newCtx;
@@ -141,9 +142,9 @@ public class MessageHelper {
 
     public static Map getClonedTransportHeaders(org.apache.axis2.context.MessageContext msgCtx) {
         
-        Map headers = (Map) msgCtx.
-            getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        Map clonedHeaders = new HashMap();
+        Map headers = (Map) msgCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        Map<String, Object> clonedHeaders = new HashMap<String, Object>();
 
         if (headers != null && headers.isEmpty()) {
             for (Object o : headers.keySet()) {

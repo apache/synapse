@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.base.AbstractTransportSender;
@@ -40,7 +41,9 @@ import java.io.IOException;
 
 /**
  * axis2.xml - transport definition
- *  <transportSender name="file" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
+ *  <transportSender name="file" class="org.apache.synapse.transport.vfs.VFSTransportSender">
+ *      <parameter name="transport.vfs.Locking">enable|disable</parameter> ?
+ *  </transportSender>
  */
 public class VFSTransportSender extends AbstractTransportSender implements ManagementSupport {
 
@@ -48,6 +51,14 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
 
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
+
+    /**
+     * By default file locking in VFS transport is turned on at a global level
+     *
+     * NOTE: DO NOT USE THIS FLAG, USE PollTableEntry#isFileLockingEnabled() TO CHECK WHETHR
+     * FILE LOCKING IS ENABLED
+     */
+    private boolean globalFileLockingFlag = true;
 
     /**
      * The public constructor
@@ -71,6 +82,14 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
             fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));
             fsm.init();
             fsManager = fsm;
+            Parameter lckFlagParam = transportOut.getParameter(VFSConstants.TRANSPORT_FILE_LOCKING);
+            if (lckFlagParam != null) {
+                String strLockingFlag = lckFlagParam.getValue().toString();
+                // by-default enabled, if explicitly specified as "disable" make it disable
+                if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strLockingFlag)) {
+                    globalFileLockingFlag = false;
+                }
+            }
         } catch (FileSystemException e) {
             handleException("Error initializing the file transport : " + e.getMessage(), e);
         }
@@ -93,7 +112,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
         VFSOutTransportInfo vfsOutInfo = null;
 
         if (targetAddress != null) {
-            vfsOutInfo = new VFSOutTransportInfo(targetAddress);
+            vfsOutInfo = new VFSOutTransportInfo(targetAddress, globalFileLockingFlag);
         } else if (outTransportInfo != null && outTransportInfo instanceof VFSOutTransportInfo) {
             vfsOutInfo = (VFSOutTransportInfo) outTransportInfo;
         }
@@ -144,28 +163,49 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         FileObject responseFile = fsManager.resolveFile(replyFile,
                                 VFSUtils.getFileName(msgCtx, vfsOutInfo));
 
-                        acquireLockForSending(responseFile, vfsOutInfo);
-                        if (!responseFile.exists()) {
-                            responseFile.createFile();
+                        // if file locking is not disabled acquire the lock
+                        // before uploading the file
+                        if (vfsOutInfo.isFileLockingEnabled()) {
+                            acquireLockForSending(responseFile, vfsOutInfo);
+                            if (!responseFile.exists()) {
+                                responseFile.createFile();
+                            }
+                            populateResponseFile(responseFile, msgCtx,append, true);
+                            VFSUtils.releaseLock(fsManager, responseFile);
+                        } else {
+                            if (!responseFile.exists()) {
+                                responseFile.createFile();
+                            }
+                            populateResponseFile(responseFile, msgCtx,append, false);
                         }
-                        populateResponseFile(responseFile, msgCtx, append);
-                        VFSUtils.releaseLock(fsManager, responseFile);
 
                     } else if (replyFile.getType() == FileType.FILE) {
-                        
-                        acquireLockForSending(replyFile, vfsOutInfo);
-                        populateResponseFile(replyFile, msgCtx, append);
-                        VFSUtils.releaseLock(fsManager, replyFile);
-                        
+
+                        // if file locking is not disabled acquire the lock
+                        // before uploading the file
+                        if (vfsOutInfo.isFileLockingEnabled()) {
+                            acquireLockForSending(replyFile, vfsOutInfo);
+                            populateResponseFile(replyFile, msgCtx, append, true);
+                            VFSUtils.releaseLock(fsManager, replyFile);
+                        } else {
+                            populateResponseFile(replyFile, msgCtx, append, false);
+                        }
+
                     } else {
                         handleException("Unsupported reply file type : " + replyFile.getType() +
                                 " for file : " + vfsOutInfo.getOutFileURI());
                     }
                 } else {
-                    acquireLockForSending(replyFile, vfsOutInfo);
-                    replyFile.createFile();
-                    populateResponseFile(replyFile, msgCtx, append);
-                    VFSUtils.releaseLock(fsManager, replyFile);
+                    // if file locking is not disabled acquire the lock before uploading the file
+                    if (vfsOutInfo.isFileLockingEnabled()) {
+                        acquireLockForSending(replyFile, vfsOutInfo);
+                        replyFile.createFile();
+                        populateResponseFile(replyFile, msgCtx, append, true);
+                        VFSUtils.releaseLock(fsManager, replyFile);
+                    } else {
+                        replyFile.createFile();
+                        populateResponseFile(replyFile, msgCtx, append, false);
+                    }
                 }
             } catch (FileSystemException e) {
                 handleException("Error resolving reply file : " +
@@ -183,7 +223,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     }
 
     private void populateResponseFile(FileObject responseFile, MessageContext msgContext,
-                                      boolean append) throws AxisFault {
+                                      boolean append, boolean lockingEnabled) throws AxisFault {
         
         MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
@@ -202,11 +242,15 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
             metrics.incrementBytesSent(msgContext, os.getByteCount());
             
         } catch (FileSystemException e) {
-            VFSUtils.releaseLock(fsManager, responseFile);
+            if (lockingEnabled) {
+                VFSUtils.releaseLock(fsManager, responseFile);
+            }
             metrics.incrementFaultsSending();
             handleException("IO Error while creating response file : " + responseFile.getName(), e);
         } catch (IOException e) {
-            VFSUtils.releaseLock(fsManager, responseFile);
+            if (lockingEnabled) {
+                VFSUtils.releaseLock(fsManager, responseFile);
+            }
             metrics.incrementFaultsSending();
             handleException("IO Error while creating response file : " + responseFile.getName(), e);
         }

@@ -24,11 +24,13 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.MessageHelper;
 
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 
@@ -165,11 +167,13 @@ public class SOAPUtils {
                         SOAPFaultCode newSOAPFaultCode = soap12Factory.createSOAPFaultCode();
                         newSOAPFault.setCode(newSOAPFaultCode);
 
-                        String value = code.getText();
-                        if(value != null) {
+                        QName s11Code = code.getTextAsQName();
+                        if (s11Code != null) {
+                            // get the corresponding SOAP12 fault code
+                            // for the provided SOAP11 fault code
                             SOAPFaultValue newSOAPFaultValue
                                     = soap12Factory.createSOAPFaultValue(newSOAPFaultCode);
-                            newSOAPFaultValue.setText(value);
+                            newSOAPFaultValue.setText(getMappingSOAP12Code(s11Code));
                         }
 
                     }
@@ -245,12 +249,12 @@ public class SOAPUtils {
 
                     while(allAttributes.hasNext()) {
                         OMAttribute attr = (OMAttribute) allAttributes.next();
-                        if(attr.getNamespace() != null
+                        if (attr.getNamespace() != null
                             && SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
                             attr.getNamespace().getNamespaceURI())) {
                             String attrName = attr.getLocalName();
 
-                            if(SOAP_ATR_ROLE.equals(attrName)) {
+                            if (SOAP_ATR_ROLE.equals(attrName)) {
                                 OMAttribute newAtr = omNode.getOMFactory().createOMAttribute(
                                     SOAP_ATR_ACTOR, newEnvelope.getNamespace(),
                                     attr.getAttributeValue());
@@ -275,63 +279,131 @@ public class SOAPUtils {
                         }
 
                         newEnvelope.getHeader().addChild(newSOAPHeader);
-                    } // while(allAttributes.hasNext())
+                    }
 
                 } else {
                     newEnvelope.getHeader().addChild(omNode);
-                } // if (omNode instanceof SOAPHeaderBlock)
-
-            } // while (itr.hasNext())
-
-        } // if (clonedOldEnv.getHeader() != null)
+                }
+            }
+        }
 
         if (clonedOldEnv.getBody() != null) {
-            Iterator itr = clonedOldEnv.getBody().getChildren();
-            while (itr.hasNext()) {
-                OMNode omNode = (OMNode) itr.next();
+            if (clonedOldEnv.hasFault()) {
+                SOAPFault soapFault = clonedOldEnv.getBody().getFault();
+                SOAPFault newSOAPFault = soap11Factory.createSOAPFault();
+                newEnvelope.getBody().addChild(newSOAPFault);
 
-                if (omNode != null && omNode instanceof SOAPFault) {
+                SOAPFaultCode code = soapFault.getCode();
+                if(code != null) {
+                    SOAPFaultCode newSOAPFaultCode
+                            = soap11Factory.createSOAPFaultCode(newSOAPFault);
 
-                    SOAPFault soapFault = (SOAPFault) omNode;
-                    SOAPFault newSOAPFault = soap11Factory.createSOAPFault();
-                    newEnvelope.getBody().addChild(newSOAPFault);
-
-                    SOAPFaultCode code = soapFault.getCode();
-                    if(code != null) {
-                        SOAPFaultCode newSOAPFaultCode
-                                = soap11Factory.createSOAPFaultCode(newSOAPFault);
-
-                        SOAPFaultValue value = code.getValue();
-                        if(value != null) {
-                            soap11Factory.createSOAPFaultValue(newSOAPFaultCode);
-                            if(value.getText() != null) {
-                                newSOAPFaultCode.setText(value.getText());
-                            }
+                    SOAPFaultValue value = code.getValue();
+                    if(value != null) {
+                        // get the corresponding SOAP12 fault code
+                        // for the provided SOAP11 fault code
+                        soap11Factory.createSOAPFaultValue(newSOAPFaultCode);
+                        if(value.getTextAsQName() != null) {
+                            newSOAPFaultCode.setText(
+                                    getMappingSOAP11Code(value.getTextAsQName()));
                         }
                     }
+                }
 
-                    SOAPFaultReason reason = soapFault.getReason();
-                    if(reason != null) {
-                        SOAPFaultReason newSOAPFaultReason
-                                = soap11Factory.createSOAPFaultReason(newSOAPFault);
+                SOAPFaultReason reason = soapFault.getReason();
+                if(reason != null) {
+                    SOAPFaultReason newSOAPFaultReason
+                            = soap11Factory.createSOAPFaultReason(newSOAPFault);
 
-                        List allSoapTexts = reason.getAllSoapTexts();
-                        Iterator iterAllSoapTexts = allSoapTexts.iterator();
-                        if (iterAllSoapTexts.hasNext()) {
-                            SOAPFaultText soapFaultText = (SOAPFaultText) iterAllSoapTexts.next();
-                            newSOAPFaultReason.setText(soapFaultText.getText());
-                        }
+                    List allSoapTexts = reason.getAllSoapTexts();
+                    Iterator iterAllSoapTexts = allSoapTexts.iterator();
+                    if (iterAllSoapTexts.hasNext()) {
+                        SOAPFaultText soapFaultText = (SOAPFaultText) iterAllSoapTexts.next();
+                        newSOAPFaultReason.setText(soapFaultText.getText());
                     }
+                }
+            } else {
+                Iterator itr = clonedOldEnv.getBody().getChildren();
+                while (itr.hasNext()) {
+                    OMNode omNode = (OMNode) itr.next();
+                    if (omNode != null) {
+                        newEnvelope.getBody().addChild(omNode);
+                    }
+                }
+            }
 
-                } else {
-                    newEnvelope.getBody().addChild(omNode);
-                } // if (omNode instanceof SOAPFault)
-
-            } // while (itr.hasNext())
-
-        } // if (clonedOldEnv.getBody() != null)
+        }
         
         axisOutMsgCtx.setEnvelope(newEnvelope);
     }
 
+    /**********************************************************************
+     *                     Fault code conversions                         *
+     **********************************************************************/
+
+    private static final QName S11_FAULTCODE_VERSIONMISMATCH = new QName(
+            SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI, "VersionMismatch",
+            SOAP11Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+    private static final QName S12_FAULTCODE_VERSIONMISMATCH = new QName(
+            SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI, "VersionMismatch",
+            SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+
+    private static final QName S11_FAULTCODE_MUSTUNDERSTAND = new QName(
+            SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI, "MustUnderstand",
+            SOAP11Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+    private static final QName S12_FAULTCODE_MUSTUNDERSTAND = new QName(
+            SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI, "MustUnderstand",
+            SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+
+    private static final QName S11_FAULTCODE_CLIENT = new QName(
+            SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI, "Client",
+            SOAP11Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+    private static final QName S12_FAULTCODE_SENDER = new QName(
+            SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI, "Sender",
+            SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+
+    private static final QName S11_FAULTCODE_SERVER = new QName(
+            SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI, "Server",
+            SOAP11Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+    private static final QName S12_FAULTCODE_RECEIVER = new QName(
+            SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI, "Receiver",
+            SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+
+    private static final QName S12_FAULTCODE_DATAENCODINGUNKNOWN = new QName(
+            SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI, "DataEncodingUnknown",
+            SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX);
+
+    private static QName getMappingSOAP12Code(QName soap11Code) {
+        if (S11_FAULTCODE_VERSIONMISMATCH.equals(soap11Code)) {
+            return S12_FAULTCODE_VERSIONMISMATCH;
+        } else if (S11_FAULTCODE_MUSTUNDERSTAND.equals(soap11Code)) {
+            return S12_FAULTCODE_MUSTUNDERSTAND;
+        } else if (S11_FAULTCODE_CLIENT.equals(soap11Code)) {
+            return S12_FAULTCODE_SENDER;
+        } else if (S11_FAULTCODE_SERVER.equals(soap11Code)) {
+            return S12_FAULTCODE_RECEIVER;
+        } else {
+            log.warn("An unidentified SOAP11 FaultCode encountered, returning a blank QName");
+            return new QName("", "");
+        }
+    }
+
+    private static QName getMappingSOAP11Code(QName soap12Code) {
+        if (S12_FAULTCODE_VERSIONMISMATCH.equals(soap12Code)) {
+            return S11_FAULTCODE_VERSIONMISMATCH;
+        } else if (S12_FAULTCODE_MUSTUNDERSTAND.equals(soap12Code)) {
+            return S11_FAULTCODE_MUSTUNDERSTAND;
+        } else if (S12_FAULTCODE_SENDER.equals(soap12Code)) {
+            return S11_FAULTCODE_SERVER;
+        } else if (S12_FAULTCODE_RECEIVER.equals(soap12Code)) {
+            return S11_FAULTCODE_SERVER;
+        } else if (S12_FAULTCODE_DATAENCODINGUNKNOWN.equals(soap12Code)) {
+            log.debug("There is no matching SOAP11 code value for SOAP12 fault code " +
+                    "DataEncodingUnknown, returning a blank QName");
+            return new QName("");
+        } else {
+            log.warn("An unidentified SOAP11 FaultCode encountered, returning a blank QName");
+            return new QName("");
+        }
+    }
 }

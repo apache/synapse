@@ -292,7 +292,13 @@
   
   [<<<transport.vfs.MoveTimestampFormat>>> (Optional)]
   Timestamp prefix format for processed file name. java.text.SimpleDateFormat compatible string. e.g. yyMMddHHmmss'-'
-  
+
+  [<<<transport.vfs.Locking>>> (Optional)]
+  By-default file locking is turned on in the VFS transport, and this parameter lets you configure
+  the locking behaviour on a per service basis. Possible values are <<<enable>>> or <<<disable>>>,
+  and both these values are important because the locking can be disabled at the global level by
+  specifying that at the receiver level and selectively enable locking only for a set of services.
+
   [<<<transport.vfs.Streaming>>> (Optional)]
   If this parameter is set to <<<true>>>, the transport will attempt to use a
   <<<javax.activation.DataSource>>> (instead of a <<<java.io.InputStream>>>) object to pass
@@ -315,12 +321,15 @@
   
   []
   
-  Note that since the VFS endpoints are configured at the level of the service, there are no
-  transport parameters and the transport listener is enabled in <<<axis2.xml>>> simply as
+  Note that since the VFS endpoints are configured at the level of the service, the only parameter
+  that is available at the listener is the file locking configuration parameter whcih is optional 
+  and the transport listener is enabled in <<<axis2.xml>>> simply as
   follows:
 
 +-------------------------------------+  
-<transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
+<transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener">
+    <parameter name="transport.vfs.Locking">enable | disable</parameter> ?
+</transportReceiver>
 +-------------------------------------+  
 
 * {Transport sender}
@@ -328,10 +337,13 @@
   The VFS transport sender allows to write outgoing messages to local or remote files. As with
   the listener, the transport sender supports any protocol for which there is a VFS provider.
 
-  The sender is enabled be the following directive in <<<axis2.xml>>>:
+  The sender is enabled be the following directive in <<<axis2.xml>>> file locking which is
+  by-default enabled can be configured using the <<<transport.vfs.Locking>>> parameter:
 
 +-------------------------------------+  
-<transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
+<transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender">
+    <parameter name="transport.vfs.Locking">enable | disable</parameter> ?
+</transportSender>
 +-------------------------------------+  
 
   To send a message using the VFS transport, the destination URI must start with <<<vfs:>>>
@@ -358,6 +370,10 @@
 
   []
   
+  The global configuration of the file locking can be overriden by providing the
+  <<<transport.vfs.Locking>>> as a URL parameter with the appropriate value (<<<enable>>>, or
+  <<<disable>>>) on a given endpoint.
+
   It should be noted that by its nature, the VFS transport sender doesn't support synchronous
   responses and should only be invoked using the out-only message exchange pattern.
   In a Synapse mediation, this can be forced using the following mediator:

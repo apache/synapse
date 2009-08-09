@@ -5,10 +5,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -223,13 +220,14 @@ public class MessageHelper {
      * @return cloned SOAPEnvelope from the provided one
      */
     public static SOAPEnvelope cloneSOAPEnvelope(SOAPEnvelope envelope) {
-        SOAPEnvelope newEnvelope;
+        SOAPFactory fac;
         if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI
-            .equals(envelope.getBody().getNamespace().getNamespaceURI())) {
-            newEnvelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+                .equals(envelope.getBody().getNamespace().getNamespaceURI())) {
+            fac = OMAbstractFactory.getSOAP11Factory();
         } else {
-            newEnvelope = OMAbstractFactory.getSOAP12Factory().getDefaultEnvelope();
+            fac = OMAbstractFactory.getSOAP12Factory();
         }
+        SOAPEnvelope newEnvelope = fac.getDefaultEnvelope();
 
         if (envelope.getHeader() != null) {
             Iterator itr = envelope.getHeader().cloneOMElement().getChildren();
@@ -239,9 +237,16 @@ public class MessageHelper {
         }
 
         if (envelope.getBody() != null) {
-            Iterator itr = envelope.getBody().cloneOMElement().getChildren();
-            while (itr.hasNext()) {
-                newEnvelope.getBody().addChild((OMNode) itr.next());
+            // treat the SOAPFault cloning as a special case otherwise a cloning OMElement as the
+            // fault would lead to class cast exceptions if accessed through the getFault method
+            if (envelope.getBody().hasFault()) {
+                SOAPFault fault = envelope.getBody().getFault();
+                newEnvelope.getBody().addFault(cloneSOAPFault(fault));
+            } else {
+                Iterator itr = envelope.getBody().cloneOMElement().getChildren();
+                while (itr.hasNext()) {
+                    newEnvelope.getBody().addChild((OMNode) itr.next());
+                }
             }
         }
 
@@ -345,6 +350,7 @@ public class MessageHelper {
 
     /**
      * Get the Policy object for the given name from the Synapse configuration at runtime
+     * 
      * @param synCtx the current synapse configuration to get to the synapse configuration
      * @param propertyKey the name of the property which holds the Policy required
      * @return the Policy object with the given name, from the configuration
@@ -357,6 +363,75 @@ public class MessageHelper {
             handleException("Cannot locate policy from the property : " + propertyKey);
         }
         return null;
+    }
+
+    /**
+     * Clones the SOAPFault, fault cloning is not the same as cloning the OMElement because if the
+     * Fault is accessed through the SOAPEnvelope.getBody().getFault() method it will lead to a
+     * class cast because the cloned element is just an OMElement but not a Fault.
+     * 
+     * @param fault that needs to be cloned
+     * @return the cloned fault
+     */
+    public static SOAPFault cloneSOAPFault(SOAPFault fault) {
+
+        SOAPFactory fac;
+        int soapVersion;
+        final int SOAP_11 = 1;
+        final int SOAP_12 = 2;
+        if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI
+                .equals(fault.getNamespace().getNamespaceURI())) {
+            fac = OMAbstractFactory.getSOAP11Factory();
+            soapVersion = SOAP_11;
+        } else {
+            fac = OMAbstractFactory.getSOAP12Factory();
+            soapVersion = SOAP_12;
+        }
+        SOAPFault newFault = fac.createSOAPFault();
+
+        SOAPFaultCode code = fac.createSOAPFaultCode();
+        SOAPFaultReason reason = fac.createSOAPFaultReason();
+
+        switch (soapVersion) {
+            case SOAP_11:
+                code.setText(fault.getCode().getTextAsQName());
+                reason.setText(fault.getReason().getText());
+                break;
+            case SOAP_12:
+                SOAPFaultValue value = fac.createSOAPFaultValue(code);
+                value.setText(fault.getCode().getTextAsQName());
+                for (Object obj : fault.getReason().getAllSoapTexts()) {
+                    SOAPFaultText text = fac.createSOAPFaultText();
+                    text.setText(((SOAPFaultText) obj).getText());
+                    reason.addSOAPText(text);
+                }
+                break;
+        }
+
+        newFault.setCode(code);
+        newFault.setReason(reason);
+
+        if (fault.getNode() != null) {
+            SOAPFaultNode soapfaultNode = fac.createSOAPFaultNode();
+            soapfaultNode.setNodeValue(fault.getNode().getNodeValue());
+            newFault.setNode(soapfaultNode);
+        }
+
+        if (fault.getRole() != null) {
+            SOAPFaultRole soapFaultRole = fac.createSOAPFaultRole();
+            soapFaultRole.setRoleValue(fault.getRole().getRoleValue());
+            newFault.setRole(soapFaultRole);
+        }
+
+        if (fault.getDetail() != null) {
+            SOAPFaultDetail soapFaultDetail = fac.createSOAPFaultDetail();
+            for (Iterator itr = fault.getDetail().getAllDetailEntries(); itr.hasNext();) {
+                soapFaultDetail.addDetailEntry(((OMElement) itr.next()).cloneOMElement());
+            }
+            newFault.setDetail(soapFaultDetail);
+        }
+
+        return newFault;
     }
 
     private static void handleException(String msg) {

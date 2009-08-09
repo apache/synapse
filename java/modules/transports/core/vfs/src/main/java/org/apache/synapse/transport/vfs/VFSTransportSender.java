@@ -62,7 +62,9 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
      * @param transportOut the transport-out description
      * @throws AxisFault on error
      */
-    public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
+    public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut)
+            throws AxisFault {
+
         super.init(cfgCtx, transportOut);
         try {
             StandardFileSystemManager fsm = new StandardFileSystemManager();
@@ -78,7 +80,6 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
      * Send the given message over the VFS transport
      *
      * @param msgCtx the axis2 message context
-     * @return the result of the send operation / handler
      * @throws AxisFault on error
      */
     public void sendMessage(MessageContext msgCtx, String targetAddress,
@@ -103,8 +104,8 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 
                 boolean wasError = true;
                 int retryCount = 0;
-                int maxRetryCount = VFSUtils.getMaxRetryCount(vfsOutInfo);
-                long reconnectionTimeout = VFSUtils.getReconnectTimout(vfsOutInfo);
+                int maxRetryCount = vfsOutInfo.getMaxRetryCount();
+                long reconnectionTimeout = vfsOutInfo.getReconnectTimeout();
                 boolean append = vfsOutInfo.isAppend();
                 
                 while (wasError) {
@@ -113,17 +114,18 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         retryCount++;
                         replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
                     
-                        if(replyFile == null) {
+                        if (replyFile == null) {
                             log.error("replyFile is null");
                             throw new FileSystemException("replyFile is null");
                         }
-                    
                         wasError = false;
                                         
-                    } catch(FileSystemException e) {
+                    } catch (FileSystemException e) {
                         log.error("cannot resolve replyFile", e);
-                        if(maxRetryCount <= retryCount)
-                            handleException("cannot resolve replyFile repeatedly: " + e.getMessage(), e);
+                        if(maxRetryCount <= retryCount) {
+                            handleException("cannot resolve replyFile repeatedly: "
+                                    + e.getMessage(), e);
+                        }
                     }
                 
                     if (wasError) {
@@ -180,19 +182,25 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
         }
     }
 
-    private void populateResponseFile(FileObject responseFile, MessageContext msgContext, boolean append) throws AxisFault {
+    private void populateResponseFile(FileObject responseFile, MessageContext msgContext,
+                                      boolean append) throws AxisFault {
+        
         MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
+        
         try {
-            CountingOutputStream os = new CountingOutputStream(responseFile.getContent().getOutputStream(append));
+            CountingOutputStream os = new CountingOutputStream(
+                    responseFile.getContent().getOutputStream(append));
             try {
                 messageFormatter.writeTo(msgContext, format, os, true);
             } finally {
                 os.close();
             }
+            
             // update metrics
             metrics.incrementMessagesSent(msgContext);
             metrics.incrementBytesSent(msgContext, os.getByteCount());
+            
         } catch (FileSystemException e) {
             VFSUtils.releaseLock(fsManager, responseFile);
             metrics.incrementFaultsSending();
@@ -206,6 +214,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
 
     private void acquireLockForSending(FileObject responseFile, VFSOutTransportInfo vfsOutInfo)
             throws AxisFault {
+        
         int tryNum = 0;
         // wait till we get the lock
         while (!VFSUtils.acquireLock(fsManager, responseFile)) {
@@ -214,6 +223,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         + responseFile.getName() + ", unable to acquire the " +
                         "lock even after " + tryNum + " retries");
             } else {
+                
                 log.warn("Couldn't get the lock for the file : "
                         + responseFile.getName() + ", retry : " + tryNum
                         + " scheduled after : " + vfsOutInfo.getReconnectTimeout());

@@ -19,17 +19,24 @@
 
 package org.apache.synapse.transport.vfs;
 
-public class VFSConstants {
+public final class VFSConstants {
+    
     // vfs transport prefix (e.g. used in an out EPR etc)
     public static final String VFS_PREFIX = "vfs:";
 
-    public static final String TRANSPORT_FILE_ACTION_AFTER_PROCESS = "transport.vfs.ActionAfterProcess";
-    public static final String TRANSPORT_FILE_ACTION_AFTER_ERRORS = "transport.vfs.ActionAfterErrors";
-    public static final String TRANSPORT_FILE_ACTION_AFTER_FAILURE = "transport.vfs.ActionAfterFailure";
+    public static final String TRANSPORT_FILE_ACTION_AFTER_PROCESS
+            = "transport.vfs.ActionAfterProcess";
+    public static final String TRANSPORT_FILE_ACTION_AFTER_ERRORS
+            = "transport.vfs.ActionAfterErrors";
+    public static final String TRANSPORT_FILE_ACTION_AFTER_FAILURE
+            = "transport.vfs.ActionAfterFailure";
 
-    public static final String TRANSPORT_FILE_MOVE_AFTER_PROCESS = "transport.vfs.MoveAfterProcess";
-    public static final String TRANSPORT_FILE_MOVE_AFTER_ERRORS = "transport.vfs.MoveAfterErrors";
-    public static final String TRANSPORT_FILE_MOVE_AFTER_FAILURE = "transport.vfs.MoveAfterFailure";
+    public static final String TRANSPORT_FILE_MOVE_AFTER_PROCESS
+            = "transport.vfs.MoveAfterProcess";
+    public static final String TRANSPORT_FILE_MOVE_AFTER_ERRORS
+            = "transport.vfs.MoveAfterErrors";
+    public static final String TRANSPORT_FILE_MOVE_AFTER_FAILURE
+            = "transport.vfs.MoveAfterFailure";
 
     public static final String TRANSPORT_FILE_FILE_URI = "transport.vfs.FileURI";
     public static final String TRANSPORT_FILE_FILE_NAME_PATTERN = "transport.vfs.FileNamePattern";
@@ -38,7 +45,8 @@ public class VFSConstants {
     public static final String REPLY_FILE_URI = "transport.vfs.ReplyFileURI";
     public static final String REPLY_FILE_NAME = "transport.vfs.ReplyFileName";
 
-    public static final String TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT = "transport.vfs.MoveTimestampFormat";
+    public static final String TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT
+            = "transport.vfs.MoveTimestampFormat";
 
     public static final String DEFAULT_RESPONSE_FILE = "response.xml";
     

@@ -84,16 +84,6 @@ public class VFSUtils extends BaseUtils {
         }
         return fileName;
     }
-    
-    public static int getMaxRetryCount(VFSOutTransportInfo vfsOutInfo) {
-        return vfsOutInfo.getMaxRetryCount() != 0 ? vfsOutInfo.getMaxRetryCount() :
-                VFSConstants.DEFAULT_MAX_RETRY_COUNT;
-    }
-
-    public static long getReconnectTimout(VFSOutTransportInfo vfsOutInfo) {
-        return vfsOutInfo.getReconnectTimeout() != 0 ? vfsOutInfo.getReconnectTimeout() :
-                VFSConstants.DEFAULT_RECONNECT_TIMEOUT;
-    }
 
     /**
      * Acquires a file item lock before processing the item, guaranteing that the file is not

@@ -26,8 +26,6 @@ import junit.framework.TestSuite;
 
 import org.apache.axis2.transport.testkit.ManagedTestSuite;
 import org.apache.axis2.transport.testkit.TransportTestSuiteBuilder;
-import org.apache.axis2.transport.testkit.axis2.SimpleTransportDescriptionFactory;
-import org.apache.axis2.transport.testkit.axis2.TransportDescriptionFactory;
 import org.apache.axis2.transport.testkit.axis2.client.AxisAsyncTestClient;
 import org.apache.axis2.transport.testkit.axis2.endpoint.AxisAsyncEndpoint;
 import org.apache.axis2.transport.testkit.axis2.endpoint.AxisEchoEndpoint;
@@ -44,15 +42,12 @@ public class VFSTransportTest extends TestCase {
         // Since VFS has no Content-Type header, SwA is not supported.
         suite.addExclude("(test=AsyncSwA)");
         
-        TransportDescriptionFactory tdf =
-            new SimpleTransportDescriptionFactory("vfs", VFSTransportListener.class,
-                    VFSTransportSender.class);
-        
         TransportTestSuiteBuilder builder = new TransportTestSuiteBuilder(suite);
         
         ContentTypeServiceConfigurator cfgtr = new ContentTypeServiceConfigurator("transport.vfs.ContentType");
         
-        builder.addEnvironment(new VFSTestEnvironment(new File("target/vfs3")), tdf);
+        builder.addEnvironment(new VFSTestEnvironment(new File("target/vfs3")),
+                new VFSTransportDescriptionFactory());
         
         builder.addAsyncChannel(new VFSAsyncFileChannel("req/in"));
         

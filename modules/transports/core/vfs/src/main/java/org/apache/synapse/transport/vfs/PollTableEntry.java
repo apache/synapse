@@ -66,6 +66,11 @@ public class PollTableEntry extends AbstractPollTableEntry {
 
     private int maxRetryCount;
     private long reconnectTimeout;
+    private boolean fileLocking;
+
+    public PollTableEntry(boolean fileLocking) {
+        this.fileLocking = fileLocking;
+    }
 
     @Override
     public EndpointReference[] getEndpointReferences(String ip) {
@@ -152,6 +157,10 @@ public class PollTableEntry extends AbstractPollTableEntry {
         return maxRetryCount;
     }
 
+    public boolean isFileLockingEnabled() {
+        return fileLocking;
+    }
+
     public long getReconnectTimeout() {
         return reconnectTimeout;
     }
@@ -226,6 +235,14 @@ public class PollTableEntry extends AbstractPollTableEntry {
             reconnectTimeout = strReconnectTimeout != null ?
                     Integer.parseInt(strReconnectTimeout) * 1000 :
                     VFSConstants.DEFAULT_RECONNECT_TIMEOUT;
+
+            String strFileLocking = ParamUtils.getOptionalParam(
+                    params, VFSConstants.TRANSPORT_FILE_LOCKING);
+            if (VFSConstants.TRANSPORT_FILE_LOCKING_ENABLED.equals(strFileLocking)) {
+                fileLocking = true;
+            } else if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strFileLocking)) {
+                fileLocking = false;
+            }
             
             return super.loadConfiguration(params);
         }

@@ -18,13 +18,13 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.axiom.attachments.SizeAwareDataSource;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Data source that reads data from a VFS {@link FileObject}.
@@ -32,6 +32,7 @@ import org.apache.commons.vfs.FileSystemException;
  * implements {@link SizeAwareDataSource}.
  */
 public class FileObjectDataSource implements SizeAwareDataSource {
+    
     private final FileObject file;
     private final String contentType;
 

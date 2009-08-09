@@ -21,29 +21,30 @@ package org.apache.synapse.transport.vfs;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.description.*;
-import org.apache.axis2.format.DataSourceMessageBuilder;
-import org.apache.axis2.format.ManagedDataSource;
-import org.apache.axis2.format.ManagedDataSourceFactory;
-import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.transport.base.BaseConstants;
-import org.apache.axis2.transport.base.BaseUtils;
-import org.apache.axis2.transport.base.AbstractPollingTransportListener;
-import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.format.DataSourceMessageBuilder;
+import org.apache.axis2.format.ManagedDataSource;
+import org.apache.axis2.format.ManagedDataSourceFactory;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.base.AbstractPollingTransportListener;
+import org.apache.axis2.transport.base.BaseConstants;
+import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
 
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
-
-import java.util.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The "vfs" transport is a polling based transport - i.e. it gets kicked off at
@@ -168,7 +169,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             } catch (FileSystemException e) {
                 log.error("cannot resolve fileObject", e);
                 if (maxRetryCount <= retryCount)
-                    processFailure("cannot resolve fileObject repeatedly: " + e.getMessage(), e, entry);
+                    processFailure("cannot resolve fileObject repeatedly: "
+                            + e.getMessage(), e, entry);
                 return;
             }
 
@@ -210,7 +212,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
 
                             moveOrDeleteAfterProcessing(entry, fileObject);
                             VFSUtils.releaseLock(fsManager, fileObject);
-                        } else {
+                        } else if (log.isDebugEnabled()) {
                             log.debug("Couldn't get the lock for processing the file : "
                                     + fileObject.getName());
                         }
@@ -251,7 +253,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
 
                             moveOrDeleteAfterProcessing(entry, child);
                             VFSUtils.releaseLock(fsManager, child);
-                        } else {
+                        } else if (log.isDebugEnabled()) {
                             log.debug("Couldn't get the lock for processing the file : "
                                     + child.getName());
                         }
@@ -272,10 +274,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 entry.setLastPollTime(now);
                 entry.setNextPollTime(now + entry.getPollInterval());
 
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to access or read file or directory : " + fileURI);
-                }
+            } else if (log.isDebugEnabled()) {
+                log.debug("Unable to access or read file or directory : " + fileURI);
             }
             onPollCompletion(entry);
         } catch (FileSystemException e) {
@@ -317,7 +317,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 } else {
                     prefix = "";
                 }
-                FileObject dest = moveToDirectory.resolveFile(prefix + fileObject.getName().getBaseName());
+                FileObject dest = moveToDirectory.resolveFile(
+                        prefix + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
                     log.debug("Moving to file :" + dest.getName().getURI());
                 }
@@ -341,7 +342,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             }
 
         } catch (FileSystemException e) {
-            log.error("Error resolving directory to move after processing : " + moveToDirectoryURI, e);
+            log.error("Error resolving directory to move after processing : "
+                    + moveToDirectoryURI, e);
         }
     }
 
@@ -365,11 +367,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             transportHeaders.put(VFSConstants.FILE_NAME, fileName);
 
             try {
-                transportHeaders.put(VFSConstants.FILE_LENGTH, Long.valueOf(content.getSize()));
-            } catch (FileSystemException ignore) {}
-            try {
-                transportHeaders.put(VFSConstants.LAST_MODIFIED,
-                        Long.valueOf(content.getLastModifiedTime()));
+                transportHeaders.put(VFSConstants.FILE_LENGTH, content.getSize());
+                transportHeaders.put(VFSConstants.LAST_MODIFIED, content.getLastModifiedTime());
             } catch (FileSystemException ignore) {}
 
             MessageContext msgContext = entry.createMessageContext();

@@ -19,18 +19,19 @@
 
 package org.apache.synapse.transport.vfs;
 
-import java.util.Map;
-
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.Map;
 
 /**
  * The VFS OutTransportInfo is a holder of information to send an outgoing message
  * (e.g. a Response) to a VFS destination. Thus at a minimum a reference to a
  * File URI (i.e. directory or a file) are held
  */
+
 public class VFSOutTransportInfo implements OutTransportInfo {
 
     private static final Log log = LogFactory.getLog(VFSOutTransportInfo.class);
@@ -42,7 +43,14 @@ public class VFSOutTransportInfo implements OutTransportInfo {
     private long reconnectTimeout = 30000;
     private boolean append;
 
+    /**
+     * Constructs the VFSOutTransportInfo containing the information about the file to which the
+     * response has to be submitted to.
+     * 
+     * @param outFileURI URI of the file to which the message is delivered
+     */
     VFSOutTransportInfo(String outFileURI) {
+        
         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
             this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
         } else {
@@ -50,17 +58,30 @@ public class VFSOutTransportInfo implements OutTransportInfo {
         }
         
         Map<String,String> properties = BaseUtils.getEPRProperties(outFileURI);
-        if(properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {
+        if (properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {
             String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);
             maxRetryCount = Integer.parseInt(strMaxRetryCount);
+        } else {
+            maxRetryCount = VFSConstants.DEFAULT_MAX_RETRY_COUNT;
         }
-        if(properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {
+
+        if (properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {
             String strReconnectTimeout = properties.get(VFSConstants.RECONNECT_TIMEOUT);
             reconnectTimeout = Long.parseLong(strReconnectTimeout) * 1000;
-        }        
+        } else {
+            reconnectTimeout = VFSConstants.DEFAULT_RECONNECT_TIMEOUT;
+        }
+
         if (properties.containsKey(VFSConstants.APPEND)) {
             String strAppend = properties.get(VFSConstants.APPEND);
             append = Boolean.parseBoolean(strAppend);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Using the fileURI        : " + this.outFileURI);
+            log.debug("Using the maxRetryCount  : " + maxRetryCount);
+            log.debug("Using the reconnectionTimeout : " + reconnectTimeout);
+            log.debug("Using the append         : " + append);
         }
     }
 
@@ -77,19 +98,19 @@ public class VFSOutTransportInfo implements OutTransportInfo {
     }
 
     public int getMaxRetryCount() {
-      return maxRetryCount;
+        return maxRetryCount;
     }
 
     public void setMaxRetryCount(int maxRetryCount) {
-      this.maxRetryCount = maxRetryCount;
+        this.maxRetryCount = maxRetryCount;
     }
 
     public long getReconnectTimeout() {
-      return reconnectTimeout;
+        return reconnectTimeout;
     }
 
     public void setReconnectTimeout(long reconnectTimeout) {
-      this.reconnectTimeout = reconnectTimeout;
+        this.reconnectTimeout = reconnectTimeout;
     }
     
     public boolean isAppend() {
@@ -98,5 +119,9 @@ public class VFSOutTransportInfo implements OutTransportInfo {
 
     public void setAppend(boolean append) {
         this.append = append;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 }

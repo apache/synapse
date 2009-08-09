@@ -24,7 +24,6 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;

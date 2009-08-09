@@ -27,6 +27,7 @@ import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.format.DataSourceMessageBuilder;
 import org.apache.axis2.format.ManagedDataSource;
 import org.apache.axis2.format.ManagedDataSourceFactory;
@@ -76,7 +77,9 @@ import java.util.Map;
  * smb://somehost/home
  *
  * axis2.xml - transport definition
- *  <transportReceiver name="file" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
+ *  <transportReceiver name="file" class="org.apache.synapse.transport.vfs.VFSTransportListener">
+ *      <parameter name="transport.vfs.Locking">enable|disable</parameter> ?
+ *  </transportReceiver>
  *
  * services.xml - service attachment
  *  required parameters
@@ -110,6 +113,14 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
     private FileSystemManager fsManager = null;
 
     /**
+     * By default file locking in VFS transport is turned on at a global level
+     *
+     * NOTE: DO NOT USE THIS FLAG, USE PollTableEntry#isFileLockingEnabled() TO CHECK WHETHR
+     * FILE LOCKING IS ENABLED
+     */
+    private boolean globalFileLockingFlag = true;
+
+    /**
      * Initializes the VFS transport by getting the VFS File System manager
      * @param cfgCtx the Axsi2 configuration context
      * @param trpInDesc the VFS transport in description from the axis2.xml
@@ -124,6 +135,14 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));
             fsm.init();
             fsManager = fsm;
+            Parameter lockFlagParam = trpInDesc.getParameter(VFSConstants.TRANSPORT_FILE_LOCKING);
+            if (lockFlagParam != null) {
+                String strLockingFlag = lockFlagParam.getValue().toString();
+                // by-default enabled, if explicitly specified as "disable" make it disable
+                if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strLockingFlag)) {
+                    globalFileLockingFlag = false;
+                }
+            }
         } catch (FileSystemException e) {
             handleException("Error initializing the file transport : " + e.getMessage(), e);
         }
@@ -196,14 +215,17 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 if (children == null || children.length == 0) {
 
                     if (fileObject.getType() == FileType.FILE) {
-                        if (VFSUtils.acquireLock(fsManager, fileObject)) {
+                        if (!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled() &&
+                                VFSUtils.acquireLock(fsManager, fileObject))) {
                             try {
                                 processFile(entry, fileObject);
                                 entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
                                 metrics.incrementMessagesReceived();
 
                             } catch (AxisFault e) {
-                                VFSUtils.releaseLock(fsManager, fileObject);
+                                if (entry.isFileLockingEnabled()) {
+                                    VFSUtils.releaseLock(fsManager, fileObject);
+                                }
                                 logException("Error processing File URI : "
                                         + fileObject.getName(), e);
                                 entry.setLastPollState(PollTableEntry.FAILED);
@@ -211,7 +233,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                             }
 
                             moveOrDeleteAfterProcessing(entry, fileObject);
-                            VFSUtils.releaseLock(fsManager, fileObject);
+                            if (entry.isFileLockingEnabled()) {
+                                VFSUtils.releaseLock(fsManager, fileObject);
+                            }
                         } else if (log.isDebugEnabled()) {
                             log.debug("Couldn't get the lock for processing the file : "
                                     + fileObject.getName());
@@ -231,7 +255,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                         }
                         if ((entry.getFileNamePattern() != null) && (
                                 child.getName().getBaseName().matches(entry.getFileNamePattern()))
-                                && VFSUtils.acquireLock(fsManager, child)) {
+                                && (!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled()
+                                && VFSUtils.acquireLock(fsManager, child)))) {
                             try {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Processing file :" + child);
@@ -243,7 +268,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                 metrics.incrementMessagesReceived();
 
                             } catch (Exception e) {
-                                VFSUtils.releaseLock(fsManager, child);
+                                if (entry.isFileLockingEnabled()) {
+                                    VFSUtils.releaseLock(fsManager, child);
+                                }
                                 logException("Error processing File URI : " + child.getName(), e);
                                 failCount++;
                                 // tell moveOrDeleteAfterProcessing() file failed
@@ -252,7 +279,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                             }
 
                             moveOrDeleteAfterProcessing(entry, child);
-                            VFSUtils.releaseLock(fsManager, child);
+                            if (entry.isFileLockingEnabled()) {
+                                VFSUtils.releaseLock(fsManager, child);
+                            }
                         } else if (log.isDebugEnabled()) {
                             log.debug("Couldn't get the lock for processing the file : "
                                     + child.getName());
@@ -409,7 +438,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             String replyFileURI = entry.getReplyFileURI();
             if (replyFileURI != null) {
                 msgContext.setProperty(Constants.OUT_TRANSPORT_INFO,
-                        new VFSOutTransportInfo(replyFileURI));
+                        new VFSOutTransportInfo(replyFileURI, entry.isFileLockingEnabled()));
             }
 
             // Determine the message builder to use
@@ -489,6 +518,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
 
     @Override
     protected PollTableEntry createEndpoint() {
-        return new PollTableEntry();
+        return new PollTableEntry(globalFileLockingFlag);
     }
 }

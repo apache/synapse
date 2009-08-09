@@ -42,6 +42,7 @@ public class VFSOutTransportInfo implements OutTransportInfo {
     private int maxRetryCount = 3;
     private long reconnectTimeout = 30000;
     private boolean append;
+    private boolean fileLocking;
 
     /**
      * Constructs the VFSOutTransportInfo containing the information about the file to which the
@@ -49,14 +50,14 @@ public class VFSOutTransportInfo implements OutTransportInfo {
      * 
      * @param outFileURI URI of the file to which the message is delivered
      */
-    VFSOutTransportInfo(String outFileURI) {
+    VFSOutTransportInfo(String outFileURI, boolean fileLocking) {
         
         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
             this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
         } else {
             this.outFileURI = outFileURI;
         }
-        
+
         Map<String,String> properties = BaseUtils.getEPRProperties(outFileURI);
         if (properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {
             String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);
@@ -72,6 +73,17 @@ public class VFSOutTransportInfo implements OutTransportInfo {
             reconnectTimeout = VFSConstants.DEFAULT_RECONNECT_TIMEOUT;
         }
 
+        if (properties.containsKey(VFSConstants.TRANSPORT_FILE_LOCKING)) {
+            String strFileLocking = properties.get(VFSConstants.TRANSPORT_FILE_LOCKING);
+            if (VFSConstants.TRANSPORT_FILE_LOCKING_ENABLED.equals(strFileLocking)) {
+                fileLocking = true;
+            } else if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strFileLocking)) {
+                fileLocking = false;
+            }
+        } else {
+            this.fileLocking = fileLocking;
+        }
+
         if (properties.containsKey(VFSConstants.APPEND)) {
             String strAppend = properties.get(VFSConstants.APPEND);
             append = Boolean.parseBoolean(strAppend);
@@ -82,6 +94,7 @@ public class VFSOutTransportInfo implements OutTransportInfo {
             log.debug("Using the maxRetryCount  : " + maxRetryCount);
             log.debug("Using the reconnectionTimeout : " + reconnectTimeout);
             log.debug("Using the append         : " + append);
+            log.debug("File locking             : " + (this.fileLocking ? "ON" : "OFF"));
         }
     }
 
@@ -123,5 +136,9 @@ public class VFSOutTransportInfo implements OutTransportInfo {
 
     public String getContentType() {
         return contentType;
+    }
+
+    public boolean isFileLockingEnabled() {
+        return fileLocking;
     }
 }

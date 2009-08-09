@@ -30,9 +30,9 @@ public class SEDAQueuePolicy {
     public static final String QUEUE_TYPE_LINKED_BLOCKING = "LinkedBlocking";
     public static final String QUEUE_TYPE_PRIORITY_BLOCKING = "PriorityBlocking";
     public static final String QUEUE_TYPE_SYNCHRONOUS = "Synchronous";
-    private int queueSize;
+    private int queueSize = 100;
     private int queueWorkers;
-    private String queueType;
+    private String queueType = QUEUE_TYPE_LINKED_BLOCKING;
     private final Map<String, String> properties = new HashMap<String, String>();
 
     public int getQueueSize() {

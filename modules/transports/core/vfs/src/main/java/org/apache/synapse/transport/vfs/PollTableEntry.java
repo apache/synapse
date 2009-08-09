@@ -18,14 +18,14 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.AbstractPollTableEntry;
 import org.apache.axis2.transport.base.ParamUtils;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Holds information about an entry in the VFS transport poll table used by the
@@ -149,11 +149,11 @@ public class PollTableEntry extends AbstractPollTableEntry {
     }
 
     public int getMaxRetryCount() {
-      return maxRetryCount;
+        return maxRetryCount;
     }
 
     public long getReconnectTimeout() {
-      return reconnectTimeout;
+        return reconnectTimeout;
     }
 
     public DateFormat getMoveTimestampFormat() {
@@ -162,43 +162,51 @@ public class PollTableEntry extends AbstractPollTableEntry {
 
     @Override
     public boolean loadConfiguration(ParameterInclude params) throws AxisFault {
+        
         fileURI = ParamUtils.getOptionalParam(params, VFSConstants.TRANSPORT_FILE_FILE_URI);
         if (fileURI == null) {
             return false;
         } else {
+            
             if (fileURI.startsWith(VFSConstants.VFS_PREFIX)) {
                 fileURI = fileURI.substring(VFSConstants.VFS_PREFIX.length());
             }
+            
             replyFileURI = ParamUtils.getOptionalParam(params, VFSConstants.REPLY_FILE_URI);
             fileNamePattern = ParamUtils.getOptionalParam(params,
                     VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN);
+
             contentType = ParamUtils.getRequiredParam(params,
                     VFSConstants.TRANSPORT_FILE_CONTENT_TYPE);
             String option = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
-            actionAfterProcess =
-                VFSTransportListener.MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE;
+                    params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
+            actionAfterProcess = VFSTransportListener.MOVE.equals(option) ?
+                    PollTableEntry.MOVE : PollTableEntry.DELETE;
+
             option = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
-            actionAfterErrors =
-                VFSTransportListener.MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE;
+                    params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
+            actionAfterErrors = VFSTransportListener.MOVE.equals(option) ?
+                    PollTableEntry.MOVE : PollTableEntry.DELETE;
+
             option = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
-            actionAfterFailure =
-                VFSTransportListener.MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE;
+                    params, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
+            actionAfterFailure = VFSTransportListener.MOVE.equals(option) ?
+                    PollTableEntry.MOVE : PollTableEntry.DELETE;
 
             String moveDirectoryAfterProcess = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+                    params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
             setMoveAfterProcess(moveDirectoryAfterProcess);
+
             String moveDirectoryAfterErrors = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
+                    params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_ERRORS);
             setMoveAfterErrors(moveDirectoryAfterErrors);
+
             String moveDirectoryAfterFailure = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
+                    params, VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
             setMoveAfterFailure(moveDirectoryAfterFailure);
 
             String moveFileTimestampFormat = ParamUtils.getOptionalParam(
-                params, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
+                    params, VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT);
             if(moveFileTimestampFormat != null) {
                 moveTimestampFormat = new SimpleDateFormat(moveFileTimestampFormat);
             }
@@ -209,16 +217,15 @@ public class PollTableEntry extends AbstractPollTableEntry {
             }
             
             String strMaxRetryCount = ParamUtils.getOptionalParam(
-                params, VFSConstants.MAX_RETRY_COUNT);
-            if(strMaxRetryCount != null) {
-                maxRetryCount = Integer.parseInt(strMaxRetryCount);
-            }
+                    params, VFSConstants.MAX_RETRY_COUNT);
+            maxRetryCount = strMaxRetryCount != null ? Integer.parseInt(strMaxRetryCount) :
+                    VFSConstants.DEFAULT_MAX_RETRY_COUNT;
 
             String strReconnectTimeout = ParamUtils.getOptionalParam(
-                params, VFSConstants.RECONNECT_TIMEOUT);            
-            if(strReconnectTimeout != null) {
-                reconnectTimeout = Integer.parseInt(strReconnectTimeout) * 1000;
-            }
+                    params, VFSConstants.RECONNECT_TIMEOUT);
+            reconnectTimeout = strReconnectTimeout != null ?
+                    Integer.parseInt(strReconnectTimeout) * 1000 :
+                    VFSConstants.DEFAULT_RECONNECT_TIMEOUT;
             
             return super.loadConfiguration(params);
         }

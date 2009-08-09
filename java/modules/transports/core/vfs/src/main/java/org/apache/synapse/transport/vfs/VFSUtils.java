@@ -24,16 +24,16 @@ import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs.FileContent;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.Arrays;
-import java.io.OutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Random;
 
 public class VFSUtils extends BaseUtils {
 
@@ -52,7 +52,7 @@ public class VFSUtils extends BaseUtils {
             if (o instanceof String) {
                 return (String) o;
             }
-        } catch (FileSystemException e) {}
+        } catch (FileSystemException ignored) {}
         return null;
     }
 
@@ -85,20 +85,14 @@ public class VFSUtils extends BaseUtils {
         return fileName;
     }
     
-    public static int getMaxRetryCount(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
-          if(vfsOutInfo.getMaxRetryCount() != 0) {
-            return vfsOutInfo.getMaxRetryCount();
-          }
-          
-          return VFSConstants.DEFAULT_MAX_RETRY_COUNT; 
-    }    
+    public static int getMaxRetryCount(VFSOutTransportInfo vfsOutInfo) {
+        return vfsOutInfo.getMaxRetryCount() != 0 ? vfsOutInfo.getMaxRetryCount() :
+                VFSConstants.DEFAULT_MAX_RETRY_COUNT;
+    }
 
-    public static long getReconnectTimout(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
-      if(vfsOutInfo.getReconnectTimeout() != 0) {
-        return vfsOutInfo.getReconnectTimeout();
-      }
-
-      return VFSConstants.DEFAULT_RECONNECT_TIMEOUT; 
+    public static long getReconnectTimout(VFSOutTransportInfo vfsOutInfo) {
+        return vfsOutInfo.getReconnectTimeout() != 0 ? vfsOutInfo.getReconnectTimeout() :
+                VFSConstants.DEFAULT_RECONNECT_TIMEOUT;
     }
 
     /**
@@ -186,7 +180,7 @@ public class VFSUtils extends BaseUtils {
             // noinspection ResultOfMethodCallIgnored
             is.read(val);
             if (Arrays.equals(lockValue, val) && is.read() == -1) {
-               return true;
+                return true;
             } else {
                 log.debug("The lock has been acquired by an another party");
             }

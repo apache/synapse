@@ -18,18 +18,23 @@
 */
 package org.apache.synapse.transport.vfs;
 
-import org.apache.axis2.transport.OutTransportInfo;
-import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.base.*;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.commons.vfs.*;
-import org.apache.commons.vfs.impl.StandardFileSystemManager;
+import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.OutTransportInfo;
+import org.apache.axis2.transport.base.AbstractTransportSender;
+import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.OMOutputFormat;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.impl.StandardFileSystemManager;
 
 import java.io.IOException;
 
@@ -77,11 +82,11 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
      * @throws AxisFault on error
      */
     public void sendMessage(MessageContext msgCtx, String targetAddress,
-        OutTransportInfo outTransportInfo) throws AxisFault {
+                            OutTransportInfo outTransportInfo) throws AxisFault {
 
         if (waitForSynchronousResponse(msgCtx)) {
             throw new AxisFault("The VFS transport doesn't support synchronous responses. " +
-            		"Please use the appropriate (out only) message exchange pattern.");
+                    "Please use the appropriate (out only) message exchange pattern.");
         }
 
         VFSOutTransportInfo vfsOutInfo = null;
@@ -98,35 +103,36 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 
                 boolean wasError = true;
                 int retryCount = 0;
-                int maxRetryCount = VFSUtils.getMaxRetryCount(msgCtx, vfsOutInfo);
-                long reconnectionTimeout = VFSUtils.getReconnectTimout(msgCtx, vfsOutInfo);
+                int maxRetryCount = VFSUtils.getMaxRetryCount(vfsOutInfo);
+                long reconnectionTimeout = VFSUtils.getReconnectTimout(vfsOutInfo);
                 boolean append = vfsOutInfo.isAppend();
                 
-                while(wasError == true) {
-                  try {
-                    retryCount++;
-                    replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
+                while (wasError) {
                     
-                    if(replyFile == null) {
-                      log.error("replyFile is null");
-                      throw new FileSystemException("replyFile is null");
-                    }
-                    
-                    wasError = false;
-                                        
-                  } catch(FileSystemException e) {
-                    log.error("cannot resolve replyFile", e);
-                    if(maxRetryCount <= retryCount)
-                      handleException("cannot resolve replyFile repeatedly: " + e.getMessage(), e);
-                  }
-                
-                  if(wasError == true) {
                     try {
-                      Thread.sleep(reconnectionTimeout);
-                    } catch (InterruptedException e2) {
-                      e2.printStackTrace();
+                        retryCount++;
+                        replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
+                    
+                        if(replyFile == null) {
+                            log.error("replyFile is null");
+                            throw new FileSystemException("replyFile is null");
+                        }
+                    
+                        wasError = false;
+                                        
+                    } catch(FileSystemException e) {
+                        log.error("cannot resolve replyFile", e);
+                        if(maxRetryCount <= retryCount)
+                            handleException("cannot resolve replyFile repeatedly: " + e.getMessage(), e);
                     }
-                  }
+                
+                    if (wasError) {
+                        try {
+                            Thread.sleep(reconnectionTimeout);
+                        } catch (InterruptedException e2) {
+                            e2.printStackTrace();
+                        }
+                    }
                 }
                 
                 if (replyFile.exists()) {
@@ -134,7 +140,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                     if (replyFile.getType() == FileType.FOLDER) {
                         // we need to write a file containing the message to this folder
                         FileObject responseFile = fsManager.resolveFile(replyFile,
-                            VFSUtils.getFileName(msgCtx, vfsOutInfo));
+                                VFSUtils.getFileName(msgCtx, vfsOutInfo));
 
                         acquireLockForSending(responseFile, vfsOutInfo);
                         if (!responseFile.exists()) {
@@ -151,7 +157,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         
                     } else {
                         handleException("Unsupported reply file type : " + replyFile.getType() +
-                            " for file : " + vfsOutInfo.getOutFileURI());
+                                " for file : " + vfsOutInfo.getOutFileURI());
                     }
                 } else {
                     acquireLockForSending(replyFile, vfsOutInfo);
@@ -161,7 +167,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 }
             } catch (FileSystemException e) {
                 handleException("Error resolving reply file : " +
-                    vfsOutInfo.getOutFileURI(), e);
+                        vfsOutInfo.getOutFileURI(), e);
             } finally {
                 if (replyFile != null) {
                     try {

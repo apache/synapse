@@ -26,6 +26,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
+import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
@@ -96,6 +97,16 @@ public class SynapseConfigurationBuilder {
             } catch (XMLStreamException e) {
                 handleException("Could not initialize Synapse : " + e.getMessage(), e);
             }
+        }
+
+        // Check for the main sequence and add a default main sequence if not present
+        if (synCfg.getMainSequence() == null) {
+            SynapseXMLConfigurationFactory.setDefaultMainSequence(synCfg);
+        }
+
+        // Check for the fault sequence and add a deafult fault sequence if not present
+        if (synCfg.getFaultSequence() == null) {
+            SynapseXMLConfigurationFactory.setDefaultFaultSequence(synCfg);
         }
 
 

@@ -122,21 +122,15 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         // the root level before trying to look in the registry (hence config.getMainSequence
         // can not be used here)
         if (!config.getLocalRegistry().containsKey(SynapseConstants.MAIN_SEQUENCE_KEY)) {
-            // if the root tag does not contain any mediators & registry does not have a
-            // entry with key main then use the defualt main sequence
-            if (rootSequence.getList().isEmpty() && config.getMainSequence() == null) {
-                setDefaultMainSequence(config);
-            } else {
+            // if the root tag contains child mediators & registry does not have an
+            // entry with key 'main' then set as main sequence
+            if (!rootSequence.getList().isEmpty() && config.getMainSequence() == null) {
                 config.addSequence(rootSequence.getName(), rootSequence);
             }
         } else if (!rootSequence.getList().isEmpty()) {
             handleException("Invalid Synapse Configuration : Conflict in resolving the \"main\" " +
                     "mediator\n\tSynapse Configuration cannot have sequence named \"main\" and " +
                     "toplevel mediators simultaniously");
-        }
-
-        if (config.getFaultSequence() == null) {
-            setDefaultFaultSequence(config);
         }
 
         return config;

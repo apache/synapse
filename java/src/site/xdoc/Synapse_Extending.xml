@@ -482,5 +482,43 @@ public interface MediatorSerializer {
         org.apache.synapse.config.xml.MediatorFactory
         org.apache.synapse.config.xml.MediatorSerializer
     /... the implementation classes as usual...</pre>
+    <h2 id="synObservers">
+        Writing Synapse Observers
+    </h2>
+    <p>
+       A Synapse observer is developed by either implementing the
+       org.apache.synapse.config.SynapseObserver interface or by extending the
+       org.apache.synapse.config.AbstractSynapseObserver class. A Synapse observer is notified
+       by the Synapse configuration when new elements are added to the configuration and
+       when existing elements are removed from the configuration. The following event
+       handlers are available to the Synapse observer implementations.
+    </p>
+<pre xml:space="preserve">
+ public void sequenceAdded(Mediator sequence);
+ public void sequenceRemoved(Mediator sequence);
+ public void entryAdded(Entry entry);
+ public void entryRemoved(Entry entry);
+ public void endpointAdded(Endpoint endpoint);
+ public void endpointRemoved(Endpoint endpoint);
+ public void proxyServiceAdded(ProxyService proxy);
+ public void proxyServiceRemoved(ProxyService proxy);
+ public void startupAdded(Startup startup);
+ public void startupRemoved(Startup startup);
+ public void eventSourceAdded(SynapseEventSource eventSource);
+ public void eventSourceRemoved(SynapseEventSource eventSource);
+</pre>
+     <p>
+         The AbstractSynapseObserver provides default implementations to all these
+         event handlers. It simply logs any received events.
+     </p>
+     <p>
+         In situations where the custom code has access to the SynapseConfiguration class
+         observers can be directly registered with the SynapseConfiguration by using the
+         registerObserver(SynapseObserver o) method. Otherwise SynapseObserver implementations
+         can be defined in the synapse.properties file which resides in the SYNAPSE_HOME/lib
+         directory. The following example shows how two observers are registered with the
+         Synapse configuration using the synapse.properties file.
+     </p>
+     <pre xml:space="preserve">synapse.observers=test.LoggingObserverImpl, test.SimpleObserverImpl</pre>
   </body>
 </document>

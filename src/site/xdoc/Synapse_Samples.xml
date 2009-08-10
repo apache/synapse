@@ -4254,7 +4254,6 @@ Discounted price: 138.77458254967408</pre>
        </p>
        <pre xml:space="preserve">
          synapse_sample_600.xml
-            |
             |-- endpoints
             |   `-- foo.xml
             |-- events
@@ -4270,8 +4269,10 @@ Discounted price: 138.77458254967408</pre>
             |   |-- custom-logger.xml
             |   |-- fault.xml
             |   `-- main.xml
+            |-- synapse.xml
             `-- tasks
                 `-- task1.xml
+
        </pre>
        <div>
          <p>
@@ -4290,15 +4291,16 @@ Discounted price: 138.77458254967408</pre>
             within it. When Synapse is started with the sample configuration 600, Synapse will load the configuration from
             this directory. You will find a number of subdirectories and a set of XML files in each of those directories.
             Synapse will parse all the XML files in this file hierarchy and construct the full Synapse configuration at startup. 
-            As a result when this sample is executed Synapse will start with three proxy services, three sequences, a task, an event
+            As a result when this sample is executed Synapse will start with four proxy services, several sequences, a task, an event
             source and some endpoint and local entry definitions.
          </p>
          <p>
             The names of the subdirectories (eg: proxy-services, sequences, endpoints) are fixed and hence cannot be changed.
             Also the registry definition should go into a file named registry.xml which resides at the top level of the file
-            hierarchy. The files which define proxy services, sequences, endpoints etc can have any name. These configuration
-            files must have the .xml extension at the end of the name. Synapse will ignore any files which does not have the
-            .xml extension.
+            hierarchy. It can also be specified in the synapse.xml file at top level. This synapse.xml file can include
+            any item that can be normally defined in a synapse.xml file. The files which define proxy services, sequences,
+            endpoints etc can have any name. These configuration files must have the .xml extension at the end of the name. Synapse
+            will ignore any files which do not have the .xml extension.
          </p>
          <p>
             None of the directories and files in the sample file hierachy are mandatory. You can leave entire directories out if

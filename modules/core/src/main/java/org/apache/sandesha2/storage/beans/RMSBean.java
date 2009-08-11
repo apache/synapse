@@ -182,6 +182,7 @@ public class RMSBean extends RMSequenceBean {
 	public static final int TERM_PAUSER_FOR_CS        = 0x00000002;
 	public static final int EXPECTED_REPLIES          = 0x00000020;
 	public static final int SOAP_VERSION_FLAG         = 0x00000200;
+	public static final int REALLOCATED               = 0x00002000;
 	
 	public RMSBean() {
 	}
@@ -512,7 +513,7 @@ public class RMSBean extends RMSequenceBean {
 		else if((bean.getInternalSeqIDOfSeqUsedForReallocation() != null && !bean.getInternalSeqIDOfSeqUsedForReallocation().equals(this.getInternalSeqIDOfSeqUsedForReallocation())))
 			match = false;
 		
-		else if(bean.isReallocated() != this.isReallocated())
+		else if((bean.rmsFlags & REALLOCATED) != 0 && bean.isReallocated() != this.isReallocated())
 			match = false;
 		
 // Avoid matching on the error information
@@ -560,6 +561,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setReallocated(int reallocated) {
 		this.reallocated = reallocated;
+		this.rmsFlags |= REALLOCATED;
 	}
 
 	public String getInternalSeqIDOfSeqUsedForReallocation() {

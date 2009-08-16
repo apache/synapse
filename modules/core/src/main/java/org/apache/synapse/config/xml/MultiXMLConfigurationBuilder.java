@@ -73,7 +73,7 @@ public class MultiXMLConfigurationBuilder {
     public static final String ENDPOINTS_DIR       = "endpoints";
     public static final String LOCAL_ENTRY_DIR     = "local-entries";
     public static final String TASKS_DIR           = "tasks";
-    public static final String EVENTS_DIR          = "events";
+    public static final String EVENTS_DIR          = "event-sources";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 
@@ -87,80 +87,88 @@ public class MultiXMLConfigurationBuilder {
 
     public static SynapseConfiguration getConfiguration(String root) throws XMLStreamException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Building Synapse configuration from the directory heirarchy at : " + root);
+        log.info("Building synapse configuration from the " +
+                "synapse artifact repository at : " + root);
+
+        // First try to load the configuration from synapse.xml
+        SynapseConfiguration synapseConfig = createConfigurationFromSynapseXML(root);
+        if (synapseConfig == null) {
+            synapseConfig = SynapseConfigUtils.newConfiguration();
+            synapseConfig.setDefaultQName(XMLConfigConstants.DEFINITIONS_ELT);
+        } else if (log.isDebugEnabled()) {
+            log.debug("Found a synapse configuration in the " + SynapseConstants.SYNAPSE_XML
+                    + " file at the artifact repository root, which gets the presedence "
+                    + "over other definitions");
         }
 
-        SynapseConfiguration synapseConfig = null;
-        try {
-            // First try to load the configuration from synapse.xml
-            synapseConfig = createConfigurationFromSynapseXML(root);
-            if (synapseConfig == null) {
-                synapseConfig = SynapseConfigUtils.newConfiguration();
-                synapseConfig.setDefaultQName(XMLConfigConstants.DEFINITIONS_ELT);
-            }
-
-            if (synapseConfig.getRegistry() == null) {
-                // If the synapse.xml does not define a registry look for a registry.xml
-                createRegistry(synapseConfig, root);
-            }
-
-            createLocalEntries(synapseConfig, root);
-            createEndpoints(synapseConfig, root);
-            createSequences(synapseConfig, root);
-            createProxyServices(synapseConfig, root);
-            createTasks(synapseConfig, root);
-            createEventSources(synapseConfig, root);
-
-        } catch (FileNotFoundException e) {
-            handleException("Error while reading from configuration file", e);
+        if (synapseConfig.getRegistry() == null) {
+            // If the synapse.xml does not define a registry look for a registry.xml
+            createRegistry(synapseConfig, root);
+        } else if (log.isDebugEnabled()) {
+            log.debug("Using the registry defined in the " + SynapseConstants.SYNAPSE_XML
+                    + " as the registry, any definitions in the "
+                    + REGISTRY_FILE + " will be neglected");
         }
+
+        createLocalEntries(synapseConfig, root);
+        createEndpoints(synapseConfig, root);
+        createSequences(synapseConfig, root);
+        createProxyServices(synapseConfig, root);
+        createTasks(synapseConfig, root);
+        createEventSources(synapseConfig, root);
+
 
         if (synapseConfig.getLocalRegistry().isEmpty() &&
                 synapseConfig.getProxyServices().isEmpty() && synapseConfig.getRegistry() != null) {
 
-            log.info("No proxy service definitions or local entry definitions were " +
-                    "found at : " + root + ". Attempting to load the configuration from " +
-                    "the Synapse registry.");
+            if (log.isDebugEnabled()) {
+                log.debug("No definitions were found at artifact repository : " + root +
+                        " except the registry definition. Attempting to load the configuration " +
+                        "from the defined registry.");
+            }
 
             OMNode remoteConfigNode = synapseConfig.getRegistry().lookup("synapse.xml");
             if (remoteConfigNode != null) {
                 synapseConfig = XMLConfigurationBuilder.getConfiguration(
                         SynapseConfigUtils.getStreamSource(remoteConfigNode).getInputStream());
-            } else {
-                log.warn("The resource synapse.xml is not available in the Synapse registry.");
+            } else if (log.isDebugEnabled()) {
+                log.debug("The resource synapse.xml is not available in the Synapse registry.");
             }
         }
 
         return synapseConfig;
     }
 
-    private static SynapseConfiguration createConfigurationFromSynapseXML(
-            String rootDirPath) throws FileNotFoundException, XMLStreamException {
+    private static SynapseConfiguration createConfigurationFromSynapseXML(String rootDirPath)
+            throws XMLStreamException {
 
         File synapseXML = new File(rootDirPath, SynapseConstants.SYNAPSE_XML);
-        if (synapseXML.exists()) {
-            return XMLConfigurationBuilder.getConfiguration(new FileInputStream(synapseXML));
+        if (synapseXML.exists() && synapseXML.isFile()) {
+            try {
+                return XMLConfigurationBuilder.getConfiguration(new FileInputStream(synapseXML));
+            } catch (FileNotFoundException ignored) {}
         }
         return null;
     }
 
     private static void createRegistry(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File registryDef = new File(rootDirPath, REGISTRY_FILE);
-        if (registryDef.exists()) {
+        if (registryDef.exists() && registryDef.isFile()) {
             if (log.isDebugEnabled()) {
                 log.debug("Initializing Synapse registry from the configuration at : " +
                         registryDef.getPath());
             }
-            OMElement document = parseFile(registryDef);
-            SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document);
+            try {
+                OMElement document = parseFile(registryDef);
+                SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document);
+            } catch (FileNotFoundException ignored) {}
         }
     }
 
     private static void createLocalEntries(SynapseConfiguration synapseConfig, String rootDirPath) 
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File localEntriesDir = new File(rootDirPath, LOCAL_ENTRY_DIR);
         if (localEntriesDir.exists()) {
@@ -169,15 +177,18 @@ public class MultiXMLConfigurationBuilder {
             }
             File[] entryDefinitions = localEntriesDir.listFiles(filter);
             for (File file : entryDefinitions) {
-                OMElement document = parseFile(file);
-                Entry entry = SynapseXMLConfigurationFactory.defineEntry(synapseConfig, document);
-                entry.setFileName(file.getName());
+                try {
+                    OMElement document = parseFile(file);
+                    Entry entry = SynapseXMLConfigurationFactory.defineEntry(
+                            synapseConfig, document);
+                    entry.setFileName(file.getName());
+                } catch (FileNotFoundException ignored) {}
             }
         }
     }
 
     private static void createProxyServices(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File proxyServicesDir = new File(rootDirPath, PROXY_SERVICES_DIR);
         if (proxyServicesDir.exists()) {
@@ -186,16 +197,18 @@ public class MultiXMLConfigurationBuilder {
             }
             File[] proxyDefinitions = proxyServicesDir.listFiles(filter);
             for (File file : proxyDefinitions) {
-                OMElement document = parseFile(file);
-                ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(synapseConfig,
-                        document);
-                proxy.setFileName(file.getName());
+                try {
+                    OMElement document = parseFile(file);
+                    ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(
+                            synapseConfig, document);
+                    proxy.setFileName(file.getName());
+                } catch (FileNotFoundException ignored) {}
             }
         }
     }
 
     private static void createTasks(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File tasksDir = new File(rootDirPath, TASKS_DIR);
         if (tasksDir.exists()) {
@@ -204,18 +217,20 @@ public class MultiXMLConfigurationBuilder {
             }
             File[] taskDefinitions = tasksDir.listFiles(filter);
             for (File file : taskDefinitions) {
-                OMElement document = parseFile(file);
-                Startup startup = SynapseXMLConfigurationFactory.defineStartup(synapseConfig,
-                        document);
-                if (startup instanceof AbstractStartup) {
-                    ((AbstractStartup) startup).setFileName(file.getName());
-                }
+                try {
+                    OMElement document = parseFile(file);
+                    Startup startup = SynapseXMLConfigurationFactory.defineStartup(
+                            synapseConfig, document);
+                    if (startup instanceof AbstractStartup) {
+                        ((AbstractStartup) startup).setFileName(file.getName());
+                    }
+                } catch (FileNotFoundException ignored) {}
             }
         }
     }
 
     private static void createSequences(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File sequencesDir = new File(rootDirPath, SEQUENCES_DIR);
         if (sequencesDir.exists()) {
@@ -224,18 +239,20 @@ public class MultiXMLConfigurationBuilder {
             }
             File[] sequences = sequencesDir.listFiles(filter);
             for (File file : sequences) {
-                OMElement document = parseFile(file);
-                Mediator seq = SynapseXMLConfigurationFactory.defineSequence(synapseConfig,
-                        document);
-                if (seq instanceof SequenceMediator) {
-                    ((SequenceMediator) seq).setFileName(file.getName());
-                }
+                try {
+                    OMElement document = parseFile(file);
+                    Mediator seq = SynapseXMLConfigurationFactory.defineSequence(
+                            synapseConfig, document);
+                    if (seq instanceof SequenceMediator) {
+                        ((SequenceMediator) seq).setFileName(file.getName());
+                    }
+                } catch (FileNotFoundException ignored) {}
             }
         }
     }
 
     private static void createEndpoints(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File endpointsDir = new File(rootDirPath, ENDPOINTS_DIR);
         if (endpointsDir.exists()) {
@@ -244,18 +261,20 @@ public class MultiXMLConfigurationBuilder {
             }
             File[] endpoints = endpointsDir.listFiles(filter);
             for (File file : endpoints) {
-                OMElement document = parseFile(file);
-                Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(synapseConfig,
-                        document);
-                if (endpoint instanceof AbstractEndpoint) {
-                    ((AbstractEndpoint) endpoint).setFileName(file.getName());
-                }
+                try {
+                    OMElement document = parseFile(file);
+                    Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
+                            synapseConfig, document);
+                    if (endpoint instanceof AbstractEndpoint) {
+                        ((AbstractEndpoint) endpoint).setFileName(file.getName());
+                    }
+                } catch (FileNotFoundException ignored) {}
             }
         }
     }
 
     private static void createEventSources(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws FileNotFoundException, XMLStreamException {
+            throws XMLStreamException {
 
         File eventsDir = new File(rootDirPath, EVENTS_DIR);
         if (eventsDir.exists()) {
@@ -264,10 +283,12 @@ public class MultiXMLConfigurationBuilder {
             }
             File[] events = eventsDir.listFiles(filter);
             for (File file : events) {
-                OMElement document = parseFile(file);
-                SynapseEventSource eventSource = SynapseXMLConfigurationFactory.defineEventSource(
-                        synapseConfig, document);
-                eventSource.setFileName(file.getName());
+                try {
+                    OMElement document = parseFile(file);
+                    SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
+                            defineEventSource(synapseConfig, document);
+                    eventSource.setFileName(file.getName());
+                } catch (FileNotFoundException ignored) {}
            }
         }
     }

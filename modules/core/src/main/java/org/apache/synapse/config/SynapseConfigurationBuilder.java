@@ -93,7 +93,8 @@ public class SynapseConfigurationBuilder {
             // build the Synapse configuration by processing given directory hierarchy
             try {
                 synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile);
-                log.info("Loaded Synapse configuration from the directory hierarchy at : " + configFile);
+                log.info("Loaded Synapse configuration from the artifact " +
+                        "repository at : " + configFile);
             } catch (XMLStreamException e) {
                 handleException("Could not initialize Synapse : " + e.getMessage(), e);
             }
@@ -108,7 +109,6 @@ public class SynapseConfigurationBuilder {
         if (synCfg.getFaultSequence() == null) {
             SynapseXMLConfigurationFactory.setDefaultFaultSequence(synCfg);
         }
-
 
         return synCfg;
     }

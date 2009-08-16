@@ -20,16 +20,13 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.registry.Registry;
 import org.apache.synapse.aspects.AspectConfiguration;
-import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -37,15 +34,11 @@ import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.eventing.EventSourceFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.builtin.DropMediator;
-import org.apache.synapse.mediators.builtin.LogMediator;
-import org.apache.synapse.util.xpath.SynapseXPath;
-import org.jaxen.JaxenException;
+import org.apache.synapse.registry.Registry;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.Iterator;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
@@ -100,22 +93,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     rootSequence.addChild(m);
                 }
             }
-        }
-
-        Registry localConfigReg = config.getRegistry();
-        if (config.getLocalRegistry().isEmpty() && config.getProxyServices().isEmpty() &&
-                rootSequence.getList().isEmpty() && localConfigReg != null) {
-            OMNode remoteConfigNode = localConfigReg.lookup("synapse.xml");
-            try {
-                config = XMLConfigurationBuilder.getConfiguration(SynapseConfigUtils
-                        .getStreamSource(remoteConfigNode).getInputStream());
-                if (config.getRegistry() == null) {
-                    config.setRegistry(localConfigReg);
-                }
-            } catch (XMLStreamException xse) {
-                throw new SynapseException("Problem loading remote synapse.xml ", xse);
-            }
-
         }
 
         // if there is no sequence named main defined locally look for the set of mediators in
@@ -195,74 +172,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return null;
     }
 
-    public static SynapseEventSource defineEventSource(SynapseConfiguration config, OMElement elem) {
+    public static SynapseEventSource defineEventSource(SynapseConfiguration config,
+                                                       OMElement elem) {
         SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
         config.addEventSource(eventSource.getName(), eventSource);
         return eventSource;
-    }
-
-    /**
-     * Return the main sequence if one is not defined. This implementation defaults to
-     * a simple sequence with a <send/>
-     *
-     * @param config the configuration to be updated
-     */
-    public static void setDefaultMainSequence(SynapseConfiguration config) {
-        SequenceMediator main = new SequenceMediator();
-        main.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
-        main.addChild(new LogMediator());
-        main.addChild(new DropMediator());
-        config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, main);
-        // set the aspect configuration
-        AspectConfiguration configuration = new AspectConfiguration(main.getName());
-        main.configure(configuration);
-    }
-
-    /**
-     * Return the fault sequence if one is not defined. This implementation defaults to
-     * a simple sequence :
-     * <log level="full">
-     *   <property name="MESSAGE" value="Executing default "fault" sequence"/>
-     *   <property name="ERROR_CODE" expression="get-property('ERROR_CODE')"/>
-     *   <property name="ERROR_MESSAGE" expression="get-property('ERROR_MESSAGE')"/>
-     * </log>
-     * <drop/>
-     *
-     * @param config the configuration to be updated
-     */
-    public static void setDefaultFaultSequence(SynapseConfiguration config) {
-        SequenceMediator fault = new SequenceMediator();
-        fault.setName(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY);
-        LogMediator log = new LogMediator();
-        log.setLogLevel(LogMediator.FULL);
-
-        MediatorProperty mp = new MediatorProperty();
-        mp.setName("MESSAGE");
-        mp.setValue("Executing default \"fault\" sequence");
-        log.addProperty(mp);
-
-        mp = new MediatorProperty();
-        mp.setName("ERROR_CODE");
-        try {
-            mp.setExpression(new SynapseXPath("get-property('ERROR_CODE')"));
-        } catch (JaxenException ignore) {}
-        log.addProperty(mp);
-
-        mp = new MediatorProperty();
-        mp.setName("ERROR_MESSAGE");
-        try {
-            mp.setExpression(new SynapseXPath("get-property('ERROR_MESSAGE')"));
-        } catch (JaxenException ignore) {}
-        log.addProperty(mp);
-
-        fault.addChild(log);
-        fault.addChild(new DropMediator());
-
-        // set aspect configuration
-        AspectConfiguration configuration = new AspectConfiguration(fault.getName());
-        fault.configure(configuration);
-
-        config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
     }
 
     private static void handleException(String msg) {

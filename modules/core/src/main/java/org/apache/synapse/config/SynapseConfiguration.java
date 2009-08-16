@@ -667,7 +667,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @return the proxy services defined
      */
     public Collection<ProxyService> getProxyServices() {
-        return proxyServices.values();
+        return Collections.unmodifiableCollection(proxyServices.values());
     }
 
     /**

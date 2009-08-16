@@ -26,13 +26,20 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.KeyStoreInformation;
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.factory.KeyStoreInformationFactory;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.builtin.DropMediator;
+import org.apache.synapse.mediators.builtin.LogMediator;
 import org.apache.synapse.util.SynapseBinaryDataSource;
+import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 import org.xml.sax.InputSource;
 
 import javax.activation.DataHandler;
@@ -729,6 +736,70 @@ public class SynapseConfigUtils {
             }
         }
         return synConfig;
+    }
+
+    /**
+     * Return the main sequence if one is not defined. This implementation defaults to
+     * a simple sequence with a <send/>
+     *
+     * @param config the configuration to be updated
+     */
+    public static void setDefaultMainSequence(SynapseConfiguration config) {
+        SequenceMediator main = new SequenceMediator();
+        main.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
+        main.addChild(new LogMediator());
+        main.addChild(new DropMediator());
+        config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, main);
+        // set the aspect configuration
+        AspectConfiguration configuration = new AspectConfiguration(main.getName());
+        main.configure(configuration);
+    }
+
+    /**
+     * Return the fault sequence if one is not defined. This implementation defaults to
+     * a simple sequence :
+     * <log level="full">
+     *   <property name="MESSAGE" value="Executing default "fault" sequence"/>
+     *   <property name="ERROR_CODE" expression="get-property('ERROR_CODE')"/>
+     *   <property name="ERROR_MESSAGE" expression="get-property('ERROR_MESSAGE')"/>
+     * </log>
+     * <drop/>
+     *
+     * @param config the configuration to be updated
+     */
+    public static void setDefaultFaultSequence(SynapseConfiguration config) {
+        SequenceMediator fault = new SequenceMediator();
+        fault.setName(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY);
+        LogMediator log = new LogMediator();
+        log.setLogLevel(LogMediator.FULL);
+
+        MediatorProperty mp = new MediatorProperty();
+        mp.setName("MESSAGE");
+        mp.setValue("Executing default \"fault\" sequence");
+        log.addProperty(mp);
+
+        mp = new MediatorProperty();
+        mp.setName("ERROR_CODE");
+        try {
+            mp.setExpression(new SynapseXPath("get-property('ERROR_CODE')"));
+        } catch (JaxenException ignore) {}
+        log.addProperty(mp);
+
+        mp = new MediatorProperty();
+        mp.setName("ERROR_MESSAGE");
+        try {
+            mp.setExpression(new SynapseXPath("get-property('ERROR_MESSAGE')"));
+        } catch (JaxenException ignore) {}
+        log.addProperty(mp);
+
+        fault.addChild(log);
+        fault.addChild(new DropMediator());
+
+        // set aspect configuration
+        AspectConfiguration configuration = new AspectConfiguration(fault.getName());
+        fault.configure(configuration);
+
+        config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
     }
 }
 

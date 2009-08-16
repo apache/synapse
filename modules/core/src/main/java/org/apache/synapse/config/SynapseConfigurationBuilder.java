@@ -19,22 +19,21 @@
 
 package org.apache.synapse.config;
 
+import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
-import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
-import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
+import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
+import org.apache.synapse.registry.Registry;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 /**
  * Builds a Synapse Configuration model with a given input
@@ -75,7 +74,10 @@ public class SynapseConfigurationBuilder {
 
         File synapseConfigLocation = new File(configFile);
         if (!synapseConfigLocation.exists()) {
-            throw new SynapseException("Unable to load the Synapse configuration from : " + configFile);
+            String message = "Unable to load the Synapse configuration from : "
+                    + configFile + ". Specified file not found";
+            log.fatal(message);
+            throw new SynapseException(message);
         }
 
         SynapseConfiguration synCfg = null;
@@ -100,14 +102,45 @@ public class SynapseConfigurationBuilder {
             }
         }
 
+        assert synCfg != null;
+        Registry localConfigReg = synCfg.getRegistry();
+        if (synCfg.getLocalRegistry().isEmpty() && synCfg.getProxyServices().isEmpty()
+                && localConfigReg != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Only the registry is defined in the synapse configuration, trying " +
+                        "to fetch a configuration from the registry");
+            }
+            // TODO: support a artifact repo for registry as well instead of just the synapse.xml
+            OMNode remoteConfigNode = localConfigReg.lookup("synapse.xml");
+            if (remoteConfigNode != null) {
+                try {
+                    synCfg = XMLConfigurationBuilder.getConfiguration(SynapseConfigUtils
+                            .getStreamSource(remoteConfigNode).getInputStream());
+                    // TODO: when you fetch the configuration and serialize the config in any case
+                    // TODO: the remote config is serialized to the synapse.xml we should prevent
+                    // TODO: that, and should serialize the config to the registry
+                    if (synCfg.getRegistry() == null) {
+                        synCfg.setRegistry(localConfigReg);
+                    } else {
+                        log.warn("Registry declaration has been overwriten by the registry " +
+                                "declaration found at the remote configuration");
+                    }
+                } catch (XMLStreamException xse) {
+                    throw new SynapseException("Problem loading remote synapse.xml ", xse);
+                }
+            } else if (log.isDebugEnabled()) {
+                log.debug("Couldn't find a synapse configuration on the registry");
+            }
+        }
+
         // Check for the main sequence and add a default main sequence if not present
         if (synCfg.getMainSequence() == null) {
-            SynapseXMLConfigurationFactory.setDefaultMainSequence(synCfg);
+            SynapseConfigUtils.setDefaultMainSequence(synCfg);
         }
 
         // Check for the fault sequence and add a deafult fault sequence if not present
         if (synCfg.getFaultSequence() == null) {
-            SynapseXMLConfigurationFactory.setDefaultFaultSequence(synCfg);
+            SynapseConfigUtils.setDefaultFaultSequence(synCfg);
         }
 
         return synCfg;

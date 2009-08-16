@@ -18,24 +18,23 @@
  */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.SynapseConfigUtils;
-import org.apache.synapse.config.Entry;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Startup;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.AbstractEndpoint;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.startup.AbstractStartup;
-import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.Startup;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.endpoints.AbstractEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.eventing.SynapseEventSource;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.startup.AbstractStartup;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
@@ -51,7 +50,7 @@ import java.io.*;
  *  <li>CONF_HOME/endpoints</li>
  *  <li>CONF_HOME/local-entries</li>
  *  <li>CONF_HOME/tasks</li>
- *  <li>CONF_HOME/events</li>
+ *  <li>CONF_HOME/event-sources</li>
  * </ul>
  *
  * Each of these directories will house a set of XML files. Each file will define exactly
@@ -116,25 +115,6 @@ public class MultiXMLConfigurationBuilder {
         createProxyServices(synapseConfig, root);
         createTasks(synapseConfig, root);
         createEventSources(synapseConfig, root);
-
-
-        if (synapseConfig.getLocalRegistry().isEmpty() &&
-                synapseConfig.getProxyServices().isEmpty() && synapseConfig.getRegistry() != null) {
-
-            if (log.isDebugEnabled()) {
-                log.debug("No definitions were found at artifact repository : " + root +
-                        " except the registry definition. Attempting to load the configuration " +
-                        "from the defined registry.");
-            }
-
-            OMNode remoteConfigNode = synapseConfig.getRegistry().lookup("synapse.xml");
-            if (remoteConfigNode != null) {
-                synapseConfig = XMLConfigurationBuilder.getConfiguration(
-                        SynapseConfigUtils.getStreamSource(remoteConfigNode).getInputStream());
-            } else if (log.isDebugEnabled()) {
-                log.debug("The resource synapse.xml is not available in the Synapse registry.");
-            }
-        }
 
         return synapseConfig;
     }

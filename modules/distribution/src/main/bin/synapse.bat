@@ -23,7 +23,7 @@ if "%OS%"=="WINNT" @setlocal
 rem %~dp0 is expanded pathname of the current script under NT
 set SYNAPSE_HOME=%~dps0..
 
-set _SYNAPSE_XML="%SYNAPSE_HOME%\repository\conf\synapse.xml"
+set _SYNAPSE_XML="%SYNAPSE_HOME%\repository\conf\synapse-config"
 set _XDEBUG=
 set _SERVER_NAME=
 

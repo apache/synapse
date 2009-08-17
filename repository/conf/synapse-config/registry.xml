@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>       
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -16,21 +17,12 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<!-- A simple Synapse configuration -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <in>
-        <!-- Log all messages passing through -->
-        <log level="full"/>
-        
-        <!-- ensure that the default configuration only sends if it is one of samples -->
-        <!-- Otherwise Synapse would be an open proxy by default (BAD!)               -->
-        <filter source="get-property('To')" regex="http://localhost:9000.*">
-            <!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
-            <send/>
-        </filter>
-    </in>
-    <out>
-        <send/>
-    </out>
-</definitions>
+<!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->
+<registry xmlns="http://ws.apache.org/ns/synapse"
+          provider="org.apache.synapse.registry.url.SimpleURLRegistry">
+    <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
+    <parameter name="root">file:repository/conf/sample/resources/</parameter>
+    <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
+    <parameter name="cachableDuration">15000</parameter>
+</registry>

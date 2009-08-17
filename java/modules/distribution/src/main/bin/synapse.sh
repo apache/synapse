@@ -120,8 +120,8 @@ fi
 # endorsed dir
 SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 
-# synapse.xml
-SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse.xml
+# synapse config
+SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse-config
 
 # server name
 SERVER_NAME=

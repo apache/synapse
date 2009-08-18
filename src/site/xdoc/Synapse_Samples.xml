@@ -2019,30 +2019,30 @@ Connection: Keep-Alive
 <a name="Transport" id="Transport">Transport samples and switching transports</a> </h1>
 <h2>
 <a name="Sample250" id="Sample250">Sample 250: Introduction to switching transports - JMS to http/s</a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    <proxy name="StockQuoteProxy" transports="jms">
-        <target>
-            <inSequence>
-                <property action="set" name="OUT_ONLY" value="true"/>
-            </inSequence>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-            <outSequence>
-                <send/>
-            </outSequence>
-        </target>
-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-        <parameter name="transport.jms.ContentType">
-            <rules>
-                <jmsProperty>contentType</jmsProperty>
-                <default>application/xml</default>
-            </rules>
-        </parameter>
-    </proxy>
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+            &lt;/inSequence&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+                &lt;default&gt;application/xml&lt;/default&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+    &lt;/proxy&gt;
 
-</definitions>]]></pre>
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Introduction to switching transports with proxy services</strong> </p>
 <p>
@@ -2111,79 +2111,78 @@ java.naming.provider.url=tcp://localhost:61616</pre>
 <pre xml:space="preserve">Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</pre>
 <h2>
 <a name="Sample252" id="Sample252">Sample 252: Pure text/binary and POX message support with JMS</a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
-
-    <sequence name="text_proxy">
-        <log level="full"/>
-        <header name="Action" value="urn:placeOrder"/>
-        <script language="js">]]>&lt;![CDATA[<![CDATA[
-            var args = mc.getPayloadXML().toString().split(" ");
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;sequence name=&quot;text_proxy&quot;&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+        &lt;header name=&quot;Action&quot; value=&quot;urn:placeOrder&quot;/&gt;
+        &lt;script language=&quot;js&quot;&gt;&lt;![CDATA[
+            var args = mc.getPayloadXML().toString().split(&quot; &quot;);
             mc.setPayloadXML(
-            <placeOrder xmlns="http://services.samples">
-                <order xmlns="http://services.samples/xsd">
-                    <price>{args[0]}</price>
-                    <quantity>{args[1]}</quantity>
-                    <symbol>{args[2]}</symbol>
-                </order>
-            </placeOrder>);
-        ]]>]]&gt;<![CDATA[</script>
-        <property action="set" name="OUT_ONLY" value="true"/>
-        <log level="full"/>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
-    </sequence>
+            &lt;placeOrder xmlns=&quot;http://services.samples&quot;&gt;
+                &lt;order xmlns=&quot;http://services.samples/xsd&quot;&gt;
+                    &lt;price&gt;{args[0]}&lt;/price&gt;
+                    &lt;quantity&gt;{args[1]}&lt;/quantity&gt;
+                    &lt;symbol&gt;{args[2]}&lt;/symbol&gt;
+                &lt;/order&gt;
+            &lt;/placeOrder&gt;);
+        ]]&gt;&lt;/script&gt;
+        &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
 
-    <sequence name="mtom_proxy">
-        <log level="full"/>
-        <property action="set" name="OUT_ONLY" value="true"/>
-        <header name="Action" value="urn:oneWayUploadUsingMTOM"/>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/services/MTOMSwASampleService" optimize="mtom"/>
-            </endpoint>
-        </send>
-    </sequence>
+    &lt;sequence name=&quot;mtom_proxy&quot;&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+        &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+        &lt;header name=&quot;Action&quot; value=&quot;urn:oneWayUploadUsingMTOM&quot;/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/MTOMSwASampleService&quot; optimize=&quot;mtom&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
 
-    <sequence name="pox_proxy">
-        <property action="set" name="OUT_ONLY" value="true"/>
-        <header name="Action" value="urn:placeOrder"/>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
-            </endpoint>
-        </send>
-    </sequence>
+    &lt;sequence name=&quot;pox_proxy&quot;&gt;
+        &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+        &lt;header name=&quot;Action&quot; value=&quot;urn:placeOrder&quot;/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot; format=&quot;soap11&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
 
-    <sequence name="out">
-        <send/>
-    </sequence>
+    &lt;sequence name=&quot;out&quot;&gt;
+		&lt;send/&gt;
+	&lt;/sequence&gt;
 
-    <proxy name="JMSFileUploadProxy" transports="jms">
-        <target inSequence="mtom_proxy" outSequence="out"/>
-        <parameter name="transport.jms.ContentType">
-            <rules>
-                <bytesMessage>application/octet-stream</bytesMessage>
-            </rules>
-        </parameter>
-        <parameter name="Wrapper">{http://services.samples/xsd}element</parameter>
-    </proxy>
-    <proxy name="JMSTextProxy" transports="jms">
-        <target inSequence="text_proxy" outSequence="out"/>
-        <parameter name="transport.jms.ContentType">
-            <rules>
-                <textMessage>text/plain</textMessage>
-            </rules>
-        </parameter>
-        <parameter name="Wrapper">{http://services.samples/xsd}text</parameter>
-    </proxy>
-    <proxy name="JMSPoxProxy" transports="jms">
-        <target inSequence="pox_proxy" outSequence="out"/>
-        <parameter name="transport.jms.ContentType">application/xml</parameter>
-    </proxy>
-</definitions>]]></pre>
+    &lt;proxy name=&quot;JMSFileUploadProxy&quot; transports=&quot;jms&quot;&gt;
+        &lt;target inSequence=&quot;mtom_proxy&quot; outSequence=&quot;out&quot;/&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;bytesMessage&gt;application/octet-stream&lt;/bytesMessage&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;Wrapper&quot;&gt;{http://services.samples/xsd}element&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    &lt;proxy name=&quot;JMSTextProxy&quot; transports=&quot;jms&quot;&gt;
+        &lt;target inSequence=&quot;text_proxy&quot; outSequence=&quot;out&quot;/&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;textMessage&gt;text/plain&lt;/textMessage&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;Wrapper&quot;&gt;{http://services.samples/xsd}text&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    &lt;proxy name=&quot;JMSPoxProxy&quot; transports=&quot;jms&quot;&gt;
+        &lt;target inSequence=&quot;pox_proxy&quot; outSequence=&quot;out&quot;/&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;application/xml&lt;/parameter&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Pure POX/Text and Binary JMS Proxy services - including MTOM</strong> </p>
 <p>
@@ -2197,37 +2196,29 @@ java.naming.provider.url=tcp://localhost:61616</pre>
 <p>Execute JMS client as follows. This will post a pure text JMS message with the content defined (e.g. &quot;12.33 1000 ACP&quot;) to the specified JMS destination - dynamicQueues/JMSTextProxy </p>
 <pre xml:space="preserve">ant jmsclient -Djms_type=text -Djms_payload=&quot;12.33 1000 ACP&quot; -Djms_dest=dynamicQueues/JMSTextProxy</pre>
 <p>Following the logs, you could notice that Synapse received the JMS text message and transformed it into a SOAP payload as follows. Notice that the wrapper element &quot;{http://services.samples/xsd}text&quot; has been used to hold the text message content. </p>
-<pre xml:space="preserve"><![CDATA[[jms-Worker-1] INFO LogMediator To: ,
-                                WSAction: urn:mediate,
-                                SOAPAction: urn:mediate,
-                                MessageID: ID:orcus.veithen.net-50631-1225235276233-1:0:1:1:1,
-                                Direction: request,
+<pre xml:space="preserve">[jms-Worker-1] INFO LogMediator To: , WSAction: urn:mediate, SOAPAction: urn:mediate, MessageID: ID:orcus.veithen.net-50631-1225235276233-1:0:1:1:1, Direction: request,
 Envelope:
-<?xml version='1.0' encoding='utf-8'?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-  <soapenv:Body>
-    <axis2ns1:text xmlns:axis2ns1="http://services.samples/xsd">12.33 1000 ACP</axis2ns1:text>
-  </soapenv:Body>
-</soapenv:Envelope>]]></pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;axis2ns1:text xmlns:axis2ns1=&quot;http://services.samples/xsd&quot;&gt;12.33 1000 ACP&lt;/axis2ns1:text&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
 <p>Now, you could see how the script mediator created a stock quote request by tokenizing the text as follows, and sent the message to the placeOrder operation of the SimpleStockQuoteService. </p>
-<pre xml:space="preserve"><![CDATA[[jms-Worker-1] INFO LogMediator To: ,
-                                WSAction: urn:placeOrder,
-                                SOAPAction: urn:placeOrder,
-                                MessageID: ID:orcus.veithen.net-50631-1225235276233-1:0:1:1:1,
-                                Direction: request,
+<pre xml:space="preserve">[jms-Worker-1] INFO LogMediator To: , WSAction: urn:placeOrder, SOAPAction: urn:placeOrder, MessageID: ID:orcus.veithen.net-50631-1225235276233-1:0:1:1:1, Direction: request,
 Envelope:
-<?xml version='1.0' encoding='utf-8'?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-  <soapenv:Body>
-    <placeOrder xmlns="http://services.samples">
-      <order xmlns="http://services.samples/xsd">
-        <price>12.33</price>
-        <quantity>1000</quantity>
-        <symbol>ACP</symbol>
-      </order>
-    </placeOrder>
-  </soapenv:Body>
-</soapenv:Envelope>]]></pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;placeOrder xmlns=&quot;http://services.samples&quot;&gt;
+      &lt;order xmlns=&quot;http://services.samples/xsd&quot;&gt;
+        &lt;price&gt;12.33&lt;/price&gt;
+        &lt;quantity&gt;1000&lt;/quantity&gt;
+        &lt;symbol&gt;ACP&lt;/symbol&gt;
+      &lt;/order&gt;
+    &lt;/placeOrder&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
 <p>The sample Axis2 server would now accept the one-way message and issue the following message: </p>
 <pre xml:space="preserve">samples.services.SimpleStockQuoteService :: Accepted order for : 1000 stocks of ACP at $ 12.33</pre>
 <p></p>
@@ -2235,18 +2226,14 @@ Envelope:
 <pre xml:space="preserve">ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy \
               -Djms_payload=./../../repository/conf/sample/resources/mtom/asf-logo.gif</pre>
 <p>Examining the Synapse debug logs reveals that the binary content was received over JMS and wrapped with the specified element into a SOAP infoset as follows: </p>
-<pre xml:space="preserve"><![CDATA[[jms-Worker-1] INFO LogMediator To: ,
-                                WSAction: urn:mediate,
-                                SOAPAction: urn:mediate,
-                                MessageID: ID:orcus.veithen.net-50702-1225236039556-1:0:1:1:1,
-                                Direction: request,
+<pre xml:space="preserve">[jms-Worker-1] INFO LogMediator To: , WSAction: urn:mediate, SOAPAction: urn:mediate, MessageID: ID:orcus.veithen.net-50702-1225236039556-1:0:1:1:1, Direction: request,
 Envelope:
-<?xml version='1.0' encoding='utf-8'?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-  <soapenv:Body>
-    <axis2ns1:element xmlns:axis2ns1="http://services.samples/xsd">R0lGODlhgw...AAOw==</axis2ns1:element>
-  </soapenv:Body>
-</soapenv:Envelope>]]></pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;axis2ns1:element xmlns:axis2ns1=&quot;http://services.samples/xsd&quot;&gt;R0lGODlhgw...AAOw==&lt;/axis2ns1:element&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
 <p>Thereafter the message was sent as a MTOM optimized message as specified by the 'format=mtom' attribute of the endpoint, to the MTOMSwASampleService using the SOAP action 'urn:oneWayUploadUsingMTOM'. Once received by the sample service, it is saved into a temporary file and could be verified for correctness. </p>
 <pre xml:space="preserve">Wrote to file : ./../../work/temp/sampleServer/mtom-4417.gif</pre>
 <p></p>
@@ -2317,35 +2304,35 @@ Transfer-Encoding: chunked
 0</pre>
 <h2>
 <a name="Sample254" id="Sample254">Sample 254: Using the file system as transport medium using VFS transport listener and sender</a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
-    <proxy name="StockQuoteProxy" transports="vfs">
-        <parameter name="transport.vfs.FileURI">file:///home/user/test/in</parameter> <!--CHANGE-->
-        <parameter name="transport.vfs.ContentType">text/xml</parameter>
-        <parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
-        <parameter name="transport.PollInterval">15</parameter>
-        <parameter name="transport.vfs.MoveAfterProcess">file:///home/user/test/original</parameter> <!--CHANGE-->
-        <parameter name="transport.vfs.MoveAfterFailure">file:///home/user/test/original</parameter> <!--CHANGE-->
-        <parameter name="transport.vfs.ActionAfterProcess">MOVE</parameter>
-        <parameter name="transport.vfs.ActionAfterFailure">MOVE</parameter>
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;vfs&quot;&gt;
+        &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;file:///home/user/test/in&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.vfs.FileNamePattern&quot;&gt;.*\.xml&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.PollInterval&quot;&gt;15&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.vfs.MoveAfterProcess&quot;&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name=&quot;transport.vfs.MoveAfterFailure&quot;&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name=&quot;transport.vfs.ActionAfterProcess&quot;&gt;MOVE&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.vfs.ActionAfterFailure&quot;&gt;MOVE&lt;/parameter&gt;
 
-        <target>
-            <endpoint>
-                <address format="soap12" uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-            <outSequence>
-                <property name="transport.vfs.ReplyFileName"
-                          expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')" scope="transport"/>
-                <property action="set" name="OUT_ONLY" value="true"/>
-                <send>
-                    <endpoint>
-                        <address uri="vfs:file:///home/user/test/out"/> <!--CHANGE-->
-                    </endpoint>
-                </send>
-            </outSequence>
-        </target>
-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-    </proxy>
-</definitions>]]></pre>
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address format=&quot;soap12&quot; uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;property name=&quot;transport.vfs.ReplyFileName&quot;
+                          expression=&quot;fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')&quot; scope=&quot;transport&quot;/&gt;
+                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri=&quot;vfs:file:///home/user/test/out&quot;/&gt; &lt;!--CHANGE--&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Using the file system as transport medium using VFS transport listener and sender</strong> </p>
 <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
@@ -2355,14 +2342,14 @@ Transfer-Encoding: chunked
 <p>Copy SYNAPSE_HOME/repository/conf/sample/resources/vfs/test.xml to the directory given in transport.vfs.FileURI above. </p>
 <p>test.xml file content is as follows </p>
 <pre xml:space="preserve">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
-        &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
-        &lt;soapenv:Body&gt;
-                &lt;m0:getQuote xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
-                        &lt;m0:request&gt;
-                                &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
-                        &lt;/m0:request&gt;
-                &lt;/m0:getQuote&gt;
-        &lt;/soapenv:Body&gt;
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+    &lt;soapenv:Body&gt;
+            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
+                    &lt;m0:request&gt;
+                            &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+                    &lt;/m0:request&gt;
+            &lt;/m0:getQuote&gt;
+    &lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</pre>
 <p>VFS transport listener will pick the file from 
 <em>in</em> directory and send it to the Axis2 service. The request XML file will be moved to 
@@ -2371,30 +2358,30 @@ Transfer-Encoding: chunked
 <h2>
 <a name="Sample255" id="Sample255">Sample 255: Switching from ftp transport listener to mail transport sender</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-        &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;vfs&quot;&gt;
-                &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;vfs:ftp://guest:guest@localhost/test?vfs.passive=true&lt;/parameter&gt; &lt;!--CHANGE--&gt;
-                &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
-                &lt;parameter name=&quot;transport.vfs.FileNamePattern&quot;&gt;.*\.xml&lt;/parameter&gt;
-                &lt;parameter name=&quot;transport.PollInterval&quot;&gt;15&lt;/parameter&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;vfs&quot;&gt;
+            &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;vfs:ftp://guest:guest@localhost/test?vfs.passive=true&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+            &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
+            &lt;parameter name=&quot;transport.vfs.FileNamePattern&quot;&gt;.*\.xml&lt;/parameter&gt;
+            &lt;parameter name=&quot;transport.PollInterval&quot;&gt;15&lt;/parameter&gt;
 
-                &lt;target&gt;
-                        &lt;inSequence&gt;
-                                &lt;header name=&quot;Action&quot; value=&quot;urn:getQuote&quot;/&gt;
-                        &lt;/inSequence&gt;
-                        &lt;endpoint&gt;
-                                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
-                        &lt;/endpoint&gt;
-                        &lt;outSequence&gt;
-                                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
-                                &lt;send&gt;
-                                        &lt;endpoint&gt;
-                                                &lt;address uri=&quot;mailto:user@host&quot;/&gt; &lt;!--CHANGE--&gt;
-                                        &lt;/endpoint&gt;
-                                &lt;/send&gt;
-                        &lt;/outSequence&gt;
-                &lt;/target&gt;
-                &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
-        &lt;/proxy&gt;
+            &lt;target&gt;
+                    &lt;inSequence&gt;
+                            &lt;header name=&quot;Action&quot; value=&quot;urn:getQuote&quot;/&gt;
+                    &lt;/inSequence&gt;
+                    &lt;endpoint&gt;
+                            &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                    &lt;/endpoint&gt;
+                    &lt;outSequence&gt;
+                            &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+                            &lt;send&gt;
+                                    &lt;endpoint&gt;
+                                            &lt;address uri=&quot;mailto:user@host&quot;/&gt; &lt;!--CHANGE--&gt;
+                                    &lt;/endpoint&gt;
+                            &lt;/send&gt;
+                    &lt;/outSequence&gt;
+            &lt;/target&gt;
+            &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+    &lt;/proxy&gt;
 &lt;/definitions&gt; </pre>
 <p>
 <strong>Objective: Switching from FTP transport listener to mail transport sender</strong> </p>
@@ -2410,46 +2397,46 @@ Transfer-Encoding: chunked
 <p>VFS transport listener will pick the file from the directory in the FTP server and send it to the Axis2 service. The file in the FTP directory will be deleted. The response will be sent to the given email address. </p>
 <h2>
 <a name="Sample256" id="Sample256">Sample 256: Proxy services with the mail transport </a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
-    <proxy name="StockQuoteProxy" transports="mailto">
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;mailto&quot;&gt;
 
-        <parameter name="transport.mail.Address">synapse.demo.1@gmail.com</parameter>
-        <parameter name="transport.mail.Protocol">pop3</parameter>
-        <parameter name="transport.PollInterval">5</parameter>
-        <parameter name="mail.pop3.host">pop.gmail.com</parameter>
-        <parameter name="mail.pop3.port">995</parameter>
-        <parameter name="mail.pop3.user">synapse.demo.1</parameter>
-        <parameter name="mail.pop3.password">mailpassword</parameter>
-        <parameter name="mail.pop3.socketFactory.class">javax.net.ssl.SSLSocketFactory</parameter>
-        <parameter name="mail.pop3.socketFactory.fallback">false</parameter>
-        <parameter name="mail.pop3.socketFactory.port">995</parameter>
-        <parameter name="transport.mail.ContentType">application/xml</parameter>
+        &lt;parameter name=&quot;transport.mail.Address&quot;&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.mail.Protocol&quot;&gt;pop3&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.PollInterval&quot;&gt;5&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.host&quot;&gt;pop.gmail.com&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.port&quot;&gt;995&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.user&quot;&gt;synapse.demo.1&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.password&quot;&gt;mailpassword&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.socketFactory.class&quot;&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.socketFactory.fallback&quot;&gt;false&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.pop3.socketFactory.port&quot;&gt;995&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.mail.ContentType&quot;&gt;application/xml&lt;/parameter&gt;
 
-        <target>
-            <inSequence>
-                <property name="senderAddress" expression="get-property('transport', 'From')"/>
-                <log level="full">
-                    <property name="Sender Address" expression="get-property('senderAddress')"/>
-                </log>
-                <send>
-                    <endpoint>
-                        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-                    </endpoint>
-                </send>
-            </inSequence>
-            <outSequence>
-                <property name="Subject" value="Custom Subject for Response" scope="transport"/>
-                <header name="To" expression="fn:concat('mailto:', get-property('senderAddress'))"/>
-                <log level="full">
-                    <property name="message" value="Response message"/>
-                    <property name="Sender Address" expression="get-property('senderAddress')"/>
-                </log>
-                <send/>
-            </outSequence>
-        </target>
-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-    </proxy>
-</definitions>]]></pre>
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;senderAddress&quot; expression=&quot;get-property(&quot;transport&quot;, &quot;From&quot;)&quot;/&gt;
+                &lt;log level=&quot;full&quot;&gt;
+                    &lt;property name=&quot;Sender Address&quot; expression=&quot;get-property(&quot;senderAddress&quot;)&quot;/&gt;
+                &lt;/log&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;property name=&quot;Subject&quot; value=&quot;Custom Subject for Response&quot; scope=&quot;transport&quot;/&gt;
+                &lt;header name=&quot;To&quot; expression=&quot;fn:concat(&quot;mailto:&quot;, get-property(&quot;senderAddress&quot;))&quot;/&gt;
+                &lt;log level=&quot;full&quot;&gt;
+                    &lt;property name=&quot;message&quot; value=&quot;Response message&quot;/&gt;
+                    &lt;property name=&quot;Sender Address&quot; expression=&quot;get-property(&quot;senderAddress&quot;)&quot;/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Using the mail transport with Proxy services</strong> </p>
 <p>
@@ -2460,11 +2447,11 @@ Transfer-Encoding: chunked
 <a href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport sender</a> </p>
 <p>Start the Synapse configuration numbered 256: i.e. synapse -sample 256 </p>
 <p>Send an email with the following body and any custom Subject from your mail account. </p>
-<pre xml:space="preserve"><![CDATA[<getQuote xmlns="http://services.samples">
-   <request xmlns="http://services.samples/xsd">
-       <symbol>IBM</symbol>
-   </request>
-</getQuote>]]></pre>
+<pre xml:space="preserve">&lt;getQuote xmlns=&quot;http://services.samples&quot;&gt;
+   &lt;request xmlns=&quot;http://services.samples/xsd&quot;&gt;
+       &lt;symbol&gt;IBM&lt;/symbol&gt;
+   &lt;/request&gt;
+&lt;/getQuote&gt;</pre>
 <p>After a few seconds (e.g. 30s), you should receive a POX response in your email account with the stock quote reply. </p>
 <p>Note that in this sample we used the <tt>transport.mail.ContentType</tt> property to make sure that the transport parses
 the request message as POX. If you remove this property, you may still be able to send requests using a standard
@@ -2556,32 +2543,31 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>Synapse will forward the order request to the session with the Executor. The first response coming from the Executor will be sent back over HTTP. Executor generally sends two responses for each incoming order request. But since the response has to be forwarded over HTTP only one can be sent back to the client. </p>
 <h2>
 <a name="Sample259" id="Sample259">Sample 259: Switch from FIX to HTTP </a></h2>
-<pre xml:space="preserve">          &lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-            &lt;localEntry key=&quot;xslt-key-req&quot;
-		src=&quot;file:repository/conf/sample/resources/transform/transform_fix_to_http.xslt&quot; /&gt;
-	        &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
-		        &lt;target&gt;
-			        &lt;endpoint&gt;
-				        &lt;address
-					        uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot; /&gt;
-			        &lt;/endpoint&gt;
-			        &lt;inSequence&gt;
-				        &lt;log level=&quot;full&quot; /&gt;
-				        &lt;xslt key=&quot;xslt-key-req&quot; /&gt;
-				        &lt;log level=&quot;full&quot; /&gt;
-			        &lt;/inSequence&gt;
-			        &lt;outSequence&gt;
-				        &lt;log level=&quot;full&quot; /&gt;
-			        &lt;/outSequence&gt;
-		        &lt;/target&gt;
-		    &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
-			    file:repository/conf/sample/resources/fix/fix-synapse.cfg
-		    &lt;/parameter&gt;
-		    &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
-			    file
-		    &lt;/parameter&gt;
-	       &lt;/proxy&gt;
-        &lt;/definitions&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;localEntry key=&quot;xslt-key-req&quot; src=&quot;file:repository/conf/sample/resources/transform/transform_fix_to_http.xslt&quot; /&gt;
+    &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address
+                    uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot; /&gt;
+            &lt;/endpoint&gt;
+            &lt;inSequence&gt;
+                &lt;log level=&quot;full&quot; /&gt;
+                &lt;xslt key=&quot;xslt-key-req&quot; /&gt;
+                &lt;log level=&quot;full&quot; /&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;log level=&quot;full&quot; /&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+    &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
+        file:repository/conf/sample/resources/fix/fix-synapse.cfg
+    &lt;/parameter&gt;
+    &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
+        file
+    &lt;/parameter&gt;
+   &lt;/proxy&gt;
+&lt;/definitions&gt;
       </pre>
 <p>
 <strong>Objective: Demonstrate the capability of switching between FIX to HTTP</strong> </p>
@@ -2598,20 +2584,20 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_259.xml file and make sure that transport.fix.AcceptorConfigURL property points to the fix-synapse.cfg file you created. Once done you can start the Synapse configuration numbered 259: i.e. synapse -sample 259. Note that Synapse creates a new FIX session with Banzai at this point. </p>
 <p>Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ 100. User has to send a 'Limit' Order because price is a mandatory field for 'placeOrder' operation. </p>
 <p>Synapse will forward the order request to one-way 'placeOrder' operation on the SimpleStockQuoteService. Synapse uses a simple XSLT mediator to transform the incoming FIX to a SOAP message. </p>
-<pre xml:space="preserve">          &lt;xsl:stylesheet version=&quot;2.0&quot;
-	        xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
-	        xmlns:fn=&quot;http://www.w3.org/2005/02/xpath-functions&quot;&gt;
-	        &lt;xsl:output method=&quot;xml&quot; omit-xml-declaration=&quot;yes&quot; indent=&quot;yes&quot; /&gt;
-	      &lt;xsl:template match=&quot;/&quot;&gt;
-		    &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
-			    &lt;m0:order&gt;
-				    &lt;m0:price&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='44']&quot;/&gt;&lt;/m0:price&gt;
-				    &lt;m0:quantity&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='38']&quot;/&gt;&lt;/m0:quantity&gt;
-				    &lt;m0:symbol&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='55']&quot;/&gt;&lt;/m0:symbol&gt;
-			    &lt;/m0:order&gt;
-		    &lt;/m0:placeOrder&gt;
-	       &lt;/xsl:template&gt;
-        &lt;/xsl:stylesheet&gt;
+<pre xml:space="preserve">&lt;xsl:stylesheet version=&quot;2.0&quot;
+    xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+    xmlns:fn=&quot;http://www.w3.org/2005/02/xpath-functions&quot;&gt;
+    &lt;xsl:output method=&quot;xml&quot; omit-xml-declaration=&quot;yes&quot; indent=&quot;yes&quot; /&gt;
+  &lt;xsl:template match=&quot;/&quot;&gt;
+    &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+        &lt;m0:order&gt;
+            &lt;m0:price&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='44']&quot;/&gt;&lt;/m0:price&gt;
+            &lt;m0:quantity&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='38']&quot;/&gt;&lt;/m0:quantity&gt;
+            &lt;m0:symbol&gt;&lt;xsl:value-of select=&quot;//message/body/field[@id='55']&quot;/&gt;&lt;/m0:symbol&gt;
+        &lt;/m0:order&gt;
+    &lt;/m0:placeOrder&gt;
+   &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
       </pre>
 <p>To get an idea about the various transport parameters being used in this sample see 
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
@@ -2664,20 +2650,20 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <h2>
 <a name="Sample261" id="Sample261">Sample 261: Switch between FIX versions </a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-         &lt;proxy name=&quot;OrderProcesserProxy41&quot; transports=&quot;fix&quot;&gt;
-            &lt;target&gt;
-               &lt;endpoint&gt;
-                  &lt;address uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot;/&gt;
-               &lt;/endpoint&gt;
-               &lt;inSequence&gt;&lt;log level=&quot;full&quot;/&gt;&lt;/inSequence&gt;
-               &lt;outSequence&gt;&lt;log level=&quot;full&quot;/&gt;&lt;send/&gt;&lt;/outSequence&gt;
-            &lt;/target&gt;
-            &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;file:repository/conf/sample/resources/fix/fix-synapse-m40.cfg&lt;/parameter&gt;
-            &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;file&lt;/parameter&gt;
-            &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:repository/conf/sample/resources/fix/synapse-sender-m.cfg&lt;/parameter&gt;
-            &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;file&lt;/parameter&gt;
-         &lt;/proxy&gt;
-      &lt;/definitions&gt;</pre>
+     &lt;proxy name=&quot;OrderProcesserProxy41&quot; transports=&quot;fix&quot;&gt;
+        &lt;target&gt;
+           &lt;endpoint&gt;
+              &lt;address uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot;/&gt;
+           &lt;/endpoint&gt;
+           &lt;inSequence&gt;&lt;log level=&quot;full&quot;/&gt;&lt;/inSequence&gt;
+           &lt;outSequence&gt;&lt;log level=&quot;full&quot;/&gt;&lt;send/&gt;&lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;file:repository/conf/sample/resources/fix/fix-synapse-m40.cfg&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;file&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:repository/conf/sample/resources/fix/synapse-sender-m.cfg&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;file&lt;/parameter&gt;
+     &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the capability of switching between FIX versions e.g. FIX4.0 to FIX4.1</strong> </p>
 <p>
@@ -2688,9 +2674,9 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <pre xml:space="preserve">DataDictionary=~/etc/spec/FIX40-synapse.xml</pre>
 <p>Note: FIX40-synapse.xml can be found at $SYNAPSE_HOME/repository/conf/samples/resources/fix. This is a custom FIX data dictionary file that has added tag 150,151 to the execution messages (35=8) of FIX4.0. Make sure the DataDictionary property of the banzai.cfg points to this data dictionary file. </p>
 <p>Add the following lines to the Executor configuration file (executor.cfg). </p>
-<pre xml:space="preserve">            [session]
-            BeginString=FIX.4.1
-            SocketAcceptPort=19877</pre>
+<pre xml:space="preserve">[session]
+BeginString=FIX.4.1
+SocketAcceptPort=19877</pre>
 <p>Start Banzai and Executor using the custom configuration files. </p>
 <p>Enable FIX transport in the Synapse axis2.xml. See 
 <a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a> </p>
@@ -2703,48 +2689,48 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <h2>
 <a name="Sample262" id="Sample262">Sample 262: CBR of FIX messages</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-	    &lt;sequence name=&quot;CBR_SEQ&quot;&gt;
-		    &lt;in&gt;
-			    &lt;switch source=&quot;//message/body/field[@id='55']&quot;&gt;
-				    &lt;case regex=&quot;GOOG&quot;&gt;
-					    &lt;send&gt;
-						    &lt;endpoint&gt;
-							    &lt;address
-								    uri=&quot;fix://localhost:19876?BeginString=FIX.4.0&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot; /&gt;
-    						&lt;/endpoint&gt;
-	    				&lt;/send&gt;
-		    		&lt;/case&gt;
-			    	&lt;case regex=&quot;MSFT&quot;&gt;
-				    	&lt;send&gt;
-					    	&lt;endpoint&gt;
-						    	&lt;address
-							    	uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot; /&gt;
-						    &lt;/endpoint&gt;
-    					&lt;/send&gt;
-	     			&lt;/case&gt;
-                    &lt;default&gt;&lt;/default&gt;
-    			&lt;/switch&gt;
-	    	&lt;/in&gt;
-    		&lt;out&gt;
-	    		&lt;send /&gt;
-    		&lt;/out&gt;
-	    &lt;/sequence&gt;
-	    &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
-		    &lt;target inSequence=&quot;CBR_SEQ&quot; /&gt;
-		    &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
-			    file:repository/conf/sample/resources/fix/fix-synapse.cfg
-		    &lt;/parameter&gt;
-		    &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
-			    file
-		    &lt;/parameter&gt;
-		    &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;
-			    file:repository/conf/sample/resources/fix/synapse-sender.cfg
-		    &lt;/parameter&gt;
-		    &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;
-			    file
-		    &lt;/parameter&gt;
-	    &lt;/proxy&gt;
-       &lt;/definitions&gt;</pre>
+    &lt;sequence name=&quot;CBR_SEQ&quot;&gt;
+        &lt;in&gt;
+            &lt;switch source=&quot;//message/body/field[@id='55']&quot;&gt;
+                &lt;case regex=&quot;GOOG&quot;&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address
+                                uri=&quot;fix://localhost:19876?BeginString=FIX.4.0&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot; /&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex=&quot;MSFT&quot;&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address
+                                uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;amp;SenderCompID=SYNAPSE&amp;amp;TargetCompID=EXEC&quot; /&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;default&gt;&lt;/default&gt;
+            &lt;/switch&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send /&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+    &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
+        &lt;target inSequence=&quot;CBR_SEQ&quot; /&gt;
+        &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;
+            file:repository/conf/sample/resources/fix/fix-synapse.cfg
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;
+            file
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;
+            file:repository/conf/sample/resources/fix/synapse-sender.cfg
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;
+            file
+        &lt;/parameter&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the capability of CBR FIX messages</strong> </p>
 <p>
@@ -2756,8 +2742,8 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>Note: FIX40-synapse.xml can be found at $SYNAPSE_HOME/repository/conf/samples/resources/fix. This is a custom FIX data dictionary file that has added tag 150,151 to the execution messages (35=8) of FIX4.0. Make sure the DataDictionary property of the banzai.cfg points to this data dictionary file. </p>
 <p>Add the following lines to executor.cfg </p>
 <pre xml:space="preserve">[session]
-               BeginString=FIX.4.1
-               SocketAcceptPort=19877</pre>
+BeginString=FIX.4.1
+SocketAcceptPort=19877</pre>
 <p>Start Banzai and Executor using the custom config files. </p>
 <p>Enable FIX transport in the Synapse axis2.xml. See 
 <a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a> </p>
@@ -2773,30 +2759,28 @@ mail clients don't allow the user to explicitly set the content type.</p>
 
 <h2>
 <a name="Sample263" id="Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
-
-    <proxy name="StockQuoteProxy" transports="jms">
-        <target>
-            <inSequence>
-                <property action="set" name="OUT_ONLY" value="true"/>
-            </inSequence>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-            <outSequence>
-                <send/>
-            </outSequence>
-        </target>
-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-        <parameter name="transport.jms.ContentType">
-            <rules>
-                <jmsProperty>contentType</jmsProperty>
-                <default>application/xml</default>
-            </rules>
-        </parameter>
-    </proxy>
-
-</definitions>]]></pre>
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+            &lt;/inSequence&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+                &lt;default&gt;application/xml&lt;/default&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Introduction to switching transports with proxy services. The JMS provider will be <a href="http://jboss.org/jbossmessaging/">JBoss Messaging(JBM).</a></strong> </p>
 <p>
@@ -2813,10 +2797,10 @@ mail clients don't allow the user to explicitly set the content type.</p>
 </pre>
 <p>Once you started the JBM server with the above changes you'll be able to see the following on STDOUT.</p>
 <pre xml:space="preserve">10:18:02,673 INFO [org.jboss.messaging.core.server.impl.MessagingServerImpl]  JBoss Messaging Server version 2.0.0.BETA3 (maggot, 104) started </pre>
-<p>You will now need to configure the Axis2 instance used by Synapse (not the sample Axis2 server) to enable JMS support using the above provider. Refer to the Axis2 documentation on setting up JMS for more details (http://ws.apache.org/axis2/1_1/jms-transport.html). You will also need to copy the jbm-core-client.jar, jbm-jms-client.jar, jnp-client.jar(these jars are inside client folder ) and
+<p>You will now need to configure the Axis2 instance used by Synapse (not the sample Axis2 server) to enable JMS support using the above provider. Refer Axis2 documentation on setting up JMS in detail (http://ws.apache.org/axis2/1_1/jms-transport.html). You will also need to copy the jbm-core-client.jar, jbm-jms-client.jar, jnp-client.jar(these jars are inside client folder ) and
     jbm-transports.jar, netty.jar(these jars are from lib folder) jars from JBM into the lib directory to allow Synapse to connect to the JBM JMS provider. This was tested with JBM 2.0.0.BETA3 </p>
 
-<p>You need to add the following configuration for Axis2 transport listener in axis2.xml found at repository/conf/axis2.xml.</p>
+<p>You need to add the following configuration for Axis2 JMS transport listener in axis2.xml found at repository/conf/axis2.xml.</p>
 <pre xml:space="preserve">
 &lt;transportReceiver name=&quot;jms&quot; class=&quot;org.apache.axis2.transport.jms.JMSListener&quot;&gt;
     &lt;parameter name=&quot;java.naming.factory.initial&quot;&gt;org.jnp.interfaces.NamingContextFactory&lt;/parameter&gt;
@@ -2825,8 +2809,8 @@ mail clients don't allow the user to explicitly set the content type.</p>
     &lt;parameter name=&quot;transport.jms.ConnectionFactoryJNDIName&quot;&gt;ConnectionFactory&lt;/parameter&gt;
 &lt;/transportReceiver&gt;
 </pre>
-<p>And also uncomment the section for JMS transport sender.</p>
-<p>Once you start the Synapse configuration and request for the WSDL of the proxy service (http://localhost:8280/services/StockQuoteProxy?wsdl) you will notice that its exposed only on the JMS transport. This is because the configuration specified this requirement in the proxy service definition. </p>
+<p>And also uncomment the section for JMS transport sender in the same file.</p>
+<p>Once you start the Synapse configuration 250 and request for the WSDL of the proxy service (http://localhost:8280/services/StockQuoteProxy?wsdl) you will notice that its exposed only on the JMS transport. This is because the configuration specified this requirement in the proxy service definition. </p>
 <p>Now lets send a stock quote request on JMS, using the dumb stock quote client as follows: </p>
 <pre xml:space="preserve">ant jmsclient -Djms_type=pox -Djms_dest=StockQuoteProxy -Djms_payload=MSFT -Djava.naming.provider.url=jnp://localhost:1099 -Djava.naming.factory.initial=org.jnp.interfaces.NamingContextFactory -D=java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces</pre>
 <p>On the Synapse debug log you will notice that the JMS listener received the request message as: </p>

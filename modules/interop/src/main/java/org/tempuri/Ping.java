@@ -18,10 +18,10 @@ package org.tempuri;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.databinding.ADBException;
-import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
  * Ping bean class
@@ -216,10 +216,6 @@ public class Ping implements org.apache.axis2.databinding.ADBBean {
 				return "ns" + (int) Math.random();
 			}
 
-			public void serialize(MTOMAwareXMLStreamWriter arg0) throws XMLStreamException {
-				// TODO Auto-generated method stub
-				
-			}
 		};
 
 		// ignore the QName passed in - we send only OUR QName!
@@ -252,12 +248,12 @@ public class Ping implements org.apache.axis2.databinding.ADBBean {
 
 	}
 	
-    public void serialize(final QName parentQName,
-            MTOMAwareXMLStreamWriter xmlWriter)throws XMLStreamException, ADBException{}
+	public void serialize(final QName parentQName,
+		XMLStreamWriter xmlWriter)throws XMLStreamException, ADBException{}
 
-    public void serialize(final QName parentQName,
-            MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType)throws XMLStreamException, ADBException{}
+	public void serialize(final QName parentQName,
+		XMLStreamWriter xmlWriter,
+		boolean serializeType)throws XMLStreamException, ADBException{}
 
 	/**
 	 * Factory class that keeps the parse method

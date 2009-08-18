@@ -18,10 +18,10 @@ package org.tempuri;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.databinding.ADBException;
-import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
  * EchoStringResponseBodyType bean class
@@ -220,10 +220,6 @@ public class EchoStringResponseBodyType implements
 				return "ns" + (int) Math.random();
 			}
 
-			public void serialize(MTOMAwareXMLStreamWriter arg0) throws XMLStreamException {
-				// TODO Auto-generated method stub
-				
-			}
 		};
 
 		return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -255,12 +251,12 @@ public class EchoStringResponseBodyType implements
 
 	}
 	
-    public void serialize(final QName parentQName,
-            MTOMAwareXMLStreamWriter xmlWriter)throws XMLStreamException, ADBException{}
+	public void serialize(final QName parentQName,
+		XMLStreamWriter xmlWriter)throws XMLStreamException, ADBException{}
 
-    public void serialize(final QName parentQName,
-            MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType)throws XMLStreamException, ADBException{}
+	public void serialize(final QName parentQName,
+		XMLStreamWriter xmlWriter,
+		boolean serializeType)throws XMLStreamException, ADBException{}
 
 	/**
 	 * Factory class that keeps the parse method

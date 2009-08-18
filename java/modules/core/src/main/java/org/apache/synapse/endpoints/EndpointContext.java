@@ -215,7 +215,8 @@ public class EndpointContext {
     public void onSuccess() {
         if (isClustered) {
             Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
-            if (state != ST_ACTIVE && state != ST_OFF) {
+
+            if ((state == null) || ((state != ST_ACTIVE) && (state != ST_OFF))) {
                 setState(ST_ACTIVE);
             }
         } else {

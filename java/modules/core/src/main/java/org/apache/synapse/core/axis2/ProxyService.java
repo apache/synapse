@@ -620,7 +620,7 @@ public class ProxyService implements AspectConfigurable {
 
             AxisService as = axisConfig.getServiceForActivation(this.getName());
             as.setActive(true);
-            axisConfig.notifyObservers(AxisEvent.SERVICE_START, as);
+            axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_START, as), as);
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
         } else {
@@ -651,7 +651,7 @@ public class ProxyService implements AspectConfigurable {
                 AxisService as = axisConfig.getService(this.getName());
                 if (as != null) {
                     as.setActive(false);
-                    axisConfig.notifyObservers(AxisEvent.SERVICE_STOP, as);
+                    axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_STOP, as), as);
                 }
                 this.setRunning(false);
                 auditInfo("Stopped the proxy service : " + name);

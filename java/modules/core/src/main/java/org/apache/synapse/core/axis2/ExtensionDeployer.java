@@ -89,8 +89,9 @@ public class ExtensionDeployer implements Deployer {
         try {
             boolean isDirectory = deploymentFileData.getFile().isDirectory();
             deploymentFileData.setClassLoader(isDirectory, getClass().getClassLoader(),
-                    (File)cfgCtx.getAxisConfiguration().getParameterValue(
-                            Constants.Configuration.ARTIFACTS_TEMP_DIR));
+                    (File) cfgCtx.getAxisConfiguration().getParameterValue(
+                            Constants.Configuration.ARTIFACTS_TEMP_DIR),
+                    cfgCtx.getAxisConfiguration().isChildFirstClassLoading());
 
             DeploymentClassLoader urlCl
                 = (DeploymentClassLoader)deploymentFileData.getClassLoader();

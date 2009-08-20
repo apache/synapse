@@ -20,8 +20,10 @@ package org.apache.synapse.mediators.throttle;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.clustering.ClusteringFault;
-import org.apache.axis2.clustering.ClusterManager;
-import org.apache.axis2.clustering.context.Replicator;
+
+import org.apache.axis2.clustering.ClusteringAgent;
+import org.apache.axis2.clustering.state.Replicator;
+
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Mediator;
@@ -119,9 +121,9 @@ public class ThrottleMediator extends AbstractMediator {
             //To ensure check for clustering environment only happens one time
             if ((throttle == null && !isResponse) || (isResponse
                     && concurrentAccessController == null)) {
-                ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
-                if (clusterManager != null &&
-                        clusterManager.getContextManager() != null) {
+                ClusteringAgent clusteringAgent = cc.getAxisConfiguration().getClusteringAgent();
+                if (clusteringAgent != null &&
+                        clusteringAgent.getStateManager() != null) {
                     isClusteringEnable = true;
                 }
             }

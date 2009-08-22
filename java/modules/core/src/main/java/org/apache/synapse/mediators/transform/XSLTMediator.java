@@ -67,7 +67,7 @@ import java.util.List;
  * 
  */
 public class XSLTMediator extends AbstractMediator {
-    
+
     private static class ErrorListenerImpl implements ErrorListener {
         private final SynapseLog synLog;
         private final String activity;
@@ -222,28 +222,13 @@ public class XSLTMediator extends AbstractMediator {
             synLog.traceTrace("Transformation source : " + sourceNode.toString());
         }
 
-        // build transformer - if necessary
-        Entry dp = synCtx.getConfiguration().getEntryDefinition(xsltKey);
-
-        // if the xsltKey refers to a dynamic resource
-        boolean reCreate = dp != null && dp.isDynamic() && (!dp.isCached() || dp.isExpired());
-
-        synchronized (transformerLock) {
-            if (reCreate || cachedTemplates == null) {
-                // Set an error listener (SYNAPSE-307).
-                transFact.setErrorListener(new ErrorListenerImpl(synLog, "stylesheet parsing"));
-                // Allow xsl:import and xsl:include resolution
-                transFact.setURIResolver(new CustomJAXPURIResolver(resourceMap,
-                        synCtx.getConfiguration()));
-                try {
-                    cachedTemplates = transFact.newTemplates(
-                        SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
-                    if (cachedTemplates == null) {
-                        handleException("Error compiling the XSLT with key : " + xsltKey, synCtx);
-                    }
-                } catch (Exception e) {
-                    handleException("Error creating XSLT transformer using : "
-                        + xsltKey, e, synCtx);
+        // determine if it is needed to create or create the template
+        if (isCreationOrRecreationRequired(synCtx)) {
+            // many threads can see this and come here for acquiring the lock
+            synchronized (transformerLock) {
+                // only first thread should create the template
+                if (isCreationOrRecreationRequired(synCtx)) {
+                    createTemplate(synCtx, synLog);
                 }
             }
         }
@@ -344,6 +329,48 @@ public class XSLTMediator extends AbstractMediator {
 
         } catch (TransformerException e) {
             handleException("Error performing XSLT transformation using : " + xsltKey, e, synCtx);
+        }
+    }
+
+    /**
+     * Create a XSLT template object and assing it to the cachedTemplates variable
+     * @param synCtx current message
+     * @param synLog logger to use
+     */
+    private void createTemplate(MessageContext synCtx, SynapseLog synLog) {
+        // Set an error listener (SYNAPSE-307).
+        transFact.setErrorListener(new ErrorListenerImpl(synLog, "stylesheet parsing"));
+        // Allow xsl:import and xsl:include resolution
+        transFact.setURIResolver(new CustomJAXPURIResolver(resourceMap,
+                synCtx.getConfiguration()));
+        try {
+            cachedTemplates = transFact.newTemplates(
+                    SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
+            if (cachedTemplates == null) {
+                handleException("Error compiling the XSLT with key : " + xsltKey, synCtx);
+            }
+        } catch (Exception e) {
+            handleException("Error creating XSLT transformer using : " + xsltKey, e, synCtx);
+        }
+    }
+
+    /**
+     * Utility method to determine weather it is needed to create a XSLT template
+     * @param synCtx current message
+     * @return true if it is needed to create a new XSLT template
+     */
+    private boolean isCreationOrRecreationRequired(MessageContext synCtx) {
+
+        // if there are no cachedTemplates we need to create a one
+        if (cachedTemplates == null) {
+            // this is a creation case
+            return true;
+        } else {
+            // build transformer - if necessary
+            Entry dp = synCtx.getConfiguration().getEntryDefinition(xsltKey);
+            // if the xsltKey refers to a dynamic resource, and if it has been expired
+            // it is a recreation case
+            return dp != null && dp.isDynamic() && (!dp.isCached() || dp.isExpired());
         }
     }
 
@@ -524,3 +551,4 @@ public class XSLTMediator extends AbstractMediator {
 }
 
 	
+

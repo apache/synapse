@@ -23,10 +23,40 @@ package org.apache.synapse;
  */
 
 public enum ServerState {
-    UNDETERMINED,
-    INITIALIZABLE,
-    INITIALIZED,
-    MAINTENANCE,
-    STARTED,
-    STOPPED
+
+    UNDETERMINED {
+        public String toString() {
+            return "UNDETERMINED";
+        }
+    },
+
+    INITIALIZABLE {
+        public String toString() {
+            return "INITIALIZABLE";
+        }
+    },
+    
+    INITIALIZED {
+        public String toString() {
+            return "INITIALIZED";
+        }
+    },
+    
+    MAINTENANCE {
+        public String toString() {
+            return "MAINTENANCE";
+        }
+    },
+
+    STARTED {
+        public String toString() {
+            return "STARTED";
+        }
+    },
+
+    STOPPED {
+        public String toString() {
+            return "STOPPED";
+        }
+    }
 }

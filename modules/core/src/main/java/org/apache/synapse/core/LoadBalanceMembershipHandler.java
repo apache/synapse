@@ -59,6 +59,21 @@ public interface LoadBalanceMembershipHandler {
      * @param context The AlgorithmContext which holds information needed for the algorithm
      * @return Next application member to whom the message has to be sent to
      */
-     Member getNextApplicationMember(AlgorithmContext context);
+    Member getNextApplicationMember(AlgorithmContext context);
+
+    /**
+     * Get the algorithum uses in this membership handler
+     *
+     * @return  Load balance algorithm use for this Membership handler
+     */
+    LoadbalanceAlgorithm getLoadbalanceAlgorithm();
+
+    /**
+     * get the properties used to init this membership handler
+     *
+     * @return get the initial properties
+     */
+    Properties getProperties();
+
 
 }

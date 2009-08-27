@@ -41,8 +41,10 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
     private LoadBalanceEventHandler lbEventHandler;
     private ConfigurationContext configCtx;
     private LoadbalanceAlgorithm algorithm;
+    private Properties properties;
 
     public void init(Properties props, LoadbalanceAlgorithm algorithm) {
+        this.properties = props;
         this.lbDomain = props.getProperty("applicationDomain");
         if(lbDomain == null){
             String msg = "The applicationDomain property has not been specified in the " +
@@ -89,5 +91,13 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
     public Member getNextApplicationMember(AlgorithmContext context) {
         algorithm.setApplicationMembers(lbEventHandler.getMembers());
         return algorithm.getNextApplicationMember(context);
+    }
+
+    public LoadbalanceAlgorithm getLoadbalanceAlgorithm() {
+        return this.algorithm;
+    }
+
+    public Properties getProperties() {
+        return this.properties;
     }
 }

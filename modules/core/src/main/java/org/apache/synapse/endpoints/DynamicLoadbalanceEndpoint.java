@@ -72,6 +72,10 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         this.lbMembershipHandler = lbMembershipHandler;
     }
 
+    public LoadBalanceMembershipHandler getLbMembershipHandler() {
+        return lbMembershipHandler;
+    }
+
     public void send(MessageContext synCtx) {
         EndpointReference to = synCtx.getTo();
         DynamicLoadbalanceFaultHandler faultHandler = new DynamicLoadbalanceFaultHandler(to);

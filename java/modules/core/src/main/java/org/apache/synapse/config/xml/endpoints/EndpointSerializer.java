@@ -281,6 +281,8 @@ public abstract class EndpointSerializer {
             return new IndirectEndpointSerializer();
         } else if (endpoint instanceof SALoadbalanceEndpoint) {
             return new SALoadbalanceEndpointSerializer();
+        } else if (endpoint instanceof DynamicLoadbalanceEndpoint){
+            return new DynamicLoadbalanceEndpointSerializer();
         } else if (endpoint instanceof LoadbalanceEndpoint) {
             return new LoadbalanceEndpointSerializer();
         } else if (endpoint instanceof FailoverEndpoint) {

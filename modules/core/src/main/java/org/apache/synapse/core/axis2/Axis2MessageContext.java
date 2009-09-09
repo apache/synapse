@@ -34,6 +34,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -132,6 +133,9 @@ public class Axis2MessageContext implements MessageContext {
             return (Mediator) o;
         } else {
             Mediator m = getConfiguration().getSequence(key);
+            if (m instanceof SequenceMediator && !((SequenceMediator) m).isInitialized()) {
+                ((SequenceMediator) m).init(synEnv);
+            }
             localEntries.put(key, m);
             return m;
         }
@@ -143,6 +147,9 @@ public class Axis2MessageContext implements MessageContext {
             return (Endpoint) o;
         } else {
             Endpoint e = getConfiguration().getEndpoint(key);
+            if (!e.isInitialized()) {
+                e.init(synEnv);
+            }
             localEntries.put(key, e);
             return e;
         }

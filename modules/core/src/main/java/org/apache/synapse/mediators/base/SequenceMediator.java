@@ -285,4 +285,8 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
 }

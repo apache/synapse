@@ -130,8 +130,13 @@ public class TestMessageContext implements MessageContext {
             return (Mediator) o;
         } else {
             Mediator m = getConfiguration().getSequence(key);
-            if (m instanceof SequenceMediator && !((SequenceMediator) m).isInitialized()) {
-                ((SequenceMediator) m).init(synEnv);
+            if (m instanceof SequenceMediator) {
+                SequenceMediator seqMediator = (SequenceMediator) m;
+                synchronized (m) {
+                    if (!seqMediator.isInitialized()) {
+                        seqMediator.init(synEnv);
+                    }
+                }
             }
             localEntries.put(key, m);
             return m;
@@ -144,8 +149,10 @@ public class TestMessageContext implements MessageContext {
             return (Endpoint) o;
         } else {
             Endpoint e = getConfiguration().getEndpoint(key);
-            if (!e.isInitialized()) {
-                e.init(synEnv);
+            synchronized (e) {
+                if (!e.isInitialized()) {
+                    e.init(synEnv);
+                }
             }
             localEntries.put(key, e);
             return e;

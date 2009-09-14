@@ -132,7 +132,7 @@ public class Axis2SynapseController implements SynapseController {
         
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
         deployMediatorExtensions();
-        initTaskHelper(serverContextInformation);
+        initTaskManager(serverContextInformation);
         initDataSourceHelper(serverContextInformation);
         initSharedSecretCallbackHandlerCache(serverContextInformation);
         initialized = true;
@@ -227,7 +227,7 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.pauseSenders();
 
         // put tasks on hold
-        TaskHelper.getInstance().pauseAll();
+        SynapseTaskManager.getInstance().pauseAll();
         
         log.info("Entered maintenence mode");
     }
@@ -244,7 +244,7 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.resumeSenders();
 
         // resume tasks
-        TaskHelper.getInstance().resumeAll();
+        SynapseTaskManager.getInstance().resumeAll();
 
         log.info("Resumed normal operation from maintenence mode");
     }
@@ -255,8 +255,8 @@ public class Axis2SynapseController implements SynapseController {
     public void stop() {
         try {
             // stop tasks
-            if (TaskHelper.getInstance().isInitialized()) {
-                TaskHelper.getInstance().cleanup();
+            if (SynapseTaskManager.getInstance().isInitialized()) {
+                SynapseTaskManager.getInstance().cleanup();
             }
 
             // stop the listener manager
@@ -395,7 +395,7 @@ public class Axis2SynapseController implements SynapseController {
         }
         
         addServerIPAndHostEnrties();
-        
+
         return synapseConfiguration;
     }
 
@@ -448,7 +448,7 @@ public class Axis2SynapseController implements SynapseController {
                 log.info("Waiting for: " + pendingCallbacks + " callbacks/replies..");
             }
 
-            int runningTasks = TaskHelper.getInstance().getTaskScheduler().getRunningTaskCount();
+            int runningTasks = SynapseTaskManager.getInstance().getTaskScheduler().getRunningTaskCount();
             if (runningTasks > 0) {
                 log.info("Waiting for : " + runningTasks + " tasks to complete..");
             }
@@ -669,16 +669,16 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     /**
-     *  Initialize TaskHelper - with any existing  TaskDescriptionRepository and TaskScheduler
+     *  Initialize Task Manager - with any existing  TaskDescriptionRepository and TaskScheduler
      *  or without those
      * @param serverContextInformation  ServerContextInformation instance
      */
-    private void initTaskHelper(ServerContextInformation serverContextInformation) {
+    private void initTaskManager(ServerContextInformation serverContextInformation) {
 
-        TaskHelper taskHelper = TaskHelper.getInstance();
-        if (taskHelper.isInitialized()) {
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        if (synapseTaskManager.isInitialized()) {
             if (log.isDebugEnabled()) {
-                log.debug("TaskHelper has been already initialized.");
+                log.debug("SynapseTaskManager has been already initialized.");
             }
             return;
         }
@@ -687,20 +687,15 @@ public class Axis2SynapseController implements SynapseController {
             serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
         Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
 
-        if (repo instanceof TaskDescriptionRepository && taskScheduler instanceof TaskScheduler) {
-            taskHelper.init((TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
-        } else {
-
-            if (repo == null && taskScheduler == null) {
-                taskHelper.init(
-                        TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                                TaskConstants.TASK_DESCRIPTION_REPOSITORY),
-                        TaskSchedulerFactory.getTaskScheduler(TaskConstants.TASK_SCHEDULER));
-            } else {
-                handleFatal("Invalid property values for " +
-                        "TaskDescriptionRepository or / and TaskScheduler ");
-            }
+        if (repo != null && !(repo instanceof TaskDescriptionRepository)) {
+            handleFatal("Invalid property value specified for TaskDescriptionRepository");
         }
+
+        if (taskScheduler != null && !(taskScheduler instanceof TaskScheduler)) {
+            handleFatal("Invalid property value specified for TaskScheduler");
+        }
+
+        synapseTaskManager.init((TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
     }
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {

@@ -21,7 +21,6 @@ package org.apache.synapse.startup.quartz;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -49,7 +48,7 @@ public class SimpleQuartz extends AbstractStartup {
 
     private TaskDescription taskDescription;
 
-    private final TaskHelper taskHelper = TaskHelper.getInstance();
+    private final SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
 
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
@@ -64,15 +63,15 @@ public class SimpleQuartz extends AbstractStartup {
             return;
         }
 
-        if (taskHelper.isInitialized()) {
+        if (synapseTaskManager.isInitialized()) {
 
-            TaskScheduler taskScheduler = taskHelper.getTaskScheduler();
+            TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
 
             if (taskScheduler != null && taskScheduler.isInitialized()) {
                 taskScheduler.deleteTask(taskDescription.getName(), taskDescription.getGroup());
             }
 
-            TaskDescriptionRepository repository = taskHelper.getTaskDescriptionRepository();
+            TaskDescriptionRepository repository = synapseTaskManager.getTaskDescriptionRepository();
             if (repository != null) {
                 repository.removeTaskDescription(taskDescription.getName());
             }
@@ -82,22 +81,19 @@ public class SimpleQuartz extends AbstractStartup {
     public void init(SynapseEnvironment synapseEnvironment) {
 
         if (taskDescription == null) {
-            handleException("TaskDescription is null");
+            handleException("Error while initializing the startup. TaskDescription is null.");
         }
 
         SynapseConfiguration synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
 
-        if (!taskHelper.isInitialized()) {
-            taskHelper.init(
-                    TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                            TaskConstants.TASK_DESCRIPTION_REPOSITORY),
-                    TaskSchedulerFactory.getTaskScheduler(TaskConstants.TASK_SCHEDULER));
+        if (!synapseTaskManager.isInitialized()) {
+            synapseTaskManager.init(null, null);
         }
 
-        TaskDescriptionRepository repository = taskHelper.getTaskDescriptionRepository();
+        TaskDescriptionRepository repository = synapseTaskManager.getTaskDescriptionRepository();
 
         if (repository == null) {
-            handleException("Task Description Repository can not found");
+            handleException("Task Description Repository cannot be found");
         }
 
         repository.addTaskDescription(taskDescription);
@@ -112,7 +108,7 @@ public class SimpleQuartz extends AbstractStartup {
                 thisServerName = addr.getHostName();
 
             } catch (UnknownHostException e) {
-                log.warn("Could not get local host name", e);
+                log.warn("Could not get the host name", e);
             }
 
             if (thisServerName == null || thisServerName.equals("")) {
@@ -138,8 +134,7 @@ public class SimpleQuartz extends AbstractStartup {
 
         try {
 
-            TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
-                    SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
+            TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
                     taskScheduler.init(synapseConfiguration.getProperties());
@@ -148,7 +143,7 @@ public class SimpleQuartz extends AbstractStartup {
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("TaskScheduler cannot be found for :" +
-                            SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER + " , " +
+                            TaskConstants.TASK_SCHEDULER + " , " +
                             "therefore ignore scheduling of Task  " + taskDescription);
                 }
             }

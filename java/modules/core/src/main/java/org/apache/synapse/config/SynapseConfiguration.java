@@ -26,10 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.commons.datasource.DataSourceHelper;
-import org.apache.synapse.task.TaskDescriptionRepository;
-import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
-import org.apache.synapse.task.TaskScheduler;
-import org.apache.synapse.task.TaskSchedulerFactory;
+import org.apache.synapse.task.*;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -101,10 +98,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     /** Hold reference to the Axis2 ConfigurationContext */
     private AxisConfiguration axisConfiguration = null;
-    
-    private final TaskDescriptionRepository taskDescriptionRepository = 
-            TaskDescriptionRepositoryFactory.getTaskDescriptionRepository(
-                    SynapseConstants.SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY);        
     
     /**
      * Save the path to the configuration file loaded, to save it later if
@@ -942,15 +935,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
         for (ManagedLifecycle stp : startups.values()) {
             stp.destroy();
         }
-        
-        TaskScheduler taskScheduler = TaskSchedulerFactory.getTaskScheduler(
-                SynapseConstants.SYNAPSE_STARTUP_TASK_SCHEDULER);
+
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
         if (taskScheduler != null && taskScheduler.isInitialized()) {
             taskScheduler.shutDown();
-        }
-
-        if (taskDescriptionRepository != null) {
-            taskDescriptionRepository.clear();
         }
         
         // clear session information used for SA load balancing
@@ -1021,10 +1010,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
-    }
-
-    public TaskDescriptionRepository getTaskDescriptionRepository() {
-        return taskDescriptionRepository;
     }
 
     /**

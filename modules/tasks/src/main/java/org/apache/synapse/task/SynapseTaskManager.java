@@ -25,28 +25,33 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.SynapseCommonsException;
 
 /**
- * Helper class to a share Scheduler and  TaskDescriptionRepository with in a single class space
+ * Helper class to a share Scheduler and  TaskDescriptionRepository within a single class space
  */
-public class TaskHelper {
+public class SynapseTaskManager {
 
-    private static final Log log = LogFactory.getLog(TaskHelper.class);
-    private static TaskHelper ourInstance = new TaskHelper();
+    private static final Log log = LogFactory.getLog(SynapseTaskManager.class);
+
+    private static SynapseTaskManager INSTANCE = new SynapseTaskManager();
+
     private TaskDescriptionRepository taskDescriptionRepository;
     private TaskScheduler taskScheduler;
     private boolean initialized = false;
 
-    public static TaskHelper getInstance() {
-        return ourInstance;
+    public static SynapseTaskManager getInstance() {
+        return INSTANCE;
     }
 
     /**
-     * Initialize with given TaskDescriptionRepository and TaskScheduler instances .
-     * if these are null , new instances will be created.
+     * Initialize the task manager instance with the given task description repository
+     * and the task scheduler. If any of these arguments are null new instances will
+     * be created. Note that this method does not initialize the actual task scheduler
+     * instance. It is up to the task manager clients to make sure that is initialized.
      *
      * @param taskDescriptionRepository TaskDescriptionRepository  instance
      * @param taskScheduler             TaskScheduler instance
      */
-    public void init(TaskDescriptionRepository taskDescriptionRepository, TaskScheduler taskScheduler) {
+    public void init(TaskDescriptionRepository taskDescriptionRepository,
+                     TaskScheduler taskScheduler) {
 
         if (taskDescriptionRepository != null) {
             this.taskDescriptionRepository = taskDescriptionRepository;

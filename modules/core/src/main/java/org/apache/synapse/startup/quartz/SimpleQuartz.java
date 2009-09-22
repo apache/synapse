@@ -48,7 +48,7 @@ public class SimpleQuartz extends AbstractStartup {
 
     private TaskDescription taskDescription;
 
-    private final SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+    private SynapseTaskManager synapseTaskManager;
 
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
@@ -85,8 +85,14 @@ public class SimpleQuartz extends AbstractStartup {
         }
 
         SynapseConfiguration synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
-
-        if (!synapseTaskManager.isInitialized()) {
+        synapseTaskManager = synapseConfiguration.getTaskManager();
+        if (synapseTaskManager == null) {
+            log.error("SynapseTaskManager is not available in the SynapseConfiguration. Tasks " +
+                    "cannot be initialized.");
+            return;
+        } else if (!synapseTaskManager.isInitialized()) {
+            log.warn("SynapseTaskManager is not properly initialized. Initializing now with " +
+                    "default parameters.");
             synapseTaskManager.init(null, null);
         }
 

@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEvent;
@@ -86,6 +87,9 @@ public class ProxyService implements AspectConfigurable {
     private static final Log log = LogFactory.getLog(ProxyService.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     private final Log serviceLog;
+
+    public static final String ABSOLUTE_SCHEMA_URL_PARAM = "showAbsoluteSchemaURL";
+    
     /**
      * The name of the proxy service
      */
@@ -459,6 +463,10 @@ public class ProxyService implements AspectConfigurable {
                 handleException("Error setting parameter : " + name + "" +
                     "to proxy service as a Parameter", af);
             }
+        }
+
+        if (JavaUtils.isTrueExplicitly(proxyService.getParameterValue(ABSOLUTE_SCHEMA_URL_PARAM))) {
+            proxyService.setCustomSchemaNamePrefix("");
         }
 
         if (!policies.isEmpty()) {

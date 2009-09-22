@@ -69,6 +69,9 @@ public class Axis2SynapseController implements SynapseController {
     /** The Axis2 listener Manager */
     private ListenerManager listenerManager;
 
+    /** The Synapse task manager which contains the task scheduler and the task repository */
+    private SynapseTaskManager synapseTaskManager;
+
     /** The Axis2 configuration context used by Synapse */
     private ConfigurationContext configurationContext;
 
@@ -227,7 +230,9 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.pauseSenders();
 
         // put tasks on hold
-        SynapseTaskManager.getInstance().pauseAll();
+        if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+            synapseTaskManager.pauseAll();
+        }
         
         log.info("Entered maintenence mode");
     }
@@ -244,7 +249,9 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.resumeSenders();
 
         // resume tasks
-        SynapseTaskManager.getInstance().resumeAll();
+        if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+            synapseTaskManager.resumeAll();
+        }
 
         log.info("Resumed normal operation from maintenence mode");
     }
@@ -255,8 +262,8 @@ public class Axis2SynapseController implements SynapseController {
     public void stop() {
         try {
             // stop tasks
-            if (SynapseTaskManager.getInstance().isInitialized()) {
-                SynapseTaskManager.getInstance().cleanup();
+            if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+                synapseTaskManager.cleanup();
             }
 
             // stop the listener manager
@@ -396,6 +403,10 @@ public class Axis2SynapseController implements SynapseController {
         
         addServerIPAndHostEnrties();
 
+        if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+            synapseConfiguration.setTaskManager(synapseTaskManager);
+        }
+
         return synapseConfiguration;
     }
 
@@ -448,9 +459,12 @@ public class Axis2SynapseController implements SynapseController {
                 log.info("Waiting for: " + pendingCallbacks + " callbacks/replies..");
             }
 
-            int runningTasks = SynapseTaskManager.getInstance().getTaskScheduler().getRunningTaskCount();
-            if (runningTasks > 0) {
-                log.info("Waiting for : " + runningTasks + " tasks to complete..");
+            int runningTasks = 0;
+            if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+                runningTasks = synapseTaskManager.getTaskScheduler().getRunningTaskCount();
+                if (runningTasks > 0) {
+                    log.info("Waiting for : " + runningTasks + " tasks to complete..");
+                }
             }
 
             // it is safe to stop if all used listener threads, callbacks and tasks are zero
@@ -675,13 +689,7 @@ public class Axis2SynapseController implements SynapseController {
      */
     private void initTaskManager(ServerContextInformation serverContextInformation) {
 
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
-        if (synapseTaskManager.isInitialized()) {
-            if (log.isDebugEnabled()) {
-                log.debug("SynapseTaskManager has been already initialized.");
-            }
-            return;
-        }
+        synapseTaskManager = new SynapseTaskManager();
 
         Object repo = 
             serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);

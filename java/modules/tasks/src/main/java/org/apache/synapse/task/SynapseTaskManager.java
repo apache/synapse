@@ -31,14 +31,14 @@ public class SynapseTaskManager {
 
     private static final Log log = LogFactory.getLog(SynapseTaskManager.class);
 
-    private static SynapseTaskManager INSTANCE = new SynapseTaskManager();
-
     private TaskDescriptionRepository taskDescriptionRepository;
     private TaskScheduler taskScheduler;
     private boolean initialized = false;
 
-    public static SynapseTaskManager getInstance() {
-        return INSTANCE;
+    public SynapseTaskManager() {
+        if (log.isDebugEnabled()) {
+            log.debug("Created the SynapseTaskManager singleton instance");
+        }
     }
 
     /**
@@ -52,6 +52,13 @@ public class SynapseTaskManager {
      */
     public void init(TaskDescriptionRepository taskDescriptionRepository,
                      TaskScheduler taskScheduler) {
+
+        if (initialized) {
+            if (log.isDebugEnabled()) {
+                log.debug("Task manager already initialized. Skipping re-initialization.");
+            }
+            return;
+        }
 
         if (taskDescriptionRepository != null) {
             this.taskDescriptionRepository = taskDescriptionRepository;

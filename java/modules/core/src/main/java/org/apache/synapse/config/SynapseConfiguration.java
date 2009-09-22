@@ -117,6 +117,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
     private List<SynapseObserver> observers = new ArrayList<SynapseObserver>();
 
     /**
+     * The singleton task manager instance which contains the task description repository and the
+     * scheduler
+     */
+    private SynapseTaskManager taskManager;
+
+    /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
      * key a runtime exception is thrown.
      *
@@ -936,10 +942,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
             stp.destroy();
         }
 
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
-        TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
-        if (taskScheduler != null && taskScheduler.isInitialized()) {
-            taskScheduler.shutDown();
+        if (taskManager != null && taskManager.isInitialized()) {
+            TaskScheduler taskScheduler = taskManager.getTaskScheduler();
+            if (taskScheduler != null && taskScheduler.isInitialized()) {
+                taskScheduler.shutDown();
+            }
         }
         
         // clear session information used for SA load balancing
@@ -1070,6 +1077,14 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public List<SynapseObserver> getObservers() {
         return Collections.unmodifiableList(observers);
+    }
+
+    public SynapseTaskManager getTaskManager() {
+        return taskManager;
+    }
+
+    public void setTaskManager(SynapseTaskManager taskManager) {
+        this.taskManager = taskManager;
     }
 
     private void assertAlreadyExists(String key, String type) {

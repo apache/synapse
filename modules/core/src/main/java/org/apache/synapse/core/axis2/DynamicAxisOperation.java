@@ -185,6 +185,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             responseMessageContext.setProperty(
                     SynapseConstants.RELATES_TO_FOR_POX, msgctx.getMessageID());
             responseMessageContext.setOptions(options);
+            responseMessageContext.setServerSide(true);
 			addMessageContext(responseMessageContext);
 
             AxisEngine.send(msgctx);
@@ -199,8 +200,6 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                     getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
                 responseMessageContext.setAxisService(msgctx.getAxisService());
 
-                // set properties on responseMessageContext
-                responseMessageContext.setServerSide(true);
                 responseMessageContext.setProperty(MessageContext.TRANSPORT_OUT,
                     msgctx.getProperty(MessageContext.TRANSPORT_OUT));
                 responseMessageContext.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,

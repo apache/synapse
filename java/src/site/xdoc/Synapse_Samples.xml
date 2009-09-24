@@ -220,7 +220,10 @@
 <li>
 <a href="#Sample262">Sample 262: CBR of FIX messages </a></li>
 <li>
-<a href="#Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></li></ul></li>
+<a href="#Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></li>
+<li>
+<a href="#Sample264">Sample 264: Transport switching - HTTP/S to JMS two way messages</a></li>
+</ul></li>
 <li>
 <a href="#Task">Introduction to Synapse tasks</a>
 <ul>
@@ -2755,8 +2758,8 @@ SocketAcceptPort=19877</pre>
 <p>Synapse will forward the order requests with symbol 'MSFT' to FIX endpoint FIX-4.1 @ localhost:19877.</p>
 <p>Synapse will not forward the orders with other symbols to any endpoint. (default case has kept blank in the configuration)</p>
 <p>To get an idea about the various transport parameters being used in this sample see 
-<a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
-
+<a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>  
+  
 <h2>
 <a name="Sample263" id="Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
@@ -2826,9 +2829,53 @@ it will first try to read the content type from the 'contentType' message proper
 <p>e.g. </p>
 <pre xml:space="preserve">&lt;parameter name=&quot;transport.jms.Destination&quot;&gt;dynamicTopics/something.TestTopic&lt;/parameter&gt;</pre>
 
+  <h2>
+    <a name="Sample264" id="Sample264">Sample 264: Sending Two-Way Messages Using JMS transport</a>
+  </h2>
+  <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;    
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;http&quot;&gt;
+        &lt;target&gt;        
+            &lt;endpoint&gt;
+		            &lt;address uri=&quot;jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;
+                  java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=queue&quot;/&gt;
+            &lt;/endpoint&gt;            
+            &lt;inSequence&gt;                            
+                &lt;property action=&quot;set&quot; name=&quot;transport.jms.ContentTypeProperty&quot; value=&quot;Content-Type&quot; scope=&quot;axis2&quot;/&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;property action=&quot;remove&quot; name=&quot;TRANSPORT_HEADERS&quot; scope=&quot;axis2&quot;/&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;        
+        &lt;target&gt; 
+        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;        
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+  <p>
+    <strong>Objective: Demonstrate sending request response scenario with JMS transport</strong>
+  </p>
+  <p>
+    <strong>Prerequisites:</strong>
+    <br></br>You need to set up synpase and axis2 server to use the JMS transport. See
+    <a href="#Sample251">Sample 251</a> for more details.
+  </p>
+  <p>
+    This sample is similar to the <a href="#Sample251">Sample 251</a>. Only difference is we are expecting a response from the server. JMS transport uses <strong>transport.jms.ContentTypeProperty</strong> to
+    determine the content type of the response message. If this property is not set JMS transport treats the incoming message as plain text.
+  </p>
+  <p>
+    In the out path we remove the message context property <strong>TRANSPORT_HEADERS</strong>. If these property is not removed JMS headers will be passed to the client.
+  </p>
+  <p>Start Synpase using sample 264.</p>
+  <pre xml:space="preserve">synapse.bat/synapse.sh -sample 264</pre>
+  <p>Start Axis2 server with SimpleStockService deployed</p>
+  <p>Invoke the stockquote client using the following command.</p>
+  <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy -Dsymbol=MSFT</pre>
+  <p>The sample Axis2 server console will print a message indicating that it has received the request: </p>
+  <pre xml:space="preserve">Generating quote for : MSFT</pre>
+  <p>In the client side it shoud print a message indicating it has received the price.</p>
+  <pre xml:space="preserve"> Standard :: Stock price = $154.31851804993238</pre>
 
-
-<h1>
+  <h1>
 <a name="Task" id="Task">Introduction to Synapse Tasks</a> </h1>
 <h2>
 <a name="Sample300" id="Sample300">Sample 300: Introduction to Tasks with simple trigger</a></h2>

@@ -178,6 +178,11 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		rmMsgCtx.setWSAAction(SpecSpecificConstants.getCloseSequenceAction(getRMVersion()));
 		rmMsgCtx.setSOAPAction(SpecSpecificConstants.getCloseSequenceAction (getRMVersion()));
 
+         // setting the sequence reply to address
+         if (getRMSBean().getRMVersion().equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
+             rmMsgCtx.setReplyTo(getRMSBean().getAcksToEndpointReference());
+         }
+
 		// Send this outgoing message
 		sendOutgoingMessage(rmMsgCtx, Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE, 0, transaction);
 

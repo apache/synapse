@@ -318,17 +318,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				} else {
 					specVersion = rmsBean.getRMVersion();
 				}
-				if(specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
-					EndpointReference replyTo = msgContext.getReplyTo();
-					if(replyTo == null || replyTo.hasAnonymousAddress()) {
-						//we are sync
-						SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration());
-						if(!policy.isEnableMakeConnection()) {
-							String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionDisabled);
-							throw new SandeshaException(message);
-						}
-					}
-				}
 			}
 		}
 

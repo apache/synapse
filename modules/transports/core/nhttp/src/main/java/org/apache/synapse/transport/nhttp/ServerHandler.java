@@ -205,6 +205,11 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpResponse response = conn.getHttpResponse();
         ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(RESPONSE_SOURCE_BUFFER);
 
+        if (outBuf == null) {
+            shutdownConnection(conn);   // temporary fix until HTTPCORE-208 is available for SYNAPSE-584
+            return;
+        }
+
         try {
             int bytesWritten = outBuf.produceContent(encoder);
             if (metrics != null && bytesWritten > 0) {

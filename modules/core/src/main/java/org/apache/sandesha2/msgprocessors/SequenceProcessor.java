@@ -428,6 +428,13 @@ public class SequenceProcessor {
 					t.acknowledgeMessage(msgCtx);
 				}
 			}
+
+            // if the relates to is not null then this is at the client side
+            // so it is receiving a response. always have to return the thread.
+            if (msgCtx.getRelatesTo() != null) {
+                result = InvocationResponse.ABORT;
+            }
+
 		}
 
 		if (transaction != null && transaction.isActive()) 

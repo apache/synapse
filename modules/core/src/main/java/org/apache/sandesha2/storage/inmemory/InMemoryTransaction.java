@@ -19,15 +19,11 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.axis2.java.security.AccessController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -46,25 +42,6 @@ public class InMemoryTransaction implements Transaction {
 
 	private static final Log log = LogFactory.getLog(InMemoryTransaction.class);
 
-	private static int deadlockTimeoutSeconds = 25;
-	
-	// Allow the deadlock timeout to be configured to help debug
-	static{
-		String deadlockProperty = AccessController.doPrivileged(new PrivilegedAction<String>(){
-			public String run() {
-				return System.getProperty("deadlockTimeout");
-			}});
-		if(deadlockProperty != null){
-			try{
-				deadlockTimeoutSeconds = Integer.parseInt(deadlockProperty);
-			}catch(Exception e){
-				if(log.isDebugEnabled()){
-					log.debug("Exception encountered processing the deadlockTimeout property: "+deadlockProperty,e);
-				}
-			}
-		}
-	}
-	
 	private InMemoryStorageManager manager;
 	private String threadName;
 	private ArrayList<RMBean> enlistedBeans = new ArrayList<RMBean>();
@@ -81,12 +58,11 @@ public class InMemoryTransaction implements Transaction {
 		this.useSerialization = useSerialization;
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
-
-    public void commit() {
-        releaseLocks();
-        if (sentMessages && useSerialization) manager.getSender().wakeThread();
-        active = false;
-    }
+	
+	public void commit() {
+		releaseLocks();
+		active = false;
+	}
 
 	public void rollback() {
 		releaseLocks();
@@ -117,7 +93,9 @@ public class InMemoryTransaction implements Transaction {
 	
 	public void enlist(RMBean bean) {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
+		
 		if(isActive()){
+		
 		  if (bean != null) {
 			DummyTransaction tran = null;
 			synchronized (bean) {
@@ -128,67 +106,44 @@ public class InMemoryTransaction implements Transaction {
 				}
 			}
 
-			boolean locked = false;
-			int count = 0;
-			while (!locked) {
-				locked = tran.tryLock();
-				if (!locked) {
+			try {
+				boolean locked = false;
+				while (!locked) {
+					if (tran.tryLock() || tran.tryLock(5, TimeUnit.SECONDS)) {
+						enlistedBeans.add(bean);
+						locked=true;
+					} else {
+						if (log.isDebugEnabled())
+							log.debug("Waiting for bean lock 5 seconds");
 
-					try {
-						locked = tran.tryLock(5, TimeUnit.SECONDS);
-						if (!locked) {
-							count++;
-							if (log.isDebugEnabled())
-								log.debug("Waiting for bean lock 5 seconds");
-							if(count>=deadlockTimeoutSeconds){ // If we've been failed for xx seconds, lets log and give up.
-								deadlockTrace();
-								String message = "Possible deadlock enlisting bean.";
-								IllegalStateException e = new IllegalStateException(message);
-								if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Possible deadlock enlisting bean.", e);
-								throw e;
-							}
-						}
-					} catch (InterruptedException e) {
-						log.warn("InterruptedException encountered enlisting bean", e);
 					}
 				}
-
-				if (locked)
-					enlistedBeans.add(bean);
-
 			}
+			catch (InterruptedException e) {
+				log.warn("InterruptedException encountered enlisting bean",e);
+			}
+		  }
+		} else {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
+			IllegalStateException e = new IllegalStateException(message);
+			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("An attempt to enlist new work to an InMemoryTransaction that has previously been committed or rolled back.", e);
+			throw e;
 		}
-	} else {
-		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
-		IllegalStateException e = new IllegalStateException(message);
-		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("An attempt to enlist new work to an InMemoryTransaction that has previously been committed or rolled back.", e);
-		throw e;
-	}
+		
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::enlist");
 	}
-	
-	private static synchronized void deadlockTrace(){
-		Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-		log.warn("Possible deadlock enlisting bean. Threads: ");
-		for(Entry<Thread, StackTraceElement[]> entry: map.entrySet()){
-			log.warn(entry.getKey().toString());
-			for(StackTraceElement ste: entry.getValue()){
-				log.warn("\tat "+ste.toString());
-			}
-		}
-	}
-	
+		
 	private void releaseLocks() {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::releaseLocks, " + this);
 		manager.removeTransaction(this);
 
-		Iterator<RMBean> beans = enlistedBeans.iterator();
+		Iterator beans = enlistedBeans.iterator();
 		while(beans.hasNext()) {
-			RMBean bean = beans.next();
+			RMBean bean = (RMBean) beans.next();
 			DummyTransaction tran = (DummyTransaction) bean.getTransaction();
 			tran.unlock();
 		}
-		enlistedBeans.clear();
+		enlistedBeans=new ArrayList<RMBean>();
 		
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::releaseLocks");
 	}
@@ -217,7 +172,6 @@ public class InMemoryTransaction implements Transaction {
 		return thread;
 	}
 }
-
 
 
 

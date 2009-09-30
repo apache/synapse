@@ -381,11 +381,37 @@ public class SynapseConfiguration implements ManagedLifecycle {
         Object o = localRegistry.get(key);
         if (o != null && o instanceof Entry) {
             Entry entry = (Entry) o;
-            if (entry.isDynamic()) {
-                if (entry.isCached() && !entry.isExpired()) {
-                    return entry.getValue();
-                } else if (registry != null) {
+            if (!entry.isDynamic() || (entry.isCached() && !entry.isExpired())) {
+                // If the entry is not dynamic or if it is a cached dynamic entry with the
+                // cache still not expired, return the existing value.
+                return entry.getValue();
+            }
+
+            // This must be a dynamic entry whose cache has expired or which is not cached at all
+            // A registry lookup is in order
+            if (registry != null) {
+                if (entry.isCached()) {
+                    try {
+                        o = registry.getResource(entry);
+                    } catch (Exception e) {
+                        // Error occured while loading the resource from the registry
+                        // Fall back to the cached value - Do not increase the expiry time
+                        log.warn("Error while loading the resource " + key + " from the remote " +
+                                "registry. Previously cached value will be used. Check the " +
+                                "registry accessibility.");
+                        return entry.getValue();
+                    }
+                } else {
+                    // Resource not available in the cache - Must load from the registry
+                    // No fall backs possible here!!
                     o = registry.getResource(entry);
+                }
+            } else {
+                if (entry.isCached()) {
+                    // Fall back to the cached value
+                    log.warn("The registry is no longer available in the Synapse configuration. " +
+                            "Using the previously cached value for the resource : " + key);
+                    return entry.getValue();
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Will not  evaluate the value of the remote entry with a key "
@@ -394,8 +420,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
                     return null; // otherwise will return an entry with a value null
                     // (method expects return  a value not an entry )
                 }
-            } else {
-                return entry.getValue();
             }
         }
         return o;

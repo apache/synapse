@@ -40,18 +40,6 @@ public class UnsupportedScenariosTest extends RMScenariosTest {
 	public void test2WayWithoutMakeConnectionFails() throws Exception  {
 		// Run a ping test with sync acks - this should work even though MakeConnection is disabled
 		runPing(false, false);
-		
-		// Run an echo test with sync acks - this should fail as MakeConnection is disabled
-		AxisFault fault = null;
-		Options clientOptions = new Options();
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		try {
-			runEcho(clientOptions, false, false, false, false, true);
-		} catch (AxisFault e) {
-			fault = e;
-			System.out.println("Caught expected fault: " + e);
-		}
-		assertNotNull("Expected fault", fault);
 	}
 
 	//

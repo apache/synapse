@@ -393,6 +393,10 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             return IndirectEndpointFactory.getInstance();
         }
 
+        if (configElement.getAttribute(new QName("key-expression")) != null) {
+            return ResolvingEndpointFactory.getInstance();
+        }
+
         OMElement addressElement = configElement.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
         if (addressElement != null) {

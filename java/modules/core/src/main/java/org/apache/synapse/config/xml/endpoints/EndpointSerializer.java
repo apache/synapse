@@ -279,6 +279,8 @@ public abstract class EndpointSerializer {
             return new WSDLEndpointSerializer();
         } else if (endpoint instanceof IndirectEndpoint) {
             return new IndirectEndpointSerializer();
+        } else if (endpoint instanceof ResolvingEndpoint) {
+            return new ResolvingEndpointSerializer();
         } else if (endpoint instanceof SALoadbalanceEndpoint) {
             return new SALoadbalanceEndpointSerializer();
         } else if (endpoint instanceof DynamicLoadbalanceEndpoint){

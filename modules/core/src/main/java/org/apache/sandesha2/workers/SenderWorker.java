@@ -645,24 +645,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				int responseMessageType = responseRMMessage.getMessageType();
 				if(log.isDebugEnabled()) log.debug("inboundMsgType" + responseMessageType + "outgoing message type " + messageType);
 				 				
-				//if this is a response msg in response to a make connection then we have to take care with the service context
-				if((messageType == Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG || messageType == Sandesha2Constants.MessageTypes.UNKNOWN)
-						&& (responseMessageType == Sandesha2Constants.MessageTypes.APPLICATION 
-								|| responseMessageType == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE
-								|| responseMessageType == Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE
-								|| responseMessageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE)){
-				
-					//Setting the AxisService object
-					responseMessageContext.setAxisService(msgCtx.getAxisService());
+				//Setting the AxisService object
+				responseMessageContext.setAxisService(msgCtx.getAxisService());
 
-					//we cannot set service ctx for application response msgs or createSeqResponse msgs since the srvc ctx will not match the op ctx, causing
-					//problems with addressing
-					if(log.isDebugEnabled()) log.debug("NOT setting service ctx for response type " + messageType + ", current srvc ctx =" + responseMessageContext.getServiceContext());
-				}else {
-					if(log.isDebugEnabled()) log.debug("setting service ctx on msg as this is NOT a makeConnection>appResponse or makeConnection>createSeqResponse exchange pattern");
-					responseMessageContext.setServiceContext(msgCtx.getServiceContext());
-				}
-	
 				//If addressing is disabled we will be adding this message simply as the application response of the request message.
 				Boolean addressingDisabled = (Boolean) msgCtx.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
 				if (addressingDisabled!=null && Boolean.TRUE.equals(addressingDisabled)) {
@@ -673,7 +658,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					if (requestMsgOpCtx.getAxisOperation().getMessageReceiver() == null) {
 						// Generate a new RM In Only operation
 
-						ServiceContext serviceCtx = responseMessageContext.getServiceContext();
+						ServiceContext serviceCtx = msgCtx.getServiceContext();
 						AxisOperation op = msgCtx.getAxisService().getOperation(Sandesha2Constants.RM_IN_ONLY_OPERATION);
 						responseMsgOpCtx = OperationContextFactory.createOperationContext (op.getAxisSpecificMEPConstant(), op, serviceCtx);					
 					}

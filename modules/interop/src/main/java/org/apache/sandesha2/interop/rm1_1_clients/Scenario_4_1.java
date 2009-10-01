@@ -165,22 +165,22 @@ public class Scenario_4_1 {
         
 		Ping ping = new Ping ();
 		ping.setText("ping1");
-		stub.Ping (ping);
+		stub.ping (ping);
 		
 		ping = new Ping ();
 		ping.setText("ping2");
-		stub.Ping (ping);
+		stub.ping (ping);
 		
 		ping = new Ping ();
 		ping.setText("ping3");
-		stub.Ping (ping);
+		stub.ping (ping);
         
         terminateSequence(serviceClient);
         Thread.sleep(5000);
         
         serviceClient.getOptions().setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE, Constants.VALUE_TRUE);
         serviceClient.getOptions().setProperty(RampartMessageData.CANCEL_REQUEST, Constants.VALUE_TRUE);
-        stub.Ping(ping);
+        stub.ping(ping);
         
         Thread.sleep(10000);
 //        stub._getServiceClient().cleanup();

@@ -158,12 +158,12 @@ public class Scenario_1_3 {
 		options.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(1));
 		Ping ping = new Ping ();
 		ping.setText("ping1");
-		stub.Ping(ping);
+		stub.ping(ping);
 		
 		options.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(3));
 		ping = new Ping ();
 		ping.setText("ping2");
-		stub.Ping(ping);
+		stub.ping(ping);
 		
 		boolean complete = false;
 		while (!complete) {

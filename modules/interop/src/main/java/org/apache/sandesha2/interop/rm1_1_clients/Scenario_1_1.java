@@ -140,15 +140,15 @@ public class Scenario_1_1 {
 		
 		Ping ping = new Ping ();
 		ping.setText("ping1");
-		stub.Ping (ping);
+		stub.ping (ping);
 		
 		ping = new Ping ();
 		ping.setText("ping2");
-		stub.Ping (ping);
+		stub.ping (ping);
 		
 		ping = new Ping ();
 		ping.setText("ping3");
-		stub.Ping (ping);
+		stub.ping (ping);
 		
 		
 		SequenceReport sequenceReport = null;		

@@ -261,7 +261,7 @@ public class Scenario_2_1 {
 		echoString.getEchoString().setText("echo1");
 		
 		RMInteropServiceCallbackHandlerImpl callback1 = new RMInteropServiceCallbackHandlerImpl ("callback1");
-		stub.startEchoString(echoString, callback1);
+		stub.startechoString(echoString, callback1);
 		
 		echoString = new EchoString ();
 		echoString.setEchoString (new EchoStringRequestBodyType ());
@@ -269,7 +269,7 @@ public class Scenario_2_1 {
 		echoString.getEchoString().setText("echo2");
 		
 		RMInteropServiceCallbackHandlerImpl callback2 = new RMInteropServiceCallbackHandlerImpl ("callback2");
-		stub.startEchoString(echoString, callback2);
+		stub.startechoString(echoString, callback2);
 		
 		echoString = new EchoString ();
 		echoString.setEchoString (new EchoStringRequestBodyType ());
@@ -277,7 +277,7 @@ public class Scenario_2_1 {
 		echoString.getEchoString().setText("echo3");
 		
 		RMInteropServiceCallbackHandlerImpl callback3 = new RMInteropServiceCallbackHandlerImpl ("callback3");
-		stub.startEchoString(echoString, callback3);
+		stub.startechoString(echoString, callback3);
 		
 		while (!callback3.isCompleted()) {
 			Thread.sleep(2000);

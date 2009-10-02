@@ -27,6 +27,7 @@ import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
@@ -153,65 +154,63 @@ public class ClientWorker implements Runnable {
 
         SOAPEnvelope envelope = null;
         try {
-
             Header cType = response.getFirstHeader(HTTP.CONTENT_TYPE);
-
+            String contentType;
             if (cType != null) {
-                String contentType = cType.getValue();
-
-                String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
-                if (charSetEnc == null) {
-                    charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
-                }
-
-                responseMsgCtx.setProperty(
-                    Constants.Configuration.CHARACTER_SET_ENCODING,
-                    contentType.indexOf(HTTP.CHARSET_PARAM) > 0 ?
-                        charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);
-
-                // workaround for Axis2 TransportUtils.createSOAPMessage() issue, where a response
-                // of content type "text/xml" is thought to be REST if !MC.isServerSide(). This
-                // question is still under debate and due to the timelines, I am commiting this
-                // workaround as Axis2 1.2 is about to be released and Synapse 1.0
-                responseMsgCtx.setServerSide(false);
-                try {
-                    envelope = TransportUtils.createSOAPMessage(
-                            responseMsgCtx,
-                            HTTPTransportUtils.handleGZip(responseMsgCtx, in),
-                            contentType);
-
-                } catch (OMException e) {
-                    // handle non SOAP and POX/REST payloads (probably text/html)
-                    String errorMessage = "Unexpected response received. HTTP response code : "
-                        + this.response.getStatusLine().getStatusCode() + " HTTP status : "
-                        + this.response.getStatusLine().getReasonPhrase() + " exception : "
-                        + e.getMessage();
-
-                    log.warn(errorMessage);
-                    if (log.isDebugEnabled()) {
-                        log.debug(errorMessage, e);
-                        log.debug("Creating the SOAPFault to be injected...");
-                    }
-                    SOAPFactory factory = new SOAP11Factory();
-                    envelope = factory.getDefaultFaultEnvelope();
-                    SOAPFaultDetail detail = factory.createSOAPFaultDetail();
-                    detail.setText(errorMessage);
-                    envelope.getBody().getFault().setDetail(detail);
-                    SOAPFaultReason reason = factory.createSOAPFaultReason();
-                    reason.setText(errorMessage);
-                    envelope.getBody().getFault().setReason(reason);
-                    SOAPFaultCode code = factory.createSOAPFaultCode();
-                    code.setText(Integer.toString(this.response.getStatusLine().getStatusCode()));
-                    envelope.getBody().getFault().setCode(code);
-                }
-                responseMsgCtx.setServerSide(true);
-                responseMsgCtx.setEnvelope(envelope);
-
+                // This is the most common case - Most of the time servers send the Content-Type
+                contentType = cType.getValue();
             } else {
-                // there is no response entity-body
-                responseMsgCtx.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
-                responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                // Server hasn't sent the header - Try to infer the content type
+                contentType = inferContentType();
             }
+
+            String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
+            if (charSetEnc == null) {
+                charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
+            }
+
+            responseMsgCtx.setProperty(
+                Constants.Configuration.CHARACTER_SET_ENCODING,
+                contentType.indexOf(HTTP.CHARSET_PARAM) > 0 ?
+                    charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);
+
+            // workaround for Axis2 TransportUtils.createSOAPMessage() issue, where a response
+            // of content type "text/xml" is thought to be REST if !MC.isServerSide(). This
+            // question is still under debate and due to the timelines, I am commiting this
+            // workaround as Axis2 1.2 is about to be released and Synapse 1.0
+            responseMsgCtx.setServerSide(false);
+            try {
+                envelope = TransportUtils.createSOAPMessage(
+                        responseMsgCtx,
+                        HTTPTransportUtils.handleGZip(responseMsgCtx, in),
+                        contentType);
+
+            } catch (OMException e) {
+                // handle non SOAP and POX/REST payloads (probably text/html)
+                String errorMessage = "Unexpected response received. HTTP response code : "
+                    + this.response.getStatusLine().getStatusCode() + " HTTP status : "
+                    + this.response.getStatusLine().getReasonPhrase() + " exception : "
+                    + e.getMessage();
+
+                log.warn(errorMessage);
+                if (log.isDebugEnabled()) {
+                    log.debug(errorMessage, e);
+                    log.debug("Creating the SOAPFault to be injected...");
+                }
+                SOAPFactory factory = new SOAP11Factory();
+                envelope = factory.getDefaultFaultEnvelope();
+                SOAPFaultDetail detail = factory.createSOAPFaultDetail();
+                detail.setText(errorMessage);
+                envelope.getBody().getFault().setDetail(detail);
+                SOAPFaultReason reason = factory.createSOAPFaultReason();
+                reason.setText(errorMessage);
+                envelope.getBody().getFault().setReason(reason);
+                SOAPFaultCode code = factory.createSOAPFaultCode();
+                code.setText(Integer.toString(this.response.getStatusLine().getStatusCode()));
+                envelope.getBody().getFault().setCode(code);
+            }
+            responseMsgCtx.setServerSide(true);
+            responseMsgCtx.setEnvelope(envelope);
 
             // copy the HTTP status code as a message context property with the key HTTP_SC to be
             // used at the sender to set the propper status code when passing the message
@@ -249,6 +248,24 @@ public class ClientWorker implements Runnable {
                 }
             } catch (IOException ignore) {}
         }
+    }
+
+    private String inferContentType() {
+        // Try to get the content type from the message context
+        Object cTypeProperty = responseMsgCtx.getProperty(NhttpConstants.CONTENT_TYPE);
+        if (cTypeProperty != null) {
+            return cTypeProperty.toString();
+        }
+
+        // Try to get the content type from the axis configuration
+        Parameter cTypeParam = cfgCtx.getAxisConfiguration().getParameter(
+                NhttpConstants.CONTENT_TYPE);
+        if (cTypeParam != null) {
+            return cTypeParam.getValue().toString();
+        }
+
+        // Unable to determine the content type - Return default value
+        return NhttpConstants.DEFAULT_CONTENT_TYPE;
     }
 
     // -------------- utility methods -------------

@@ -120,7 +120,6 @@ public class ConnectionPool {
 
         ctx.removeAttribute(ExecutionContext.HTTP_REQUEST);
         ctx.removeAttribute(ExecutionContext.HTTP_RESPONSE);
-        ctx.removeAttribute(ExecutionContext.HTTP_CONNECTION);
 
         conn.resetOutput();
     }

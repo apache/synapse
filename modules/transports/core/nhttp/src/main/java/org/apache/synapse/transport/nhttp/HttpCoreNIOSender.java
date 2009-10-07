@@ -43,6 +43,7 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.SessionRequest;
@@ -255,6 +256,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
                 cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
             .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO");
+
+        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
+            params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
+        }
         return params;
     }
 

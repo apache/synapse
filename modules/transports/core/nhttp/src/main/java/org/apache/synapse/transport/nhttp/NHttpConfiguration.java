@@ -21,6 +21,7 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.util.Properties;
 
@@ -56,11 +57,11 @@ public final class NHttpConfiguration {
 
     private static final Log log = LogFactory.getLog(NHttpConfiguration.class);
     private static NHttpConfiguration _instance = new NHttpConfiguration();
-    private Properties props = new Properties();
+    private Properties props;
 
     private NHttpConfiguration() {
         try {
-            props.load(getClass().getClassLoader().getResourceAsStream("nhttp.properties"));
+            props = MiscellaneousUtil.loadProperties("nhttp.properties");
         } catch (Exception ignore) {}
     }
 
@@ -135,6 +136,27 @@ public final class NHttpConfiguration {
             }
             return Integer.valueOf(val);
         }        
+        return def;
+    }
+
+    /**
+     * Get properties that tune nhttp transport. Preference to system properties
+     * @param name name of the system/config property
+     * @param def default value to return if the property is not set
+     * @return the value of the property to be used
+     */
+    public boolean getBooleanValue(String name, boolean def) {
+        String val = System.getProperty(name);
+        if (val == null) {
+            val = props.getProperty(name);
+        }
+
+        if (val != null && Boolean.parseBoolean(val)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using nhttp tuning parameter : " + name);
+            }
+            return true;
+        }
         return def;
     }
 

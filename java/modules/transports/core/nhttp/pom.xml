@@ -149,7 +149,7 @@
     </dependencies>
 
     <properties>
-        <httpcore.nio.version>4.0</httpcore.nio.version>
+        <httpcore.nio.version>4.1-alpha1</httpcore.nio.version>
     </properties>
 
 </project>

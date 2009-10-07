@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
@@ -121,6 +122,10 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
                 cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
             .setParameter(HttpProtocolParams.ORIGIN_SERVER, "Synapse-HttpComponents-NIO");
+
+        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
+            params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
+        }
         return params;
     }
 

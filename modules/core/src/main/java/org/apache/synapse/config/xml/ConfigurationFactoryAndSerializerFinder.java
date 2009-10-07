@@ -30,8 +30,6 @@ import sun.misc.Service;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

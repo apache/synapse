@@ -359,14 +359,14 @@ public class ServerHandler implements NHttpServiceHandler {
      * @param e the exception encountered
      */
     public void exception(NHttpServerConnection conn, IOException e) {
-        if (e instanceof ConnectionClosedException ||
+        if (e instanceof ConnectionClosedException || (e.getMessage() != null &&
                 e.getMessage().contains("Connection reset by peer") ||
-                e.getMessage().contains("forcibly closed")) {
+                e.getMessage().contains("forcibly closed"))) {
             if (log.isDebugEnabled()) {
                 log.debug("I/O error (Probably the keepalive connection " +
                         "was closed):" + e.getMessage());
             }
-        } else {
+        } else if (e.getMessage() != null) {
             String msg = e.getMessage().toLowerCase();
             if (msg.indexOf("broken") != -1) {
                 log.warn("I/O error (Probably the connection " +
@@ -374,6 +374,11 @@ public class ServerHandler implements NHttpServiceHandler {
             } else {
                 log.error("I/O error: " + e.getMessage(), e);
             }
+            if (metrics != null) {
+                metrics.incrementFaultsReceiving();
+            }
+        } else {
+            log.error("Unexpected I/O error: " + e.getClass().getName(), e);
             if (metrics != null) {
                 metrics.incrementFaultsReceiving();
             }

@@ -71,8 +71,12 @@ public class SSLClientIOEventDispatch
     }
 
     protected NHttpClientIOTarget createConnection(IOSession session) {
-        return LoggingUtils.decorate(
-                super.createConnection(LoggingUtils.decorate(session, "sslclient")));
+        session = LoggingUtils.decorate(session, "sslclient");
+        return LoggingUtils.createClientConnection(
+                session, 
+                createHttpResponseFactory(), 
+                createByteBufferAllocator(), 
+                this.params);
     }
 
 }

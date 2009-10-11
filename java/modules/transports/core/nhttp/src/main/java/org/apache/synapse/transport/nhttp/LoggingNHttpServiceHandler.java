@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.ConnectionClosedException;
@@ -35,31 +34,20 @@ import org.apache.http.nio.NHttpServiceHandler;
  * Decorator class intended to transparently extend an {@link NHttpServiceHandler} 
  * with basic event logging capabilities using Commons Logging. 
  */
-public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
+class LoggingNHttpServiceHandler implements NHttpServiceHandler {
 
     private final Log log;
-    private final Log headerlog;
     private final NHttpServiceHandler handler;
     
     public LoggingNHttpServiceHandler(
             final Log log, 
-            final Log headerlog, 
             final NHttpServiceHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("HTTP service handler may not be null");
         }
         this.handler = handler;
-        if (log != null) {
-            this.log = log;
-        } else {
-            this.log = LogFactory.getLog(handler.getClass());
-        }
-        if (log != null) {
-            this.headerlog = headerlog;
-        } else {
-            this.headerlog = LogFactory.getLog(LoggingUtils.HEADER_LOG_ID);
-        }
+        this.log = LogFactory.getLog(handler.getClass());
     }
     
     public void connected(final NHttpServerConnection conn) {
@@ -101,13 +89,6 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
             this.log.debug("HTTP connection " + conn + ": " + request.getRequestLine());
         }
         this.handler.requestReceived(conn);
-        if (this.headerlog.isDebugEnabled()) {
-            this.headerlog.debug(">> " + request.getRequestLine().toString());
-            Header[] headers = request.getAllHeaders();
-            for (int i = 0; i < headers.length; i++) {
-                this.headerlog.debug(">> " + headers[i].toString());
-            }
-        }
     }
 
     public void outputReady(final NHttpServerConnection conn, final ContentEncoder encoder) {

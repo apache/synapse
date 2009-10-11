@@ -45,9 +45,13 @@ public class SSLServerIOEventDispatch
     }
     
     @Override
-    protected NHttpServerIOTarget createConnection(final IOSession session) {
-        return LoggingUtils.decorate(
-                super.createConnection(LoggingUtils.decorate(session, "sslserver")));
+    protected NHttpServerIOTarget createConnection(IOSession session) {
+        session = LoggingUtils.decorate(session, "sslserver");
+        return LoggingUtils.createServerConnection(
+                session, 
+                createHttpRequestFactory(), 
+                createByteBufferAllocator(), 
+                this.params);
     }
     
 }

@@ -34,16 +34,21 @@ import org.apache.http.nio.reactor.SessionBufferStatus;
  * Decorator class intended to transparently extend an {@link IOSession} 
  * with basic event logging capabilities using Commons Logging. 
  */
-public class LoggingIOSession implements IOSession {
+class LoggingIOSession implements IOSession {
 
     private static AtomicLong COUNT = new AtomicLong(0);
     
     private final Log log;
+    private final Wire wirelog;
     private final IOSession session;
     private final ByteChannel channel;
     private final String id;
     
-    public LoggingIOSession(final Log log, final IOSession session, final String id) {
+    public LoggingIOSession(
+            final Log log, 
+            final Log wirelog, 
+            final IOSession session, 
+            final String id) {
         super();
         if (session == null) {
             throw new IllegalArgumentException("I/O session may not be null");
@@ -51,11 +56,8 @@ public class LoggingIOSession implements IOSession {
         this.session = session;
         this.channel = new LoggingByteChannel();
         this.id = id + "-" + COUNT.incrementAndGet();
-        if (log != null) {
-            this.log = log;
-        } else {
-            this.log = LogFactory.getLog(session.getClass());
-        }
+        this.log = LogFactory.getLog(session.getClass());
+        this.wirelog = new Wire(wirelog);
     }
 
     public int getStatus() {
@@ -190,6 +192,13 @@ public class LoggingIOSession implements IOSession {
             if (log.isDebugEnabled()) {
                 log.debug("I/O session " + id + " " + session + ": " + bytesRead + " bytes read");
             }
+            if (bytesRead > 0 && wirelog.isEnabled()) {
+                ByteBuffer b = dst.duplicate();
+                int p = b.position();
+                b.limit(p);
+                b.position(p - bytesRead);
+                wirelog.input(b);
+            }
             return bytesRead;
         }
 
@@ -197,6 +206,13 @@ public class LoggingIOSession implements IOSession {
             int byteWritten = session.channel().write(src);
             if (log.isDebugEnabled()) {
                 log.debug("I/O session " + id + " " + session + ": " + byteWritten + " bytes written");
+            }
+            if (byteWritten > 0 && wirelog.isEnabled()) {
+                ByteBuffer b = src.duplicate();
+                int p = b.position();
+                b.limit(p);
+                b.position(p - byteWritten);
+                wirelog.output(b);
             }
             return byteWritten;
         }

@@ -32,8 +32,12 @@ public class PlainClientIOEventDispatch extends DefaultClientIOEventDispatch {
     
     @Override
     protected NHttpClientIOTarget createConnection(IOSession session) {
-        return LoggingUtils.decorate(
-                super.createConnection(LoggingUtils.decorate(session, "client")));
+        session = LoggingUtils.decorate(session, "client");
+        return LoggingUtils.createClientConnection(
+                session, 
+                createHttpResponseFactory(), 
+                this.allocator, 
+                this.params);
     }
     
 }

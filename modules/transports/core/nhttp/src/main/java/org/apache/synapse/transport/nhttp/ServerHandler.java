@@ -20,8 +20,10 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.MetricsCollector;
-import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
+import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -31,19 +33,13 @@ import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.nio.util.ByteBufferAllocator;
-import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.http.nio.util.ContentOutputBuffer;
-import org.apache.http.nio.util.ContentInputBuffer;
-import org.apache.http.nio.util.SharedInputBuffer;
-import org.apache.http.nio.util.SharedOutputBuffer;
 import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.nio.entity.ContentOutputStream;
+import org.apache.http.nio.util.*;
+import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.http.util.EncodingUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,6 +109,35 @@ public class ServerHandler implements NHttpServiceHandler {
 
         HttpContext context = conn.getContext();
         HttpRequest request = conn.getHttpRequest();
+
+        ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
+        if (!ver.lessEquals(HttpVersion.HTTP_1_1)) {
+            // Downgrade protocol version if greater than HTTP/1.1
+            ver = HttpVersion.HTTP_1_1;
+        }
+
+        if (request instanceof HttpEntityEnclosingRequest) {
+            if (((HttpEntityEnclosingRequest) request).expectContinue()) {
+
+                HttpResponse response = responseFactory.newHttpResponse(ver, HttpStatus.SC_CONTINUE, context);
+                response.setParams(new DefaultedHttpParams(response.getParams(), this.params));
+
+                if (response.getStatusLine().getStatusCode() < 200) {
+                    // Send 1xx response indicating the server expections
+                    // have been met
+                    try {
+                        conn.submitResponse(response);
+                    } catch (Exception e) {
+                        if (metrics != null) {
+                            metrics.incrementFaultsReceiving();
+                        }
+                        handleException("Error processing request received for expectation continue request : " +
+                            request.getRequestLine().getUri(), e, conn);
+                    }
+                }
+            }
+        }
+
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
         try {

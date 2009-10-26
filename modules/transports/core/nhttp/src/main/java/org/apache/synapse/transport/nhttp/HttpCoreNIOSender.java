@@ -327,6 +327,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
                 HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
                 HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
+                HTTP.EXPECT_DIRECTIVE.equalsIgnoreCase(headerName) ||
                 HTTP.SERVER_HEADER.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_LEN.equalsIgnoreCase(headerName) ||

@@ -170,6 +170,7 @@ public class Axis2FlexibleMEPClient {
                 }                
 
             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {
+                axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
                 axisOutMsgCtx.setDoingREST(true);
             } else {
                 processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);

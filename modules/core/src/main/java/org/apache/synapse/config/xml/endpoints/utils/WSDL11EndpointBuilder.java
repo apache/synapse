@@ -31,12 +31,11 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.WSDLException;
+import javax.wsdl.*;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
+import javax.wsdl.extensions.http.HTTPAddress;
+import javax.wsdl.extensions.http.HTTPBinding;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLLocator;
 import javax.wsdl.xml.WSDLReader;
@@ -136,6 +135,28 @@ public class WSDL11EndpointBuilder {
                         serviceURL = address.getLocationURI();
                         format = SynapseConstants.FORMAT_SOAP12;
                         break;
+                    } else if (obj instanceof HTTPAddress) {
+                        HTTPAddress address = (HTTPAddress) obj;
+                        serviceURL = address.getLocationURI();
+                        format = SynapseConstants.FORMAT_REST;
+                        Binding binding = port.getBinding();
+                        if (binding == null) {
+                            continue;
+                        }
+                        for (Object portElement : binding.getExtensibilityElements()) {
+                            if (portElement instanceof HTTPBinding) {
+                                HTTPBinding httpBinding = (HTTPBinding) portElement;
+                                String verb = httpBinding.getVerb();
+                                if (verb == null || "".equals(verb)) {
+                                    continue;
+                                }
+                                if ("POST".equals(verb.toUpperCase())) {
+                                    format = SynapseConstants.FORMAT_REST;
+                                } else if ("GET".equals(verb.toUpperCase())) {
+                                    format = SynapseConstants.FORMAT_GET;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -148,6 +169,10 @@ public class WSDL11EndpointBuilder {
                 endpointDefinition.setForceSOAP11(true);
             } else if (SynapseConstants.FORMAT_SOAP12.equals(format)) {
                 endpointDefinition.setForceSOAP12(true);
+            } else if (SynapseConstants.FORMAT_REST.equals(format)){
+                endpointDefinition.setForceREST(true);
+            } else if (SynapseConstants.FORMAT_GET.equals(format)){
+                endpointDefinition.setForceGET(true);
             } else {
                 handleException("format value '" + format + "' not yet implemented");
             }

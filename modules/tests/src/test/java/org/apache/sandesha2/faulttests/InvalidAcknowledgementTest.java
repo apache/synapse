@@ -336,7 +336,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 				
 		//setup the sequenceAck portion of the msg
-		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
+		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue, true);
 		// Set the sequenceId
 		Identifier id = new Identifier(rmNamespaceValue);
 		id.setIndentifer(sequenceIDAck);
@@ -392,7 +392,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		applicationRMMsg.setSequence(sequence);
 		
 		//setup the sequenceAck portion of the msg
-		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
+		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue, true);
 		// Set the sequenceId
 		Identifier id = new Identifier(rmNamespaceValue);
 		id.setIndentifer(sequenceIDAck);

@@ -173,7 +173,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true, false);
 		
 		//this is not a client generated message. So set serverSide to true.
 		ackMsgCtx.setServerSide(true);

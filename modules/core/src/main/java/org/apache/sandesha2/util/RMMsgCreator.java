@@ -488,7 +488,8 @@ public class RMMsgCreator {
 	 * @param sequenceId - The sequence to which we will be Acking
 	 * @throws SandeshaException
 	 */
-	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean, boolean addToEnvelope)
+	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean, boolean addToEnvelope,
+										boolean isPiggybacked)
 			throws SandeshaException {
 		if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
@@ -500,7 +501,7 @@ public class RMMsgCreator {
 			if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 				log.debug("RMMsgCreator::addAckMessage : there are messages to ack " + ackRangeArrayList);
 			//there are actually messages to ack
-			SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
+			SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue, isPiggybacked);
 			Identifier id = new Identifier(rmNamespaceValue);
 			id.setIndentifer(sequenceId);
 			sequenceAck.setIdentifier(id);

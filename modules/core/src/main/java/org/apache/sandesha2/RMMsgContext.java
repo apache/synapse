@@ -603,7 +603,7 @@ public class RMMsgContext {
 						sequence = new Sequence(namespace);
 						sequence.fromHeaderBlock(element);
 					}else if(WSRM_COMMON.SEQUENCE_ACK.equals(localName)){
-						SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(namespace);
+						SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(namespace, false);
 						sequenceAcknowledgement.fromHeaderBlock(element);
 						sequenceAcknowledgements.add(sequenceAcknowledgement);
 					}else if(WSRM_COMMON.ACK_REQUESTED.equals(localName)){

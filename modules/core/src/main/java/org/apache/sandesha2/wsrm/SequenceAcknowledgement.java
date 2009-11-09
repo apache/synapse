@@ -53,10 +53,11 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 	private OMNamespace omNamespace = null;
 	private boolean ackNone = false;
 	private boolean ackFinal = false;
+	private boolean piggybacked = false;
 	
 	private OMElement originalSequenceAckElement;
 	
-	public SequenceAcknowledgement(String namespaceValue) {
+	public SequenceAcknowledgement(String namespaceValue, boolean _piggybacked) {
 		this.namespaceValue = namespaceValue;
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
 			omNamespace = Sandesha2Constants.SPEC_2005_02.OM_NS_URI;
@@ -65,6 +66,7 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 		}
 		acknowledgementRangeList = new ArrayList<Range>();
 		nackList = new ArrayList<Long>();
+		piggybacked = _piggybacked;
 	}
 
 	public String getNamespaceValue() {
@@ -198,7 +200,13 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 							header.toString()));
 
 		// SequenceACK messages should always have the MustUnderstand flag set to true
-		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
+		// Unless it is a piggybacked ack
+		if(piggybacked){
+			sequenceAcknowledgementHeaderBlock.setMustUnderstand(false);
+		} else {
+			sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
+		}
+		
 		identifier.toOMElement(sequenceAcknowledgementHeaderBlock, omNamespace);
 
 		Iterator<Range> ackRangeIt = acknowledgementRangeList.iterator();

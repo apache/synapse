@@ -269,7 +269,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				RMDBean incomingSequenceBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId);
 
 				if (incomingSequenceBean!=null)
-					RMMsgCreator.addAckMessage(rmMsgCtx, inboundSequenceId, incomingSequenceBean, false);
+					RMMsgCreator.addAckMessage(rmMsgCtx, inboundSequenceId, incomingSequenceBean, false, true);
 			}
 
 			if (transaction != null && transaction.isActive()) 

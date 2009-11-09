@@ -81,7 +81,7 @@ public class AcknowledgementManager {
 					if (acksToEPR == null || acksToEPR.hasAnonymousAddress()) {
 						if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 							log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
-						RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean, false);
+						RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean, false, true);
 					}
 				}
 			}
@@ -115,7 +115,7 @@ public class AcknowledgementManager {
 					log.debug("Piggybacking ack for sequence: " + inboundSequence);
 				RMDBean sequence = storageManager.getRMDBeanMgr().retrieve(inboundSequence);
 				if (sequence != null && !sequence.isTerminated()) {				  
-    				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, sequence, false);
+    				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, sequence, false, true);
     				((Sender) storageManager.getSender()).removeScheduledAcknowledgement(inboundSequence);
 				}
 			} else {
@@ -147,7 +147,7 @@ public class AcknowledgementManager {
 					if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 						log.debug("Piggybacking ack for sequence: " + sequenceId);
 
-					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false);
+					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence, false, true);
 
 					((Sender) storageManager.getSender()).removeScheduledAcknowledgement(sequenceId);
 
@@ -213,7 +213,7 @@ public class AcknowledgementManager {
 		ackMsgCtx.setServerSide(serverSide);
 
 		// adding the SequenceAcknowledgement part.
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean, true, false);
 
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::generateAckMessage");

@@ -27,7 +27,9 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
 
 /**
  * <pre>
- * &lt;property name="string" [action=set/remove] (value="literal" | expression="xpath")/&gt;
+ * &lt;property name="string" [action=set/remove] (value="literal" | expression="xpath") [type="literal"]&gt;
+ *     [Random XML]
+ * &lt;/property&gt;
  * </pre>
  */
 public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
@@ -51,22 +53,30 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
         if (mediator.getValue() != null) {
             property.addAttribute(fac.createOMAttribute(
-                    "value", nullNS, mediator.getValue()));
-
+                    "value", nullNS, mediator.getValue().toString()));
+        } else if (mediator.getValueElement() != null) {
+            property.addChild(mediator.getValueElement());
         } else if (mediator.getExpression() != null) {
-            SynapseXPathSerializer.serializeXPath(mediator.getExpression(), property, "expression");
-
+            SynapseXPathSerializer.serializeXPath(mediator.getExpression(),
+                    property, "expression");
         } else if (mediator.getAction() == PropertyMediator.ACTION_SET) {
-            handleException("Invalid property mediator. Value or expression is required if action is SET");
+            handleException("Invalid property mediator. Value or expression is required if " +
+                    "action is SET");
         }
+
         if (mediator.getScope() != null) {
             // if we have already built a mediator with scope, scope should be valid, now save it
             property.addAttribute(fac.createOMAttribute("scope", nullNS, mediator.getScope()));
         }
+
         if (mediator.getAction() == PropertyMediator.ACTION_REMOVE) {
             property.addAttribute(fac.createOMAttribute(
                     "action", nullNS, "remove"));
+        } else if (mediator.getType() != null) {
+            property.addAttribute(fac.createOMAttribute(
+                    "type" , nullNS, mediator.getType()));
         }
+
         if (parent != null) {
             parent.addChild(property);
         }

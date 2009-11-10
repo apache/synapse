@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
 public class PropertyMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_SCOPE = new QName("scope");
     private static final QName ATT_ACTION = new QName("action");
+    private static final QName ATT_TYPE = new QName("type");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -47,29 +48,50 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         OMAttribute expression = elem.getAttribute(ATT_EXPRN);
         OMAttribute scope = elem.getAttribute(ATT_SCOPE);
         OMAttribute action = elem.getAttribute(ATT_ACTION);
+        OMAttribute type = elem.getAttribute(ATT_TYPE);
+
+        OMElement valueElement = elem.getFirstElement();
 
         if (name == null) {
             String msg = "The 'name' attribute is required for the configuration of a property mediator";
             log.error(msg);
             throw new SynapseException(msg);
-        } else if ((value == null && expression == null) && !(action != null && "remove".equals(action.getAttributeValue()))) {
-            String msg = "Either an 'value' or 'expression' attribute is required for a property mediator when action is SET";
+        } else if ((value == null && valueElement == null && expression == null) &&
+                !(action != null && "remove".equals(action.getAttributeValue()))) {
+            String msg = "Either a child element or one of 'value', 'expression' attributes is " +
+                    "required for a property mediator when action is SET";
             log.error(msg);
             throw new SynapseException(msg);
         }
+        
         propMediator.setName(name.getAttributeValue());
+        String dataType = null;
+        if (type != null) {
+            dataType = type.getAttributeValue();
+        }
+
         if (value != null) {
-            propMediator.setValue(value.getAttributeValue());
+            propMediator.setValue(value.getAttributeValue(), dataType);
+        } else if (valueElement != null) {
+            propMediator.setValueElement(valueElement);
         } else if (expression != null) {
             try {
-                propMediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN));
-
+                propMediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN),
+                        dataType);
             } catch (JaxenException e) {
-                String msg = "Invalid XPath expression for attribute 'expression' : " + expression.getAttributeValue();
+                String msg = "Invalid XPath expression for attribute 'expression' : " +
+                        expression.getAttributeValue();
                 log.error(msg);
                 throw new SynapseException(msg);
             }
         }
+
+        // The action attribute is optional, if provided and equals to 'remove' the
+        // property mediator will act as a property remove mediator
+        if (action != null && "remove".equals(action.getAttributeValue())) {
+            propMediator.setAction(PropertyMediator.ACTION_REMOVE);
+        }
+        
         if (scope != null) {
             String valueStr = scope.getAttributeValue();
             if (!XMLConfigConstants.SCOPE_AXIS2.equals(valueStr) && !XMLConfigConstants.SCOPE_TRANSPORT.equals(valueStr)
@@ -82,14 +104,11 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
             }
             propMediator.setScope(valueStr);
         }
+
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(propMediator, elem);
-        // The action attribute is optional, if provided and equals to 'remove' the
-        // property mediator will act as a property remove mediator
-        if (action != null && "remove".equals(action.getAttributeValue())) {
-            propMediator.setAction(PropertyMediator.ACTION_REMOVE);
-        }
+
         return propMediator;
     }
 

@@ -43,6 +43,10 @@ public class XMLConfigConstants {
     public static final String SCOPE_CLIENT = "axis2-client";
     /** The scope name for transport header properties */
     public static final String SCOPE_TRANSPORT = "transport";
+    /** The set of supported data types */
+    public static enum DATA_TYPES {
+        STRING, BOOLEAN, INTEGER, LONG, SHORT, FLOAT, DOUBLE, OM
+    }
 
     //-- WS-RM sequence mediator --
     /** WS-RM version 1.0*/

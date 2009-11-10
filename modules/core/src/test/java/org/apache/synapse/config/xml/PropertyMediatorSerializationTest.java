@@ -56,4 +56,16 @@ public class PropertyMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
+
+    public void testPropertyMediatorSerializationScenarioFive() throws Exception {
+        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\"  name=\"DoubleProperty\" type=\"DOUBLE\" value=\"123.456\"/>";
+        assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
+        assertTrue(serialization(inputXml, propertyMediatorSerializer));
+    }
+
+    public void testPropertyMediatorSerializationScenarioSix() throws Exception {
+        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\"  name=\"OMProperty\"><name>Synapse</name></property>";
+        assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
+        assertTrue(serialization(inputXml, propertyMediatorSerializer));
+    }
 }

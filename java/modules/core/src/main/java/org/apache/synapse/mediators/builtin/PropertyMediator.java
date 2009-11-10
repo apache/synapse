@@ -21,11 +21,15 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
 
+import javax.xml.stream.XMLStreamException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,8 +46,12 @@ public class PropertyMediator extends AbstractMediator {
 
     /** The Name of the property  */
     private String name = null;
-    /** The Value to be set*/
-    private String value = null;
+    /** The Value to be set  */
+    private Object value = null;
+    /** The data type of the value */
+    private String type = null;
+    /** The XML value to be set */
+    private OMElement valueElement = null;
     /** The XPath expr. to get value  */
     private SynapseXPath expression = null;
     /** The scope for which decide properties where to go*/
@@ -75,7 +83,7 @@ public class PropertyMediator extends AbstractMediator {
 
         if (action == ACTION_SET) {
 
-            String resultValue = (value != null ? value : expression.stringValueOf(synCtx));
+            Object resultValue = getResultValue(synCtx);
 
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Setting property : " + name + " at scope : " +
@@ -177,12 +185,39 @@ public class PropertyMediator extends AbstractMediator {
         this.name = name;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
     public void setValue(String value) {
-        this.value = value;
+        setValue(value, null);
+    }
+
+    /**
+     * Set the value to be set by this property mediator and the data type
+     * to be used when setting the value. Accepted type names are defined in
+     * XMLConfigConstants.DATA_TYPES enumeration. Passing null as the type
+     * implies that 'STRING' type should be used.
+     *
+     * @param value the value to be set as a string
+     * @param type the type name
+     */
+    public void setValue(String value, String type) {
+        this.type = type;
+        // Convert the value into specified type
+        this.value = convertValue(value, type);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public OMElement getValueElement() {
+        return valueElement;
+    }
+
+    public void setValueElement(OMElement valueElement) {
+        this.valueElement = valueElement;
     }
 
     public SynapseXPath getExpression() {
@@ -190,7 +225,15 @@ public class PropertyMediator extends AbstractMediator {
     }
 
     public void setExpression(SynapseXPath expression) {
+        setExpression(expression, null);
+    }
+
+    public void setExpression(SynapseXPath expression, String type) {
         this.expression = expression;
+        // Save the type information for now
+        // We need to convert the result of the expression into this type during mediation
+        // A null type would imply 'STRING' type
+        this.type = type;
     }
 
     public String getScope() {
@@ -207,5 +250,51 @@ public class PropertyMediator extends AbstractMediator {
 
     public void setAction(int action) {
         this.action = action;
+    }
+
+    private Object getResultValue(MessageContext synCtx) {
+        if (value != null) {
+            return value;
+        } else if (valueElement != null) {
+            return valueElement;
+        } else {
+            return convertValue(expression.stringValueOf(synCtx), type);
+        }
+    }
+
+    private Object convertValue(String value, String type) {
+        if (type == null) {
+            // If no type is set we simply return the string value
+            return value;
+        }
+
+        try {
+            XMLConfigConstants.DATA_TYPES dataType = XMLConfigConstants.DATA_TYPES.valueOf(type);
+            switch (dataType) {
+                case BOOLEAN    : return Boolean.parseBoolean(value);
+                case DOUBLE     : return Double.parseDouble(value);
+                case FLOAT      : return Float.parseFloat(value);
+                case INTEGER    : return Integer.parseInt(value);
+                case LONG       : return Long.parseLong(value);
+                case OM         : return buildOM(value);
+                case SHORT      : return Short.parseShort(value);
+                default         : return value;
+            }
+        } catch (IllegalArgumentException e) {
+            String msg = "Unknown type : " + type + " for the property mediator or the " +
+                    "property value cannot be converted into the specified type.";
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
+    }
+
+    private OMElement buildOM(String value) {
+        try {
+            return AXIOMUtil.stringToOM(value);
+        } catch (XMLStreamException e) {
+            String msg = "Error while parsing the string property value as XML";
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
     }
 }

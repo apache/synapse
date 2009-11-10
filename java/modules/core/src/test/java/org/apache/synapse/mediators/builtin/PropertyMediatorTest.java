@@ -21,9 +21,15 @@ package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.axiom.om.OMElement;
+
+import java.util.Map;
 
 public class PropertyMediatorTest extends TestCase {
 
@@ -57,6 +63,103 @@ public class PropertyMediatorTest extends TestCase {
         assertTrue("valueTwo".equals((new SynapseXPath(
             "synapse:get-property('nameTwo')")).stringValueOf(synCtx)));
                 
+    }
+
+    public void testTypeAwarePropertyHandling() throws Exception {
+        PropertyMediator propMediatorOne = new PropertyMediator();
+        propMediatorOne.setName("nameOne");
+        propMediatorOne.setValue("valueOne", XMLConfigConstants.DATA_TYPES.STRING.name());
+
+        PropertyMediator propMediatorTwo = new PropertyMediator();
+        propMediatorTwo.setName("nameTwo");
+        propMediatorTwo.setValue("25000", XMLConfigConstants.DATA_TYPES.INTEGER.name());
+        propMediatorTwo.setScope(XMLConfigConstants.SCOPE_AXIS2);
+
+        PropertyMediator propMediatorThree = new PropertyMediator();
+        propMediatorThree.setName("nameThree");
+        propMediatorThree.setValue("123.456", XMLConfigConstants.DATA_TYPES.DOUBLE.name());
+        propMediatorThree.setScope(XMLConfigConstants.SCOPE_TRANSPORT);
+
+        PropertyMediator propMediatorFour = new PropertyMediator();
+        propMediatorFour.setName("nameFour");
+        propMediatorFour.setValue("true", XMLConfigConstants.DATA_TYPES.BOOLEAN.name());
+
+        PropertyMediator propMediatorFive = new PropertyMediator();
+        propMediatorFive.setName("nameFive");
+        propMediatorFive.setValue("123456", XMLConfigConstants.DATA_TYPES.LONG.name());
+        propMediatorFive.setScope(XMLConfigConstants.SCOPE_AXIS2);
+
+        PropertyMediator propMediatorSix = new PropertyMediator();
+        propMediatorSix.setName("nameSix");
+        propMediatorSix.setValue("12345", XMLConfigConstants.DATA_TYPES.SHORT.name());
+        propMediatorSix.setScope(XMLConfigConstants.SCOPE_TRANSPORT);
+
+        PropertyMediator propMediatorSeven = new PropertyMediator();
+        propMediatorSeven.setName("nameSeven");
+        propMediatorSeven.setValue("123.456", XMLConfigConstants.DATA_TYPES.FLOAT.name());
+
+        MessageContext synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>");
+        propMediatorOne.mediate(synCtx);
+        propMediatorTwo.mediate(synCtx);
+        propMediatorThree.mediate(synCtx);
+        propMediatorFour.mediate(synCtx);
+        propMediatorFive.mediate(synCtx);
+        propMediatorSix.mediate(synCtx);
+        propMediatorSeven.mediate(synCtx);
+
+        org.apache.axis2.context.MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        Map transportHeaders = (Map) axisCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        Object valueOne = synCtx.getProperty("nameOne");
+        Object valueTwo = axisCtx.getProperty("nameTwo");
+        Object valueThree = transportHeaders.get("nameThree");
+        Object valueFour = synCtx.getProperty("nameFour");
+        Object valueFive = axisCtx.getProperty("nameFive");
+        Object valueSix = transportHeaders.get("nameSix");
+        Object valueSeven = synCtx.getProperty("nameSeven");
+
+        assertEquals("valueOne", valueOne);
+        assertEquals(new Integer(25000), valueTwo);
+        assertEquals(new Double(123.456), valueThree);
+        assertEquals(Boolean.TRUE, valueFour);
+        assertEquals(new Long(123456), valueFive);
+        assertEquals(new Short("12345"), valueSix);
+        assertEquals(new Float(123.456), valueSeven);
+        System.out.println("All property values are correctly in place - Test SUCCESSFUL");
+    }
+
+    public void testXMLPropertyHandling() throws Exception {
+        PropertyMediator propMediatorOne = new PropertyMediator();
+        propMediatorOne.setName("nameOne");
+        String xml = "<Project><name>Synapse</name></Project>";
+        OMElement valueOne = TestUtils.createOMElement(xml);
+        propMediatorOne.setValueElement(valueOne);
+
+        // Test setting XML properties
+        MessageContext synCtx = TestUtils.getTestContext("<getQuote><symbol>IBM</symbol></getQuote>");
+        propMediatorOne.mediate(synCtx);
+        Object prop = synCtx.getProperty("nameOne");
+        assertEquals(valueOne, prop);
+
+        // Test XML property retreival
+        String exprValue = new SynapseXPath("synapse:get-property('nameOne')").stringValueOf(synCtx);
+        assertEquals(xml, exprValue);
+
+        // Test property removal
+        propMediatorOne.setAction(PropertyMediator.ACTION_REMOVE);
+        propMediatorOne.mediate(synCtx);
+        assertNull(synCtx.getProperty("nameOne"));
+
+        // Setting XML properties using expressions
+        synCtx.setProperty("nameOne", xml);
+        PropertyMediator propertyMediatorTwo = new PropertyMediator();
+        propertyMediatorTwo.setName("nameTwo");
+        propertyMediatorTwo.setExpression(new SynapseXPath("synapse:get-property('nameOne')"),
+                XMLConfigConstants.DATA_TYPES.OM.name());
+        propertyMediatorTwo.mediate(synCtx);
+        Object exprProp = synCtx.getProperty("nameTwo");
+        assertTrue(exprProp != null && exprProp instanceof OMElement);
     }
 
     /**

@@ -23,6 +23,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -276,23 +277,13 @@ public class PropertyMediator extends AbstractMediator {
                 case FLOAT      : return Float.parseFloat(value);
                 case INTEGER    : return Integer.parseInt(value);
                 case LONG       : return Long.parseLong(value);
-                case OM         : return buildOM(value);
+                case OM         : return SynapseConfigUtils.stringToOM(value);
                 case SHORT      : return Short.parseShort(value);
                 default         : return value;
             }
         } catch (IllegalArgumentException e) {
             String msg = "Unknown type : " + type + " for the property mediator or the " +
                     "property value cannot be converted into the specified type.";
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
-        }
-    }
-
-    private OMElement buildOM(String value) {
-        try {
-            return AXIOMUtil.stringToOM(value);
-        } catch (XMLStreamException e) {
-            String msg = "Error while parsing the string property value as XML";
             log.error(msg, e);
             throw new SynapseException(msg, e);
         }

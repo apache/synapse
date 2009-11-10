@@ -20,8 +20,8 @@
 package org.apache.synapse.config;
 
 import org.apache.axiom.om.*;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

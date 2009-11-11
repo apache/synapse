@@ -1143,7 +1143,9 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <h4>
       <a name="property" id="property">Property</a>
     </h4>
-<pre xml:space="preserve"> &lt;property name="string" [action=set|remove] (value="literal" | expression="xpath") [scope=transport|axis2|axis2-client]/&gt;</pre>
+<pre xml:space="preserve"> &lt;property name="string" [action=set|remove] [type="string"] (value="literal" | expression="xpath") [scope=transport|axis2|axis2-client]&gt;
+     &lt;xml-element/&gt;?
+&lt;/property&gt;</pre>
     <p>
       The property token refers to a &lt;property&gt; element which is a
       mediator that has no direct impact on the message but rather on the
@@ -1155,6 +1157,36 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       specified, it will default to the Synapse message context scope. Using the
       property element with action specified as "remove" you can remove any
       existing message context properties.
+    </p>
+    <p>
+      Using the type attribute one can set properties with specific types on
+      the message context. Currently the type attribute accepts following
+      data types.
+    </p>
+        <ul>
+            <li>STRING</li>
+            <li>BOOLEAN</li>
+            <li>DOUBLE</li>
+            <li>FLOAT</li>
+            <li>INTEGER</li>
+            <li>LONG</li>
+            <li>SHORT</li>
+            <li>OM</li>
+        </ul>
+    <p>
+      The type names are case sensitive. If a type is not explicitly specified
+      properties will be set as string values. Type 'OM' can be used to set XML
+      property values on the message context. This becomes useful when the expression
+      associated with the property mediator evaluates to an XML value during mediation.
+      With the type attribute set to 'OM' the resulting XML will be converted to
+      an AXIOM OMElement before setting it to the message context.
+    </p>
+    <p>
+      You can use the property mediator to set fixed XML property values on the
+      message context too. To do that instead of specifying a 'value' attribute
+      specify the XML property value as a child element of the property element.
+      The type attribute has no significance in this situation as the type of the
+      property value is always 'OM'.
     </p>
     <p>
       There are some well-defined properties that you can get/set on the Synapse

@@ -55,6 +55,7 @@
                     <instructions>
                         <Export-Package>
                             org.apache.synapse.format.hessian.*,
+                            org.apache.synapse.format.raw.*,
                             org.apache.synapse.format.syslog.*,
                             org.apache.synapse.mediators.bsf.*,
                             org.apache.synapse.mediators.spring.*,
@@ -63,6 +64,7 @@
                         </Export-Package>
                         <Import-Package>
                             !org.apache.synapse.format.hessian.*,
+                            !org.apache.synapse.format.raw.*,
                             !org.apache.synapse.format.syslog.*,
                             !org.apache.synapse.mediators.bsf.*,
                             !org.apache.synapse.mediators.spring.*,

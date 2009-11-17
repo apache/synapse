@@ -77,16 +77,7 @@ public class RMSBeanMgrTest extends SandeshaTestCase {
     	createSeqBean1.setCreateSeqMsgID("CreateSeqMsgId1");
     	createSeqBean1.setSequenceID("SeqId1");
     	
-    	RMSBean createSeqBean2 = new RMSBean ();
-    	createSeqBean2.setInternalSequenceID("TmpSeqId2");
-    	createSeqBean2.setCreateSeqMsgID("CreateSeqMsgId2");
-    	createSeqBean2.setSequenceID("SeqId1");
-    	
     	assertTrue(mgr.insert(createSeqBean1));
-        
-        //This RMSBean won't get added 
-        //as we protect against adding two RMSBeans with identical Seq ID's
-        assertFalse(mgr.insert(createSeqBean2));
 
         RMSBean target = new RMSBean();
         target.setSequenceID("SeqId1");

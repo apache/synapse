@@ -36,44 +36,26 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr<RMSBean> implements RMSB
 	
 	private ConcurrentHashMap<String, String> seqID2csm = new ConcurrentHashMap<String, String>();
 	private ConcurrentHashMap<String, String> intSeqID2csm = new ConcurrentHashMap<String, String>();
-	private ConcurrentHashMap<String, String> inUseSeqIDs = new ConcurrentHashMap<String, String>();
 
 	public InMemoryRMSBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
 	}
 	
-	private boolean isSeqIDUsable(String seqID, String createSeqMsgID, boolean isInsert){
-		boolean isUsable = true;
-		if(seqID != null) {
-			Object o = inUseSeqIDs.putIfAbsent(seqID, createSeqMsgID);
-			
-			if(isInsert && o!= null){
-				isUsable = false;
-			}
-			
-			if(o != null && !o.equals(createSeqMsgID)){
-				isUsable = false;
-			}
-		}
-		return isUsable;
-	}
 
 	public boolean insert(RMSBean bean) throws SandeshaStorageException {
 		boolean res = false;
 		lock.lock();
-		if(isSeqIDUsable(bean.getSequenceID(), bean.getCreateSeqMsgID(), true)){
-			if(intSeqID2csm.get(bean.getInternalSequenceID())==null){
-				res = super.insert(bean.getCreateSeqMsgID(), bean);
-				if(res){
-					if(bean.getInternalSequenceID()!=null){
-						intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
-					}
-					if(bean.getSequenceID()!=null){
-						seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
-					}
+		if(intSeqID2csm.get(bean.getInternalSequenceID())==null){
+			res = super.insert(bean.getCreateSeqMsgID(), bean);
+			if(res){
+				if(bean.getInternalSequenceID()!=null){
+					intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
 				}
-			}			
-		} 
+				if(bean.getSequenceID()!=null){
+					seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
+				}
+			}
+		}			
 
 		lock.unlock();
 
@@ -85,7 +67,6 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr<RMSBean> implements RMSB
 		if(removed!=null){
 			seqID2csm.remove(removed.getSequenceID());
 			intSeqID2csm.remove(removed.getInternalSequenceID());			
-			inUseSeqIDs.remove(removed.getSequenceID());
 		}
 		return removed!=null;
 
@@ -98,15 +79,13 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr<RMSBean> implements RMSB
 	public boolean update(RMSBean bean) throws SandeshaStorageException {
 		boolean result = false;
 		
-		if(isSeqIDUsable(bean.getSequenceID(), bean.getCreateSeqMsgID(), false)){
-			result = super.update(bean.getCreateSeqMsgID(), bean);
-			if(bean.getInternalSequenceID()!=null){
-				intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
-			}
-			if(bean.getSequenceID()!=null){
-				seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
-			}
-		} 
+		result = super.update(bean.getCreateSeqMsgID(), bean);
+		if(bean.getInternalSequenceID()!=null){
+			intSeqID2csm.put(bean.getInternalSequenceID(), bean.getCreateSeqMsgID());
+		}
+		if(bean.getSequenceID()!=null){
+			seqID2csm.put(bean.getSequenceID(), bean.getCreateSeqMsgID());
+		}
 
 		return result;		
 	}

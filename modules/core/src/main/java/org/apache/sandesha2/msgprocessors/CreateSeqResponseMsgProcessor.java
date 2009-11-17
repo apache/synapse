@@ -109,6 +109,17 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		
+		//Need to see if the seqID is a dupe of one that already exists
+		//If it is we can't accept the CSR, so will do nothing so that a new CreateSeq msg is sent
+		RMSBean finderBean = new RMSBean ();
+		finderBean.setSequenceID(newOutSequenceId);
+		RMSBean rmsBeanWithDuplicateSeqID = storageManager.getRMSBeanMgr().findUnique(finderBean);
+		if(rmsBeanWithDuplicateSeqID != null){
+			if (log.isDebugEnabled())
+				log.debug("Duplicate SeqID: " + newOutSequenceId + " so we can't accept the CSR, will terminate this seq and reallocate to a new seq");
+			return false;
+		}
 
 		// Check that the create sequence response message proves possession of the correct token
 		MessageContext msgCtx = createSeqResponseRMMsgCtx.getMessageContext();

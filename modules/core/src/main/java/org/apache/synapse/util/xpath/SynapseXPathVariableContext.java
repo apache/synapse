@@ -22,10 +22,19 @@ package org.apache.synapse.util.xpath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.description.AxisBindingOperation;
+import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.description.WSDL20DefaultValueHolder;
+import org.apache.axis2.Constants;
+import org.apache.axis2.transport.http.util.URIEncoderDecoder;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
 import java.util.Map;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Jaxen variable context for the XPath variables implicitly exposed by Synapse.
@@ -38,6 +47,9 @@ import java.util.Map;
  * </dl>
  */
 public class SynapseXPathVariableContext implements VariableContext {
+
+    private static final Log log = LogFactory.getLog(SynapseXPathVariableContext.class);
+
     /** Parent variable context */
     private final VariableContext parent;
 
@@ -133,6 +145,57 @@ public class SynapseXPathVariableContext implements VariableContext {
                         Map headersMap = (Map) headers;
                         return headersMap.get(localName);
                     }
+                } else if (SynapseXPathConstants.URL_VARIABLE_PREFIX.equals(prefix)) {
+
+                    EndpointReference toEPR = synCtx.getTo();
+                    if (toEPR != null) {
+                        String completeURL = toEPR.getAddress();
+                        AxisBindingOperation axisBindingOperation = (AxisBindingOperation)
+                                ((Axis2MessageContext) synCtx).getAxis2MessageContext().getProperty(
+                                        Constants.AXIS_BINDING_OPERATION);
+                        String queryParameterSeparator = null;
+                        if (axisBindingOperation != null) {
+                            queryParameterSeparator = (String) axisBindingOperation.getProperty(
+                                    WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR);
+                        }
+                        if (queryParameterSeparator == null) {
+                            queryParameterSeparator = WSDL20DefaultValueHolder.
+                                    ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR_DEFAULT;
+                        }
+
+                        int i = completeURL.indexOf("?");
+                        if (i > -1) {
+                            String queryString = completeURL.substring(i + 1);
+                            
+                            if (queryString != null && !queryString.equals("")) {
+                                String params[] = queryString.split(queryParameterSeparator);
+
+                                if (params == null || params.length == 0) {
+                                    return "";
+                                }
+
+                                for (String param : params) {
+                                    String temp[] = param.split("=");
+                                    if (temp != null && temp.length >= 1) {
+                                        if (temp[0].equals(localName)) {
+                                            try {
+                                                return temp.length > 1 ?
+                                                        URIEncoderDecoder.decode(temp[1]) : "";
+                                            } catch (UnsupportedEncodingException e) {
+                                                String msg = "Couldn't decode the URL parameter " +
+                                                        "value " + temp[1] +
+                                                        " with name " + localName;
+                                                log.error(msg, e);
+                                                throw new UnresolvableException(
+                                                        msg + e.getMessage());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return "";
                 }
             }
         }

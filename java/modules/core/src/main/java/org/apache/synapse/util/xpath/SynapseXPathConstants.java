@@ -41,4 +41,7 @@ public final class SynapseXPathConstants {
 
     /** Variable prefix for accessing transport headers of the message through XPath variables */
     public static final String TRANSPORT_VARIABLE_PREFIX = "trp";
+
+    /** Variable prefix for accessing URL parameters of the message through XPath variables */
+    public static final String URL_VARIABLE_PREFIX = "url";
 }

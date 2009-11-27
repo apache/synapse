@@ -65,11 +65,13 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.BindException;
 import java.util.*;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
  */
+@SuppressWarnings({"JavadocReference"})
 public class HttpCoreNIOSender extends AbstractHandler implements TransportSender, ManagementSupport {
 
     private static final Log log = LogFactory.getLog(HttpCoreNIOSender.class);
@@ -109,7 +111,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @param transportOut the description of the http/s transport from Axis2 configuration
      * @throws AxisFault thrown on an error
      */
-    public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
+    public void init(ConfigurationContext cfgCtx, final TransportOutDescription transportOut) throws AxisFault {
         this.cfgCtx = cfgCtx;
 
         // is this an SSL Sender?
@@ -151,44 +153,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             cfgCtx.setNonReplicableProperty("warnOnHTTP500", warnOnHttp500);
         }
 
-        HttpParams params = getClientParameters();
-        try {
-            String prefix = (sslContext == null ? "http" : "https") + "-Sender I/O dispatcher";
-            ioReactor = new DefaultConnectingIOReactor(
-                NHttpConfiguration.getInstance().getClientIOWorkers(),
-                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
-            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
-                public boolean handle(IOException ioException) {
-                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
-                        ioException.getMessage(), ioException);
-                    return true;
-                }
-
-                public boolean handle(RuntimeException runtimeException) {
-                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
-                        runtimeException.getMessage(), runtimeException);
-                    return true;
-                }
-            });
-        } catch (IOException e) {
-            log.error("Error starting the IOReactor", e);
-        }
-
-        handler = new ClientHandler(cfgCtx, params, metrics);
-        final IOEventDispatch ioEventDispatch = getEventDispatch(
-            handler, sslContext, sslIOSessionHandler, params, transportOut);
-
         // start the Sender in a new seperate thread
         Thread t = new Thread(new Runnable() {
             public void run() {
-                try {
-                    ioReactor.execute(ioEventDispatch);
-                } catch (InterruptedIOException ex) {
-                    log.fatal("Reactor Interrupted");
-                } catch (IOException e) {
-                    log.fatal("Encountered an I/O error: " + e.getMessage(), e);
-                }
-                log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender Shutdown");
+                executeClientEngine(transportOut);
             }
         }, "HttpCoreNIOSender");
         t.start();
@@ -517,6 +485,86 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             try {
                 is.close();
             } catch (IOException ignore) {}
+        }
+    }
+
+    /**
+     * Configure and start the IOReactor
+     */
+    private void executeClientEngine(final TransportOutDescription transportOut) {
+
+        HttpParams params = getClientParameters();
+        try {
+            String prefix = (sslContext == null ? "http" : "https") + "-Sender I/O dispatcher";
+            ioReactor = new DefaultConnectingIOReactor(
+                NHttpConfiguration.getInstance().getClientIOWorkers(),
+                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
+            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                public boolean handle(IOException ioException) {
+                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
+                        ioException.getMessage(), ioException);
+                    if (ioException instanceof BindException) {
+                        // bind failures considered OK to ignore
+                        return true;
+                    }
+                    return false;
+                }
+
+                public boolean handle(RuntimeException runtimeException) {
+                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
+                        runtimeException.getMessage(), runtimeException);
+                    if (runtimeException instanceof UnsupportedOperationException) {
+                        // Unsupported operations considered OK to ignore
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        } catch (IOException e) {
+            log.error("Error starting the IOReactor", e);
+        }
+
+        handler = new ClientHandler(cfgCtx, params, metrics);
+        IOEventDispatch ioEventDispatch = null;
+        try {
+            ioEventDispatch = getEventDispatch(
+            handler, sslContext, sslIOSessionHandler, params, transportOut);
+        } catch (AxisFault axisFault) {
+            log.fatal("Error getting event dispatch");
+        }
+
+        state = BaseConstants.STARTED;
+        boolean attemptAutoRestart = true;
+        try {
+            ioReactor.execute(ioEventDispatch);
+            attemptAutoRestart = false;
+        } catch (InterruptedIOException ex) {
+            log.fatal("Reactor Interrupted");
+        } catch (IOException e) {
+            log.fatal("Encountered an I/O error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.fatal("Encountered an error: " + e.getMessage(), e);
+        }
+
+        if (attemptAutoRestart) {
+            log.info("IOReactor encountered a fatal exception. Attempting a re-start of the reactor");
+            try {
+                log.info("Attempt shutdown of the IOReactor if still running..");
+                ioReactor.shutdown();
+            } catch (IOException ignore) {}
+            handler.stop();
+
+            log.info("Restarting IOReactor.. ");
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    executeClientEngine(transportOut);
+                }
+            }, "HttpCoreNIOSender");
+            t.start();
+            log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender auto re-starting");
+
+        } else {
+            log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender Shutdown");
         }
     }
 

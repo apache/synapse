@@ -40,7 +40,6 @@ import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
-import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -49,6 +48,7 @@ import org.apache.http.params.HttpProtocolParams;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -242,83 +242,103 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         if (log.isDebugEnabled()) {
             log.debug("Starting Listener...");
         }
-        
-        // configure the IO reactor on the specified port
-        HttpParams params = getServerParameters();
-        try {
-            String prefix = (sslContext == null ? "http" : "https") + "-Listener I/O dispatcher";
-            ioReactor = new DefaultListeningIOReactor(
-                NHttpConfiguration.getInstance().getServerIOWorkers(),                
-                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
-
-            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
-                public boolean handle(IOException ioException) {
-                    log.warn("System may be unstable: IOReactor encountered a checked exception : "
-                            + ioException.getMessage(), ioException);
-                    return true;
-                }
-
-                public boolean handle(RuntimeException runtimeException) {
-                    log.warn("System may be unstable: IOReactor encountered a runtime exception : "
-                            + runtimeException.getMessage(), runtimeException);
-                    return true;
-                }
-            });
-        } catch (IOException e) {
-            handleException("Error starting the IOReactor", e);
-        }
-
-        for (Object obj : cfgCtx.getAxisConfiguration().getServices().values()) {
-            addToServiceURIMap((AxisService) obj);
-        }
-        
-        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
-        final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
-                sslContext, sslIOSessionHandler, params);
-        state = BaseConstants.STARTED;
-        
-        ListenerEndpoint endpoint;
-        try {
-            if (bindAddress == null) {
-                endpoint = ioReactor.listen(new InetSocketAddress(port));
-            } else {
-                endpoint = ioReactor.listen(new InetSocketAddress(
-                    InetAddress.getByName(bindAddress), port));
-            }
-        } catch (IOException e) {
-            handleException("Encountered an I/O error: " + e.getMessage(), e);
-            return;
-        }
-        
-        // start the IO reactor in a new separate thread
+        // start the Listener in a new seperate thread
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
-                    ioReactor.execute(ioEventDispatch);
-                } catch (InterruptedIOException ex) {
-                    log.fatal("Reactor Interrupted");
-                } catch (IOException e) {
-                    log.fatal("Encountered an I/O error: " + e.getMessage(), e);
+                    startServerEngine();
                 } catch (Exception e) {
-                    log.fatal("Unexpected exception in I/O reactor", e);
+                    e.printStackTrace();
                 }
-                log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Shutdown");
             }
         }, "HttpCoreNIOListener");
 
         t.start();
-        
-        // Wait for the endpoint to become ready, i.e. for the listener to start accepting
-        // requests.
-        try {
-            endpoint.waitFor();
-        } catch (InterruptedException e) {
-            log.warn("HttpCoreNIOListener#start() was interrupted");
-        }
-        
-        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener started on" +
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener starting on" +
             (bindAddress != null ? " address : " + bindAddress : "") + " port : " + port);
     }
+
+    /**
+     * configure and start the IO reactor on the specified port
+     */
+    private void startServerEngine() {
+        HttpParams params = getServerParameters();
+        try {
+            String prefix = (sslContext == null ? "http" : "https") + "-Listener I/O dispatcher";
+            ioReactor = new DefaultListeningIOReactor(
+                NHttpConfiguration.getInstance().getServerIOWorkers(),
+                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
+
+            ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                public boolean handle(IOException ioException) {
+                    log.warn("System may be unstable: IOReactor encountered a checked exception : " +
+                        ioException.getMessage(), ioException);
+                    if (ioException instanceof BindException) {
+                        // bind failures considered OK to ignore
+                        return true;
+                    }
+                    return false;
+                }
+
+                public boolean handle(RuntimeException runtimeException) {
+                    log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
+                        runtimeException.getMessage(), runtimeException);
+                    if (runtimeException instanceof UnsupportedOperationException) {
+                        // Unsupported operations considered OK to ignore
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        } catch (IOException e) {
+            log.error("Error starting the IOReactor", e);
+        }
+
+        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
+        IOEventDispatch ioEventDispatch = getEventDispatch(
+            handler, sslContext, sslIOSessionHandler, params);
+
+        state = BaseConstants.STARTED;
+        boolean attemptAutoRestart = true;
+        try {
+            if (bindAddress == null) {
+                ioReactor.listen(new InetSocketAddress(port));
+            } else {
+                ioReactor.listen(new InetSocketAddress(
+                    InetAddress.getByName(bindAddress), port));
+            }
+            ioReactor.execute(ioEventDispatch);
+            attemptAutoRestart = false;
+
+        } catch (InterruptedIOException ex) {
+            log.fatal("Reactor Interrupted");
+        } catch (IOException e) {
+            log.fatal("Encountered an I/O error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.fatal("Encountered a Runtime exception : " + e.getMessage(), e);
+        }
+
+        if (attemptAutoRestart) {
+            log.info("IOReactor encountered a fatal exception. Attempting a re-start of the reactor");
+            try {
+                log.info("Attempt shutdown of the IOReactor if still running..");
+                ioReactor.shutdown();
+            } catch (IOException ignore) {}
+            handler.stop();
+
+            log.info("Restarting IOReactor.. ");
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    startServerEngine();
+                }
+            }, "HttpCoreNIOListener");
+            t.start();
+            log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener auto re-starting");
+
+        } else {
+            log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Shutdown");
+        }
+    }    
 
     private void addToServiceURIMap(AxisService service) {
         Parameter param = service.getParameter(NhttpConstants.SERVICE_URI_LOCATION);

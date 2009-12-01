@@ -20,7 +20,6 @@ package org.apache.synapse.commons.security.wrappers;
 
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
 
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -33,8 +32,8 @@ import java.security.PrivateKey;
 public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
 
     /**
-     * @see org.apache.synapse.commons.security.wrappers.KeyStoreWrapper
-     *      #init(org.apache.synapse.security.bean.KeyStoreInformation, String, String)
+     * @see KeyStoreWrapper
+     *      #init(KeyStoreInformation, String, String)
      */
     public void init(IdentityKeyStoreInformation information, String keyPassword) {
         super.init(information, keyPassword);
@@ -61,7 +60,7 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
      * @return PrivateKey if there is a one , otherwise null
      */
     public PrivateKey getPrivateKey() {
-        Key key = super.getKey();
+        Key key = super.getDefaultPrivateKey();
         if (key instanceof PrivateKey) {
             return (PrivateKey) key;
         }
@@ -77,34 +76,6 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
         Key key = super.getPrivateKey(alias);
         if (key instanceof PrivateKey) {
             return (PrivateKey) key;
-        }
-        return null;
-    }
-
-    /**
-     * Returns the secret key
-     *
-     * @param alias       The alias of the certificate in the specified keyStore
-     * @param keyPassword Password to access secret key
-     * @return SecretKey if there is a one , otherwise null
-     */
-    public SecretKey getSecretKey(String alias, String keyPassword) {
-        Key key = super.getKey(alias, keyPassword);
-        if (key instanceof SecretKey) {
-            return (SecretKey) key;
-        }
-        return null;
-    }
-
-    /**
-     * Returns the secret key based on initialization data
-     *
-     * @return SecretKey if there is a one , otherwise null
-     */
-    public SecretKey getSecretKey() {
-        Key key = super.getKey();
-        if (key instanceof SecretKey) {
-            return (SecretKey) key;
         }
         return null;
     }

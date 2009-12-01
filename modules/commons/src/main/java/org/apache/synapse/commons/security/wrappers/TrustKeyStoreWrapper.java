@@ -28,7 +28,7 @@ import java.security.KeyStore;
  */
 public class TrustKeyStoreWrapper extends KeyStoreWrapper {
     /**
-     * @see org.apache.synapse.commons.security.wrappers.KeyStoreWrapper
+     * @see KeyStoreWrapper
      *      There is no keyPassword as trusted Store doesn't keep private or secret keys
      */
     public void init(TrustKeyStoreInformation information) {

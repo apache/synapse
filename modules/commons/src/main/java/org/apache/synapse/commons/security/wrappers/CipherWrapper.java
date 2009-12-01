@@ -20,16 +20,15 @@ package org.apache.synapse.commons.security.wrappers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.security.definition.CipherInformation;
 import org.apache.synapse.commons.security.enumeration.CipherOperationMode;
 import org.apache.synapse.commons.security.tool.EncodingHelper;
-import org.apache.synapse.commons.SynapseCommonsException;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +53,7 @@ public class CipherWrapper {
      * providing those.
      *
      * @param cipherInformation Encapsulated object contains all information required to cipher
-     * @param key               The key that will be used by the cipher either for encryption and 
+     * @param key               The key that will be used by the cipher either for encryption and
      *                          encryption
      */
     public CipherWrapper(CipherInformation cipherInformation, Key key) {
@@ -73,23 +72,23 @@ public class CipherWrapper {
             } else if (opMode == CipherOperationMode.DECRYPT) {
                 cipher.init(Cipher.DECRYPT_MODE, key);
             } else {
-                handleException("Invalid mode : " + opMode);
+                throw new SynapseCommonsException("Invalid mode : " + opMode, log);
             }
 
         } catch (NoSuchAlgorithmException e) {
-            handleException("There is no algorithm support for " +
-                    "'" + algorithm + "' in the operation mode '" + opMode + "'" + e);
+            throw new SynapseCommonsException("There is no algorithm support for " +
+                    "'" + algorithm + "' in the operation mode '" + opMode + "'" + e, log);
         } catch (NoSuchPaddingException e) {
-            handleException("There is no padding scheme  for " +
-                    "'" + algorithm + "' in the operation mode '" + opMode + "'" + e);
+            throw new SynapseCommonsException("There is no padding scheme  for " +
+                    "'" + algorithm + "' in the operation mode '" + opMode + "'" + e, log);
         } catch (InvalidKeyException e) {
-            handleException("Invalid key ", e);
+            throw new SynapseCommonsException("Invalid key ", e, log);
         }
     }
 
     /**
      * Constructs a cipher wrapper using the provided information and pass phrase.
-     * 
+     *
      * @param cipherInformation Encapsulated object contains all information required to cipher
      * @param passphrase        The pass phrase used to construct a secret key using the same algorithm
      *                          that will be used to de- or encrypt data.
@@ -107,12 +106,13 @@ public class CipherWrapper {
      */
     public String getSecret(InputStream inputStream) {
 
-        InputStream sourceStream = null;
+        InputStream sourceStream;
         if (cipherInformation.getInType() != null) {
             try {
                 sourceStream = EncodingHelper.decode(inputStream, cipherInformation.getInType());
             } catch (IOException e) {
-                handleException("IOError when decoding the input stream for cipher ", e);
+                throw new SynapseCommonsException(
+                        "IOError when decoding the input stream for cipher ", e, log);
             }
         } else {
             sourceStream = inputStream;
@@ -128,7 +128,8 @@ public class CipherWrapper {
                 out.write(buffer, 0, length);
             }
         } catch (IOException e) {
-            handleException("IOError when reading the input stream for cipher ", e);
+            throw new SynapseCommonsException("IOError when reading the input stream for cipher ",
+                    e, log);
         } finally {
             try {
                 sourceStream.close();
@@ -138,24 +139,13 @@ public class CipherWrapper {
                 // ignore exception
             }
         }
-        
+
         String secret;
-        if (cipherInformation.getOutType() != null) {            
+        if (cipherInformation.getOutType() != null) {
             secret = EncodingHelper.encode(baos, cipherInformation.getOutType());
         } else {
             secret = baos.toString();
         }
         return secret;
-    }
-
-    
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseCommonsException(msg, e);
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
     }
 }

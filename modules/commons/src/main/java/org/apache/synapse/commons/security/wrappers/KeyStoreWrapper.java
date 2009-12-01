@@ -20,19 +20,20 @@ package org.apache.synapse.commons.security.wrappers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.KeyStoreInformation;
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
-import org.apache.synapse.commons.SynapseCommonsException;
 
+import javax.crypto.SecretKey;
 import java.security.*;
 import java.security.cert.Certificate;
 
 /**
- * Wraps the keyStore and provide abstraction need for ciphering in the synapse.
+ * Wraps the keyStore and provide abstraction need for ciphering.
  */
 public abstract class KeyStoreWrapper {
-    
+
     protected Log log;
     /* Bean that encapsulates the information about KeyStore */
     private KeyStoreInformation keyStoreInformation;
@@ -55,7 +56,7 @@ public abstract class KeyStoreWrapper {
     protected void init(KeyStoreInformation information, String keyPassword) {
 
         if (information == null) {
-            handleException("KeyStore information cannot be found");
+            throw new SynapseCommonsException("KeyStore information cannot be found", log);
         }
         this.keyStoreInformation = information;
         this.keyPassword = keyPassword;
@@ -65,7 +66,7 @@ public abstract class KeyStoreWrapper {
         } else if (information instanceof IdentityKeyStoreInformation) {
             this.keyStore = ((IdentityKeyStoreInformation) information).getIdentityKeyStore();
         } else {
-            handleException("Invalid KeyStore type");
+            throw new SynapseCommonsException("Invalid KeyStore type", log);
         }
     }
 
@@ -79,17 +80,17 @@ public abstract class KeyStoreWrapper {
     protected Key getKey(String alias, String keyPassword) {
 
         if (alias == null || "".equals(alias)) {
-            handleException("The alias need to provided to get certificate");
+            throw new SynapseCommonsException("The alias need to provided to get certificate", log);
         }
         if (keyPassword != null) {
             try {
                 return keyStore.getKey(alias, keyPassword.toCharArray());
             } catch (KeyStoreException e) {
-                handleException("Error loading key for alias : " + alias, e);
+                throw new SynapseCommonsException("Error loading key for alias : " + alias, e, log);
             } catch (NoSuchAlgorithmException e) {
-                handleException("Error loading key for alias : " + alias, e);
+                throw new SynapseCommonsException("Error loading key for alias : " + alias, e, log);
             } catch (UnrecoverableKeyException e) {
-                handleException("Error loading key for alias : " + alias, e);
+                throw new SynapseCommonsException("Error loading key for alias : " + alias, e, log);
             }
         }
         return null;
@@ -101,14 +102,14 @@ public abstract class KeyStoreWrapper {
      * @param alias The alias of the certificate in the specified keyStore
      * @return Key , if there is a one , otherwise null
      */
-    protected Key getKey(String alias) {
+    protected Key getPublicKeyFromCetificate(String alias) {
         try {
             Certificate certificate = keyStore.getCertificate(alias);
             if (certificate != null) {
                 return certificate.getPublicKey();
             }
         } catch (KeyStoreException e) {
-            handleException("Error loading key for alias : " + alias, e);
+            throw new SynapseCommonsException("Error loading key for alias : " + alias, e, log);
         }
         return null;
     }
@@ -118,12 +119,11 @@ public abstract class KeyStoreWrapper {
      *
      * @return Key , if there is a one , otherwise null
      */
-    protected Key getKey() {
+    protected Key getDefaultPrivateKey() {
         if (keyPassword != null) {
             return getKey(keyStoreInformation.getAlias(), keyPassword);
-        } else {
-            return getKey(keyStoreInformation.getAlias());
         }
+        return null;
     }
 
     /**
@@ -143,7 +143,7 @@ public abstract class KeyStoreWrapper {
      * @return PublicKey if there is a one , otherwise null
      */
     public PublicKey getPublicKey(String alias) {
-        Key key = getKey(alias);
+        Key key = getPublicKeyFromCetificate(alias);
         if (key instanceof PublicKey) {
             return (PublicKey) key;
         }
@@ -156,21 +156,11 @@ public abstract class KeyStoreWrapper {
      * @return PublicKey if there is a one , otherwise null
      */
     public PublicKey getPublicKey() {
-        Key key = getKey();
+        Key key = getPublicKeyFromCetificate(keyStoreInformation.getAlias());
         if (key instanceof PublicKey) {
             return (PublicKey) key;
         }
         return null;
-    }
-
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseCommonsException(msg, e);
-    }
-
-    protected void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
     }
 
     /**
@@ -180,5 +170,34 @@ public abstract class KeyStoreWrapper {
      */
     protected KeyStore getKeyStore() {
         return keyStore;
+    }
+
+    /**
+     * Returns the secret key
+     *
+     * @param alias       The alias of the certificate in the specified keyStore
+     * @param keyPassword Password to access secret key
+     * @return SecretKey if there is a one , otherwise null
+     */
+    public SecretKey getSecretKey(String alias, String keyPassword) {
+        Key key = getKey(alias, keyPassword);
+        if (key instanceof SecretKey) {
+            return (SecretKey) key;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the secret key based on initialization data
+     *
+     * @return SecretKey if there is a one , otherwise null
+     */
+    public SecretKey getSecretKey() {
+        Key key = getKey(keyStoreInformation.getAlias(),
+                keyStoreInformation.getKeyStorePasswordProvider().getResolvedSecret());
+        if (key instanceof SecretKey) {
+            return (SecretKey) key;
+        }
+        return null;
     }
 }

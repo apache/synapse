@@ -153,7 +153,7 @@ public class ClientWorker implements Runnable {
         }
 
         try {
-            if (response.getEntity() != null && in != null) {
+            if (in != null) {
                 Header cType = response.getFirstHeader(HTTP.CONTENT_TYPE);
                 String contentType;
                 if (cType != null) {

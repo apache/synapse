@@ -46,9 +46,15 @@ public class EndpointContext {
     public static final int ST_ACTIVE      = 1;
     /** An endpoint which timed out - but now maybe ready to retry depending on the current time */
     public static final int ST_TIMEOUT     = 2;
-    /** An endpoint put into the suspended state by the system. Will retry after an applicable delay */
+    /**
+     * An endpoint put into the suspended state by the system.
+     * Will retry after an applicable delay
+     */
     public static final int ST_SUSPENDED   = 3;
-    /** An endpoint manually switched off into maintenence - it will never change state automatically */
+    /**
+     * An endpoint manually switched off into maintenence -
+     * it will never change state automatically
+     */
     public static final int ST_OFF = 4;
 
     /** The state of the endpoint at present */
@@ -78,7 +84,8 @@ public class EndpointContext {
     /**
      * Create an EndpointContext to hold runtime state of an Endpoint
      * @param endpointName the name of the endpoint (mainly for logging)
-     * @param endpointDefinition the definition of the endpoint (e.g. retry time, suspend duration..)
+     * @param endpointDefinition the definition of the endpoint
+     *  (e.g. retry time, suspend duration..)
      * @param clustered is the environment clustered?
      * @param cfgCtx the Axis2 configurationContext for clustering
      */
@@ -87,7 +94,8 @@ public class EndpointContext {
 
         if (clustered) {
             if (endpointName == null) {
-                handleException("For proper clustered mode operation, all endpoints should be uniquely named");
+                handleException("For proper clustered mode operation, all endpoints should " +
+                        "be uniquely named");
             }
             this.isClustered = true;
             this.cfgCtx = cfgCtx;
@@ -123,7 +131,8 @@ public class EndpointContext {
                     break;
                 }
                 case ST_TIMEOUT: {
-                    Integer retries = (Integer) cfgCtx.getPropertyNonReplicable(REMAINING_RETRIES_KEY);
+                    Integer retries
+                            = (Integer) cfgCtx.getPropertyNonReplicable(REMAINING_RETRIES_KEY);
                     if (retries == null) {
                         retries = definition.getRetriesOnTimeoutBeforeSuspend();
                     }
@@ -135,15 +144,15 @@ public class EndpointContext {
                         setState(ST_SUSPENDED);
 
                     } else {
-                        Replicator.setAndReplicateState(REMAINING_RETRIES_KEY, (retries - 1), cfgCtx);
-                        long nextRetry = System.currentTimeMillis() + definition.getRetryDurationOnTimeout();
+                        Replicator.setAndReplicateState(
+                                REMAINING_RETRIES_KEY, (retries - 1), cfgCtx);
+                        long nextRetry = System.currentTimeMillis()
+                                + definition.getRetryDurationOnTimeout();
                         Replicator.setAndReplicateState(NEXT_RETRY_TIME_KEY, nextRetry, cfgCtx);
 
-                        if (log.isDebugEnabled()) {
-                            log.debug("Endpoint : " + endpointName + " is marked as TIMEOUT and " +
-                                    "will be retried : " + (retries - 1) + " more time/s after : " +
-                                    new Date(nextRetry) + " until its marked SUSPENDED for failure");
-                        }
+                        log.warn("Endpoint : " + endpointName + " is marked as TIMEOUT and " +
+                                "will be retried : " + (retries - 1) + " more time/s after : " +
+                                new Date(nextRetry) + " until its marked SUSPENDED for failure");
                     }
                     break;
                 }
@@ -154,7 +163,8 @@ public class EndpointContext {
                 case ST_OFF: {
                     // mark as in maintenence, and reset all other information
                     Replicator.setAndReplicateState(REMAINING_RETRIES_KEY,
-                            definition == null ? -1 : definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);
+                            definition == null ? -1 :
+                                    definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);
                     Replicator.setAndReplicateState(LAST_SUSPEND_DURATION_KEY, null, cfgCtx);
                     break;
                 }
@@ -176,8 +186,8 @@ public class EndpointContext {
                     }
 
                     if (retries <= 0) {
-                        log.info("Endpoint : " + endpointName + " has been marked for SUSPENSION, " +
-                                "but no further retries remain. Thus it will be SUSPENDED.");
+                        log.info("Endpoint : " + endpointName + " has been marked for SUSPENSION, "
+                                + "but no further retries remain. Thus it will be SUSPENDED.");
 
                         setState(ST_SUSPENDED);
 
@@ -186,11 +196,10 @@ public class EndpointContext {
                         localNextRetryTime =
                                 System.currentTimeMillis() + definition.getRetryDurationOnTimeout();
 
-                        if (log.isDebugEnabled()) {
-                            log.debug("Endpoint : " + endpointName + " is marked as TIMEOUT and " +
-                                    "will be retried : " + localRemainingRetries + " more time/s after : " +
-                                    new Date(localNextRetryTime) + " until its marked SUSPENDED for failure");
-                        }
+                        log.warn("Endpoint : " + endpointName + " is marked as TIMEOUT and " +
+                                "will be retried : " + localRemainingRetries + " more time/s " +
+                                "after : " + new Date(localNextRetryTime)
+                                + " until its marked SUSPENDED for failure");
                     }
                     break;
                 }
@@ -284,13 +293,11 @@ public class EndpointContext {
             localNextRetryTime = nextRetryTime;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Suspending endpoint : " + endpointName +
-                    (notYetSuspended ? " -" :
-                            " - last suspend duration was : " + lastSuspendDuration + "ms and") +
-                    " current suspend duration is : " + nextSuspendDuration + "ms - " +
-                    "Next retry after : " + new Date(nextRetryTime));
-        }
+        log.warn("Suspending endpoint : " + endpointName +
+                (notYetSuspended ? " -" :
+                        " - last suspend duration was : " + lastSuspendDuration + "ms and") +
+                " current suspend duration is : " + nextSuspendDuration + "ms - " +
+                "Next retry after : " + new Date(nextRetryTime));
     }
 
     /**
@@ -310,11 +317,13 @@ public class EndpointContext {
 
             // gets the value from configuration context (The shared state across all instances)
             Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
-            Integer remainingRetries = (Integer) cfgCtx.getPropertyNonReplicable(REMAINING_RETRIES_KEY);
+            Integer remainingRetries
+                    = (Integer) cfgCtx.getPropertyNonReplicable(REMAINING_RETRIES_KEY);
             Long nextRetryTime = (Long) cfgCtx.getPropertyNonReplicable(NEXT_RETRY_TIME_KEY);
 
             if (state == null) {
-                // state has not yet been replicated.. first replication occurs on first timeout or fault
+                // state has not yet been replicated..
+                // first replication occurs on first timeout or fault
                 return true;
 
             } else {
@@ -330,17 +339,19 @@ public class EndpointContext {
                     // if we are in the ST_TIMEOUT state, reduce a remaining retry
                     if (state == ST_TIMEOUT) {
                         remainingRetries--;
-                        Replicator.setAndReplicateState(REMAINING_RETRIES_KEY, remainingRetries, cfgCtx);
+                        Replicator.setAndReplicateState(
+                                REMAINING_RETRIES_KEY, remainingRetries, cfgCtx);
 
                         if (log.isDebugEnabled()) {
-                            log.debug("Endpoint : " + endpointName + " currently in timeout state" +
-                                    " is ready to retry. Remaining retries before suspension : " + remainingRetries);
+                            log.debug("Endpoint : " + endpointName + " which is currently in " +
+                                    "timeout state is ready to be retried. Remaining retries " +
+                                    "before suspension : " + remainingRetries);
                         }
 
                     } else {
                         if (log.isDebugEnabled()) {
-                            log.debug("Endpoint : " + endpointName + " currently SUSPENDED," +
-                                    " is ready to retry now");
+                            log.debug("Endpoint : " + endpointName + " which is currently " +
+                                    "SUSPENDED, is ready to be retried now");
                         }
                     }
                     return true;
@@ -364,14 +375,15 @@ public class EndpointContext {
                     localRemainingRetries--;
 
                     if (log.isDebugEnabled()) {
-                        log.debug("Endpoint : " + endpointName + " currently in timeout state" +
-                                " is ready to retry. Remaining retries before suspension : " + localRemainingRetries);
+                        log.debug("Endpoint : " + endpointName + " which is currently in timeout " +
+                                "state is ready to be retried. Remaining retries before " +
+                                "suspension : " + localRemainingRetries);
                     }
 
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("Endpoint : " + endpointName + " currently SUSPENDED," +
-                                " is ready to retry now");
+                        log.debug("Endpoint : " + endpointName + " which is currently SUSPENDED," +
+                                " is ready to be retried now");
                     }
                 }
                 return true;
@@ -379,8 +391,9 @@ public class EndpointContext {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Endpoint : " + endpointName + " not ready and is currently : " +
-                    getStateAsString() + " Next retry will be after : " + new Date(localNextRetryTime));
+            log.debug("Endpoint : " + endpointName + " not ready and is currently : "
+                    + getStateAsString() + ". Next retry will be after : "
+                    + new Date(localNextRetryTime));
         }
 
         return false;
@@ -405,7 +418,8 @@ public class EndpointContext {
     public boolean isState(int s) {
         if (isClustered) {
             Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
-            // state has not yet been replicated.. first replication occurs on first timeout or fault
+            // state has not yet been replicated..
+            // first replication occurs on first timeout or fault
             return state == null || state == s;
         } else {
             return localState == s;

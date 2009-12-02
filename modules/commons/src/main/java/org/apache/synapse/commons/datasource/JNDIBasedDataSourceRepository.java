@@ -46,6 +46,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
     private static final Map<String, InitialContext> perDataSourceICMap
             = new HashMap<String, InitialContext>();
     private static final List<String> cachedNameList = new ArrayList<String>();
+    private static final List<Integer> cachedPorts = new ArrayList<Integer>();
 
     private boolean initialized = false;
 
@@ -277,6 +278,10 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         jndiProperties.clear();
         perDataSourceICMap.clear();
         cachedNameList.clear();
+        for (int port : cachedPorts) {
+            RMIRegistryController.getInstance().removeLocalRegistry(port);
+        }
+        cachedPorts.clear();
     }
 
     private InitialContext getCachedInitialContext(String name) {
@@ -481,6 +486,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
             // Create a RMI local registry
             RMIRegistryController.getInstance().createLocalRegistry(port);
+            cachedPorts.add(port);
             providerUrl = "rmi://" + providerHost + ":" + port;
 
         }

@@ -23,16 +23,17 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.DBReportMediatorFactory;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DBReportMediatorTest extends AbstractMediatorTestCase {    
+public class DBReportMediatorTest extends AbstractMediatorTestCase {
 
     private static DBReportMediator report;
 
@@ -56,6 +57,7 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
     public static Test suite() {
         return new TestSetup(new TestSuite(DBReportMediatorTest.class)) {
 
+            @Override
             protected void setUp() throws Exception {
 
                 String baseDir = System.getProperty("basedir");
@@ -85,6 +87,8 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
                             "  </statement>\n" +
                             "</dblookup>"
                     ));
+                
+                report.init(new Axis2SynapseEnvironment(new SynapseConfiguration()));
 
                 java.sql.Statement s = report.getDataSource().getConnection().createStatement();
                 try {
@@ -94,6 +98,7 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
                 s.close();
             }
 
+            @Override
             protected void tearDown() throws Exception {
 
             }

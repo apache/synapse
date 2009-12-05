@@ -23,7 +23,9 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.DBLookupMediatorFactory;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
 
@@ -50,6 +52,7 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
     public static Test suite() {
         return new TestSetup(new TestSuite(DBLookupMediatorTest.class)) {
 
+            @Override
             protected void setUp() throws Exception {
 
                 String baseDir = System.getProperty("basedir");
@@ -80,6 +83,8 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
                             "</dblookup>"
                     ));
 
+                lookup.init(new Axis2SynapseEnvironment(new SynapseConfiguration()));
+
                 java.sql.Statement s = lookup.getDataSource().getConnection().createStatement();
                 try {
                     s.execute("drop table destinations");
@@ -91,6 +96,7 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
                 s.close();
             }
 
+            @Override
             protected void tearDown() throws Exception {
 
             }

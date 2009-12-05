@@ -89,6 +89,7 @@ public class ValidateMediator extends AbstractListMediator {
     private final SchemaFactory factory = SchemaFactory.newInstance(
             XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
+    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -137,11 +138,8 @@ public class ValidateMediator extends AbstractListMediator {
                 if (errorHandler.isValidationError()) {
                     //reset the errorhandler state
                     errorHandler.setValidationError(false);
-
-                    if (synLog.isTraceOrDebugEnabled()) {
-                        synLog.traceOrDebug("Error creating a new schema objects for " +
-                            "schemas : " + schemaKeys.toString());
-                    }
+                    handleException("Error creating a new schema objects for schemas : "
+                            + schemaKeys.toString(), errorHandler.getSaxParseException(), synCtx);
                 }
             }
         }

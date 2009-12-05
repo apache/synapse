@@ -21,45 +21,65 @@ package org.apache.synapse.mediators.db;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.datasources.PerUserPoolDataSource;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.commons.datasource.DBPoolView;
-import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
+import org.apache.synapse.commons.datasource.*;
+import org.apache.synapse.commons.datasource.factory.DataSourceFactory;
+import org.apache.synapse.commons.jmx.MBeanRepository;
+import org.apache.synapse.commons.security.secret.SecretManager;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 
+import javax.naming.Context;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
-
 /**
  * This abstract DB mediator will perform common DB connection pooling etc. for all DB mediators
  */
 public abstract class AbstractDBMediator extends AbstractMediator implements ManagedLifecycle {
 
-    /** Hold JDBC properties */
-    protected final Map dataSourceProps = new HashMap();
+    /** The information needed to create a data source */
+    private DataSourceInformation dataSourceInformation;
+
+    /** The name of the data source to lookup. */
+    private String dataSourceName;
+
+    /** The information needed to lookup a data source from a JNDI provider */
+    private Properties jndiProperties = new Properties();
+    
     /** The DataSource to get DB connections */
-    private DataSource dataSource = null;
-    /**
-     * MBean for DBPool monitoring
-     */
+    private DataSource dataSource;
+
+    /** MBean for DBPool monitoring */
     private DBPoolView dbPoolView;
+
     /** Statements */
     private final List<Statement> statementList = new ArrayList<Statement>();
 
+    /** Map to store the pool configuration for de-serialization */
+    private Map<Object, String> dataSourceProps = new HashMap<Object, String>();
+
     /**
-     * Initializes the mediator. Does nothing right now. If DataSource lookup is supported, could
-     * do the IC lookup here
+     * Initializes the mediator - either an existing data source will be looked up
+     * from an in- or external JNDI provider or a custom data source will be created
+     * based on the provide configuration (using Apache DBCP).
+     *  
      * @param se the Synapse environment reference
      */
     public void init(SynapseEnvironment se) {
-        // do nothing
+        // check whether we shall try to lookup an existing data source or create a new custom data source
+        if (dataSourceName != null) {
+            dataSource = lookupDataSource(dataSourceName, jndiProperties);
+        } else if (dataSourceInformation != null) {
+            dataSource = createCustomDataSource(dataSourceInformation);
+        }
     }
 
     /**
@@ -122,11 +142,19 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @return a unique name or URL to refer to the DataSource being used
      */
     protected String getDSName() {
-        String name = (String) dataSourceProps.get(AbstractDBMediatorFactory.URL_Q);
+        String name = dataSourceInformation.getUrl();
         if (name == null) {
-            name = (String) dataSourceProps.get(AbstractDBMediatorFactory.DSNAME_Q);
+            name = dataSourceInformation.getDatasourceName();
         }
         return name;
+    }
+    
+    public void setDataSourceInformation(DataSourceInformation dataSourceInformation) {
+        this.dataSourceInformation = dataSourceInformation;
+    }
+
+    public void setJndiProperties(Properties jndiProperties) {
+        this.jndiProperties = jndiProperties;
     }
 
     public DataSource getDataSource() {
@@ -137,6 +165,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         this.dataSource = dataSource;
     }
 
+    public void setDataSourceName(String dataSourceName) {
+        this.dataSourceName = dataSourceName;
+    }
+
     public void addDataSourceProperty(QName name, String value) {
         dataSourceProps.put(name, value);
     }
@@ -145,16 +177,20 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         dataSourceProps.put(name, value);
     }
 
-    public Map getDataSourceProps() {
-        return dataSourceProps;
-    }
-
     public void addStatement(Statement stmnt) {
         statementList.add(stmnt);
     }
 
-    public List getStatementList() {
+    public List<Statement> getStatementList() {
         return statementList;
+    }
+
+    public DBPoolView getDbPoolView() {
+        return dbPoolView;
+    }
+
+    public void setDbPoolView(DBPoolView dbPoolView) {
+        this.dbPoolView = dbPoolView;
     }
 
     /**
@@ -187,7 +223,6 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             int numActive = basicDataSource.getNumActive();
             int numIdle = basicDataSource.getNumIdle();
             String connectionId = Integer.toHexString(con.hashCode());
-
 
             DBPoolView dbPoolView = getDbPoolView();
             if (dbPoolView != null) {
@@ -301,11 +336,87 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         return ps;
     }
 
-    public DBPoolView getDbPoolView() {
-        return dbPoolView;
+    /**
+     * Lookup the DataSource on JNDI using the specified name and optional properties
+     *
+     * @param dataSourceName the name of the data source to lookup
+     * @param jndiProperties the JNDI properties identifying a data source provider  
+     * 
+     * @return a DataSource looked up using the specified JNDI properties
+     */
+    private DataSource lookupDataSource(String dataSourceName, Properties jndiProperties) {
+
+        DataSource dataSource = null;
+        RepositoryBasedDataSourceFinder finder = DataSourceHelper.getInstance()
+                .getRepositoryBasedDataSourceFinder();
+
+        if (finder.isInitialized()) {
+            // first try a lookup based on the data source name only
+            dataSource = finder.find(dataSourceName);
+
+            if (dataSource != null) {
+                MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();
+                Object mBean = mBeanRepository.getMBean(dataSourceName);
+                if (mBean instanceof DBPoolView) {
+                    setDbPoolView((DBPoolView) mBean);
+                }
+            } else {
+                // decrypt the password if needed
+                String password = jndiProperties.getProperty(Context.SECURITY_CREDENTIALS);
+                if (password != null && !"".equals(password)) {
+                    jndiProperties.put(Context.SECURITY_CREDENTIALS, getActualPassword(password));
+                }
+
+                // lookup the data source using the specified jndi properties
+                dataSource = DataSourceFinder.find(dataSourceName, jndiProperties);
+                if (dataSource == null) {
+                    handleException("Cannot find a DataSource " + dataSourceName + " for given JNDI properties :" + jndiProperties);
+                }
+            }
+        }
+        log.info("Sunccessfully looked up datasource " + dataSourceName + ".");
+
+        return dataSource;
     }
 
-    public void setDbPoolView(DBPoolView dbPoolView) {
-        this.dbPoolView = dbPoolView;
+    /**
+     * Create a custom DataSource using the specified data source information.
+     *
+     * @param dataSourceInformation the data source information to create a data source
+     * 
+     * @return a DataSource created using specified properties
+     */
+    protected DataSource createCustomDataSource(DataSourceInformation dataSourceInformation) {
+        
+        DataSource dataSource = DataSourceFactory.createDataSource(dataSourceInformation);
+        if (dataSource != null) {
+            log.info("Sunccessfully created data source for " + dataSourceInformation.getUrl() + ".");
+        }
+        
+        return dataSource;
+    }
+
+    /**
+     * Get the password from SecretManager . here only use SecretManager
+     *
+     * @param aliasPasword alias password
+     * @return if the SecretManager is initiated , then , get the corresponding secret
+     *         , else return alias itself
+     */
+    private String getActualPassword(String aliasPasword) {
+        SecretManager secretManager = SecretManager.getInstance();
+        if (secretManager.isInitialized()) {
+            return secretManager.getSecret(aliasPasword);
+        }
+        return aliasPasword;
+    }
+
+    protected void handleException(String message) {
+        LogFactory.getLog(this.getClass()).error(message);
+        throw new SynapseException(message);
+    }
+
+    public Map<Object, String> getDataSourceProps() {
+        return dataSourceProps;
     }
 }

@@ -296,6 +296,16 @@
       implement the org.apache.synapse.registry.Registry interface to suit the
       actual Registry being used.
     </p>
+    <h3>
+      <a href="#eventsource">Event Source</a>
+    </h3>
+    <p>
+      An Event Source use to define the Event Source and the Subscription Manager configurations
+      use in the eventing implementation of Synapse. Event source provides a service URL that can be
+      used to the send subscriptions and events (events that do not required to go through a
+      mediation flow).
+
+    </p>
     <h2>
       The Axis2 Configuration (axis2.xml)
     </h2>
@@ -324,6 +334,7 @@
    &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
    &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
    &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
+   &lt;<a href="#eventsource">eventsource</a> name="string" ...&gt;...&lt;/eventsource&gt;?
    <a href="#mediator">mediator</a>*
  &lt;/definitions&gt;</pre>
     <p/>
@@ -1023,6 +1034,29 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       attribute under proxy services for more information.
     </p>
     <h2>
+      <a name="eventsource" id="eventsource">Event Source</a>
+    </h2>
+    <p>
+      A &lt;eventSource&gt; element is used to define a Synapse event source.
+    </p>
+<pre xml:space="preserve">&lt;eventSource name="string"&gt;
+	&lt;subscriptionManager class="mypackage.MyClass"&gt;
+		   &lt;parameter name="string"/&gt;
+	&lt;/subscriptionManager&gt;
+&lt;/eventSource&gt;</pre>
+    <p>
+      An event source required to implement eventing in Synpase. Event source used to inject
+      subscription messages in to Synpase and provide a service URL for the users to send subscriptions
+      to Synapse. User can send messages to manage the subscriptions (unsubscribe, renew, get-status)
+      to the event source.
+    </p>
+    <p>
+      Subscription manager configured inside the event source will be responsible to hold the subscriptions,
+      and provide operations to manage the subscriptions. Subscription storage will decide
+      based on the implementation of the subscription manager , e.g. Registry, memory, database.
+      Additional information required to setup the subscription manager can be set as properties. 
+    </p>
+    <h2>
       <a name="mediator" id="mediator">Mediators</a>
     </h2>
     <p>
@@ -1030,7 +1064,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </p>
 <pre xml:space="preserve">
     <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#header">header</a>  | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a>
-    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a>
+    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a> | <a href="#eventPublisher">eventPublisher</a>
     </pre>
     <p>
       In addition to the above, Synapse will be able to load custom mediators
@@ -2036,6 +2070,22 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       neatly, for the last message of the sequence also an XPath expression
       should be specified. With the version attribute the WS-RM specification
       version to be used can be specified, 1.0 or 1.1.
+    </p>
+    </h3>
+        <h4>
+      <a name="eventPublisher" id="eventPublisher">eventPublisher</a>
+    </h4>
+<pre xml:space="preserve"> &lt;eventPublisher eventSourceName="string"/&gt;</pre>
+    <p>
+      The &lt;eventPublisher&gt; mediator use to send events to the subscribers that match
+      the given filter criteria. A pre defined event source need to be provided with the mediator.
+    </p>
+    <p>The eventPublisher mediator handover the event to the defined event source in the mediator
+        and event source picks the valid subscriptions from the subscription manager
+        by applying the define filter.
+        Any mediation required before dispatching the events can be done by adding
+        mediators using sequences before the eventPublisher mediator. Quality of service like security
+        can add to the events by applying QOS to the proxy service that holds the  eventPublisher mediator.
     </p>
     <p/>
     <p/>

@@ -698,10 +698,15 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <p>
 	If you are using a binary distribution of Quickfix/J, the two
-	samples and their configuration files are all packed to a 
-	single jar file called quickfixj-examples.jar. You will have to
-	extract the jar file, modify the configuration files and pack
+	samples and their default configuration files are all packed to a
+	single jar file called quickfixj-examples.jar. You can extract the jar file,
+    replace the modified configuration files and pack
 	them to a jar file again under the same name.
+    You can pass the new configuration file as a command line parameter too, in that case you don't
+    need to modify the quickfixj-examples.jar.
+    You can copy the config files from $SYNAPSE_HOME/repository/conf/sample/resources/fix folder to
+    $QFJ_HOME/etc folder. Execute the sample apps from $QFJ_HOME/bin, ./banzai.sh/bat ../etc/banzai.cfg
+    executor.sh/bat ../etc/executor.sh. 
     </p>
     <p>
     For more information regarding the FIX sample applications please

@@ -147,6 +147,12 @@ public final class SynapseConstants {
         * be preserved */
         public static final String PRESERVE_WS_ADDRESSING = "PRESERVE_WS_ADDRESSING";
 
+        /**
+         * The name of the property which specifies the operation name that is
+         * invoked by an endpoint
+        */
+        public static final String ENDPOINT_OPERATION = "endpoint.operation";
+    
         //-- error handling --
         /** An Axis2 message context property indicating a transport send failure */
         public static final String SENDING_FAULT = "SENDING_FAULT";

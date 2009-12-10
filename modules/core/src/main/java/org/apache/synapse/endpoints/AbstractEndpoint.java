@@ -22,10 +22,12 @@ package org.apache.synapse.endpoints;
 import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.BaseConstants;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -350,8 +352,46 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
      * @param synCtx the current message
      */
     protected void prepareForEndpointStatistics(MessageContext synCtx) {
-    // Setting Required property to reportForComponent the End Point aspects
+        // Setting Required property to reportForComponent the End Point aspects
         if (definition != null && definition.isStatisticsEnable()) {
+            String opName = null;
+
+            if (synCtx.getProperty(SynapseConstants.ENDPOINT_OPERATION) != null) {
+                opName = synCtx.getProperty(SynapseConstants.ENDPOINT_OPERATION).toString();
+            } else if (synCtx instanceof Axis2MessageContext) {
+                AxisOperation operation
+                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
+                if (operation != null) {
+                    opName = operation.getName().getLocalPart();
+                }
+                if (opName == null ||
+                        SynapseConstants.SYNAPSE_OPERATION_NAME.getLocalPart().equals(opName)) {
+                    String soapAction = synCtx.getSoapAction();
+                    opName = null;
+                    if (soapAction != null) {
+                        int index = soapAction.indexOf("urn:");
+                        if (index >= 0) {
+                            opName = soapAction.substring("urn:".length());
+                        } else {
+                            opName = soapAction;
+                        }
+                    }
+                }
+            }
+
+            AspectConfiguration oldConfiguration = definition.getAspectConfiguration();
+            if (opName != null) {
+                if (oldConfiguration.isStatisticsEnable()) {
+                    AspectConfiguration newConfiguration = new AspectConfiguration(
+                            oldConfiguration.getId() + "." + opName);
+                    newConfiguration.enableStatistics();
+                    StatisticsReporter.reportForComponent(synCtx, newConfiguration,
+                            ComponentType.ENDPOINT);
+                }
+            } else {
+                StatisticsReporter.reportForComponent(synCtx, oldConfiguration,
+                        ComponentType.ENDPOINT);
+            }
             StatisticsReporter.reportForComponent(synCtx, definition.getAspectConfiguration(),
                     ComponentType.ENDPOINT);
         }

@@ -392,8 +392,6 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
                 StatisticsReporter.reportForComponent(synCtx, oldConfiguration,
                         ComponentType.ENDPOINT);
             }
-            StatisticsReporter.reportForComponent(synCtx, definition.getAspectConfiguration(),
-                    ComponentType.ENDPOINT);
         }
     }
 

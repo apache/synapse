@@ -48,7 +48,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
         StatisticsReporter.reportForComponent(synCtx,
                 AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx),
-                ComponentType.SEQUENCE);
+                ComponentType.PROXYSERVICE);
         
         boolean traceOn = synCtx.getMainSequence().getTraceState() == SynapseConstants.TRACING_ON;
         boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
@@ -95,6 +95,8 @@ public class SynapseMessageReceiver implements MessageReceiver {
                 warn(traceOn, "Exception encountered but no fault handler found - " +
                     "message dropped", synCtx);
             }
+        } finally {
+            StatisticsReporter.endReportForAllOnRequestProcessed(synCtx);
         }
     }
 

@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.aspects.statistics;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Identifiable;
@@ -26,6 +27,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.AspectConfigurationDetectionStrategy;
 import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
  * A utility to report statistics
@@ -52,7 +54,6 @@ public class StatisticsReporter {
             StatisticsRecord record = StatisticsReporter.getStatisticsRecord(synCtx);
             record.setOwner(componentType);
             collectStatistics(synCtx, record, configurable, componentType);
-
         }
     }
 
@@ -61,7 +62,7 @@ public class StatisticsReporter {
      *
      * @param synCtx Current Message through synapse
      */
-    public static void reportForAll(MessageContext synCtx) {
+    public static void reportForAllOnResponseReceived(MessageContext synCtx) {
 
         AspectConfiguration configuration =
                 AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx);
@@ -85,13 +86,75 @@ public class StatisticsReporter {
             if (log.isDebugEnabled()) {
                 log.debug("Reporting a fault : " + statisticsRecord);
             }
-            statisticsRecord.collect(
-                    new AspectConfiguration(SynapseConstants.SYNAPSE_ASPECTS),
-                    ComponentType.ANY, true);
-            statisticsRecord.setFaultResponse(true);
+            StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
+                    ComponentType.ANY);
+            statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
+            statisticsLog.setFault(true);
+            statisticsRecord.collect(statisticsLog);
         }
     }
 
+    /**
+     * Reports statistics on the response message Sent
+     *
+     * @param synCtx   MessageContext instance
+     * @param endpoint EndpointDefinition instance
+     */
+    public static void reportForAllOnResponseSent(MessageContext synCtx,
+                                                  EndpointDefinition endpoint) {
+        if (endpoint != null) {
+            if (synCtx.getProperty(SynapseConstants.OUT_ONLY) != null) {
+                endReportForAll(synCtx, endpoint.isStatisticsEnable());
+            }
+        } else {
+            endReportForAll(synCtx, false);
+        }
+    }
+
+    /**
+     * Ends statistics reporting for any component
+     *
+     * @param synCtx             MessageContext instance
+     * @param isStatisticsEnable is stat enable
+     */
+    private static void endReportForAll(MessageContext synCtx, boolean isStatisticsEnable) {
+
+        if (!isStatisticsEnable) {
+            AspectConfiguration configuration =
+                    AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx);
+            isStatisticsEnable = configuration != null && configuration.isStatisticsEnable();
+        }
+        if (isStatisticsEnable) {
+            StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
+            if (statisticsRecord != null && !statisticsRecord.isEndAnyReported()) {
+                StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
+                        ComponentType.ANY);
+                statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
+                statisticsLog.setFault(isFault(synCtx));
+                statisticsLog.setEndAnyLog(true);
+                statisticsRecord.collect(statisticsLog);
+                statisticsRecord.setEndAnyReported(true);
+            }
+        }
+    }
+
+    /**
+     * Ends statistics reporting after request processed
+     *
+     * @param synCtx MessageContext instance
+     */
+    public static void endReportForAllOnRequestProcessed(MessageContext synCtx) {
+        if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null && !synCtx.isResponse()) {
+            endReportForAll(synCtx, false);
+        }
+    }
+
+    /**
+     * Gets a StatisticsRecord
+     *
+     * @param synCtx MessageContext instance
+     * @return a StatisticsRecord
+     */
     private static StatisticsRecord getStatisticsRecord(MessageContext synCtx) {
 
         StatisticsRecord statisticsRecord =
@@ -107,6 +170,14 @@ public class StatisticsReporter {
         return statisticsRecord;
     }
 
+    /**
+     * Collects statistics
+     *
+     * @param synCtx        MessageContext instance
+     * @param record        StatisticsRecord instance
+     * @param configurable  StatisticsConfigurable  instance
+     * @param componentType ComponentType instance
+     */
     private static void collectStatistics(MessageContext synCtx,
                                           StatisticsRecord record,
                                           StatisticsConfigurable configurable,
@@ -122,11 +193,76 @@ public class StatisticsReporter {
             synCtx.getEnvironment().setStatisticsCollector(collector);
         }
 
-        record.collect((Identifiable) configurable,
-                componentType, synCtx.isResponse());
+        record.collect(createStatisticsLog((Identifiable) configurable, componentType, synCtx));
 
         if (!collector.contains(record)) {
             collector.collect(record);
         }
+    }
+
+    /**
+     * Factory method to create a   StatisticsLog
+     *
+     * @param identifiable  component
+     * @param componentType component type
+     * @param synCtx        MessageContext instance
+     * @return a StatisticsLog
+     */
+    private static StatisticsLog createStatisticsLog(Identifiable identifiable,
+                                                     ComponentType componentType,
+                                                     MessageContext synCtx) {
+        if (isValid(identifiable)) {
+            String auditID = identifiable.getId();
+            StatisticsLog statisticsLog = new StatisticsLog(auditID, componentType);
+            statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
+            statisticsLog.setFault(isFault(synCtx));
+            return statisticsLog;
+        }
+        return null;
+    }
+
+    /**
+     * Checks the validity of the component
+     *
+     * @param identifiable component as a
+     * @return true if the component is valid
+     */
+    private static boolean isValid(Identifiable identifiable) {
+
+        if (identifiable == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid aspects configuration , It is null.");
+            }
+            return false;
+        }
+
+        String auditID = identifiable.getId();
+        if (auditID == null || "".equals(auditID)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid aspects configuration , Audit name is null.");
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Detects a fault
+     *
+     * @param context MessageContext context
+     * @return true if this is a fault
+     */
+    private static boolean isFault(MessageContext context) {
+        boolean isFault = context.isFaultResponse();
+        if (!isFault) {
+            SOAPEnvelope envelope = context.getEnvelope();
+            if (envelope != null) {
+                isFault = envelope.hasFault();
+            }
+            if (!isFault) {
+                isFault = context.getProperty(SynapseConstants.ERROR_CODE) != null;
+            }
+        }
+        return isFault;
     }
 }

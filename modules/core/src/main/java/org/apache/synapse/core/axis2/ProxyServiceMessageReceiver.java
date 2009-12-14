@@ -184,6 +184,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 warn(traceOn, "Exception encountered but no fault handler found - " +
                     "message dropped", synCtx);
             }
+        } finally {
+            StatisticsReporter.endReportForAllOnRequestProcessed(synCtx);
         }
     }
 

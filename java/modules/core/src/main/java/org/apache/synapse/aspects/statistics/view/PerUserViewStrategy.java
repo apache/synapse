@@ -161,12 +161,7 @@ public abstract class PerUserViewStrategy implements StatisticsViewStrategy {
     private void updateStatistics(String id, ComponentType type, InOutStatisticsView view,
                                   StatisticsUpdateStrategy strategy) {
         if (view != null) {
-            strategy.updateInFlowStatistics(id, type,
-                    view.getInStatistics());
-            if (type != ComponentType.ENDPOINT) {
-                strategy.updateOutFlowStatistics(id, type,
-                        view.getOutStatistics());
-            }
+            strategy.updateStatistics(id, type, view);
         }
     }
 

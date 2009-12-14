@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
@@ -72,8 +73,6 @@ public class MediatorFaultHandler extends FaultHandler {
             name = faultMediator.getClass().getName();
         }
 
-        StatisticsReporter.reportFaultForAll(synCtx);
-        
         if (traceOrDebugOn) {
             traceOrDebugWarn(traceOn, "Executing fault handler mediator : " + name);
         }

@@ -31,16 +31,18 @@ public class StatisticsLog {
 
     private long time;
 
-    private boolean isResponse;
+    private boolean isResponse = false;
 
-    public StatisticsLog(String id, ComponentType componentType, boolean isResponse) {
-        this(id, System.currentTimeMillis(), componentType, isResponse);
+    private boolean isFault = false;
+
+    private boolean isEndAnyLog = false;
+
+    public StatisticsLog(String id, ComponentType componentType) {
+        this(id, System.currentTimeMillis(), componentType);
     }
 
-    public StatisticsLog(String id, long startTime, ComponentType componentType,
-                         boolean isResponse) {
+    public StatisticsLog(String id, long startTime, ComponentType componentType) {
         this.id = id;
-        this.isResponse = isResponse;
         this.time = startTime;
         this.componentType = componentType;
     }
@@ -59,5 +61,25 @@ public class StatisticsLog {
 
     public boolean isResponse() {
         return isResponse;
+    }
+
+    public boolean isFault() {
+        return isFault;
+    }
+
+    public void setFault(boolean fault) {
+        isFault = fault;
+    }
+
+    public void setResponse(boolean response) {
+        isResponse = response;
+    }
+
+    public void setEndAnyLog(boolean endAnyLog) {
+        isEndAnyLog = endAnyLog;
+    }
+
+    public boolean isEndAnyLog() {
+        return isEndAnyLog;
     }
 }

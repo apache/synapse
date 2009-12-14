@@ -169,15 +169,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public void send(EndpointDefinition endpoint, MessageContext synCtx) {
         if (synCtx.isResponse()) {
 
-           StatisticsReporter.reportForAll(synCtx);
-            
             if (endpoint != null) {
-               
                 Axis2Sender.sendOn(endpoint, synCtx);
-
             } else {
                 Axis2Sender.sendBack(synCtx);
             }
+            StatisticsReporter.reportForAllOnResponseSent(synCtx, endpoint);
         } else {
             // If this request is related to session affinity endpoints - For client initiated session
             Dispatcher dispatcher =

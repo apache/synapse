@@ -332,7 +332,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 dispatcher.updateSession(synapseInMessageContext);
             }
 
-            StatisticsReporter.reportForAll(synapseInMessageContext);
+            StatisticsReporter.reportForAllOnResponseReceived(synapseInMessageContext);
             
             // send the response message through the synapse mediation flow
             try {

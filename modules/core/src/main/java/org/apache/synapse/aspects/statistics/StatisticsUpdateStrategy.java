@@ -19,9 +19,10 @@
 package org.apache.synapse.aspects.statistics;
 
 import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.aspects.statistics.view.InOutStatisticsView;
 import org.apache.synapse.aspects.statistics.view.Statistics;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Updates the given statistics base on statistics logs in the given statistics record.
@@ -35,75 +36,90 @@ public class StatisticsUpdateStrategy {
         this.statisticsRecord = statisticsRecord;
     }
 
-    public void updateInFlowStatistics(String id, ComponentType componentType,
-                                       Statistics statistics) {
-        updateStatistics(id, componentType, statistics, false);
-    }
-
-    public void updateOutFlowStatistics(String id, ComponentType componentType,
-                                        Statistics statistics) {
-        updateStatistics(id, componentType, statistics, true);
-    }
-
-    private void updateStatistics(String id, ComponentType componentType,
-                                  Statistics statistics, boolean isResponse) {
+    public void updateStatistics(String id,
+                                 ComponentType componentType,
+                                 InOutStatisticsView statisticsView) {
 
         StatisticsLog startLog = null;
         StatisticsLog endLog = null;
-        final Iterator<StatisticsLog> statisticsLogs = statisticsRecord.getAllStatisticsLogs();
-        while (statisticsLogs.hasNext()) {
-            StatisticsLog log = statisticsLogs.next();
+        final List<StatisticsLog> statisticsLogs = statisticsRecord.getAllStatisticsLogs();
+        for (StatisticsLog log : statisticsLogs) {
+
             if (log == null) {
                 continue;
             }
+
             switch (componentType) {
                 case SEQUENCE: {
                     if (componentType == log.getComponentType()) {
-                        if (isResponse != log.isResponse()) {
-                            continue;
-                        }
                         if (!id.equals(log.getId())) {
                             continue;
                         }
                         if (startLog == null) {
                             startLog = log;
-                        } else if (startLog.isResponse() == log.isResponse()) {
+                        } else {
                             endLog = log;
                         }
                     }
                     break;
                 }
                 default: {
-                    if (!isResponse) {
-                        if (componentType == log.getComponentType()) {
-                            if (!id.equals(log.getId())) {
-                                continue;
-                            }
-                            if (startLog == null) {
-                                startLog = log;
-                            }
-                        }
-                        if (startLog == null) {
+                    if (componentType == log.getComponentType()) {
+                        if (!id.equals(log.getId())) {
                             continue;
                         }
-                        if (log.getComponentType() == ComponentType.ANY && endLog == null) {
+                        startLog = log;
+                    } else if (log.getComponentType() == ComponentType.ANY) {
+                        if (startLog != null) {
                             endLog = log;
                         }
-                    } else {
-                        if (log.getComponentType() == ComponentType.ANY) {
-                            if (startLog == null) {
-                                startLog = log;
-                            } else if (endLog == null) {
-                                endLog = log;
-                            }
-                        }
+                        break;
                     }
                 }
             }
+
+            if (endLog != null && startLog != null) {
+                Statistics statistics;
+                switch (componentType) {
+                    case SEQUENCE: {
+                        if (startLog.isResponse()) {
+                            statistics = statisticsView.getOutStatistics();
+                        } else {
+                            statistics = statisticsView.getInStatistics();
+                        }
+                        statistics.update(endLog.getTime() - startLog.getTime(), endLog.isFault());
+                        break;
+                    }
+                    case ENDPOINT: {
+                        statistics = statisticsView.getInStatistics();
+                        statistics.update(endLog.getTime() - startLog.getTime(), endLog.isFault());
+                        break;
+                    }
+                    case PROXYSERVICE: {
+                        Statistics inStatistics = statisticsView.getInStatistics();
+                        Statistics outStatistics = statisticsView.getOutStatistics();
+                        inStatistics.update(endLog.getTime() - startLog.getTime(), endLog.isFault());
+                        if (!endLog.isEndAnyLog()) {
+                            StatisticsLog lastLog = statisticsLogs.get(statisticsLogs.size() - 1);
+                            if (lastLog != endLog) {
+                                outStatistics.update(
+                                        lastLog.getTime() - endLog.getTime(), lastLog.isFault());
+                            }
+                        }
+                        return;
+                    }
+                }
+                startLog = null;
+                endLog = null;
+            }
         }
-        if (endLog != null && startLog != null) {
-            statistics.update(endLog.getTime() - startLog.getTime(),
-                    statisticsRecord.isFaultResponse());
+
+        if (startLog != null && componentType == ComponentType.PROXYSERVICE) {
+            Statistics inStatistics = statisticsView.getInStatistics();
+            StatisticsLog lastLog = statisticsLogs.get(statisticsLogs.size() - 1);
+            if (lastLog != startLog) {
+                inStatistics.update(lastLog.getTime() - startLog.getTime(), lastLog.isFault());
+            }
         }
     }
 }

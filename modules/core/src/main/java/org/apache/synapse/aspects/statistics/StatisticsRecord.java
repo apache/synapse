@@ -20,7 +20,6 @@ package org.apache.synapse.aspects.statistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Identifiable;
 import org.apache.synapse.aspects.ComponentType;
 
 import java.util.ArrayList;
@@ -35,10 +34,10 @@ public class StatisticsRecord {
     private static final Log log = LogFactory.getLog(StatisticsRecord.class);
     private String id;
     private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();
-    private boolean isFaultResponse;
     private String clientIP;
     private String clientHost;
     private ComponentType owner;
+    private boolean isEndAnyReported = false;
 
     public StatisticsRecord(String id, String clientIP, String clientHost) {
         this.id = id;
@@ -50,10 +49,6 @@ public class StatisticsRecord {
         return id;
     }
 
-    public boolean isFaultResponse() {
-        return isFaultResponse;
-    }
-
     public String getClientIP() {
         return clientIP;
     }
@@ -62,26 +57,14 @@ public class StatisticsRecord {
         return clientHost;
     }
 
-    public void setFaultResponse(boolean faultResponse) {
-        isFaultResponse = faultResponse;
-    }
-
     /**
      * Collecting statistics for a particular component
      *
-     * @param identifiable  audit configurable component
-     * @param componentType The component that belong statistics
-     * @param isResponse    Is this Response or not
+     * @param log StatisticsLog
      */
-    public void collect(Identifiable identifiable, ComponentType componentType, boolean isResponse) {
-
-        if (isValid(identifiable)) {
-
-            String auditID = identifiable.getId();
-            if (log.isDebugEnabled()) {
-                log.debug("Start to reportForComponent statistics for : " + auditID);
-            }
-            statisticsLogs.add(new StatisticsLog(auditID, componentType, isResponse));
+    public void collect(StatisticsLog log) {
+        if (log != null) {
+            statisticsLogs.add(log);
         }
     }
 
@@ -90,10 +73,10 @@ public class StatisticsRecord {
      *
      * @return A Iterator for all StatisticsLogs
      */
-    public Iterator<StatisticsLog> getAllStatisticsLogs() {
+    public List<StatisticsLog> getAllStatisticsLogs() {
         final List<StatisticsLog> logs = new ArrayList<StatisticsLog>();
         logs.addAll(statisticsLogs);
-        return logs.iterator();
+        return logs;
     }
 
     /**
@@ -115,13 +98,6 @@ public class StatisticsRecord {
         return logIds.iterator();
     }
 
-    public String toString() {
-        return new StringBuffer()
-                .append("[Message id : ").append(id).append(" ]")
-                .append("[Remote  IP : ").append(clientIP).append(" ]")
-                .append("[Remote host : ").append(clientHost).append(" ]")
-                .toString();
-    }
 
     public void clearLogs() {
         statisticsLogs.clear();
@@ -135,22 +111,19 @@ public class StatisticsRecord {
         this.owner = owner;
     }
 
-    private boolean isValid(Identifiable identifiable) {
+    public boolean isEndAnyReported() {
+        return isEndAnyReported;
+    }
 
-        if (identifiable == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Invalid aspects configuration , It is null.");
-            }
-            return false;
-        }
+    public void setEndAnyReported(boolean endAnyReported) {
+        isEndAnyReported = endAnyReported;
+    }
 
-        String auditID = identifiable.getId();
-        if (auditID == null || "".equals(auditID)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Invalid aspects configuration , Audit name is null.");
-            }
-            return false;
-        }
-        return true;
+    public String toString() {
+        return new StringBuffer()
+                .append("[Message id : ").append(id).append(" ]")
+                .append("[Remote  IP : ").append(clientIP).append(" ]")
+                .append("[Remote host : ").append(clientHost).append(" ]")
+                .toString();
     }
 }

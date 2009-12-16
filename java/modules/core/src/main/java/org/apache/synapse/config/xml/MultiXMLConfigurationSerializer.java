@@ -109,37 +109,37 @@ public class MultiXMLConfigurationSerializer {
     public void createDirectoryStructure() throws Exception {
 
         File proxyDir = new File(rootDirectory, MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR);
-        if (!proxyDir.exists() && !proxyDir.mkdir()) {
+        if (!proxyDir.exists() && !proxyDir.mkdirs()) {
             throw new Exception("Error while creating the directory for proxy services : " +
                     proxyDir.getAbsolutePath());
         }
 
         File eventsDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EVENTS_DIR);
-        if (!eventsDir.exists() && !eventsDir.mkdir()) {
+        if (!eventsDir.exists() && !eventsDir.mkdirs()) {
             throw new Exception("Error while creating the directory for events : " +
                     eventsDir.getAbsolutePath());
         }
 
         File entriesDir = new File(rootDirectory, MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR);
-        if (!entriesDir.exists() && !entriesDir.mkdir()) {
+        if (!entriesDir.exists() && !entriesDir.mkdirs()) {
             throw new Exception("Error while creating the local entries directory : " +
                     entriesDir.getAbsolutePath());
         }
 
         File eprDir = new File(rootDirectory, MultiXMLConfigurationBuilder.ENDPOINTS_DIR);
-        if (!eprDir.exists() && !eprDir.mkdir()) {
+        if (!eprDir.exists() && !eprDir.mkdirs()) {
             throw new Exception("Error while creating the directory for endpoints : " +
                     eprDir.getAbsolutePath());
         }
 
         File seqDir = new File(rootDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
-        if (!seqDir.exists() && !seqDir.mkdir()) {
+        if (!seqDir.exists() && !seqDir.mkdirs()) {
             throw new Exception("Error while creating the directory for sequences : " +
                     seqDir.getAbsolutePath());
         }
 
         File tasksDir = new File(rootDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
-        if (!tasksDir.exists() && !tasksDir.mkdir()) {
+        if (!tasksDir.exists() && !tasksDir.mkdirs()) {
             throw new Exception("Error while creating the directory for tasks : " +
                     tasksDir.getAbsolutePath());
         }
@@ -220,7 +220,7 @@ public class MultiXMLConfigurationSerializer {
 
     private void serializeSynapseXML(OMElement definitions) throws Exception {
         File synapseXML = new File(rootDirectory, SynapseConstants.SYNAPSE_XML);
-        if (!rootDirectory.exists() && !rootDirectory.mkdir()) {
+        if (!rootDirectory.exists() && !rootDirectory.mkdirs()) {
             throw new Exception("Error while creating the root configuration directory " +
                     "at: " + rootDirectory.getAbsolutePath());                
         }
@@ -239,13 +239,13 @@ public class MultiXMLConfigurationSerializer {
         }
     }
 
-    public void serializeSynapseRegistry(Registry registry, SynapseConfiguration synapseConfig,
+    public OMElement serializeSynapseRegistry(Registry registry, SynapseConfiguration synapseConfig,
                                          OMElement parent) throws Exception {
         OMElement registryElem = RegistrySerializer.serializeRegistry(null, registry);
-        if (!String.valueOf(Boolean.TRUE).equals(
-                synapseConfig.getProperty(MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION))) {
+        if (!Boolean.valueOf(synapseConfig.getProperty(
+                MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION)) && parent != null) {
             parent.addChild(registryElem);
-            return;
+            return registryElem;
         }
 
         File registryConf = new File(rootDirectory, MultiXMLConfigurationBuilder.REGISTRY_FILE);
@@ -261,11 +261,14 @@ public class MultiXMLConfigurationSerializer {
             throw new Exception("Error while creating the registry configuration file at : " +
                     registryConf.getAbsolutePath());
         }
+
+        return registryElem;
     }
 
-    public void serializeProxy(ProxyService service, OMElement parent) throws Exception {
+    public OMElement serializeProxy(ProxyService service, OMElement parent) throws Exception {
+
         File proxyDir = new File(rootDirectory, MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR);
-        if (!proxyDir.exists() && !proxyDir.mkdir()) {
+        if (!proxyDir.exists() && !proxyDir.mkdirs()) {
             throw new Exception("Error while creating the directory for proxy services : " +
                     proxyDir.getAbsolutePath());
         }
@@ -282,14 +285,16 @@ public class MultiXMLConfigurationSerializer {
                 throw new Exception("Error while creating the file : " +
                         proxyFile.getAbsolutePath());
             }
-        } else {
+        } else if (parent != null) {
             parent.addChild(proxyElem);
         }
+
+        return proxyElem;
     }
 
-    public void serializeEventSource(SynapseEventSource source, OMElement parent) throws Exception {
+    public OMElement serializeEventSource(SynapseEventSource source, OMElement parent) throws Exception {
         File eventsDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EVENTS_DIR);
-        if (!eventsDir.exists() && !eventsDir.mkdir()) {
+        if (!eventsDir.exists() && !eventsDir.mkdirs()) {
             throw new Exception("Error while creating the directory for events : " +
                     eventsDir.getAbsolutePath());
         }
@@ -306,14 +311,17 @@ public class MultiXMLConfigurationSerializer {
                 throw new Exception("Error while creating the file : " +
                         eventSrcFile.getAbsolutePath());
             }
-        } else {
+        } else if (parent != null) {
             parent.addChild(eventSrcElem);
         }
+
+        return eventSrcElem;
     }
 
-    public void serializeTask(Startup task, OMElement parent) throws Exception {
+    public OMElement serializeTask(Startup task, OMElement parent) throws Exception {
+
         File tasksDir = new File(rootDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
-        if (!tasksDir.exists() && !tasksDir.mkdir()) {
+        if (!tasksDir.exists() && !tasksDir.mkdirs()) {
             throw new Exception("Error while creating the directory for tasks : " +
                     tasksDir.getAbsolutePath());
         }
@@ -330,15 +338,17 @@ public class MultiXMLConfigurationSerializer {
                 throw new Exception("Error while creating the file : " +
                         taskFile.getAbsolutePath());
             }
-        } else {
+        } else if (parent != null) {
             parent.addChild(taskElem);
         }
+
+        return taskElem;
     }
 
-    public void serializeSequence(SequenceMediator seq, OMElement parent) throws Exception {
+    public OMElement serializeSequence(SequenceMediator seq, OMElement parent) throws Exception {
 
         File seqDir = new File(rootDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
-        if (!seqDir.exists() && !seqDir.mkdir()) {
+        if (!seqDir.exists() && !seqDir.mkdirs()) {
             throw new Exception("Error while creating the directory for sequences : " +
                     seqDir.getAbsolutePath());
         }
@@ -355,15 +365,17 @@ public class MultiXMLConfigurationSerializer {
             } else {
                 throw new Exception("Error while creating the file : " + seqFile.getAbsolutePath());
             }
-        } else {
+        } else if (parent != null) {
             parent.addChild(seqElem);
         }
 
+        return seqElem;
     }
 
-    public void serializeEndpoint(Endpoint epr, OMElement parent) throws Exception {
+    public OMElement serializeEndpoint(Endpoint epr, OMElement parent) throws Exception {
+
         File eprDir = new File(rootDirectory, MultiXMLConfigurationBuilder.ENDPOINTS_DIR);
-        if (!eprDir.exists() && !eprDir.mkdir()) {
+        if (!eprDir.exists() && !eprDir.mkdirs()) {
             throw new Exception("Error while creating the directory for endpoints : " +
                     eprDir.getAbsolutePath());
         }
@@ -379,29 +391,30 @@ public class MultiXMLConfigurationSerializer {
             } else {
                 throw new Exception("Error while creating the file : " + eprFile.getAbsolutePath());
             }
-        } else {
+        } else if (parent != null) {
             parent.addChild(eprElem);
         }
 
+        return eprElem;
     }
 
-    public void serializeLocalEntry(Object o, OMElement parent) throws Exception {
+    public OMElement serializeLocalEntry(Object o, OMElement parent) throws Exception {
         if (o instanceof SequenceMediator) {
-            serializeSequence((SequenceMediator) o, parent);
+            return serializeSequence((SequenceMediator) o, parent);
         } else if (o instanceof Endpoint) {
-            serializeEndpoint((Endpoint) o, parent);
+            return serializeEndpoint((Endpoint) o, parent);
         } else if (o instanceof Entry) {
             Entry entry = (Entry) o;
             if ((SynapseConstants.SERVER_HOST.equals(entry.getKey())
                     || SynapseConstants.SERVER_IP.equals(entry.getKey()))
                     || entry.getType() == Entry.REMOTE_ENTRY) {
-                return;
+                return null;
             }
 
             File entriesDir = new File(rootDirectory, MultiXMLConfigurationBuilder.
                         LOCAL_ENTRY_DIR);
             OMElement entryElem = EntrySerializer.serializeEntry(entry, null);
-            if (!entriesDir.exists() && !entriesDir.mkdir()) {
+            if (!entriesDir.exists() && !entriesDir.mkdirs()) {
                 throw new Exception("Error while creating the local entries directory : " +
                         entriesDir.getAbsolutePath());
             }
@@ -417,10 +430,13 @@ public class MultiXMLConfigurationSerializer {
                     throw new Exception("Error while creating the file : " +
                             entryFile.getAbsolutePath());
                 }
-            } else {
+            } else if (parent != null) {
                 parent.addChild(entryElem);
             }
+
+            return entryElem;
         }
+        return null;
     }
 
     private void cleanUpDirectory()  throws Exception {

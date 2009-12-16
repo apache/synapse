@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -75,6 +74,8 @@ public class MultiXMLConfigurationBuilder {
     public static final String EVENTS_DIR          = "event-sources";
 
     public static final String REGISTRY_FILE       = "registry.xml";
+
+    public static final String SEPARATE_REGISTRY_DEFINITION = "__separateRegDef";
 
     private static Log log = LogFactory.getLog(MultiXMLConfigurationBuilder.class);
 
@@ -143,6 +144,8 @@ public class MultiXMLConfigurationBuilder {
             try {
                 OMElement document = parseFile(registryDef);
                 SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document);
+                synapseConfig.getProperties().setProperty(SEPARATE_REGISTRY_DEFINITION,
+                        String.valueOf(Boolean.TRUE));
             } catch (FileNotFoundException ignored) {}
         }
     }
@@ -279,10 +282,5 @@ public class MultiXMLConfigurationBuilder {
         OMElement document = new StAXOMBuilder(is).getDocumentElement();
         document.build();
         return document;
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

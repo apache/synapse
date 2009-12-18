@@ -225,18 +225,7 @@ public class MultiXMLConfigurationSerializer {
                     "at: " + rootDirectory.getAbsolutePath());                
         }
 
-        if (synapseXML.exists() && !synapseXML.delete()) {
-            throw new Exception("Error while deleting the existing synapse.xml file");            
-        }
-
-        if (synapseXML.createNewFile()) {
-            OutputStream out = new FileOutputStream(synapseXML);
-            XMLPrettyPrinter.prettify(definitions, out);
-            out.close();
-        } else {
-            throw new Exception("Error while creating the Synapse configuration " +
-                    "file at : " + synapseXML.getAbsolutePath());
-        }
+        writeToFile(definitions, synapseXML);
     }
 
     public OMElement serializeSynapseRegistry(Registry registry, SynapseConfiguration synapseConfig,
@@ -277,14 +266,7 @@ public class MultiXMLConfigurationSerializer {
 
         if (service.getFileName() != null) {
             File proxyFile = new File(proxyDir, service.getFileName());
-            if (proxyFile.createNewFile()) {
-                OutputStream out = new FileOutputStream(proxyFile);
-                XMLPrettyPrinter.prettify(proxyElem, out);
-                out.flush();
-            } else {
-                throw new Exception("Error while creating the file : " +
-                        proxyFile.getAbsolutePath());
-            }
+            writeToFile(proxyElem, proxyFile);
         } else if (parent != null) {
             parent.addChild(proxyElem);
         }
@@ -303,14 +285,7 @@ public class MultiXMLConfigurationSerializer {
 
         if (source.getFileName() != null) {
             File eventSrcFile = new File(eventsDir, source.getFileName());
-            if (eventSrcFile.createNewFile()) {
-                OutputStream out = new FileOutputStream(eventSrcFile);
-                XMLPrettyPrinter.prettify(eventSrcElem, out);
-                out.flush();
-            } else {
-                throw new Exception("Error while creating the file : " +
-                        eventSrcFile.getAbsolutePath());
-            }
+            writeToFile(eventSrcElem, eventSrcFile);
         } else if (parent != null) {
             parent.addChild(eventSrcElem);
         }
@@ -330,14 +305,7 @@ public class MultiXMLConfigurationSerializer {
 
         if (task instanceof AbstractStartup && ((AbstractStartup) task).getFileName() != null) {
             File taskFile = new File(tasksDir, ((AbstractStartup) task).getFileName());
-            if (taskFile.createNewFile()) {
-                OutputStream out = new FileOutputStream(taskFile);
-                XMLPrettyPrinter.prettify(taskElem, out);
-                out.flush();
-            } else {
-                throw new Exception("Error while creating the file : " +
-                        taskFile.getAbsolutePath());
-            }
+            writeToFile(taskElem, taskFile);
         } else if (parent != null) {
             parent.addChild(taskElem);
         }
@@ -355,16 +323,9 @@ public class MultiXMLConfigurationSerializer {
 
         OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
                 serializeMediator(null, seq);
-        File seqFile;
         if (seq.getFileName() != null) {
-            seqFile = new File(seqDir, seq.getFileName());
-            if (seqFile.createNewFile()) {
-                OutputStream out = new FileOutputStream(seqFile);
-                XMLPrettyPrinter.prettify(seqElem, out);
-                out.close();
-            } else {
-                throw new Exception("Error while creating the file : " + seqFile.getAbsolutePath());
-            }
+            File seqFile = new File(seqDir, seq.getFileName());
+            writeToFile(seqElem, seqFile);
         } else if (parent != null) {
             parent.addChild(seqElem);
         }
@@ -381,16 +342,10 @@ public class MultiXMLConfigurationSerializer {
         }
 
         OMElement eprElem = EndpointSerializer.getElementFromEndpoint(epr);
-        File eprFile;
+
         if (epr instanceof AbstractEndpoint && ((AbstractEndpoint) epr).getFileName() != null) {
-            eprFile = new File(eprDir, ((AbstractEndpoint) epr).getFileName());
-            if (eprFile.createNewFile()) {
-                OutputStream out = new FileOutputStream(eprFile);
-                XMLPrettyPrinter.prettify(eprElem, out);
-                out.flush();
-            } else {
-                throw new Exception("Error while creating the file : " + eprFile.getAbsolutePath());
-            }
+            File eprFile = new File(eprDir, ((AbstractEndpoint) epr).getFileName());
+            writeToFile(eprElem, eprFile);
         } else if (parent != null) {
             parent.addChild(eprElem);
         }
@@ -419,17 +374,9 @@ public class MultiXMLConfigurationSerializer {
                         entriesDir.getAbsolutePath());
             }
 
-            File entryFile;
             if (entry.getFileName() != null) {
-               entryFile  = new File(entriesDir, entry.getFileName());
-                if (entryFile.createNewFile()) {
-                    OutputStream out = new FileOutputStream(entryFile);
-                    XMLPrettyPrinter.prettify(entryElem, out);
-                    out.flush();
-                } else {
-                    throw new Exception("Error while creating the file : " +
-                            entryFile.getAbsolutePath());
-                }
+               File entryFile  = new File(entriesDir, entry.getFileName());
+               writeToFile(entryElem, entryFile);
             } else if (parent != null) {
                 parent.addChild(entryElem);
             }
@@ -437,6 +384,13 @@ public class MultiXMLConfigurationSerializer {
             return entryElem;
         }
         return null;
+    }
+
+    private void writeToFile(OMElement content, File file) throws Exception {
+        OutputStream out = new FileOutputStream(file);
+        XMLPrettyPrinter.prettify(content, out);
+        out.flush();
+        out.close();
     }
 
     private void cleanUpDirectory()  throws Exception {

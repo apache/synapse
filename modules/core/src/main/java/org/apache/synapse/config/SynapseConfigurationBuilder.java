@@ -86,7 +86,6 @@ public class SynapseConfigurationBuilder {
             try {
                 synCfg = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
                 log.info("Loaded Synapse configuration from : " + configFile);
-                synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
             } catch (Exception e) {
                 handleException("Could not initialize Synapse : " + e.getMessage(), e);
             }
@@ -103,6 +102,7 @@ public class SynapseConfigurationBuilder {
         }
 
         assert synCfg != null;
+        synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
         Registry localConfigReg = synCfg.getRegistry();
         if (synCfg.getLocalRegistry().isEmpty() && synCfg.getProxyServices().isEmpty()
                 && localConfigReg != null) {

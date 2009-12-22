@@ -94,7 +94,9 @@ public class MultiXMLConfigurationSerializer {
 
             // If a backup was created, clean it up
             if (backupDirectory != null) {
-                log.info("Cleaning up the backup files at : " + backupDirectory.getPath());
+                if (log.isDebugEnabled()) {
+                    log.debug("Cleaning up the backup files at : " + backupDirectory.getPath());
+                }
                 deleteDirectory(backupDirectory);
                 backupDirectory = null;
             }

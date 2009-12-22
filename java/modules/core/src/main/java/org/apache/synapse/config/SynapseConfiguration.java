@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.commons.datasource.DataSourceHelper;
-import org.apache.synapse.task.*;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -115,12 +114,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * The list of registered configuration observers
      */
     private List<SynapseObserver> observers = new ArrayList<SynapseObserver>();
-
-    /**
-     * The singleton task manager instance which contains the task description repository and the
-     * scheduler
-     */
-    private SynapseTaskManager taskManager;
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -965,13 +958,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
         for (ManagedLifecycle stp : startups.values()) {
             stp.destroy();
         }
-
-        if (taskManager != null && taskManager.isInitialized()) {
-            TaskScheduler taskScheduler = taskManager.getTaskScheduler();
-            if (taskScheduler != null && taskScheduler.isInitialized()) {
-                taskScheduler.shutDown();
-            }
-        }
         
         // clear session information used for SA load balancing
         try {
@@ -1101,14 +1087,6 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public List<SynapseObserver> getObservers() {
         return Collections.unmodifiableList(observers);
-    }
-
-    public SynapseTaskManager getTaskManager() {
-        return taskManager;
-    }
-
-    public void setTaskManager(SynapseTaskManager taskManager) {
-        this.taskManager = taskManager;
     }
 
     private void assertAlreadyExists(String key, String type) {

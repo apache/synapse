@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.task.*;
@@ -48,8 +47,6 @@ public class SimpleQuartz extends AbstractStartup {
 
     private TaskDescription taskDescription;
 
-    private SynapseTaskManager synapseTaskManager;
-
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
     }
@@ -63,6 +60,7 @@ public class SimpleQuartz extends AbstractStartup {
             return;
         }
 
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
         if (synapseTaskManager.isInitialized()) {
 
             TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
@@ -84,13 +82,8 @@ public class SimpleQuartz extends AbstractStartup {
             handleException("Error while initializing the startup. TaskDescription is null.");
         }
 
-        SynapseConfiguration synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
-        synapseTaskManager = synapseConfiguration.getTaskManager();
-        if (synapseTaskManager == null) {
-            log.error("SynapseTaskManager is not available in the SynapseConfiguration. Tasks " +
-                    "cannot be initialized.");
-            return;
-        } else if (!synapseTaskManager.isInitialized()) {
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        if (!synapseTaskManager.isInitialized()) {
             log.warn("SynapseTaskManager is not properly initialized. Initializing now with " +
                     "default parameters.");
             synapseTaskManager.init(null, null);
@@ -143,7 +136,7 @@ public class SimpleQuartz extends AbstractStartup {
             TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
-                    taskScheduler.init(synapseConfiguration.getProperties());
+                    taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());
                 }
                 taskScheduler.scheduleTask(taskDescription, map, SimpleQuartzJob.class);
             } else {

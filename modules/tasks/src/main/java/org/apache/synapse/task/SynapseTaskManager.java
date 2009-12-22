@@ -35,10 +35,16 @@ public class SynapseTaskManager {
     private TaskScheduler taskScheduler;
     private boolean initialized = false;
 
-    public SynapseTaskManager() {
+    private static final SynapseTaskManager INSTANCE = new SynapseTaskManager();
+
+    private SynapseTaskManager() {
         if (log.isDebugEnabled()) {
             log.debug("Created the SynapseTaskManager singleton instance");
         }
+    }
+
+    public static SynapseTaskManager getInstance() {
+        return INSTANCE;
     }
 
     /**
@@ -95,7 +101,7 @@ public class SynapseTaskManager {
 
     private void assertInitialized() {
         if (!initialized) {
-            String msg = "Task helper has not been initialized, it requires to be initialized";
+            String msg = "Task manager has not been initialized, it requires to be initialized";
             log.error(msg);
             throw new SynapseCommonsException(msg);
         }
@@ -106,9 +112,11 @@ public class SynapseTaskManager {
     }
 
     public void cleanup() {
+        log.info("Shutting down the task manager");
         assertInitialized();
         taskDescriptionRepository.clear();
         taskScheduler.shutDown();
+        initialized = false;
     }
 
     public void pauseAll() {

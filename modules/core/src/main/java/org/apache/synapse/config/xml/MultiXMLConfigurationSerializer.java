@@ -195,7 +195,7 @@ public class MultiXMLConfigurationSerializer {
                 SequenceMediator seq = (SequenceMediator) o;
                 if (seq.getFileName() == null) {
                     MediatorSerializerFinder.getInstance().
-                            getSerializer(seq).serializeMediator(null, seq);
+                            getSerializer(seq).serializeMediator(definitions, seq);
                 }
             } else if (o instanceof AbstractEndpoint) {
                 AbstractEndpoint endpoint = (AbstractEndpoint) o;

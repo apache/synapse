@@ -69,9 +69,6 @@ public class Axis2SynapseController implements SynapseController {
     /** The Axis2 listener Manager */
     private ListenerManager listenerManager;
 
-    /** The Synapse task manager which contains the task scheduler and the task repository */
-    private SynapseTaskManager synapseTaskManager;
-
     /** The Axis2 configuration context used by Synapse */
     private ConfigurationContext configurationContext;
 
@@ -230,7 +227,8 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.pauseSenders();
 
         // put tasks on hold
-        if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        if (synapseTaskManager.isInitialized()) {
             synapseTaskManager.pauseAll();
         }
         
@@ -249,7 +247,8 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.resumeSenders();
 
         // resume tasks
-        if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        if (synapseTaskManager.isInitialized()) {
             synapseTaskManager.resumeAll();
         }
 
@@ -262,7 +261,8 @@ public class Axis2SynapseController implements SynapseController {
     public void stop() {
         try {
             // stop tasks
-            if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+            SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+            if (synapseTaskManager.isInitialized()) {
                 synapseTaskManager.cleanup();
             }
 
@@ -364,7 +364,7 @@ public class Axis2SynapseController implements SynapseController {
                 undeployProxyServices();
                 undeployEventSources();
             } catch (AxisFault e) {
-                handleFatal("t", e);
+                handleFatal("Error while shutting down the Synapse environment", e);
             }
             synapseEnvironment.setInitialized(false);
         }
@@ -402,10 +402,6 @@ public class Axis2SynapseController implements SynapseController {
         }
         
         addServerIPAndHostEnrties();
-
-        if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
-            synapseConfiguration.setTaskManager(synapseTaskManager);
-        }
 
         return synapseConfiguration;
     }
@@ -460,7 +456,8 @@ public class Axis2SynapseController implements SynapseController {
             }
 
             int runningTasks = 0;
-            if (synapseTaskManager != null && synapseTaskManager.isInitialized()) {
+            SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+            if (synapseTaskManager.isInitialized()) {
                 runningTasks = synapseTaskManager.getTaskScheduler().getRunningTaskCount();
                 if (runningTasks > 0) {
                     log.info("Waiting for : " + runningTasks + " tasks to complete..");
@@ -689,7 +686,7 @@ public class Axis2SynapseController implements SynapseController {
      */
     private void initTaskManager(ServerContextInformation serverContextInformation) {
 
-        synapseTaskManager = new SynapseTaskManager();
+        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
 
         Object repo = 
             serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);

@@ -138,6 +138,18 @@
                         <updatePolicy>never</updatePolicy>
                     </releases>
                     <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>wso2-m2-snapshots</id>
+                    <name>WSO2 Maven 2 SNAPSHOTS Repository</name>
+                    <url>http://dist.wso2.org/snapshots/maven2/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
                         <updatePolicy>interval:60</updatePolicy>
                     </snapshots>
                 </repository>
@@ -756,7 +768,19 @@
                 <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <updatePolicy>interval:10080</updatePolicy> <!-- i.e. refresh weekly -->
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>wso2-m2-snapshots</id>
+            <name>WSO2 Maven 2 SNAPSHOTS Repository</name>
+            <url>http://dist.wso2.org/snapshots/maven2/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>interval:10080</updatePolicy>
             </snapshots>
         </repository>
         <repository>

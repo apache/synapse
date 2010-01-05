@@ -383,7 +383,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
             if (opName != null) {
                 if (oldConfiguration.isStatisticsEnable()) {
                     AspectConfiguration newConfiguration = new AspectConfiguration(
-                            oldConfiguration.getId() + "." + opName);
+                            oldConfiguration.getId() + SynapseConstants.STATISTICS_KEY_SEPARATOR +
+                                    opName);
                     newConfiguration.enableStatistics();
                     StatisticsReporter.reportForComponent(synCtx, newConfiguration,
                             ComponentType.ENDPOINT);

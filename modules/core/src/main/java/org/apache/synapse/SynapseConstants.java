@@ -282,6 +282,9 @@ public final class SynapseConstants {
     /** A name to use for anonymous sequences in the sequence stack */
     public static final String ANONYMOUS_SEQUENCE = "AnonymousSequence";
 
+    /** String to be used as the separator when defining resource IDs for statistics */
+    public static final String STATISTICS_KEY_SEPARATOR = "__";
+
     /** Message format values in EndpointDefinition. Used by address, wsdl endpoints */
     public static final String FORMAT_POX = "pox";
     public static final String FORMAT_GET = "get";

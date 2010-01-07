@@ -1031,7 +1031,7 @@ public class SandeshaUtil {
 	*/
 	public static void reallocateMessagesToNewSequence(StorageManager storageManager, RMSBean oldRMSBean, 
 		List<MessageContext> msgsToSend, Transaction transaction)
-		throws AxisFault, SandeshaException{
+		throws Exception{
 
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::reallocateMessagesToNewSequence");

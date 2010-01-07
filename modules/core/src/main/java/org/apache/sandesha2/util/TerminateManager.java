@@ -355,7 +355,10 @@ public class TerminateManager {
 			} catch(Exception e){
 				
 				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
-					log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reallocationFailed, rmsBean.getSequenceID(), e.toString()));				
+					log.warn(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reallocationFailed, rmsBean.getSequenceID()));
+				
+				if(LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
+					log.debug("Reallocation failed for messages on sequence " + rmsBean.getSequenceID() + " because of " + e);
 			
 				//Reallocation Failed
 				//Need to mark any RMSBeans involved as failed so that we don't attempt to send

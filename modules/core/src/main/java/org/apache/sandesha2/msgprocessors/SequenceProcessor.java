@@ -244,7 +244,7 @@ public class SequenceProcessor {
 			
 			EndpointReference acksTo = bean.getAcksToEndpointReference();
 			
-			// Send an Ack if needed.
+			//Send an Ack if needed.
 			//We are not sending acks for duplicate messages in the anon InOut case.
 			//If a standalone ack get sent before the actualy message (I.e. before the original msg get
 			//replied), the client may take this as a InOnly message and may avoid looking for the application
@@ -430,11 +430,17 @@ public class SequenceProcessor {
 			}
 
             // if the relates to is not null then this is at the client side
-            // so it is receiving a response. always have to return the thread.
-            if (msgCtx.getRelatesTo() != null) {
+            // so it is receiving a response.  We have to abort the thread in the Async case as 
+			// we don't want too many threads open e.g. many async responses coming in at once all waiting
+			// for an earlier response which hasn't arrived.  In the Sync case we need to suspend as aborting
+			// causes Axis to mark this msg as delivered and then when the invoker thread tries to deliver
+			// the msg Axis returns with a NullPointerException.
+            if (msgCtx.getRelatesTo() != null && !msgCtx.getTo().hasAnonymousAddress()) {
                 result = InvocationResponse.ABORT;
-            }
-
+                if (log.isDebugEnabled())
+    				log.debug("SequenceProcessor::processReliableMessage, Aborting the thread as this " +
+    						"is an async response requiring inorder delivery.  An invoker thread will process the delivery"); 
+            } 
 		}
 
 		if (transaction != null && transaction.isActive()) 

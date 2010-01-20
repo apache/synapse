@@ -41,7 +41,7 @@ import org.wso2.throttle.*;
  * Only support IP based throttling- Throttling can manage per IP using the throttle policy
  */
 
-public class ThrottleMediator extends AbstractMediator {
+public class ThrottleMediator extends AbstractMediator implements ManagedLifecycle {
 
     /* The key for getting the throttling policy - key refers to a/an [registry] entry    */
     private String policyKey = null;

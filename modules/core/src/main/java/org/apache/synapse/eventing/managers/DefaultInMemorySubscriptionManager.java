@@ -27,10 +27,7 @@ import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.filters.TopicBasedEventFilter;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
-import org.wso2.eventing.Event;
-import org.wso2.eventing.Subscription;
-import org.wso2.eventing.SubscriptionManager;
-import org.wso2.eventing.SubscriptionData;
+import org.wso2.eventing.*;
 import org.wso2.eventing.exceptions.EventException;
 
 import java.util.*;
@@ -66,6 +63,12 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         store.put(subscription.getId(), subscription);
         return subscription.getId();
 
+    }
+
+    public String subscribeNonPersistantly(Subscription subscription,
+                                           EventDispatcher<MessageContext> dispatcher) throws EventException {
+        subscription.setEventDispatcher(dispatcher);
+        return subscribe(subscription);
     }
 
     public boolean unsubscribe(String id) throws EventException {

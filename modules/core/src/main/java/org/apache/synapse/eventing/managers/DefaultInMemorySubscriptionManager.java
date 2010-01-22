@@ -65,13 +65,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
 
     }
 
-    public String subscribeNonPersistantly(Subscription subscription,
-                                           EventDispatcher<MessageContext> dispatcher) throws EventException {
-        subscription.setEventDispatcher(dispatcher);
-        return subscribe(subscription);
-    }
-
-    public boolean unsubscribe(String id) throws EventException {
+  public boolean unsubscribe(String id) throws EventException {
         if (store.containsKey(id)) {
             store.remove(id);
             return true;

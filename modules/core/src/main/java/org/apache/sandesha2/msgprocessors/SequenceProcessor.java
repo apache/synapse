@@ -269,7 +269,6 @@ public class SequenceProcessor {
 		EndpointReference toEPR = msgCtx.getTo();
 		if(toEPR == null || toEPR.hasAnonymousAddress()) {
 			RMSBean outBean = null;
-
 			// Look for the correct outbound sequence by checking the anon uuid (if there is one)
 			String toAddress = (toEPR == null) ? null : toEPR.getAddress();
 			if(SandeshaUtil.isWSRMAnonymous(toAddress)) {
@@ -429,18 +428,18 @@ public class SequenceProcessor {
 				}
 			}
 
-            // if the relates to is not null then this is at the client side
-            // so it is receiving a response.  We have to abort the thread in the Async case as 
+			// if the relates to is not null then this is at the client side
+			// so it is receiving a response.  We have to abort the thread in the Async case as 
 			// we don't want too many threads open e.g. many async responses coming in at once all waiting
 			// for an earlier response which hasn't arrived.  In the Sync case we need to suspend as aborting
 			// causes Axis to mark this msg as delivered and then when the invoker thread tries to deliver
 			// the msg Axis returns with a NullPointerException.
-            if (msgCtx.getRelatesTo() != null && !msgCtx.getTo().hasAnonymousAddress()) {
-                result = InvocationResponse.ABORT;
-                if (log.isDebugEnabled())
-    				log.debug("SequenceProcessor::processReliableMessage, Aborting the thread as this " +
-    						"is an async response requiring inorder delivery.  An invoker thread will process the delivery"); 
-            } 
+			if (msgCtx.getRelatesTo() != null && msgCtx.getTo() != null && !msgCtx.getTo().hasAnonymousAddress()) {
+				result = InvocationResponse.ABORT;
+				if (log.isDebugEnabled())
+					log.debug("SequenceProcessor::processReliableMessage, Aborting the thread as this " +
+							"is an async response requiring inorder delivery.  An invoker thread will process the delivery"); 
+			} 
 		}
 
 		if (transaction != null && transaction.isActive()) 

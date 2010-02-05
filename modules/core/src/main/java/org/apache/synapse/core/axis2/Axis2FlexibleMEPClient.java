@@ -218,7 +218,9 @@ public class Axis2FlexibleMEPClient {
             processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);
         }
 
-        if (axisOutMsgCtx.isDoingREST()) {
+        // only put whttp:location for the REST (GET) requests, otherwise causes issues for POX messages
+        if (axisOutMsgCtx.isDoingREST() && HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(
+                axisOutMsgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE))) {
             if (axisOutMsgCtx.getProperty(WSDL2Constants.ATTR_WHTTP_LOCATION) == null
                     && axisOutMsgCtx.getEnvelope().getBody().getFirstElement() != null) {
                 axisOutMsgCtx.setProperty(WSDL2Constants.ATTR_WHTTP_LOCATION,

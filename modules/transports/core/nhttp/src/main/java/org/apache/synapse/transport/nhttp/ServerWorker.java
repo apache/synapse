@@ -21,8 +21,8 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -32,7 +32,6 @@ import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -437,7 +436,13 @@ public class ServerWorker implements Runnable {
             if (service != null) {
                 try {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    service.printWSDL(baos, getIpAddress());
+                    String parameterValue = parameters.get("wsdl");
+                    if (parameterValue == null) {
+                        service.printWSDL(baos, getIpAddress());
+                    } else {
+                        // here the parameter value should be the wsdl file name
+                        service.printUserWSDL(baos, parameterValue);
+                    }
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
                     serverHandler.commitResponseHideExceptions(conn, response);
                     os.write(baos.toByteArray());

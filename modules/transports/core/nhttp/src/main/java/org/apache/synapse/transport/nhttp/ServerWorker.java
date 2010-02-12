@@ -437,7 +437,13 @@ public class ServerWorker implements Runnable {
             if (service != null) {
                 try {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    service.printWSDL(baos, getIpAddress());
+                    String parameterValue = parameters.get("wsdl");
+                    if (parameterValue == null) {
+                        service.printWSDL(baos, getIpAddress());
+                    } else {
+                        // here the parameter value should be the wsdl file name
+                        service.printUserWSDL(baos, parameterValue);
+                    }
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
                     serverHandler.commitResponseHideExceptions(conn, response);
                     os.write(baos.toByteArray());

@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -72,6 +73,7 @@ public class MultiXMLConfigurationBuilder {
     public static final String LOCAL_ENTRY_DIR     = "local-entries";
     public static final String TASKS_DIR           = "tasks";
     public static final String EVENTS_DIR          = "event-sources";
+    public static final String EXECUTORS_DIR       = "priority-executors";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 
@@ -116,6 +118,7 @@ public class MultiXMLConfigurationBuilder {
         createProxyServices(synapseConfig, root);
         createTasks(synapseConfig, root);
         createEventSources(synapseConfig, root);
+        createExecutors(synapseConfig, root);
 
         return synapseConfig;
     }
@@ -271,6 +274,26 @@ public class MultiXMLConfigurationBuilder {
                     SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
                             defineEventSource(synapseConfig, document);
                     eventSource.setFileName(file.getName());
+                } catch (FileNotFoundException ignored) {}
+           }
+        }
+    }
+
+    private static void createExecutors(SynapseConfiguration synapseConfig, String rootDirPath)
+            throws XMLStreamException {
+
+        File eventsDir = new File(rootDirPath, EXECUTORS_DIR);
+        if (eventsDir.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading event sources from : " + eventsDir.getPath());
+            }
+            File[] events = eventsDir.listFiles(filter);
+            for (File file : events) {
+                try {
+                    OMElement document = parseFile(file);
+                    PriorityExecutor executor = SynapseXMLConfigurationFactory.
+                            defineExecutor(synapseConfig, document);
+                    executor.setFileName(file.getName());
                 } catch (FileNotFoundException ignored) {}
            }
         }

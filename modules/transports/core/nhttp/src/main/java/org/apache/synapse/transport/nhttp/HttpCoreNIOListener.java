@@ -19,6 +19,8 @@
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -45,10 +47,20 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.synapse.commons.executors.PriorityExecutor;
+import org.apache.synapse.commons.executors.ExecutorConstants;
+import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
+import org.apache.synapse.commons.evaluators.Parser;
+import org.apache.synapse.commons.evaluators.EvaluatorException;
+import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 
 import javax.net.ssl.SSLContext;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -98,6 +110,10 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private int state = BaseConstants.STOPPED;
     /** The ServerHandler */
     private ServerHandler handler = null;
+    /** This will execute the requests based on calculate priority */
+    private PriorityExecutor executor = null;
+    /** parser for calculating the priority of incoming messages */
+    private Parser parser = null;
 
     protected IOEventDispatch getEventDispatch(
         NHttpServiceHandler handler, SSLContext sslContext, 
@@ -182,6 +198,63 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         mbeanSupport
             = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
         mbeanSupport.register();
+
+        // create the priority based executor and parser
+        param = transprtIn.getParameter(NhttpConstants.PRIORITY_CONFIG_FILE_NAME);
+        if (param != null && param.getValue() != null) {
+            createPriorityConfiguration(param.getValue().toString());
+        }
+    }
+
+    private void createPriorityConfiguration(String fileName) throws AxisFault {
+        OMElement definitions = null;
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            definitions = new StAXOMBuilder(fis).getDocumentElement();
+            definitions.build();
+        } catch (FileNotFoundException e) {
+            handleException("Priority configuration file cannot be found : " + fileName, e);
+        } catch (XMLStreamException e) {
+            handleException("Error parsing priority configuration xml file " + fileName, e);
+        }
+
+        assert definitions != null;
+
+        OMElement executorElem = definitions.getFirstChildWithName(
+                new QName(ExecutorConstants.PRIORITY_EXECUTOR));
+
+        if (executorElem == null) {
+            handleException(ExecutorConstants.PRIORITY_EXECUTOR +
+                    " configuration is mandatory for priority based routing");
+        }
+
+        executor = PriorityExecutorFactory.createExecutor(null, executorElem, false);
+        OMElement conditionsElem = definitions.getFirstChildWithName(
+                new QName(EvaluatorConstants.CONDITIONS));
+        if (conditionsElem == null) {
+            handleException("Conditions configuration is mandatory for priority based routing");
+        }
+
+        executor.init();
+
+        assert conditionsElem != null;
+        OMAttribute defPriorityAttr = conditionsElem.getAttribute(
+                new QName(EvaluatorConstants.DEFAULT_PRIORITY));
+        if (defPriorityAttr != null) {
+            parser = new Parser(Integer.parseInt(defPriorityAttr.getAttributeValue()));
+        } else {
+            parser = new Parser();
+        }
+
+        try {
+            parser.init(conditionsElem);
+        } catch (EvaluatorException e) {
+            handleException("Invalid " + EvaluatorConstants.CONDITIONS +
+                    " configuration for priority based mediation", e);
+        }
+
+        log.info("Created a priority based executor from the configuration: " +
+                fileName);
     }
 
     /**
@@ -272,7 +345,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             addToServiceURIMap((AxisService) obj);
         }
         
-        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics);
+        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics, parser, executor);
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
                 sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;
@@ -547,6 +620,11 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);
+    }
+
+    private void handleException(String msg) throws AxisFault {
+        log.error(msg);
+        throw new AxisFault(msg);
     }
 
     // -- jmx/management methods--

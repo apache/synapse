@@ -35,6 +35,8 @@ public interface SynapseLog {
     /**
      * Check whether a call to {@link #traceOrDebug(Object)} would actually cause a log
      * message to be written to the logs.
+     *
+     * @return <code>true</code> if trace or debug is enabled
      */
     boolean isTraceOrDebugEnabled();
     
@@ -65,6 +67,8 @@ public interface SynapseLog {
     /**
      * Check whether a call to {@link #traceTrace(Object)} would actually cause a log
      * message to be written to the logs.
+     *
+     * @return <code>true</code> if trace is enabled for the trace log
      */
     boolean isTraceTraceEnabled();
     
@@ -88,6 +92,20 @@ public interface SynapseLog {
      * @param msg the message to be logged
      */
     void auditLog(Object msg);
+
+    /**
+     * Log an audit message at the TRACE category.
+     *
+     * @param msg the message to be logged
+     */
+    void auditDebug(Object msg);
+
+    /**
+     * Log an audit message at the TRACE category.
+     *
+     * @param msg the message to be logged
+     */
+    void auditTrace(Object msg);
     
     /**
      * Log a warning message.
@@ -97,6 +115,20 @@ public interface SynapseLog {
      * @param msg the message to be logged
      */
     void auditWarn(Object msg);
+
+    /**
+     * Log an audit message at the ERROR category.
+     *
+     * @param msg the message to be logged
+     */
+    void auditError(Object msg);
+
+    /**
+     * Log an audit message at the FATAL category.
+     *
+     * @param msg the message to be logged
+     */
+    void auditFatal(Object msg);
     
     /**
      * Log a message at level 'error'.

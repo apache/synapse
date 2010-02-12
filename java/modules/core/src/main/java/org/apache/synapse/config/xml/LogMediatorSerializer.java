@@ -20,14 +20,12 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
 /**
  * <pre>
- * &lt;log [level="simple|headers|full|custom"] [separator="string"]&gt;
+ * &lt;log [level="simple|headers|full|custom"] [separator="string"] [category="INFO|TRACE|DEBUG|WARN|ERROR|FATAL"]&gt;
  *      &lt;property&gt; *
  * &lt;/log&gt;
  * </pre>
@@ -50,6 +48,23 @@ public class LogMediatorSerializer extends AbstractMediatorSerializer {
                     mediator.getLogLevel() == LogMediator.HEADERS ? "headers" :
                     mediator.getLogLevel() == LogMediator.FULL ? "full" :
                     mediator.getLogLevel() == LogMediator.CUSTOM ? "custom" : "simple"
+                ));
+        }
+
+        if (mediator.getCategory() != LogMediator.CATEGORY_INFO) {
+            log.addAttribute(fac.createOMAttribute(
+                "category", nullNS,
+                    mediator.getCategory() == LogMediator.CATEGORY_TRACE ?
+                            LogMediatorFactory.CAT_TRACE :
+                    mediator.getCategory() == LogMediator.CATEGORY_DEBUG ?
+                            LogMediatorFactory.CAT_DEBUG :
+                    mediator.getCategory() == LogMediator.CATEGORY_WARN ?
+                            LogMediatorFactory.CAT_WARN :
+                    mediator.getCategory() == LogMediator.CATEGORY_ERROR ?
+                            LogMediatorFactory.CAT_ERROR :
+                    mediator.getCategory() == LogMediator.CATEGORY_FATAL ?
+                            LogMediatorFactory.CAT_FATAL :
+                            LogMediatorFactory.CAT_INFO
                 ));
         }
 

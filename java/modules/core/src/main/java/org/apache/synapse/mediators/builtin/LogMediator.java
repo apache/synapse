@@ -19,9 +19,9 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -50,12 +50,21 @@ public class LogMediator extends AbstractMediator {
     /** all attributes of level 'simple' and the SOAP envelope and any properties */
     public static final int FULL    = 3;
 
+    public static final int CATEGORY_INFO = 0;
+    public static final int CATEGORY_DEBUG = 1;
+    public static final int CATEGORY_TRACE = 2;
+    public static final int CATEGORY_WARN = 3;
+    public static final int CATEGORY_ERROR = 4;
+    public static final int CATEGORY_FATAL = 5;
+
     public static final String DEFAULT_SEP = ", ";
 
     /** The default log level is set to SIMPLE */
     private int logLevel = SIMPLE;
     /** The separator for which used to separate logging information */
     private String separator = DEFAULT_SEP;
+    /** Category of the log statement */
+    private int category = CATEGORY_INFO;
     /** The holder for the custom properties */
     private final List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
 
@@ -77,7 +86,26 @@ public class LogMediator extends AbstractMediator {
             }
         }
 
-        synLog.auditLog(getLogMessage(synCtx));
+        switch (category) {
+            case CATEGORY_INFO :
+                synLog.auditLog(getLogMessage(synCtx));
+                break;
+            case CATEGORY_TRACE :
+                synLog.auditTrace(getLogMessage(synCtx));
+                break;
+            case CATEGORY_DEBUG :
+                synLog.auditDebug(getLogMessage(synCtx));
+                break;
+            case CATEGORY_WARN :
+                synLog.auditWarn(getLogMessage(synCtx));
+                break;
+            case CATEGORY_ERROR :
+                synLog.auditError(getLogMessage(synCtx));
+                break;
+            case CATEGORY_FATAL :
+                synLog.auditFatal(getLogMessage(synCtx));
+                break;
+        }
 
         synLog.traceOrDebug("End : Log mediator");
         return true;
@@ -195,6 +223,18 @@ public class LogMediator extends AbstractMediator {
 
     public List<MediatorProperty> getProperties() {
         return properties;
+    }
+
+    public int getCategory() {
+        return category;
+    }
+
+    public void setCategory(int category) {
+        if (category > 0 && category <= 5) {
+            this.category = category;
+        } else {
+            
+        }
     }
 
     private String trimLeadingSeparator(StringBuffer sb) {

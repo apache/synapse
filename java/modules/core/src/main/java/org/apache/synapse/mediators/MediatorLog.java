@@ -104,6 +104,32 @@ public class MediatorLog implements SynapseLog {
     }
 
     /**
+     * Log a message at level DEBUG to all available/enabled logs.
+     */
+    public void auditDebug(Object msg) {
+        defaultLog.debug(msg);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().debug(msg);
+        }
+        if (traceOn) {
+            traceLog.debug(msg);
+        }
+    }
+
+    /**
+     * Log a message at level TRACE to all available/enabled logs.
+     */
+    public void auditTrace(Object msg) {
+        defaultLog.trace(msg);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().trace(msg);
+        }
+        if (traceOn) {
+            traceLog.trace(msg);
+        }
+    }
+
+    /**
      * Log a message at level WARN to all available/enabled logs.
      */
     public void auditWarn(Object msg) {
@@ -113,6 +139,32 @@ public class MediatorLog implements SynapseLog {
         }
         if (traceOn) {
             traceLog.warn(msg);
+        }
+    }
+
+    /**
+     * Log a message at level ERROR to all available/enabled logs.
+     */
+    public void auditError(Object msg) {
+        defaultLog.error(msg);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().error(msg);
+        }
+        if (traceOn) {
+            traceLog.error(msg);
+        }
+    }
+
+    /**
+     * Log a message at level FATAL to all available/enabled logs.
+     */
+    public void auditFatal(Object msg) {
+        defaultLog.fatal(msg);
+        if (synCtx.getServiceLog() != null) {
+            synCtx.getServiceLog().fatal(msg);
+        }
+        if (traceOn) {
+            traceLog.fatal(msg);
         }
     }
 

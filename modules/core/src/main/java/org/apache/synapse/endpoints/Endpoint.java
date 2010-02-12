@@ -111,4 +111,16 @@ public interface Endpoint extends ManagedLifecycle {
      * @return EndpointView instance
      */
     public EndpointView getMetricsMBean();
+
+    /**
+     * Get the filename from which this endpoint is loaded, <code>null</code> if it is an anonymous endpoint
+     * @return String file name
+     */
+    public String getFileName();
+
+    /**
+     * Set the filename from which the endpoint is loaded
+     * @param fileName from which the endpoint is loaded
+     */
+    public void setFileName(String fileName);
 }

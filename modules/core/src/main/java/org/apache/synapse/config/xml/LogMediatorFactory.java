@@ -42,8 +42,15 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
     private static final String HEADERS = "headers";
     private static final String FULL    = "full";
     private static final String CUSTOM  = "custom";
+    public static final String CAT_INFO = "INFO";
+    public static final String CAT_TRACE = "TRACE";
+    public static final String CAT_DEBUG = "DEBUG";
+    public static final String CAT_WARN = "WARN";
+    public static final String CAT_ERROR = "ERROR";
+    public static final String CAT_FATAL = "FATAL";
     private static final QName ATT_LEVEL = new QName("level");
     private static final QName ATT_SEPERATOR = new QName("separator");
+    private static final QName ATT_CATEGORY = new QName("category");
 
     public QName getTagQName() {
         return LOG_Q;
@@ -69,6 +76,28 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
                 logMediator.setLogLevel(LogMediator.FULL);
             } else if (CUSTOM.equals(levelstr)) {
                 logMediator.setLogLevel(LogMediator.CUSTOM);
+            }
+        }
+
+        // Set the log statement category (i.e. INFO, DEBUG, etc..)
+        OMAttribute category = elem.getAttribute(ATT_CATEGORY);
+        if (category != null) {
+            String catstr = category.getAttributeValue().trim().toUpperCase();
+            if (CAT_INFO.equals(catstr)) {
+                logMediator.setCategory(LogMediator.CATEGORY_INFO);
+            } else if (CAT_TRACE.equals(catstr)) {
+                logMediator.setCategory(LogMediator.CATEGORY_TRACE);
+            } else if (CAT_DEBUG.equals(catstr)) {
+                logMediator.setCategory(LogMediator.CATEGORY_DEBUG);
+            } else if (CAT_WARN.equals(catstr)) {
+                logMediator.setCategory(LogMediator.CATEGORY_WARN);
+            } else if (CAT_ERROR.equals(catstr)) {
+                logMediator.setCategory(LogMediator.CATEGORY_ERROR);
+            } else if (CAT_FATAL.equals(catstr)) {
+                logMediator.setCategory(LogMediator.CATEGORY_FATAL);
+            } else {
+                handleException("Invalid log category. Category has to be one of " +
+                        "the following : INFO, TRACE, DEBUG, WARN, ERROR, FATAL");
             }
         }
 

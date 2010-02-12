@@ -104,7 +104,12 @@ public class VFSUtils extends BaseUtils {
             // check whether there is an existing lock for this item, if so it is assumed
             // to be processed by an another listener (downloading) or a sender (uploading)
             // lock file is derived by attaching the ".lock" second extension to the file name
-            FileObject lockObject = fsManager.resolveFile(fo.getURL().toString() + ".lock");
+            String fullPath = fo.getURL().toString();
+            int pos = fullPath.indexOf("?");
+            if (pos != -1) {
+                fullPath = fullPath.substring(0, pos);
+            }
+            FileObject lockObject = fsManager.resolveFile(fullPath + ".lock");
             if (lockObject.exists()) {
                 log.debug("There seems to be an external lock, aborting the processing of the file "
                         + fo.getName() + ". This could possibly be due to some other party already "
@@ -122,7 +127,7 @@ public class VFSUtils extends BaseUtils {
                 } catch (IOException e) {
                     lockObject.delete();
                     log.debug("Couldn't create the lock file before processing the file "
-                            + fo.getName(), e);
+                            + fullPath, e);
                     return false;
                 } finally {
                     lockObject.close();
@@ -134,7 +139,7 @@ public class VFSUtils extends BaseUtils {
                 // as the written random lock value.
                 // NOTE: this may not be optimal but is sub optimal
                 FileObject verifyingLockObject = fsManager.resolveFile(
-                        fo.getURL().toString() + ".lock");
+                        fullPath + ".lock");
                 if (verifyingLockObject.exists() && verifyLock(lockValue, verifyingLockObject)) {
                     return true;
                 }

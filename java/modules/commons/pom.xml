@@ -75,5 +75,10 @@
           <artifactId>activation</artifactId>
           <version>1.1</version>
         </dependency>
+        <dependency>
+          <groupId>org.apache.axis2</groupId>
+          <artifactId>axis2-transport-base</artifactId>          
+          <version>${axis2.transport.version}</version>
+        </dependency>
     </dependencies>
 </project>

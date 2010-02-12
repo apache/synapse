@@ -85,4 +85,5 @@ public class NhttpConstants {
     public static final String HTTP_REQ_METHOD = "HTTP_REQ_METHOD";
     public static final String NO_ENTITY_BODY = "NO_ENTITY_BODY";
     public static final String ENDPOINT_PREFIX = "ENDPOINT_PREFIX";
+    protected static final String PRIORITY_CONFIG_FILE_NAME = "priorityConfigFile";
 }

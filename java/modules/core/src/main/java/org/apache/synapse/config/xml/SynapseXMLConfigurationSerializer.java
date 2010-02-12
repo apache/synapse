@@ -20,10 +20,12 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
+import org.apache.synapse.commons.executors.config.PriorityExecutorSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.eventing.SynapseEventSource;
 
 public class SynapseXMLConfigurationSerializer implements ConfigurationSerializer {
@@ -100,6 +102,8 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         // handle startups
         serializeStartups(definitions, synCfg.getStartups());
 
+        // Executors
+        serializeExecutors(definitions, synCfg.getPriorityExecutors());
         return definitions;
     }
 
@@ -135,6 +139,18 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
                 Mediator mediator = (Mediator) sequences.get(key);
                 MediatorSerializerFinder.getInstance().getSerializer(mediator)
                         .serializeMediator(definitions, mediator);
+            }
+        }
+    }
+
+    private static void serializeExecutors(OMElement definitions,
+                                           Map<String, PriorityExecutor> executors) {
+        for (Object o : executors.keySet()) {
+            if (o instanceof String) {
+                String key = (String) o;
+                PriorityExecutor executor = executors.get(key);
+                PriorityExecutorSerializer.serialize(definitions, executor,
+                        XMLConfigConstants.SYNAPSE_NAMESPACE);
             }
         }
     }

@@ -139,6 +139,7 @@
                             org.apache.synapse,
                             org.apache.synapse.aspects.*,
                             org.apache.synapse.deployers.*,
+                            org.apache.synapse.executors.*,
                             org.apache.synapse.config.*,
                             org.apache.synapse.core.*,
                             org.apache.synapse.endpoints.*,

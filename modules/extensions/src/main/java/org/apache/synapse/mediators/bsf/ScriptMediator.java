@@ -395,6 +395,7 @@ public class ScriptMediator extends AbstractMediator {
         if (scriptEngine == null) {
             handleException("No script engine found for language: " + language);
         }
+        System.out.println("Script Engine Selected is " + scriptEngine.toString());
         xmlHelper = XMLHelper.getArgHelper(scriptEngine);
 
         this.multiThreadedEngine = scriptEngine.getFactory().getParameter("THREADING") != null;

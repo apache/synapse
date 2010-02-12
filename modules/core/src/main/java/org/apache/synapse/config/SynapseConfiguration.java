@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.commons.datasource.DataSourceHelper;
+import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -114,6 +115,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * The list of registered configuration observers
      */
     private List<SynapseObserver> observers = new ArrayList<SynapseObserver>();
+
+    /**
+     * Executors for executing sequences with priorities
+     */
+    private Map<String, PriorityExecutor> executors = new HashMap<String, PriorityExecutor>();
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -1022,6 +1028,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 stp.init(se);
             }
         }
+
+        // initialize sequence executors
+        for (PriorityExecutor executor : getPriorityExecutors().values()) {
+            executor.init();
+        }
     }
 
     private void handleException(String msg) {
@@ -1087,6 +1098,33 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     public List<SynapseObserver> getObservers() {
         return Collections.unmodifiableList(observers);
+    }
+
+    /**
+     * Add an executor
+     * @param name name of the executor
+     * @param executor executor
+     */
+    public void addPriorityExecutor(String name, PriorityExecutor executor) {
+        executors.put(name, executor);
+    }
+
+    /**
+     * Get the executors map
+     * @return exectors map, stored as name of executor and executor
+     */
+    public Map<String, PriorityExecutor> getPriorityExecutors() {
+        return executors;
+    }
+
+    /**
+     * Removes an executor from the configuration
+     * 
+     * @param name name of the executor
+     * @return removed executor
+     */
+    public PriorityExecutor removeExecutor(String name) {
+        return executors.remove(name);        
     }
 
     private void assertAlreadyExists(String key, String type) {

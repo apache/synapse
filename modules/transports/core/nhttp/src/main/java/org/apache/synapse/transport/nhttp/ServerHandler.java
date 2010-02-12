@@ -44,10 +44,15 @@ import org.apache.http.protocol.*;
 import org.apache.http.util.EncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.evaluators.Parser;
+import org.apache.synapse.commons.evaluators.EvaluatorContext;
+import org.apache.synapse.commons.executors.PriorityExecutor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * The server connection handler. An instance of this class is used by each IOReactor, to
@@ -81,11 +86,16 @@ public class ServerHandler implements NHttpServiceHandler {
     /** the metrics collector */
     private MetricsCollector metrics = null;
 
+    private Parser parser = null;
+
+    private PriorityExecutor executor = null;
+
     public static final String REQUEST_SINK_BUFFER = "synapse.request-sink-buffer";
     public static final String RESPONSE_SOURCE_BUFFER = "synapse.response-source-buffer";
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
-        final boolean isHttps, final MetricsCollector metrics) {
+        final boolean isHttps, final MetricsCollector metrics,
+        Parser parser, PriorityExecutor executor) {
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
@@ -97,12 +107,17 @@ public class ServerHandler implements NHttpServiceHandler {
         this.allocator = new HeapByteBufferAllocator();
 
         this.cfg = NHttpConfiguration.getInstance();
-        this.workerPool = WorkerPoolFactory.getWorkerPool(
-            cfg.getServerCoreThreads(),
-            cfg.getServerMaxThreads(),
-            cfg.getServerKeepalive(),
-            cfg.getServerQueueLen(),
-            "Server Worker thread group", "HttpServerWorker");
+       if (executor == null)  {
+            this.workerPool = WorkerPoolFactory.getWorkerPool(
+                cfg.getServerCoreThreads(),
+                cfg.getServerMaxThreads(),
+                cfg.getServerKeepalive(),
+                cfg.getServerQueueLen(),
+                "Server Worker thread group", "HttpServerWorker");
+        } else {
+            this.executor = executor;
+            this.parser = parser;
+        }
     }
 
     /**
@@ -148,9 +163,22 @@ public class ServerHandler implements NHttpServiceHandler {
             response.setEntity(entity);
 
             // hand off processing of the request to a thread off the pool
-            workerPool.execute(
-                new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
-                    request, is, response, os));
+            ServerWorker worker = new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
+                        request, is, response, os);
+
+            if (workerPool != null) {
+                workerPool.execute(worker);
+            } else if (executor != null) {
+                Map<String, String> headers = new HashMap<String, String>();
+                for (Header header : request.getAllHeaders()) {
+                    headers.put(header.getName(), header.getValue());
+                }
+
+                EvaluatorContext evaluatorContext =
+                        new EvaluatorContext(request.getRequestLine().getUri(), headers);
+                int priority = parser.parse(evaluatorContext);
+                executor.execute(worker, priority);
+            }
 
         } catch (Exception e) {
             if (metrics != null) {
@@ -442,7 +470,11 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public void stop() {
         try {
-            workerPool.shutdown(1000);
+            if (workerPool != null) {
+                workerPool.shutdown(1000);
+            } else if (executor != null) {
+                executor.destroy();
+            }
         } catch (InterruptedException ignore) {}
     }
 }

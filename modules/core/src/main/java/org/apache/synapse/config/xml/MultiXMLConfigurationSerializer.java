@@ -28,6 +28,8 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.commons.executors.PriorityExecutor;
+import org.apache.synapse.commons.executors.config.PriorityExecutorSerializer;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -86,6 +88,7 @@ public class MultiXMLConfigurationSerializer {
             serializeEventSources(synapseConfig.getEventSources(), definitions);
             serializeTasks(synapseConfig.getStartups(), definitions);
             serializeLocalRegistryValues(synapseConfig.getLocalRegistry().values(), definitions);
+            serializeExecutors(synapseConfig.getPriorityExecutors().values(), definitions);
 
             // Now serialize the content to synapse.xml
             serializeSynapseXML(definitions);
@@ -145,6 +148,12 @@ public class MultiXMLConfigurationSerializer {
             throw new Exception("Error while creating the directory for tasks : " +
                     tasksDir.getAbsolutePath());
         }
+
+        File executorDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
+        if (!executorDir.exists() && !executorDir.mkdirs()) {
+            throw new Exception("Error while creating the directory for tasks : " +
+                    executorDir.getAbsolutePath());
+        }
     }
 
     /**
@@ -170,6 +179,7 @@ public class MultiXMLConfigurationSerializer {
         Collection<SynapseEventSource> eventSources = synapseConfig.getEventSources();
         Collection<Startup> tasks = synapseConfig.getStartups();
         Collection localEntries = synapseConfig.getLocalRegistry().values();
+        Collection<PriorityExecutor> executors = synapseConfig.getPriorityExecutors().values();
 
         for (ProxyService service : proxyServices) {
             if (service.getFileName() == null) {
@@ -215,6 +225,11 @@ public class MultiXMLConfigurationSerializer {
                     EntrySerializer.serializeEntry(entry, definitions);
                 }
             }
+        }
+
+        for (PriorityExecutor executor : executors) {
+            PriorityExecutorSerializer.serialize(definitions, executor,
+                    SynapseConstants.SYNAPSE_NAMESPACE);
         }
 
         serializeSynapseXML(definitions);
@@ -488,4 +503,30 @@ public class MultiXMLConfigurationSerializer {
         }
     }
 
+    private void serializeExecutors(Collection<PriorityExecutor> executors,
+                                       OMElement parent) throws Exception {
+        for (PriorityExecutor source : executors) {
+            serializeExecutor(source, parent);
+        }
+    }
+
+    private OMElement serializeExecutor(PriorityExecutor source, OMElement parent) throws Exception {
+        File executorDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
+        if (!executorDir.exists() && !executorDir.mkdirs()) {
+            throw new Exception("Error while creating the directory for executors : " +
+                    executorDir.getAbsolutePath());
+        }
+
+        OMElement eventDirElem = PriorityExecutorSerializer.serialize(null, source,
+                SynapseConstants.SYNAPSE_NAMESPACE);
+
+        if (source.getFileName() != null) {
+            File eventSrcFile = new File(executorDir, source.getFileName());
+            writeToFile(eventDirElem, eventSrcFile);
+        } else if (parent != null) {
+            parent.addChild(eventDirElem);
+        }
+
+        return eventDirElem;
+    }
 }

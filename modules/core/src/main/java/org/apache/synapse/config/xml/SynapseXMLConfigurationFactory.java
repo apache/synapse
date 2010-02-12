@@ -26,6 +26,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.executors.PriorityExecutor;
+import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -37,6 +39,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
+import org.apache.axis2.AxisFault;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -86,6 +89,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineRegistry(config, elt);
                 } else if (XMLConfigConstants.EVENT_SOURCE_ELT.equals(elt.getQName())) {
                     defineEventSource(config, elt);
+                } else if (XMLConfigConstants.EXECUTOR_ELT.equals(elt.getQName())) {
+                    defineExecutor(config,  elt);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt);
                 } else {
@@ -177,6 +182,19 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
         config.addEventSource(eventSource.getName(), eventSource);
         return eventSource;
+    }
+
+    public static PriorityExecutor defineExecutor(SynapseConfiguration config,
+                                                       OMElement elem) {
+        PriorityExecutor executor = null;
+        try {
+            executor = PriorityExecutorFactory.createExecutor(
+                XMLConfigConstants.SYNAPSE_NAMESPACE, elem, true);
+        } catch (AxisFault axisFault) {
+            handleException("Failed to create the priority-executor configuration");
+        }
+        config.addPriorityExecutor(executor.getName(), executor);
+        return executor;
     }
 
     private static void handleException(String msg) {

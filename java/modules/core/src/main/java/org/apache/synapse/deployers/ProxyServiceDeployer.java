@@ -77,6 +77,8 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("ProxyService Deployment from file : " + fileName + " : Completed");
                 }
+                log.info("ProxyService named '" + proxy.getName()
+                        + "' has been deployed from file : " + fileName);
                 return proxy.getName();
             } else {
                 log.error("ProxyService Deployment Failed. The artifact described in the file "

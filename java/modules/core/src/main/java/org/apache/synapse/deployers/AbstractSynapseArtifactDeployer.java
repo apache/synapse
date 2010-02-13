@@ -28,6 +28,10 @@ import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.ServerState;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -51,12 +55,8 @@ import java.util.Map;
  */
 public abstract class AbstractSynapseArtifactDeployer implements Deployer {
 
+    private static final Log log = LogFactory.getLog(AbstractSynapseArtifactDeployer.class);
     protected ConfigurationContext cfgCtx;
-
-    /**
-     * Keeps track of the deployed artifacts in the synapse environment 
-     */
-    private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
 
     /**
      * Initializes the Synapse artifact deployment
@@ -73,12 +73,23 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      * artifact deployers.
      *
      * @param deploymentFileData file to be used for the deployment
-     * @throws DeploymentException incase of an error in deploying the file
+     * @throws DeploymentException in-case of an error in deploying the file
      * 
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#deploySynapseArtifact(
      * org.apache.axiom.om.OMElement, String)
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
+
+        if (ServerManager.getInstance().getServerState() != ServerState.STARTED) {
+            // synapse server has not yet being started
+            if (log.isDebugEnabled()) {
+                log.debug("Skipped the artifact deployment (since the Synapse " +
+                        "server doesn't seem to be started yet), from file : "
+                        + deploymentFileData.getAbsolutePath());
+            }
+            return;
+        }
+
         String filename = deploymentFileData.getAbsolutePath();
         try {
             InputStream in = new FileInputStream(filename);
@@ -89,7 +100,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                         StAXUtils.createXMLStreamReader(in)).getDocumentElement();
                 String artifatcName = deploySynapseArtifact(element, filename);
                 if (artifatcName != null) {
-                    fileName2ArtifactName.put(filename, artifatcName);
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(filename, artifatcName);
                 }
             } finally {
                 in.close();
@@ -117,8 +128,14 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploySynapseArtifact(String) 
      */
     public void unDeploy(String fileName) throws DeploymentException {
-        undeploySynapseArtifact(fileName2ArtifactName.get(fileName));
-        fileName2ArtifactName.remove(fileName);
+        FileNameToArtifactNameHolder holder = FileNameToArtifactNameHolder.getInstance();
+        if (holder.containsFileName(fileName)) {
+            undeploySynapseArtifact(holder.getArtifactNameForFile(fileName));
+            holder.removeArtifactWithFileName(fileName);
+        } else {
+            throw new DeploymentException("Artifact representing the filename " + fileName
+                    + " is not deployed on Synapse");
+        }
     }
 
     // We do not support dynamically setting the directory nor the extension

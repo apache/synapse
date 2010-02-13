@@ -57,6 +57,8 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("Endpoint Deployment from file : " + fileName + " : Completed");
                 }
+                log.info("Endpoint named '" + ep.getName()
+                        + "' has been deployed from file : " + fileName);
                 return ep.getName();
             } else {
                 log.error("Endpoint Deployment Failed. The artifact described in the file "

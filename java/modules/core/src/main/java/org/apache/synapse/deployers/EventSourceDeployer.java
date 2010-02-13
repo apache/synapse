@@ -57,6 +57,8 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("EventSource Deployment from file : " + fileName + " : Completed");
                 }
+                log.info("EventSource named '" + es.getName()
+                        + "' has been deployed from file : " + fileName);
                 return es.getName();
             } else {
                 log.error("EventSource Deployment Failed. The artifact described in the file "

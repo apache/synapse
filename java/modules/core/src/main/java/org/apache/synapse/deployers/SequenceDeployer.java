@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
@@ -59,6 +60,8 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("Sequence Deployment from file : " + fileName + " : Completed");
                 }
+                log.info("Sequence named '" + seq.getName()
+                        + "' has been deployed from file : " + fileName);
                 return seq.getName();
             } else {
                 log.error("Sequence Deployment Failed. The artifact described in the file "
@@ -83,6 +86,11 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
             SequenceMediator seq
                     = getSynapseConfiguration().getDefinedSequences().get(artifactName);
             if (seq != null) {
+                if (SynapseConstants.MAIN_SEQUENCE_KEY.equals(seq.getName())
+                        || SynapseConstants.FAULT_SEQUENCE_KEY.equals(seq.getName())) {
+                    log.error("Cannot Undeploy the " + seq.getName() + " sequence");
+                    return;
+                }
                 getSynapseConfiguration().removeSequence(artifactName);
                 if (log.isDebugEnabled()) {
                     log.debug("Destroying the sequence named : " + artifactName);

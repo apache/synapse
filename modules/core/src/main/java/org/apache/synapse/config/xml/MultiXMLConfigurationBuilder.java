@@ -30,7 +30,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.endpoints.AbstractEndpoint;
+import org.apache.synapse.deployers.FileNameToArtifactNameHolder;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -168,6 +168,8 @@ public class MultiXMLConfigurationBuilder {
                     Entry entry = SynapseXMLConfigurationFactory.defineEntry(
                             synapseConfig, document);
                     entry.setFileName(file.getName());
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(
+                            file.getAbsolutePath(), entry.getKey());
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -188,6 +190,8 @@ public class MultiXMLConfigurationBuilder {
                     ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(
                             synapseConfig, document);
                     proxy.setFileName(file.getName());
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(
+                            file.getAbsolutePath(), proxy.getName());
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -210,6 +214,8 @@ public class MultiXMLConfigurationBuilder {
                     if (startup instanceof AbstractStartup) {
                         ((AbstractStartup) startup).setFileName(file.getName());
                     }
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(
+                            file.getAbsolutePath(), startup.getName());
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -230,7 +236,10 @@ public class MultiXMLConfigurationBuilder {
                     Mediator seq = SynapseXMLConfigurationFactory.defineSequence(
                             synapseConfig, document);
                     if (seq instanceof SequenceMediator) {
-                        ((SequenceMediator) seq).setFileName(file.getName());
+                        SequenceMediator sequence = (SequenceMediator) seq;
+                        sequence.setFileName(file.getName());
+                        FileNameToArtifactNameHolder.getInstance().addArtifact(
+                                file.getAbsolutePath(), sequence.getName());
                     }
                 } catch (FileNotFoundException ignored) {}
             }
@@ -251,9 +260,9 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
                             synapseConfig, document);
-                    if (endpoint instanceof AbstractEndpoint) {
-                        ((AbstractEndpoint) endpoint).setFileName(file.getName());
-                    }
+                    endpoint.setFileName(file.getName());
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(
+                            file.getAbsolutePath(), endpoint.getName());
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -274,6 +283,8 @@ public class MultiXMLConfigurationBuilder {
                     SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
                             defineEventSource(synapseConfig, document);
                     eventSource.setFileName(file.getName());
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(
+                            file.getAbsolutePath(), eventSource.getName());
                 } catch (FileNotFoundException ignored) {}
            }
         }
@@ -294,6 +305,8 @@ public class MultiXMLConfigurationBuilder {
                     PriorityExecutor executor = SynapseXMLConfigurationFactory.
                             defineExecutor(synapseConfig, document);
                     executor.setFileName(file.getName());
+                    FileNameToArtifactNameHolder.getInstance().addArtifact(
+                            file.getAbsolutePath(), executor.getName());
                 } catch (FileNotFoundException ignored) {}
            }
         }

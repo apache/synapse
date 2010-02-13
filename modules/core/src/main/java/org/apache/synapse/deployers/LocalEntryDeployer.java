@@ -53,6 +53,8 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("LocalEntry Deployment from file : " + fileName + " : Completed");
                 }
+                log.info("LocalEntry named '" + e.getKey()
+                        + "' has been deployed from file : " + fileName);
                 return e.getKey();
             } else {
                 log.error("LocalEntry Deployment Failed. The artifact described in the file "

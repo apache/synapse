@@ -37,6 +37,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +58,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
 
     private static final Log log = LogFactory.getLog(AbstractSynapseArtifactDeployer.class);
     protected ConfigurationContext cfgCtx;
+    private Map<String, String> updatingArtifacts = new HashMap<String, String>();
 
     /**
      * Initializes the Synapse artifact deployment
@@ -98,7 +100,14 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                 // since all synapse artifacts are XML based
                 OMElement element = new StAXOMBuilder(
                         StAXUtils.createXMLStreamReader(in)).getDocumentElement();
-                String artifatcName = deploySynapseArtifact(element, filename);
+                String artifatcName;
+                if (updatingArtifacts.containsKey(filename)) {
+                    String existingArtifactName = updatingArtifacts.get(filename);
+                    updatingArtifacts.remove(filename);
+                    artifatcName = updateSynapseArtifact(element, filename, existingArtifactName);
+                } else {
+                    artifatcName = deploySynapseArtifact(element, filename);
+                }
                 if (artifatcName != null) {
                     FileNameToArtifactNameHolder.getInstance().addArtifact(filename, artifatcName);
                 }
@@ -130,7 +139,17 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
     public void unDeploy(String fileName) throws DeploymentException {
         FileNameToArtifactNameHolder holder = FileNameToArtifactNameHolder.getInstance();
         if (holder.containsFileName(fileName)) {
-            undeploySynapseArtifact(holder.getArtifactNameForFile(fileName));
+            File undeployingFile = new File(fileName);
+            // axis2 treats Hot-Update as (Undeployment + deployment), where synapse needs to differentiate
+            // the Hot-Update from the above two, since it needs some validations for a real undeployment.
+            // also this makes sure a zero downtime of the synapse artifacts which are being Hot-deployed
+            if (undeployingFile.exists()) {
+                // if the file exists, which means it has been updated and is a Hot-Update case
+                updatingArtifacts.put(fileName, holder.getArtifactNameForFile(fileName));
+            } else {
+                // if the file doesn't exists then it is an actual undeployment
+                undeploySynapseArtifact(holder.getArtifactNameForFile(fileName));
+            }
             holder.removeArtifactWithFileName(fileName);
         } else {
             throw new DeploymentException("Artifact representing the filename " + fileName
@@ -154,6 +173,18 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      * org.apache.axis2.deployment.repository.util.DeploymentFileData)
      */
     public abstract String deploySynapseArtifact(OMElement artifactConfig, String fileName);
+
+    /**
+     * All synapse artifact deployers MUST implement this method and it handles artifact specific update
+     * tasks of those artifacts.
+     *
+     * @param artifactConfig built element representing the artifact to be deployed loaded from the file
+     * @param fileName file name from which this artifact is being loaded
+     * @param existingArtifactName name of the artifact that was being deployed using the updated file
+     * @return String artifact name created by the update task
+     */
+    public abstract String updateSynapseArtifact(OMElement artifactConfig, String fileName,
+                                                 String existingArtifactName);
 
     /**
      * All synapse artifact deployers MUST implement this method and it handles artifact specific undeployment

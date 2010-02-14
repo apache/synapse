@@ -72,10 +72,55 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
     }
 
     @Override
+    public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
+                                        String existingArtifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("EventSource Update from file : " + fileName + " : Started");
+        }
+
+        try {
+            SynapseEventSource es = EventSourceFactory.createEventSource(artifactConfig);
+            if (es != null) {
+                es.setFileName(fileName);
+                if (log.isDebugEnabled()) {
+                    log.debug("EventSource named '" + es.getName()
+                            + "' has been built from the file " + fileName);
+                }
+                getSynapseConfiguration().removeEventSource(existingArtifactName);
+                getSynapseConfiguration().getAxisConfiguration().removeService(existingArtifactName);
+                if (!existingArtifactName.equals(es.getName())) {
+                    log.info("EventSource named " + existingArtifactName + " has been Undeployed");
+                }
+                es.buildService(getSynapseConfiguration().getAxisConfiguration());
+                if (log.isDebugEnabled()) {
+                    log.debug("Initialized the EventSource : " + es.getName());
+                }
+                getSynapseConfiguration().addEventSource(es.getName(), es);
+                if (log.isDebugEnabled()) {
+                    log.debug("EventSource " + (existingArtifactName.equals(es.getName()) ?
+                            "update" : "deployment") + " from file : " + fileName + " : Completed");
+                }
+                log.info("EventSource named '" + es.getName()
+                        + "' has been " + (existingArtifactName.equals(es.getName()) ?
+                            "update" : "deployed") + " from file : " + fileName);
+                return es.getName();
+            } else {
+                log.error("EventSource Update Failed. The artifact described in the file "
+                        + fileName + " is not a EventSource");
+            }
+        } catch (Exception e) {
+            log.error("EventSource Update from the file : " + fileName + " : Failed.", e);
+        }
+
+        return null;
+    }
+
+    @Override
     public void undeploySynapseArtifact(String artifactName) {
 
         if (log.isDebugEnabled()) {
-            log.debug("EventSource Undeployment of the sequence named : "
+            log.debug("EventSource Undeployment of the event source named : "
                     + artifactName + " : Started");
         }
         
@@ -84,9 +129,10 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
             if (es != null) {
                 getSynapseConfiguration().removeEventSource(artifactName);
                 if (log.isDebugEnabled()) {
-                    log.debug("EventSource Undeployment of the EventSource named : "
+                    log.debug("EventSource Undyou neeeployment of the EventSource named : "
                             + artifactName + " : Completed");
                 }
+                log.info("EventSource named '" + es.getName() + "' has been undeployed");
             } else {
                 log.error("Couldn't find the EventSource named : " + artifactName);
             }

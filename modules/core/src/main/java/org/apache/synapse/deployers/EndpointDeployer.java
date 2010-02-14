@@ -72,6 +72,53 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
     }
 
     @Override
+    public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
+                                        String existingArtifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint Update from file : " + fileName + " : Started");
+        }
+
+        try {
+            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false);
+            if (ep != null) {
+                ep.setFileName(fileName);
+                if (log.isDebugEnabled()) {
+                    log.debug("Endpoint named '" + ep.getName()
+                            + "' has been built from the file " + fileName);
+                }
+                ep.init(getSynapseEnvironment());
+                if (log.isDebugEnabled()) {
+                    log.debug("Initialized the endpoint : " + ep.getName());
+                }
+                Endpoint existingEp
+                        = getSynapseConfiguration().getDefinedEndpoints().get(existingArtifactName);
+                getSynapseConfiguration().removeEndpoint(existingArtifactName);
+                if (!existingArtifactName.equals(ep.getName())) {
+                    log.info("Endpoint named " + existingArtifactName + " has been Undeployed");
+                }
+                getSynapseConfiguration().addEndpoint(ep.getName(), ep);
+                existingEp.destroy();
+                if (log.isDebugEnabled()) {
+                    log.debug("Endpoint " + (existingArtifactName.equals(ep.getName()) ?
+                            "update" : "deployment") + " from file : " + fileName + " : Completed");
+                }
+                log.info("Endpoint named '" + ep.getName()
+                        + "' has been " + (existingArtifactName.equals(ep.getName()) ?
+                            "update" : "deployed") + " from file : " + fileName);
+                return ep.getName();
+            } else {
+                log.error("Endpoint Update Failed. The artifact described in the file "
+                        + fileName + " is not an Endpoint");
+            }
+        } catch (Exception e) {
+            log.error("Endpoint Update from the file : " + fileName + " : Failed.", e);
+        }
+
+        return null;
+    }
+
+    @Override
     public void undeploySynapseArtifact(String artifactName) {
 
         if (log.isDebugEnabled()) {
@@ -91,6 +138,7 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                     log.debug("Endpoint Undeployment of the endpoint named : "
                             + artifactName + " : Completed");
                 }
+                log.info("Endpoint named '" + ep.getName() + "' has been undeployed");
             } else {
                 log.error("Couldn't find the endpoint named : " + artifactName);
             }

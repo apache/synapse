@@ -68,6 +68,46 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
     }
 
     @Override
+    public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
+                                        String existingArtifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("LocalEntry Update from file : " + fileName + " : Started");
+        }
+
+        try {
+            Entry e = EntryFactory.createEntry(artifactConfig);
+            if (e != null) {
+                e.setFileName(fileName);
+                if (log.isDebugEnabled()) {
+                    log.debug("LocalEntry with key '" + e.getKey()
+                            + "' has been built from the file " + fileName);
+                }
+                getSynapseConfiguration().removeEntry(existingArtifactName);
+                if (!existingArtifactName.equals(e.getKey())) {
+                    log.info("LocalEntry named " + existingArtifactName + " has been Undeployed");
+                }
+                getSynapseConfiguration().addEntry(e.getKey(), e);
+                if (log.isDebugEnabled()) {
+                    log.debug("LocalEntry " + (existingArtifactName.equals(e.getKey()) ?
+                            "update" : "deployment") + " from file : " + fileName + " : Completed");
+                }
+                log.info("LocalEntry named '" + e.getKey()
+                        + "' has been " + (existingArtifactName.equals(e.getKey()) ?
+                            "updated" : "deployed") + " from file : " + fileName);
+                return e.getKey();
+            } else {
+                log.error("LocalEntry Update Failed. The artifact described in the file "
+                        + fileName + " is not a LocalEntry");
+            }
+        } catch (Exception e) {
+            log.error("LocalEntry Update from the file : " + fileName + " : Failed.", e);
+        }
+
+        return null;
+    }
+
+    @Override
     public void undeploySynapseArtifact(String artifactName) {
 
         if (log.isDebugEnabled()) {
@@ -83,6 +123,7 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                     log.debug("LocalEntry Undeployment of the entry named : "
                             + artifactName + " : Completed");
                 }
+                log.info("LocalEntry named '" + e.getKey() + "' has been undeployed");
             } else {
                 log.error("Couldn't find the LocalEntry named : " + artifactName);
             }

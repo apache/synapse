@@ -25,7 +25,7 @@
     <!-- WARNING: Hot deployment is turned on by default, but it is highly recommended to set this to false
             on production environments, unless you really want to use hot deployment in production -->
     <parameter name="hotdeployment">true</parameter>
-    <parameter name="hotupdate">false</parameter>
+    <parameter name="hotupdate">true</parameter>
     <parameter name="enableMTOM">false</parameter>
     <parameter name="enableSwA">false</parameter>
 

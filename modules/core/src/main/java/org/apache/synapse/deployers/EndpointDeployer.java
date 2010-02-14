@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.endpoints.Endpoint;
 
 /**
@@ -61,11 +62,12 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                         + "' has been deployed from file : " + fileName);
                 return ep.getName();
             } else {
-                log.error("Endpoint Deployment Failed. The artifact described in the file "
-                        + fileName + " is not an Endpoint");
+                handleSynapseArtifactDeploymentError("Endpoint Deployment Failed. The artifact " +
+                        "described in the file " + fileName + " is not an Endpoint");
             }
         } catch (Exception e) {
-            log.error("Endpoint Deployment from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError("Endpoint Deployment from the file : "
+                    + fileName + " : Failed.", e);
         }
 
         return null;
@@ -108,11 +110,12 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                             "update" : "deployed") + " from file : " + fileName);
                 return ep.getName();
             } else {
-                log.error("Endpoint Update Failed. The artifact described in the file "
-                        + fileName + " is not an Endpoint");
+                handleSynapseArtifactDeploymentError("Endpoint Update Failed. The artifact " +
+                        "described in the file " + fileName + " is not an Endpoint");
             }
         } catch (Exception e) {
-            log.error("Endpoint Update from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "Endpoint Update from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -143,7 +146,36 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                 log.error("Couldn't find the endpoint named : " + artifactName);
             }
         } catch (Exception e) {
-            log.error("Endpoint Undeployement of endpoint named : " + artifactName + " : Failed");
+            handleSynapseArtifactDeploymentError("Endpoint Undeployement of endpoint named : "
+                    + artifactName + " : Failed", e);
+        }
+    }
+
+    @Override
+    public void restoreSynapseArtifact(String artifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Restoring the Endpoint with name : " + artifactName + " : Started");
+        }
+
+        try {
+            Endpoint ep
+                    = getSynapseConfiguration().getDefinedEndpoints().get(artifactName);
+            OMElement epElem = EndpointSerializer.getElementFromEndpoint(ep);
+            if (ep.getFileName() != null) {
+                writeToFile(epElem, ep.getFileName());
+                if (log.isDebugEnabled()) {
+                    log.debug("Restoring the Endpoint with name : "
+                            + artifactName + " : Completed");
+                }
+                log.info("Endpoint named '" + artifactName + "' has been restored");
+            } else {
+                handleSynapseArtifactDeploymentError("Couldn't restore the endpoint named '"
+                        + artifactName + "', filename cannot be found");
+            }
+        } catch (Exception e) {
+            handleSynapseArtifactDeploymentError(
+                    "Restoring of the endpoint named '" + artifactName + "' has failed", e);
         }
     }
 }

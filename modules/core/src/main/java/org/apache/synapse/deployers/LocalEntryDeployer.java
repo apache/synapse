@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.EntryFactory;
+import org.apache.synapse.config.xml.EntrySerializer;
 
 /**
  *  Handles the <code>LocalEntry</code> deployment and undeployment tasks
@@ -57,11 +58,12 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                         + "' has been deployed from file : " + fileName);
                 return e.getKey();
             } else {
-                log.error("LocalEntry Deployment Failed. The artifact described in the file "
-                        + fileName + " is not a LocalEntry");
+                handleSynapseArtifactDeploymentError("LocalEntry Deployment Failed. The artifact " +
+                        "described in the file " + fileName + " is not a LocalEntry");
             }
         } catch (Exception e) {
-            log.error("LocalEntry Deployment from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "LocalEntry Deployment from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -97,11 +99,12 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                             "updated" : "deployed") + " from file : " + fileName);
                 return e.getKey();
             } else {
-                log.error("LocalEntry Update Failed. The artifact described in the file "
-                        + fileName + " is not a LocalEntry");
+                handleSynapseArtifactDeploymentError("LocalEntry Update Failed. The artifact " +
+                        "described in the file " + fileName + " is not a LocalEntry");
             }
         } catch (Exception e) {
-            log.error("LocalEntry Update from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "LocalEntry Update from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -128,7 +131,34 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                 log.error("Couldn't find the LocalEntry named : " + artifactName);
             }
         } catch (Exception e) {
-            log.error("LocalEntry Undeployement of entry named : " + artifactName + " : Failed");
+            handleSynapseArtifactDeploymentError(
+                    "LocalEntry Undeployement of entry named : " + artifactName + " : Failed", e);
+        }
+    }
+
+    @Override
+    public void restoreSynapseArtifact(String artifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("LocalEntry the Sequence with name : " + artifactName + " : Started");
+        }
+
+        try {
+            Entry e = getSynapseConfiguration().getDefinedEntries().get(artifactName);
+            OMElement entryElem = EntrySerializer.serializeEntry(e, null);
+            if (e.getFileName() != null) {
+                writeToFile(entryElem, e.getFileName());
+                if (log.isDebugEnabled()) {
+                    log.debug("Restoring the LocalEntry with name : " + artifactName + " : Completed");
+                }
+                log.info("LocalEntry named '" + artifactName + "' has been restored");
+            } else {
+                handleSynapseArtifactDeploymentError("Couldn't restore the LocalEntry named '"
+                        + artifactName + "', filename cannot be found");
+            }
+        } catch (Exception e) {
+            handleSynapseArtifactDeploymentError(
+                    "Restoring of the LocalEntry named '" + artifactName + "' has failed", e);
         }
     }
 }

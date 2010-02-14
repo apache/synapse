@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.config.xml.MediatorSerializerFinder;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 /**
@@ -64,11 +65,12 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                         + "' has been deployed from file : " + fileName);
                 return seq.getName();
             } else {
-                log.error("Sequence Deployment Failed. The artifact described in the file "
-                        + fileName + " is not a Sequence");
+                handleSynapseArtifactDeploymentError("Sequence Deployment Failed. " +
+                        "The artifact described in the file " + fileName + " is not a Sequence");
             }
         } catch (Exception e) {
-            log.error("Sequence Deployment from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "Sequence Deployment from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -89,8 +91,8 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                 if ((SynapseConstants.MAIN_SEQUENCE_KEY.equals(existingArtifactName)
                         || SynapseConstants.FAULT_SEQUENCE_KEY.equals(existingArtifactName))
                         && !existingArtifactName.equals(seq.getName())) {
-                    log.error(existingArtifactName + " sequence cannot be renamed");
-                    return existingArtifactName;
+                    handleSynapseArtifactDeploymentError(
+                            existingArtifactName + " sequence cannot be renamed");
                 }
                 seq.setFileName(fileName);
                 if (log.isDebugEnabled()) {
@@ -118,11 +120,12 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                             "update" : "deployed") + " from file : " + fileName);
                 return seq.getName();
             } else {
-                log.error("Sequence Update Failed. The artifact described in the file "
-                        + fileName + " is not a Sequence");
+                handleSynapseArtifactDeploymentError("Sequence Update Failed. " +
+                        "The artifact described in the file " + fileName + " is not a Sequence");
             }
         } catch (Exception e) {
-            log.error("Sequence Update from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "Sequence Update from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -142,8 +145,8 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
             if (seq != null) {
                 if (SynapseConstants.MAIN_SEQUENCE_KEY.equals(seq.getName())
                         || SynapseConstants.FAULT_SEQUENCE_KEY.equals(seq.getName())) {
-                    log.error("Cannot Undeploy the " + seq.getName() + " sequence");
-                    return;
+                    handleSynapseArtifactDeploymentError(
+                            "Cannot Undeploy the " + seq.getName() + " sequence");
                 }
                 getSynapseConfiguration().removeSequence(artifactName);
                 if (log.isDebugEnabled()) {
@@ -159,7 +162,36 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                 log.error("Couldn't find the sequence named : " + artifactName);
             }
         } catch (Exception e) {
-            log.error("Sequence Undeployement of sequence named : " + artifactName + " : Failed");
+            handleSynapseArtifactDeploymentError(
+                    "Sequence Undeployement of sequence named : " + artifactName + " : Failed", e);
+        }
+    }
+
+    @Override
+    public void restoreSynapseArtifact(String artifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Restoring the Sequence with name : " + artifactName + " : Started");
+        }
+
+        try {
+            SequenceMediator seq
+                    = getSynapseConfiguration().getDefinedSequences().get(artifactName);
+            OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
+                    serializeMediator(null, seq);
+            if (seq.getFileName() != null) {
+                writeToFile(seqElem, seq.getFileName());
+                if (log.isDebugEnabled()) {
+                    log.debug("Restoring the Sequence with name : " + artifactName + " : Completed");
+                }
+                log.info("Sequence named '" + artifactName + "' has been restored");
+            } else {
+                handleSynapseArtifactDeploymentError("Couldn't restore the sequence named '"
+                        + artifactName + "', filename cannot be found");
+            }
+        } catch (Exception e) {
+            handleSynapseArtifactDeploymentError(
+                    "Restoring of the sequence named '" + artifactName + "' has failed", e);
         }
     }
 }

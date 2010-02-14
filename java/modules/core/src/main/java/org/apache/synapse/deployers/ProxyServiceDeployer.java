@@ -23,8 +23,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
+import org.apache.synapse.config.xml.ProxyServiceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 /**
@@ -69,11 +69,12 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                         + "' has been deployed from file : " + fileName);
                 return proxy.getName();
             } else {
-                log.error("ProxyService Deployment Failed. The artifact described in the file "
-                        + fileName + " is not a ProxyService");
+                handleSynapseArtifactDeploymentError("ProxyService Deployment Failed. The " +
+                        "artifact described in the file " + fileName + " is not a ProxyService");
             }
         } catch (Exception e) {
-            log.error("ProxyService Deployment from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "ProxyService Deployment from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -119,11 +120,12 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                             "update" : "deployed") + " from file : " + fileName);
                 return proxy.getName();
             } else {
-                log.error("ProxyService Update Failed. The artifact described in the file "
-                        + fileName + " is not a ProxyService");
+                handleSynapseArtifactDeploymentError("ProxyService Update Failed. The artifact " +
+                        "described in the file " + fileName + " is not a ProxyService");
             }
         } catch (Exception e) {
-            log.error("ProxyService Update from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "ProxyService Update from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -154,7 +156,36 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                 log.error("Couldn't find the ProxyService named : " + artifactName);
             }
         } catch (Exception e) {
-            log.error("ProxyService Undeployement of proxy named : " + artifactName + " : Failed");
+            handleSynapseArtifactDeploymentError(
+                    "ProxyService Undeployement of proxy named : " + artifactName + " : Failed", e);
+        }
+    }
+
+    @Override
+    public void restoreSynapseArtifact(String artifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Restoring the ProxyService with name : " + artifactName + " : Started");
+        }
+
+        try {
+            ProxyService proxy
+                    = getSynapseConfiguration().getProxyService(artifactName);
+            OMElement proxyElem = ProxyServiceSerializer.serializeProxy(null, proxy);
+            if (proxy.getFileName() != null) {
+                writeToFile(proxyElem, proxy.getFileName());
+                if (log.isDebugEnabled()) {
+                    log.debug("Restoring the ProxyService with name : "
+                            + artifactName + " : Completed");
+                }
+                log.info("ProxyService named '" + artifactName + "' has been restored");
+            } else {
+                handleSynapseArtifactDeploymentError("Couldn't restore the ProxyService named '"
+                        + artifactName + "', filename cannot be found");
+            }
+        } catch (Exception e) {
+            handleSynapseArtifactDeploymentError(
+                    "Restoring of the ProxyService named '" + artifactName + "' has failed", e);
         }
     }
 

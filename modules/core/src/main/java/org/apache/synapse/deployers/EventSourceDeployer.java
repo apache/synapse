@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.xml.eventing.EventSourceFactory;
+import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.eventing.SynapseEventSource;
 
 /**
@@ -61,11 +62,12 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                         + "' has been deployed from file : " + fileName);
                 return es.getName();
             } else {
-                log.error("EventSource Deployment Failed. The artifact described in the file "
-                        + fileName + " is not an EventSource");
+                handleSynapseArtifactDeploymentError("EventSource Deployment Failed. The " +
+                        "artifact described in the file " + fileName + " is not an EventSource");
             }
         } catch (Exception e) {
-            log.error("EventSource Deployment from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "EventSource Deployment from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -106,11 +108,12 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                             "update" : "deployed") + " from file : " + fileName);
                 return es.getName();
             } else {
-                log.error("EventSource Update Failed. The artifact described in the file "
-                        + fileName + " is not a EventSource");
+                handleSynapseArtifactDeploymentError("EventSource Update Failed. The artifact " +
+                        "described in the file " + fileName + " is not a EventSource");
             }
         } catch (Exception e) {
-            log.error("EventSource Update from the file : " + fileName + " : Failed.", e);
+            handleSynapseArtifactDeploymentError(
+                    "EventSource Update from the file : " + fileName + " : Failed.", e);
         }
 
         return null;
@@ -137,8 +140,35 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                 log.error("Couldn't find the EventSource named : " + artifactName);
             }
         } catch (Exception e) {
-            log.error("EventSource Undeployement of EventSource named : "
-                    + artifactName + " : Failed");
+            handleSynapseArtifactDeploymentError("EventSource Undeployement of EventSource named : "
+                    + artifactName + " : Failed", e);
+        }
+    }
+
+    @Override
+    public void restoreSynapseArtifact(String artifactName) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Restoring the EventSource with name : " + artifactName + " : Started");
+        }
+
+        try {
+            SynapseEventSource es
+                    = getSynapseConfiguration().getEventSource(artifactName);
+            OMElement esElem = EventSourceSerializer.serializeEventSource(null, es);
+            if (es.getFileName() != null) {
+                writeToFile(esElem, es.getFileName());
+                if (log.isDebugEnabled()) {
+                    log.debug("Restoring the EventSource with name : " + artifactName + " : Completed");
+                }
+                log.info("EventSource named '" + artifactName + "' has been restored");
+            } else {
+                handleSynapseArtifactDeploymentError("Couldn't restore the EventSource named '"
+                        + artifactName + "', filename cannot be found");
+            }
+        } catch (Exception e) {
+            handleSynapseArtifactDeploymentError(
+                    "Restoring of the EventSource named '" + artifactName + "' has failed", e);
         }
     }
 }

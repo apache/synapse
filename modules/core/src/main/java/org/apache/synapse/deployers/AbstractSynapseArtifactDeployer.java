@@ -145,7 +145,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                     }
                 }
                 if (artifatcName != null) {
-                    FileNameToArtifactNameHolder.getInstance().addArtifact(filename, artifatcName);
+                    DeployedSynapseArtifactHolder.getInstance().addArtifact(filename, artifatcName);
                 }
             } finally {
                 in.close();
@@ -182,7 +182,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
             return;
         }
 
-        FileNameToArtifactNameHolder holder = FileNameToArtifactNameHolder.getInstance();
+        DeployedSynapseArtifactHolder holder = DeployedSynapseArtifactHolder.getInstance();
         if (holder.containsFileName(fileName)) {
             File undeployingFile = new File(fileName);
             // axis2 treats Hot-Update as (Undeployment + deployment), where synapse needs to differentiate
@@ -304,7 +304,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
             backupFile(new File(fileName));
             log.info("Restoring the existing artifact into the file : " + fileName);
             restoreSynapseArtifact(updatingArtifacts.get(fileName));
-            FileNameToArtifactNameHolder.getInstance().addArtifact(
+            DeployedSynapseArtifactHolder.getInstance().addArtifact(
                     fileName, updatingArtifacts.get(fileName));
             updatingArtifacts.remove(fileName);
         }

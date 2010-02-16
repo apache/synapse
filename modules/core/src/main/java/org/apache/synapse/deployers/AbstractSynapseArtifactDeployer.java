@@ -39,10 +39,6 @@ import org.apache.synapse.core.SynapseEnvironment;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implements the generic logic for the synapse artifact deployment and provide a deployment framework
@@ -59,12 +55,11 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
     private static final Log log = LogFactory.getLog(AbstractSynapseArtifactDeployer.class);
     protected  Log deployerLog;
     protected ConfigurationContext cfgCtx;
-    private Map<String, String> updatingArtifacts = new HashMap<String, String>();
-    private List<String> restoredFiles = new ArrayList<String>();
-    private List<String> backedUpFiles = new ArrayList<String>();
+    private SynapseArtifactDeploymentStore deploymentStore;
 
     protected AbstractSynapseArtifactDeployer() {
         deployerLog = LogFactory.getLog(this.getClass());
+        deploymentStore = SynapseArtifactDeploymentStore.getInstance();
     }
 
     /**
@@ -102,10 +97,10 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
         String filename = deploymentFileData.getAbsolutePath();
 
         // check whether this is triggered by a restore, if it is a restore we do not want to deploy it again
-        if (restoredFiles.contains(filename)) {
+        if (deploymentStore.isRestoredFile(filename)) {
             // only one deployment trigger can happen after a restore and hence remove it from restoredFiles
             // at the first hit, allowing the further deployments/updates to take place as usual
-            restoredFiles.remove(filename);
+            deploymentStore.removeRestoredFile(filename);
             return;
         }
         
@@ -117,10 +112,11 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                 OMElement element = new StAXOMBuilder(
                         StAXUtils.createXMLStreamReader(in)).getDocumentElement();
                 String artifatcName = null;
-                if (updatingArtifacts.containsKey(filename)) {
+                if (deploymentStore.isUpdatingArtifact(filename)) {
                     // this is an hot-update case
-                    String existingArtifactName = updatingArtifacts.get(filename);
-                    updatingArtifacts.remove(filename);
+                    String existingArtifactName
+                            = deploymentStore.getUpdatingArtifactWithFileName(filename);
+                    deploymentStore.removeUpdatingArtifact(filename);
                     try {
                         artifatcName = updateSynapseArtifact(
                                 element, filename, existingArtifactName);
@@ -145,7 +141,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                     }
                 }
                 if (artifatcName != null) {
-                    DeployedSynapseArtifactHolder.getInstance().addArtifact(filename, artifatcName);
+                    deploymentStore.addArtifact(filename, artifatcName);
                 }
             } finally {
                 in.close();
@@ -175,29 +171,29 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
     public void unDeploy(String fileName) throws DeploymentException {
 
         // We want to eliminate the undeployment when we are backing up these files
-        if (backedUpFiles.contains(fileName)) {
+        if (deploymentStore.isBackedUpArtifact(fileName)) {
             // only one undeployment trigger can happen after a backup and hence remove it from backedUpFiles
             // at the first hit, allowing the further undeploymentsto take place as usual
-            backedUpFiles.remove(fileName);
+            deploymentStore.removeBackedUpArtifact(fileName);
             return;
         }
 
-        DeployedSynapseArtifactHolder holder = DeployedSynapseArtifactHolder.getInstance();
-        if (holder.containsFileName(fileName)) {
+        if (deploymentStore.containsFileName(fileName)) {
             File undeployingFile = new File(fileName);
             // axis2 treats Hot-Update as (Undeployment + deployment), where synapse needs to differentiate
             // the Hot-Update from the above two, since it needs some validations for a real undeployment.
             // also this makes sure a zero downtime of the synapse artifacts which are being Hot-deployed
             if (undeployingFile.exists()) {
                 // if the file exists, which means it has been updated and is a Hot-Update case
-                updatingArtifacts.put(fileName, holder.getArtifactNameForFile(fileName));
-                holder.removeArtifactWithFileName(fileName);
+                deploymentStore.addUpdatingArtifact(
+                        fileName, deploymentStore.getArtifactNameForFile(fileName));
+                deploymentStore.removeArtifactWithFileName(fileName);
             } else {
                 // if the file doesn't exists then it is an actual undeployment
-                String artifactName = holder.getArtifactNameForFile(fileName);
+                String artifactName = deploymentStore.getArtifactNameForFile(fileName);
                 try {
                     undeploySynapseArtifact(artifactName);
-                    holder.removeArtifactWithFileName(fileName);
+                    deploymentStore.removeArtifactWithFileName(fileName);
                 } catch (SynapseArtifactDeploymentException sade) {
                     log.error("Unable to undeploy the artifact from file : " + fileName, sade);
                     log.info("Restoring the artifact into the file : " + fileName);
@@ -281,7 +277,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
 
     protected void writeToFile(OMElement content, String fileName) throws Exception {
         // this is not good, but I couldn't think of a better design :-(
-        restoredFiles.add(fileName);
+        deploymentStore.addRestoredArtifact(fileName);
         OutputStream out = new FileOutputStream(new File(fileName));
         XMLPrettyPrinter.prettify(content, out);
         out.flush();
@@ -300,19 +296,19 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
 
     private void handleDeploymentError(String msg, Exception e, String fileName) {
         log.error(msg, e);
-        if (updatingArtifacts.containsKey(fileName)) {
+        if (deploymentStore.isUpdatingArtifact(fileName)) {
             backupFile(new File(fileName));
             log.info("Restoring the existing artifact into the file : " + fileName);
-            restoreSynapseArtifact(updatingArtifacts.get(fileName));
-            DeployedSynapseArtifactHolder.getInstance().addArtifact(
-                    fileName, updatingArtifacts.get(fileName));
-            updatingArtifacts.remove(fileName);
+            restoreSynapseArtifact(deploymentStore.getUpdatingArtifactWithFileName(fileName));
+            deploymentStore.addArtifact(
+                    fileName, deploymentStore.getUpdatingArtifactWithFileName(fileName));
+            deploymentStore.removeUpdatingArtifact(fileName);
         }
     }
 
     private String backupFile(File file) {
         String filePath = file.getAbsolutePath();
-        backedUpFiles.add(filePath);
+        deploymentStore.addBackedUpArtifact(filePath);
         String backupFilePath = filePath + ".back";
         int backupIndex = 0;
         while (backupIndex >= 0) {

@@ -36,29 +36,29 @@ import java.util.Map;
  * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer
  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
  */
-public class FileNameToArtifactNameHolder {
+public class DeployedSynapseArtifactHolder {
 
     /**
      * Keeps track of the deployed artifacts in the synapse environment
      */
     private static Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
 
-    private static FileNameToArtifactNameHolder _instance;
+    private static DeployedSynapseArtifactHolder _instance;
 
-    private static final Log log = LogFactory.getLog(FileNameToArtifactNameHolder.class);
+    private static final Log log = LogFactory.getLog(DeployedSynapseArtifactHolder.class);
     
-    private FileNameToArtifactNameHolder() {}
+    private DeployedSynapseArtifactHolder() {}
 
     /**
      * Provides the <code>singleton</code> instance of
-     * {@link org.apache.synapse.deployers.FileNameToArtifactNameHolder}
+     * {@link DeployedSynapseArtifactHolder}
      *
-     * @return the singleton instance of FileNameToArtifactNameHolder 
+     * @return the singleton instance of DeployedSynapseArtifactHolder
      */
-    public static FileNameToArtifactNameHolder getInstance() {
+    public static DeployedSynapseArtifactHolder getInstance() {
         
         if (_instance == null) {
-            _instance = new FileNameToArtifactNameHolder();
+            _instance = new DeployedSynapseArtifactHolder();
         }
         return _instance;
     }

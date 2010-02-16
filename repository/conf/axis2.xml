@@ -78,7 +78,7 @@
 
     <!-- Extension deployer
          ***** Uncomment the following line to enable (hot) deployment of Synapse extensions (mediators and startups) ***** -->
-    <!--<deployer extension="xar" directory="extensions" class="org.apache.synapse.core.axis2.ExtensionDeployer"/>-->
+    <!--<deployer extension="xar" directory="extensions" class="org.apache.synapse.deployers.ExtensionDeployer"/>-->
 
     <!-- WARNING: Synapse Artifact Deployers, it is highly recommended to comment out these deployers in production
                 unless you really want to use hot deployment/update -->

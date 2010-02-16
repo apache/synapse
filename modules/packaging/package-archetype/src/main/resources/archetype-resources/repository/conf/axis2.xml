@@ -75,7 +75,7 @@
 
     <!-- Extension deployer
          ***** Uncomment the following line to enable (hot) deployment of Synapse extensions (mediators and startups) ***** -->
-    <!--<deployer extension="xar" directory="extensions" class="org.apache.synapse.core.axis2.ExtensionDeployer"/>-->
+    <!--<deployer extension="xar" directory="extensions" class="org.apache.synapse.deployers.ExtensionDeployer"/>-->
 
     <!-- Following parameter will set the host name for the epr-->
     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->

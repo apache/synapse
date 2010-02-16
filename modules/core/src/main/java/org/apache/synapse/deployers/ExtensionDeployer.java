@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.core.axis2;
+package org.apache.synapse.deployers;
 
 import java.io.BufferedReader;
 import java.io.File;

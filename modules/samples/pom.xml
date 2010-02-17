@@ -397,6 +397,11 @@
                 <configuration>
                     <instructions>
                         <Private-Package>samples.*</Private-Package>
+                        <Import-Package>
+                            !org.apache.commons.logging,
+                            org.apache.commons.logging; version=0.0.0,,
+                            *; resolution:=optional
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

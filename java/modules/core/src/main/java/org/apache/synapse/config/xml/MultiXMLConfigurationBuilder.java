@@ -147,7 +147,7 @@ public class MultiXMLConfigurationBuilder {
             try {
                 OMElement document = parseFile(registryDef);
                 SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document);
-                synapseConfig.getProperties().setProperty(SEPARATE_REGISTRY_DEFINITION,
+                synapseConfig.setProperty(SEPARATE_REGISTRY_DEFINITION,
                         String.valueOf(Boolean.TRUE));
             } catch (FileNotFoundException ignored) {}
         }

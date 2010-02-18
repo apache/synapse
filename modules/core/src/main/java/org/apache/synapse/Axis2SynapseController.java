@@ -385,7 +385,12 @@ public class Axis2SynapseController implements SynapseController {
             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
-        synapseConfiguration.setProperties(SynapsePropertiesLoader.loadSynapseProperties());
+        Properties properties = SynapsePropertiesLoader.loadSynapseProperties();
+        if (properties != null) {
+            for (String key : properties.stringPropertyNames()) {
+                synapseConfiguration.setProperty(key, properties.getProperty(key));
+            }
+        }
 
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
         synapseConfiguration.setAxisConfiguration(configurationContext.getAxisConfiguration());

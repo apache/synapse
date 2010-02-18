@@ -849,9 +849,21 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     /**
+     * Sets the specified property to the Synapse configuration
+     *
+     * @param key Name of the property
+     * @param value Value of the property to be set
+     */
+    public void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    /**
      * Sets the properties to configure the Synapse enviornment.
      *
      * @param properties - Properties which needs to be set
+     *
+     * @deprecated
      */
     public void setProperties(Properties properties) {
         this.properties = properties;

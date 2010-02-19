@@ -24,6 +24,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisMessage;
 import org.apache.axis2.description.OutOnlyAxisOperation;
+import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -178,7 +179,12 @@ public class AnonymousServiceFactory {
             AxisService axisAnonymousService  = new AxisService(serviceKey);
             axisAnonymousService.addOperation(dynamicOperation);
             axisAnonymousService.addOperation(asyncOperation);
-            axisCfg.addService(axisAnonymousService);
+            AxisServiceGroup axisAnonSvcGroup = new AxisServiceGroup(axisCfg);
+            axisAnonSvcGroup.setServiceGroupName(serviceKey);
+            axisAnonSvcGroup.addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+            axisAnonymousService.setClientSide(true);
+            axisAnonSvcGroup.addService(axisAnonymousService);
+            axisCfg.addServiceGroup(axisAnonSvcGroup);
             axisCfg.getPhasesInfo().setOperationPhases(dynamicOperation);
             return axisAnonymousService;
 

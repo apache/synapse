@@ -142,6 +142,12 @@ public class ProxyServiceFactory {
             proxy.setStartOnLoad(true);
         }
 
+        OMAttribute serviceGroup = elem.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "serviceGroup"));
+        if (serviceGroup != null) {
+            proxy.setServiceGroup(serviceGroup.getAttributeValue());
+        }
+
         // setting the description of the proxy service
         OMElement descriptionElement = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "description"));

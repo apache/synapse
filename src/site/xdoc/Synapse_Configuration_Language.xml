@@ -760,7 +760,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       A &lt;proxy&gt; element is used to define a Synapse Proxy service.
     </p>
-<pre xml:space="preserve"> &lt;proxy name="string" [transports="(http |https |jms |.. )+|all"] [pinnedServers="(serverName )+"]&gt;
+<pre xml:space="preserve"> &lt;proxy name="string" [transports="(http |https |jms |.. )+|all"] [pinnedServers="(serverName )+"] [serviceGroup="string"]&gt;
    &lt;description&gt;...&lt;/description&gt;?
    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
       &lt;inSequence&gt;...&lt;/inSequence&gt;?
@@ -799,6 +799,14 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       machine would be used or default to 'localhost'. You can give a name to a
       Synapse server instance as ./synapse.sh -serverName=&lt;ServerName&gt;
       or by editing the wrapper.conf where Synapse is started as a service.
+    </p>
+    <p>
+      By default when a proxy service is created it is added to an Axis service
+      group which has the same name as the proxy service. With the 'serviceGroup'
+      attribute this behavior can be further configured. A custom Axis service
+      group can be specified for a proxy service using the 'serviceGroup' attribute.
+      This way multiple proxy services can be grouped together at Axis2 level
+      thus greeatly simplifying service management tasks.
     </p>
     <p>
       Each service could define the target for received messages as a named

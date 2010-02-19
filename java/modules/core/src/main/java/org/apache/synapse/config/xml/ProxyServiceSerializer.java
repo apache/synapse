@@ -72,6 +72,11 @@ public class ProxyServiceSerializer {
             proxy.addAttribute(fac.createOMAttribute("transports", nullNS, transportStr));
         }
 
+        if (service.getServiceGroup() != null) {
+            proxy.addAttribute(fac.createOMAttribute(
+                    "serviceGroup", nullNS, service.getServiceGroup()));
+        }
+
         List pinnedServers = service.getPinnedServers();
         if (pinnedServers != null && !pinnedServers.isEmpty()) {
           String pinnedServersStr = "" + pinnedServers.get(0);

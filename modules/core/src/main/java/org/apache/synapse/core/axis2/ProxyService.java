@@ -208,6 +208,8 @@ public class ProxyService implements AspectConfigurable {
 
     private String fileName;
 
+    private String serviceGroup;
+
     /**
      * Constructor
      *
@@ -542,8 +544,25 @@ public class ProxyService implements AspectConfigurable {
         try {
             proxyService.addParameter(
                     SynapseConstants.SERVICE_TYPE_PARAM_NAME, SynapseConstants.PROXY_SERVICE_TYPE);
-            auditInfo("Adding service " + name + " to the Axis2 configuration");
-            axisCfg.addService(proxyService);
+            if (serviceGroup == null) {
+                auditInfo("Adding service " + name + " to the Axis2 configuration");
+                axisCfg.addService(proxyService);
+            } else {
+                auditInfo("Adding service " + name + " to the service group " + serviceGroup);
+                AxisServiceGroup proxyServiceGroup = axisCfg.getServiceGroup(serviceGroup);
+                if (proxyServiceGroup == null) {
+                    // If the specified group does not exist we should create it
+                    proxyServiceGroup = new AxisServiceGroup();
+                    proxyServiceGroup.setServiceGroupName(serviceGroup);
+                    proxyServiceGroup.setParent(axisCfg);
+                    // Add  the service to the new group and add the group the AxisConfiguration
+                    proxyServiceGroup.addService(proxyService);
+                    axisCfg.addServiceGroup(proxyServiceGroup);
+                } else {
+                    // Simply add the service to the existing group
+                    proxyServiceGroup.addService(proxyService);
+                }
+            }
             this.setRunning(true);
         } catch (AxisFault axisFault) {
             try {
@@ -966,6 +985,14 @@ public class ProxyService implements AspectConfigurable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getServiceGroup() {
+        return serviceGroup;
+    }
+
+    public void setServiceGroup(String serviceGroup) {
+        this.serviceGroup = serviceGroup;
     }
 
     @Override

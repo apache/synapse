@@ -23,6 +23,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
@@ -51,6 +52,7 @@ import java.util.Collection;
 /**
  * Serializes the Synapse configuration to a specified directory
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class MultiXMLConfigurationSerializer {
 
     /** The directory to where the configuration should be serialized */
@@ -58,10 +60,13 @@ public class MultiXMLConfigurationSerializer {
     /** The backup directory to be created when the target directory already exists */
     private File backupDirectory;
 
+    private SynapseArtifactDeploymentStore deploymentStore;
+
     private static Log log = LogFactory.getLog(MultiXMLConfigurationSerializer.class);
 
     public MultiXMLConfigurationSerializer(String directoryPath) {
         rootDirectory = new File(directoryPath);
+        deploymentStore = SynapseArtifactDeploymentStore.getInstance();
     }
 
     public void serialize(SynapseConfiguration synapseConfig) {
@@ -281,8 +286,11 @@ public class MultiXMLConfigurationSerializer {
 
         OMElement proxyElem = ProxyServiceSerializer.serializeProxy(null, service);
 
-        if (service.getFileName() != null) {
-            File proxyFile = new File(proxyDir, service.getFileName());
+        String fileName = service.getFileName();
+        if (fileName != null) {
+            handleDeployment(proxyDir.getAbsolutePath()
+                    + File.separator + fileName, service.getName());
+            File proxyFile = new File(proxyDir, fileName);
             writeToFile(proxyElem, proxyFile);
         } else if (parent != null) {
             parent.addChild(proxyElem);
@@ -300,7 +308,10 @@ public class MultiXMLConfigurationSerializer {
 
         OMElement eventSrcElem = EventSourceSerializer.serializeEventSource(null, source);
 
-        if (source.getFileName() != null) {
+        String fileName = source.getFileName();
+        if (fileName != null) {
+            handleDeployment(eventsDir.getAbsolutePath()
+                    + File.separator + fileName, source.getName());
             File eventSrcFile = new File(eventsDir, source.getFileName());
             writeToFile(eventSrcElem, eventSrcFile);
         } else if (parent != null) {
@@ -321,7 +332,10 @@ public class MultiXMLConfigurationSerializer {
         OMElement taskElem = StartupFinder.getInstance().serializeStartup(null, task);
 
         if (task instanceof AbstractStartup && ((AbstractStartup) task).getFileName() != null) {
-            File taskFile = new File(tasksDir, ((AbstractStartup) task).getFileName());
+            String fileName = ((AbstractStartup) task).getFileName();
+            handleDeployment(tasksDir.getAbsolutePath()
+                    + File.separator +  fileName, task.getName());
+            File taskFile = new File(tasksDir, fileName);
             writeToFile(taskElem, taskFile);
         } else if (parent != null) {
             parent.addChild(taskElem);
@@ -340,8 +354,11 @@ public class MultiXMLConfigurationSerializer {
 
         OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
                 serializeMediator(null, seq);
-        if (seq.getFileName() != null) {
-            File seqFile = new File(seqDir, seq.getFileName());
+        String fileName = seq.getFileName();
+        if (fileName != null) {
+            handleDeployment(seqDir.getAbsolutePath()
+                    + File.separator + fileName, seq.getName());
+            File seqFile = new File(seqDir, fileName);
             writeToFile(seqElem, seqFile);
         } else if (parent != null) {
             parent.addChild(seqElem);
@@ -360,8 +377,11 @@ public class MultiXMLConfigurationSerializer {
 
         OMElement eprElem = EndpointSerializer.getElementFromEndpoint(epr);
 
-        if (epr instanceof AbstractEndpoint && ((AbstractEndpoint) epr).getFileName() != null) {
-            File eprFile = new File(eprDir, ((AbstractEndpoint) epr).getFileName());
+        String fileName = epr.getFileName();
+        if (fileName != null) {
+            handleDeployment(eprDir.getAbsolutePath()
+                    + File.separator + fileName, epr.getName());
+            File eprFile = new File(eprDir, fileName);
             writeToFile(eprElem, eprFile);
         } else if (parent != null) {
             parent.addChild(eprElem);
@@ -391,9 +411,12 @@ public class MultiXMLConfigurationSerializer {
                         entriesDir.getAbsolutePath());
             }
 
-            if (entry.getFileName() != null) {
-               File entryFile  = new File(entriesDir, entry.getFileName());
-               writeToFile(entryElem, entryFile);
+            String fileName = entry.getFileName();
+            if (fileName != null) {
+                handleDeployment(entriesDir.getAbsolutePath()
+                        + File.separator + fileName, entry.getKey());
+                File entryFile  = new File(entriesDir, fileName);
+                writeToFile(entryElem, entryFile);
             } else if (parent != null) {
                 parent.addChild(entryElem);
             }
@@ -528,5 +551,12 @@ public class MultiXMLConfigurationSerializer {
         }
 
         return eventDirElem;
+    }
+
+    private void handleDeployment(String fileName, String artifactName) {
+        if (!deploymentStore.containsFileName(fileName)) {
+            deploymentStore.addArtifact(fileName, artifactName);
+        }
+        deploymentStore.addRestoredArtifact(fileName);
     }
 }

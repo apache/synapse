@@ -553,7 +553,11 @@ public class Axis2SynapseController implements SynapseController {
         transports.add(Constants.TRANSPORT_HTTP);
         transports.add(Constants.TRANSPORT_HTTPS);
         synapseService.setExposedTransports(transports);
-        axisCfg.addService(synapseService);
+        AxisServiceGroup synapseServiceGroup = new AxisServiceGroup(axisCfg);
+        synapseServiceGroup.setServiceGroupName(SynapseConstants.SYNAPSE_SERVICE_NAME);
+        synapseServiceGroup.addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+        synapseServiceGroup.addService(synapseService);
+        axisCfg.addServiceGroup(synapseServiceGroup);
     }
     
     /**
@@ -699,13 +703,12 @@ public class Axis2SynapseController implements SynapseController {
 
         if (repo != null && !(repo instanceof TaskDescriptionRepository)) {
             handleFatal("Invalid property value specified for TaskDescriptionRepository");
-        }
-
-        if (taskScheduler != null && !(taskScheduler instanceof TaskScheduler)) {
+        } else if (taskScheduler != null && !(taskScheduler instanceof TaskScheduler)) {
             handleFatal("Invalid property value specified for TaskScheduler");
+        } else {
+            synapseTaskManager.init(
+                    (TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
         }
-
-        synapseTaskManager.init((TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
     }
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {

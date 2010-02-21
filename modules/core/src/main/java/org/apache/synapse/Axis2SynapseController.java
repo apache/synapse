@@ -387,7 +387,9 @@ public class Axis2SynapseController implements SynapseController {
 
         Properties properties = SynapsePropertiesLoader.loadSynapseProperties();
         if (properties != null) {
-            for (String key : properties.stringPropertyNames()) {
+            Enumeration keys =  properties.keys();
+            while (keys.hasMoreElements()) {
+                String key = (String) keys.nextElement();
                 synapseConfiguration.setProperty(key, properties.getProperty(key));
             }
         }

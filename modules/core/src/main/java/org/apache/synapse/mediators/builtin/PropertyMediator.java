@@ -28,9 +28,8 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axis2.util.JavaUtils;
 
-import javax.xml.stream.XMLStreamException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -272,7 +271,7 @@ public class PropertyMediator extends AbstractMediator {
         try {
             XMLConfigConstants.DATA_TYPES dataType = XMLConfigConstants.DATA_TYPES.valueOf(type);
             switch (dataType) {
-                case BOOLEAN    : return Boolean.parseBoolean(value);
+                case BOOLEAN    : return JavaUtils.isTrueExplicitly(value);
                 case DOUBLE     : return Double.parseDouble(value);
                 case FLOAT      : return Float.parseFloat(value);
                 case INTEGER    : return Integer.parseInt(value);

@@ -38,11 +38,11 @@ public class StatisticsReporter {
     private static final Log log = LogFactory.getLog(StatisticsReporter.class);
 
     /**
-     * Collects statistics for the given componenet
+     * Collects statistics for the given component
      *
      * @param synCtx        Current Message through synapse
      * @param configurable  Instance that can be configured it's audit
-     * @param componentType Type of the componet need aspect
+     * @param componentType Type of the component need aspect
      */
     public static void reportForComponent(MessageContext synCtx,
                                           StatisticsConfigurable configurable,
@@ -78,8 +78,9 @@ public class StatisticsReporter {
      * Reporting a fault
      *
      * @param synCtx synCtx  Current Message through synapse
+     * @param errorLog the received error information
      */
-    public static void reportFaultForAll(MessageContext synCtx) {
+    public static void reportFaultForAll(MessageContext synCtx , ErrorLog errorLog) {
 
         StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
         if (statisticsRecord != null) {
@@ -90,6 +91,7 @@ public class StatisticsReporter {
                     ComponentType.ANY);
             statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
             statisticsLog.setFault(true);
+            statisticsLog.setErrorLog(errorLog);
             statisticsRecord.collect(statisticsLog);
         }
     }
@@ -130,7 +132,10 @@ public class StatisticsReporter {
                 StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
                         ComponentType.ANY);
                 statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
-                statisticsLog.setFault(isFault(synCtx));
+                if (isFault(synCtx)) {
+                    statisticsLog.setFault(true);
+                    statisticsLog.setErrorLog(ErrorLogFactory.createErrorLog(synCtx));
+                }
                 statisticsLog.setEndAnyLog(true);
                 statisticsRecord.collect(statisticsLog);
                 statisticsRecord.setEndAnyReported(true);
@@ -215,7 +220,10 @@ public class StatisticsReporter {
             String auditID = identifiable.getId();
             StatisticsLog statisticsLog = new StatisticsLog(auditID, componentType);
             statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
-            statisticsLog.setFault(isFault(synCtx));
+            if (isFault(synCtx)) {
+                statisticsLog.setFault(true);
+                statisticsLog.setErrorLog(ErrorLogFactory.createErrorLog(synCtx));
+            }
             return statisticsLog;
         }
         return null;

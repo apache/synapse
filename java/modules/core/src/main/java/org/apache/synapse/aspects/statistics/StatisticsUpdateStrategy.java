@@ -88,22 +88,34 @@ public class StatisticsUpdateStrategy {
                             statistics = statisticsView.getInStatistics();
                         }
                         statistics.update(endLog.getTime() - startLog.getTime(), endLog.isFault());
+                        if (endLog.isFault()) {
+                            statistics.addErrorLog(endLog.getErrorLog());
+                        }
                         break;
                     }
                     case ENDPOINT: {
                         statistics = statisticsView.getInStatistics();
                         statistics.update(endLog.getTime() - startLog.getTime(), endLog.isFault());
+                        if (endLog.isFault()) {
+                            statistics.addErrorLog(endLog.getErrorLog());
+                        }
                         break;
                     }
                     case PROXYSERVICE: {
                         Statistics inStatistics = statisticsView.getInStatistics();
                         Statistics outStatistics = statisticsView.getOutStatistics();
                         inStatistics.update(endLog.getTime() - startLog.getTime(), endLog.isFault());
+                        if (endLog.isFault()) {
+                            inStatistics.addErrorLog(endLog.getErrorLog());
+                        }
                         if (!endLog.isEndAnyLog()) {
                             StatisticsLog lastLog = statisticsLogs.get(statisticsLogs.size() - 1);
                             if (lastLog != endLog) {
                                 outStatistics.update(
                                         lastLog.getTime() - endLog.getTime(), lastLog.isFault());
+                                if (lastLog.isFault()) {
+                                    outStatistics.addErrorLog(lastLog.getErrorLog());
+                                }
                             }
                         }
                         return;

@@ -36,6 +36,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.statistics.ErrorLogFactory;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -162,7 +163,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
 
-            StatisticsReporter.reportFaultForAll(synapseOutMsgCtx);
+            StatisticsReporter.reportFaultForAll(synapseOutMsgCtx,
+                    ErrorLogFactory.createErrorLog(response));
             // there is a sending fault. propagate the fault to fault handlers.
 
             Stack faultStack = synapseOutMsgCtx.getFaultStack();

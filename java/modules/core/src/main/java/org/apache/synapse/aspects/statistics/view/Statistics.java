@@ -18,6 +18,11 @@
  */
 package org.apache.synapse.aspects.statistics.view;
 
+import org.apache.synapse.aspects.statistics.ErrorLog;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The statistics data structure
  */
@@ -54,6 +59,10 @@ public class Statistics {
      * Identifier for this statistics , whose statistics
      */
     private String id;
+    /**
+     * List of Error log entries
+     */
+    private final List<ErrorLog> errorLogs = new ArrayList<ErrorLog>();
 
     public Statistics(String id) {
         this.id = id;
@@ -132,6 +141,16 @@ public class Statistics {
         this.id = id;
     }
 
+    public List<ErrorLog> getErrorLogs() {
+        return errorLogs;
+    }
+
+    public void addErrorLog(ErrorLog errorLog) {
+        if (errorLog != null) {
+            this.errorLogs.add(errorLog);
+        }
+    }
+
     public String toString() {
         return new StringBuffer()
                 .append("[Avg Processing Time : ").append(avgProcessingTime).append(" ]")
@@ -141,5 +160,4 @@ public class Statistics {
                 .append(" [Total Fault Response Count : ").append(faultCount).append(" ]")
                 .toString();
     }
-
 }

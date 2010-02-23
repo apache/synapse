@@ -37,6 +37,8 @@ public class StatisticsLog {
 
     private boolean isEndAnyLog = false;
 
+    private ErrorLog errorLog;
+
     public StatisticsLog(String id, ComponentType componentType) {
         this(id, System.currentTimeMillis(), componentType);
     }
@@ -81,5 +83,13 @@ public class StatisticsLog {
 
     public boolean isEndAnyLog() {
         return isEndAnyLog;
+    }
+
+    public ErrorLog getErrorLog() {
+        return errorLog;
+    }
+
+    public void setErrorLog(ErrorLog errorLog) {
+        this.errorLog = errorLog;
     }
 }

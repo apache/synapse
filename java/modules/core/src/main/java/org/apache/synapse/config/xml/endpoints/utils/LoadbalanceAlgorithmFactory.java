@@ -27,6 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
+import org.apache.axis2.clustering.Member;
 
 import javax.xml.namespace.QName;
 import java.util.List;
@@ -79,6 +80,13 @@ public class LoadbalanceAlgorithmFactory {
             }
         }
         
+        return algorithm;
+    }
+
+    public static LoadbalanceAlgorithm createLoadbalanceAlgorithm2(OMElement loadbalanceElement,
+                                                                   List<Member> members) {
+        LoadbalanceAlgorithm algorithm = createLoadbalanceAlgorithm(loadbalanceElement, null);
+        algorithm.setApplicationMembers(members);
         return algorithm;
     }
 }

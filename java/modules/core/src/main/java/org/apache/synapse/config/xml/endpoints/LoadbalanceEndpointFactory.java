@@ -85,7 +85,6 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
                         getChildrenWithName((MEMBER)).hasNext()){
                     String msg =
                             "Invalid Synapse configuration. " +
-                            "loadbalanceEndpoint element cannot have both member & endpoint " +
                             "child elements";
                     log.error(msg);
                     throw new SynapseException(msg);
@@ -106,16 +105,17 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
                     log.error(msg);
                     throw new SynapseException(msg);
                 }
-//                TODO FIX-RUWAN
-//                List<Member> members = getMembers(loadbalanceElement);
-//                loadbalanceEndpoint.setMembers(members);
-//                algorithm =
-//                        LoadbalanceAlgorithmFactory.
-//                                createLoadbalanceAlgorithm2(loadbalanceElement, members);
-//                loadbalanceEndpoint.startApplicationMembershipTimer();
+
+                List<Member> members = getMembers(loadbalanceElement);
+                loadbalanceEndpoint.setMembers(members);
+                algorithm =
+                        LoadbalanceAlgorithmFactory.
+                                createLoadbalanceAlgorithm2(loadbalanceElement, members);
+                loadbalanceEndpoint.startApplicationMembershipTimer();
             }
 
-            if (loadbalanceEndpoint.getChildren() == null) {
+            if (loadbalanceEndpoint.getChildren() == null &&
+                    loadbalanceEndpoint.getMembers() == null) {
                 String msg = "Invalid Synapse configuration.\n"
                     + "A LoadbalanceEndpoint must have child elements, but the LoadbalanceEndpoint "
                     + "'" + loadbalanceEndpoint.getName() + "' does not have any child elements.";

@@ -172,14 +172,19 @@ public class ServerWorker implements Runnable {
             HttpInetConnection inetConn = (HttpInetConnection) conn;
             InetAddress remoteAddr = inetConn.getRemoteAddress();
             if (remoteAddr != null) {
-                msgContext.setProperty(MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
-                msgContext.setProperty(NhttpConstants.REMOTE_HOST, NhttpUtil.getHostName(remoteAddr));
+                msgContext.setProperty(
+                        MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
+                msgContext.setProperty(
+                        NhttpConstants.REMOTE_HOST, NhttpUtil.getHostName(remoteAddr));
                 remoteAddress = remoteAddr.getHostAddress();
             }
         }
 
         msgContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL,
                 new HttpCoreRequestResponseTransport(msgContext));
+
+        msgContext.setProperty(ServerHandler.SERVER_CONNECTION_DEBUG,
+            conn.getContext().getAttribute(ServerHandler.SERVER_CONNECTION_DEBUG));
         
         return msgContext;
     }
@@ -228,8 +233,10 @@ public class ServerWorker implements Runnable {
         if (servicePrefix.indexOf("://") == -1) {
             HttpInetConnection inetConn = (HttpInetConnection) conn;
             InetAddress localAddr = inetConn.getLocalAddress();
-            servicePrefix = (isHttps ? "https://" : "http://") +
-                localAddr.getHostName() + ":" + inetConn.getLocalPort() + servicePrefix;
+            if (localAddr != null) {
+                servicePrefix = (isHttps ? "https://" : "http://") +
+                        localAddr.getHostName() + ":" + inetConn.getLocalPort() + servicePrefix;
+            }
         }
         msgContext.setProperty(NhttpConstants.SERVICE_PREFIX, servicePrefix);
 
@@ -263,12 +270,11 @@ public class ServerWorker implements Runnable {
 
             String respWritten = (String)
                 msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
-            boolean respWillFollow =
-                !Constants.VALUE_TRUE.equals(respWritten) && !"SKIP".equals(respWritten);
-            boolean acked = ((
-                (RequestResponseTransport)
-                    msgContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
-                == RequestResponseTransport.RequestResponseTransportStatus.ACKED);
+            boolean respWillFollow
+                    = !Constants.VALUE_TRUE.equals(respWritten) && !"SKIP".equals(respWritten);
+            boolean acked = (((RequestResponseTransport) msgContext.getProperty(
+                    RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
+                    == RequestResponseTransport.RequestResponseTransportStatus.ACKED);
             boolean forced = msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED);
 
             if (respWillFollow || acked || forced) {
@@ -341,7 +347,8 @@ public class ServerWorker implements Runnable {
             String contentTypeStr = contentType != null ? contentType.getValue() : null;
 
             String charSetEncoding = BuilderUtil.getCharSetEncoding(contentTypeStr);
-            msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
+            msgContext.setProperty(
+                    Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
 
             Header soapAction  = request.getFirstHeader(SOAPACTION);
 
@@ -590,6 +597,8 @@ public class ServerWorker implements Runnable {
 
     /**
      * Calls the RESTUtil to process GET and DELETE Request
+     *
+     * @param method HTTP method, either GET or DELETE
      */
     private void processGetAndDelete(String method) {
         try {

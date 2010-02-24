@@ -54,6 +54,7 @@ import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
+import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 
 import java.io.IOException;
 
@@ -89,6 +90,8 @@ public class ClientHandler implements NHttpClientHandler {
 
     public static final String OUTGOING_MESSAGE_CONTEXT = "synapse.axis2_message_context";
     public static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
+    public static final String CLIENT_CONNECTION_DEBUG = "synapse.client-connection-debug";
+    public static final String CONNECTION_CREATION_TIME = "synapse.connectioCreationTime";
 
     public static final String REQUEST_SOURCE_BUFFER = "synapse.request-source-buffer";
     public static final String RESPONSE_SINK_BUFFER = "synapse.response-sink-buffer";
@@ -156,6 +159,10 @@ public class ClientHandler implements NHttpClientHandler {
         if (log.isDebugEnabled() ) {
             log.debug("ClientHandler connected : " + conn);
         }
+        // record connection creation time for debug logging
+        conn.getContext().setAttribute(CONNECTION_CREATION_TIME, System.currentTimeMillis());
+
+
         try {
             processConnection(conn, (Axis2HttpRequest) attachment);
         } catch (ConnectionClosedException e) {
@@ -175,6 +182,14 @@ public class ClientHandler implements NHttpClientHandler {
      */
     private void processConnection(final NHttpClientConnection conn,
         final Axis2HttpRequest axis2Req) throws ConnectionClosedException {
+
+        // record start time of request
+        ClientConnectionDebug cd = (ClientConnectionDebug)
+                axis2Req.getMsgContext().getProperty(CLIENT_CONNECTION_DEBUG);
+        if (cd != null) {
+            cd.recordRequestStartTime(conn, axis2Req);
+            conn.getContext().setAttribute(CLIENT_CONNECTION_DEBUG, cd);
+        }
 
         try {
             // Reset connection metrics
@@ -218,7 +233,7 @@ public class ClientHandler implements NHttpClientHandler {
             synchronized(axis2Req) {
                 axis2Req.setReadyToStream(true);
                 axis2Req.notifyAll();
-            }            
+            }
         }
     }
 
@@ -427,6 +442,8 @@ public class ClientHandler implements NHttpClientHandler {
                                 NhttpConstants.ERROR_DETAIL, errorMessage);
                             envelope.getBody().getFault().getDetail().setText(errorMessage);
                         }
+                        nioFaultMessageContext.setProperty(CLIENT_CONNECTION_DEBUG,
+                            mc.getProperty(CLIENT_CONNECTION_DEBUG));
                         mr.receive(nioFaultMessageContext);
 
                     } catch (AxisFault af) {
@@ -459,6 +476,9 @@ public class ClientHandler implements NHttpClientHandler {
             }
 
             if (decoder.isCompleted()) {
+                ((ClientConnectionDebug) conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG)).
+                    recordResponseCompletionTime();
+                
                 if (metrics != null) {
                     if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
                         MessageContext mc = getMessageContext(conn);
@@ -527,6 +547,8 @@ public class ClientHandler implements NHttpClientHandler {
                 } else {
                     metrics.incrementBytesSent(bytesWritten);
                 }
+                ((ClientConnectionDebug) context.getAttribute(
+                        CLIENT_CONNECTION_DEBUG)).recordRequestCompletionTime();
             }
 
         } catch (IOException e) {
@@ -562,6 +584,8 @@ public class ClientHandler implements NHttpClientHandler {
             return;
         }
 
+        ((ClientConnectionDebug) conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG)).
+                recordResponseStartTime(response.getStatusLine().toString());
 
         // Have we sent out our request fully in the first place? if not, forget about it now..
         Axis2HttpRequest req
@@ -829,19 +853,25 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection to be shutdown
      */
     private void shutdownConnection(final NHttpClientConnection conn) {
+        HttpContext context = conn.getContext();
         SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
-            conn.getContext().getAttribute(REQUEST_SOURCE_BUFFER);
+                context.getAttribute(REQUEST_SOURCE_BUFFER);
         if (outputBuffer != null) {
             outputBuffer.close();
         }
         SharedInputBuffer inputBuffer = (SharedInputBuffer)
-            conn.getContext().getAttribute(RESPONSE_SINK_BUFFER);
+            context.getAttribute(RESPONSE_SINK_BUFFER);
         if (inputBuffer != null) {
             inputBuffer.close();
         }
         try {
             conn.shutdown();
         } catch (IOException ignore) {}
+
+        context.removeAttribute(RESPONSE_SINK_BUFFER);
+        context.removeAttribute(REQUEST_SOURCE_BUFFER);
+        context.removeAttribute(CLIENT_CONNECTION_DEBUG);
+        context.removeAttribute(CONNECTION_CREATION_TIME);
     }
 
     /**

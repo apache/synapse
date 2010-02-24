@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.protocol.HTTP;
+import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -139,6 +140,13 @@ public class ClientWorker implements Runnable {
             responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
             responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
             responseMsgCtx.setTo(null);
+
+            // Ensure MessageContext has a ClientConnectionDebug attached before we start streaming
+            ClientConnectionDebug cd = (ClientConnectionDebug)
+                outMsgCtx.getProperty(ClientHandler.CLIENT_CONNECTION_DEBUG);
+            if (cd != null) {
+                responseMsgCtx.setProperty(ClientHandler.CLIENT_CONNECTION_DEBUG, cd);
+            }
         }
     }
 

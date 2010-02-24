@@ -68,7 +68,7 @@ public class Match implements Evaluator {
     }
 
     public String getName() {
-        return "match";
+        return EvaluatorConstants.MATCH;
     }
 
     public int getType() {

@@ -35,7 +35,7 @@ public class Not implements Evaluator {
     }
 
     public String getName() {
-        return "not";
+        return EvaluatorConstants.NOT;
     }
 
     public void setEvaluator(Evaluator evaluator) {

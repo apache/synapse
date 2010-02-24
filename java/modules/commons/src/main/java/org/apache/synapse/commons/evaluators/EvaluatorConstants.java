@@ -19,6 +19,9 @@
 
 package org.apache.synapse.commons.evaluators;
 
+/**
+ * Constants used through out the evaluators
+ */
 public class EvaluatorConstants {
     public static final String PRIORITY = "priority";    
     public static final String VALUE = "value";

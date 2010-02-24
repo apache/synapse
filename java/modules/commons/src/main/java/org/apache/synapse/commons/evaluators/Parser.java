@@ -45,10 +45,16 @@ import java.util.ArrayList;
 public class Parser {
     private Log log = LogFactory.getLog(Parser.class);
 
+    /** set of conditions to be evaluated */
     private Condition[] conditions = null;
 
+    /** Default priority to be used */
     private int defaultPriority = -1;
 
+    /**
+     * Create a parser with the defualt priority set to -1. If a HTTP message
+     * doesn't obey any of the conditions parser will return -1.     
+     */
     public Parser() {
     }
 

@@ -41,7 +41,7 @@ public class Or implements Evaluator {
     }
 
     public String getName() {
-        return "or";
+        return EvaluatorConstants.OR;
     }
 
     public void setEvaluators(Evaluator[] evaluators) {

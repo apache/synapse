@@ -25,7 +25,7 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.axiom.om.OMElement;
 
 /**
- * Interface for creating a evaluator.
+ * This should be implemented by all the Factories creating an evaluators.
  */
 public interface EvaluatorFactory {
 

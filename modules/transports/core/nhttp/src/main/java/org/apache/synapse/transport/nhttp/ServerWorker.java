@@ -198,6 +198,10 @@ public class ServerWorker implements Runnable {
         msgContext.setProperty(Constants.Configuration.HTTP_METHOD,
             request.getRequestLine().getMethod());
 
+        if (NHttpConfiguration.getInstance().isHttpMethodDisabled(method)) {
+            handleException("Unsupported method : " + method, null);
+        }
+
         String uri = request.getRequestLine().getUri();
         String oriUri = uri;
 
@@ -239,11 +243,6 @@ public class ServerWorker implements Runnable {
             }
         }
         msgContext.setProperty(NhttpConstants.SERVICE_PREFIX, servicePrefix);
-        
-        List<String> disabledMethods = NHttpConfiguration.getInstance().getDisabledHttpMethods();
-        if (disabledMethods.contains(method)) {
-            handleException("Unsupported method : " + method, null);
-        }
 
         if ("GET".equals(method)) {
             processGet();

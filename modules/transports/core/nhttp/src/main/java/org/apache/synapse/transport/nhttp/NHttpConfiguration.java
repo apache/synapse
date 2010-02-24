@@ -61,6 +61,7 @@ public final class NHttpConfiguration {
     private static final Log log = LogFactory.getLog(NHttpConfiguration.class);
     private static NHttpConfiguration _instance = new NHttpConfiguration();
     private Properties props;
+    List<String> methods;
 
     private NHttpConfiguration() {
         try {
@@ -178,13 +179,15 @@ public final class NHttpConfiguration {
         return val == null ? def : val;
     }
 
-    public List<String> getDisabledHttpMethods() {
-        ArrayList<String> methods = new ArrayList<String>();
-        String methodsString = getStringValue(G_DISABLED_HTTP_METHODS, "");
-        for (String methodStr : methodsString.split(",")) {
-            methods.add(methodStr.trim().toUpperCase());
+    public boolean isHttpMethodDisabled(String method) {
+        if (methods == null) {
+            methods = new ArrayList<String>();
+            String methodsString = getStringValue(G_DISABLED_HTTP_METHODS, "");
+            for (String methodStr : methodsString.split(",")) {
+                methods.add(methodStr.trim().toUpperCase());
+            }
         }
-        return methods;
+        return methods.contains(method);
     }
 
 }

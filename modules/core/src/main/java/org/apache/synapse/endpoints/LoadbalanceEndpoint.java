@@ -22,6 +22,7 @@ package org.apache.synapse.endpoints;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clustering.Member;
+import org.apache.http.protocol.HTTP;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
@@ -148,8 +149,9 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
                     }
                 }
                 EndpointReference epr =
-                        new EndpointReference(transport + "://" + currentMember.getHostName() +
-                                              ":" + currentMember.getHttpPort() + address);
+                        new EndpointReference(transport + "://" + currentMember.getHostName()
+                                + ":" + ("http".equals(transport) ? currentMember.getHttpPort() :
+                                currentMember.getHttpPort())+ address);
                 synCtx.setTo(epr);
                 if (failover) {
                     synCtx.getEnvelope().build();

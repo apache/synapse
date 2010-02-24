@@ -435,10 +435,10 @@ public class ServerWorker implements Runnable {
             response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
             serverHandler.commitResponseHideExceptions(conn,  response);
 
-        } else if (!uri.startsWith(servicePath)) {
-            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-            response.addHeader(LOCATION, servicePath + "/");
-            serverHandler.commitResponseHideExceptions(conn, response);
+//        } else if (!uri.startsWith(servicePath)) {
+//            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
+//            response.addHeader(LOCATION, servicePath + "/");
+//            serverHandler.commitResponseHideExceptions(conn, response);
 
         } else if (serviceName != null && parameters.containsKey("wsdl")) {
             AxisService service = cfgCtx.getAxisConfiguration().
@@ -574,7 +574,8 @@ public class ServerWorker implements Runnable {
                 handleBrowserException("Invalid service : " + serviceName, null);
                 return;
             }
-        } else if (serviceName == null || serviceName.length() == 0) {
+        } else if (uri.startsWith(servicePath) &&
+                (serviceName == null || serviceName.length() == 0)) {
 
             try {
                 byte[] bytes = getServicesHTML().getBytes();

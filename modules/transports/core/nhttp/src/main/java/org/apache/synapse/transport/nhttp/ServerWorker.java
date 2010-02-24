@@ -239,7 +239,11 @@ public class ServerWorker implements Runnable {
             }
         }
         msgContext.setProperty(NhttpConstants.SERVICE_PREFIX, servicePrefix);
-
+        
+        List<String> disabledMethods = NHttpConfiguration.getInstance().getDisabledHttpMethods();
+        if (disabledMethods.contains(method)) {
+            handleException("Unsupported method : " + method, null);
+        }
 
         if ("GET".equals(method)) {
             processGet();

@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -54,6 +56,7 @@ public final class NHttpConfiguration {
 
     // general
     private static final String G_BUFFER_SIZE  = "nhttp_buffer_size";
+    private static final String G_DISABLED_HTTP_METHODS = "nhttp_disabled_methods";
 
     private static final Log log = LogFactory.getLog(NHttpConfiguration.class);
     private static NHttpConfiguration _instance = new NHttpConfiguration();
@@ -173,6 +176,15 @@ public final class NHttpConfiguration {
         }
 
         return val == null ? def : val;
+    }
+
+    public List<String> getDisabledHttpMethods() {
+        ArrayList<String> methods = new ArrayList<String>();
+        String methodsString = getStringValue(G_DISABLED_HTTP_METHODS, "");
+        for (String methodStr : methodsString.split(",")) {
+            methods.add(methodStr.trim().toUpperCase());
+        }
+        return methods;
     }
 
 }

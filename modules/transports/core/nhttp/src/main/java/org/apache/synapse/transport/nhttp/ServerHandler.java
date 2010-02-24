@@ -47,6 +47,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.evaluators.Parser;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.executors.PriorityExecutor;
+import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,6 +93,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public static final String REQUEST_SINK_BUFFER = "synapse.request-sink-buffer";
     public static final String RESPONSE_SOURCE_BUFFER = "synapse.response-source-buffer";
+    public static final String CONNECTION_CREATION_TIME = "synapse.connectionCreationTime";
+    public static final String SERVER_CONNECTION_DEBUG = "synapse.server-connection-debug";
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
         final boolean isHttps, final MetricsCollector metrics,
@@ -130,6 +133,10 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpRequest request = conn.getHttpRequest();
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
+        // prepare to collect debug information
+        conn.getContext().setAttribute(
+                ServerHandler.SERVER_CONNECTION_DEBUG, new ServerConnectionDebug(conn));
+
         try {
             InputStream is;
             // Only create an input buffer and ContentInputStream if the request has content
@@ -137,7 +144,8 @@ public class ServerHandler implements NHttpServiceHandler {
                 // Mark request as not yet fully read, to detect timeouts from harmless keepalive deaths
                 conn.getContext().setAttribute(NhttpConstants.REQUEST_READ, Boolean.FALSE);
                 
-                ContentInputBuffer inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+                ContentInputBuffer inputBuffer
+                        = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
                 context.setAttribute(REQUEST_SINK_BUFFER, inputBuffer);
                 is = new ContentInputStream(inputBuffer);
             } else {
@@ -145,7 +153,8 @@ public class ServerHandler implements NHttpServiceHandler {
                 conn.getContext().removeAttribute(NhttpConstants.REQUEST_READ);
             }
             
-            ContentOutputBuffer outputBuffer = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+            ContentOutputBuffer outputBuffer
+                    = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
             context.setAttribute(RESPONSE_SOURCE_BUFFER, outputBuffer);
             OutputStream os = new ContentOutputStream(outputBuffer);
 
@@ -197,7 +206,8 @@ public class ServerHandler implements NHttpServiceHandler {
     public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) {
 
         HttpContext context = conn.getContext();
-        ContentInputBuffer inBuf = (ContentInputBuffer) context.getAttribute(REQUEST_SINK_BUFFER);
+        ContentInputBuffer inBuf
+                = (ContentInputBuffer) context.getAttribute(REQUEST_SINK_BUFFER);
 
         try {
             int bytesRead = inBuf.consumeContent(decoder);
@@ -206,6 +216,10 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
             if (decoder.isCompleted()) {
+                
+                ((ServerConnectionDebug) conn.getContext().getAttribute(
+                        SERVER_CONNECTION_DEBUG)).recordRequestCompletionTime();
+
                 if (metrics != null) {
                     metrics.incrementMessagesReceived();
                 }
@@ -231,7 +245,14 @@ public class ServerHandler implements NHttpServiceHandler {
 
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(RESPONSE_SOURCE_BUFFER);
+        ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(
+                RESPONSE_SOURCE_BUFFER);
+
+        if (outBuf == null) {
+            // fix for SYNAPSE 584. This is a temporaly fix becuase of HTTPCORE-208
+            shutdownConnection(conn);
+            return;
+        }
 
         try {
             int bytesWritten = outBuf.produceContent(encoder);
@@ -240,7 +261,12 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
             if (encoder.isCompleted()) {
-                Boolean reqRead = (Boolean) conn.getContext().getAttribute(NhttpConstants.REQUEST_READ);
+                
+                ((ServerConnectionDebug) conn.getContext().getAttribute(
+                        SERVER_CONNECTION_DEBUG)).recordResponseCompletionTime();
+
+                Boolean reqRead = (Boolean) conn.getContext().getAttribute(
+                        NhttpConstants.REQUEST_READ);
                 if (reqRead != null && !reqRead) {
                     try {
                         // this is a connection we should not re-use
@@ -268,7 +294,8 @@ public class ServerHandler implements NHttpServiceHandler {
      * @param conn the connection being processed
      * @param response the response to commit over the connection
      */
-    public void commitResponseHideExceptions(final NHttpServerConnection conn, final HttpResponse response) {
+    public void commitResponseHideExceptions(
+            final NHttpServerConnection conn, final HttpResponse response) {
         try {
             conn.suspendInput();
             httpProcessor.process(response, conn.getContext());
@@ -328,6 +355,8 @@ public class ServerHandler implements NHttpServiceHandler {
         if (log.isTraceEnabled()) {
             log.trace("New incoming connection");
         }
+        // record connection creation time for debug logging
+        conn.getContext().setAttribute(CONNECTION_CREATION_TIME, System.currentTimeMillis());
     }
 
     public void responseReady(NHttpServerConnection conn) {
@@ -347,6 +376,8 @@ public class ServerHandler implements NHttpServiceHandler {
         shutdownConnection(conn);
         context.removeAttribute(REQUEST_SINK_BUFFER);
         context.removeAttribute(RESPONSE_SOURCE_BUFFER);
+        context.removeAttribute(CONNECTION_CREATION_TIME);
+        context.removeAttribute(SERVER_CONNECTION_DEBUG);
 
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");

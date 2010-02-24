@@ -54,6 +54,8 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.axis2.transport.base.threads.NativeThreadFactory;
+import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
+import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 
@@ -383,6 +385,21 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             
             NHttpClientConnection conn = ConnectionPool.getConnection(host, port);
 
+            // Ensure MessageContext has a ClientConnectionDebug attached before we start streaming
+            ServerConnectionDebug scd = (ServerConnectionDebug)
+                msgContext.getProperty(ServerHandler.SERVER_CONNECTION_DEBUG);
+
+            ClientConnectionDebug ccd = null;
+            if (scd != null) {
+                ccd = scd.getClientConnectionDebug();
+                if (ccd == null) {
+                    ccd = new ClientConnectionDebug(scd);
+                    scd.setClientConnectionDebug(ccd);
+                }
+                ccd.recordRequestStartTime(conn, axis2Req);
+                msgContext.setProperty(ClientHandler.CLIENT_CONNECTION_DEBUG, ccd);
+            }
+
             if (conn == null) {
                 ioReactor.connect(new InetSocketAddress(host, port),
                     null, axis2Req, sessionRequestCallback);
@@ -460,6 +477,23 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
         }
 
+        // pass ClientConnectionDebug to the Server side
+        ServerConnectionDebug scd = (ServerConnectionDebug)
+                worker.getConn().getContext().getAttribute(ServerHandler.SERVER_CONNECTION_DEBUG);
+        ClientConnectionDebug ccd = (ClientConnectionDebug)
+            msgContext.getProperty(ClientHandler.CLIENT_CONNECTION_DEBUG);
+
+        if (scd != null && ccd != null) {
+            scd.setClientConnectionDebug(ccd);
+        } else if (scd == null && ccd != null) {
+            scd = ccd.getServerConnectionDebug();
+            scd.setClientConnectionDebug(ccd);
+        }
+
+        if (scd != null) {
+            scd.recordResponseStartTime();
+        }
+
         MetricsCollector lstMetrics = worker.getServiceHandler().getMetrics();
         try {
             worker.getServiceHandler().commitResponse(worker.getConn(), response);
@@ -486,29 +520,31 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 lstMetrics.incrementFaultsSending();
             }
             handleException("Unexpected HTTP protocol error sending response to : " +
-                worker.getRemoteAddress(), e);
+                worker.getRemoteAddress() + "\n" + scd.dump(), e);
         } catch (ConnectionClosedException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            log.warn("Connection closed by client : " + worker.getRemoteAddress());
+            log.warn("Connection closed by client : "
+                    + worker.getRemoteAddress() + "\n" + scd.dump());
         } catch (IllegalStateException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            log.warn("Connection closed by client : " + worker.getRemoteAddress());
+            log.warn("Connection closed by client : "
+                    + worker.getRemoteAddress() + "\n" + scd.dump());
         } catch (IOException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
             handleException("IO Error sending response message to : " +
-                worker.getRemoteAddress(), e);
+                worker.getRemoteAddress() + "\n" + scd.dump(), e);
         } catch (Exception e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
             handleException("General Error sending response message to : " +
-                worker.getRemoteAddress(), e);
+                worker.getRemoteAddress() + "\n" + scd.dump(), e);
         }
 
         InputStream is = worker.getIs();

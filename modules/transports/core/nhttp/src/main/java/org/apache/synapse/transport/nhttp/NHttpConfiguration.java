@@ -160,4 +160,19 @@ public final class NHttpConfiguration {
         return def;
     }
 
+    /**
+     * Get properties that tune nhttp transport. Preference to system properties
+     * @param name name of the system/config property
+     * @param def default value to return if the property is not set
+     * @return the value of the property to be used
+     */
+    public String getStringValue(String name, String def) {
+        String val = System.getProperty(name);
+        if (val == null) {
+            val = props.getProperty(name);
+        }
+
+        return val == null ? def : val;
+    }
+
 }

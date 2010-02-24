@@ -671,6 +671,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private SessionRequestCallback getSessionRequestCallback() {
         return new SessionRequestCallback() {
             public void completed(SessionRequest request) {
+                if (log.isDebugEnabled() && request.getSession() != null &&
+                        request.getSession().getLocalAddress() != null) {
+                    log.debug("Connected to remote address : "
+                            + request.getSession().getRemoteAddress()
+                            + " from local address : " + request.getSession().getLocalAddress());
+                }
             }
 
             public void failed(SessionRequest request) {

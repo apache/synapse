@@ -60,7 +60,7 @@ public class Equal implements Evaluator {
     }
 
     public String getName() {
-        return "equal";
+        return EvaluatorConstants.EQUAL;
     }
 
     public void setValue(String value) {

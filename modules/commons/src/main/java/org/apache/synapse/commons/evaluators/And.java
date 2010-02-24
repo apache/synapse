@@ -41,7 +41,7 @@ public class And implements Evaluator {
     }
 
     public String getName() {
-        return "and";
+        return EvaluatorConstants.AND;
     }
 
     public void setEvaluators(Evaluator[] evaluators) {

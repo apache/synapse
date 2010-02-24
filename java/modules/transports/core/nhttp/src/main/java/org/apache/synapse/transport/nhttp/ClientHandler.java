@@ -853,6 +853,15 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection to be shutdown
      */
     private void shutdownConnection(final NHttpClientConnection conn) {
+
+        if (log.isDebugEnabled() && conn instanceof HttpInetConnection) {
+            HttpInetConnection inetConnection = (HttpInetConnection) conn;
+            log.debug("Connection to remote address : " + inetConnection.getRemoteAddress()
+                    + ":" + inetConnection.getRemotePort() + " from local address : "
+                    + inetConnection.getLocalAddress() + ":" + inetConnection.getLocalPort() +
+                    " is closed!");
+        }
+
         HttpContext context = conn.getContext();
         SharedOutputBuffer outputBuffer = (SharedOutputBuffer)
                 context.getAttribute(REQUEST_SOURCE_BUFFER);

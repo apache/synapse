@@ -22,7 +22,7 @@ package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
-import org.apache.synapse.commons.evaluators.Match;
+import org.apache.synapse.commons.evaluators.MatchEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
@@ -36,7 +36,7 @@ public class MatchFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(MatchFactory.class);
 
     public Evaluator create(OMElement e) throws EvaluatorException {
-        Match equal = new Match();
+        MatchEvaluator equal = new MatchEvaluator();
 
         OMAttribute typeAttr = e.getAttribute(new QName(EvaluatorConstants.TYPE));
 

@@ -20,33 +20,25 @@
 package org.apache.synapse.commons.evaluators;
 
 /**
- * This encapsulates two or more boolean conditions. This acts as the "and"
- * boolean operator.   
+ * This encapsulates boolean condition. This acts as not boolean operator.   
  *
  * Syntax:
- * <and>
- *     two or more evaluators
- * <and>
+ * <not>
+ *     one evaluator
+ * </not>
  */
-public class And implements Evaluator {
-    private Evaluator[] evaluators;
+public class NotEvaluator implements Evaluator {
+    private Evaluator evaluator;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
-        for (Evaluator e : evaluators) {
-            if (!e.evaluate(context)) {
-                return false;
-            }
-        }
-        return true;
+        return !evaluator.evaluate(context);
     }
 
     public String getName() {
-        return EvaluatorConstants.AND;
+        return EvaluatorConstants.NOT;
     }
 
-    public void setEvaluators(Evaluator[] evaluators) {
-        this.evaluators = evaluators;
+    public void setEvaluator(Evaluator evaluator) {
+        this.evaluator = evaluator;
     }
 }
-
-

@@ -22,27 +22,23 @@ package org.apache.synapse.commons.evaluators;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.UnsupportedEncodingException;
 
 /**
- * This evaluator uses regular expressions to match a given HTTP request.
+ * Try to see weather a part of the HTTP request is equal to the value provided.
  *
- * syntax:
- * <match type="header | param | url" source="" regex=""/>
+ * If the values are equal retun true 
  *
- * The source is used to extract the HTTP header or URL param
+ * Syntax:
+ * <equal type="header | param | url" source="" value=""/>
  */
-public class Match implements Evaluator {
-
-    private Log log = LogFactory.getLog(Match.class);
-
-    private int type = 3;
+public class EqualEvaluator implements Evaluator {
+    private Log log = LogFactory.getLog(EqualEvaluator.class);
+    private String value = null;
 
     private String source = null;
 
-    private Pattern regex = null;
+    private int type = 0;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         String sourceText = null;
@@ -59,40 +55,24 @@ public class Match implements Evaluator {
             sourceText = context.getHeader(source);
         }
 
-        if (sourceText == null) {
-            return false;
-        }
+        return sourceText != null && sourceText.equalsIgnoreCase(value);
 
-        Matcher matcher = regex.matcher(sourceText);
-        return matcher.matches();
     }
 
     public String getName() {
-        return EvaluatorConstants.MATCH;
+        return EvaluatorConstants.EQUAL;
     }
 
-    public int getType() {
-        return type;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public Pattern getRegex() {
-        return regex;
-    }
-
-    public void setType(int type) {
-        this.type = type;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public void setSource(String source) {
         this.source = source;
     }
 
-    public void setRegex(Pattern regex) {
-        this.regex = regex;
+    public void setType(int type) {
+        this.type = type;
     }
 
     private void handleException(String message) throws EvaluatorException {

@@ -25,7 +25,7 @@ import org.apache.synapse.mediators.db.DBReportMediator;
 
 /**
  * Serializer for {@link DBReportMediator} instances.
- * 
+ *
  * @see DBReportMediatorFactory
  */
 public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
@@ -38,7 +38,10 @@ public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
 
         DBReportMediator mediator = (DBReportMediator) m;
         OMElement dbReport = fac.createOMElement("dbreport", synNS);
-        saveTracingState(dbReport,mediator);
+        if (mediator.isUseTransaction()) {
+            dbReport.addAttribute(fac.createOMAttribute("useTransaction", nullNS, "true"));
+        }
+        saveTracingState(dbReport, mediator);
         serializeDBInformation(mediator, dbReport);
 
         if (parent != null) {

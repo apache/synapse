@@ -1764,7 +1764,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <h4>
       <a name="dbreport" id="dbreport">DB-report</a>
     </h4>
-<pre xml:space="preserve">&lt;dbreport&gt;
+<pre xml:space="preserve">&lt;dbreport useTransaction=(true|false)&gt;
    &lt;connection&gt;
      &lt;pool&gt;
       (

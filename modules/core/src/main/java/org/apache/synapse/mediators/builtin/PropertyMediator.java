@@ -33,6 +33,8 @@ import org.apache.axis2.util.JavaUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * The property mediator would save(or remove) a named property as a local property of
@@ -62,6 +64,13 @@ public class PropertyMediator extends AbstractMediator {
     /** Set the property (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
     private int action = ACTION_SET;
 
+    /** Regualar expresion pattern to be evaluated over the property value.
+     * Resulting match string will be applied to the property */
+    private Pattern pattern;
+
+    /** A pattern can be matched to several parts of the value. Which one to choose.*/
+    private int group = 0;
+
     /**
      * Sets a property into the current (local) Synapse Context or into the Axis Message Context
      * or into Transports Header and removes above properties from the corresponding locations.
@@ -84,6 +93,12 @@ public class PropertyMediator extends AbstractMediator {
         if (action == ACTION_SET) {
 
             Object resultValue = getResultValue(synCtx);
+
+            // if the result value is a String we can apply a reguar expression to
+            // choose part of it
+            if (resultValue instanceof String && pattern != null) {
+                resultValue = getMatchedValue((String) resultValue, synLog);
+            }
 
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Setting property : " + name + " at scope : " +
@@ -252,6 +267,22 @@ public class PropertyMediator extends AbstractMediator {
         this.action = action;
     }
 
+    public Pattern getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(Pattern pattern) {
+        this.pattern = pattern;
+    }
+
+    public int getGroup() {
+        return group;
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
+    }
+
     private Object getResultValue(MessageContext synCtx) {
         if (value != null) {
             return value;
@@ -286,5 +317,43 @@ public class PropertyMediator extends AbstractMediator {
             log.error(msg, e);
             throw new SynapseException(msg, e);
         }
+    }
+
+    /**
+     * Apply the Regular expression on to the String value and choose the matching group.
+     * If a matching not found same string passed in to this method will be returned.
+     * If a pattern is not specified same String passed to this method will be retured.
+     *
+     * @param value String value against the regular expression is matched
+     * @param synLog log
+     * @return the matched string group
+     */
+    private String getMatchedValue(String value, SynapseLog synLog) {
+
+        String matchedValue = value;
+        // if we cannot find a match set the value to empty string
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.matches()) {
+            
+            if (matcher.groupCount() >= group) {
+                matchedValue = matcher.group(group);
+            } else {
+                if (synLog.isTraceOrDebugEnabled()) {
+                    String msg = "Failed to get a match for regx : " +
+                            pattern.toString() + " with the property value :" +
+                            value + " for group :" + group;
+                    synLog.traceOrDebug(msg);
+                }
+            }
+            
+        } else {
+            if (synLog.isTraceOrDebugEnabled()) {
+                String msg = "Unable to find a match for regx : " +
+                        pattern.toString() + " with the property value :" + value;
+                synLog.traceOrDebug(msg);
+            }
+        }
+        
+        return matchedValue;
     }
 }

@@ -77,6 +77,15 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
                     "type" , nullNS, mediator.getType()));
         }
 
+        if (mediator.getPattern() != null) {
+            property.addAttribute(fac.createOMAttribute(
+                    "pattern", nullNS, mediator.getPattern().toString()));
+            if (mediator.getGroup() >= 0) {
+                property.addAttribute(fac.createOMAttribute(
+                        "group", nullNS, Integer.toString(mediator.getGroup())));
+            }
+        }
+
         if (parent != null) {
             parent.addChild(property);
         }

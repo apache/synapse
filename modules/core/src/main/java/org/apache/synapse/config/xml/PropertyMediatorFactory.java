@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.regex.Pattern;
 
 /**
  * Creates a property mediator through the supplied XML configuration
@@ -39,6 +40,8 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_SCOPE = new QName("scope");
     private static final QName ATT_ACTION = new QName("action");
     private static final QName ATT_TYPE = new QName("type");
+    private static final QName ATT_PATTERN = new QName("pattern");
+    private static final QName ATT_GROUP = new QName("group");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -49,6 +52,8 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         OMAttribute scope = elem.getAttribute(ATT_SCOPE);
         OMAttribute action = elem.getAttribute(ATT_ACTION);
         OMAttribute type = elem.getAttribute(ATT_TYPE);
+        OMAttribute pattern = elem.getAttribute(ATT_PATTERN);
+        OMAttribute group = elem.getAttribute(ATT_GROUP);
 
         OMElement valueElement = elem.getFirstElement();
 
@@ -84,6 +89,24 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
                 log.error(msg);
                 throw new SynapseException(msg);
             }
+        }
+
+        if (pattern != null) {
+            propMediator.setPattern(Pattern.compile(pattern.getAttributeValue()));
+            if (group != null) {
+                int groupValue = Integer.parseInt(group.getAttributeValue());
+                if (groupValue >= 0) {
+                    propMediator.setGroup(groupValue);
+                } else {                    
+                    String msg = "group can have a positive value only";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
+            }
+        } else if (group != null) {
+            String msg = "group is only allowed when a pattern is specified";
+            log.error(msg);
+            throw new SynapseException(msg);
         }
 
         // The action attribute is optional, if provided and equals to 'remove' the

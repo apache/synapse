@@ -177,7 +177,7 @@ public class SynapseXPathVariableContext implements VariableContext {
                                 for (String param : params) {
                                     String temp[] = param.split("=");
                                     if (temp != null && temp.length >= 1) {
-                                        if (temp[0].equals(localName)) {
+                                        if (temp[0].equalsIgnoreCase(localName)) {
                                             try {
                                                 return temp.length > 1 ?
                                                         URIEncoderDecoder.decode(temp[1]) : "";

@@ -142,14 +142,23 @@ public class MessageHelper {
 
     public static Map getClonedTransportHeaders(org.apache.axis2.context.MessageContext msgCtx) {
         
-        Map headers = (Map) msgCtx.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        Map<String, Object> clonedHeaders = new HashMap<String, Object>();
+        Map headers = (Map) msgCtx.
+                getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        Map<String, String> clonedHeaders;
+        if (headers instanceof TreeMap) {
+            clonedHeaders = new TreeMap<String, String>(new Comparator<String>() {
+                public int compare(String s1, String s2) {
+                    return s1.compareToIgnoreCase(s2);
+                }
+            });
+        } else {
+            clonedHeaders = new HashMap<String, String>();
+        }
 
-        if (headers != null && headers.isEmpty()) {
+        if (headers != null && !headers.isEmpty()) {
             for (Object o : headers.keySet()) {
                 String headerName = (String) o;
-                clonedHeaders.put(headerName, headers.get(headerName));
+                clonedHeaders.put(headerName, (String) headers.get(headerName));
             }
         }
 

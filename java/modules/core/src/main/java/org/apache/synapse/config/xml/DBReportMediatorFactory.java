@@ -20,6 +20,7 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.db.DBReportMediator;
@@ -29,7 +30,7 @@ import javax.xml.namespace.QName;
 /**
  * Factory for {@link DBReportMediator} instances.
  * <pre>
- * &lt;dbreport&gt;
+ * &lt;dbreport useTransaction="true|false"&gt;
  *   &lt;connection&gt;
  *     &lt;pool&gt;
  *      (
@@ -57,10 +58,21 @@ import javax.xml.namespace.QName;
 public class DBReportMediatorFactory extends AbstractDBMediatorFactory {
 
     private static final QName DBREPORT_Q =
-        new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dbreport");
+            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dbreport");
+    private static final QName DBREPORT_USE_TX = new QName("useTransaction");
 
     public Mediator createMediator(OMElement elem) {
         DBReportMediator mediator = new DBReportMediator();
+
+        OMAttribute useTx = elem.getAttribute(DBREPORT_USE_TX);
+        if (useTx != null && useTx.getAttributeValue() != null) {
+            String useTxValue = useTx.getAttributeValue();
+            if (useTxValue.equals("true")) {
+                mediator.setUseTransaction(true);
+            } else {
+                mediator.setUseTransaction(false);
+            }
+        }
         buildDataSource(elem, mediator);
         processStatements(elem, mediator);
         return mediator;

@@ -31,7 +31,20 @@ import java.sql.Connection;
  */
 public class DBReportMediator extends AbstractDBMediator {
 
+    public boolean isUseTransaction() {
+        return useTransaction;
+    }
+
+    public void setUseTransaction(boolean useTransaction) {
+        this.useTransaction = useTransaction;
+    }
+
+    // Does the DBReport mediator participate in a distribute tx?
+    // default do not participate in a distribute tx
+    boolean useTransaction = false;
+
     protected void processStatement(Statement stmnt, MessageContext msgCtx) {
+
 
         SynapseLog synLog = getLog(msgCtx);
 
@@ -44,27 +57,30 @@ public class DBReportMediator extends AbstractDBMediator {
             if (count > 0) {
                 if (synLog.isTraceOrDebugEnabled()) {
                     synLog.traceOrDebug(
-                        "Inserted " + count + " row/s using statement : " + stmnt.getRawStatement());
+                            "Inserted " + count + " row/s using statement : " + stmnt.getRawStatement());
                 }
             } else {
                 if (synLog.isTraceOrDebugEnabled()) {
                     synLog.traceOrDebug(
-                        "No rows were inserted for statement : " + stmnt.getRawStatement());
+                            "No rows were inserted for statement : " + stmnt.getRawStatement());
                 }
             }
-            
-            if (!con.getAutoCommit()) {
-                con.commit();
+
+            if (!useTransaction) {
+                if (!con.getAutoCommit()) {
+                    con.commit();
+                }
             }
 
         } catch (SQLException e) {
             handleException("Error execuring insert statement : " + stmnt.getRawStatement() +
-                " against DataSource : " + getDSName(), e, msgCtx);
+                    " against DataSource : " + getDSName(), e, msgCtx);
         } finally {
             if (con != null) {
                 try {
                     con.close();
-                } catch (SQLException ignore) {}
+                } catch (SQLException ignore) {
+                }
             }
         }
     }

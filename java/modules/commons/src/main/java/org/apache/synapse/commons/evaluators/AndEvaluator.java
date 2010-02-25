@@ -20,31 +20,33 @@
 package org.apache.synapse.commons.evaluators;
 
 /**
- * This encapsulates two or more boolean conditions. This acts as the "or"
- * boolean operator.
+ * This encapsulates two or more boolean conditions. This acts as the "and"
+ * boolean operator.   
  *
  * Syntax:
- * <or>
+ * <and>
  *     two or more evaluators
- * </or>
+ * <and>
  */
-public class Or implements Evaluator {
+public class AndEvaluator implements Evaluator {
     private Evaluator[] evaluators;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         for (Evaluator e : evaluators) {
-            if (e.evaluate(context)) {
-                return true;
+            if (!e.evaluate(context)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public String getName() {
-        return EvaluatorConstants.OR;
+        return EvaluatorConstants.AND;
     }
 
     public void setEvaluators(Evaluator[] evaluators) {
         this.evaluators = evaluators;
     }
 }
+
+

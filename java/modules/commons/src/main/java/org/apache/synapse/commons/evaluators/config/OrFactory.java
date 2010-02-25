@@ -21,7 +21,7 @@
 package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.synapse.commons.evaluators.Evaluator;
-import org.apache.synapse.commons.evaluators.Or;
+import org.apache.synapse.commons.evaluators.OrEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
@@ -35,7 +35,7 @@ public class OrFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(OrFactory.class);
 
     public Evaluator create(OMElement e) throws EvaluatorException {
-        Or o = new Or();
+        OrEvaluator o = new OrEvaluator();
 
         Iterator it = e.getChildElements();
 

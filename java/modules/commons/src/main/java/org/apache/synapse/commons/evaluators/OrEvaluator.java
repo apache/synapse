@@ -20,25 +20,31 @@
 package org.apache.synapse.commons.evaluators;
 
 /**
- * This encapsulates boolean condition. This acts as not boolean operator.   
+ * This encapsulates two or more boolean conditions. This acts as the "or"
+ * boolean operator.
  *
  * Syntax:
- * <not>
- *     one evaluator
- * </not>
+ * <or>
+ *     two or more evaluators
+ * </or>
  */
-public class Not implements Evaluator {
-    private Evaluator evaluator;
+public class OrEvaluator implements Evaluator {
+    private Evaluator[] evaluators;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
-        return !evaluator.evaluate(context);
+        for (Evaluator e : evaluators) {
+            if (e.evaluate(context)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getName() {
-        return EvaluatorConstants.NOT;
+        return EvaluatorConstants.OR;
     }
 
-    public void setEvaluator(Evaluator evaluator) {
-        this.evaluator = evaluator;
+    public void setEvaluators(Evaluator[] evaluators) {
+        this.evaluators = evaluators;
     }
 }

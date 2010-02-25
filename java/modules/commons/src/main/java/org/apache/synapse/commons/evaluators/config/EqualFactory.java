@@ -21,7 +21,7 @@ package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
-import org.apache.synapse.commons.evaluators.Equal;
+import org.apache.synapse.commons.evaluators.EqualEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
@@ -34,7 +34,7 @@ public class EqualFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(EqualFactory.class);
 
     public Evaluator create(OMElement e) throws EvaluatorException {
-        Equal equal = new Equal();
+        EqualEvaluator equal = new EqualEvaluator();
 
         OMAttribute typeAttr = e.getAttribute(new QName(EvaluatorConstants.TYPE));
 

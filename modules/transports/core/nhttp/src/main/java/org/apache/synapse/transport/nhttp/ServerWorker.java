@@ -161,7 +161,13 @@ public class ServerWorker implements Runnable {
         msgContext.setProperty(
             Constants.Configuration.TRANSPORT_IN_URL, request.getRequestLine().getUri());
 
-        Map<String, String> headers = new HashMap<String, String>();
+        // http transport header names are case insensitive 
+        Map<String, String> headers = new TreeMap<String, String>(new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
+        
         for (Header header : request.getAllHeaders()) {
             headers.put(header.getName(), header.getValue());
         }

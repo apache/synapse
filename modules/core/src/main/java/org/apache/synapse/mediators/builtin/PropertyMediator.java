@@ -137,7 +137,7 @@ public class PropertyMediator extends AbstractMediator {
                         org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
                 if (headers != null && headers instanceof Map) {
-                    Map headersMap = (HashMap) headers;
+                    Map headersMap = (Map) headers;
                     headersMap.put(name, resultValue);
                 }
                 if (headers == null) {
@@ -181,7 +181,7 @@ public class PropertyMediator extends AbstractMediator {
                 Object headers = axis2MessageCtx.getProperty(
                         org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
                 if (headers != null && headers instanceof Map) {
-                    Map headersMap = (HashMap) headers;
+                    Map headersMap = (Map) headers;
                     headersMap.remove(name);
                 } else {
                     synLog.traceOrDebug("No transport headers found for the message");

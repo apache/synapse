@@ -19,16 +19,16 @@
 
 package org.apache.synapse.mediators.transaction;
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.transaction.TransactionConfiguration;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.mediators.AbstractMediator;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.Status;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 /**
  * The Mediator for commit, rollback, suspend, resume jta transactions
@@ -37,18 +37,17 @@ public class TransactionMediator extends AbstractMediator {
 
     public static final String ACTION_COMMIT = "commit";
     public static final String ACTION_ROLLBACK = "rollback";
-    public static final String ACTION_SUSPEND = "suspend";
-    public static final String ACTION_RESUME = "resume";
     public static final String ACTION_NEW = "new";
     public static final String ACTION_USE_EXISTING_OR_NEW = "use-existing-or-new";
     public static final String ACTION_FAULT_IF_NO_TX = "fault-if-no-tx";
-    public static final String SUSPENDED_TRANSACTION = "suspendedTransaction";
+    private static final String USER_TX_LOOKUP_STR = "java:comp/UserTransaction";
+    private Context txContext;
 
     private String action = "";
 
     public boolean mediate(MessageContext synCtx) {
 
-        TransactionManager transactionManager;
+        UserTransaction tx = null;
         final SynapseLog synLog = getLog(synCtx);
 
         if (synLog.isTraceOrDebugEnabled()) {
@@ -58,13 +57,17 @@ public class TransactionMediator extends AbstractMediator {
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
-
-        transactionManager = getTransactionManager(synCtx);
+        initContext(synCtx);
+        try {
+            tx = (UserTransaction) txContext.lookup(USER_TX_LOOKUP_STR);
+        } catch (NamingException e) {
+            handleException("Cloud not get the context name " + USER_TX_LOOKUP_STR, e, synCtx);
+        }
 
         if (action.equals(ACTION_COMMIT)) {
 
             try {
-                transactionManager.commit();
+                tx.commit();
             } catch (Exception e) {
                 handleException("Unable to commit transaction", e, synCtx);
             }
@@ -72,7 +75,7 @@ public class TransactionMediator extends AbstractMediator {
         } else if (action.equals(ACTION_ROLLBACK)) {
 
             try {
-                transactionManager.rollback();
+                tx.rollback();
             } catch (Exception e) {
                 handleException("Unable to rollback transaction", e, synCtx);
             }
@@ -81,7 +84,7 @@ public class TransactionMediator extends AbstractMediator {
 
             int status = Status.STATUS_UNKNOWN;
             try {
-                status = transactionManager.getStatus();
+                status = tx.getStatus();
             } catch (Exception e) {
                 handleException("Unable to query transaction status", e, synCtx);
             }
@@ -92,7 +95,7 @@ public class TransactionMediator extends AbstractMediator {
             }
 
             try {
-                transactionManager.begin();
+                tx.begin();
             } catch (Exception e) {
                 handleException("Unable to begin a new transaction", e, synCtx);
             }
@@ -101,14 +104,14 @@ public class TransactionMediator extends AbstractMediator {
 
             int status = Status.STATUS_UNKNOWN;
             try {
-                status = transactionManager.getStatus();
+                status = tx.getStatus();
             } catch (Exception e) {
                 handleException("Unable to query transaction status", e, synCtx);
             }
 
             try {
                 if (status == Status.STATUS_NO_TRANSACTION) {
-                    transactionManager.begin();
+                    tx.begin();
                 }
             } catch (Exception e) {
                 handleException("Unable to begin a new transaction", e, synCtx);
@@ -118,33 +121,13 @@ public class TransactionMediator extends AbstractMediator {
 
             int status = Status.STATUS_UNKNOWN;
             try {
-                status = transactionManager.getStatus();
+                status = tx.getStatus();
             } catch (Exception e) {
                 handleException("Unable to query transaction status", e, synCtx);
             }
 
             if (status != Status.STATUS_ACTIVE)
                 throw new SynapseException("No active transaction. Require an active transaction");
-
-        } else if (action.equals(ACTION_SUSPEND)) {
-
-            try {
-                Transaction tx = transactionManager.suspend();
-                synCtx.setProperty(SUSPENDED_TRANSACTION, tx);
-            } catch (Exception e) {
-                handleException("Unable to suspend transaction", e, synCtx);
-            }
-
-        } else if (action.equals(ACTION_RESUME)) {
-
-            Transaction tx = (Transaction) synCtx.getProperty(SUSPENDED_TRANSACTION);
-            if (tx == null)
-                handleException("Couldn't find a suspended transaction to resume", synCtx);
-            try {
-                transactionManager.resume(tx);
-            } catch (Exception e) {
-                handleException("Unable to resume transaction", e, synCtx);
-            }
 
         } else {
             handleException("Invalid transaction mediator action : " + action, synCtx);
@@ -157,35 +140,20 @@ public class TransactionMediator extends AbstractMediator {
         return true;
     }
 
-    private TransactionManager getTransactionManager(MessageContext synCtx) {
-
-        TransactionManager transactionManager = null;
-
-        try {    
-            TransactionConfiguration transactionConfiguration = synCtx.getConfiguration()
-                    .getAxisConfiguration().getTransactionConfiguration();
-
-            if (transactionConfiguration != null) {
-                transactionManager = transactionConfiguration.getTransactionManager();
-            } else {
-                handleException("TransactionConfiguration has not been found. " +
-                        "Please check the axis2.xml and uncomment/enable the " +
-                        "transaction configuration.", synCtx);
-            }
-            
-        } catch (AxisFault ex) {
-            handleException("Unable to get Transaction Manager", ex, synCtx);
-        }
-
-        return transactionManager;
-    }
-
     public void setAction(String action) {
         this.action = action;
     }
 
     public String getAction() {
         return action;
+    }
+
+    private void initContext(MessageContext synCtx) {
+        try {
+            txContext = new InitialContext();
+        } catch (NamingException e) {
+            handleException("Cloud not create initial context", e, synCtx);
+        }
     }
 
 }

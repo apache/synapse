@@ -22,7 +22,7 @@ package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
-import org.apache.synapse.commons.evaluators.Not;
+import org.apache.synapse.commons.evaluators.NotEvaluator;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +32,7 @@ public class NotFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(NotFactory.class);
 
     public Evaluator create(OMElement e) throws EvaluatorException {
-        Not not = new Not();
+        NotEvaluator not = new NotEvaluator();
 
         OMElement ce = e.getFirstElement();
 

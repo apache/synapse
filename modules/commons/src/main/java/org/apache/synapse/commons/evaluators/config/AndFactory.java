@@ -21,7 +21,7 @@ package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
-import org.apache.synapse.commons.evaluators.And;
+import org.apache.synapse.commons.evaluators.AndEvaluator;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +34,7 @@ public class AndFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(AndFactory.class);
 
     public Evaluator create(OMElement e) throws EvaluatorException {
-        And o = new And();
+        AndEvaluator o = new AndEvaluator();
 
         Iterator it = e.getChildElements();
 
@@ -60,7 +60,7 @@ public class AndFactory implements EvaluatorFactory {
             o.setEvaluators(evaluators.toArray(new Evaluator[evaluators.size()]));
         } else {
             handleException("Two or more expressions " +
-                    "should be provided under Or");
+                    "should be provided under And");
             return null;
         }
         return o;

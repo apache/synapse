@@ -1185,7 +1185,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <h4>
       <a name="property" id="property">Property</a>
     </h4>
-<pre xml:space="preserve"> &lt;property name="string" [action=set|remove] [type="string"] (value="literal" | expression="xpath") [scope=transport|axis2|axis2-client]&gt;
+<pre xml:space="preserve"> &lt;property name="string" [action=set|remove] [type="string"] (value="literal" | expression="xpath") [scope=transport|axis2|axis2-client] [pattern="regex" [group="integer"]]&gt;
      &lt;xml-element/&gt;?
 &lt;/property&gt;</pre>
     <p>
@@ -1200,6 +1200,13 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       property element with action specified as "remove" you can remove any
       existing message context properties.
     </p>
+    <p>
+      If a pattern is specified, this regular expression will be applied on
+      top of the value of the property. If group number is specified the matching
+      group will be set as the value of the property. If group is not specified,
+      it defaults to 0. If a patter is specified and it is not matched, the
+      value will be set to empty string.
+    </p>  
     <p>
       Using the type attribute one can set properties with specific types on
       the message context. Currently the type attribute accepts following

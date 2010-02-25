@@ -275,6 +275,8 @@ public abstract class EndpointSerializer {
 
         if (endpoint instanceof AddressEndpoint) {
             return new AddressEndpointSerializer();
+        } else if (endpoint instanceof DefaultEndpoint) {
+            return new DefaultEndpointSerializer();
         } else if (endpoint instanceof WSDLEndpoint) {
             return new WSDLEndpointSerializer();
         } else if (endpoint instanceof IndirectEndpoint) {

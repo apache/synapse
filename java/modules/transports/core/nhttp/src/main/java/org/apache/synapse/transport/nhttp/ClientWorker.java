@@ -42,8 +42,10 @@ import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Performs processing of the HTTP response received for our outgoing request. An instance of this
@@ -118,7 +120,14 @@ public class ClientWorker implements Runnable {
             // set any transport headers received
             Header[] headers = response.getAllHeaders();
             if (headers != null && headers.length > 0) {
-                Map headerMap = new HashMap();
+
+                Map<String, String> headerMap
+                        = new TreeMap<String, String>(new Comparator<String>() {
+                    public int compare(String o1, String o2) {
+                        return o1.compareToIgnoreCase(o2);
+                    }
+                });
+                
                 for (int i=0; i<headers.length; i++) {
                     Header header = headers[i];
                     if ("Location".equals(header.getName())

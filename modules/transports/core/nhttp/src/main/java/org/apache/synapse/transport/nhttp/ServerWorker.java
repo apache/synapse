@@ -192,6 +192,7 @@ public class ServerWorker implements Runnable {
     /**
      * Process the incoming request
      */
+    @SuppressWarnings({"unchecked"})
     public void run() {
 
         String method = request.getRequestLine().getMethod().toUpperCase();
@@ -266,31 +267,49 @@ public class ServerWorker implements Runnable {
         // dual channel invocation. This is becasue we need to ACK to the request once the request
         // is received to synapse. Otherwise we will not be able to support the single channel
         // invocation within the actual service and synapse for a dual channel request from the
-        // client. This condition is a bit complex but cannot simplify any further.
-        if (msgContext != null && msgContext.getOperationContext() != null &&
-                (!msgContext.getOperationContext().getAxisOperation().isControlOperation() ||
-                        msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED))) {
-
-            String respWritten = (String)
-                msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
-            boolean respWillFollow
-                    = !Constants.VALUE_TRUE.equals(respWritten) && !"SKIP".equals(respWritten);
+        // client.
+        if (isAckRequired()) {
+            String respWritten = "";
+            if (msgContext.getOperationContext() != null) {
+                respWritten = (String) msgContext.getOperationContext().getProperty(
+                        Constants.RESPONSE_WRITTEN);
+            }
+            boolean respWillFollow = !Constants.VALUE_TRUE.equals(respWritten)
+                    && !"SKIP".equals(respWritten);
             boolean acked = (((RequestResponseTransport) msgContext.getProperty(
                     RequestResponseTransport.TRANSPORT_CONTROL)).getStatus()
                     == RequestResponseTransport.RequestResponseTransportStatus.ACKED);
             boolean forced = msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED);
+            boolean nioAck = msgContext.isPropertyTrue("NIO-ACK-Requested", false);
 
-            if (respWillFollow || acked || forced) {
+            if (respWillFollow || acked || forced || nioAck) {
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Sending 202 Accepted response for MessageID : " +
-                        msgContext.getMessageID() +
-                        " response written : " + respWritten +
-                        " response will follow : " + respWillFollow +
-                        " acked : " + acked + " forced ack : " + forced);
+                if (!nioAck) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Sending 202 Accepted response for MessageID : " +
+                                msgContext.getMessageID() +
+                                " response written : " + respWritten +
+                                " response will follow : " + respWillFollow +
+                                " acked : " + acked + " forced ack : " + forced);
+                    }
+                    response.setStatusCode(HttpStatus.SC_ACCEPTED);
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Sending ACK response with status "
+                                + msgContext.getProperty(NhttpConstants.HTTP_SC)
+                                + ", for MessageID : " + msgContext.getMessageID());
+                    }
+                    response.setStatusCode(Integer.parseInt(
+                            msgContext.getProperty(NhttpConstants.HTTP_SC).toString()));
+                    Map<String, String> responseHeaders = (Map<String, String>)
+                            msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+                    if (responseHeaders != null) {
+                        for (String headerName : responseHeaders.keySet()) {
+                            response.addHeader(headerName, responseHeaders.get(headerName));
+                        }
+                    }
                 }
 
-                response.setStatusCode(HttpStatus.SC_ACCEPTED);
                 if (metrics != null) {
                     metrics.incrementMessagesSent();
                 }
@@ -338,6 +357,23 @@ public class ServerWorker implements Runnable {
                 } catch (IOException ignore) {}
             }
         }
+    }
+
+    private boolean isAckRequired() {
+
+        // This condition is a bit complex but cannot simplify any further.
+        if (msgContext != null) {
+            if (msgContext.getOperationContext() != null &&
+                    (!msgContext.getOperationContext().getAxisOperation().isControlOperation() ||
+                            msgContext.isPropertyTrue(NhttpConstants.FORCE_SC_ACCEPTED))) {
+
+                return true;
+            } else if (msgContext.isPropertyTrue("NIO-ACK-Requested", false)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

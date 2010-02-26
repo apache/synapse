@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -32,10 +33,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisServiceGroup;
-import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -44,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
+import org.apache.sandesha2.policy.builders.RMAssertionBuilder;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -281,9 +281,14 @@ public class Axis2FlexibleMEPClient {
         if (wsRMEnabled) {
             // if a WS-RM policy is specified, use it
             if (wsRMPolicyKey != null) {
-                clientOptions.setProperty(
-                    SynapseConstants.SANDESHA_POLICY,
-                        MessageHelper.getPolicy(synapseOutMessageContext, wsRMPolicyKey));
+                Object property = synapseOutMessageContext.getEntry(wsRMPolicyKey);
+                if (property instanceof OMElement) {
+                    OMElement policyOMElement = (OMElement) property;
+                    RMAssertionBuilder builder = new RMAssertionBuilder();
+                    SandeshaPolicyBean sandeshaPolicyBean = (SandeshaPolicyBean) builder.build(policyOMElement, null);
+                    Parameter policyParam = new Parameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN, sandeshaPolicyBean);
+                    anoymousService.addParameter(policyParam);
+                }
             }
         }
 

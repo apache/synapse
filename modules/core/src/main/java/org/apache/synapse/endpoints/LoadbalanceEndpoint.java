@@ -151,7 +151,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
                 EndpointReference epr =
                         new EndpointReference(transport + "://" + currentMember.getHostName()
                                 + ":" + ("http".equals(transport) ? currentMember.getHttpPort() :
-                                currentMember.getHttpPort())+ address);
+                                currentMember.getHttpsPort()) + address);
                 synCtx.setTo(epr);
                 if (failover) {
                     synCtx.getEnvelope().build();
@@ -345,3 +345,4 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
         }
     }
 }
+

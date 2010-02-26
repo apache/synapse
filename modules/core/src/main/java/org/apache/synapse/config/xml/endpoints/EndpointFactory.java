@@ -31,6 +31,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.util.UUIDGenerator;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -55,6 +56,8 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         log = LogFactory.getLog(this.getClass());
     }
 
+    private static final String ENDPOINT_NAME_PREFIX = "endpoint_";
+
     /**
      * Core method which is exposed for the external use, and this will find the proper
      * {@link EndpointFactory} and create the endpoint which is of the format {@link Endpoint}.
@@ -64,7 +67,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return created endpoint
      */
     public static Endpoint getEndpointFromElement(OMElement elem, boolean isAnonymous) {
-        return getEndpointFactory(elem).createEndpoint(elem, isAnonymous);
+        return getEndpointFactory(elem).createEndpointWithName(elem, isAnonymous);
     }
 
     /**
@@ -75,7 +78,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      */
     public Object getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om, false);
+            return createEndpointWithName((OMElement) om, false);
         } else {
             handleException("Invalid XML configuration for an Endpoint. OMElement expected");
         }
@@ -93,6 +96,25 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return Endpoint implementation for the given configuration.
      */
     protected abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint);
+
+    /**
+     *  Make sure that the endpoints created by the factory has a name
+     * 
+     * @param epConfig          OMElement conatining the endpoint configuration.
+     * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
+     * @return Endpoint implementation for the given configuration.
+     */
+    private Endpoint createEndpointWithName(OMElement epConfig, boolean anonymousEndpoint) {
+        
+        Endpoint ep = createEndpoint(epConfig, anonymousEndpoint);
+        // if the endpoint doesn't have a name we will generate a unique name.
+        if (ep.getName() == null) {
+            String uuid = UUIDGenerator.getUUID();
+            uuid = uuid.replace(':', '_');
+            ep.setName(ENDPOINT_NAME_PREFIX + uuid);
+        }
+        return ep;
+    }
 
     /**
      * Extracts the QoS information from the XML which represents a WSDL/Address/Default endpoints

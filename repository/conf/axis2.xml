@@ -164,6 +164,7 @@
     	<parameter name="non-blocking">true</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
         <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
+        <!-- paramter name="priorityConfigFile" locked="false">location of priority configuration file<parameter-->
     </transportReceiver>
 
     <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->

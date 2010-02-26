@@ -317,6 +317,12 @@
                 <li>
                     <a href="#Sample601">Sample 601: Using Synapse Observers</a>
                 </li>
+                <li>
+                    <a href="#Sample650">Sample 650: Priority based Mediation</a>
+                </li>
+                <li>
+                    <a href="#Sample651">Sample 651: NHTTP Transport Priority based dispatching</a>
+                </li>
             </ul>
         </li>
 </ul></div>
@@ -4277,6 +4283,7 @@ Discounted price: 138.77458254967408</pre>
            Event publish after transformation.
          </p>
        </div>
+    
        <h2>
          <a name="Sample600" id="Sample600">Sample 600: File hierarchy based configuration builder</a>
        </h2>
@@ -4403,5 +4410,200 @@ Discounted price: 138.77458254967408</pre>
          <p>
            Refer Synapse <a href="Synapse_Extending.html#synObservers">Synapse Extending Guide</a> for more details on developing Synapse observers.
          </p>
+       </div>
+
+    <h2>
+         <a name="Sample650" id="Sample650">Sample 650: Priority Based Message Mediation</a>
+       </h2>
+       <p>
+         &#xa0;
+       </p>
+   <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;priority-executor name=&quot;exec&quot;&gt;
+        &lt;queues&gt;
+            &lt;queue size=&quot;100&quot; priority=&quot;1&quot;/&gt;
+            &lt;queue size=&quot;100&quot; priority=&quot;10&quot;/&gt;
+        &lt;/queues&gt;
+    &lt;/priority-executor&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;filter source=&quot;$trp:priority&quot; regex=&quot;1&quot;&gt;
+                    &lt;then&gt;
+                        &lt;enqueue priority=&quot;1&quot; sequence=&quot;priority_sequence&quot; executor=&quot;exec&quot;/&gt;
+                    &lt;/then&gt;
+                    &lt;else&gt;
+                        &lt;enqueue priority=&quot;10&quot; sequence=&quot;priority_sequence&quot; executor=&quot;exec&quot;/&gt;
+                    &lt;/else&gt;
+                &lt;/filter&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+    &lt;/proxy&gt;
+    &lt;sequence name=&quot;priority_sequence&quot;&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+       <div>
+         <p>
+           <strong>Objective:</strong> Demonstrate the priority based mediation capability of synapse.
+         </p>
+         <p>
+           <strong>Prerequisites:</strong> Deploy the
+           SimpleStockQuoteService in sample Axis2 server and start it on port
+           9000. Priority is applied only when synapse is loaded with enough messages to consume its core number of threads.
+             So to observe the priority based mediation, it is required to use a load testing tool like JMeter, SOAP UI or Apache bench.
+         </p>
+         <p>
+           Start Synapse with the sample configuration 650 (i.e. synapse -sample 650).
+         </p>
+         <p>
+           In this sample, client should send a HTTP header that specifies the priority of the message.This header name is priority.
+             This header is retrieved in the synapse configuration using the $trp:priority XPath expression. Then it is matched against
+             the value 1. If it has the value 1, message is executed with priority 1. Otherwise the message is executed with priority 10.
+         </p>
+           <p>
+               Here are two sample XML files that can be used to invoke the service using a tool like JMeter, or Ab. For SOAP UI,
+               user can use the WSDL repository/conf/sample/resources/proxy/sample_proxy_1.wsdl to create the request. The only
+               difference between the two demonstrated requests here is the symbol. One has the symbol as IBM and other has MSFT. For one type of
+               request set the priority header to 1 and for the next set the priority header to 10. Then load synapse with high
+               volume of traffic from both types of requests using the load testing tool. In the back end server it prints the
+               symbol of the incoming requests. User should be able to see more of high priority symbol.
+           </p>
+           <pre xml:space="preserve">
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+     &lt;soapenv:Header xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+        &lt;wsa:To&gt;http://localhost:8281/services/SimpleStockQuoteService&lt;/wsa:To&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:1B57D0B0BF770678DE1261165228620&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+     &lt;/soapenv:Header&gt;
+     &lt;soapenv:Body&gt;
+        &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+           &lt;m0:request&gt;
+              &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+           &lt;/m0:request&gt;
+        &lt;/m0:getQuote&gt;
+     &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+           </pre>
+           <pre xml:space="preserve">
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+     &lt;soapenv:Header xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+        &lt;wsa:To&gt;http://localhost:8281/services/SimpleStockQuoteService&lt;/wsa:To&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:1B57D0B0BF770678DE1261165228620&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+     &lt;/soapenv:Header&gt;
+     &lt;soapenv:Body&gt;
+        &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+           &lt;m0:request&gt;
+              &lt;m0:symbol&gt;MSFT&lt;/m0:symbol&gt;
+           &lt;/m0:request&gt;
+        &lt;/m0:getQuote&gt;
+     &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+           </pre>
+       </div>
+
+    <h2>
+         <a name="Sample651" id="Sample651">Sample 651: NHTTP Transport Priority Based Dispatching</a>
+       </h2>
+       <p>
+         &#xa0;
+       </p>
+    <p>
+        Here is the priority configuration file used by the NHTTP transport to determine the priority based on HTTP level properties.
+    </p>
+   <pre xml:space="preserve">&lt;priorityConfiguration&gt;
+    &lt;priority-executor&gt;
+        &lt;!-- two priorities specified with priority 10 and 1. Both priority messages has a queue depth of 100 --&gt;
+        &lt;queues isFixedCapacity=&quot;true&quot; nextQueue=&quot;org.apache.synapse.commons.executors.PRRNextQueueAlgorithm&quot;&gt;
+            &lt;queue size=&quot;100&quot; priority=&quot;10&quot;/&gt;
+            &lt;queue size=&quot;100&quot; priority=&quot;1&quot;/&gt;
+        &lt;/queues&gt;
+        &lt;!-- these are the default values, values are put here to show their availability --&gt;
+        &lt;threads core=&quot;20&quot; max=&quot;100&quot; keep-alive=&quot;5&quot;/&gt;
+    &lt;/priority-executor&gt;
+
+    &lt;!-- if a message comes that we cannot determine priority, we set a default priority of 1 --&gt;
+    &lt;conditions defaultPriority=&quot;1&quot;&gt;
+        &lt;condition priority=&quot;10&quot;&gt;
+            &lt;!-- check for the header named priority --&gt;
+            &lt;equal type=&quot;header&quot; source=&quot;priority&quot; value=&quot;5&quot;/&gt;
+        &lt;/condition&gt;
+        &lt;condition priority=&quot;1&quot;&gt;
+            &lt;equal type=&quot;header&quot; source=&quot;priority&quot; value=&quot;1&quot;/&gt;
+        &lt;/condition&gt;
+    &lt;/conditions&gt;
+&lt;/priorityConfiguration&gt;</pre>
+       <div>
+         <p>
+           <strong>Objective:</strong> Demonstrate the priority based dispatching of NHTTP transport.
+         </p>
+         <p>
+           <strong>Prerequisites:</strong> Deploy the
+           SimpleStockQuoteService in sample Axis2 server and start it on port
+           9000. Priority is applied only when synapse is loaded with enough messages to consume its core number of threads.
+             So to observe the priority based dispatching, it is required to use a load testing tool like JMeter, SOAP UI or Apache bench.
+         </p>
+         <p>
+             Open axis2.xml in repository/conf directory and uncomment the following parameter to the configuration.
+             <strong>priorityConfigFile</strong>. Set the value to repository/conf/sample/resources/priority/priority-configuration.xml
+         </p>
+         <p>
+           Start Synapse with the sample configuration 150 (i.e. synapse -sample 150).
+         </p>
+         <p>
+           In this sample, client should send a HTTP header that specifies the priority of the message.This header name is priority.
+             This header is retrieved in the prioirty configuration. Then it is matched against
+             the value 1 and 10. Depending on this value message is executed with priority 1 or 10.
+         </p>
+           <p>
+               Here are two sample XML files that can be used to invoke the service using a tool like JMeter, or Apache Ab. For SOAP UI,
+               user can use the WSDL repository/conf/sample/resources/proxy/sample_proxy_1.wsdl to create the request. The only
+               difference between the two demonstrated requests here is the symbol. One has the symbol as IBM and other has MSFT. For one type of
+               request set the priority header to 1 and for the next set the priority header to 10. Then load synapse with high
+               volume of traffic from both types of requests using the load testing tool. In the back end server it prints the
+               symbol of the incoming requests. User should be able to see more of high priority symbol.
+           </p>
+           <pre xml:space="preserve">
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+     &lt;soapenv:Header xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+        &lt;wsa:To&gt;http://localhost:8281/services/SimpleStockQuoteService&lt;/wsa:To&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:1B57D0B0BF770678DE1261165228620&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+     &lt;/soapenv:Header&gt;
+     &lt;soapenv:Body&gt;
+        &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+           &lt;m0:request&gt;
+              &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+           &lt;/m0:request&gt;
+        &lt;/m0:getQuote&gt;
+     &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+           </pre>
+           <pre xml:space="preserve">
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+     &lt;soapenv:Header xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+        &lt;wsa:To&gt;http://localhost:8281/services/SimpleStockQuoteService&lt;/wsa:To&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:1B57D0B0BF770678DE1261165228620&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+     &lt;/soapenv:Header&gt;
+     &lt;soapenv:Body&gt;
+        &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+           &lt;m0:request&gt;
+              &lt;m0:symbol&gt;MSFT&lt;/m0:symbol&gt;
+           &lt;/m0:request&gt;
+        &lt;/m0:getQuote&gt;
+     &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+           </pre>
        </div>
 </body></document>

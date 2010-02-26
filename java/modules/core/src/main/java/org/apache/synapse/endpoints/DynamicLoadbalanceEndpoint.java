@@ -121,14 +121,10 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
                     }
                 }
 
-                int port = currentMember.getHttpPort();
-                if ("https".equals(transport)) {
-                    port = currentMember.getHttpsPort();
-                }
-
                 EndpointReference epr =
                         new EndpointReference(transport + "://" + currentMember.getHostName() +
-                                ":" + port + address);
+                                ":" + ("http".equals(transport) ? currentMember.getHttpPort() :
+                                currentMember.getHttpsPort()) + address);
                 synCtx.setTo(epr);
                 if (isFailover()) {
                     synCtx.getEnvelope().build();
@@ -181,4 +177,3 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         }
     }
 }
-

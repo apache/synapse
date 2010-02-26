@@ -33,6 +33,7 @@ import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
 import org.apache.axis2.util.MessageContextBuilder;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,6 +55,7 @@ import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 
 import java.io.IOException;
@@ -382,6 +384,15 @@ public class ClientHandler implements NHttpClientHandler {
         }
 
         final MessageContext mc = axis2Request.getMsgContext();
+
+        // if the request message is a sandesha messag we ignore the
+        // exception handling
+        // we cannot use the declared sandesha2 constant since
+        // nhttp transport shouldn't take a sandesha2 dependency
+        String done = (String) mc.getProperty("Sandesha2AppProcessingDone");
+		if (JavaUtils.isTrueExplicitly(done)) {
+			return;
+		}
 
         if (mc.getAxisOperation() != null &&
                 mc.getAxisOperation().getMessageReceiver() != null) {

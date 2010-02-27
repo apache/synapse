@@ -1079,7 +1079,20 @@ public class FaultManager {
 							
 							((AxisCallback)callback).onError(fault);
 						}
-					}
+					 // this is actually to support synapse. Synpase Axis Operation does not have a callBackMessageReceiver
+                     // synapse AxisOperation always has the synapse message receiver. And also to be send in the synapse
+                     // fault mediators we need to set the SENDING_FAULT property as well.
+                    } else if (msgReceiver != null) {
+                        try {
+                            //since there is no reponse we set this message as the fault reply
+                            context.getOptions().setRelationships(new RelatesTo[]{new RelatesTo(context.getMessageID())});
+                            context.setProperty("SENDING_FAULT", Boolean.TRUE);
+                            msgReceiver.receive(context);
+                        } catch (AxisFault axisFault) {
+                            log.error(axisFault.getMessage());
+                            throw new SandeshaException("Can not invoke the message receiver ", axisFault);
+                        }
+                    }
 				}
 			}
 		}

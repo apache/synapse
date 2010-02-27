@@ -22,9 +22,13 @@ package org.apache.synapse.deployers;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.eventing.EventSourceFactory;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.eventing.SynapseEventSource;
+
+import java.io.File;
 
 /**
  *  Handles the <code>EventSource</code> deployment and undeployment tasks
@@ -157,7 +161,11 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                     = getSynapseConfiguration().getEventSource(artifactName);
             OMElement esElem = EventSourceSerializer.serializeEventSource(null, es);
             if (es.getFileName() != null) {
-                writeToFile(esElem, es.getFileName());
+                String fileName = ServerManager.getInstance()
+                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                        + File.separator + MultiXMLConfigurationBuilder.EVENTS_DIR
+                        + File.separator + es.getFileName();
+                writeToFile(esElem, fileName);
                 if (log.isDebugEnabled()) {
                     log.debug("Restoring the EventSource with name : " + artifactName + " : Completed");
                 }

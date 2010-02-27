@@ -22,9 +22,13 @@ package org.apache.synapse.deployers;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.EntryFactory;
 import org.apache.synapse.config.xml.EntrySerializer;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
+
+import java.io.File;
 
 /**
  *  Handles the <code>LocalEntry</code> deployment and undeployment tasks
@@ -147,7 +151,11 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
             Entry e = getSynapseConfiguration().getDefinedEntries().get(artifactName);
             OMElement entryElem = EntrySerializer.serializeEntry(e, null);
             if (e.getFileName() != null) {
-                writeToFile(entryElem, e.getFileName());
+                String fileName = ServerManager.getInstance()
+                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                        + File.separator + MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR
+                        + File.separator + e.getFileName();
+                writeToFile(entryElem, fileName);
                 if (log.isDebugEnabled()) {
                     log.debug("Restoring the LocalEntry with name : " + artifactName + " : Completed");
                 }

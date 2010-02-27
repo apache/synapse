@@ -23,9 +23,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
 import org.apache.synapse.config.xml.ProxyServiceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
+
+import java.io.File;
 
 /**
  *  Handles the <code>ProxyService</code> deployment and undeployment tasks
@@ -173,7 +177,11 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                     = getSynapseConfiguration().getProxyService(artifactName);
             OMElement proxyElem = ProxyServiceSerializer.serializeProxy(null, proxy);
             if (proxy.getFileName() != null) {
-                writeToFile(proxyElem, proxy.getFileName());
+                String fileName = ServerManager.getInstance()
+                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                        + File.separator + MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR
+                        + File.separator + proxy.getFileName();
+                writeToFile(proxyElem, fileName);
                 if (log.isDebugEnabled()) {
                     log.debug("Restoring the ProxyService with name : "
                             + artifactName + " : Completed");

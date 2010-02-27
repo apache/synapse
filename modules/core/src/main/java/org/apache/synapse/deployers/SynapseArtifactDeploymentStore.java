@@ -22,6 +22,8 @@ package org.apache.synapse.deployers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -38,10 +40,20 @@ import java.util.*;
 public final class SynapseArtifactDeploymentStore {
 
     /** Keeps track of the deployed artifacts in the synapse environment */
-    private static Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
+    private static Map<String, String> fileName2ArtifactName
+            = new TreeMap<String, String>(new Comparator<String>() {
+        public int compare(String o1, String o2) {
+            return (new File(o1)).compareTo(new File(o2));
+        }
+    });
 
     /** Keeps track of the updating artifacts in the synapse environment in a particular instance */
-    private Map<String, String> updatingArtifacts = new HashMap<String, String>();
+    private Map<String, String> updatingArtifacts
+            = new TreeMap<String, String>(new Comparator<String>() {
+        public int compare(String o1, String o2) {
+            return (new File(o1)).compareTo(new File(o2));
+        }
+    });
 
     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */
     private List<String> restoredFiles = new ArrayList<String>();
@@ -156,7 +168,9 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact which is being restored
      */
     public void addRestoredArtifact(String fileName) {
-        restoredFiles.add(fileName);
+        try {
+            restoredFiles.add((new File(fileName)).getCanonicalPath());
+        } catch (IOException ignore) {}
     }
 
     /**
@@ -167,7 +181,10 @@ public final class SynapseArtifactDeploymentStore {
      * <code>false</code> otherwise
      */
     public boolean isRestoredFile(String fileName) {
-        return restoredFiles.contains(fileName);
+        try {
+            return restoredFiles.contains((new File(fileName)).getCanonicalPath());
+        } catch (IOException ignore) {}
+        return false;
     }
 
     /**
@@ -176,7 +193,9 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be removed
      */
     public void removeRestoredFile(String fileName) {
-        restoredFiles.remove(fileName);
+        try {
+            restoredFiles.remove((new File(fileName)).getCanonicalPath());
+        } catch (IOException ignore) {}
     }
 
     /**
@@ -185,7 +204,9 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be added into the backedUp artifacts
      */
     public void addBackedUpArtifact(String fileName) {
-        backedUpFiles.add(fileName);
+        try {
+            backedUpFiles.add((new File(fileName)).getCanonicalPath());
+        } catch (IOException ignore) {}
     }
 
     /**
@@ -195,7 +216,10 @@ public final class SynapseArtifactDeploymentStore {
      * @return boolean <code>true</code> if the artifact is being backed up, <code>false</code> otherwise
      */
     public boolean isBackedUpArtifact(String fileName) {
-        return backedUpFiles.contains(fileName);
+        try {
+            return backedUpFiles.contains((new File(fileName)).getCanonicalPath());
+        } catch (IOException ignore) {}
+        return false;
     }
 
     /**
@@ -204,6 +228,8 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be removed
      */
     public void removeBackedUpArtifact(String fileName) {
-        backedUpFiles.remove(fileName);
+        try {
+            backedUpFiles.remove((new File(fileName)).getCanonicalPath());
+        } catch (IOException ignore) {}
     }
 }

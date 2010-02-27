@@ -23,10 +23,14 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MediatorSerializerFinder;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SequenceMediator;
+
+import java.io.File;
 
 /**
  *  Handles the <code>Sequence</code> deployment and undeployment tasks
@@ -48,7 +52,7 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
             Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig);
             if (m instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) m;
-                seq.setFileName(fileName);
+                seq.setFileName((new File(fileName).getName()));
                 if (log.isDebugEnabled()) {
                     log.debug("Sequence named '" + seq.getName()
                             + "' has been built from the file " + fileName);
@@ -94,7 +98,7 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                     handleSynapseArtifactDeploymentError(
                             existingArtifactName + " sequence cannot be renamed");
                 }
-                seq.setFileName(fileName);
+                seq.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("Sequence named '" + seq.getName()
                             + "' has been built from the file " + fileName);
@@ -180,7 +184,11 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
             OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
                     serializeMediator(null, seq);
             if (seq.getFileName() != null) {
-                writeToFile(seqElem, seq.getFileName());
+                String fileName = ServerManager.getInstance()
+                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                        + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR
+                        + File.separator + seq.getFileName();
+                writeToFile(seqElem, fileName);
                 if (log.isDebugEnabled()) {
                     log.debug("Restoring the Sequence with name : " + artifactName + " : Completed");
                 }

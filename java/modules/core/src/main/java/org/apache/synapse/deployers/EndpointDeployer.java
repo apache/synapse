@@ -22,9 +22,13 @@ package org.apache.synapse.deployers;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.endpoints.Endpoint;
+
+import java.io.File;
 
 /**
  *  Handles the <code>Endpoint</code> deployment and undeployment tasks
@@ -163,7 +167,11 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                     = getSynapseConfiguration().getDefinedEndpoints().get(artifactName);
             OMElement epElem = EndpointSerializer.getElementFromEndpoint(ep);
             if (ep.getFileName() != null) {
-                writeToFile(epElem, ep.getFileName());
+                String fileName = ServerManager.getInstance()
+                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                        + File.separator + MultiXMLConfigurationBuilder.ENDPOINTS_DIR
+                        + File.separator + ep.getFileName();
+                writeToFile(epElem, fileName);
                 if (log.isDebugEnabled()) {
                     log.debug("Restoring the Endpoint with name : "
                             + artifactName + " : Completed");

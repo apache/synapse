@@ -620,7 +620,8 @@ public class ServerWorker implements Runnable {
                 (serviceName == null || serviceName.length() == 0)) {
 
             try {
-                byte[] bytes = getServicesHTML().getBytes();
+                byte[] bytes = getServicesHTML(
+                        servicePath.endsWith("/") ? "" : servicePath + "/").getBytes();
                 response.addHeader(CONTENT_TYPE, TEXT_HTML);
                 serverHandler.commitResponseHideExceptions(conn, response);
                 os.write(bytes);
@@ -790,9 +791,10 @@ public class ServerWorker implements Runnable {
      * This can be delegated to another Class as well
      * where it will handle more options of GET messages.
      *
+     * @param prefix to be used for the Service names
      * @return the HTML to be displayed as a String
      */
-    public String getServicesHTML() {
+    public String getServicesHTML(String prefix) {
 
         Map services = cfgCtx.getAxisConfiguration().getServices();
         Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
@@ -815,7 +817,7 @@ public class ServerWorker implements Runnable {
                 }
 
                 Iterator iterator = axisService.getOperations();
-                resultBuf.append("<h3><a href=\"").append(axisService.getName()).append(
+                resultBuf.append("<h3><a href=\"").append(prefix).append(axisService.getName()).append(
                         "?wsdl\">").append(axisService.getName()).append("</a></h3>");
 
                 if (iterator.hasNext()) {

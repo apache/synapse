@@ -87,6 +87,7 @@
     <deployer extension="xml" directory="conf/synapse-config/local-entries" class="org.apache.synapse.deployers.LocalEntryDeployer"/>
     <deployer extension="xml" directory="conf/synapse-config/proxy-services" class="org.apache.synapse.deployers.ProxyServiceDeployer"/>
     <deployer extension="xml" directory="conf/synapse-config/event-sources" class="org.apache.synapse.deployers.EventSourceDeployer"/>
+    <deployer extension="xml" directory="conf/synapse-config/tasks" class="org.apache.synapse.deployers.TaskDeployer"/>
 
     <!-- Following parameter will set the host name for the epr-->
     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->

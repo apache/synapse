@@ -811,8 +811,8 @@ public class ServerWorker implements Runnable {
             for (Object service : services.values()) {
 
                 AxisService axisService = (AxisService) service;
-                if (axisService.getName().startsWith("__") || JavaUtils.isTrueExplicitly(
-                        axisService.getParameter(NhttpConstants.HIDDEN_SERVICE_PARAM_NAME))) {
+                if (axisService.getName().startsWith("__") || JavaUtils.isTrueExplicitly(axisService
+                        .getParameter(NhttpConstants.HIDDEN_SERVICE_PARAM_NAME).getValue())) {
                     continue;    // skip private services
                 }
 

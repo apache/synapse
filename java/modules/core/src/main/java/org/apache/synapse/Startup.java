@@ -46,4 +46,19 @@ public interface Startup extends ManagedLifecycle {
      * @param id String name to be set to the startup
      */
     public void setName(String id);
+
+    /**
+     * Returns the name of the file where this startup is defined
+     *
+     * @return a file name as a string or null
+     */
+    public String getFileName();
+
+
+    /**
+     * Set the name of the file name where this startup is defined
+     *
+     * @param fileName the name of the file as a string
+     */
+    public void setFileName(String fileName);
 }

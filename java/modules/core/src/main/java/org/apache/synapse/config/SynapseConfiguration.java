@@ -1084,13 +1084,25 @@ public class SynapseConfiguration implements ManagedLifecycle {
      */
     public void removeEventSource(String name) {
         SynapseEventSource eventSource = eventSources.get(name);
-        if (eventSource != null) {
-            eventSources.remove(name);
-            for (SynapseObserver o : observers) {
-                o.eventSourceRemoved(eventSource);
-            }
-        } else {
+        if (eventSource == null) {
             handleException("No event source exists by the name : " + name);
+        } else {
+            try {
+                if (getAxisConfiguration().getServiceForActivation(name) != null) {
+                    if (getAxisConfiguration().getServiceForActivation(name)
+                            .isActive()) {
+                        getAxisConfiguration().getService(name)
+                                .setActive(false);
+                    }
+                    getAxisConfiguration().removeService(name);
+                }
+                eventSources.remove(name);
+                for (SynapseObserver o : observers) {
+                    o.eventSourceRemoved(eventSource);
+                }
+            } catch (AxisFault axisFault) {
+                handleException(axisFault.getMessage());
+            }
         }
     }
 

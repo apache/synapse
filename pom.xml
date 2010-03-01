@@ -1015,6 +1015,13 @@
             <email>asankaa AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
+        <developer>
+            <name>Supun Kamburugamuva</name>
+            <id>supun</id>
+            <email>supun AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+
     </developers>
 
     <contributors>

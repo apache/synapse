@@ -94,7 +94,6 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                             + "' has been built from the file " + fileName);
                 }
                 getSynapseConfiguration().removeEventSource(existingArtifactName);
-                getSynapseConfiguration().getAxisConfiguration().removeService(existingArtifactName);
                 if (!existingArtifactName.equals(es.getName())) {
                     log.info("EventSource named " + existingArtifactName + " has been Undeployed");
                 }

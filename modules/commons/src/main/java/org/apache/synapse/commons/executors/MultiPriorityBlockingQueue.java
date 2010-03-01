@@ -341,10 +341,6 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         return capacity - count;
     }
 
-    public E element() {
-        return super.element();
-    }
-
     public E peek() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -358,10 +354,6 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         } finally {
             lock.unlock();
         }
-    }
-
-    public boolean add(E e) {
-        return super.add(e);
     }
 
     public Iterator<E> iterator() {
@@ -390,22 +382,6 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         } finally {
             lock.unlock();
         }
-    }
-
-    public boolean containsAll(Collection<?> c) {
-        return super.containsAll(c);
-    }
-
-    public boolean addAll(Collection<? extends E> c) {
-        return super.addAll(c);
-    }
-
-    public boolean removeAll(Collection<?> c) {
-        return super.removeAll(c);
-    }
-
-    public boolean retainAll(Collection<?> c) {
-        return super.retainAll(c);
     }
 
     public boolean contains(Object o) {

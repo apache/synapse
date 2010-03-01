@@ -238,7 +238,7 @@ public class Axis2HttpRequest {
                 httpRequest.removeHeader(existingHeader);
             }
             httpRequest.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
-                soapAction);
+                messageFormatter.formatSOAPAction(msgContext, null, soapAction));
         }
 
         if (NHttpConfiguration.getInstance().isKeepAliveDisabled() ||

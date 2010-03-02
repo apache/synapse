@@ -71,7 +71,7 @@ public class DataSourceInformationRepositoryFactory {
     }
 
      /**
-     * Setup an existing datasource inforamtion repository adding the provided
+     * Setup an existing datasource information repository adding the provided
      * datasource information.
      *
      * @param datasourceInformationRepository an existing data source information repository

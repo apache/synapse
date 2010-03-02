@@ -27,11 +27,11 @@ import java.util.*;
 
 /**
  * This queue implements the BlockingQueue interface. The element should implement the
- * Importance interface.
+ * Importance interface. </p>
  *
- * Internally Queue is implemented as a set of multiple queues corresponding to some
- * fixed priorities. When inserting an element, it will be put in to one of these queue
- * depending on its importance.
+ * <p> Internally Queue is implemented as a set of multiple queues corresponding to some
+ * fixed priorities. When inserting an element, it will be put in to one of these queues
+ * depending on its importance.</p>
  *
  * @param <E> E should implement the Importance interface.
  */
@@ -331,10 +331,6 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         } finally {
             lock.unlock();
         }
-    }
-
-    public E remove() {
-        return super.remove();
     }
 
     public int remainingCapacity() {

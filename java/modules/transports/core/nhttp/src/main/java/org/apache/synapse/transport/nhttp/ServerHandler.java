@@ -338,7 +338,7 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpContext context = conn.getContext();
         Boolean read = (Boolean) context.getAttribute(NhttpConstants.REQUEST_READ);
 
-        if (read != null && read) {
+        if (read == null || read) {
             if (log.isDebugEnabled()) {
                 log.debug("Keepalive connection was closed");
             }

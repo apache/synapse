@@ -19,7 +19,7 @@
 
 package org.apache.synapse.commons.executors;
 
-public class ExecutorConstants {
+public abstract class ExecutorConstants {
     public static final String NAME = "name";
     public static final String VALUE = "value";
     public static final String SIZE = "size";

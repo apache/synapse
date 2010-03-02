@@ -23,7 +23,7 @@ import org.apache.synapse.MessageContext;
 import javax.xml.namespace.QName;
 
 /**
- *
+ * Base class representing mediator variable used in XQuery mediator
  */
 
 public abstract class MediatorVariable {
@@ -61,6 +61,12 @@ public abstract class MediatorVariable {
         this.value = value;
     }
 
+    /**
+     * Calculates the value of this variable
+     *
+     * @param synCtx Current message in transit
+     * @return <code>true</code> if the value has changed
+     */
     public abstract boolean evaluateValue(MessageContext synCtx);
 
 }

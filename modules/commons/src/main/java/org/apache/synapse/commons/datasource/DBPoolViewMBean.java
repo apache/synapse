@@ -21,17 +21,39 @@ package org.apache.synapse.commons.datasource;
 import java.util.Map;
 
 /**
- *
+ * MBean for retriving some statistics about the connection pool
  */
 public interface DBPoolViewMBean {
-
+    /**
+     * Number of active connections
+     *
+     * @return <code>int</code> Number of active connections
+     */
     public int getNumActive();
 
+    /**
+     * Number of idle connections
+     *
+     * @return <code>int</code> Number of idle connections
+     */
     public int getNumIdle();
 
+    /**
+     * Data source name
+     *
+     * @return <code>String</code> data source name
+     */
     public String getName();
 
+    /**
+     * Connection information as a string
+     *
+     * @return <code>String</code> representing connection information
+     */
     public Map getConnectionUsage();
 
+    /**
+     * reset statistics
+     */
     public void reset();
 }

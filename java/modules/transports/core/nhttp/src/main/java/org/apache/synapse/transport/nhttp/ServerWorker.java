@@ -27,6 +27,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.base.MetricsCollector;
@@ -811,8 +812,10 @@ public class ServerWorker implements Runnable {
             for (Object service : services.values()) {
 
                 AxisService axisService = (AxisService) service;
-                if (axisService.getName().startsWith("__") || JavaUtils.isTrueExplicitly(axisService
-                        .getParameter(NhttpConstants.HIDDEN_SERVICE_PARAM_NAME).getValue())) {
+                Parameter parameter = axisService.getParameter(
+                        NhttpConstants.HIDDEN_SERVICE_PARAM_NAME);
+                if (axisService.getName().startsWith("__") ||
+                        (parameter != null && JavaUtils.isTrueExplicitly(parameter.getValue()))) {
                     continue;    // skip private services
                 }
 

@@ -40,7 +40,7 @@ public class DataSourceInformationListFactory {
      * Factory method for creating a  a DataSourceInformation Collection
      *
      * @param dsProperties Datasource configuration properties
-     * @return A List of DataSourceInformations
+     * @return A List of DataSourceInformation
      */
     public static List<DataSourceInformation> createDataSourceInformationList(
             Properties dsProperties) {

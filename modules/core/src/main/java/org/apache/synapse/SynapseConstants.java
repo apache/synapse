@@ -370,4 +370,7 @@ public final class SynapseConstants {
     // referring real endpoint is null
     public static final int ENDPOINT_IN_DIRECT_NOT_READY = 305100;
 
+    // callout operation failed
+    public static final int CALLOUT_OPERATION_FAILED    = 401000;
+
 }

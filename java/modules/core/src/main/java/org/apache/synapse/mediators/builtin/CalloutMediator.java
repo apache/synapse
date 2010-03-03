@@ -31,10 +31,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseLog;
+import org.apache.synapse.*;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -108,7 +105,12 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                 }
             }
 
-            OMElement result = sc.sendReceive(request);
+            OMElement result = null;
+            try {
+                result = sc.sendReceive(request);
+            } catch (AxisFault axisFault) {
+                handleFault(synCtx, axisFault);
+            }
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Response payload received : " + result);
@@ -145,6 +147,33 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
         synLog.traceOrDebug("End : Callout mediator");
         return true;
+    }
+
+    private void handleFault(MessageContext synCtx, AxisFault axisFault) {
+        synCtx.setProperty(SynapseConstants.SENDING_FAULT, Boolean.TRUE);
+        if (axisFault.getFaultCodeElement() != null) {
+            synCtx.setProperty(SynapseConstants.ERROR_CODE,
+                    axisFault.getFaultCodeElement().getText());
+        } else {
+            synCtx.setProperty(SynapseConstants.ERROR_CODE,
+                    SynapseConstants.CALLOUT_OPERATION_FAILED);
+        }
+
+        if (axisFault.getFaultReasonElement() != null) {
+            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
+                    axisFault.getFaultReasonElement().getText());
+        } else {
+            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, "Error while performing " +
+                    "the callout operation");
+        }
+
+        if (axisFault.getFaultDetailElement() != null) {
+            synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                    axisFault.getFaultDetailElement().getText());
+        }
+
+        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, axisFault);
+        throw new SynapseException("Error while performing the callout operation", axisFault);
     }
 
     private OMElement getRequestPayload(MessageContext synCtx) throws AxisFault {

@@ -427,10 +427,12 @@ public class MultiXMLConfigurationSerializer {
     }
 
     private void writeToFile(OMElement content, File file) throws Exception {
-        OutputStream out = new FileOutputStream(file);
+        File tempFile = File.createTempFile("syn_mx_", ".xml");
+        OutputStream out = new FileOutputStream(tempFile);
         XMLPrettyPrinter.prettify(content, out);
         out.flush();
         out.close();
+        tempFile.renameTo(file);
     }
 
     private void cleanUpDirectory()  throws Exception {

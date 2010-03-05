@@ -19,6 +19,7 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.synapse.ServerManager;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
@@ -45,6 +46,7 @@ import org.apache.axis2.util.XMLPrettyPrinter;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.GregorianCalendar;
 import java.util.Collection;
@@ -80,6 +82,7 @@ public class MultiXMLConfigurationSerializer {
         OMElement definitions = fac.createOMElement("definitions", synNS);
 
         try {
+            markConfigurationForSerialization();
             // TO start with clean up the existing configuration files
             cleanUpDirectory();
             createDirectoryStructure();
@@ -113,6 +116,61 @@ public class MultiXMLConfigurationSerializer {
             log.error("Error occured while serializing the Synapse configuration.", e);
             // Attempt to perform a restore using the backups available
             restoreBackup();
+        }
+    }
+
+    private void markConfigurationForSerialization() throws IOException {
+
+        // get the existing configuration and mark those files to be not to effect on deployers for deletion
+        SynapseConfiguration synCfg = ServerManager.getInstance()
+                .getServerContextInformation().getSynapseConfiguration();
+
+        for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
+            if (seq.getFileName() != null) {
+                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
+                        MultiXMLConfigurationBuilder.SEQUENCES_DIR)).getCanonicalPath()
+                        + seq.getFileName());
+            }
+        }
+
+        for (Endpoint ep : synCfg.getDefinedEndpoints().values()) {
+            if (ep.getFileName() != null) {
+                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
+                        MultiXMLConfigurationBuilder.ENDPOINTS_DIR)).getCanonicalPath()
+                        + ep.getFileName());
+            }
+        }
+
+        for (ProxyService proxy : synCfg.getProxyServices()) {
+            if (proxy.getFileName() != null) {
+                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
+                        MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR)).getCanonicalPath()
+                        + proxy.getFileName());
+            }
+        }
+
+        for (Entry e : synCfg.getDefinedEntries().values()) {
+            if (e.getFileName() != null) {
+                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
+                        MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR)).getCanonicalPath()
+                        + e.getFileName());
+            }
+        }
+
+        for (SynapseEventSource es : synCfg.getEventSources()) {
+            if (es.getFileName() != null) {
+                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
+                        MultiXMLConfigurationBuilder.EVENTS_DIR)).getCanonicalPath()
+                        + es.getFileName());
+            }
+        }
+
+        for (Startup s : synCfg.getStartups()) {
+            if (s.getFileName() != null) {
+                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
+                        MultiXMLConfigurationBuilder.TASKS_DIR)).getCanonicalPath()
+                        + s.getFileName());
+            }
         }
     }
 

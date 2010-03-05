@@ -128,48 +128,48 @@ public class MultiXMLConfigurationSerializer {
         for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
             if (seq.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.SEQUENCES_DIR)).getCanonicalPath()
-                        + seq.getFileName());
+                        MultiXMLConfigurationBuilder.SEQUENCES_DIR)).getAbsolutePath() 
+                        + File.separator + seq.getFileName());
             }
         }
 
         for (Endpoint ep : synCfg.getDefinedEndpoints().values()) {
             if (ep.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.ENDPOINTS_DIR)).getCanonicalPath()
-                        + ep.getFileName());
+                        MultiXMLConfigurationBuilder.ENDPOINTS_DIR)).getAbsolutePath()
+                        + File.separator + ep.getFileName());
             }
         }
 
         for (ProxyService proxy : synCfg.getProxyServices()) {
             if (proxy.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR)).getCanonicalPath()
-                        + proxy.getFileName());
+                        MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR)).getAbsolutePath()
+                        + File.separator + proxy.getFileName());
             }
         }
 
         for (Entry e : synCfg.getDefinedEntries().values()) {
             if (e.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR)).getCanonicalPath()
-                        + e.getFileName());
+                        MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR)).getAbsolutePath()
+                        + File.separator + e.getFileName());
             }
         }
 
         for (SynapseEventSource es : synCfg.getEventSources()) {
             if (es.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.EVENTS_DIR)).getCanonicalPath()
-                        + es.getFileName());
+                        MultiXMLConfigurationBuilder.EVENTS_DIR)).getAbsolutePath()
+                        + File.separator + es.getFileName());
             }
         }
 
         for (Startup s : synCfg.getStartups()) {
             if (s.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.TASKS_DIR)).getCanonicalPath()
-                        + s.getFileName());
+                        MultiXMLConfigurationBuilder.TASKS_DIR)).getAbsolutePath()
+                        + File.separator + s.getFileName());
             }
         }
     }

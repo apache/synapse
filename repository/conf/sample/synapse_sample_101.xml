@@ -19,15 +19,14 @@
     
 <!-- Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-
     <in>
         <RMSequence single="true" version="1.0"/>
         <send>
-        	<endpoint name="reliable">
-    			<address uri="http://localhost:9000/services/ReliableStockQuoteService">
-	    			<enableRM/>
-		    		<enableAddressing/>
-			    </address>
+            <endpoint name="reliable">
+    		<address uri="http://localhost:9000/services/ReliableStockQuoteService">
+	    	   <enableRM/>
+		   <enableAddressing/>
+	        </address>
             </endpoint>
         </send>
     </in>
@@ -40,5 +39,4 @@
                 xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm"/>
         <send/>
     </out>
-
 </definitions>

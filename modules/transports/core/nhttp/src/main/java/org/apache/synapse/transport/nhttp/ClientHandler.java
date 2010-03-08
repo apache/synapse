@@ -487,8 +487,11 @@ public class ClientHandler implements NHttpClientHandler {
             }
 
             if (decoder.isCompleted()) {
-                ((ClientConnectionDebug) conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG)).
-                    recordResponseCompletionTime();
+                ClientConnectionDebug ccd = (ClientConnectionDebug)
+                        conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG);
+                if (ccd != null) {
+                    ccd.recordResponseCompletionTime();
+                }
                 
                 if (metrics != null) {
                     if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
@@ -558,8 +561,12 @@ public class ClientHandler implements NHttpClientHandler {
                 } else {
                     metrics.incrementBytesSent(bytesWritten);
                 }
-                ((ClientConnectionDebug) context.getAttribute(
-                        CLIENT_CONNECTION_DEBUG)).recordRequestCompletionTime();
+
+                ClientConnectionDebug ccd = (ClientConnectionDebug)
+                        context.getAttribute(CLIENT_CONNECTION_DEBUG);
+                if (ccd != null) {
+                    ccd.recordRequestCompletionTime();
+                }
             }
 
         } catch (IOException e) {
@@ -595,8 +602,11 @@ public class ClientHandler implements NHttpClientHandler {
             return;
         }
 
-        ((ClientConnectionDebug) conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG)).
-                recordResponseStartTime(response.getStatusLine().toString());
+        ClientConnectionDebug ccd = (ClientConnectionDebug) 
+                conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG);
+        if (ccd != null) {
+            ccd.recordResponseStartTime(response.getStatusLine().toString());
+        }
 
         // Have we sent out our request fully in the first place? if not, forget about it now..
         Axis2HttpRequest req

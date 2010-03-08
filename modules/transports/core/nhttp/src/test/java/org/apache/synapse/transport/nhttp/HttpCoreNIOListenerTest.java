@@ -33,13 +33,6 @@ public class HttpCoreNIOListenerTest extends TestCase {
         
         // These tests don't work because of a problem similar to SYNAPSE-418
         suite.addExclude("(test=EchoXML)");
-        suite.addExclude("(test=AsyncXML)");
-        suite.addExclude("(test=AsyncTextPlain)");
-        suite.addExclude("(test=AsyncBinary)");
-        suite.addExclude("(test=AsyncSwA)");
-        suite.addExclude("(test=AsyncSOAPLarge)");
-        suite.addExclude("(test=REST)");
-        suite.addExclude("(test=MinConcurrency)");
 
         TransportDescriptionFactory tdfNIO =
             new SimpleTransportDescriptionFactory("http", HttpCoreNIOListener.class, 

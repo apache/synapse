@@ -54,13 +54,13 @@ public class ScriptMediatorTest extends TestCase {
     }
 
 
-//    public static Test suite() {
-//        TestSuite suite = new TestSuite();
-//        for (int i = 0; i < 10; i++) {
-//            suite.addTest(new RepeatedTest(new ScriptMediatorTest("testThreadSafety"), 10));
-//        }
-//        return suite;
-//    }
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
+        for (int i = 0; i < 10; i++) {
+            suite.addTest(new RepeatedTest(new ScriptMediatorTest("testThreadSafety"), 10));
+        }
+        return suite;
+    }
 
     public ScriptMediatorTest(String name) {
         super(name);

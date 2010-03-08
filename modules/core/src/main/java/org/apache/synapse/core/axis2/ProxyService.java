@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.java2wsdl.Java2WSDLConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -549,10 +550,9 @@ public class ProxyService implements AspectConfigurable {
                 axisCfg.addService(proxyService);
             } else {
                 auditInfo("Adding service " + name + " to the service group " + serviceGroup);
-                AxisServiceGroup proxyServiceGroup = axisCfg.getServiceGroup(serviceGroup);
-                if (proxyServiceGroup == null) {
+                if (axisCfg.getServiceGroup(serviceGroup) == null) {
                     // If the specified group does not exist we should create it
-                    proxyServiceGroup = new AxisServiceGroup();
+                    AxisServiceGroup proxyServiceGroup = new AxisServiceGroup();
                     proxyServiceGroup.setServiceGroupName(serviceGroup);
                     proxyServiceGroup.setParent(axisCfg);
                     // Add  the service to the new group and add the group the AxisConfiguration
@@ -560,7 +560,7 @@ public class ProxyService implements AspectConfigurable {
                     axisCfg.addServiceGroup(proxyServiceGroup);
                 } else {
                     // Simply add the service to the existing group
-                    proxyServiceGroup.addService(proxyService);
+                    axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);
                 }
             }
             this.setRunning(true);

@@ -171,31 +171,31 @@ public class TaskScheduler {
         assertStarted();
 
         if (taskDescription == null) {
-            throw new SynapseTaskException("Task Description can not be found", log);
+            throw new SynapseTaskException("Task Description cannot be found", log);
         }
 
         if (jobClass == null) {
-            throw new SynapseTaskException("Job Class can not be found", log);
+            throw new SynapseTaskException("Job Class cannot be found", log);
         }
 
         if (triggerFactory == null) {
-            throw new SynapseTaskException("TriggerFactory can not be found", log);
+            throw new SynapseTaskException("TriggerFactory cannot be found", log);
         }
 
         if (jobDetailFactory == null) {
-            throw new SynapseTaskException("JobDetailFactory can not be found", log);
+            throw new SynapseTaskException("JobDetailFactory cannot be found", log);
         }
 
         Trigger trigger = triggerFactory.createTrigger(taskDescription);
         if (trigger == null) {
-            throw new SynapseTaskException("Trigger can not be created from : "
+            throw new SynapseTaskException("Trigger cannot be created from : "
                     + taskDescription, log);
         }
 
         JobDetail jobDetail = jobDetailFactory.createJobDetail(taskDescription,
                 resources, jobClass);
         if (jobDetail == null) {
-            throw new SynapseTaskException("JobDetailcan not be created from : " + taskDescription +
+            throw new SynapseTaskException("JobDetail cannot be created from : " + taskDescription +
                     " and job class " + jobClass.getName(), log);
         }
 
@@ -221,13 +221,13 @@ public class TaskScheduler {
             try {
                 if (scheduler != null && scheduler.isStarted()) {
                     if (log.isDebugEnabled()) {
-                        log.debug("ShutingDown Task Scheduler : " + scheduler.getMetaData());
+                        log.debug("ShuttingDown Task Scheduler : " + scheduler.getMetaData());
                     }
                     scheduler.shutdown();
                 }
                 initialized = false;
             } catch (SchedulerException e) {
-                throw new SynapseTaskException("Error ShutingDown task scheduler ", e, log);
+                throw new SynapseTaskException("Error ShuttingDown task scheduler ", e, log);
             }
         }
     }
@@ -331,7 +331,7 @@ public class TaskScheduler {
                 throw new SynapseTaskException("Scheduler has not been started yet", log);
             }
         } catch (SchedulerException e) {
-            throw new SynapseTaskException("Error determine start state of the cheduler ", e, log);
+            throw new SynapseTaskException("Error determine start state of the scheduler ", e, log);
         }
     }
 

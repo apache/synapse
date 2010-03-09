@@ -36,7 +36,7 @@ public class TaskDescriptionRepositoryFactory {
     /**
      * Returns a TaskDescriptionRepository instance
      * There is an only one instance of TaskDescriptionRepository for a given id as
-     *  Factory caches TaskDescriptionRepositorys
+     *  Factory caches TaskDescriptionRepositories
      *
      * @param id Identifier for TaskDescriptionRepository
      * @return TaskDescriptionRepository instance

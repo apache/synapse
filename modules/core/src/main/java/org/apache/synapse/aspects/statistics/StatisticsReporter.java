@@ -146,11 +146,21 @@ public class StatisticsReporter {
     /**
      * Ends statistics reporting after request processed
      *
-     * @param synCtx MessageContext instance
+     * @param synCtx              MessageContext instance
+     * @param aspectConfiguration main component's aspect conf
      */
-    public static void endReportForAllOnRequestProcessed(MessageContext synCtx) {
-        if (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null && !synCtx.isResponse()) {
-            endReportForAll(synCtx, false);
+    public static void endReportForAllOnRequestProcessed(MessageContext synCtx,
+                                                         AspectConfiguration aspectConfiguration) {
+
+        boolean isOutOnly = Boolean.parseBoolean(
+                String.valueOf(synCtx.getProperty(SynapseConstants.OUT_ONLY)));
+        if (!isOutOnly) {
+            isOutOnly = (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null
+                    && !synCtx.isResponse());
+        }
+        if (isOutOnly) {
+            endReportForAll(synCtx,
+                    (aspectConfiguration != null && aspectConfiguration.isStatisticsEnable()));
         }
     }
 

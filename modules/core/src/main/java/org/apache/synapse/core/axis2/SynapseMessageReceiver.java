@@ -96,7 +96,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
                     "message dropped", synCtx);
             }
         } finally {
-            StatisticsReporter.endReportForAllOnRequestProcessed(synCtx);
+            StatisticsReporter.endReportForAllOnRequestProcessed(synCtx, null);
         }
     }
 

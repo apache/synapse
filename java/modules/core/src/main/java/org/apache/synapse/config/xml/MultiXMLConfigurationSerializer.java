@@ -593,7 +593,7 @@ public class MultiXMLConfigurationSerializer {
         }
     }
 
-    private OMElement serializeExecutor(PriorityExecutor source, OMElement parent) throws Exception {
+    public OMElement serializeExecutor(PriorityExecutor source, OMElement parent) throws Exception {
         File executorDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
         if (!executorDir.exists() && !executorDir.mkdirs()) {
             throw new Exception("Error while creating the directory for executors : " +

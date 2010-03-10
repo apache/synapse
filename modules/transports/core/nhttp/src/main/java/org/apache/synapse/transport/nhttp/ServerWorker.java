@@ -157,7 +157,8 @@ public class ServerWorker implements Runnable {
             msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
         }
         msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
-        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
+        // the following statement causes the soap session services to be failing - ruwan        
+        // msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
         msgContext.setServerSide(true);
         msgContext.setProperty(
             Constants.Configuration.TRANSPORT_IN_URL, request.getRequestLine().getUri());

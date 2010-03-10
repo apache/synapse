@@ -560,8 +560,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * (normal response versus fault response) as well as Axis2 message context properties set
      * via Synapse configuration or MessageBuilders.
      * 
-     * @see NhttpConstants.FAULTS_AS_HTTP_200
-     * @see NhttpConstants.HTTP_SC
+     * @see org.apache.synapse.transport.nhttp.NhttpConstants#FAULTS_AS_HTTP_200
+     * @see org.apache.synapse.transport.nhttp.NhttpConstants#HTTP_SC
      * 
      * @param msgContext the Axis2 message context 
      * @param response the HTTP response object

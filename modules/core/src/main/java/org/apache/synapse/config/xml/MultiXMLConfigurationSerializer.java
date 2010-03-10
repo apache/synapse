@@ -125,6 +125,10 @@ public class MultiXMLConfigurationSerializer {
         SynapseConfiguration synCfg = ServerManager.getInstance()
                 .getServerContextInformation().getSynapseConfiguration();
 
+        if (synCfg == null) {
+            return;
+        }
+
         for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
             if (seq.getFileName() != null) {
                 deploymentStore.addBackedUpArtifact((new File(rootDirectory,

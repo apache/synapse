@@ -38,7 +38,7 @@ import java.io.File;
  */
 public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
 
-    private static Log log = LogFactory.getLog(SequenceDeployer.class);
+    private static Log log = LogFactory.getLog(ProxyServiceDeployer.class);
 
     @Override
     public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {

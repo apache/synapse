@@ -84,6 +84,11 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
+        String filename = deploymentFileData.getAbsolutePath();
+        if (log.isDebugEnabled()) {
+            log.debug("Deployment of the synapse artifact from file : " + filename + " : STARTED");
+        }
+
         if (ServerManager.getInstance().getServerState() != ServerState.STARTED) {
             // synapse server has not yet being started
             if (log.isDebugEnabled()) {
@@ -94,10 +99,11 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
             return;
         }
 
-        String filename = deploymentFileData.getAbsolutePath();
-
         // check whether this is triggered by a restore, if it is a restore we do not want to deploy it again
         if (deploymentStore.isRestoredFile(filename)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Restored artifact detected with filename : " + filename);
+            }
             // only one deployment trigger can happen after a restore and hence remove it from restoredFiles
             // at the first hit, allowing the further deployments/updates to take place as usual
             deploymentStore.removeRestoredFile(filename);
@@ -113,6 +119,10 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                         StAXUtils.createXMLStreamReader(in)).getDocumentElement();
                 String artifatcName = null;
                 if (deploymentStore.isUpdatingArtifact(filename)) {
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Updating artifact detected with filename : " + filename);
+                    }
                     // this is an hot-update case
                     String existingArtifactName
                             = deploymentStore.getUpdatingArtifactWithFileName(filename);
@@ -156,6 +166,10 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
             handleDeploymentError("Deployment of synapse artifact failed. Error parsing "
                     + filename + " : " + ex.getMessage(), ex, filename);
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Deployment of the synapse artifact from file : " + filename + " : COMPLETED");
+        }
     }
 
     /**
@@ -170,8 +184,16 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      */
     public void unDeploy(String fileName) throws DeploymentException {
 
+        if (log.isDebugEnabled()) {
+            log.debug("UnDeployment of the synapse artifact from file : " + fileName + " : STARTED");
+        }
+
         // We want to eliminate the undeployment when we are backing up these files
         if (deploymentStore.isBackedUpArtifact(fileName)) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("BackedUp artifact detected with filename : " + fileName);
+            }
             // only one undeployment trigger can happen after a backup and hence remove it from backedUpFiles
             // at the first hit, allowing the further undeploymentsto take place as usual
             deploymentStore.removeBackedUpArtifact(fileName);
@@ -184,6 +206,9 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
             // the Hot-Update from the above two, since it needs some validations for a real undeployment.
             // also this makes sure a zero downtime of the synapse artifacts which are being Hot-deployed
             if (undeployingFile.exists()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Marking artifact as updating from file : " + fileName);
+                }
                 // if the file exists, which means it has been updated and is a Hot-Update case
                 deploymentStore.addUpdatingArtifact(
                         fileName, deploymentStore.getArtifactNameForFile(fileName));
@@ -205,6 +230,11 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
                     + fileName + " is not deployed on Synapse";
             log.error(msg);
             throw new DeploymentException(msg);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("UnDeployment of the synapse artifact from file : "
+                    + fileName + " : COMPLETED");
         }
     }
 

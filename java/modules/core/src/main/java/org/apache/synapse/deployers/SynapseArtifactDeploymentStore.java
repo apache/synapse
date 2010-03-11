@@ -88,6 +88,9 @@ public final class SynapseArtifactDeploymentStore {
     public void addArtifact(String fileName, String artifactName) {
 
         if (!fileName2ArtifactName.containsKey(fileName)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Added deployment artifact with file : " + fileName);
+            }
             fileName2ArtifactName.put(fileName, artifactName);
         } else {
             log.error("An artifact has already been loaded from the file : " + fileName);
@@ -120,6 +123,9 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of which the artifact required to be removed
      */
     public void removeArtifactWithFileName(String fileName) {
+        if (log.isDebugEnabled()) {
+            log.debug("Removing deployment artifact with file : " + fileName);
+        }
         fileName2ArtifactName.remove(fileName);
     }
 
@@ -130,6 +136,9 @@ public final class SynapseArtifactDeploymentStore {
      * @param artifactName name of the actual artifact being updated
      */
     public void addUpdatingArtifact(String fileName, String artifactName) {
+        if (log.isDebugEnabled()) {
+            log.debug("Added updating file : " + fileName);
+        }
         updatingArtifacts.put(fileName, artifactName);
     }
 
@@ -159,6 +168,9 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be removed from the updating artifacts
      */
     public void removeUpdatingArtifact(String fileName) {
+        if (log.isDebugEnabled()) {
+            log.debug("Removing the updating file : " + fileName);
+        }
         updatingArtifacts.remove(fileName);
     }
 
@@ -169,6 +181,9 @@ public final class SynapseArtifactDeploymentStore {
      */
     public void addRestoredArtifact(String fileName) {
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Added restored file : " + (new File(fileName)).getCanonicalPath());
+            }
             restoredFiles.add((new File(fileName)).getCanonicalPath());
         } catch (IOException ignore) {}
     }
@@ -194,6 +209,9 @@ public final class SynapseArtifactDeploymentStore {
      */
     public void removeRestoredFile(String fileName) {
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing restored file : " + (new File(fileName)).getCanonicalPath());
+            }
             restoredFiles.remove((new File(fileName)).getCanonicalPath());
         } catch (IOException ignore) {}
     }
@@ -205,6 +223,9 @@ public final class SynapseArtifactDeploymentStore {
      */
     public void addBackedUpArtifact(String fileName) {
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Added backup file : " + (new File(fileName)).getCanonicalPath());
+            }
             backedUpFiles.add((new File(fileName)).getCanonicalPath());
         } catch (IOException ignore) {}
     }
@@ -229,6 +250,9 @@ public final class SynapseArtifactDeploymentStore {
      */
     public void removeBackedUpArtifact(String fileName) {
         try {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing backup file : " + (new File(fileName)).getCanonicalPath());
+            }
             backedUpFiles.remove((new File(fileName)).getCanonicalPath());
         } catch (IOException ignore) {}
     }

@@ -50,7 +50,7 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
         try {
             ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig);
             if (proxy != null) {
-                proxy.setFileName(fileName);
+                proxy.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("ProxyService named '" + proxy.getName()
                             + "' has been built from the file " + fileName);
@@ -95,7 +95,7 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
         try {
             ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig);
             if (proxy != null) {
-                proxy.setFileName(fileName);
+                proxy.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("ProxyService named '" + proxy.getName()
                             + "' has been built from the file " + fileName);

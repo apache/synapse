@@ -37,7 +37,7 @@ import java.io.File;
  */
 public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
 
-    private static Log log = LogFactory.getLog(SequenceDeployer.class);
+    private static Log log = LogFactory.getLog(EventSourceDeployer.class);
 
     @Override
     public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {

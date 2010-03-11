@@ -49,7 +49,7 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
         try {
             Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false);
             if (ep != null) {
-                ep.setFileName(fileName);
+                ep.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("Endpoint named '" + ep.getName()
                             + "' has been built from the file " + fileName);
@@ -88,7 +88,7 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
         try {
             Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false);
             if (ep != null) {
-                ep.setFileName(fileName);
+                ep.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("Endpoint named '" + ep.getName()
                             + "' has been built from the file " + fileName);

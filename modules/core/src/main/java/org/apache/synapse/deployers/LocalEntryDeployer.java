@@ -49,7 +49,7 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
         try {
             Entry e = EntryFactory.createEntry(artifactConfig);
             if (e != null) {
-                e.setFileName(fileName);
+                e.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("LocalEntry with key '" + e.getKey()
                             + "' has been built from the file " + fileName);
@@ -84,7 +84,7 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
         try {
             Entry e = EntryFactory.createEntry(artifactConfig);
             if (e != null) {
-                e.setFileName(fileName);
+                e.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("LocalEntry with key '" + e.getKey()
                             + "' has been built from the file " + fileName);

@@ -49,7 +49,7 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
         try {
             SynapseEventSource es = EventSourceFactory.createEventSource(artifactConfig);
             if (es != null) {
-                es.setFileName(fileName);
+                es.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("EventSource named '" + es.getName()
                             + "' has been built from the file " + fileName);
@@ -88,7 +88,7 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
         try {
             SynapseEventSource es = EventSourceFactory.createEventSource(artifactConfig);
             if (es != null) {
-                es.setFileName(fileName);
+                es.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("EventSource named '" + es.getName()
                             + "' has been built from the file " + fileName);

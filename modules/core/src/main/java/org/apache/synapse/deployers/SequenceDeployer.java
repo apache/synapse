@@ -52,7 +52,7 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
             Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig);
             if (m instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) m;
-                seq.setFileName((new File(fileName).getName()));
+                seq.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("Sequence named '" + seq.getName()
                             + "' has been built from the file " + fileName);

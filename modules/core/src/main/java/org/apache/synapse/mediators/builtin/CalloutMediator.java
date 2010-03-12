@@ -168,8 +168,13 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         }
 
         if (axisFault.getFaultDetailElement() != null) {
-            synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
-                    axisFault.getFaultDetailElement().getText());
+            if (axisFault.getFaultDetailElement().getFirstElement() != null) {
+                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                        axisFault.getFaultDetailElement().getFirstElement());
+            } else {
+                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                        axisFault.getFaultDetailElement().getText());
+            }
         }
 
         synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, axisFault);

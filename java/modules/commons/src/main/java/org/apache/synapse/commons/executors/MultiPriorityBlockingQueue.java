@@ -408,11 +408,19 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
     }
 
     public void clear() {
-        while (true) {
-            if (poll() == null)  break;
-        }
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (InternalQueue<E> intQueue : queues) {
+                intQueue.clear();
+            }
+            count = 0;
+        } finally {
+            lock.unlock();
+        }                
     }
 
+    @SuppressWarnings({"SuspiciousToArrayCall"})
     public <T> T[] toArray(T[] a) {
         final ReentrantLock lock = this.lock;
         lock.lock();

@@ -168,6 +168,14 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         return capacity;
     }
 
+    @Override
+    public boolean contains(Object o) {
+        for (E e : array) {
+            if (e.equals(o)) return true;
+        }
+        return false;
+    }
+
     private int increment(int i) {
         return (++i == array.length)? 0 : i;
     }

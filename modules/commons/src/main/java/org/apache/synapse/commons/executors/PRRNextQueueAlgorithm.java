@@ -26,10 +26,10 @@ import java.util.List;
  *
  * <p>This algorithm works in cycles. Lets say we have queues with following priorities.
  * 7, 5, 2 and assume we name the queues as 1, 2, 3 in the order. </p>
- * <p>Here is how messages are picked in a single cycle
- * 1, 1, 1, 1, 1, 1, 1 // all the messages for the queue with priority 1 are sent for this cycle
- * 2, 2, 2, 2, 2,  // all the messages for the queue with priority 2 are sent for this cycle
- * 3, 3 // all the messages with priority 2 are sent for this cycle</p>
+ * <p>Here is how messages are picked in a single cycle </p>
+ * <p> 1, 1, 1, 1, 1, 1, 1 all the messages for the queue with priority 1 are sent for this cycle
+ * 2, 2, 2, 2, 2,  all the messages for the queue with priority 2 are sent for this cycle
+ * 3, 3 all the messages with priority 2 are sent for this cycle</p>
  *
  * <p>This algorithm choose the queues in the above order if all the queues have messages at the
  * point of selection. If a queue doesn't have messages it will skip the queue and move to the
@@ -37,25 +37,16 @@ import java.util.List;
  */
 public class PRRNextQueueAlgorithm<E> implements NextQueueAlgorithm<E> {
     
-    /**
-     * We hold a reference to the actual queue
-     */
+    /** Reference to the actual queue */
     private List<InternalQueue<E>> queues;
 
-    /**
-     * Number of queues, this is just to avoid the overhead of calculating
-     * this again and again
-     */
+    /** Number of queues, we keep this to avoid the overhead of calculatin this again and again */
     private int size = 0;
 
-    /**
-     * Current queue we are operating on
-     */
+    /** Current queue we are operating on */
     private int currentQueue = 0;
 
-    /**
-     * Number of messages sent from the current queue
-     */
+    /** Number of messages sent from the current queue */
     private int currentCount = 0;
 
     public InternalQueue<E> getNextQueue() {
@@ -80,6 +71,7 @@ public class PRRNextQueueAlgorithm<E> implements NextQueueAlgorithm<E> {
                 // we move forward until we find a non empty queue or everything is empty
             } while (internalQueue.size() == 0 && c < size);
 
+            // if we come to the initial queue, that means all the queues are empty.
             if (internalQueue.size() == 0) {
                 currentQueue = 0;
                 return null;
@@ -87,9 +79,6 @@ public class PRRNextQueueAlgorithm<E> implements NextQueueAlgorithm<E> {
         }
 
         currentCount++;
-
-        /*log.info("Get the queue with the priority: " +
-                        internalQueue.getPriority());*/
 
         return internalQueue;
     }

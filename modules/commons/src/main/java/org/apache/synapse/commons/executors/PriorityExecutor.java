@@ -47,6 +47,7 @@ public class PriorityExecutor {
     private int max = ExecutorConstants.DEFAULT_MAX;
     /** Keep alive time for spare threads */
     private int keepAlive = ExecutorConstants.DEFAULT_KEEP_ALIVE;
+
     /** This will be executed before the Task is submitted  */
     private BeforeExecuteHandler beforeExecuteHandler;
     /** Queue used by the executor */
@@ -56,12 +57,14 @@ public class PriorityExecutor {
     private String fileName;
 
     /**
-     * Execute a given task with the priority specified.
+     * Execute a given task with the priority specified. If the task throws an exception,
+     * it will be captured and logged to prevent the threads from dying. 
      *
      * @param task task to be executed
      * @param priority priority of the tast
      */
     public void execute(final Runnable task, int priority) {
+        // create a dummy worker to execute the task
         Worker w = new Worker(task, priority);
 
         if (beforeExecuteHandler != null) {

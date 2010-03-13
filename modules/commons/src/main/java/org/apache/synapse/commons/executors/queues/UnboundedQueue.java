@@ -59,11 +59,17 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
     }
 
     public E poll() {
-        return elements.remove(elements.size() - 1);
+        if (elements.size() > 0) {
+            return elements.remove(elements.size() - 1);
+        }
+        return null;
     }
 
     public E peek() {
-        return elements.get(elements.size() - 1);
+        if (elements.size() > 0) {
+            return elements.get(elements.size() - 1);
+        }
+        return null;
     }
 
     public int getPriority() {
@@ -104,5 +110,10 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
 
     public int getCapacity() {
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return elements.contains(o);
     }
 }

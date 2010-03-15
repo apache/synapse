@@ -22,9 +22,7 @@ package org.apache.synapse.commons.executors.queues;
 import org.apache.synapse.commons.executors.InternalQueue;
 
 import java.util.concurrent.locks.Condition;
-import java.util.AbstractQueue;
-import java.util.Iterator;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * A bounded queue implementation for internal queues. This queue is backed by an
@@ -62,14 +60,18 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
     /**
      * Head of the queue
      */
-    private int head;
+    private int head = 0;
 
     /**
      * Tail of the queue
      */
-    private int tail;
-    
+    private int tail = 0;
 
+    /**
+     * Create a queue with the given priority and capacity.
+     * @param priority priority of the elements in the queue
+     * @param capacity capacity of the queue
+     */
     public FixedSizeQueue(int priority, int capacity) {
         this.priority = priority;        
         this.capacity = capacity;
@@ -93,7 +95,9 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         this.notFullCond = notFullCond;
     }
 
-    public Iterator<E> iterator() {return null;}
+    public Iterator<E> iterator() {
+        return new Itr<E>();
+    }
 
     public int size() {
         return count;
@@ -176,8 +180,64 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         return false;
     }
 
-    private int increment(int i) {
-        return (++i == array.length)? 0 : i;
+    @Override
+    public boolean remove(Object o) {
+        boolean found = false;
+        int i = head;
+        int iterations = 0;
+        while (iterations++ < count) {
+            if (!found && array[i].equals(o)) {
+                found = true;
+            }
+
+            if (found) {
+                int j = increment(i);
+                array[i] = array[j];
+            }
+
+            i = increment(i);
+        }
+
+        if (found) {
+            count--;
+            tail = decrement(tail);
+        }
+
+        return found;
+    }
+
+    private class Itr<E> implements Iterator<E> {
+	    int index = head;
+
+        public boolean hasNext() {
+            return index != tail;
+        }
+
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            return (E) array[index++];
+
+        }
+
+        public void remove() {            
+            while (index != tail) {
+                int j = increment(index);
+
+                array[index] = array[j];
+                index = j;
+            }
+        }
+    }
+
+    private int decrement(int n) {
+        return (n == 0) ? array.length - 1 : n;
+    }
+
+    private int increment(int n) {
+        return (++n == array.length) ? 0 : n;
     }
 
     private void insert(E e) {

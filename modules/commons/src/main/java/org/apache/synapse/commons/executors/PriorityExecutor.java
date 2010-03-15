@@ -37,22 +37,18 @@ public class PriorityExecutor {
 
     /** Actual thread pool executor */
     private ThreadPoolExecutor executor;
-
     /** Name of the executor */
     private String name = null;
-
     /** Core threads count */
     private int core = ExecutorConstants.DEFAULT_CORE;
     /** Max thread count */
     private int max = ExecutorConstants.DEFAULT_MAX;
     /** Keep alive time for spare threads */
     private int keepAlive = ExecutorConstants.DEFAULT_KEEP_ALIVE;
-
     /** This will be executed before the Task is submitted  */
     private BeforeExecuteHandler beforeExecuteHandler;
     /** Queue used by the executor */
     private MultiPriorityBlockingQueue<Runnable> queue;
-
     /** this is used by the file based synapse xml configuration */
     private String fileName;
 
@@ -95,11 +91,11 @@ public class PriorityExecutor {
     }
 
     /**
-     * Destroy the executor. 
+     * Destroy the executor. Stop all the threads running. 
      */
     public void destroy() {
         if (log.isDebugEnabled()) {
-            log.debug("Shutting down thread pool executor");
+            log.debug("Shutting down priority executor" + (name != null ? ": " + name : ""));
         }
 
         executor.shutdown();
@@ -152,7 +148,7 @@ public class PriorityExecutor {
     }
 
     /**
-     * Set the queue
+     * Set the queue.
      *
      * @param queue queue used for handling the priorities
      */
@@ -161,7 +157,7 @@ public class PriorityExecutor {
     }
 
     /**
-     * Get the queue
+     * Get the queue.
      *
      * @return queue used for handling multiple priorities
      */

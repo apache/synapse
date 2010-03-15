@@ -59,7 +59,6 @@ public class PriorityExecutorFactory {
                                                   boolean requireName) throws AxisFault {        
         QName queuesQName = createQname(namespace, ExecutorConstants.QUEUES);
         QName queueQName = createQname(namespace, ExecutorConstants.QUEUE);
-
         QName threadsQName = createQname(namespace, ExecutorConstants.THREADS);
 
         PriorityExecutor executor = new PriorityExecutor();

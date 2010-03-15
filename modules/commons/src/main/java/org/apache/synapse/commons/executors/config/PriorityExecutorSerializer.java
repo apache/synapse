@@ -32,6 +32,7 @@ public class PriorityExecutorSerializer {
 
     public static OMElement serialize(OMElement parent,
                                       PriorityExecutor executor, String namespace) {        
+
         QName executorQName = createQname(namespace, ExecutorConstants.PRIORITY_EXECUTOR);
         QName queuesQName = createQname(namespace, ExecutorConstants.QUEUES);
         QName queueQName = createQname(namespace, ExecutorConstants.QUEUE);
@@ -55,7 +56,7 @@ public class PriorityExecutorSerializer {
 
         // create the queues configuration
         MultiPriorityBlockingQueue queue = executor.getQueue();
-        NextQueueAlgorithm algo = queue.getNextQueue();
+        NextQueueAlgorithm algo = queue.getNextQueueAlgorithm();
         OMElement queuesEle = fac.createOMElement(queuesQName);
 
         if (!(algo instanceof PRRNextQueueAlgorithm)) {

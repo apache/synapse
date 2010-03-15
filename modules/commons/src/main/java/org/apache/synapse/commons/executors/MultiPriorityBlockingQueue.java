@@ -53,19 +53,21 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
     private int capacity = Integer.MAX_VALUE;
 
     /** Algorithm for determining next queue */
-    private NextQueueAlgorithm<E> nextQueue;
+    private NextQueueAlgorithm<E> nextQueueAlgorithm;
     
     /** whether fixed size queues are used */
     private boolean isFixedSizeQueues;
 
     /**
-     * Create a queue with the given queues
+     * Create a queue with the given queues. </p>
      *
-     * This method will create a Queue that accepts objects with only the priorities specified.
-     * If a object is submitted with a different priority it will result in a null point
-     * exception.
-     * @param queues internal queues to be used
-     * @param isFixedQueues weather fixed queues are used
+     * <p> This method will create a Queue that accepts objects with only the priorities specified.
+     * If a object is submitted with a different priority it will result in an
+     * IllegalArgumentException. If the algorithm is null, this queue will use the
+     * PRRNextQueueAlgorithm.</p>
+     * 
+     * @param queues list of InternalQueue to be used
+     * @param isFixedQueues weather fixed size queues are used
      * @param algorithm algorithm for calculating next queue
      */
     public MultiPriorityBlockingQueue(List<InternalQueue<E>> queues,
@@ -93,12 +95,12 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
 
         if (algorithm == null) {
-            nextQueue = new PRRNextQueueAlgorithm<E>();
+            nextQueueAlgorithm = new PRRNextQueueAlgorithm<E>();
         } else {
-            nextQueue = algorithm;
+            nextQueueAlgorithm = algorithm;
         }
         // initialize the algorithm
-        nextQueue.init(queues);
+        nextQueueAlgorithm.init(queues);
     }
 
     /**
@@ -207,11 +209,11 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         try {
-            InternalQueue<E> internalQueue = nextQueue.getNextQueue();
+            InternalQueue<E> internalQueue = nextQueueAlgorithm.getNextQueue();
             try {
                 while (internalQueue == null) {
                     notEmpty.await();
-                    internalQueue = nextQueue.getNextQueue();
+                    internalQueue = nextQueueAlgorithm.getNextQueue();
                 }
             } catch (InterruptedException ie) {
                 notEmpty.signal();
@@ -241,7 +243,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         lock.lockInterruptibly();
         try {
             for (;;) {
-                InternalQueue<E> internalQueue = nextQueue.getNextQueue();
+                InternalQueue<E> internalQueue = nextQueueAlgorithm.getNextQueue();
                 if (internalQueue != null) {
                     E e = internalQueue.poll();
                     count--;
@@ -319,7 +321,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-            InternalQueue<E> internalQueue = nextQueue.getNextQueue();
+            InternalQueue<E> internalQueue = nextQueueAlgorithm.getNextQueue();
             if (internalQueue != null) {
                 count--;
                 E e = internalQueue.poll();
@@ -341,7 +343,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-            InternalQueue<E> internalQueue = nextQueue.getNextQueue();
+            InternalQueue<E> internalQueue = nextQueueAlgorithm.getNextQueue();
             if (internalQueue != null) {
                 return internalQueue.peek();
             } else {
@@ -455,7 +457,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
                 return q;
             }
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 
     private class QueueIterator implements Iterator<E> {
@@ -504,8 +506,8 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         return queues;
     }
 
-    public NextQueueAlgorithm<E> getNextQueue() {
-        return nextQueue;
+    public NextQueueAlgorithm<E> getNextQueueAlgorithm() {
+        return nextQueueAlgorithm;
     }
 
     public boolean isFixedSizeQueues() {

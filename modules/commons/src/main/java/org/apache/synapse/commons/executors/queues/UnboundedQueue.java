@@ -116,4 +116,9 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
     public boolean contains(Object o) {
         return elements.contains(o);
     }
+
+    @Override
+    public boolean remove(Object o) {
+        return elements.remove(o);
+    }
 }

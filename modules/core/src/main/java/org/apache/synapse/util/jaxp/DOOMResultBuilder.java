@@ -56,8 +56,14 @@ public class DOOMResultBuilder implements ResultBuilder {
     public OMElement getNode(Charset charset) {
         // TODO: we need to support SOAPEnvelope
         //       (not supported by the original code in XSLTMediator)
-        return ElementHelper.importOMElement(
-                (OMElement)document.getDocumentElement(), OMAbstractFactory.getOMFactory());
+        if (document.getDocumentElement() != null) {
+            return ElementHelper.importOMElement(
+                    (OMElement) document.getDocumentElement(), OMAbstractFactory.getOMFactory());
+        } else {
+            handleException("Cannot find the Document Element");
+        }
+
+        return null;
     }
 
     public void release() {
@@ -66,5 +72,10 @@ public class DOOMResultBuilder implements ResultBuilder {
     private static void handleException(String message, Throwable ex) {
         log.error(message, ex);
         throw new SynapseException(message, ex);
+    }
+
+    private static void handleException(String message) {
+        log.error(message);
+        throw new SynapseException(message);
     }
 }

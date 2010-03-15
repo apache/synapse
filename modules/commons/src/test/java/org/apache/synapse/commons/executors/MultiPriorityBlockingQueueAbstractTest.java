@@ -32,8 +32,11 @@ import junit.framework.TestCase;
  * MultiPriorityBlockingQueue.
  */
 public abstract class MultiPriorityBlockingQueueAbstractTest extends TestCase {
-    protected MultiPriorityBlockingQueue<DummyTask> createUnboundedQueue(int noQueues, int[] priorities) {
-        List<InternalQueue<DummyTask>> internalQueueList = new ArrayList<InternalQueue<DummyTask>>();
+    protected MultiPriorityBlockingQueue<DummyTask> createUnboundedQueue(
+            int noQueues, int[] priorities) {
+
+        List<InternalQueue<DummyTask>> internalQueueList =
+                new ArrayList<InternalQueue<DummyTask>>();
 
         for (int i = 0; i < noQueues; i++) {
             InternalQueue<DummyTask> intQueue = new UnboundedQueue<DummyTask>(priorities[i]);
@@ -46,10 +49,12 @@ public abstract class MultiPriorityBlockingQueueAbstractTest extends TestCase {
 
     protected MultiPriorityBlockingQueue<DummyTask> createFixedQueue(
             int noQueues, int[] sizes, int[] priorities) {
-        List<InternalQueue<DummyTask>> internalQueueList = new ArrayList<InternalQueue<DummyTask>>();
+        List<InternalQueue<DummyTask>> internalQueueList =
+                new ArrayList<InternalQueue<DummyTask>>();
 
         for (int i = 0; i < noQueues; i++) {
-            InternalQueue<DummyTask> intQueue = new FixedSizeQueue<DummyTask>(priorities[i], sizes[i]);
+            InternalQueue<DummyTask> intQueue =
+                    new FixedSizeQueue<DummyTask>(priorities[i], sizes[i]);
 
             internalQueueList.add(intQueue);
         }

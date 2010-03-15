@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.locks.Condition;
 
 /**
- * An unbounded queue
+ * An unbounded queue backed by and ArrayList. 
  * @param <E>
  */
 public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue<E> {

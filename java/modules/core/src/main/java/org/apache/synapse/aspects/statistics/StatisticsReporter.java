@@ -273,12 +273,13 @@ public class StatisticsReporter {
     private static boolean isFault(MessageContext context) {
         boolean isFault = context.isFaultResponse();
         if (!isFault) {
-            SOAPEnvelope envelope = context.getEnvelope();
-            if (envelope != null) {
-                isFault = envelope.hasFault();
-            }
+            isFault = context.getProperty(SynapseConstants.ERROR_CODE) != null;
+
             if (!isFault) {
-                isFault = context.getProperty(SynapseConstants.ERROR_CODE) != null;
+                SOAPEnvelope envelope = context.getEnvelope();
+                if (envelope != null) {
+                    isFault = envelope.hasFault();
+                }
             }
         }
         return isFault;

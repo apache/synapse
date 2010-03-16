@@ -23,10 +23,11 @@ package org.apache.synapse.commons.evaluators;
  * This encapsulates two or more boolean conditions. This acts as the "or"
  * boolean operator.
  *
- * Syntax:
- * <or>
+ * <pre>
+ * &lt;or&gt;
  *     two or more evaluators
- * </or>
+ * &lt;/or&gt;
+ * </pre>
  */
 public class OrEvaluator implements Evaluator {
     private Evaluator[] evaluators;

@@ -22,11 +22,11 @@ package org.apache.synapse.commons.evaluators;
 /**
  * This encapsulates two or more boolean conditions. This acts as the "and"
  * boolean operator.   
- *
- * Syntax:
- * <and>
+ * <pre>
+ * &lt;and&gt;
  *     two or more evaluators
- * <and>
+ * &lt;and&gt;
+ * </pre>
  */
 public class AndEvaluator implements Evaluator {
     private Evaluator[] evaluators;

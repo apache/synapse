@@ -18,6 +18,8 @@
  */
 package org.apache.synapse.aspects.statistics;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.statistics.mbean.StatisticsView;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
@@ -29,6 +31,8 @@ import java.util.List;
  */
 
 public class StatisticsCollector {
+
+    private static final Log log = LogFactory.getLog(StatisticsCollector.class);
 
     private final List<StatisticsRecord> statisticsCollection = new ArrayList<StatisticsRecord>();
 
@@ -82,7 +86,9 @@ public class StatisticsCollector {
     public List<StatisticsRecord> getAndClearStatisticsRecords() {
         List<StatisticsRecord> records = new ArrayList<StatisticsRecord>();
         records.addAll(statisticsCollection);
-        statisticsCollection.clear();
+        for (StatisticsRecord record : records) {
+            statisticsCollection.remove(record);
+        }
         return records;
     }
 }

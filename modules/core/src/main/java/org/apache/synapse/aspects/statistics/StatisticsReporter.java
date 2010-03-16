@@ -25,7 +25,6 @@ import org.apache.synapse.Identifiable;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
-import org.apache.synapse.aspects.AspectConfigurationDetectionStrategy;
 import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.endpoints.EndpointDefinition;
 
@@ -47,13 +46,10 @@ public class StatisticsReporter {
     public static void reportForComponent(MessageContext synCtx,
                                           StatisticsConfigurable configurable,
                                           ComponentType componentType) {
-
-        if (configurable != null && configurable.isStatisticsEnable()
-                && configurable instanceof Identifiable) {
-
-            StatisticsRecord record = StatisticsReporter.getStatisticsRecord(synCtx);
+        if (configurable instanceof Identifiable && configurable.isStatisticsEnable()) {
+            StatisticsRecord record = getStatisticsRecord(synCtx);
             record.setOwner(componentType);
-            collectStatistics(synCtx, record, configurable, componentType);
+            record.collect(createStatisticsLog((Identifiable) configurable, componentType, synCtx));
         }
     }
 
@@ -63,26 +59,27 @@ public class StatisticsReporter {
      * @param synCtx Current Message through synapse
      */
     public static void reportForAllOnResponseReceived(MessageContext synCtx) {
-
-        AspectConfiguration configuration =
-                AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx);
-
-        if (configuration != null && configuration.isStatisticsEnable()) {
-
-            StatisticsRecord record = StatisticsReporter.getStatisticsRecord(synCtx);
-            collectStatistics(synCtx, record, configuration, ComponentType.ANY);
+        synCtx.setProperty(SynapseConstants.SENDING_REQUEST, false);
+        StatisticsRecord statisticsRecord =
+                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
+        if (statisticsRecord != null) {
+            AspectConfiguration configuration = new AspectConfiguration(
+                    SynapseConstants.SYNAPSE_ASPECTS);
+            configuration.enableStatistics();
+            statisticsRecord.collect(createStatisticsLog(configuration, ComponentType.ANY, synCtx));
         }
     }
 
     /**
      * Reporting a fault
      *
-     * @param synCtx synCtx  Current Message through synapse
+     * @param synCtx   synCtx  Current Message through synapse
      * @param errorLog the received error information
      */
-    public static void reportFaultForAll(MessageContext synCtx , ErrorLog errorLog) {
+    public static void reportFaultForAll(MessageContext synCtx, ErrorLog errorLog) {
 
-        StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
+        StatisticsRecord statisticsRecord =
+                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
         if (statisticsRecord != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Reporting a fault : " + statisticsRecord);
@@ -120,15 +117,10 @@ public class StatisticsReporter {
      * @param isStatisticsEnable is stat enable
      */
     private static void endReportForAll(MessageContext synCtx, boolean isStatisticsEnable) {
-
-        if (!isStatisticsEnable) {
-            AspectConfiguration configuration =
-                    AspectConfigurationDetectionStrategy.getAspectConfiguration(synCtx);
-            isStatisticsEnable = configuration != null && configuration.isStatisticsEnable();
-        }
-        if (isStatisticsEnable) {
-            StatisticsRecord statisticsRecord = StatisticsReporter.getStatisticsRecord(synCtx);
-            if (statisticsRecord != null && !statisticsRecord.isEndAnyReported()) {
+        StatisticsRecord statisticsRecord =
+                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
+        if (isStatisticsEnable || statisticsRecord != null) {
+            if (!statisticsRecord.isEndReported()) {
                 StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
                         ComponentType.ANY);
                 statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
@@ -138,7 +130,8 @@ public class StatisticsReporter {
                 }
                 statisticsLog.setEndAnyLog(true);
                 statisticsRecord.collect(statisticsLog);
-                statisticsRecord.setEndAnyReported(true);
+                statisticsRecord.setEndReported(true);
+                addStatistics(synCtx, statisticsRecord);
             }
         }
     }
@@ -155,7 +148,8 @@ public class StatisticsReporter {
         boolean isOutOnly = Boolean.parseBoolean(
                 String.valueOf(synCtx.getProperty(SynapseConstants.OUT_ONLY)));
         if (!isOutOnly) {
-            isOutOnly = (synCtx.getProperty(SynapseConstants.LAST_ENDPOINT) == null
+            isOutOnly = (!Boolean.parseBoolean(
+                    String.valueOf(synCtx.getProperty(SynapseConstants.SENDING_REQUEST)))
                     && !synCtx.isResponse());
         }
         if (isOutOnly) {
@@ -188,15 +182,11 @@ public class StatisticsReporter {
     /**
      * Collects statistics
      *
-     * @param synCtx        MessageContext instance
-     * @param record        StatisticsRecord instance
-     * @param configurable  StatisticsConfigurable  instance
-     * @param componentType ComponentType instance
+     * @param synCtx MessageContext instance
+     * @param record StatisticsRecord instance
      */
-    private static void collectStatistics(MessageContext synCtx,
-                                          StatisticsRecord record,
-                                          StatisticsConfigurable configurable,
-                                          ComponentType componentType) {
+    private static void addStatistics(MessageContext synCtx,
+                                      StatisticsRecord record) {
 
         StatisticsCollector collector = synCtx.getEnvironment().getStatisticsCollector();
         if (collector == null) {
@@ -207,9 +197,7 @@ public class StatisticsReporter {
             collector = new StatisticsCollector();
             synCtx.getEnvironment().setStatisticsCollector(collector);
         }
-
-        record.collect(createStatisticsLog((Identifiable) configurable, componentType, synCtx));
-
+        synCtx.getPropertyKeySet().remove(SynapseConstants.STATISTICS_STACK);
         if (!collector.contains(record)) {
             collector.collect(record);
         }

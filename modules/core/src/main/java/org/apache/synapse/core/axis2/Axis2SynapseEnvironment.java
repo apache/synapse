@@ -185,6 +185,10 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                     dispatcher.updateSession(synCtx);
                 }
             }
+
+            // This is only for stats collection
+            synCtx.setProperty(SynapseConstants.SENDING_REQUEST, true);
+
             Axis2Sender.sendOn(endpoint, synCtx);
         }
     }

@@ -22,10 +22,11 @@ package org.apache.synapse.commons.evaluators;
 /**
  * This encapsulates boolean condition. This acts as not boolean operator.   
  *
- * Syntax:
- * <not>
+ * <pre>
+ * &lt;not&gt;
  *     one evaluator
- * </not>
+ * &lt;/not&gt;
+ * </pre>
  */
 public class NotEvaluator implements Evaluator {
     private Evaluator evaluator;

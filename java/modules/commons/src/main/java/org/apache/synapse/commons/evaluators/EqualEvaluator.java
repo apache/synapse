@@ -26,11 +26,10 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Try to see weather a part of the HTTP request is equal to the value provided.
- *
- * If the values are equal retun true 
- *
- * Syntax:
- * <equal type="header | param | url" source="" value=""/>
+ * If the values are equal retun true
+ * <pre>
+ * &lt;equal type=&quot;header | param | url&quot; source=&quot;&quot; value=&quot;&quot;/&gt;
+ * </pre>
  */
 public class EqualEvaluator implements Evaluator {
     private Log log = LogFactory.getLog(EqualEvaluator.class);

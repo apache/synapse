@@ -38,7 +38,7 @@ import org.apache.synapse.executors.SequenceWorker;
 public class EnqueueMediator extends AbstractMediator {
     private String executorName = null;
 
-    private int priority = 1;
+    private int priority = 0;
 
     private String sequenceName = null;
 

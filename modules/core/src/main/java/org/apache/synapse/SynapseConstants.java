@@ -330,6 +330,9 @@ public final class SynapseConstants {
 
     public static final String DOING_FAIL_OVER = "synapse.doing.failover";
 
+    // to be a help for stat collection
+    public static final String SENDING_REQUEST = "synapse.internal.request.sending";
+
     public static final String SYNAPSE_STARTUP_TASK_SCHEDULER = "synapse.startup.taskscheduler";
 
     public static final String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";

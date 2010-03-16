@@ -51,6 +51,13 @@ public class StatisticsUpdateStrategy {
 
             switch (componentType) {
                 case SEQUENCE: {
+
+                    if (startLog != null) {
+                        if (log.isEndAnyLog() ||
+                                log.getComponentType() == ComponentType.ANY) {
+                            endLog = log;
+                        }
+                    }
                     if (componentType == log.getComponentType()) {
                         if (!id.equals(log.getId())) {
                             continue;

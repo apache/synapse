@@ -37,7 +37,7 @@ public class StatisticsRecord {
     private String clientIP;
     private String clientHost;
     private ComponentType owner;
-    private boolean isEndAnyReported = false;
+    private boolean isEndReported = false;
 
     public StatisticsRecord(String id, String clientIP, String clientHost) {
         this.id = id;
@@ -111,12 +111,12 @@ public class StatisticsRecord {
         this.owner = owner;
     }
 
-    public boolean isEndAnyReported() {
-        return isEndAnyReported;
+    public boolean isEndReported() {
+        return isEndReported;
     }
 
-    public void setEndAnyReported(boolean endAnyReported) {
-        isEndAnyReported = endAnyReported;
+    public void setEndReported(boolean endReported) {
+        isEndReported = endReported;
     }
 
     public String toString() {

@@ -982,6 +982,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
             SALSessions.getInstance().reset();
             DataSourceHelper.getInstance().getDataSourceRepositoryManager().clear();
         } catch (Throwable ignored) {}
+
+        // destroy the priority executors. 
+        for(PriorityExecutor pe : executors.values()) {
+            pe.destroy();
+        }
     }
 
     /**

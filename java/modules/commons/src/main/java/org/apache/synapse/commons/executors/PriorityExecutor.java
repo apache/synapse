@@ -81,7 +81,8 @@ public class PriorityExecutor {
         }
 
         executor = new ThreadPoolExecutor(core, max, keepAlive, TimeUnit.SECONDS, queue,
-                new NativeThreadFactory(new ThreadGroup("executor-group"), "priority-worker"));
+                new NativeThreadFactory(new ThreadGroup("executor-group"),
+                        "priority-worker" + (name != null ? "-" + name : "")));
 
         if (log.isDebugEnabled()) {
             log.debug("Started the thread pool executor with threads, " +

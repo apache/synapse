@@ -19,10 +19,7 @@
 
 package org.apache.synapse.mediators.base;
 
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Nameable;
-import org.apache.synapse.SynapseLog;
+import org.apache.synapse.*;
 import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -72,11 +69,6 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
 
         SynapseLog synLog = getLog(synCtx);
 
-        if (isStatisticsEnable()) {
-            StatisticsReporter.reportForComponent(synCtx,
-                    getAspectConfiguration(), ComponentType.SEQUENCE);
-        }
-
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Start : Sequence "
                     + (name == null ? (key == null ? "<anonymous" : "key=<" + key) : "<"
@@ -96,6 +88,10 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
             // Setting Required property to reportForComponent the sequence aspects
 
             try {
+                if (isStatisticsEnable()) {
+                    StatisticsReporter.reportForComponent(synCtx,
+                            getAspectConfiguration(), ComponentType.SEQUENCE);
+                }
 
                 // push the errorHandler sequence into the current message as the fault handler
                 if (errorHandler != null) {
@@ -145,8 +141,16 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
             } finally {
 
                 if (isStatisticsEnable()) {
-                    StatisticsReporter.reportForComponent(synCtx,
-                            getAspectConfiguration(),ComponentType.SEQUENCE);
+                    boolean shouldReport = Boolean.parseBoolean(
+                            String.valueOf(synCtx.getProperty(SynapseConstants.OUT_ONLY)));
+                    if (!shouldReport) {
+                        shouldReport = !(Boolean.parseBoolean(String.valueOf(
+                                synCtx.getProperty(SynapseConstants.SENDING_REQUEST))));
+                    }
+                    if (shouldReport) {
+                        StatisticsReporter.reportForComponent(synCtx,
+                                getAspectConfiguration(), ComponentType.SEQUENCE);
+                    }
                 }
             }
 
@@ -241,7 +245,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
     public void setErrorHandler(String errorHandler) {
         this.errorHandler = errorHandler;
     }
-   
+
     /**
      * Is this a dynamic sequence?
      * @return true if dynamic

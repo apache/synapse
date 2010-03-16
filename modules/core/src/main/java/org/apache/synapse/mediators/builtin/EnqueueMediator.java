@@ -65,15 +65,15 @@ public class EnqueueMediator extends AbstractMediator {
 
             executor.execute(worker, priority);
 
-            if (log.isTraceOrDebugEnabled()) {
-                log.traceOrDebug("End: enqueue mediator");
-            }
-
             // with the nio transport, this causes the listener not to write a 202
             // Accepted response, as this implies that Synapse does not yet know if
             // a 202 or 200 response would be written back.
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().getOperationContext().setProperty(
                     org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
+
+            if (log.isTraceOrDebugEnabled()) {
+                log.traceOrDebug("End: enqueue mediator");
+            }
 
             return true;
         } else {

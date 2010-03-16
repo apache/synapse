@@ -29,18 +29,19 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * This class is used to parse a Given HTTP request against a set of rules.
- *
+ * This class is used to parse a Given HTTP request against a set of rules.</p>
+ * <p>
  * A Rule has a priority. If a HTTP request matches the Rule, parser returns
- * the priority corresponding to that rule.
- *
- * Here is the syntax of the configuration used to building the parser
- *
- * <conditions [defualtPriority = "int"]>
- *     <condition priority = "">
- *        <and/> | <or> | <not> | <match> | <equal>
- *     </condition>
- * </conditions>
+ * the priority corresponding to that rule.</p>
+ * <p>
+ * Here is the syntax of the configuration used to building the parser</p>
+ * <pre>
+ * &lt;conditions [defualtPriority = &quot;int&quot;]&gt;
+ *     &lt;condition priority = &quot;&quot;&gt;
+ *        &lt;and/&gt; | &lt;or&gt; | &lt;not&gt; | &lt;match&gt; | &lt;equal&gt;
+ *     &lt;/condition&gt;
+ * &lt;/conditions&gt;
+ * </pre>
  */
 public class Parser {
     private Log log = LogFactory.getLog(Parser.class);

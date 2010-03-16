@@ -29,8 +29,9 @@ import java.io.UnsupportedEncodingException;
 /**
  * This evaluator uses regular expressions to match a given HTTP request.
  *
- * syntax:
- * <match type="header | param | url" source="" regex=""/>
+ * <pre>
+ * &lt;match type=&quot;header | param | url&quot; source=&quot;&quot; regex=&quot;&quot;/&gt;
+ * </pre>
  *
  * The source is used to extract the HTTP header or URL param
  */

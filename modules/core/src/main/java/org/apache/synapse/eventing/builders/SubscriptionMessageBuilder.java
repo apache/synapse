@@ -263,26 +263,30 @@ public class SubscriptionMessageBuilder {
         if (renewElem != null) {
             OMElement expiryElem = renewElem.getFirstChildWithName(EXPIRES);
             if (expiryElem != null) {
-                Calendar calendarExpires = null;
-                try {
-                    if (expiryElem.getText().startsWith("P")) {
-                        calendarExpires = ConverterUtil.convertToDuration(expiryElem.getText())
-                                .getAsCalendar();
-                    } else {
-                        calendarExpires = ConverterUtil.convertToDateTime(expiryElem.getText());
+                if (!(expiryElem.getText().startsWith("*"))) {
+                    Calendar calendarExpires = null;
+                    try {
+                        if (expiryElem.getText().startsWith("P")) {
+                            calendarExpires = ConverterUtil.convertToDuration(expiryElem.getText())
+                                    .getAsCalendar();
+                        } else {
+                            calendarExpires = ConverterUtil.convertToDateTime(expiryElem.getText());
+                        }
+                    } catch (Exception e) {
+                        setExpirationFault(subscription);
                     }
-                } catch (Exception e) {
-                    setExpirationFault(subscription);
-                }
-                Calendar calendarNow = Calendar.getInstance();
-                if ((isValidDate(expiryElem.getText(), calendarExpires)) &&
-                        (calendarNow.before(calendarExpires))) {
+                    Calendar calendarNow = Calendar.getInstance();
+                    if ((isValidDate(expiryElem.getText(), calendarExpires)) &&
+                            (calendarNow.before(calendarExpires))) {
+                        subscription.setExpires(calendarExpires);
+                    } else {
+                        setExpirationFault(subscription);
+                    }
+
                     subscription.setExpires(calendarExpires);
                 } else {
                     setExpirationFault(subscription);
                 }
-
-                subscription.setExpires(calendarExpires);
             } else {
                 setExpirationFault(subscription);
             }

@@ -185,7 +185,8 @@ public class Axis2HttpRequest {
             URL reqURI = messageFormatter.getTargetAddress(
                     msgContext, format, new URL(epr.getAddress()));
             String path = (msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
-                    reqURI.toString() : reqURI.getPath()) + "?" + reqURI.getQuery();
+                    reqURI.toString() : reqURI.getPath()) +
+                    (reqURI.getQuery() != null ? "?" + reqURI.getQuery() : "");
 
             httpRequest = new BasicHttpRequest(httpMethod, path,
                     msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?

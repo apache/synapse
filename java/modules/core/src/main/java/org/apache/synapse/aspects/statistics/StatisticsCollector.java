@@ -25,6 +25,7 @@ import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Collects statistics and provides those collected data
@@ -34,7 +35,8 @@ public class StatisticsCollector {
 
     private static final Log log = LogFactory.getLog(StatisticsCollector.class);
 
-    private final List<StatisticsRecord> statisticsCollection = new ArrayList<StatisticsRecord>();
+    private final ConcurrentLinkedQueue<StatisticsRecord> statisticsCollection =
+            new ConcurrentLinkedQueue<StatisticsRecord>();
 
     public StatisticsCollector() {
         MBeanRegistrar.getInstance().registerMBean(new StatisticsView(this),
@@ -47,7 +49,7 @@ public class StatisticsCollector {
      * @param statisticsRecord statistics record instance
      */
     public void collect(StatisticsRecord statisticsRecord) {
-        this.statisticsCollection.add(statisticsRecord);
+        this.statisticsCollection.offer(statisticsRecord);
     }
 
     /**

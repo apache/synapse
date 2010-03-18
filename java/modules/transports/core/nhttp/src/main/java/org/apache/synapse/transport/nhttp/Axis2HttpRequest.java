@@ -81,6 +81,8 @@ public class Axis2HttpRequest {
     private volatile boolean completed = false;
     /** The URL prefix of the endpoint (to be used for Location header re-writing in the response)*/
     private String endpointURLPrefix = null;
+    /** weather chunking is enabled or not */
+    private boolean chunked = true;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
         this.epr = epr;
@@ -89,12 +91,13 @@ public class Axis2HttpRequest {
         this.format = NhttpUtil.getOMOutputFormat(msgContext);
         this.messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
+        this.chunked = !msgContext.isPropertyTrue(NhttpConstants.DISABLE_CHUNKING);
     }
 
     public void setReadyToStream(boolean readyToStream) {
         this.readyToStream = readyToStream;
     }
-    
+
     public void setOutputBuffer(ContentOutputBuffer outputBuffer) {
         this.outputBuffer = outputBuffer;
     }
@@ -161,18 +164,12 @@ public class Axis2HttpRequest {
             BasicHttpEntity entity = new BasicHttpEntity();
 
             if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
-                TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
-                OutputStream out = serialized.getOutputStream();
-                try {
-                    messageFormatter.writeTo(msgContext, format, out, true);
-                } finally {
-                    out.close();
-                }
-                msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, serialized);
-                entity.setContentLength(serialized.getLength());
-
+                setStreamAsTempData(entity);
             } else {
-                entity.setChunked(!msgContext.isPropertyTrue(NhttpConstants.DISABLE_CHUNKING));
+                entity.setChunked(chunked);
+                if (!chunked) {
+                    setStreamAsTempData(entity);
+                }
             }
             ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
 
@@ -278,16 +275,14 @@ public class Axis2HttpRequest {
             OutputStream out = new ContentOutputStream(outputBuffer);
             try {
                 if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
-                    TemporaryData serialized =
-                            (TemporaryData)msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
-                    try {
-                        serialized.writeTo(out);
-                    } finally {
-                        serialized.release();
-                    }
+                    writeMessageFromTempData(out);
                 } else {
-                    messageFormatter.writeTo(msgContext, format, out, false);
-                }        
+                    if (chunked) {
+                        messageFormatter.writeTo(msgContext, format, out, false);
+                    } else {
+                        writeMessageFromTempData(out);
+                    }
+                }
             } catch (Exception e) {
                 Throwable t = e.getCause();
                 if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {
@@ -320,6 +315,38 @@ public class Axis2HttpRequest {
                 }
                 setSendingCompleted(true);
             }
+        }
+    }
+
+    /**
+     * Write the stream to a temporary storage and calculate the content length
+     * @param entity HTTPEntity
+     * @throws IOException if an exception occurred while writing data
+     */
+    private void setStreamAsTempData(BasicHttpEntity entity) throws IOException {
+        TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
+        OutputStream out = serialized.getOutputStream();
+        try {
+            messageFormatter.writeTo(msgContext, format, out, true);
+        } finally {
+            out.close();
+        }
+        msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, serialized);
+        entity.setContentLength(serialized.getLength());
+    }
+
+    /**
+     * Take the data from temporary storage and write it to the output stream
+     * @param out output stream
+     * @throws IOException if an exception occurred while writing data
+     */
+    private void writeMessageFromTempData(OutputStream out) throws IOException {
+        TemporaryData serialized =
+                (TemporaryData) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
+        try {
+            serialized.writeTo(out);
+        } finally {
+            serialized.release();
         }
     }
 

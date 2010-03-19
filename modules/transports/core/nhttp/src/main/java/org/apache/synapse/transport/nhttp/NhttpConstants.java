@@ -47,6 +47,7 @@ public class NhttpConstants {
     public static final String SERIALIZED_BYTES = "SerializedBytes";
     public static final String REQUEST_READ = "REQUEST_READ";
     public static final String CONTENT_TYPE = "CONTENT_TYPE";
+    public static final String REQUEST_CONTENT_TYPE = "DEFAULT_REQUEST_CONTENT_TYPE";
     public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
     public static final String SEND_TIMEOUT = "SEND_TIMEOUT";

@@ -391,7 +391,8 @@ public class ServerWorker implements Runnable {
 
         try {
             Header contentType = request.getFirstHeader(HTTP.CONTENT_TYPE);
-            String contentTypeStr = contentType != null ? contentType.getValue() : null;
+            String contentTypeStr = contentType != null ?
+                    contentType.getValue() : inferContentType();
 
             String charSetEncoding = BuilderUtil.getCharSetEncoding(contentTypeStr);
             msgContext.setProperty(
@@ -408,6 +409,15 @@ public class ServerWorker implements Runnable {
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);
         }
+    }
+
+    private String inferContentType() {
+        Parameter param = cfgCtx.getAxisConfiguration().
+                getParameter(NhttpConstants.REQUEST_CONTENT_TYPE);
+        if (param != null) {
+            return param.getValue().toString();
+        }
+        return null;
     }
 
     /**

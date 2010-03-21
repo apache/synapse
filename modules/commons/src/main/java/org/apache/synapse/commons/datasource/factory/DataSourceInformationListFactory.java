@@ -20,9 +20,9 @@ package org.apache.synapse.commons.datasource.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.datasource.DataSourceInformation;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.util.ArrayList;
 import java.util.List;

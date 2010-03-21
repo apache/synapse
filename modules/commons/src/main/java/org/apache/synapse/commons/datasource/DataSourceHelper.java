@@ -18,16 +18,18 @@
  */
 package org.apache.synapse.commons.datasource;
 
-import org.apache.synapse.commons.datasource.factory.DataSourceInformationRepositoryFactory;
-import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.datasource.factory.DataSourceInformationRepositoryFactory;
 
 import java.util.Properties;
 
 /**
  * Some help functions related with DataSourceInformationRepository
+ * TODO - rename class name
  */
+@SuppressWarnings("unused")
 public class DataSourceHelper {
 
     private static final Log log = LogFactory.getLog(DataSourceHelper.class);

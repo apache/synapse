@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Keeps DatasourceMBeans
  */
 public class DatasourceMBeanRepository implements MBeanRepository {
 
     private final static Log log = LogFactory.getLog(DatasourceMBeanRepository.class);
 
-    private final static Map<String, DBPoolView> dataSourcesMBeans
+    private final Map<String, DBPoolView> dataSourcesMBeans
             = new HashMap<String, DBPoolView>();
     private final static DatasourceMBeanRepository DATASOURCE_M_BEAN_REPOSITORY
             = new DatasourceMBeanRepository();
@@ -49,18 +49,27 @@ public class DatasourceMBeanRepository implements MBeanRepository {
 
     public void addMBean(String name, Object mBean) {
 
-        assertNull(name, "DataSorce MBean name cannot be found.");
-        assertNull(mBean, "DataSorce MBean  cannot be found.");
-        assertFalse(mBean instanceof DBPoolView, "Given MBean instance is not matched " +
-                "with the expected MBean - 'DBPoolView'.");
+        if (name == null || "".equals(name)) {
+            throw new SynapseCommonsException("DataSource MBean name cannot be found.", log);
+        }
+
+        if (mBean == null) {
+            throw new SynapseCommonsException("DataSource MBean  cannot be found.", log);
+        }
+
+        if (!(mBean instanceof DBPoolView)) {
+            throw new SynapseCommonsException("Given MBean instance is not matched" +
+                    "with the expected MBean - 'DBPoolView'", log);
+        }
         dataSourcesMBeans.put(name, (DBPoolView) mBean);
         MBeanRegistrar.getInstance().registerMBean(mBean,
                 MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
     public Object getMBean(String name) {
-
-        assertNull(name, "DataSorce MBean name cannot be found.");
+        if (name == null || "".equals(name)) {
+            throw new SynapseCommonsException("DataSource MBean name cannot be found.", log);
+        }
         return dataSourcesMBeans.get(name);
     }
 
@@ -83,34 +92,4 @@ public class DatasourceMBeanRepository implements MBeanRepository {
             dataSourcesMBeans.clear();
         }
     }
-
-    private void assertNull(String name, String msg) {
-        if (name == null || "".equals(name)) {
-            handleException(msg);
-        }
-    }
-
-    private void assertNull(Object object, String msg) {
-        if (object == null) {
-            handleException(msg);
-        }
-    }
-
-    private void assertFalse(boolean condition, String msg) {
-        if (!condition) {
-            handleException(msg);
-        }
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
-    }
-
-
 }

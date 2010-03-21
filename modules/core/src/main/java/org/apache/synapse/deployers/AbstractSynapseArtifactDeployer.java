@@ -29,6 +29,7 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.util.XMLPrettyPrinter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerManager;
@@ -84,7 +85,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
-        String filename = deploymentFileData.getAbsolutePath();
+        String filename = FilenameUtils.normalize(deploymentFileData.getAbsolutePath());
         if (log.isDebugEnabled()) {
             log.debug("Deployment of the synapse artifact from file : " + filename + " : STARTED");
         }
@@ -184,6 +185,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      */
     public void unDeploy(String fileName) throws DeploymentException {
 
+        fileName = FilenameUtils.normalize(fileName);
         if (log.isDebugEnabled()) {
             log.debug("UnDeployment of the synapse artifact from file : " + fileName + " : STARTED");
         }
@@ -325,6 +327,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
     }
 
     private void handleDeploymentError(String msg, Exception e, String fileName) {
+        fileName = FilenameUtils.normalize(fileName);
         log.error(msg, e);
         if (deploymentStore.isUpdatingArtifact(fileName)) {
             backupFile(new File(fileName));
@@ -337,7 +340,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
     }
 
     private String backupFile(File file) {
-        String filePath = file.getAbsolutePath();
+        String filePath = FilenameUtils.normalize(file.getAbsolutePath());
         deploymentStore.addBackedUpArtifact(filePath);
         String backupFilePath = filePath + ".back";
         int backupIndex = 0;

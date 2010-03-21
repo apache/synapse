@@ -52,7 +52,6 @@ public class DataSourceInformationRepositoryFactory {
      *
      * @param listener   DataSourceInformationRepositoryListener
      * @param properties DataSource properties
-     *
      * @return a new, configured DataSourceInformationRepository instance
      */
     public static DataSourceInformationRepository createDataSourceInformationRepository(
@@ -70,27 +69,28 @@ public class DataSourceInformationRepositoryFactory {
         return datasourceInformationRepository;
     }
 
-     /**
+    /**
      * Setup an existing datasource information repository adding the provided
      * datasource information.
      *
-     * @param datasourceInformationRepository an existing data source information repository
+     * @param datasourceInformationRepository
+     *                   an existing data source information repository
      * @param properties DataSource properties
      */
     public static void setupDatasourceInformationRepository(
-             DataSourceInformationRepository datasourceInformationRepository,
-             Properties properties) {
+            DataSourceInformationRepository datasourceInformationRepository,
+            Properties properties) {
 
-         if (properties != null) {
-             datasourceInformationRepository.setConfigurationProperties(properties);
-         }
-         List<DataSourceInformation> sourceInformationList =
-                 DataSourceInformationListFactory.createDataSourceInformationList(properties);
+        if (properties != null) {
+            datasourceInformationRepository.setConfigurationProperties(properties);
+        }
+        List<DataSourceInformation> sourceInformationList =
+                DataSourceInformationListFactory.createDataSourceInformationList(properties);
 
-         for (DataSourceInformation information : sourceInformationList) {
-             if (information != null) {
-                 datasourceInformationRepository.addDataSourceInformation(information);
-             }
-         }
-     }
+        for (DataSourceInformation information : sourceInformationList) {
+            if (information != null) {
+                datasourceInformationRepository.addDataSourceInformation(information);
+            }
+        }
+    }
 }

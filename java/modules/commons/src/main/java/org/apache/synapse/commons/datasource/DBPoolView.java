@@ -24,7 +24,7 @@ import java.util.Map;
 
 
 /**
- *  Data source connection pool stats collector implementation
+ * Data source connection pool stats collector implementation
  */
 public class DBPoolView implements DBPoolViewMBean {
 

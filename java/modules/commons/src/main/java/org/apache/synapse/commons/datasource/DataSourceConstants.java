@@ -19,7 +19,7 @@
 package org.apache.synapse.commons.datasource;
 
 /**
- * 
+ * Constants  related to the DataSource component
  */
 public class DataSourceConstants {
 
@@ -62,7 +62,6 @@ public class DataSourceConstants {
     public final static String PROP_LOGABANDONED = "logAbandoned";
     public final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
     public final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
-    public final static String PROP_CONNECTIONPROPERTIES = "connectionProperties";
     public static final String PROP_PROVIDER_PORT = "providerPort";
     public final static String PROP_REGISTRY = "registry";
     public final static String PROP_REGISTRY_MEMORY = "memory";

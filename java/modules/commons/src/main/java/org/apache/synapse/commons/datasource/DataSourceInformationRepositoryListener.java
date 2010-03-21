@@ -21,14 +21,14 @@ package org.apache.synapse.commons.datasource;
 import java.util.Properties;
 
 /**
- * listen and handle events relating to changes in DataSourceInformationRepository
+ * listen and handle events relating to changes in <code>DataSourceInformationRepository</code>
  */
 public interface DataSourceInformationRepositoryListener {
 
     /**
      * Event when adding a DataSourceInformation
      *
-     * @param dataSourceInformation Added DataSourceInformation instance
+     * @param dataSourceInformation added DataSourceInformation instance
      */
     void addDataSourceInformation(DataSourceInformation dataSourceInformation);
 

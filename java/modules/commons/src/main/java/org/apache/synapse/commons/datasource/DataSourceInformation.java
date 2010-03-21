@@ -18,8 +18,8 @@
  */
 package org.apache.synapse.commons.datasource;
 
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import java.util.HashMap;
@@ -29,6 +29,7 @@ import java.util.Properties;
 /**
  * Encapsulates the All information related to a DataSource
  */
+@SuppressWarnings("unused")
 public class DataSourceInformation {
 
     public static final String BASIC_DATA_SOURCE = "BasicDataSource";
@@ -90,7 +91,7 @@ public class DataSourceInformation {
     public void setDatasourceName(String datasourceName) {
         this.datasourceName = datasourceName;
     }
-    
+
     public String getAlias() {
         return alias;
     }
@@ -332,5 +333,12 @@ public class DataSourceInformation {
 
     public Map<String, Object> getAllParameters() {
         return this.parameters;
+    }
+
+    @Override
+    public String toString() {
+        return "DataSourceInformation{" +
+                "datasourceName='" + datasourceName + '\'' +
+                '}';
     }
 }

@@ -28,8 +28,9 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Keep and maintain DataSourceInformations
+ * Keep and maintain <code>DataSourceInformation</code>
  */
+@SuppressWarnings("unused")
 public class DataSourceInformationRepository {
 
     private static final Log log = LogFactory.getLog(DataSourceInformationRepository.class);
@@ -42,22 +43,24 @@ public class DataSourceInformationRepository {
     /**
      * Configuring DataSourceInformationRepository
      *
-     * @param congurationProperties properties to be used for configure
+     * @param configurationProperties properties to be used for configure
      */
-    public void setConfigurationProperties(Properties congurationProperties) {
+    public void setConfigurationProperties(Properties configurationProperties) {
         if (listener != null) {
-            listener.reConfigure(congurationProperties);
+            listener.reConfigure(configurationProperties);
         }
     }
 
     /**
      * Adding a DataSourceInformation instance
      *
-     * @param dataSourceInformation DataSourceInformation instance
+     * @param dataSourceInformation <code>DataSourceInformation</code> instance
      */
     public void addDataSourceInformation(DataSourceInformation dataSourceInformation) {
 
-        assertNull(dataSourceInformation, "DataSource information is null");
+        if (dataSourceInformation == null) {
+            throw new SynapseCommonsException("DataSource information is null", log);
+        }
 
         dataSourceInformationMap.put(dataSourceInformation.getAlias(), dataSourceInformation);
         if (assertListerNotNull()) {
@@ -66,7 +69,7 @@ public class DataSourceInformationRepository {
     }
 
     /**
-     * Get a existing a DataSourceInformation instance by name
+     * Get an existing <code>DataSourceInformation</code> instance for the given name
      *
      * @param name Name of the DataSourceInformation to be returned
      * @return DataSourceInformation instance if the are any with given name, otherwise
@@ -74,7 +77,10 @@ public class DataSourceInformationRepository {
      */
     public DataSourceInformation getDataSourceInformation(String name) {
 
-        assertNull(name, "Name of the datasource  information instance to be returned is null");
+        if (name == null || "".equals(name)) {
+            throw new SynapseCommonsException("Name of the datasource information instance to be " +
+                    "returned is null", log);
+        }
 
         return dataSourceInformationMap.get(name);
     }
@@ -87,23 +93,31 @@ public class DataSourceInformationRepository {
      */
     public DataSourceInformation removeDataSourceInformation(String name) {
 
-        assertNull(name, "Name of the datasource information instance to be removed is null");
+        if (name == null || "".equals(name)) {
+            throw new SynapseCommonsException("Name of the datasource information instance to be" +
+                    " removed is null", log);
+
+        }
 
         DataSourceInformation information = dataSourceInformationMap.remove(name);
 
-        assertNull(information, "There is no datasource information instance for given name :" +
-                name);
+        if (information == null) {
+            throw new SynapseCommonsException("There is no datasource information instance" +
+                    " for given name :" + name, log);
+
+        }
 
         if (assertListerNotNull()) {
             listener.removeDataSourceInformation(information);
         }
+
         return information;
     }
 
     /**
-     * Returns all DataSourceInformations in the repository
+     * Returns all <code>DataSourceInformation</code>s in the repository
      *
-     * @return List of DataSourceInformations
+     * @return List of <code>DataSourceInformation</code>s
      */
     public Iterator<DataSourceInformation> getAllDataSourceInformation() {
 
@@ -111,31 +125,34 @@ public class DataSourceInformationRepository {
     }
 
     /**
-     * Sets a DataSourceInformationRepositoryListener
+     * Sets a <code>DataSourceInformationRepositoryListener</code> instance
      *
-     * @param listener DataSourceInformationRepositoryListener instance
+     * @param listener <code>DataSourceInformationRepositoryListener</code> instance
      */
     public void setRepositoryListener(DataSourceInformationRepositoryListener listener) {
 
-        assertNull(listener, "Provided 'DataSourceInformationRepositoryListener' " +
-                "instance is null");
+        if (listener == null) {
+            throw new SynapseCommonsException("Provided DataSourceInformationRepositoryListener " +
+                    "instance is null", log);
+        }
 
         if (this.listener != null) {
-            handleException("There is a 'DataSourceInformationRepositoryListener' " +
-                    "associated with 'DataSourceInformationRepository'");
+            throw new SynapseCommonsException("There is already a DataSourceInformationRepositoryListener " +
+                    "associated with 'DataSourceInformationRepository", log);
         }
+
         this.listener = listener;
     }
 
     /**
-     * Remove existing DataSourceInformationRepositoryListener
+     * Remove existing <code>DataSourceInformationRepositoryListener</code>
      */
     public void removeRepositoryListener() {
         this.listener = null;
     }
 
     /**
-     * Gets existing DataSourceInformationRepositoryListener
+     * Gets the existing <code>DataSourceInformationRepositoryListener</code>
      *
      * @return DataSourceInformationRepositoryListener that have been registered
      */
@@ -146,30 +163,13 @@ public class DataSourceInformationRepository {
     private boolean assertListerNotNull() {
         if (listener == null) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot find a 'DataSourceInformationRepositoryListener'.");
+                log.debug("Cannot find a DataSourceInformationRepositoryListener.");
             }
             return false;
         }
         if (log.isDebugEnabled()) {
-            log.debug("Using 'DataSourceInformationRepositoryListener' as :" + listener);
+            log.debug("Using DataSourceInformationRepositoryListener as :" + listener);
         }
         return true;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
-    }
-
-    private void assertNull(String name, String msg) {
-        if (name == null || "".equals(name)) {
-            handleException(msg);
-        }
-    }
-
-    private void assertNull(Object object, String msg) {
-        if (object == null) {
-            handleException(msg);
-        }
     }
 }

@@ -39,23 +39,22 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
 
     private final static Log log = LogFactory.getLog(InMemoryDataSourceRepository.class);
 
-    private final static Map<String, DataSource> dataSources = new HashMap<String, DataSource>();
-    private final static MBeanRepository REPOSITORY = DatasourceMBeanRepository.getInstance();
+    private final Map<String, DataSource> dataSources = new HashMap<String, DataSource>();
+    private static final MBeanRepository REPOSITORY = DatasourceMBeanRepository.getInstance();
 
     public InMemoryDataSourceRepository() {
     }
 
     /**
      * Keep DataSource in the Local store.
-     * 
-     * @param dataSourceInformation the information describing a data source
      *
+     * @param dataSourceInformation the information describing a data source
      * @see DataSourceRepository#register(DataSourceInformation)
      */
     public void register(DataSourceInformation dataSourceInformation) {
 
         if (dataSourceInformation == null) {
-            handleException("DataSourceInformation cannot be found.");
+            throw new SynapseCommonsException("DataSourceInformation cannot be found.", log);
         }
 
         DataSource dataSource = DataSourceFactory.createDataSource(dataSourceInformation);
@@ -81,7 +80,11 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
 
     public void unRegister(String name) {
 
-        assertNull(name, "Name of the datasource to be removed is empty or null");
+        if (name == null || "".equals(name)) {
+            throw new SynapseCommonsException("Name of the datasource to be removed is empty or " +
+                    "null", log);
+        }
+
         dataSources.remove(name);
         REPOSITORY.removeMBean(name);
     }
@@ -93,7 +96,11 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
      */
     public DataSource lookUp(String name) {
 
-        assertNull(name, "DataSorce name cannot be found.");
+        if (name == null || "".equals(name)) {
+            throw new SynapseCommonsException("Name of the datasource to be looked up is empty or" +
+                    "null", log);
+        }
+
         return dataSources.get(name);
     }
 
@@ -111,18 +118,5 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
             dataSources.clear();
         }
         REPOSITORY.clear();
-
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
-    }
-
-
-    private void assertNull(String name, String msg) {
-        if (name == null || "".equals(name)) {
-            handleException(msg);
-        }
     }
 }

@@ -29,7 +29,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- *
+ * Utility class to locate DataSources from a JNDI tree
  */
 public class DataSourceFinder {
 
@@ -49,10 +49,9 @@ public class DataSourceFinder {
             return find(dsName, context);
 
         } catch (NamingException e) {
-            handleException("Error looking up DataSource : " + dsName +
-                    " using JNDI properties : " + jndiEnv, e);
+            throw new SynapseCommonsException("Error looking up DataSource : " + dsName +
+                    " using JNDI properties : " + jndiEnv, e, log);
         }
-        return null;
     }
 
     /**
@@ -69,36 +68,13 @@ public class DataSourceFinder {
             if (dataSourceO != null && dataSourceO instanceof DataSource) {
                 return (DataSource) dataSourceO;
             } else {
-                handleException("DataSource : " + dsName + " not found when looking up" +
-                        " using JNDI properties : " + context.getEnvironment());
+                throw new SynapseCommonsException("DataSource : " + dsName + " not found " +
+                        "when looking up using JNDI properties : " + context.getEnvironment(), log);
             }
 
         } catch (NamingException e) {
-            handleException(new StringBuilder().append("Error looking up DataSource : ")
-                    .append(dsName).append(" using JNDI properties : ").
-                    append(context).toString(), e);
+            throw new SynapseCommonsException("Error looking up DataSource : " + dsName + " using JNDI" +
+                    " properties : " + context, e, log);
         }
-        return null;
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseCommonsException(msg, e);
     }
 }

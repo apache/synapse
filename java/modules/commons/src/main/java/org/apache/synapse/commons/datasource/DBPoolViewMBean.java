@@ -21,7 +21,7 @@ package org.apache.synapse.commons.datasource;
 import java.util.Map;
 
 /**
- * MBean for retriving some statistics about the connection pool
+ * MBean for retrieving some statistics about the connection pool
  */
 public interface DBPoolViewMBean {
     /**

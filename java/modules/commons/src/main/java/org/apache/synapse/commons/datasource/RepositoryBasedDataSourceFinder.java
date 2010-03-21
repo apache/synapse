@@ -25,49 +25,37 @@ import org.apache.synapse.commons.SynapseCommonsException;
 import javax.sql.DataSource;
 
 /**
- * Finds a DataSource from  DataSourceRepositories
+ * Finds a DataSource from  DataSource Repositories
  */
 public class RepositoryBasedDataSourceFinder {
 
     private final static Log log = LogFactory.getLog(RepositoryBasedDataSourceFinder.class);
     private DataSourceRepositoryManager dataSourceRepositoryManager;
     private boolean initialized;
-   
+
     public void init(DataSourceRepositoryManager dataSourceRepositoryManager) {
         this.dataSourceRepositoryManager = dataSourceRepositoryManager;
         this.initialized = true;
     }
 
     /**
-     * Find a DataSource using given name
+     * Find a DataSource using the given name
      *
-     * @param name Name of the DataSource to be found
+     * @param name name of the DataSource to be found
      * @return DataSource if found , otherwise null
      */
     public DataSource find(String name) {
         assertInitialized();
         if (name == null || "".equals(name)) {
-            handleException("DataSource name cannot be found.");
+            throw new SynapseCommonsException("DataSource name cannot be found.", log);
         }
-
         return dataSourceRepositoryManager.getDataSource(name);
-    }
-
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
     }
 
     private void assertInitialized() {
         if (!initialized) {
-            handleException("RepositoryBasedDataSourceFinder has not been " +
-                    "initialized with a 'DataSourceRepositoryManager' instance ");
+            throw new SynapseCommonsException("RepositoryBasedDataSourceFinder has not been " +
+                    "initialized with a 'DataSourceRepositoryManager' instance ", log);
         }
     }
 

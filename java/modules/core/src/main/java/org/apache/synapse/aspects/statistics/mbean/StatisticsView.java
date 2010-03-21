@@ -47,7 +47,7 @@ public class StatisticsView implements StatisticsViewMBean {
                         ComponentType.ENDPOINT));
     }
 
-    public List<String> getSystemSequnceStats(String id) {
+    public List<String> getSystemSequenceStats(String id) {
         return getAsList(this.systemViewStrategy.determineView(id,
                 collector.getStatisticsRecords(),
                 ComponentType.SEQUENCE));
@@ -66,7 +66,7 @@ public class StatisticsView implements StatisticsViewMBean {
                         ComponentType.ENDPOINT));
     }
 
-    public List<String> getSystemSequncesStats() {
+    public List<String> getSystemSequencesStats() {
         return getAllStatsAsList(
                 this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
                         ComponentType.SEQUENCE));

@@ -28,7 +28,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
- * Take an  AspectConfiguration based on some startegy - Currently only consider statistics
+ * Take an  AspectConfiguration based on some strategy - Currently only consider statistics
  */
 public class AspectConfigurationDetectionStrategy {
 

@@ -27,13 +27,13 @@ public interface StatisticsViewMBean {
 
     List<String> getSystemEndpointStats(String id);
 
-    List<String> getSystemSequnceStats(String id);
+    List<String> getSystemSequenceStats(String id);
 
     List<String> getSystemProxyServiceStats(String id);
 
     List<String> getSystemEndpointsStats();
 
-    List<String> getSystemSequncesStats();
+    List<String> getSystemSequencesStats();
 
     List<String> getSystemProxyServicesStats();
 

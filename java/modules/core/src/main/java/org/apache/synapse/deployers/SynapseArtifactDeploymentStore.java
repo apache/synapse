@@ -19,12 +19,15 @@
 
 package org.apache.synapse.deployers;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Keeps track of the artifacts deployed with files inside the synapse repository</p>
@@ -40,20 +43,10 @@ import java.util.*;
 public final class SynapseArtifactDeploymentStore {
 
     /** Keeps track of the deployed artifacts in the synapse environment */
-    private static Map<String, String> fileName2ArtifactName
-            = new TreeMap<String, String>(new Comparator<String>() {
-        public int compare(String o1, String o2) {
-            return (new File(o1)).compareTo(new File(o2));
-        }
-    });
+    private static Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
 
     /** Keeps track of the updating artifacts in the synapse environment in a particular instance */
-    private Map<String, String> updatingArtifacts
-            = new TreeMap<String, String>(new Comparator<String>() {
-        public int compare(String o1, String o2) {
-            return (new File(o1)).compareTo(new File(o2));
-        }
-    });
+    private Map<String, String> updatingArtifacts = new HashMap<String, String>();
 
     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */
     private List<String> restoredFiles = new ArrayList<String>();
@@ -87,6 +80,7 @@ public final class SynapseArtifactDeploymentStore {
      */
     public void addArtifact(String fileName, String artifactName) {
 
+        fileName = getNormalizedAbsolutePath(fileName);
         if (!fileName2ArtifactName.containsKey(fileName)) {
             if (log.isDebugEnabled()) {
                 log.debug("Added deployment artifact with file : " + fileName);
@@ -104,7 +98,7 @@ public final class SynapseArtifactDeploymentStore {
      * @return boolean <code>true</code> if it is available, <code>false</code> if not
      */
     public boolean containsFileName(String fileName) {
-        return fileName2ArtifactName.containsKey(fileName);
+        return fileName2ArtifactName.containsKey(getNormalizedAbsolutePath(fileName));
     }
 
     /**
@@ -114,7 +108,7 @@ public final class SynapseArtifactDeploymentStore {
      * @return String artifact name mapped with the give <code>filename</code>
      */
     public String getArtifactNameForFile(String fileName) {
-        return fileName2ArtifactName.get(fileName);
+        return fileName2ArtifactName.get(getNormalizedAbsolutePath(fileName));
     }
 
     /**
@@ -123,6 +117,7 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of which the artifact required to be removed
      */
     public void removeArtifactWithFileName(String fileName) {
+        fileName = getNormalizedAbsolutePath(fileName);
         if (log.isDebugEnabled()) {
             log.debug("Removing deployment artifact with file : " + fileName);
         }
@@ -136,6 +131,7 @@ public final class SynapseArtifactDeploymentStore {
      * @param artifactName name of the actual artifact being updated
      */
     public void addUpdatingArtifact(String fileName, String artifactName) {
+        fileName = getNormalizedAbsolutePath(fileName);
         if (log.isDebugEnabled()) {
             log.debug("Added updating file : " + fileName);
         }
@@ -149,7 +145,7 @@ public final class SynapseArtifactDeploymentStore {
      * @return boolean <code>true</code> if it is at the updating state, <code>false</code> otherwise
      */
     public boolean isUpdatingArtifact(String fileName) {
-        return updatingArtifacts.containsKey(fileName);
+        return updatingArtifacts.containsKey(getNormalizedAbsolutePath(fileName));
     }
 
     /**
@@ -159,7 +155,7 @@ public final class SynapseArtifactDeploymentStore {
      * @return String artifact name corresponds to the given file name
      */
     public String getUpdatingArtifactWithFileName(String fileName) {
-        return updatingArtifacts.get(fileName);
+        return updatingArtifacts.get(getNormalizedAbsolutePath(fileName));
     }
 
     /**
@@ -168,6 +164,7 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be removed from the updating artifacts
      */
     public void removeUpdatingArtifact(String fileName) {
+        fileName = getNormalizedAbsolutePath(fileName);
         if (log.isDebugEnabled()) {
             log.debug("Removing the updating file : " + fileName);
         }
@@ -180,12 +177,11 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact which is being restored
      */
     public void addRestoredArtifact(String fileName) {
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Added restored file : " + (new File(fileName)).getCanonicalPath());
-            }
-            restoredFiles.add((new File(fileName)).getCanonicalPath());
-        } catch (IOException ignore) {}
+        fileName = getNormalizedAbsolutePath(fileName);
+        if (log.isDebugEnabled()) {
+            log.debug("Added restored file : " + fileName);
+        }
+        restoredFiles.add(fileName);
     }
 
     /**
@@ -196,10 +192,7 @@ public final class SynapseArtifactDeploymentStore {
      * <code>false</code> otherwise
      */
     public boolean isRestoredFile(String fileName) {
-        try {
-            return restoredFiles.contains((new File(fileName)).getCanonicalPath());
-        } catch (IOException ignore) {}
-        return false;
+        return restoredFiles.contains(getNormalizedAbsolutePath(fileName));
     }
 
     /**
@@ -208,12 +201,11 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be removed
      */
     public void removeRestoredFile(String fileName) {
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Removing restored file : " + (new File(fileName)).getCanonicalPath());
-            }
-            restoredFiles.remove((new File(fileName)).getCanonicalPath());
-        } catch (IOException ignore) {}
+        fileName = getNormalizedAbsolutePath(fileName);
+        if (log.isDebugEnabled()) {
+            log.debug("Removing restored file : " + fileName);
+        }
+        restoredFiles.remove(fileName);
     }
 
     /**
@@ -222,12 +214,11 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be added into the backedUp artifacts
      */
     public void addBackedUpArtifact(String fileName) {
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Added backup file : " + (new File(fileName)).getCanonicalPath());
-            }
-            backedUpFiles.add((new File(fileName)).getCanonicalPath());
-        } catch (IOException ignore) {}
+        fileName = getNormalizedAbsolutePath(fileName);
+        if (log.isDebugEnabled()) {
+            log.debug("Added backup file : " + fileName);
+        }
+        backedUpFiles.add(fileName);
     }
 
     /**
@@ -237,10 +228,7 @@ public final class SynapseArtifactDeploymentStore {
      * @return boolean <code>true</code> if the artifact is being backed up, <code>false</code> otherwise
      */
     public boolean isBackedUpArtifact(String fileName) {
-        try {
-            return backedUpFiles.contains((new File(fileName)).getCanonicalPath());
-        } catch (IOException ignore) {}
-        return false;
+        return backedUpFiles.contains(getNormalizedAbsolutePath(fileName));
     }
 
     /**
@@ -249,11 +237,14 @@ public final class SynapseArtifactDeploymentStore {
      * @param fileName name of the file of the artifact to be removed
      */
     public void removeBackedUpArtifact(String fileName) {
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Removing backup file : " + (new File(fileName)).getCanonicalPath());
-            }
-            backedUpFiles.remove((new File(fileName)).getCanonicalPath());
-        } catch (IOException ignore) {}
+        fileName = getNormalizedAbsolutePath(fileName);
+        if (log.isDebugEnabled()) {
+            log.debug("Removing backup file : " + fileName);
+        }
+        backedUpFiles.remove(fileName);
+    }
+
+    public static String getNormalizedAbsolutePath(String fileName) {
+        return FilenameUtils.normalize(new File(fileName).getAbsolutePath());
     }
 }

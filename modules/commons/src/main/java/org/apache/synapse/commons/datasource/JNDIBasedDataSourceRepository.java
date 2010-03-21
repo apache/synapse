@@ -23,10 +23,10 @@ package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.security.SecurityConstants;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.commons.util.RMIRegistryController;
 
 import javax.naming.*;
 import javax.sql.DataSource;
@@ -43,10 +43,10 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
     private InitialContext initialContext;
     private Properties jndiProperties;
-    private static final Map<String, InitialContext> perDataSourceICMap
+    private final Map<String, InitialContext> perDataSourceICMap
             = new HashMap<String, InitialContext>();
-    private static final List<String> cachedNameList = new ArrayList<String>();
-    private static final List<Integer> cachedPorts = new ArrayList<Integer>();
+    private final List<String> cachedNameList = new ArrayList<String>();
+    private final List<Integer> cachedPorts = new ArrayList<Integer>();
 
     private boolean initialized = false;
 
@@ -65,7 +65,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             initialContext = createInitialContext(jndiProperties);
         }
     }
-    
+
     /**
      * Register a DataSource in the JNDI tree
      *
@@ -159,7 +159,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             } catch (NamingException e) {
                 String msg = " Error binding name ' " + dataSourceName + " ' to " +
                         "the DataSource(BasicDataSource) reference";
-                handleException(msg, e);
+                throw new SynapseCommonsException(msg, e, log);
             }
 
         } else if (DataSourceInformation.PER_USER_POOL_DATA_SOURCE.equals(dsType)) {
@@ -192,7 +192,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             } catch (NamingException e) {
                 String msg = "Error binding name '" + name + "' to " +
                         "the DriverAdapterCPDS reference";
-                handleException(msg, e);
+                throw new SynapseCommonsException(msg, e, log);
             }
 
             // Construct PerUserPoolDataSource reference
@@ -227,11 +227,11 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             } catch (NamingException e) {
                 String msg = "Error binding name ' " + dataSourceName + " ' to " +
                         "the PerUserPoolDataSource reference";
-                handleException(msg, e);
+                throw new SynapseCommonsException(msg, e, log);
             }
 
         } else {
-            handleException("Unsupported data source type : " + dsType);
+            throw new SynapseCommonsException("Unsupported data source type : " + dsType, log);
         }
         cachedNameList.add(dataSourceName);
     }
@@ -242,7 +242,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         try {
             context.unbind(name);
         } catch (NamingException e) {
-            handleException("Error removing a Datasource with name : " +
+            throw new SynapseCommonsException("Error removing a Datasource with name : " +
                     name + " from the JNDI context : " + initialContext, e);
         }
         cachedNameList.remove(name);
@@ -395,17 +395,19 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
                     assert context != null;
                     context = context.createSubcontext(path1);
                     if (context == null) {
-                        handleException("sub context " + path1 + " could not be created");
+                        throw new SynapseCommonsException("sub context " + path1 + " could not" +
+                                " be created", log);
                     }
 
                 } catch (NamingException e) {
-                    handleException("Unable to create sub context : " + path1, e);
+                    throw new SynapseCommonsException("Unable to create sub context : " + path1,
+                            e, log);
                 }
             }
         }
     }
 
-    private static Properties createJNDIEnvironment(Properties dsProperties, String name) {
+    private Properties createJNDIEnvironment(Properties dsProperties, String name) {
 
         String namingFactory = DataSourceConstants.DEFAULT_IC_FACTORY;
         String providerUrl = null;
@@ -502,43 +504,23 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         return initialized;
     }
 
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
-    }
-
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     * @param e   The exception
-     */
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseCommonsException(msg, e);
-    }
-
     private void validateInitialized() {
         if (!isInitialized()) {
-            handleException("Datasource registry has not been initialized yet");
+            throw new SynapseCommonsException("Datasource repository has not been initialized " +
+                    "yet", log);
         }
     }
 
     private void validateDSName(String dataSourceName) {
         if (dataSourceName == null || "".equals(dataSourceName)) {
-            handleException("Invalid DataSource configuration !! -" +
-                    "DataSource Name cannot be found ");
+            throw new SynapseCommonsException("Invalid DataSource configuration !! -" +
+                    "DataSource Name cannot be found ", log);
         }
     }
 
     private void validateInitialContext(InitialContext initialContext) {
         if (initialContext == null) {
-            handleException("InitialContext cannot be found.");
+            throw new SynapseCommonsException("InitialContext cannot be found.", log);
         }
     }
 
@@ -557,10 +539,9 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
             return new InitialContext(jndiEnv);
 
         } catch (NamingException e) {
-            handleException("Error creating a InitialConext" +
-                    " with JNDI env jndiProperties : " + jndiEnv);
+            throw new SynapseCommonsException("Error creating a InitialContext" +
+                    " with JNDI env jndiProperties : " + jndiEnv, log);
         }
-        return null;
     }
 
     private boolean isValid(Properties dsProperties) {

@@ -58,7 +58,7 @@ public interface DataSourceRepository {
     /**
      * Find and Returns an registered  DataSource in the DataSourceRegistry
      *
-     * @param name Name of the DataSoure to be looked up
+     * @param name Name of the DataSource to be looked up
      * @return DataSource Instance
      */
     DataSource lookUp(String name);

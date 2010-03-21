@@ -26,15 +26,14 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Utility class to handle data source registration
+ * Manages data sources defined in the synapse. This is an observer of the DataSourceInformationRepository
  */
 public class DataSourceRepositoryManager implements DataSourceInformationRepositoryListener {
 
     private static final Log log = LogFactory.getLog(DataSourceRepositoryManager.class);
 
-
-    private InMemoryDataSourceRepository  inMemoryDataSourceRepository;
-    private JNDIBasedDataSourceRepository  jndiBasedDataSourceRepository;
+    private final InMemoryDataSourceRepository inMemoryDataSourceRepository;
+    private final JNDIBasedDataSourceRepository jndiBasedDataSourceRepository;
 
     public DataSourceRepositoryManager(InMemoryDataSourceRepository inMemoryDataSourceRepository,
                                        JNDIBasedDataSourceRepository jndiBasedDataSourceRepository) {
@@ -51,27 +50,49 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
     public DataSource getDataSource(String name) {
 
         if (name == null || "".equals(name)) {
-            handleException("DataSource name cannot be found.");
+            throw new SynapseCommonsException("DataSource name cannot be found.", log);
         }
 
         DataSource result = inMemoryDataSourceRepository.lookUp(name);
 
         if (result != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("DataSource is found in the in-memory data source repository." +
+                        " Datasource name is : " + name);
+            }
             return result;
         }
+
         if (jndiBasedDataSourceRepository.isInitialized()) {
-            return jndiBasedDataSourceRepository.lookUp(name);
+            result = jndiBasedDataSourceRepository.lookUp(name);
+            if (result != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("DataSource is found in the JNDI data source repository." +
+                            " Datasource name is : " + name);
+                }
+                return result;
+            }
         }
-        return null;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Cannot find a datasource with name : " + name + " either in in-memory or" +
+                    " JNDI datasource repositories");
+        }
+
+        return result;
     }
 
     public void addDataSourceInformation(DataSourceInformation dataSourceInformation) {
 
-        if (dataSourceInformation == null) {
-            return;
-        }
+        assertDataSourceInformationNull(dataSourceInformation);
 
         String repositoryType = dataSourceInformation.getRepositoryType();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Registering a datasource in the repository : " + repositoryType + "." +
+                    " DataSource information is : " + dataSourceInformation);
+        }
+
         if (DataSourceConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
             jndiBasedDataSourceRepository.register(dataSourceInformation);
         } else {
@@ -81,7 +102,14 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
 
     public void removeDataSourceInformation(DataSourceInformation dataSourceInformation) {
 
+        assertDataSourceInformationNull(dataSourceInformation);
+
         String repositoryType = dataSourceInformation.getRepositoryType();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Un-Registering a datasource from the repository : " + repositoryType + "." +
+                    " DataSource information is : " + dataSourceInformation);
+        }
 
         if (DataSourceConstants.PROP_REGISTRY_JNDI.equals(repositoryType)) {
             jndiBasedDataSourceRepository.unRegister(dataSourceInformation.getDatasourceName());
@@ -92,11 +120,22 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
 
     public void reConfigure(Properties confProperties) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Reconfiguring datasource repositories ");
+        }
         jndiBasedDataSourceRepository.init(confProperties);
         inMemoryDataSourceRepository.init(confProperties);
     }
 
+    /**
+     * Clear all DataSource Repositories
+     */
     public void clear() {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Clearing datasource repositories ");
+        }
+
         if (inMemoryDataSourceRepository.isInitialized()) {
             inMemoryDataSourceRepository.clear();
         }
@@ -105,14 +144,10 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
         }
     }
 
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
+    private void assertDataSourceInformationNull(DataSourceInformation dataSourceInformation) {
+        if (dataSourceInformation == null) {
+            throw new SynapseCommonsException("Provided DataSource Information instance is null",
+                    log);
+        }
     }
-
 }

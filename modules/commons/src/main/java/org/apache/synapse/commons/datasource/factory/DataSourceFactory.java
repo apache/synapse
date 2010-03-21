@@ -180,7 +180,7 @@ public class DataSourceFactory {
             return perUserPoolDataSource;
 
         } else {
-            handleException("Unsupported DataSorce : " + dsType);
+            handleException("Unsupported DataSource : " + dsType);
         }
         return null;
     }

@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.MessageHelper;
@@ -58,6 +59,11 @@ public class Axis2Sender {
                 endpoint,
                 // The Axis2 Message context of the Synapse MC
                 synapseInMessageContext);
+
+            if (synapseInMessageContext.isResponse()) {
+                // report stats for any component at response sending check point
+                StatisticsReporter.reportForAllOnResponseSent(synapseInMessageContext, endpoint);
+            }
 
         } catch (Exception e) {
             handleException("Unexpected error during sending message out", e);
@@ -98,11 +104,11 @@ public class Axis2Sender {
                 messageContext.setWSAAction("");
                 messageContext.setSoapAction("");
                 messageContext.setProperty(
-                        NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);                
+                        NhttpConstants.IGNORE_SC_ACCEPTED, Constants.VALUE_TRUE);
                 messageContext.setProperty(
                         AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
             }
-            
+
             if (messageContext.getEnvelope().hasFault()
                     && AddressingHelper.isFaultRedirected(messageContext)
                     && !messageContext.getFaultTo().hasNoneAddress()) {
@@ -134,7 +140,10 @@ public class Axis2Sender {
             }
 
             Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
-            
+
+           // report stats for any component at response sending check point
+            StatisticsReporter.reportForAllOnResponseSent(smc, null);
+
             AxisEngine.send(messageContext);
 
         } catch (AxisFault e) {

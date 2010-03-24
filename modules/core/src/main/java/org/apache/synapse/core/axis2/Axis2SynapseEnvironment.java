@@ -31,7 +31,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
-import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.commons.util.TemporaryData;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -60,12 +59,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private StatisticsCollector statisticsCollector;
 
     public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
-        
+
         int coreThreads = SynapseThreadPool.SYNAPSE_CORE_THREADS;
         int maxThreads  = SynapseThreadPool.SYNAPSE_MAX_THREADS;
         long keepAlive  = SynapseThreadPool.SYNAPSE_KEEP_ALIVE;
         int qlength     = SynapseThreadPool.SYNAPSE_THREAD_QLEN;
-        
+
         try {
             qlength = Integer.parseInt(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_QLEN));
         } catch (Exception ignore) {}
@@ -81,7 +80,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         try {
             keepAlive = Long.parseLong(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_ALIVE));
         } catch (Exception ignore) {}
-        
+
         this.executorService = new SynapseThreadPool(coreThreads, maxThreads, keepAlive, qlength,
             synCfg.getProperty(SynapseThreadPool.SYN_THREAD_GROUP,
                 SynapseThreadPool.SYNAPSE_THREAD_GROUP),
@@ -100,7 +99,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         if (log.isDebugEnabled()) {
             log.debug("Injecting MessageContext");
         }
-        synCtx.setEnvironment(this);         
+        synCtx.setEnvironment(this);
         Mediator mandatorySeq = synCtx.getConfiguration().getMandatorySequence();
         // the mandatory sequence is optional and hence check for the existance before mediation
         if (mandatorySeq != null) {
@@ -174,7 +173,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             } else {
                 Axis2Sender.sendBack(synCtx);
             }
-            StatisticsReporter.reportForAllOnResponseSent(synCtx, endpoint);
         } else {
             // If this request is related to session affinity endpoints - For client initiated session
             Dispatcher dispatcher =

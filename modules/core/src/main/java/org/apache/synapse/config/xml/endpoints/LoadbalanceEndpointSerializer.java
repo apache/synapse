@@ -67,23 +67,24 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
         }
 
         // Serialize endpoint elements which are children of the loadbalance element
-        for (Endpoint childEndpoint : loadbalanceEndpoint.getChildren()) {
-            loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
+        if (loadbalanceEndpoint.getChildren() != null) {
+            for (Endpoint childEndpoint : loadbalanceEndpoint.getChildren()) {
+                loadbalanceElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
+            }
+
+        } else {
+            for (Member member : loadbalanceEndpoint.getMembers()) {
+                OMElement memberEle = fac.createOMElement(
+                        "member", SynapseConstants.SYNAPSE_OMNAMESPACE, loadbalanceElement);
+                memberEle.addAttribute(fac.createOMAttribute(
+                        "hostName", null, member.getHostName()));
+                memberEle.addAttribute(fac.createOMAttribute(
+                        "httpPort", null, String.valueOf(member.getHttpPort())));
+                memberEle.addAttribute(fac.createOMAttribute(
+                        "httpsPort", null, String.valueOf(member.getHttpsPort())));
+                loadbalanceElement.addChild(memberEle);
+            }
         }
-
-//      TODO FIX_RUWAN        
-//        // Serialize member elements which are children of the loadbalance element
-//        for (Member member : loadbalanceEndpoint.getAllMembers()) {
-//            OMElement memberEle =
-//                    fac.createOMElement("member",
-//                                        SynapseConstants.SYNAPSE_OMNAMESPACE, loadbalanceElement);
-//            memberEle.addAttribute(fac.createOMAttribute("hostName", null, member.getHostName()));
-//            memberEle.addAttribute(fac.createOMAttribute("httpPort", null,
-//                                                         String.valueOf(member.getHttpPort())));
-//            memberEle.addAttribute(fac.createOMAttribute("httpsPort", null,
-//                                                         String.valueOf(member.getHttpsPort())));
-//        }
-
         return endpointElement;
     }
 }

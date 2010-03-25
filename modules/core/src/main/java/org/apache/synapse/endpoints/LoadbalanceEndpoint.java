@@ -160,6 +160,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
                 AddressEndpoint endpoint = new AddressEndpoint();
                 EndpointDefinition definition = new EndpointDefinition();
                 endpoint.setDefinition(definition);
+                endpoint.init(synCtx.getEnvironment());
                 endpoint.send(synCtx);
             } else {
                 log.error("Cannot load balance for non-HTTP/S transport " + transport);

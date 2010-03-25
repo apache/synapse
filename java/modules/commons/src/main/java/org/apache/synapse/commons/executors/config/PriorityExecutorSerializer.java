@@ -31,18 +31,11 @@ import java.util.List;
 public class PriorityExecutorSerializer {
 
     public static OMElement serialize(OMElement parent,
-                                      PriorityExecutor executor, String namespace) {        
-
-        QName executorQName = createQname(namespace, ExecutorConstants.PRIORITY_EXECUTOR);
-        QName queuesQName = createQname(namespace, ExecutorConstants.QUEUES);
-        QName queueQName = createQname(namespace, ExecutorConstants.QUEUE);
-        QName threadsQName = createQname(namespace, ExecutorConstants.THREADS);
-
-
+                                      PriorityExecutor executor, String namespace) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMElement executorElement = fac.createOMElement(executorQName);
         OMNamespace nullNS = fac.createOMNamespace("", "");
 
+        OMElement executorElement = createElement(ExecutorConstants.PRIORITY_EXECUTOR, namespace);
         if (executor.getName() != null) {
             executorElement.addAttribute(fac.createOMAttribute(ExecutorConstants.NAME,
                     nullNS, executor.getName()));
@@ -57,11 +50,11 @@ public class PriorityExecutorSerializer {
         // create the queues configuration
         MultiPriorityBlockingQueue queue = executor.getQueue();
         NextQueueAlgorithm algo = queue.getNextQueueAlgorithm();
-        OMElement queuesEle = fac.createOMElement(queuesQName);
+        OMElement queuesEle = createElement(ExecutorConstants.QUEUES, namespace);
 
         if (!(algo instanceof PRRNextQueueAlgorithm)) {
             queuesEle.addAttribute(fac.createOMAttribute(ExecutorConstants.NEXT_QUEUE, nullNS,
-                    algo.getClass().getName()));            
+                    algo.getClass().getName()));
         }
 
         if (!queue.isFixedSizeQueues()) {
@@ -71,7 +64,7 @@ public class PriorityExecutorSerializer {
 
         List<InternalQueue> intQueues = queue.getQueues();
         for (InternalQueue intQueue : intQueues) {
-            OMElement queueEle = fac.createOMElement(queueQName);
+            OMElement queueEle = createElement(ExecutorConstants.QUEUE, namespace);
 
             if (queue.isFixedSizeQueues()) {
                 queueEle.addAttribute(fac.createOMAttribute(ExecutorConstants.SIZE, nullNS,
@@ -86,7 +79,7 @@ public class PriorityExecutorSerializer {
         executorElement.addChild(queuesEle);
 
         // create the Threads configuration
-        OMElement threadsEle = fac.createOMElement(threadsQName);
+        OMElement threadsEle = createElement(ExecutorConstants.THREADS, namespace);
         threadsEle.addAttribute(fac.createOMAttribute(
                 ExecutorConstants.MAX, nullNS, Integer.toString(executor.getMax())));
         threadsEle.addAttribute(fac.createOMAttribute(
@@ -103,11 +96,19 @@ public class PriorityExecutorSerializer {
         return executorElement;
     }
 
-    private static QName createQname(String namespace, String name) {
+    /**
+     * Create an OMElement with the given name.
+     * @param name name of the element
+     * @param namespace if null element won't have a namespace
+     * @return created OMElement
+     */
+    private static OMElement createElement(String name, String namespace) {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
         if (namespace == null) {
-            return new QName(name);
+            return fac.createOMElement(new QName(name));
         }
-        return new QName(namespace, name, "syn");
+
+        OMNamespace omNamespace = fac.createOMNamespace(namespace, "");
+        return fac.createOMElement(name, omNamespace);
     }
 }
-

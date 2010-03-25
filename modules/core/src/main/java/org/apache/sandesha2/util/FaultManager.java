@@ -233,7 +233,7 @@ public class FaultManager {
 		Iterator<Range> it = sequenceAckList.iterator();
 
 		while (it.hasNext()) {
-			Range acknowledgementRange = (Range) it.next();
+			Range acknowledgementRange = it.next();
 			if (acknowledgementRange.lowerValue > acknowledgementRange.upperValue) {
 				invalidAck = true;					
 				// check upper isn't bigger than the highest out msg number
@@ -1046,7 +1046,7 @@ public class FaultManager {
 		
 		Iterator<SenderBean> iterator = storageManager.getSenderBeanMgr().find(target).iterator();
 		while (iterator.hasNext()) {
-			SenderBean tempBean = (SenderBean) iterator.next();
+			SenderBean tempBean = iterator.next();
 
 			if (tempBean.getMessageType() != Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG &&
 				tempBean.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
@@ -1082,7 +1082,7 @@ public class FaultManager {
 					 // this is actually to support synapse. Synpase Axis Operation does not have a callBackMessageReceiver
                      // synapse AxisOperation always has the synapse message receiver. And also to be send in the synapse
                      // fault mediators we need to set the SENDING_FAULT property as well.
-                    } else if (msgReceiver != null) {
+                    } else if (msgReceiver != null && tempBean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
                         try {
                             //since there is no reponse we set this message as the fault reply
                             context.getOptions().setRelationships(new RelatesTo[]{new RelatesTo(context.getMessageID())});

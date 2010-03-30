@@ -26,10 +26,10 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.ComponentType;
-import org.apache.synapse.endpoints.EndpointDefinition;
 
 /**
- * A utility to report statistics
+ * A utility to report statistics at various check points in the message flow
+ * TODO - This class should be removed after a flow based statistics collection is done.
  */
 
 public class StatisticsReporter {
@@ -37,32 +37,65 @@ public class StatisticsReporter {
     private static final Log log = LogFactory.getLog(StatisticsReporter.class);
 
     /**
-     * Collects statistics for the given component
+     * Collects statistics for the given component.This is the starting point of
+     * collecting stats for a particular component
      *
-     * @param synCtx        Current Message through synapse
-     * @param configurable  Instance that can be configured it's audit
-     * @param componentType Type of the component need aspect
+     * @param synCtx        the current message being passed through the synapse
+     * @param configurable  a component that can be configured it's audit
+     * @param componentType the type of the component which needs to collect statistics
      */
     public static void reportForComponent(MessageContext synCtx,
                                           StatisticsConfigurable configurable,
                                           ComponentType componentType) {
-        if (configurable instanceof Identifiable && configurable.isStatisticsEnable()) {
-            StatisticsRecord record = getStatisticsRecord(synCtx);
-            record.setOwner(componentType);
-            record.collect(createStatisticsLog((Identifiable) configurable, componentType, synCtx));
+
+        if (!(configurable instanceof Identifiable)) {
+            // provided configuration is not a Identifiable
+            return;
         }
+
+        if (!configurable.isStatisticsEnable()) {
+            // statistics is disabled
+            return;
+        }
+
+        StatisticsRecord record =
+                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
+        if (record == null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Setting a statistics stack on the message context.");
+            }
+            record = StatisticsRecordFactory.getStatisticsRecord(synCtx);
+            synCtx.setProperty(SynapseConstants.STATISTICS_STACK, record);
+        }
+
+        record.setOwner(componentType);
+        record.collect(createStatisticsLog((Identifiable) configurable, componentType, synCtx));
+
     }
 
     /**
-     * Collects statistics for any component
+     * Collects statistics for any component when a response for a request is received.
+     * Any component means that this statistics log (check point) is valid for sequence, endpoint,
+     * and proxy.
      *
-     * @param synCtx Current Message through synapse
+     * @param synCtx the current message being passed through the synapse
      */
     public static void reportForAllOnResponseReceived(MessageContext synCtx) {
+
+        // remove the property that have been set when sending the request
         synCtx.setProperty(SynapseConstants.SENDING_REQUEST, false);
+
+        //  if there is a statistics record
         StatisticsRecord statisticsRecord =
                 (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
         if (statisticsRecord != null) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Reporting a statistics on a response is received : " +
+                        statisticsRecord);
+            }
+
             AspectConfiguration configuration = new AspectConfiguration(
                     SynapseConstants.SYNAPSE_ASPECTS);
             configuration.enableStatistics();
@@ -71,7 +104,9 @@ public class StatisticsReporter {
     }
 
     /**
-     * Reporting a fault
+     * Reporting a fault for any component when a response for a request is received.
+     * Any component means that this statistics log (check point) is valid for sequence, endpoint,
+     * and proxy.
      *
      * @param synCtx   synCtx  Current Message through synapse
      * @param errorLog the received error information
@@ -81,9 +116,11 @@ public class StatisticsReporter {
         StatisticsRecord statisticsRecord =
                 (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
         if (statisticsRecord != null) {
+
             if (log.isDebugEnabled()) {
                 log.debug("Reporting a fault : " + statisticsRecord);
             }
+
             StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
                     ComponentType.ANY);
             statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
@@ -94,99 +131,52 @@ public class StatisticsReporter {
     }
 
     /**
-     * Reports statistics on the response message Sent
-     *
-     * @param synCtx   MessageContext instance
-     * @param endpoint EndpointDefinition instance
-     */
-    public static void reportForAllOnResponseSent(MessageContext synCtx,
-                                                  EndpointDefinition endpoint) {
-        if (endpoint != null) {
-            if (synCtx.getProperty(SynapseConstants.OUT_ONLY) != null) {
-                endReportForAll(synCtx, endpoint.isStatisticsEnable());
-            }
-        } else {
-            endReportForAll(synCtx, false);
-        }
-    }
-
-    /**
-     * Ends statistics reporting for any component
-     *
-     * @param synCtx             MessageContext instance
-     * @param isStatisticsEnable is stat enable
-     */
-    private static void endReportForAll(MessageContext synCtx, boolean isStatisticsEnable) {
-        StatisticsRecord statisticsRecord =
-                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
-        if (isStatisticsEnable || statisticsRecord != null) {
-            if (!statisticsRecord.isEndReported()) {
-                StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
-                        ComponentType.ANY);
-                statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
-                if (isFault(synCtx)) {
-                    statisticsLog.setFault(true);
-                    statisticsLog.setErrorLog(ErrorLogFactory.createErrorLog(synCtx));
-                }
-                statisticsLog.setEndAnyLog(true);
-                statisticsRecord.collect(statisticsLog);
-                statisticsRecord.setEndReported(true);
-                addStatistics(synCtx, statisticsRecord);
-            }
-        }
-    }
-
-    /**
-     * Ends statistics reporting after request processed
-     *
-     * @param synCtx              MessageContext instance
-     * @param aspectConfiguration main component's aspect conf
-     */
-    public static void endReportForAllOnRequestProcessed(MessageContext synCtx,
-                                                         AspectConfiguration aspectConfiguration) {
-
-        boolean isOutOnly = Boolean.parseBoolean(
-                String.valueOf(synCtx.getProperty(SynapseConstants.OUT_ONLY)));
-        if (!isOutOnly) {
-            isOutOnly = (!Boolean.parseBoolean(
-                    String.valueOf(synCtx.getProperty(SynapseConstants.SENDING_REQUEST)))
-                    && !synCtx.isResponse());
-        }
-        if (isOutOnly) {
-            endReportForAll(synCtx,
-                    (aspectConfiguration != null && aspectConfiguration.isStatisticsEnable()));
-        }
-    }
-
-    /**
-     * Gets a StatisticsRecord
+     * Reports statistics  for any component on the response message is sent
+     * Any component means that this statistics log (check point) is valid for sequence, endpoint,
+     * and proxy.
      *
      * @param synCtx MessageContext instance
-     * @return a StatisticsRecord
      */
-    private static StatisticsRecord getStatisticsRecord(MessageContext synCtx) {
+    public static void reportForAllOnResponseSent(MessageContext synCtx) {
+        endReportForAll(synCtx);
+    }
 
-        StatisticsRecord statisticsRecord =
+    /**
+     * Ends statistics reporting for any component. Only at this point, the statistics record is put
+     * into the <code>StatisticsCollector </code>
+     * Any component means that this statistics log (check point) is valid for sequence, endpoint,
+     * and proxy.
+     *
+     * @param synCtx MessageContext instance
+     */
+    private static void endReportForAll(MessageContext synCtx) {
+
+        StatisticsRecord record =
                 (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
-        if (statisticsRecord == null) {
+        if (record == null) {
+            //There is no statistics record.
+            return;
+        }
 
+        if (record.isEndReported()) {
             if (log.isDebugEnabled()) {
-                log.debug("Setting statistics stack on the message context.");
+                log.debug("The statistics record has been already reported.");
             }
-            statisticsRecord = StatisticsRecordFactory.getStatisticsRecord(synCtx);
-            synCtx.setProperty(SynapseConstants.STATISTICS_STACK, statisticsRecord);
+            return;
         }
-        return statisticsRecord;
-    }
 
-    /**
-     * Collects statistics
-     *
-     * @param synCtx MessageContext instance
-     * @param record StatisticsRecord instance
-     */
-    private static void addStatistics(MessageContext synCtx,
-                                      StatisticsRecord record) {
+        StatisticsLog statisticsLog = new StatisticsLog(SynapseConstants.SYNAPSE_ASPECTS,
+                ComponentType.ANY);
+        statisticsLog.setResponse(synCtx.isResponse() || synCtx.isFaultResponse());
+
+        if (isFault(synCtx)) {
+            statisticsLog.setFault(true);
+            statisticsLog.setErrorLog(ErrorLogFactory.createErrorLog(synCtx));
+        }
+
+        statisticsLog.setEndAnyLog(true);
+        record.collect(statisticsLog);
+        record.setEndReported(true);
 
         StatisticsCollector collector = synCtx.getEnvironment().getStatisticsCollector();
         if (collector == null) {
@@ -197,14 +187,47 @@ public class StatisticsReporter {
             collector = new StatisticsCollector();
             synCtx.getEnvironment().setStatisticsCollector(collector);
         }
+
         synCtx.getPropertyKeySet().remove(SynapseConstants.STATISTICS_STACK);
+
         if (!collector.contains(record)) {
             collector.collect(record);
         }
     }
 
     /**
-     * Factory method to create a   StatisticsLog
+     * Ends statistics reporting for any component after the request processed.
+     * Any component means that this statistics log (check point) is valid for sequence, endpoint,
+     * and proxy.
+     * Only if the message is out-only, the stats are reported
+     *
+     * @param synCtx MessageContext instance
+     */
+    public static void endReportForAllOnRequestProcessed(MessageContext synCtx) {
+
+        StatisticsRecord statisticsRecord =
+                (StatisticsRecord) synCtx.getProperty(SynapseConstants.STATISTICS_STACK);
+        if (statisticsRecord == null) {
+            //There is no statistics record.
+            return;
+        }
+
+        boolean isOutOnly = Boolean.parseBoolean(
+                String.valueOf(synCtx.getProperty(SynapseConstants.OUT_ONLY)));
+        if (!isOutOnly) {
+            isOutOnly = (!Boolean.parseBoolean(
+                    String.valueOf(synCtx.getProperty(SynapseConstants.SENDING_REQUEST)))
+                    && !synCtx.isResponse());
+        }
+
+        if (isOutOnly) {
+            endReportForAll(synCtx);
+        }
+    }
+
+
+    /**
+     * Factory method to create  <code>StatisticsLog</code> instances
      *
      * @param identifiable  component
      * @param componentType component type
@@ -222,16 +245,19 @@ public class StatisticsReporter {
                 statisticsLog.setFault(true);
                 statisticsLog.setErrorLog(ErrorLogFactory.createErrorLog(synCtx));
             }
+            if (log.isDebugEnabled()) {
+                log.debug("Created statistics log : " + statisticsLog);
+            }
             return statisticsLog;
         }
         return null;
     }
 
     /**
-     * Checks the validity of the component
+     * Checks the validity of a component
      *
-     * @param identifiable component as a
-     * @return true if the component is valid
+     * @param identifiable component
+     * @return <code>true</code> if the component is valid
      */
     private static boolean isValid(Identifiable identifiable) {
 
@@ -256,7 +282,7 @@ public class StatisticsReporter {
      * Detects a fault
      *
      * @param context MessageContext context
-     * @return true if this is a fault
+     * @return <code>true</code>  if this is a fault
      */
     private static boolean isFault(MessageContext context) {
         boolean isFault = context.isFaultResponse();

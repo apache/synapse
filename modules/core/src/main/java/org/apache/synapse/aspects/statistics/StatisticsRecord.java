@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * Holds a record for statistics for current message
  */
+@SuppressWarnings("unused")
 public class StatisticsRecord {
 
     private static final Log log = LogFactory.getLog(StatisticsRecord.class);

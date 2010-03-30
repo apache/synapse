@@ -25,14 +25,14 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 /**
- * Factory for creating a StatisticsRecord
+ * Factory for creating  <code>StatisticsRecord</code> instances
  */
 public class StatisticsRecordFactory {
 
     private static final Log log = LogFactory.getLog(StatisticsRecordFactory.class);
 
     /**
-     * Factory method to create a a StatisticsRecord
+     * Factory method to create <code>StatisticsRecord</code> instances
      *
      * @param synCtx Current Message through synapse
      * @return StatisticsRecord instance
@@ -47,7 +47,7 @@ public class StatisticsRecordFactory {
         String domainName = (String) axisMC.getPropertyNonReplicable(NhttpConstants.REMOTE_HOST);
         StatisticsRecord statisticsRecord = new StatisticsRecord(messageId, remoteIP, domainName);
         if (log.isDebugEnabled()) {
-            log.debug("Created a StatisticsRecord with " + statisticsRecord.toString());
+            log.debug("Created a StatisticsRecord :  " + statisticsRecord);
         }
         return statisticsRecord;
     }

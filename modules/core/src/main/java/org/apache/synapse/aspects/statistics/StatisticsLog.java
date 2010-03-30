@@ -92,4 +92,12 @@ public class StatisticsLog {
     public void setErrorLog(ErrorLog errorLog) {
         this.errorLog = errorLog;
     }
+
+    @Override
+    public String toString() {
+        return "StatisticsLog{" +
+                "id='" + id + '\'' +
+                ", componentType=" + componentType +
+                '}';
+    }
 }

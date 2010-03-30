@@ -18,6 +18,8 @@
  */
 package org.apache.synapse.aspects.statistics;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapsePropertiesLoader;
 
@@ -26,15 +28,19 @@ import org.apache.synapse.config.SynapsePropertiesLoader;
  */
 public class ErrorLogFactory {
 
-    private static boolean enabledErrorInfo;
+    private static final Log log = LogFactory.getLog(ErrorLogFactory.class);
+
+    private static boolean enabledErrorDetails;
 
     static {
-        enabledErrorInfo = Boolean.parseBoolean(SynapsePropertiesLoader.getPropertyValue(
+        enabledErrorDetails = Boolean.parseBoolean(SynapsePropertiesLoader.getPropertyValue(
                 "synapse.detailederrorlogging.enable", "false"));
     }
 
     /**
      * Create an ErrorLog from the information in the synapse MessageContext
+     * By default only the error code is logged and if the 'synapse.detailederrorlogging.enable'
+     * has been set, then the error message, details and exception  are also logged
      *
      * @param synCtx MessageContext instance
      * @return <code>ErrorLog</code> instance
@@ -43,27 +49,36 @@ public class ErrorLogFactory {
 
         String errorCode = String.valueOf(synCtx.getProperty(SynapseConstants.ERROR_CODE));
         ErrorLog errorLog = new ErrorLog(errorCode);
-        if (enabledErrorInfo) {
+        if (enabledErrorDetails) {
             errorLog.setErrorMessage((String) synCtx.getProperty(SynapseConstants.ERROR_MESSAGE));
             errorLog.setErrorDetail((String) synCtx.getProperty(SynapseConstants.ERROR_DETAIL));
             errorLog.setException((Exception) synCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Created a Error Log : " + errorLog);
         }
         return errorLog;
     }
 
     /**
      * Create an ErrorLog from the information in the Axis2 MessageContext
+     * By default only the error code is logged and if the 'synapse.detailederrorlogging.enable'
+     * has been set, then the error message, details and exception  are also logged
      *
      * @param axisCtx Axis2 MessageContext instance
      * @return <code>ErrorLog</code> instance
      */
     public static ErrorLog createErrorLog(org.apache.axis2.context.MessageContext axisCtx) {
+
         String errorCode = String.valueOf(axisCtx.getProperty(SynapseConstants.ERROR_CODE));
         ErrorLog errorLog = new ErrorLog(errorCode);
-        if (enabledErrorInfo) {
+        if (enabledErrorDetails) {
             errorLog.setErrorMessage((String) axisCtx.getProperty(SynapseConstants.ERROR_MESSAGE));
             errorLog.setErrorDetail((String) axisCtx.getProperty(SynapseConstants.ERROR_DETAIL));
             errorLog.setException((Exception) axisCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Created a Error Log : " + errorLog);
         }
         return errorLog;
     }

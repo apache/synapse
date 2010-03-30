@@ -185,8 +185,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     "message dropped", synCtx);
             }
         } finally {
-            StatisticsReporter.endReportForAllOnRequestProcessed(synCtx,
-                    proxy.getAspectConfiguration());
+            StatisticsReporter.endReportForAllOnRequestProcessed(synCtx);
         }
     }
 

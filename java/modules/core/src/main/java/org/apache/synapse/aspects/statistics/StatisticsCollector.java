@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Collects statistics and provides those collected data
  */
-
+@SuppressWarnings("unused")
 public class StatisticsCollector {
 
     private static final Log log = LogFactory.getLog(StatisticsCollector.class);

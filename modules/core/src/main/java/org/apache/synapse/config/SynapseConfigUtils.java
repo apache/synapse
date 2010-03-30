@@ -32,6 +32,7 @@ import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformatio
 import org.apache.synapse.commons.security.definition.KeyStoreInformation;
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.factory.KeyStoreInformationFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -800,6 +801,34 @@ public class SynapseConfigUtils {
         fault.configure(configuration);
 
         config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
+    }
+
+
+    /**
+     * Factory method to create the AspectConfiguration when there is no a defined main sequence and
+     * only there is a set of mediators. This is useful when collecting stats for messages going
+     * through the main sequence
+     *  //TODO cache 
+     * @param synCtx Message Context
+     * @return an AspectConfiguration instance
+     */
+    public static AspectConfiguration getGlobalAspectConfiguration(MessageContext synCtx) {
+
+        boolean statisticsEnable = false;
+
+        if (XMLConfigConstants.STATISTICS_ENABLE.equals(
+                synCtx.getConfiguration().getProperty(
+                        SynapseConstants.SYNAPSE_STATISTICS_STATE))) {
+            statisticsEnable = true;
+        }
+
+        if (statisticsEnable) {
+            AspectConfiguration configuration = new AspectConfiguration(
+                    SynapseConstants.SYNAPSE_ASPECTS);
+            configuration.enableStatistics();
+            return configuration;
+        }
+        return null;
     }
 }
 

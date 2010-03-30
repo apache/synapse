@@ -19,8 +19,9 @@
 package org.apache.synapse.aspects.statistics;
 
 /**
- * Represent the error logs    *
+ * Represent the error logs
  */
+@SuppressWarnings("unused")
 public class ErrorLog {
 
     /**
@@ -77,5 +78,12 @@ public class ErrorLog {
 
     public void setErrorDetail(String errorDetail) {
         this.errorDetail = errorDetail;
+    }
+
+    @Override
+    public String toString() {
+        return "ErrorLog{" +
+                "errorCode='" + errorCode + '\'' +
+                '}';
     }
 }

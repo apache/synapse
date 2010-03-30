@@ -62,7 +62,7 @@ public class Axis2Sender {
 
             if (synapseInMessageContext.isResponse()) {
                 // report stats for any component at response sending check point
-                StatisticsReporter.reportForAllOnResponseSent(synapseInMessageContext, endpoint);
+                StatisticsReporter.reportForAllOnResponseSent(synapseInMessageContext);
             }
 
         } catch (Exception e) {
@@ -142,7 +142,7 @@ public class Axis2Sender {
             Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
 
            // report stats for any component at response sending check point
-            StatisticsReporter.reportForAllOnResponseSent(smc, null);
+            StatisticsReporter.reportForAllOnResponseSent(smc);
 
             AxisEngine.send(messageContext);
 

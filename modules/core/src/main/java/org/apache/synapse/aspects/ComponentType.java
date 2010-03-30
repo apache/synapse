@@ -19,7 +19,7 @@
 package org.apache.synapse.aspects;
 
 /**
- * Types for set of abstractions
+ * Types for a set of abstractions
  */
 public enum ComponentType {
     PROXYSERVICE,

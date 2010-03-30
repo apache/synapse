@@ -130,7 +130,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param mediator
      *            a Sequence mediator
      */
-    public void addSequence(String key, Mediator mediator) {
+    public synchronized void addSequence(String key, Mediator mediator) {
         assertAlreadyExists(key,SEQUENCE);
         localRegistry.put(key, mediator);
 
@@ -167,11 +167,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
         Map<String, SequenceMediator> definedSequences = new HashMap<String, SequenceMediator>();
 
-        for (Object o : localRegistry.values()) {
-
-            if (o instanceof SequenceMediator) {
-                SequenceMediator seq = (SequenceMediator) o;
-                definedSequences.put(seq.getName(), seq);
+        synchronized (this) {
+            for (Object o : localRegistry.values()) {
+                if (o instanceof SequenceMediator) {
+                    SequenceMediator seq = (SequenceMediator) o;
+                    definedSequences.put(seq.getName(), seq);
+                }
             }
         }
         return definedSequences;
@@ -256,7 +257,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param key
      *            of the sequence to be removed
      */
-    public void removeSequence(String key) {
+    public synchronized void removeSequence(String key) {
         Object sequence = localRegistry.get(key);
         if (sequence instanceof Mediator) {
             localRegistry.remove(key);
@@ -302,7 +303,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            its contents (or cached contents if the Entry refers to a
      *            dynamic resource off a remote registry)
      */
-    public void addEntry(String key, Entry entry) {
+    public synchronized void addEntry(String key, Entry entry) {
 
         assertAlreadyExists(key, ENTRY);
         
@@ -335,12 +336,13 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public Map<String, Entry> getCachedEntries() {
 
         Map<String, Entry> cachedEntries = new HashMap<String, Entry>();
-        for (Object o : localRegistry.values()) {
-
-            if (o != null && o instanceof Entry) {
-                Entry entry = (Entry) o;
-                if (entry.isDynamic() && entry.isCached()) {
-                    cachedEntries.put(entry.getKey(), entry);
+        synchronized (this) {
+            for (Object o : localRegistry.values()) {
+                if (o != null && o instanceof Entry) {
+                    Entry entry = (Entry) o;
+                    if (entry.isDynamic() && entry.isCached()) {
+                        cachedEntries.put(entry.getKey(), entry);
+                    }
                 }
             }
         }
@@ -357,13 +359,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public Map<String, Entry> getDefinedEntries() {
 
         Map<String, Entry> definedEntries = new HashMap<String, Entry>();
-        for (Object o : localRegistry.values()) {
-
-            if (o instanceof Entry
-                && ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
-
-                Entry entry = (Entry) o;
-                definedEntries.put(entry.getKey(), entry);
+        synchronized (this) {
+            for (Object o : localRegistry.values()) {
+                if (o instanceof Entry && ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
+                    Entry entry = (Entry) o;
+                    definedEntries.put(entry.getKey(), entry);
+                }
             }
         }
         return definedEntries;
@@ -456,7 +457,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param key
      *            the key of the reference to be removed
      */
-    public void removeEntry(String key) {
+    public synchronized void removeEntry(String key) {
         Object entry = localRegistry.get(key);
         if (entry instanceof Entry) {
             localRegistry.remove(key);
@@ -484,10 +485,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * Clears the cache of all the remote entries which has been
      * cached in the configuration
      */
-    public void clearCache() {
+    public synchronized void clearCache() {
 
         for (Object o : localRegistry.values()) {
-            
             if (o != null && o instanceof Entry) {
                 Entry entry = (Entry) o;
                 if (entry.isDynamic() && entry.isCached()) {
@@ -506,7 +506,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param endpoint
      *            the endpoint definition
      */
-    public void addEndpoint(String key, Endpoint endpoint) {
+    public synchronized void addEndpoint(String key, Endpoint endpoint) {
         assertAlreadyExists(key, ENDPOINT);
         localRegistry.put(key, endpoint);
         for (SynapseObserver o : observers) {
@@ -539,11 +539,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
     public Map<String, Endpoint> getDefinedEndpoints() {
 
         Map<String, Endpoint> definedEndpoints = new HashMap<String, Endpoint>();
-        for (Object o : localRegistry.values()) {
-
-            if (o instanceof Endpoint) {
-                Endpoint ep = (Endpoint) o;
-                definedEndpoints.put(ep.getName(), ep);
+        synchronized (this) {
+            for (Object o : localRegistry.values()) {
+                if (o instanceof Endpoint) {
+                    Endpoint ep = (Endpoint) o;
+                    definedEndpoints.put(ep.getName(), ep);
+                }
             }
         }
 
@@ -609,7 +610,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param key
      *            of the endpoint to be deleted
      */
-    public void removeEndpoint(String key) {
+    public synchronized void removeEndpoint(String key) {
         Object endpoint = localRegistry.get(key);
         if (endpoint instanceof Endpoint) {
             localRegistry.remove(key);
@@ -630,7 +631,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param proxy
      *            the Proxy service instance
      */
-    public void addProxyService(String name, ProxyService proxy) {
+    public synchronized void addProxyService(String name, ProxyService proxy) {
         if (!proxyServices.containsKey(name)) {
             proxyServices.put(name, proxy);
             for (SynapseObserver o : observers) {
@@ -659,7 +660,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param name
      *            of the Proxy Service to be deleted
      */
-    public void removeProxyService(String name) {
+    public synchronized void removeProxyService(String name) {
         ProxyService proxy = proxyServices.get(name);
         if (proxy == null) {
             handleException("Unknown proxy service for name : " + name);
@@ -810,7 +811,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *
      * @param startup - Startup object to be added 
      */
-    public void addStartup(Startup startup) {
+    public synchronized void addStartup(Startup startup) {
         if (!startups.containsKey(startup.getName())) {
             startups.put(startup.getName(), startup);
             for (SynapseObserver o : observers) {
@@ -827,7 +828,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * 
      * @param name - name of the startup that needs to be removed
      */
-    public void removeStartup(String name) {
+    public synchronized void removeStartup(String name) {
         Startup startup = startups.get(name);
         if (startup != null) {
             startups.remove(name);
@@ -940,7 +941,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * This method will be called on the soft shutdown or destroying the configuration
      * and will destroy all the stateful managed parts of the configuration.
      */
-    public void destroy() {
+    public synchronized void destroy() {
         
         if (log.isDebugEnabled()) {
             log.debug("Destroying the Synapse Configuration");
@@ -996,7 +997,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param se
      *          SynapseEnvironment specifying the env to be initialized
      */
-    public void init(SynapseEnvironment se) {
+    public synchronized void init(SynapseEnvironment se) {
         
         if (log.isDebugEnabled()) {
             log.debug("Initializing the Synapse Configuration using the SynapseEnvironment");
@@ -1066,7 +1067,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param eventSource
      *              the event source to be added
      */
-    public void addEventSource(String name, SynapseEventSource eventSource) {
+    public synchronized void addEventSource(String name, SynapseEventSource eventSource) {
         if (!eventSources.containsKey(name)) {
             eventSources.put(name, eventSource);
             for (SynapseObserver o : observers) {
@@ -1087,7 +1088,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *
      * @param name name of the event source to be removed
      */
-    public void removeEventSource(String name) {
+    public synchronized void removeEventSource(String name) {
         SynapseEventSource eventSource = eventSources.get(name);
         if (eventSource == null) {
             handleException("No event source exists by the name : " + name);
@@ -1134,7 +1135,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param name name of the executor
      * @param executor executor
      */
-    public void addPriorityExecutor(String name, PriorityExecutor executor) {
+    public synchronized void addPriorityExecutor(String name, PriorityExecutor executor) {
         executors.put(name, executor);
     }
 
@@ -1152,7 +1153,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @param name name of the executor
      * @return removed executor
      */
-    public PriorityExecutor removeExecutor(String name) {
+    public synchronized PriorityExecutor removeExecutor(String name) {
         return executors.remove(name);        
     }
 

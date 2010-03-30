@@ -1021,7 +1021,12 @@
             <email>supun AT apache.org</email>
             <organization>WSO2</organization>
         </developer>
-
+        <developer>
+            <name>Hiranya Jayathilaka</name>
+            <id>hiranya</id>
+            <email>hiranya AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
     </developers>
 
     <contributors>

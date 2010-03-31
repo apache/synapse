@@ -297,9 +297,8 @@ public class ProxyService implements AspectConfigurable {
                         trace.info("enableURISafeMode: true");
                     }
 
-                    proxyService = new AxisService();
-                    AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
-                    proxyService.addOperation(mediateOperation);
+                    log.warn("Unable to load the WSDL for : " + name, e);
+                    return null;
                 } else {
                     if (trace()) {
                         trace.info("WSDL was unable to load for: " + publishWSDL);

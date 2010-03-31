@@ -600,11 +600,15 @@ public class Axis2SynapseController implements SynapseController {
                 }
             }
 
-            proxy.buildAxisService(synapseConfiguration,
+            AxisService proxyService = proxy.buildAxisService(synapseConfiguration,
                     configurationContext.getAxisConfiguration());
-            log.info("Deployed Proxy service : " + proxy.getName());
-            if (!proxy.isStartOnLoad()) {
-                proxy.stop(synapseConfiguration);
+            if (proxyService != null) {
+                log.info("Deployed Proxy service : " + proxy.getName());
+                if (!proxy.isStartOnLoad()) {
+                    proxy.stop(synapseConfiguration);
+                }
+            } else {
+                log.warn("The proxy service " + proxy.getName() + " will NOT be available");
             }
         }
     }

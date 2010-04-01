@@ -56,7 +56,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private boolean initialized = false;
 
     /** The StatisticsCollector object */
-    private StatisticsCollector statisticsCollector;
+    private StatisticsCollector statisticsCollector = new StatisticsCollector();
 
     public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
 
@@ -260,9 +260,10 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     /**
-     * This method returns the StatisticsCollector
+     * This method returns the <code>StatisticsCollector</code> responsible for
+     * collecting stats for this synapse instance.
      *
-     * @return Returns the StatisticsCollector
+     * @return Returns the <code>StatisticsCollector</code>
      */
     public StatisticsCollector getStatisticsCollector() {
         return statisticsCollector;
@@ -273,6 +274,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @param collector - Statistics collector to be set
      */
+    @Deprecated
     public void setStatisticsCollector(StatisticsCollector collector) {
         this.statisticsCollector = collector;
     }

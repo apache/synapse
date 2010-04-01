@@ -47,10 +47,8 @@ public class EnqueueMediatorSerializer extends AbstractMediatorSerializer{
             handleException("Invalid enqueue mediator. sequence is required");
         }
 
-        if (mediator.getPriority() != 1) {
-            enqueue.addAttribute(fac.createOMAttribute(
-                    "priority", nullNS, mediator.getPriority() + ""));
-        }
+        enqueue.addAttribute(fac.createOMAttribute(
+                "priority", nullNS, mediator.getPriority() + ""));
 
         if (parent != null) {
             parent.addChild(enqueue);

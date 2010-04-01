@@ -79,10 +79,11 @@ public interface SynapseEnvironment {
      */
     public TemporaryData createTemporaryData();
 
-    /**
-     * This method returns the StatisticsCollector.
+   /**
+     * This method returns the <code>StatisticsCollector</code> responsible for
+     * collecting stats for this synapse instance.
      *
-     * @return Returns the StatisticsCollector
+     * @return Returns the <code>StatisticsCollector</code>
      */
     public StatisticsCollector getStatisticsCollector();
 
@@ -91,6 +92,7 @@ public interface SynapseEnvironment {
      *
      * @param statisticsCollector - StatisticsCollector to be set
      */
+    @Deprecated
     public void setStatisticsCollector(StatisticsCollector statisticsCollector);
 
     /**

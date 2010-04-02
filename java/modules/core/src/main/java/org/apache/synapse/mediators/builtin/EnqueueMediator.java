@@ -20,13 +20,13 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.executors.SequenceWorker;
 
 /**
  * This mediator execute a given sequence with a given priority.
@@ -60,9 +60,8 @@ public class EnqueueMediator extends AbstractMediator {
 
         Mediator m = synCtx.getSequence(sequenceName);
         if (m != null && m instanceof SequenceMediator) {
-
-            SequenceWorker worker = new SequenceWorker(synCtx, m);
-
+            MediatorWorker worker = new MediatorWorker(m, synCtx);
+            // execute with the given priority
             executor.execute(worker, priority);
 
             // with the nio transport, this causes the listener not to write a 202

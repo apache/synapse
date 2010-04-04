@@ -96,6 +96,9 @@ public class ServerConnectionDebug extends AbstractConnectionDebug {
 
     public String dump() {
         StringBuffer sb = new StringBuffer(50);
+        responseCompletionTime = responseCompletionTime == 0 ?
+                System.currentTimeMillis() : responseCompletionTime;
+        long totalTime = responseCompletionTime - requestStartTime;
 
         sb.append("C2E-Req-StartTime").append(keyValueSeparator).append(format(requestStartTime));
         sb.append(fieldSeparator);
@@ -124,9 +127,17 @@ public class ServerConnectionDebug extends AbstractConnectionDebug {
 
         sb.append("E2C-Resp-Start").append(keyValueSeparator).append(format(responseStartTime));
         sb.append(fieldSeparator);
-        sb.append("E2C-Resp-End").append(keyValueSeparator).append(format(
-                responseCompletionTime == 0 ? System.currentTimeMillis() : responseCompletionTime));
+        sb.append("E2C-Resp-End").append(keyValueSeparator).append(format(responseCompletionTime));
         sb.append(statementSeparator);
+
+        sb.append("Total-Time").append(keyValueSeparator).append(totalTime).append("ms");
+        if (clientConnectionDebug != null) {
+            long svcTime = clientConnectionDebug.getResponseCompletionTime() - clientConnectionDebug.getLastRequestStartTime();
+            sb.append(fieldSeparator);
+            sb.append("Svc-Time").append(keyValueSeparator).append(svcTime).append("ms");
+            sb.append(fieldSeparator);
+            sb.append("ESB-Time").append(keyValueSeparator).append(totalTime - svcTime).append("ms");
+        }
 
         return sb.toString();
     }

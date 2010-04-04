@@ -477,6 +477,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
         }
 
+        if (state == BaseConstants.PAUSED) {
+            HttpRequest req = (HttpRequest)
+                    worker.getConn().getContext().getAttribute("http.request");
+            req.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
+        }
+
         // pass ClientConnectionDebug to the Server side
         ServerConnectionDebug scd = (ServerConnectionDebug)
                 worker.getConn().getContext().getAttribute(ServerHandler.SERVER_CONNECTION_DEBUG);

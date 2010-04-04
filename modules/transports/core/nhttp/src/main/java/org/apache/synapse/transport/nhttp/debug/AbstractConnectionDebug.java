@@ -66,12 +66,24 @@ public abstract class AbstractConnectionDebug {
         StringBuffer sb = new StringBuffer();
         if (headers != null) {
             if (printAllHeaders) {
+                boolean first = true;
                 for (Header h : headers) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(fieldSeparator);
+                    }
                     sb.append(h.getName()).append(keyValueSeparator).append(h.getValue());
                 }
             } else if (printHeaderNames != null) {
+                boolean first = true;
                 for (Header h : headers) {
                     if (printHeaderNames.contains(h.getName())) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            sb.append(fieldSeparator);
+                        }
                         sb.append(h.getName()).append(keyValueSeparator).append(h.getValue());
                     }
                 }

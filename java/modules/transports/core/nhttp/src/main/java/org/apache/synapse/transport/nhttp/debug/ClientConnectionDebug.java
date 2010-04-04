@@ -63,6 +63,7 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
                 RequestLine requestLine = request.getRequestLine();
                 this.lastRequestProtocol = requestLine.getProtocolVersion().toString();
                 this.lastRequestHTTPMethod = requestLine.getMethod();
+                this.headers = request.getAllHeaders();
             } catch (IOException ignore) {}
         }
 
@@ -96,14 +97,18 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
         this.responseLine = responseLine;
     }
 
-    public void recordResponseInfo(Header[] headers) {
-        this.headers = headers;
+    public long getLastRequestStartTime() {
+        return lastRequestStartTime;
+    }
+
+    public long getResponseCompletionTime() {
+        return responseCompletionTime;
     }
 
     public String dump() {
         StringBuffer sb = new StringBuffer(25);
 
-        sb.append("E2S-Req-Start").append(keyValueSeparator).append(lastRequestStartTime);
+        sb.append("E2S-Req-Start").append(keyValueSeparator).append(format(lastRequestStartTime));
         sb.append(fieldSeparator);
         sb.append("E2S-Req-End").append(keyValueSeparator).append(format(requestCompletionTime));
         sb.append(fieldSeparator);
@@ -124,9 +129,9 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
             sb.append(statementSeparator);
         }
 
-        sb.append("S2E-Resp-Start").append(keyValueSeparator).append(responseStartTime);
+        sb.append("S2E-Resp-Start").append(keyValueSeparator).append(format(responseStartTime));
         sb.append(fieldSeparator);
-        sb.append("S2E-Resp-End").append(keyValueSeparator).append(responseCompletionTime);
+        sb.append("S2E-Resp-End").append(keyValueSeparator).append(format(responseCompletionTime));
         sb.append(statementSeparator);
 
         sb.append("S2E-Resp-Status").append(keyValueSeparator).append(responseLine);

@@ -225,6 +225,16 @@ public class StatisticsReporter {
         }
     }
 
+    /**
+     * Reports statistics on the end of the out flow
+     *
+     * @param synCtx MessageContext instance
+     */
+    public static void reportForAllOnOutFlowEnd(MessageContext synCtx) {
+
+        endReportForAll(synCtx);
+
+    }
 
     /**
      * Factory method to create  <code>StatisticsLog</code> instances

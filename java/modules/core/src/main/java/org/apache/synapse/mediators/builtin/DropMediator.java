@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**
@@ -36,7 +37,7 @@ public class DropMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        SynapseLog synLog = getLog(synCtx);
+         SynapseLog synLog = getLog(synCtx);
 
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Start : Drop mediator");
@@ -44,10 +45,19 @@ public class DropMediator extends AbstractMediator {
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
-        }      
+        }
 
-        synLog.traceOrDebug("End : Drop mediator");
         synCtx.setTo(null);
+
+        // if this is a response , this the end of the outflow
+        if (synCtx.isResponse()) {
+            StatisticsReporter.reportForAllOnOutFlowEnd(synCtx);
+        }
+
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("End : Drop mediator");
+        }
+
         return false;
     }
 }

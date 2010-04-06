@@ -23,7 +23,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -138,6 +137,9 @@ public class IndirectEndpoint extends AbstractEndpoint {
                     if (!entry.isCached() || entry.isExpired()) {
                         reLoad = true;
                     }
+                } else {
+                    // If the endpoint is static we should reload it from the Synapse config
+                    reLoad = true;
                 }
             }
 
@@ -148,9 +150,8 @@ public class IndirectEndpoint extends AbstractEndpoint {
                 }
 
                 realEndpoint = synCfg.getEndpoint(key);
-                if (realEndpoint != null && !realEndpoint.isInitialized()
-                        && realEndpoint instanceof ManagedLifecycle) {
-                    ((ManagedLifecycle) realEndpoint).init(synapseEnvironment);
+                if (realEndpoint != null && !realEndpoint.isInitialized()) {
+                    realEndpoint.init(synapseEnvironment);
                 }
             }
         }

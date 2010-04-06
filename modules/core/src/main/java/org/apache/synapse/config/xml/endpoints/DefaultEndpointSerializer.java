@@ -22,8 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -70,6 +68,8 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
             element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (SynapseConstants.FORMAT_SOAP12.equals(endpointDefinition.getFormat())) {
             element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        } else if (SynapseConstants.FORMAT_REST.equals(endpointDefinition.getFormat())) {
+            element.addAttribute(fac.createOMAttribute("format", null, "rest"));
 
             // following two kept for backward compatibility
         } else if (endpointDefinition.isForcePOX()) {
@@ -80,6 +80,8 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
             element.addAttribute(fac.createOMAttribute("format", null, "soap11"));
         } else if (endpointDefinition.isForceSOAP12()) {
             element.addAttribute(fac.createOMAttribute("format", null, "soap12"));
+        } else if (endpointDefinition.isForceREST()) {
+            element.addAttribute(fac.createOMAttribute("format", null, "rest"));
         }
 
     }

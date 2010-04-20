@@ -19,8 +19,8 @@
 package org.apache.synapse.commons.security.secret.handler;
 
 import org.apache.synapse.commons.security.secret.AbstractSecretCallbackHandler;
-import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 import org.apache.synapse.commons.security.secret.SecretManager;
+import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 
 /**
  * SecretManager based secret provider , this can be used by other application

@@ -16,30 +16,21 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.mbean;
+package org.apache.synapse.commons.security.secret.mbean;
 
 /**
- * Managing MBean for secrct
+ * Admin service for managing SecretManager
  */
-public interface JMXSecretsProviderMBean {
+
+public interface SecretManagerAdminMBean {
 
     /**
-     * Add a secret through JMX
-     *
-     * @param id     identify for what this secret is
-     * @param secret Secret
+     * Initialize the SecretManager
      */
-    public void addSecret(String id, String secret);
+    public void init();
 
     /**
-     * Remove a Secect for given ID
-     *
-     * @param id identify for what this secret is
+     * Shutting Down the SecretManager
      */
-    public void removeSecret(String id);
-
-    /**
-     * Clear all secrets
-     */
-    public void clear();
+    public void shutDown();
 }

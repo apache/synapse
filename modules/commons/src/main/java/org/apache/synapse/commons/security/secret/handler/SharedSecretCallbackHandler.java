@@ -19,9 +19,9 @@
 package org.apache.synapse.commons.security.secret.handler;
 
 import org.apache.synapse.commons.security.secret.AbstractSecretCallbackHandler;
-import org.apache.synapse.commons.security.secret.SingleSecretCallback;
-import org.apache.synapse.commons.security.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.security.secret.SecretCallback;
+import org.apache.synapse.commons.security.secret.SecretCallbackHandler;
+import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 
 /**
  * SecretCallbackHandler that uses an existing SecretCallbackHandler instance

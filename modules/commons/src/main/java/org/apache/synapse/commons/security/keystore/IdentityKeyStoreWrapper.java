@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.commons.security.wrappers;
+package org.apache.synapse.commons.security.keystore;
 
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
 

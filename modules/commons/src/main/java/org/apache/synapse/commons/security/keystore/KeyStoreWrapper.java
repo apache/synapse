@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.commons.security.wrappers;
+package org.apache.synapse.commons.security.keystore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,7 +102,7 @@ public abstract class KeyStoreWrapper {
      * @param alias The alias of the certificate in the specified keyStore
      * @return Key , if there is a one , otherwise null
      */
-    protected Key getPublicKeyFromCetificate(String alias) {
+    protected Key getPublicKeyFromCertificate(String alias) {
         try {
             Certificate certificate = keyStore.getCertificate(alias);
             if (certificate != null) {
@@ -143,7 +143,7 @@ public abstract class KeyStoreWrapper {
      * @return PublicKey if there is a one , otherwise null
      */
     public PublicKey getPublicKey(String alias) {
-        Key key = getPublicKeyFromCetificate(alias);
+        Key key = getPublicKeyFromCertificate(alias);
         if (key instanceof PublicKey) {
             return (PublicKey) key;
         }
@@ -156,7 +156,7 @@ public abstract class KeyStoreWrapper {
      * @return PublicKey if there is a one , otherwise null
      */
     public PublicKey getPublicKey() {
-        Key key = getPublicKeyFromCetificate(keyStoreInformation.getAlias());
+        Key key = getPublicKeyFromCertificate(keyStoreInformation.getAlias());
         if (key instanceof PublicKey) {
             return (PublicKey) key;
         }

@@ -16,22 +16,21 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.commons.security.secret.repository.filebased;
+package org.apache.synapse.commons.security.secret.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.security.CipherFactory;
+import org.apache.synapse.commons.security.CipherOperationMode;
+import org.apache.synapse.commons.security.DecryptionProvider;
+import org.apache.synapse.commons.security.EncodingType;
 import org.apache.synapse.commons.security.definition.CipherInformation;
-import org.apache.synapse.commons.security.enumeration.CipherOperationMode;
-import org.apache.synapse.commons.security.enumeration.EncodingType;
+import org.apache.synapse.commons.security.keystore.IdentityKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.KeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.TrustKeyStoreWrapper;
 import org.apache.synapse.commons.security.secret.SecretRepository;
-import org.apache.synapse.commons.security.wrappers.CipherWrapper;
-import org.apache.synapse.commons.security.wrappers.IdentityKeyStoreWrapper;
-import org.apache.synapse.commons.security.wrappers.TrustKeyStoreWrapper;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 
-import java.io.ByteArrayInputStream;
-import java.security.PublicKey;
-import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -65,8 +64,8 @@ public class FileBaseSecretRepository implements SecretRepository {
     /* Whether this secret repository has been initiated successfully*/
     private boolean initialize = false;
 
-    public FileBaseSecretRepository(IdentityKeyStoreWrapper wrapper, TrustKeyStoreWrapper trust) {
-        this.identity = wrapper;
+    public FileBaseSecretRepository(IdentityKeyStoreWrapper identity, TrustKeyStoreWrapper trust) {
+        this.identity = identity;
         this.trust = trust;
     }
 
@@ -93,88 +92,41 @@ public class FileBaseSecretRepository implements SecretRepository {
             return;
         }
 
-        String aliasesString = MiscellaneousUtil.getProperty(cipherProperties, ALIASES, null);
-        if (aliasesString == null || "".equals(aliasesString)) {
-            if (log.isDebugEnabled()) {
-                log.debug("There are no alias names in the cipher text file");
-            }
-            return;
+        StringBuffer sbTwo = new StringBuffer();
+        sbTwo.append(id);
+        sbTwo.append(DOT);
+        sbTwo.append(ALGORITHM);
+        //Load algorithm
+        String algorithm = MiscellaneousUtil.getProperty(properties,
+                sbTwo.toString(), DEFAULT_ALGORITHM);
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(DOT);
+        buffer.append(KEY_STORE);
+
+        //Load keyStore
+        String keyStore = MiscellaneousUtil.getProperty(properties,
+                buffer.toString(), null);
+        KeyStoreWrapper keyStoreWrapper;
+        if (TRUSTED.equals(keyStore)) {
+            keyStoreWrapper = trust;
+
+        } else {
+            keyStoreWrapper = identity;
         }
 
-        String[] aliases = aliasesString.split(",");
-        if (aliases == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("There are no alias names in the cipher text file");
-            }
-            return;
-        }
+        //Creates a cipherInformation
 
-        for (String alias : aliases) {
+        CipherInformation cipherInformation = new CipherInformation();
+        cipherInformation.setAlgorithm(algorithm);
+        cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
+        cipherInformation.setInType(EncodingType.BASE64);
+        DecryptionProvider baseCipher =
+                CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
 
-            StringBuffer buffer = new StringBuffer();
-            buffer.append(alias);
-            buffer.append(DOT);
-            buffer.append(SECRET);
-            String propKey = buffer.toString();
-
-            String secret = MiscellaneousUtil.getProperty(cipherProperties, propKey, null);
-            if (secret == null || "".equals(secret)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("No secret found for alias name " + alias);
-                }
-                continue;
-            }
-            buffer.append(DOT);
-            buffer.append(KEY_STORE);
-            String keyStorePropertyKey = buffer.toString();
-
-            //Load keyStore
-            String keyStore = MiscellaneousUtil.getProperty(cipherProperties,
-                    keyStorePropertyKey, null);
-
-            StringBuffer sbTwo = new StringBuffer();
-            sbTwo.append(propKey);
-            sbTwo.append(DOT);
-            sbTwo.append(ALGORITHM);
-            //Load algorithm
-            String algorithm = MiscellaneousUtil.getProperty(cipherProperties,
-                    sbTwo.toString(), DEFAULT_ALGORITHM);
-
-            StringBuffer sbThree = new StringBuffer();
-            sbThree.append(propKey);
-            sbThree.append(DOT);
-            sbThree.append(ALIAS);
-
-            //Loads the alias of a certificate
-            String aliasOfCert = MiscellaneousUtil.getProperty(
-                    cipherProperties, sbThree.toString(), null);
-
-            Key key;
-            if (TRUSTED.equals(keyStore)) {
-                if (aliasOfCert == null) {
-                    key = trust.getPublicKey();
-                } else {
-                    key = trust.getPublicKey(aliasOfCert);
-                }
-            } else {
-                if (aliasOfCert == null) {
-                    key = identity.getPrivateKey();
-                } else {
-                    key = identity.getPrivateKey(aliasOfCert); //TODO use password per 'alias'
-                }
-            }
-            //Creates a cipherInformation
-            CipherInformation cipherInformation = new CipherInformation();
-            cipherInformation.setAlgorithm(algorithm);
-            cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
-            cipherInformation.setInType(EncodingType.BASE64);
-
+        for (Object alias : cipherProperties.keySet()) {
             //Creates a cipher
-            CipherWrapper cipherWrapper = new CipherWrapper(cipherInformation, key);
-
-            ByteArrayInputStream in = new ByteArrayInputStream(secret.getBytes());
-            String decryptedText = cipherWrapper.getSecret(in);
-            secrets.put(propKey, decryptedText);
+            String decryptedText = new String(baseCipher.decrypt(String.valueOf(alias).getBytes()));
+            secrets.put(String.valueOf(alias), decryptedText);
             initialize = true;
         }
     }

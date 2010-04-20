@@ -21,20 +21,17 @@ package org.apache.synapse.commons.security.tool;
 import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.*;
 import org.apache.synapse.commons.security.definition.CipherInformation;
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
-import org.apache.synapse.commons.security.enumeration.CipherOperationMode;
-import org.apache.synapse.commons.security.enumeration.EncodingType;
-import org.apache.synapse.commons.security.enumeration.KeyStoreType;
-import org.apache.synapse.commons.security.wrappers.CipherWrapper;
-import org.apache.synapse.commons.security.wrappers.IdentityKeyStoreWrapper;
-import org.apache.synapse.commons.security.wrappers.TrustKeyStoreWrapper;
-import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.keystore.IdentityKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.KeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.TrustKeyStoreWrapper;
+import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import javax.crypto.spec.SecretKeySpec;
-
 import java.io.*;
 import java.security.Key;
 
@@ -57,7 +54,7 @@ import java.security.Key;
  * <li>algorithm    encrypt or decrypt algorithm (default RSA)
  * <li>outencode    Currently BASE64 or BIGINTEGER16
  * <li>inencode     Currently BASE64 or BIGINTEGER16
- * 
+ * <p/>
  * <ul>
  */
 public final class CipherTool {
@@ -112,7 +109,8 @@ public final class CipherTool {
 
     private static Log log = LogFactory.getLog(CipherTool.class);
 
-    private CipherTool() {}
+    private CipherTool() {
+    }
 
     public static void main(String[] args) throws Exception {
 
@@ -137,8 +135,17 @@ public final class CipherTool {
 
             // if pass phrase is specified, use simple symmetric en-/decryption
             String passphrase = getArgument(cmd, PASSPHRASE, null);
+            boolean isEncrypt = (cipherInformation.getCipherOperationMode() ==
+                    CipherOperationMode.ENCRYPT);
+            EncryptionProvider encryptionProvider = null;
+            DecryptionProvider decryptionProvider = null;
             if (passphrase != null) {
                 key = new SecretKeySpec(passphrase.getBytes(), cipherInformation.getAlgorithm());
+                if (isEncrypt) {
+                    encryptionProvider = CipherFactory.createCipher(cipherInformation, key);
+                } else {
+                    decryptionProvider = CipherFactory.createCipher(cipherInformation, key);
+                }
             } else {
                 // Key information must not contain any password
                 // If Key need to be loaded from a file
@@ -147,35 +154,38 @@ public final class CipherTool {
                 boolean isTrusted = isArgumentPresent(cmd, TRUSTED);
                 if (keyFile != null) {
                     key = getKey(keyFile);
-                } else {
-                    if (isTrusted) {
-                        TrustKeyStoreWrapper trustKeyStoreWrapper = new TrustKeyStoreWrapper();
-                        trustKeyStoreWrapper.init(getTrustKeyStoreInformation(cmd));
-                        key = trustKeyStoreWrapper.getPublicKey();
+                    if (isEncrypt) {
+                        encryptionProvider = CipherFactory.createCipher(cipherInformation, key);
                     } else {
-                        IdentityKeyStoreWrapper storeWrapper = new IdentityKeyStoreWrapper();
+                        decryptionProvider = CipherFactory.createCipher(cipherInformation, key);
+                    }
+                } else {
+                    KeyStoreWrapper keyStoreWrapper;
+                    if (isTrusted) {
+                        keyStoreWrapper = new TrustKeyStoreWrapper();
+                        ((TrustKeyStoreWrapper) keyStoreWrapper).init(getTrustKeyStoreInformation(cmd));
+                    } else {
+                        keyStoreWrapper = new IdentityKeyStoreWrapper();
                         //Password for access private key
                         String keyPass = getArgument(cmd, KEY_PASS, null);
                         assertEmpty(keyPass, KEY_PASS);
-                        storeWrapper.init(getIdentityKeyStoreInformation(cmd), keyPass);
-                        if (cipherInformation.getCipherOperationMode() == CipherOperationMode.ENCRYPT) {
-                            key = storeWrapper.getPublicKey();
-                        } else {
-                            key = storeWrapper.getPrivateKey();
-                        }
+                        ((IdentityKeyStoreWrapper) keyStoreWrapper).init(
+                                getIdentityKeyStoreInformation(cmd), keyPass);
+                    }
+                    if (isEncrypt) {
+                        encryptionProvider = CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
+                    } else {
+                        decryptionProvider = CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
                     }
                 }
             }
 
-            if (key == null) {
-                handleException("Cannot find a key ");
-            }
-
-            CipherWrapper cipherWrapper = new CipherWrapper(cipherInformation, key);
-            ByteArrayInputStream in = new ByteArrayInputStream(source.getBytes());
-
             PrintStream out = System.out;
-            out.println("Output : " + cipherWrapper.getSecret(in));
+            if (isEncrypt) {
+                out.println("Output : " + encryptionProvider.encrypt(source.getBytes()));
+            } else {
+                out.println("Output : " + decryptionProvider.decrypt(source.getBytes()));
+            }
 
         } catch (ParseException e) {
             handleException("Error passing arguments ", e);
@@ -250,10 +260,10 @@ public final class CipherTool {
         if (encInType != null) {
             information.setInType(EncodingType.valueOf(encInType.toUpperCase()));
         }
-        
+
         String encOutType = getArgument(cmd, OUT_TYPE, null);
         if (encOutType != null) {
-            information.setOutType(EncodingType.valueOf(encOutType.toUpperCase()));    
+            information.setOutType(EncodingType.valueOf(encOutType.toUpperCase()));
         }
 
         information.setType(getArgument(cmd, CIPHER_TYPE, null));
@@ -321,9 +331,9 @@ public final class CipherTool {
         Option source = new Option(SOURCE_IN_LINED, true, "Plain text in-lined");
         Option sourceFile = new Option(SOURCE_FILE, true, "Plain text from a file");
 
-        Option passphrase = new Option(PASSPHRASE, true, 
+        Option passphrase = new Option(PASSPHRASE, true,
                 "Passphrase to use for symmetric en- or decryption.");
-        
+
         Option keyStore = new Option(KEY_STORE, true, "Private key entry KeyStore");
         Option storeType = new Option(STORE_TYPE, true, " KeyStore type");
         Option storePassword = new Option(STORE_PASS, true, "Password for keyStore access");
@@ -342,7 +352,7 @@ public final class CipherTool {
 
         options.addOption(source);
         options.addOption(sourceFile);
-        
+
         options.addOption(passphrase);
         options.addOption(keyStore);
         options.addOption(storeType);

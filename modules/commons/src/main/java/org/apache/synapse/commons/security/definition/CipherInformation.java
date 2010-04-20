@@ -20,15 +20,17 @@ package org.apache.synapse.commons.security.definition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.enumeration.CipherOperationMode;
-import org.apache.synapse.commons.security.enumeration.EncodingType;
+import org.apache.synapse.commons.security.CipherOperationMode;
+import org.apache.synapse.commons.security.EncodingType;
 
 /**
  * Encapsulates the cipher related information
  */
 public class CipherInformation {
 
-    /** Default cipher algorithm*/
+    /**
+     * Default cipher algorithm
+     */
     public static final String DEFAULT_ALGORITHM = "RSA";
 
     private static final Log log = LogFactory.getLog(CipherInformation.class);
@@ -50,6 +52,8 @@ public class CipherInformation {
 
     /* Ciphering type - asymmetric , symmetric*/
     private String type;
+
+    private String provider;
 
     public String getAlgorithm() {
         return algorithm;
@@ -100,5 +104,13 @@ public class CipherInformation {
 
     public void setOutType(EncodingType outType) {
         this.outType = outType;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 }

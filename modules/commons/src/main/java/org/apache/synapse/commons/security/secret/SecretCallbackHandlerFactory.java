@@ -18,10 +18,10 @@
  */
 package org.apache.synapse.commons.security.secret;
 
-import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.SynapseCommonsException;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.util.Properties;
 

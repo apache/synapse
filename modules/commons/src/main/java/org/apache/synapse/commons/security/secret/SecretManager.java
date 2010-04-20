@@ -5,13 +5,13 @@ package org.apache.synapse.commons.security.secret;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
+import org.apache.synapse.commons.security.definition.KeyStoreInformationFactory;
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
-import org.apache.synapse.commons.security.definition.factory.KeyStoreInformationFactory;
-import org.apache.synapse.commons.security.wrappers.IdentityKeyStoreWrapper;
-import org.apache.synapse.commons.security.wrappers.TrustKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.IdentityKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.TrustKeyStoreWrapper;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.util.Properties;
 
@@ -45,7 +45,8 @@ public class SecretManager {
         return SECRET_MANAGER;
     }
 
-    private SecretManager() {}
+    private SecretManager() {
+    }
 
     /**
      * Initializes the Secret Manager by providing configuration properties
@@ -117,7 +118,7 @@ public class SecretManager {
 
         if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
             if (log.isDebugEnabled()) {
-                log.info("Either Identity or Trust keystore password is mandotory" +
+                log.info("Either Identity or Trust keystore password is mandatory" +
                         " in order to initialized secret manager.");
             }
             return;

@@ -16,12 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.enumeration;
+package org.apache.synapse.commons.security;
 
 /**
- * Cipher Operation Mode.
+ * Encoding Types
  */
-public enum CipherOperationMode {
-    ENCRYPT,
-    DECRYPT
+public enum EncodingType {
+    BASE64,
+    BIGINTEGER16
 }

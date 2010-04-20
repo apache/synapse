@@ -16,12 +16,19 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.enumeration;
+package org.apache.synapse.commons.security;
+
+import java.security.KeyStore;
 
 /**
- * Encoding Types
+ * Provides a way to load KeyStore
  */
-public enum EncodingType {
-    BASE64,
-    BIGINTEGER16
+public interface IKeyStoreLoader {
+
+    /**
+     * returns an instance of KeyStore object
+     *
+     * @return KeyStore Instance
+     */
+    public abstract KeyStore getKeyStore();
 }

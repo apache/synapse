@@ -16,7 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.commons.security.wrappers;
+package org.apache.synapse.commons.security.keystore;
 
 import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 
@@ -27,10 +27,7 @@ import java.security.KeyStore;
  * Only expose to get public keys
  */
 public class TrustKeyStoreWrapper extends KeyStoreWrapper {
-    /**
-     * @see KeyStoreWrapper
-     *      There is no keyPassword as trusted Store doesn't keep private or secret keys
-     */
+
     public void init(TrustKeyStoreInformation information) {
         super.init(information, null);
     }

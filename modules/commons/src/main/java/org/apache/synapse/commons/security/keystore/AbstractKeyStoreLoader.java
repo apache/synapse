@@ -20,8 +20,8 @@ package org.apache.synapse.commons.security.keystore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.interfaces.IKeyStoreLoader;
 import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.IKeyStoreLoader;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -37,7 +37,7 @@ import java.security.cert.CertificateException;
  * Provides the base for loading KeyStores
  */
 public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
-    
+
     protected Log log;
 
     protected AbstractKeyStoreLoader() {

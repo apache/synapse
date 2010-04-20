@@ -893,7 +893,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <pre>secretRepositories=file
 
-        secretRepositories.file.provider=org.apache.synapse.commons.security.secret.repository.filebased.FileBaseSecretRepositoryProvider
+        secretRepositories.file.provider=org.apache.synapse.commons.security.secret.repository.FileBaseSecretRepositoryProvider
         secretRepositories.file.location=cipher-text.properties
 
     </pre>

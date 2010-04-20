@@ -16,22 +16,18 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.secret.handler;
-
-import org.apache.synapse.commons.security.secret.AbstractSecretCallbackHandler;
-import org.apache.synapse.commons.security.secret.SingleSecretCallback;
+package org.apache.synapse.commons.security;
 
 /**
- * Hard-coded passwords as secrets .This is just a demonstration example and need to be adopted
- * as user requirements. In the production environment, this may be 'close sourced' - only provided
- * a binary contains implementation class. Then, it is needed to use de- compliers to see password.
+ * Provides Decrypt operation
  */
-public class HardCodedSecretCallbackHandler extends AbstractSecretCallbackHandler {
+public interface DecryptionProvider {
 
-
-    protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
-        // can set multiple passwords based id of SingleSecretCallback
-        singleSecretCallback.setSecret("password");
-    }
-
+    /**
+     * Decrypts input cipher bytes
+     *
+     * @param cipherText as a byte array
+     * @return plain text as byte array
+     */
+    public byte[] decrypt(byte[] cipherText);
 }

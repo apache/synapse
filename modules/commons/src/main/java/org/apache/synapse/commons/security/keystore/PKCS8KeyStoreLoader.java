@@ -3,8 +3,8 @@ package org.apache.synapse.commons.security.keystore;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.interfaces.IKeyStoreLoader;
 import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.IKeyStoreLoader;
 
 import java.io.*;
 import java.security.*;

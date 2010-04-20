@@ -44,7 +44,7 @@ public class SecretInformation {
     public void setAliasSecret(String aliasSecret) {
         this.aliasSecret = aliasSecret;
     }
-    
+
     public String getSecretPrompt() {
         return secretPrompt;
     }
@@ -56,7 +56,8 @@ public class SecretInformation {
     /**
      * Get actual password based on SecretCallbackHandler and alias password
      * If SecretCallbackHandler is null, then returns alias password
-     * @return  Actual password
+     *
+     * @return Actual password
      */
     public String getResolvedSecret() {
 
@@ -67,7 +68,7 @@ public class SecretInformation {
         }
         return aliasSecret;
     }
-    
+
     public SecretCallbackHandler getSecretProvider() {
         return secretProvider;
     }
@@ -75,8 +76,9 @@ public class SecretInformation {
     public void setSecretProvider(SecretCallbackHandler secretProvider) {
         this.secretProvider = secretProvider;
     }
-    
-    private String getSecret(SecretCallbackHandler secretCallbackHanlder, String encryptedPassword, String prompt) {
+
+    private String getSecret(SecretCallbackHandler secretCallbackHanlder,
+                             String encryptedPassword, String prompt) {
         SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
         secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHanlder});
         SingleSecretCallback secretCallback = new SingleSecretCallback(encryptedPassword);

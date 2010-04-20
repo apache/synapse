@@ -29,6 +29,7 @@ import java.util.Properties;
  *
  */
 public class MiscellaneousUtil {
+
     private static Log log = LogFactory.getLog(MiscellaneousUtil.class);
 
     private MiscellaneousUtil() {
@@ -181,6 +182,32 @@ public class MiscellaneousUtil {
         }
         return result;
     }
+
+    public static byte[] asBytes(InputStream in) {
+
+          ByteArrayOutputStream out = new ByteArrayOutputStream();
+          byte[] buffer = new byte[1024];
+          int len;
+          try {
+              while ((len = in.read(buffer)) >= 0)
+                  out.write(buffer, 0, len);
+          } catch (IOException e) {
+              throw new SynapseCommonsException("Error during converting a inputstream " +
+                      "into a bytearray ", e, log);
+          } finally {
+              if (in != null) {
+                  try {
+                      in.close();
+                  } catch (IOException ignored) {
+                  }
+              }
+              try {
+                  out.close();
+              } catch (IOException ignored) {
+              }
+          }
+          return out.toByteArray();
+      }
 
 
     /**

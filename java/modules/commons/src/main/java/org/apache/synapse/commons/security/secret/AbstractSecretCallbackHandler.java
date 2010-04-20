@@ -19,10 +19,10 @@
 package org.apache.synapse.commons.security.secret;
 
 
-import java.util.Iterator;
-
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.Iterator;
 
 /**
  * A Base SecretCallbackHandler

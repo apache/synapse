@@ -3,8 +3,8 @@ package org.apache.synapse.commons.security.keystore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.interfaces.ICACertsLoader;
 import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.ICACertsLoader;
 
 import java.io.BufferedInputStream;
 import java.io.File;

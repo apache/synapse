@@ -19,8 +19,8 @@
 package org.apache.synapse.commons.security.secret.handler;
 
 import jline.ConsoleReader;
-import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 import org.apache.synapse.commons.security.secret.AbstractSecretCallbackHandler;
+import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 
 import java.io.IOException;
 

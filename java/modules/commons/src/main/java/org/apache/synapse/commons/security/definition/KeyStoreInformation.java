@@ -20,15 +20,15 @@ package org.apache.synapse.commons.security.definition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.secret.SecretInformation;
-import org.apache.synapse.commons.security.enumeration.KeyStoreType;
-import org.apache.synapse.commons.security.interfaces.ICACertsLoader;
-import org.apache.synapse.commons.security.interfaces.IKeyStoreLoader;
+import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.ICACertsLoader;
+import org.apache.synapse.commons.security.IKeyStoreLoader;
+import org.apache.synapse.commons.security.KeyStoreType;
 import org.apache.synapse.commons.security.keystore.CACertsLoader;
 import org.apache.synapse.commons.security.keystore.JKSKeyStoreLoader;
 import org.apache.synapse.commons.security.keystore.PKCS12KeyStoreLoader;
 import org.apache.synapse.commons.security.keystore.PKCS8KeyStoreLoader;
-import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import java.security.KeyStore;
 import java.util.HashMap;

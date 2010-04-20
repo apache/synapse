@@ -16,15 +16,13 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.commons.security.tool;
+package org.apache.synapse.commons.security;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.enumeration.EncodingType;
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,76 +36,67 @@ import java.math.BigInteger;
 public final class EncodingHelper {
 
     private static Log log = LogFactory.getLog(EncodingHelper.class);
-    
+
     private EncodingHelper() {
     }
-    
+
     /**
      * Encodes the provided ByteArrayOutputStream using the specified encoding type.
-     * 
+     *
      * @param baos         The ByteArrayOutputStream to encode
      * @param encodingType The encoding to use
-     * 
      * @return The encoded ByteArrayOutputStream as a String
      */
-    public static String encode(ByteArrayOutputStream baos, EncodingType encodingType) {
-        String encodedString;
-        
-        switch(encodingType) {
+    public static byte[] encode(ByteArrayOutputStream baos, EncodingType encodingType) {
+        switch (encodingType) {
             case BASE64:
                 if (log.isDebugEnabled()) {
                     log.debug("base64 encoding on output ");
                 }
-                encodedString = new BASE64Encoder().encode(baos.toByteArray());
+                return Base64.encodeBase64(baos.toByteArray());
+            case BIGINTEGER16:
+                if (log.isDebugEnabled()) {
+                    log.debug("BigInteger 16 encoding on output ");
+                }
+                return new BigInteger(baos.toByteArray()).toByteArray();
+            default:
+                throw new IllegalArgumentException("Unsupported encoding type");
+        }
+    }
+
+    /**
+     * Decodes the provided InputStream using the specified encoding type.
+     *
+     * @param inputStream  The InputStream to decode
+     * @param encodingType The encoding to use
+     * @return The decoded InputStream
+     * @throws java.io.IOException      If an error occurs decoding the input stream
+     * @throws IllegalArgumentException if the specified encodingType is not supported
+     */
+    public static InputStream decode(InputStream inputStream, EncodingType encodingType)
+            throws IOException {
+
+        InputStream decodedInputStream = null;
+        switch (encodingType) {
+            case BASE64:
+                if (log.isDebugEnabled()) {
+                    log.debug("base64 decoding on input  ");
+                }
+                decodedInputStream = new ByteArrayInputStream(
+                        Base64.decodeBase64(MiscellaneousUtil.asBytes(inputStream)));
                 break;
             case BIGINTEGER16:
                 if (log.isDebugEnabled()) {
                     log.debug("BigInteger 16 encoding on output ");
                 }
-                encodedString = new BigInteger(baos.toByteArray()).toString(16);
+
+                BigInteger n = new BigInteger(IOUtils.toString(inputStream), 16);
+                decodedInputStream = new ByteArrayInputStream(n.toByteArray());
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported encoding type");
         }
-        
-        return encodedString;
-    }
 
-    /**
-     * Decodes the provided InputStream using the specified encoding type.
-     * 
-     * @param inputStream               The InputStream to decode
-     * @param encodingType              The encoding to use
-     * 
-     * @throws IOException              If an error occurs decoding the input stream
-     * @throws IllegalArgumentException if the specified encodingType is not supported
-     * 
-     * @return The decoded InputStream
-     */
-    public static InputStream decode(InputStream inputStream, EncodingType encodingType) 
-        throws IOException {
-        
-        InputStream decodedInputStream = null;
-            switch(encodingType) {
-                case BASE64:
-                    if (log.isDebugEnabled()) {
-                        log.debug("base64 decoding on input  ");
-                    }
-                    decodedInputStream = new ByteArrayInputStream(
-                            new BASE64Decoder().decodeBuffer(inputStream));
-                    break;
-                case BIGINTEGER16:
-                    if (log.isDebugEnabled()) {
-                        log.debug("BigInteger 16 encoding on output ");
-                    }
-                    
-                    BigInteger n = new BigInteger(IOUtils.toString(inputStream), 16);
-                    decodedInputStream = new ByteArrayInputStream(n.toByteArray());
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported encoding type");
-            }
-        
         return decodedInputStream;
     }
 }

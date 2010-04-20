@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.mbean;
+package org.apache.synapse.commons.security.secret.mbean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -18,14 +18,16 @@
  */
 package org.apache.synapse.commons.security.secret.handler;
 
+import org.apache.synapse.commons.security.CipherFactory;
+import org.apache.synapse.commons.security.CipherOperationMode;
+import org.apache.synapse.commons.security.DecryptionProvider;
+import org.apache.synapse.commons.security.EncodingType;
+import org.apache.synapse.commons.security.definition.CipherInformation;
 import org.apache.synapse.commons.security.secret.AbstractSecretCallbackHandler;
 import org.apache.synapse.commons.security.secret.SingleSecretCallback;
-import org.apache.synapse.commons.security.definition.CipherInformation;
-import org.apache.synapse.commons.security.enumeration.CipherOperationMode;
-import org.apache.synapse.commons.security.enumeration.EncodingType;
-import org.apache.synapse.commons.security.wrappers.CipherWrapper;
 
-import java.io.ByteArrayInputStream;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 
 /**
  * SecretCallbackHandler implementation which is compatible to the default encryption used
@@ -33,25 +35,24 @@ import java.io.ByteArrayInputStream;
  */
 public class JBossEncryptionSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
-    private static final String PASSPHRASE = "jaas is the way";
     private static final String ALGORITHM = "Blowfish";
-    
+    private static Key key = new SecretKeySpec("jaas is the way".getBytes(), ALGORITHM);
+
     /**
      * Decrypts the encrypted secret provided by the specified callback handler.
-     * 
+     *
      * @param singleSecretCallback The singleSecretCallback which secret has to be decrypted
      */
     @Override
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
         singleSecretCallback.setSecret(decrypt(singleSecretCallback.getId()));
     }
-    
+
     /**
      * Decrypts the encrypted secret using the Blowfish algorithm and the same hard-coded
      * passphrase the JBoss application server uses to decrypt database passwords.
-     * 
+     *
      * @param encryptedSecret the encrypted secret
-     * 
      * @return the decrypted secret.
      */
     private static String decrypt(String encryptedSecret) {
@@ -59,7 +60,7 @@ public class JBossEncryptionSecretCallbackHandler extends AbstractSecretCallback
         cipherInformation.setAlgorithm(ALGORITHM);
         cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
         cipherInformation.setInType(EncodingType.BIGINTEGER16);
-        CipherWrapper cipherWrapper = new CipherWrapper(cipherInformation, PASSPHRASE);
-        return cipherWrapper.getSecret(new ByteArrayInputStream(encryptedSecret.getBytes()));
+        DecryptionProvider decryptionProvider = CipherFactory.createCipher(cipherInformation, key);
+        return new String(decryptionProvider.decrypt(encryptedSecret.getBytes()));
     }
 }

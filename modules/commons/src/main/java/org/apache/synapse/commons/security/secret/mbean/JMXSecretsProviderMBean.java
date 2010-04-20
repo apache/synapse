@@ -16,36 +16,30 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse;
-
-import org.apache.synapse.config.SynapsePropertiesLoader;
-import org.apache.synapse.commons.security.secret.SecretManager;
-import org.apache.synapse.commons.security.secret.mbean.SecretManagerAdminMBean;
-
-import javax.management.StandardMBean;
-import javax.management.NotCompliantMBeanException;
-
+package org.apache.synapse.commons.security.secret.mbean;
 
 /**
- *
+ * Managing MBean for secrct
  */
-
-public class SecretManagerAdminMBeanImpl extends StandardMBean implements SecretManagerAdminMBean {
-
-    private SecretManager secretManager = SecretManager.getInstance();
-
-    public SecretManagerAdminMBeanImpl() throws NotCompliantMBeanException {
-        super(SecretManagerAdminMBean.class);
-    }
+public interface JMXSecretsProviderMBean {
 
     /**
-     * @see SecretManagerAdminMBean
+     * Add a secret through JMX
+     *
+     * @param id     identify for what this secret is
+     * @param secret Secret
      */
-    public void init() {
-        this.secretManager.init(SynapsePropertiesLoader.loadSynapseProperties());
-    }
+    public void addSecret(String id, String secret);
 
-    public void shutDown() {
-        this.secretManager.shoutDown();
-    }
+    /**
+     * Remove a Secect for given ID
+     *
+     * @param id identify for what this secret is
+     */
+    public void removeSecret(String id);
+
+    /**
+     * Clear all secrets
+     */
+    public void clear();
 }

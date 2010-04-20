@@ -16,18 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.interfaces;
-
-import java.security.KeyStore;
+package org.apache.synapse.commons.security;
 
 /**
- * ICACertsLoader provides an uniform interface to create a keyStore containing CA certs
- * (truststore)
+ * KeyStore Types
  */
-public interface ICACertsLoader {
-    /**
-     * @param CACertificateFilesPath Path to the CA certificates directory
-     * @return KeyStore Instance
-     */
-    public abstract KeyStore loadTrustStore(String CACertificateFilesPath);
+
+public enum KeyStoreType {
+    JKS,
+    PKCS8,
+    PKCS12,
+    CA_CERTIFICATES_PATH
 }

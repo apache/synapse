@@ -16,19 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.interfaces;
-
-import java.security.KeyStore;
+package org.apache.synapse.commons.security;
 
 /**
- * Provides a way to load KeyStore
+ * Cipher Operation Mode.
  */
-public interface IKeyStoreLoader {
-
-    /**
-     * returns an instance of KeyStore object
-     *
-     * @return KeyStore Instance
-     */
-    public abstract KeyStore getKeyStore();
+public enum CipherOperationMode {
+    ENCRYPT,
+    DECRYPT
 }

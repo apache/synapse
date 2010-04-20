@@ -16,12 +16,12 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.secret.repository.filebased;
+package org.apache.synapse.commons.security.secret.repository;
 
+import org.apache.synapse.commons.security.keystore.IdentityKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.TrustKeyStoreWrapper;
 import org.apache.synapse.commons.security.secret.SecretRepository;
 import org.apache.synapse.commons.security.secret.SecretRepositoryProvider;
-import org.apache.synapse.commons.security.wrappers.IdentityKeyStoreWrapper;
-import org.apache.synapse.commons.security.wrappers.TrustKeyStoreWrapper;
 
 
 /**

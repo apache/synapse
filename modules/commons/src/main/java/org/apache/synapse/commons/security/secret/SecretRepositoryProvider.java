@@ -18,8 +18,8 @@
  */
 package org.apache.synapse.commons.security.secret;
 
-import org.apache.synapse.commons.security.wrappers.IdentityKeyStoreWrapper;
-import org.apache.synapse.commons.security.wrappers.TrustKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.IdentityKeyStoreWrapper;
+import org.apache.synapse.commons.security.keystore.TrustKeyStoreWrapper;
 
 
 /**

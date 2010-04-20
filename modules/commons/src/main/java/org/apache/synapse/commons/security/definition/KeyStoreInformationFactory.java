@@ -16,13 +16,10 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.apache.synapse.commons.security.definition.factory;
+package org.apache.synapse.commons.security.definition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.security.definition.IdentityKeyStoreInformation;
-import org.apache.synapse.commons.security.definition.KeyStoreInformation;
-import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.security.secret.SecretInformationFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 

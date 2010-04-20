@@ -16,21 +16,17 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.commons.security.mbean;
+package org.apache.synapse.commons.security;
 
 /**
- * Admin service for managing SecretManager
+ * Provides Encrypt operation
  */
-
-public interface SecretManagerAdminMBean {
-
+public interface EncryptionProvider {
     /**
-     * Initialize the SecretManager
+     * Encrypts a plain text
+     *
+     * @param plainText as a byte array
+     * @return cipher text as a byte array
      */
-    public void init();
-
-    /**
-     * Shutting Down the SecretManager
-     */
-    public void shutDown();
+    public byte[] encrypt(byte[] plainText);
 }

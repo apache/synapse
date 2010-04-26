@@ -347,7 +347,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
     private DataSource lookupDataSource(String dataSourceName, Properties jndiProperties) {
 
         DataSource dataSource = null;
-        RepositoryBasedDataSourceFinder finder = DataSourceHelper.getInstance()
+        RepositoryBasedDataSourceFinder finder = DataSourceRepositoryHolder.getInstance()
                 .getRepositoryBasedDataSourceFinder();
 
         if (finder.isInitialized()) {

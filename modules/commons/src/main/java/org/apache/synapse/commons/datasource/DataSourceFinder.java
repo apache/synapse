@@ -73,8 +73,8 @@ public class DataSourceFinder {
             }
 
         } catch (NamingException e) {
-            throw new SynapseCommonsException("Error looking up DataSource : " + dsName + " using JNDI" +
-                    " properties : " + context, e, log);
+            throw new SynapseCommonsException("Error looking up DataSource : " + dsName
+                    + " using JNDI" + " properties : " + context, e, log);
         }
     }
 }

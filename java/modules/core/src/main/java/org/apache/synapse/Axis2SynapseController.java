@@ -35,11 +35,11 @@ import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.security.SecurityConstants;
 import org.apache.synapse.commons.security.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
-import org.apache.synapse.commons.datasource.DataSourceHelper;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.jmx.JmxInformation;
 import org.apache.synapse.commons.jmx.JmxInformationFactory;
@@ -660,21 +660,21 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     /**
-     * Initiating DataSourceHelper with a new datasource information repository or
+     * Initiating DataSourceRepositoryHolder with a new datasource information repository or
      * reusing an existing repository.
      *
      * @param serverContextInformation ServerContextInformation instance
      */
     private void initDataSourceHelper(ServerContextInformation serverContextInformation) {
-        DataSourceHelper helper = DataSourceHelper.getInstance();
+        DataSourceRepositoryHolder repositoryHolder = DataSourceRepositoryHolder.getInstance();
         Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
         Object repo =
                 serverContextInformation.getProperty(
                         DataSourceConstants.DATA_SOURCE_INFORMATION_REPOSITORY);
         if (repo instanceof DataSourceInformationRepository) {
-            helper.init((DataSourceInformationRepository) repo, synapseProperties);
+            repositoryHolder.init((DataSourceInformationRepository) repo, synapseProperties);
         } else {
-            helper.init(null, synapseProperties);
+            repositoryHolder.init(null, synapseProperties);
         }
     }
 

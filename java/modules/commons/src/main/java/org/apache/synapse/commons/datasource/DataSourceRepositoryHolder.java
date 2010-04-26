@@ -26,26 +26,29 @@ import org.apache.synapse.commons.datasource.factory.DataSourceInformationReposi
 import java.util.Properties;
 
 /**
- * Some help functions related with DataSourceInformationRepository
- * TODO - rename class name
+ * Holder for the DataSourceRepository
  */
-@SuppressWarnings("unused")
-public class DataSourceHelper {
+@SuppressWarnings({"UnusedDeclaration"})
+public class DataSourceRepositoryHolder {
 
-    private static final Log log = LogFactory.getLog(DataSourceHelper.class);
-    private final static DataSourceHelper REPOSITORY_HELPER =
-            new DataSourceHelper();
+    private static final Log log = LogFactory.getLog(DataSourceRepositoryHolder.class);
+
+    private static final DataSourceRepositoryHolder DATA_SOURCE_REPOSITORY_HOLDER 
+            = new DataSourceRepositoryHolder();
 
     private DataSourceInformationRepository dataSourceInformationRepository;
-    private boolean initialized = false;
+
     private DataSourceRepositoryManager dataSourceRepositoryManager;
+
     private RepositoryBasedDataSourceFinder repositoryBasedDataSourceFinder;
 
-    private DataSourceHelper() {
+    private boolean initialized = false;
+
+    private DataSourceRepositoryHolder() {
     }
 
-    public static DataSourceHelper getInstance() {
-        return REPOSITORY_HELPER;
+    public static DataSourceRepositoryHolder getInstance() {
+        return DATA_SOURCE_REPOSITORY_HOLDER;
     }
 
     /**
@@ -54,15 +57,17 @@ public class DataSourceHelper {
      * @param repository to be initialized
      * @param properties DataSources configuration properties
      */
-    public void init(
-            DataSourceInformationRepository repository,
-            Properties properties) {
+    public void init(DataSourceInformationRepository repository, Properties properties) {
 
         if (initialized) {
             if (log.isDebugEnabled()) {
-                log.debug("DataSourceHelper has been already initialized.");
+                log.debug("Data source repository holder has already been initialized.");
             }
             return;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing the data source repository holder");
         }
 
         DataSourceInformationRepositoryListener repositoryListener = null;
@@ -104,8 +109,7 @@ public class DataSourceHelper {
 
     private void assertInitialized() {
         if (!initialized) {
-            String msg = "DataSourceHelper has not been initialized, " +
-                    "it requires to be initialized";
+            String msg = "Data source repository holder has not been initialized";
             log.error(msg);
             throw new SynapseCommonsException(msg);
         }

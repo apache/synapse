@@ -24,8 +24,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.commons.datasource.DataSourceHelper;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
@@ -981,7 +981,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
         // clear session information used for SA load balancing
         try {
             SALSessions.getInstance().reset();
-            DataSourceHelper.getInstance().getDataSourceRepositoryManager().clear();
+            DataSourceRepositoryHolder.getInstance().getDataSourceRepositoryManager().clear();
         } catch (Throwable ignored) {}
 
         // destroy the priority executors. 

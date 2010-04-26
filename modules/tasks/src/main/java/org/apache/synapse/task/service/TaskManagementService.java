@@ -19,14 +19,14 @@
 package org.apache.synapse.task.service;
 
 import org.apache.synapse.task.TaskDescription;
-import org.apache.axiom.om.OMElement;
 
 import java.util.List;
 
 /**
  * A service for management of task
- * Implementation can be a web service , OSGI service , etc
+ * Implementation can be a web service , OSGi service , etc
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public interface TaskManagementService {
 
     /**

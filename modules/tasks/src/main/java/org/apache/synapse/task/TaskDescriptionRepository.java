@@ -28,6 +28,7 @@ import java.util.Map;
 /**
  * Local repository for holds Task descriptions
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class TaskDescriptionRepository {
 
     private static final Log log = LogFactory.getLog(TaskDescriptionRepository.class);

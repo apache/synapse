@@ -28,6 +28,7 @@ import java.util.*;
  * Encapsulates details about a task
  * Properties are self descriptive and related with quartz
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class TaskDescription {
 
     public static final String CLASSNAME = "ClassName";

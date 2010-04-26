@@ -29,6 +29,7 @@ import java.util.Properties;
 /**
  * Abstraction for scheduling a Task
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class TaskScheduler {
 
     private static Log log = LogFactory.getLog(TaskScheduler.class);

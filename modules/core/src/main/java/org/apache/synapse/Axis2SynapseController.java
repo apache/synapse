@@ -670,7 +670,7 @@ public class Axis2SynapseController implements SynapseController {
         Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
         Object repo =
                 serverContextInformation.getProperty(
-                        DataSourceConstants.DATASOURCE_INFORMATION_REPOSITORY);
+                        DataSourceConstants.DATA_SOURCE_INFORMATION_REPOSITORY);
         if (repo instanceof DataSourceInformationRepository) {
             helper.init((DataSourceInformationRepository) repo, synapseProperties);
         } else {

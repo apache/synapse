@@ -49,7 +49,7 @@ public class DataSourceInformationSerializer {
 
         // Prefix for getting particular data source's properties
         String prefix = buffer.toString();
-        addProperty(properties, prefix + DataSourceConstants.PROP_DSNAME,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DS_NAME,
                 information.getDatasourceName());
 
         SecretInformation secretInformation = information.getSecretInformation();
@@ -68,12 +68,12 @@ public class DataSourceInformationSerializer {
             }
 
         }
-        addProperty(properties, prefix + DataSourceConstants.PROP_MAXACTIVE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MAX_ACTIVE,
                 String.valueOf(information.getMaxActive()));
-        addProperty(properties, prefix + DataSourceConstants.PROP_MAXIDLE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MAX_IDLE,
                 String.valueOf(information.getMaxIdle()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_MAXWAIT,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MAX_WAIT,
                 String.valueOf(information.getMaxWait()));
 
         addProperty(properties, prefix + DataSourceConstants.PROP_DRIVER_CLS_NAME,
@@ -85,77 +85,77 @@ public class DataSourceInformationSerializer {
         addProperty(properties, prefix + DataSourceConstants.PROP_TYPE,
                 String.valueOf(information.getType()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULTAUTOCOMMIT,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULT_AUTO_COMMIT,
                 String.valueOf(information.isDefaultAutoCommit()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULTREADONLY,
+        addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULT_READ_ONLY,
                 String.valueOf(information.isDefaultReadOnly()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_TESTONBORROW,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TEST_ON_BORROW,
                 String.valueOf(information.isTestOnBorrow()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_TESTONRETURN,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TEST_ON_RETURN,
                 String.valueOf(information.isTestOnReturn()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_MINIDLE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_MIN_IDLE,
                 String.valueOf(information.getMinIdle()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_INITIALSIZE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_INITIAL_SIZE,
                 String.valueOf(information.getInitialSize()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_DEFAULTTRANSACTIONISOLATION,
+                DataSourceConstants.PROP_DEFAULT_TRANSACTION_ISOLATION,
                 String.valueOf(information.getDefaultTransactionIsolation()));
 
         String defaultCatalog = information.getDefaultCatalog();
         if (defaultCatalog != null && !"".equals(defaultCatalog)) {
-            addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULTCATALOG,
+            addProperty(properties, prefix + DataSourceConstants.PROP_DEFAULT_CATALOG,
                     String.valueOf(defaultCatalog));
         }
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+                DataSourceConstants.PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED,
                 String.valueOf(information.isAccessToUnderlyingConnectionAllowed()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_REMOVEABANDONED,
+        addProperty(properties, prefix + DataSourceConstants.PROP_REMOVE_ABANDONED,
                 String.valueOf(information.isRemoveAbandoned()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_REMOVEABANDONEDTIMEOUT,
+                DataSourceConstants.PROP_REMOVE_ABANDONED_TIMEOUT,
                 String.valueOf(information.getRemoveAbandonedTimeout()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_LOGABANDONED,
+        addProperty(properties, prefix + DataSourceConstants.PROP_LOG_ABANDONED,
                 String.valueOf(information.isLogAbandoned()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_POOLPREPAREDSTATEMENTS,
+                DataSourceConstants.PROP_POOL_PREPARED_STATEMENTS,
                 String.valueOf(information.isPoolPreparedStatements()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
+                DataSourceConstants.PROP_MAX_OPEN_PREPARED_STATEMENTS,
                 String.valueOf(information.getMaxOpenPreparedStatements()));
 
         addProperty(properties, prefix + DataSourceConstants.PROP_REGISTRY,
                 String.valueOf(information.getRepositoryType()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+                DataSourceConstants.PROP_TIME_BETWEEN_EVICTION_RUNS_MILLIS,
                 String.valueOf(information.getTimeBetweenEvictionRunsMillis()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_NUMTESTSPEREVICTIONRUN,
+                DataSourceConstants.PROP_NUM_TESTS_PER_EVICTION_RUN,
                 String.valueOf(information.getNumTestsPerEvictionRun()));
 
         addProperty(properties, prefix +
-                DataSourceConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
+                DataSourceConstants.PROP_MIN_EVICTABLE_IDLE_TIME_MILLIS,
                 String.valueOf(information.getMinEvictableIdleTimeMillis()));
 
-        addProperty(properties, prefix + DataSourceConstants.PROP_TESTWHILEIDLE,
+        addProperty(properties, prefix + DataSourceConstants.PROP_TEST_WHILE_IDLE,
                 String.valueOf(information.isTestWhileIdle()));
 
         String validationQ = information.getValidationQuery();
         if (validationQ != null && !"".equals(validationQ)) {
-            addProperty(properties, prefix + DataSourceConstants.PROP_VALIDATIONQUERY,
+            addProperty(properties, prefix + DataSourceConstants.PROP_VALIDATION_QUERY,
                     String.valueOf(validationQ));
         }
 

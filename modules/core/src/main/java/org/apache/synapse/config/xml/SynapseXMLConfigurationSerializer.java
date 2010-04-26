@@ -35,8 +35,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
 
     private static final OMFactory fac = OMAbstractFactory.getOMFactory();
 
-    private static final OMNamespace synNS = fac.createOMNamespace(
-            XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    private static final OMNamespace synNS = SynapseConstants.SYNAPSE_OMNAMESPACE;
 
     /**
      * Order of entries is irrelevant, however its nice to have some order.

@@ -43,8 +43,10 @@ public class XMLConfigurationSerializer {
     public static void serializeConfiguration(SynapseConfiguration synCfg,
         OutputStream outputStream) throws XMLStreamException {
 
-        log.info("Serializing the XML Configuration to the output stream");
-        
+        if (log.isDebugEnabled()) {
+            log.debug("Serializing the XML Configuration to the output stream");
+        }
+
         OMElement definitions
                 = ConfigurationFactoryAndSerializerFinder.serializeConfiguration(synCfg);
         definitions.serialize(outputStream);

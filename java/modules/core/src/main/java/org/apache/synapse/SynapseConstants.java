@@ -33,7 +33,7 @@ public final class SynapseConstants {
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
     /** An OMNamespace object for the Synapse NS */
     public static final OMNamespace SYNAPSE_OMNAMESPACE =
-            OMAbstractFactory.getOMFactory().createOMNamespace(SYNAPSE_NAMESPACE, "syn");
+            OMAbstractFactory.getOMFactory().createOMNamespace(SYNAPSE_NAMESPACE, "");
 
     /** The name of the main sequence for message mediation */
     public static final String MAIN_SEQUENCE_KEY  = "main";

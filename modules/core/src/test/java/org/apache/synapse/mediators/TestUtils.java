@@ -72,9 +72,15 @@ public class TestUtils {
 
     public static MessageContext createLightweightSynapseMessageContext(
             String payload) throws Exception {
+
+        return createLightweightSynapseMessageContext(payload, new SynapseConfiguration());        
+    }
+
+    public static MessageContext createLightweightSynapseMessageContext(
+            String payload, SynapseConfiguration config) throws Exception {
+
         org.apache.axis2.context.MessageContext mc =
                 new org.apache.axis2.context.MessageContext();
-        SynapseConfiguration config = new SynapseConfiguration();
         SynapseEnvironment env = new Axis2SynapseEnvironment(config);
         MessageContext synMc = new Axis2MessageContext(mc, config, env);
         SOAPEnvelope envelope =

@@ -102,6 +102,7 @@ public abstract class AbstractRegistry implements Registry {
 
         // if we get here, we have received the raw omNode from the
         // registry and our previous copy (if we had one) has expired or is not valid
+        Object expiredValue = entry.getValue();
 
         // if we have a XMLToObjectMapper for this entry, use it to convert this
         // resource into the appropriate object - e.g. sequence or endpoint
@@ -130,6 +131,15 @@ public abstract class AbstractRegistry implements Registry {
                 } else {
                     entry.setValue(omNode);
                 }
+            }
+        }
+
+        if (expiredValue != null) {
+            // Destroy the old resource so that everything is properly cleaned up
+            if (expiredValue instanceof SequenceMediator) {
+                ((SequenceMediator) expiredValue).destroy();
+            } else if (expiredValue instanceof Endpoint) {
+                ((Endpoint) expiredValue).destroy();
             }
         }
 

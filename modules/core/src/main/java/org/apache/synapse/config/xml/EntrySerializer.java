@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import javax.xml.stream.XMLStreamConstants;
 import java.net.URL;
@@ -39,8 +40,7 @@ public class EntrySerializer {
     private static Log log = LogFactory.getLog(EntrySerializer.class);
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS = fac.createOMNamespace(
-            XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace synNS = SynapseConstants.SYNAPSE_OMNAMESPACE;
     protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**

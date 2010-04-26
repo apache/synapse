@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.mediators.eip.Target;
+import org.apache.synapse.SynapseConstants;
 
 /**
  * Serializer for {@link Target} instances.
@@ -42,7 +43,7 @@ public class TargetSerializer {
      * This holds the Synapse namesapce for all the elements (qualified from default)
      */
     private static final OMNamespace synNS
-            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+            = SynapseConstants.SYNAPSE_OMNAMESPACE;
 
     /**
      * This holds the null namespace for all the attributes (unqualified from default)

@@ -91,7 +91,7 @@ public class DataSourceInformationFactory {
         datasourceInformation.setUrl(url);
 
         String dataSourceName = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConstants.PROP_DSNAME, dsName,
+                properties, prefix + DataSourceConstants.PROP_DS_NAME, dsName,
                 String.class);
         datasourceInformation.setDatasourceName(dataSourceName);
 
@@ -108,35 +108,35 @@ public class DataSourceInformationFactory {
         datasourceInformation.setRepositoryType(repositoryType);
 
         Integer maxActive = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConstants.PROP_MAXACTIVE,
+                properties, prefix + DataSourceConstants.PROP_MAX_ACTIVE,
                 GenericObjectPool.DEFAULT_MAX_ACTIVE, Integer.class);
         datasourceInformation.setMaxActive(maxActive);
 
         Integer maxIdle = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConstants.PROP_MAXIDLE,
+                properties, prefix + DataSourceConstants.PROP_MAX_IDLE,
                 GenericObjectPool.DEFAULT_MAX_IDLE, Integer.class);
         datasourceInformation.setMaxIdle(maxIdle);
 
         Long maxWait = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConstants.PROP_MAXWAIT,
+                properties, prefix + DataSourceConstants.PROP_MAX_WAIT,
                 GenericObjectPool.DEFAULT_MAX_WAIT, Long.class);
 
         datasourceInformation.setMaxWait(maxWait);
 
         // Construct DriverAdapterCPDS reference
-        String suffix = DataSourceConstants.PROP_CPDSADAPTER +
+        String suffix = DataSourceConstants.PROP_CPDS_ADAPTER +
                 DataSourceConstants.DOT_STRING +
                 DataSourceConstants.PROP_CLASS_NAME;
         String className = MiscellaneousUtil.getProperty(properties, prefix + suffix,
-                DataSourceConstants.PROP_CPDSADAPTER_DRIVER);
+                DataSourceConstants.PROP_CPDS_ADAPTER_DRIVER);
         datasourceInformation.addParameter(suffix, className);
-        suffix = DataSourceConstants.PROP_CPDSADAPTER +
+        suffix = DataSourceConstants.PROP_CPDS_ADAPTER +
                 DataSourceConstants.DOT_STRING +
                 DataSourceConstants.PROP_FACTORY;
         String factory = MiscellaneousUtil.getProperty(properties, prefix + suffix,
-                DataSourceConstants.PROP_CPDSADAPTER_DRIVER);
+                DataSourceConstants.PROP_CPDS_ADAPTER_DRIVER);
         datasourceInformation.addParameter(suffix, factory);
-        suffix = DataSourceConstants.PROP_CPDSADAPTER +
+        suffix = DataSourceConstants.PROP_CPDS_ADAPTER +
                 DataSourceConstants.DOT_STRING +
                 DataSourceConstants.PROP_NAME;
         String name = MiscellaneousUtil.getProperty(properties, prefix + suffix,
@@ -144,81 +144,81 @@ public class DataSourceInformationFactory {
         datasourceInformation.addParameter(suffix, name);
 
         boolean defaultAutoCommit = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_DEFAULTAUTOCOMMIT, true,
+                prefix + DataSourceConstants.PROP_DEFAULT_AUTO_COMMIT, true,
                 Boolean.class);
 
         boolean defaultReadOnly = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_DEFAULTREADONLY, false,
+                prefix + DataSourceConstants.PROP_DEFAULT_READ_ONLY, false,
                 Boolean.class);
 
         boolean testOnBorrow = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_TESTONBORROW, true,
+                prefix + DataSourceConstants.PROP_TEST_ON_BORROW, true,
                 Boolean.class);
 
         boolean testOnReturn = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_TESTONRETURN, false,
+                prefix + DataSourceConstants.PROP_TEST_ON_RETURN, false,
                 Boolean.class);
 
         long timeBetweenEvictionRunsMillis = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
+                prefix + DataSourceConstants.PROP_TIME_BETWEEN_EVICTION_RUNS_MILLIS,
                 GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, Long.class);
 
         int numTestsPerEvictionRun = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_NUMTESTSPEREVICTIONRUN,
+                prefix + DataSourceConstants.PROP_NUM_TESTS_PER_EVICTION_RUN,
                 GenericObjectPool.DEFAULT_NUM_TESTS_PER_EVICTION_RUN, Integer.class);
 
         long minEvictableIdleTimeMillis = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_MINEVICTABLEIDLETIMEMILLIS,
+                prefix + DataSourceConstants.PROP_MIN_EVICTABLE_IDLE_TIME_MILLIS,
                 GenericObjectPool.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS, Long.class);
 
         boolean testWhileIdle = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_TESTWHILEIDLE, false,
+                prefix + DataSourceConstants.PROP_TEST_WHILE_IDLE, false,
                 Boolean.class);
 
         String validationQuery = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_VALIDATIONQUERY, null);
+                prefix + DataSourceConstants.PROP_VALIDATION_QUERY, null);
 
         int minIdle = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_MINIDLE,
+                prefix + DataSourceConstants.PROP_MIN_IDLE,
                 GenericObjectPool.DEFAULT_MIN_IDLE,
                 Integer.class);
 
         int initialSize = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConstants.PROP_INITIALSIZE, 0,
+                properties, prefix + DataSourceConstants.PROP_INITIAL_SIZE, 0,
                 Integer.class);
 
         int defaultTransactionIsolation = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_DEFAULTTRANSACTIONISOLATION, -1,
+                prefix + DataSourceConstants.PROP_DEFAULT_TRANSACTION_ISOLATION, -1,
                 Integer.class);
 
         String defaultCatalog = MiscellaneousUtil.getProperty(
-                properties, prefix + DataSourceConstants.PROP_DEFAULTCATALOG, null);
+                properties, prefix + DataSourceConstants.PROP_DEFAULT_CATALOG, null);
 
         boolean accessToUnderlyingConnectionAllowed =
                 MiscellaneousUtil.getProperty(properties,
                         prefix +
                                 DataSourceConstants.
-                                        PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
+                                    PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED,
                         false, Boolean.class);
 
         boolean removeAbandoned = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_REMOVEABANDONED, false,
+                prefix + DataSourceConstants.PROP_REMOVE_ABANDONED, false,
                 Boolean.class);
 
         int removeAbandonedTimeout = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_REMOVEABANDONEDTIMEOUT, 300,
+                prefix + DataSourceConstants.PROP_REMOVE_ABANDONED_TIMEOUT, 300,
                 Integer.class);
 
         boolean logAbandoned = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_LOGABANDONED, false,
+                prefix + DataSourceConstants.PROP_LOG_ABANDONED, false,
                 Boolean.class);
 
         boolean poolPreparedStatements = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_POOLPREPAREDSTATEMENTS, false,
+                prefix + DataSourceConstants.PROP_POOL_PREPARED_STATEMENTS, false,
                 Boolean.class);
 
         int maxOpenPreparedStatements = MiscellaneousUtil.getProperty(properties,
-                prefix + DataSourceConstants.PROP_MAXOPENPREPAREDSTATEMENTS,
+                prefix + DataSourceConstants.PROP_MAX_OPEN_PREPARED_STATEMENTS,
                 GenericKeyedObjectPool.DEFAULT_MAX_TOTAL, Integer.class);
 
         datasourceInformation.setDefaultAutoCommit(defaultAutoCommit);
@@ -249,9 +249,9 @@ public class DataSourceInformationFactory {
         }
 
         datasourceInformation.addProperty(
-                prefix + DataSourceConstants.PROP_ICFACTORY,
+                prefix + DataSourceConstants.PROP_IC_FACTORY,
                 MiscellaneousUtil.getProperty(
-                        properties, prefix + DataSourceConstants.PROP_ICFACTORY,
+                        properties, prefix + DataSourceConstants.PROP_IC_FACTORY,
                         null));
         //Provider URL
         datasourceInformation.addProperty(

@@ -36,6 +36,7 @@ import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -173,7 +174,7 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
                 axisOutMsgCtx.setDoingREST(true);
             } else {
-                processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);
+                processWSDL2RESTRequestMessageType(originalInMsgCtx, axisOutMsgCtx);
             }
 
             if (endpoint.isUseMTOM()) {
@@ -197,17 +198,25 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
                         endpoint.getCharSetEncoding());
             }
-            
+
             if (endpoint.getAddress() != null) {
-                if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat()) &&
-                    axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX) != null) {
+                // add rest request' suffix URI
+                Object restSuffix =
+                        axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX);
+                boolean isRest = SynapseConstants.FORMAT_REST.equals(endpoint.getFormat());
+
+                if (!isRest) {
+                    isRest = isRequestRest(originalInMsgCtx);
+                }
+
+                if (isRest && restSuffix != null && !"".equals(restSuffix)) {
                     axisOutMsgCtx.setTo(
-                        new EndpointReference(endpoint.getAddress() +
-                        axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX)
-                    ));
+                            new EndpointReference(endpoint.getAddress() + restSuffix));
+
                 } else {
                     axisOutMsgCtx.setTo(new EndpointReference(endpoint.getAddress()));
                 }
+
                 axisOutMsgCtx.setProperty(NhttpConstants.ENDPOINT_PREFIX, endpoint.getAddress());
             }
 
@@ -215,7 +224,7 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.getOptions().setUseSeparateListener(true);
             }
         } else {
-            processHttpGetMethod(originalInMsgCtx, axisOutMsgCtx);
+            processWSDL2RESTRequestMessageType(originalInMsgCtx, axisOutMsgCtx);
         }
 
         // only put whttp:location for the REST (GET) requests, otherwise causes issues for POX messages
@@ -393,21 +402,62 @@ public class Axis2FlexibleMEPClient {
         }
     }
 
-    private static void processHttpGetMethod(MessageContext originalInMsgCtx,
-                                             MessageContext axisOutMsgCtx) {
+    /**
+     * This is is a workaround for axis2 RestUtils behaviour
+     * Based on an internal property and the http method, we set the message type
+     * @param originalInMsgCtx IN message
+     * @param axisOutMsgCtx Out message
+     */
+    private static void processWSDL2RESTRequestMessageType(MessageContext originalInMsgCtx,
+                                                           MessageContext axisOutMsgCtx) {
 
-        String httpMethod = (String) originalInMsgCtx.getProperty(
-                Constants.Configuration.HTTP_METHOD);
-        if (Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)) {
-            axisOutMsgCtx.setProperty(
-                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
-                    HTTPConstants.MEDIA_TYPE_X_WWW_FORM);
-            if (axisOutMsgCtx.getProperty(WSDL2Constants.ATTR_WHTTP_LOCATION) == null
-                    && axisOutMsgCtx.getEnvelope().getBody().getFirstElement() != null) {
-                axisOutMsgCtx.setProperty(WSDL2Constants.ATTR_WHTTP_LOCATION,
-                        axisOutMsgCtx.getEnvelope().getBody().getFirstElement()
-                                .getQName().getLocalPart());
+        // TODO - this is a workaround for axis2 RestUtils behaviour
+        Object restContentType =
+                originalInMsgCtx.getProperty(NhttpConstants.REST_REQUEST_CONTENT_TYPE);
+
+        if (restContentType == null) {
+
+            String httpMethod = (String) originalInMsgCtx.getProperty(
+                    Constants.Configuration.HTTP_METHOD);
+            if (Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)) {
+                restContentType = HTTPConstants.MEDIA_TYPE_X_WWW_FORM;
             }
         }
+
+        if (restContentType instanceof String) {
+
+            axisOutMsgCtx.setProperty(
+                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
+                    restContentType);
+        }
+    }
+
+    /**
+     * Whether the original request received by the synapse is REST
+     *
+     * @param originalInMsgCtx request message
+     * @return <code>true</code> if the request was a REST request
+     */
+    private static boolean isRequestRest(MessageContext originalInMsgCtx) {
+
+        boolean isRestRequest =
+                originalInMsgCtx.getProperty(NhttpConstants.REST_REQUEST_CONTENT_TYPE) != null;
+
+        if (!isRestRequest) {
+
+            String httpMethod = (String) originalInMsgCtx.getProperty(
+                    Constants.Configuration.HTTP_METHOD);
+
+            isRestRequest = Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod);
+
+            if (!isRestRequest) {
+
+                isRestRequest = Constants.Configuration.HTTP_METHOD_POST.equals(httpMethod)
+                        && HTTPTransportUtils.isRESTRequest(
+                        String.valueOf(originalInMsgCtx.getProperty(
+                                Constants.Configuration.MESSAGE_TYPE)));
+            }
+        }
+        return isRestRequest;
     }
 }

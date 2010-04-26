@@ -398,14 +398,21 @@ public class ServerWorker implements Runnable {
             msgContext.setProperty(
                     Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
 
-            Header soapAction  = request.getFirstHeader(SOAPACTION);
 
-            HTTPTransportUtils.processHTTPPostRequest(
-                msgContext, is,
-                os,
-                contentTypeStr,
-                (soapAction != null  ? soapAction.getValue()  : null),
-                request.getRequestLine().getUri());
+            if (HTTPTransportUtils.isRESTRequest(contentTypeStr)) {
+                RESTUtil.processPOSTRequest(msgContext, is, os,
+                        request.getRequestLine().getUri(), contentType);
+            } else {
+
+                Header soapAction  = request.getFirstHeader(SOAPACTION);
+                HTTPTransportUtils.processHTTPPostRequest(
+                        msgContext, is,
+                        os,
+                        contentTypeStr,
+                        (soapAction != null  ? soapAction.getValue()  : null),
+                        request.getRequestLine().getUri());
+            }
+
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);
         }
@@ -661,9 +668,9 @@ public class ServerWorker implements Runnable {
      */
     private void processGetAndDelete(String method) {
         try {
-            RESTUtil.processGETRequest(
+            RESTUtil.processGetAndDeleteRequest(
                     msgContext, os, request.getRequestLine().getUri(),
-                    request.getFirstHeader(HTTP.CONTENT_TYPE));
+                    request.getFirstHeader(HTTP.CONTENT_TYPE),method);
             // do not let the output stream close (as by default below) since
             // we are serving this GET/DELETE request through the Synapse engine
         } catch (AxisFault axisFault) {

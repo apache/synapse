@@ -24,63 +24,118 @@ package org.apache.synapse.commons.datasource;
 public class DataSourceConstants {
 
     public static final String PROP_SYNAPSE_PREFIX_DS = "synapse.datasources";
+
     public static final String PROP_DRIVER_CLS_NAME = "driverClassName";
-    public static final String PROP_DSNAME = "dsName";
+
+    public static final String PROP_DS_NAME = "dsName";
+
     public static final String PROP_URL = "url";
+
     public static final String PROP_DRIVER = "driver";
+
     public static final String PROP_USER = "user";
-    public static final String PROP_CPDSADAPTER = "cpdsadapter";
+
+    public static final String PROP_CPDS_ADAPTER = "cpdsadapter";
+
     public static final String PROP_JNDI_ENV = "jndiEnvironment";
-    public static final String PROP_DEFAULTMAXACTIVE = "defaultMaxActive";
-    public static final String PROP_DEFAULTMAXIDLE = "defaultMaxIdle";
-    public static final String PROP_DEFAULTMAXWAIT = "defaultMaxWait";
+
+    public static final String PROP_DEFAULT_MAX_ACTIVE = "defaultMaxActive";
+
+    public static final String PROP_DEFAULT_MAX_IDLE = "defaultMaxIdle";
+
+    public static final String PROP_DEFAULT_MAX_WAIT = "defaultMaxWait";
+
     public static final String PROP_DATA_SOURCE_NAME = "dataSourceName";
+
     public static final String PROP_CPDS_CLASS_NAME = "className";
+
     public static final String PROP_CPDS_FACTORY = "factory";
+
     public static final String PROP_CPDS_NAME = "name";
-    public final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
-    public final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
-    public final static String PROP_TESTONBORROW = "testOnBorrow";
-    public final static String PROP_TESTONRETURN = "testOnReturn";
-    public final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS =
-            "timeBetweenEvictionRunsMillis";
-    public final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
-    public final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
-    public final static String PROP_TESTWHILEIDLE = "testWhileIdle";
-    public final static String PROP_VALIDATIONQUERY = "validationQuery";
-    public final static String PROP_MAXACTIVE = "maxActive";
-    public final static String PROP_MAXIDLE = "maxIdle";
-    public final static String PROP_MAXWAIT = "maxWait";
-    public final static String PROP_MINIDLE = "minIdle";
-    public final static String PROP_INITIALSIZE = "initialSize";
-    public final static String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
-    public final static String PROP_DEFAULTCATALOG = "defaultCatalog";
-    public final static String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED =
-            "accessToUnderlyingConnectionAllowed";
-    public final static String PROP_REMOVEABANDONED = "removeAbandoned";
-    public final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
-    public final static String PROP_LOGABANDONED = "logAbandoned";
-    public final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
-    public final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
+
+    public final static String PROP_DEFAULT_AUTO_COMMIT = "defaultAutoCommit";
+
+    public final static String PROP_DEFAULT_READ_ONLY = "defaultReadOnly";
+
+    public final static String PROP_TEST_ON_BORROW = "testOnBorrow";
+
+    public final static String PROP_TEST_ON_RETURN = "testOnReturn";
+
+    public final static String PROP_TIME_BETWEEN_EVICTION_RUNS_MILLIS
+            = "timeBetweenEvictionRunsMillis";
+
+    public final static String PROP_NUM_TESTS_PER_EVICTION_RUN = "numTestsPerEvictionRun";
+
+    public final static String PROP_MIN_EVICTABLE_IDLE_TIME_MILLIS
+            = "minEvictableIdleTimeMillis";
+
+    public final static String PROP_TEST_WHILE_IDLE = "testWhileIdle";
+
+    public final static String PROP_VALIDATION_QUERY = "validationQuery";
+
+    public final static String PROP_MAX_ACTIVE = "maxActive";
+
+    public final static String PROP_MAX_IDLE = "maxIdle";
+
+    public final static String PROP_MAX_WAIT = "maxWait";
+
+    public final static String PROP_MIN_IDLE = "minIdle";
+
+    public final static String PROP_INITIAL_SIZE = "initialSize";
+
+    public final static String PROP_DEFAULT_TRANSACTION_ISOLATION
+            = "defaultTransactionIsolation";
+
+    public final static String PROP_DEFAULT_CATALOG = "defaultCatalog";
+
+    public final static String PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED
+            = "accessToUnderlyingConnectionAllowed";
+
+    public final static String PROP_REMOVE_ABANDONED = "removeAbandoned";
+
+    public final static String PROP_REMOVE_ABANDONED_TIMEOUT = "removeAbandonedTimeout";
+
+    public final static String PROP_LOG_ABANDONED = "logAbandoned";
+
+    public final static String PROP_POOL_PREPARED_STATEMENTS = "poolPreparedStatements";
+
+    public final static String PROP_MAX_OPEN_PREPARED_STATEMENTS = "maxOpenPreparedStatements";
+
     public static final String PROP_PROVIDER_PORT = "providerPort";
+
     public final static String PROP_REGISTRY = "registry";
+
     public final static String PROP_REGISTRY_MEMORY = "memory";
+
     public final static String PROP_REGISTRY_JNDI = "JNDI";
-    public static final String PROP_ICFACTORY = "icFactory";
+
+    public static final String PROP_IC_FACTORY = "icFactory";
+
     public static final String PROP_PROVIDER_URL = "providerUrl";
+
     public static final String DOT_STRING = ".";
+
     public static final String COMMA_STRING = ",";
+
     public static final String PROP_TYPE = "type";
+
     public static final String PROP_BASIC_DATA_SOURCE = "BasicDataSource";
+
     public static final String PROP_CLASS_NAME = "className";
-    public static final String PROP_CPDSADAPTER_DRIVER
+
+    public static final String PROP_CPDS_ADAPTER_DRIVER
             = "org.apache.commons.dbcp.cpdsadapter.DriverAdapterCPDS";
+
     public static final String PROP_FACTORY = "factory";
+
     public static final String PROP_NAME = "name";
-    public static final String DATASOURCE_INFORMATION_REPOSITORY =
-            "DataSourceInformationRepository";
-    public static final String DEFAULT_IC_FACTORY =
-            "com.sun.jndi.rmi.registry.RegistryContextFactory";
+
+    public static final String DATA_SOURCE_INFORMATION_REPOSITORY
+            = "DataSourceInformationRepository";
+
+    public static final String DEFAULT_IC_FACTORY
+            = "com.sun.jndi.rmi.registry.RegistryContextFactory";
+
     public static final int DEFAULT_PROVIDER_PORT = 2199;
 
 }

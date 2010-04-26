@@ -36,7 +36,8 @@ public class TaskDescriptionSerializer {
     private static final OMFactory omFactory = OMAbstractFactory.getOMFactory();
 
     private static final String NULL_NAMESPACE = "";
-    private static final OMNamespace NULL_OMNS = omFactory.createOMNamespace(NULL_NAMESPACE, "");
+    private static final OMNamespace NULL_OMNS
+        = omFactory.createOMNamespace(NULL_NAMESPACE, "");
 
     public static OMElement serializeTaskDescription(OMNamespace targetNamespace,
                                                      TaskDescription taskDescription) {

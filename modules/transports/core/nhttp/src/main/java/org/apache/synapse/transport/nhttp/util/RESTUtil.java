@@ -20,27 +20,26 @@
 package org.apache.synapse.transport.nhttp.util;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.WSDL20DefaultValueHolder;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.dispatchers.RequestURIBasedDispatcher;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
-import org.apache.axis2.util.Utils;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.http.Header;
+import org.apache.synapse.transport.nhttp.NHttpConfiguration;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 
+import javax.xml.namespace.QName;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * This class provides a set of utility methods to manage the REST invocation calls
@@ -117,37 +116,36 @@ public class RESTUtil {
     }
 
     /**
-     * Processes the HTTP GET request and builds the SOAP info-set of the REST message
+     * Processes the HTTP GET / DELETE request and builds the SOAP info-set of the REST message
      *
-     * @param msgContext The MessageContext of the Request Message
-     * @param out The output stream of the response
-     * @param requestURI The URL that the request came to
+     * @param msgContext        The MessageContext of the Request Message
+     * @param out               The output stream of the response
+     * @param requestURI        The URL that the request came to
      * @param contentTypeHeader The contentType header of the request
+     * @param httpMethod        The http method of the request
      * @throws AxisFault - Thrown in case a fault occurs
      */
-    public static void processGETRequest(MessageContext msgContext, OutputStream out, 
-                                         String requestURI, Header contentTypeHeader)
-            throws AxisFault {
+    public static void processGetAndDeleteRequest(MessageContext msgContext, OutputStream out,
+                                                  String requestURI, Header contentTypeHeader,
+                                                  String httpMethod) throws AxisFault {
 
-        msgContext.setTo(new EndpointReference(requestURI));
-        msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
-        msgContext.setServerSide(true);
-        msgContext.setDoingREST(true);
+        String contentType = getContentType(contentTypeHeader);
+
+        prepareMessageContext(msgContext, requestURI, httpMethod, out, contentType);
+
         msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
+
         org.apache.axis2.transport.http.util.RESTUtil.processURLRequest(msgContext, out,
-                getContentType(contentTypeHeader));
+                contentType);
     }
 
     /**
      * Processes the HTTP GET request and builds the SOAP info-set of the REST message
      *
      * @param msgContext The MessageContext of the Request Message
-     * @param out The output stream of the response
+     * @param out        The output stream of the response
      * @param soapAction SoapAction of the request
      * @param requestURI The URL that the request came to
-     * @param configurationContext The Axis Configuration Context
-     * @param requestParameters The parameters of the request message
-     * @return boolean indication whether the operation was succesfull
      * @throws AxisFault - Thrown in case a fault occurs
      */
     public static void processURLRequest(MessageContext msgContext, OutputStream out,
@@ -168,9 +166,35 @@ public class RESTUtil {
     }
 
     /**
+     * Processes the HTTP POST request and builds the SOAP info-set of the REST message
+     *
+     * @param msgContext        The MessageContext of the Request Message
+     * @param is                The  input stream of the request
+     * @param os                The output stream of the response
+     * @param requestURI        The URL that the request came to
+     * @param contentTypeHeader The contentType header of the request
+     * @throws AxisFault - Thrown in case a fault occurs
+     */
+    public static void processPOSTRequest(MessageContext msgContext, InputStream is,
+                                          OutputStream os, String requestURI,
+                                          Header contentTypeHeader) throws AxisFault {
+
+        String contentType = getContentType(contentTypeHeader);
+
+        prepareMessageContext(msgContext, requestURI, HTTPConstants.HTTP_METHOD_POST, os, contentType);
+
+        org.apache.axis2.transport.http.util.RESTUtil.processXMLRequest(msgContext, is, os,
+                contentType);
+    }
+
+    /**
      * Given the contentType HTTP header it extracts the content-type of the request
+     *
+     * @param contentTypeHeader content type HTTP header
+     * @return content type value
      */
     private static String getContentType(Header contentTypeHeader) {
+
         String contentTypeStr = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
         if (contentTypeStr != null) {
             int index = contentTypeStr.indexOf(';');
@@ -179,5 +203,47 @@ public class RESTUtil {
             }
         }
         return contentTypeStr;
+    }
+
+    /**
+     * prepare message context prior to call axis2 RestUtils
+     *
+     * @param msgContext  The MessageContext of the Request Message
+     * @param requestURI  The URL that the request came to
+     * @param httpMethod  The http method of the request
+     * @param out         The output stream of the response
+     * @param contentType The content type of the request
+     * @throws AxisFault Thrown in case a fault occurs
+     */
+    private static void prepareMessageContext(MessageContext msgContext,
+                                              String requestURI,
+                                              String httpMethod,
+                                              OutputStream out,
+                                              String contentType) throws AxisFault {
+
+        msgContext.setTo(new EndpointReference(requestURI));
+        msgContext.setProperty(HTTPConstants.HTTP_METHOD, httpMethod);
+        msgContext.setServerSide(true);
+        msgContext.setDoingREST(true);
+        msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
+        msgContext.setProperty(NhttpConstants.REST_REQUEST_CONTENT_TYPE, contentType);
+        // workaround to get REST working in the case of
+        //  1) Based on the request URI , it is possible to find a service name and operation.
+        // However, there is no actual service deployed in the synapse ( no  i.e proxy or other)
+        //  e.g  http://localhost:8280/services/StudentService/students where there  is no proxy
+        //  service with name StudentService.This is a senario where StudentService is in an external
+        //  server and it is needed to call it from synapse using the main sequence
+        //  2) request is to be injected into  the main sequence  .i.e. http://localhost:8280
+        // This method does not cause any performance issue ...
+        // Proper fix should be refractoring axis2 RestUtil in a proper way
+        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
+        AxisService axisService = requestDispatcher.findService(msgContext);
+        if (axisService == null) {
+            String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
+                    "nhttp.default.service", "__SynapseService");                 
+            axisService = msgContext.getConfigurationContext()
+                    .getAxisConfiguration().getService(defaultSvcName);
+        }
+        msgContext.setAxisService(axisService);
     }
 }

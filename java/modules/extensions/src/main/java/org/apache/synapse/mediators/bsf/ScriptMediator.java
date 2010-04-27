@@ -36,6 +36,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+import com.sun.phobos.script.javascript.RhinoScriptEngine;
+import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
+
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
  * The ScriptMediator supports scripts specified in-line or those loaded through a registry
@@ -391,6 +394,8 @@ public class ScriptMediator extends AbstractMediator {
         }
 
         ScriptEngineManager manager = new ScriptEngineManager();
+        manager.registerEngineExtension("js", new RhinoScriptEngineFactory());
+
         this.scriptEngine = manager.getEngineByExtension(language);
         if (scriptEngine == null) {
             handleException("No script engine found for language: " + language);

@@ -43,6 +43,7 @@ import java.util.ArrayList;
  * &lt;/conditions&gt;
  * </pre>
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class Parser {
     private Log log = LogFactory.getLog(Parser.class);
 

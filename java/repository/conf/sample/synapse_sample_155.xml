@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 <!-- A proxy service with a dual channel invocation to the actual server -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <proxy name="StockQuoteProxy">
         <target>
             <endpoint>

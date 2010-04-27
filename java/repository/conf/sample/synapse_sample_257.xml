@@ -19,7 +19,7 @@
 
 <!-- Introduction to FIX Proxy services in Synapse -->
 
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
    <proxy name="OrderProcesserProxy40" transports="fix">
       <target>
          <endpoint>

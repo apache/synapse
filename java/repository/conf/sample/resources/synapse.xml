@@ -18,7 +18,7 @@
   -->
 
 <!-- a registry based Synapse configuration -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <log level="custom">
         <property name="message" value="This is a dynamic Synapse configuration"/>
     </log>

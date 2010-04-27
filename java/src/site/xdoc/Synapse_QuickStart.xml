@@ -255,7 +255,7 @@ user@host:/opt/synapse-1.1.1/samples/axis2Server/src/SimpleStockQuoteService$</p
       repository/conf/sample) and listed below. It is configured to log and pass
       through, all the messages.
     </p>
-<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;<br/>    &lt;log level="full"/&gt; <br/>    &lt;send/&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;<br/>    &lt;log level="full"/&gt; <br/>    &lt;send/&gt;
 &lt;/definitions&gt; </pre>
     <p/>
     <p>
@@ -469,7 +469,7 @@ SOAPAction: null
       definition. In this case we are using the synapse_sample_150.xml, so that
       you don't have to write the configuration your self.
     </p>
-<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;
     &lt;proxy name="StockQuoteProxy"&gt;
         &lt;target&gt;
             &lt;endpoint&gt;

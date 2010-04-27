@@ -18,7 +18,7 @@
   -->
     
 <!-- Using WS-Security for outgoing messages -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 
 	<in>

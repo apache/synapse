@@ -330,7 +330,7 @@
 <a name="MediationSamples" id="MediationSamples">Message Mediation Samples</a> </h1>
 <h2>
 <a name="Sample0" id="Sample0">Sample 0: Introduction to Synapse</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;!-- log all attributes of messages passing through --&gt;
     &lt;log level=&quot;full&quot;/&gt;
 
@@ -363,7 +363,7 @@
 <p>You will see the exact same behaviour as per the previous example when you run this scenario. However this time the difference is at the client, as it sends the message to the WS-Addressing 'To' address http://localhost:9000/services/SimpleStockQuoteService, but the transport specifies Synapse as the HTTP proxy. </p>
 <h2>
 <a name="Sample1" id="Sample1">Sample 1: Simple content based routing (CBR) of messages</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;!-- filtering of messages with XPath and regex matches --&gt;
     &lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
         &lt;send&gt;
@@ -387,7 +387,7 @@
 <p>This time you will see Synapse receiving a message for which Synapse was set as the ultimate receiver of the message. Based on the 'To' EPR of http://localhost:8280/services/StockQuote, Synapse performs a match to the path '/StockQuote' and as the request matches the XPath expression of the filter mediator, the filter mediator's child mediators execute. This sends the message to a different endpoint as specified by the endpoint definition. The 'drop' mediator terminates further processing of the current message in a configuration. During response processing, the filter condition fails, and thus the implicit 'send' mediator forwards the response back to the client. </p>
 <h2>
 <a name="Sample2" id="Sample2">Sample 2: CBR with the Switch-case mediator, using message properties</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;switch source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples&quot;&gt;
         &lt;case regex=&quot;IBM&quot;&gt;
             &lt;!-- the property mediator sets a local property on the *current* message --&gt;
@@ -428,7 +428,7 @@
 <pre xml:space="preserve">      INFO LogMediator - symbol = Are you sure? - MSFT, epr = http://localhost:9000/axis2/services/SimpleStockQuoteService</pre>
 <h2>
 <a name="Sample3" id="Sample3">Sample 3: Local Registry entry definitions, reusable endpoints and sequences</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;!-- define a string resource entry to the local registry --&gt;
     &lt;localEntry key=&quot;version&quot;&gt;0.1&lt;/localEntry&gt;
     &lt;!-- define a reuseable endpoint definition --&gt;
@@ -477,7 +477,7 @@
 [HttpServerWorker-1] DEBUG AddressEndpoint - Sending To: http://localhost:9000/services/SimpleStockQuoteService </pre>
 <h2>
 <a name="Sample4" id="Sample4">Sample 4: Introduction to error handling</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;!-- the default fault handling sequence used by Synapse - named 'fault' --&gt;
     &lt;sequence name=&quot;fault&quot;&gt;
@@ -558,7 +558,7 @@
 [HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured for stock SUN, message = Reference to non-existent endpoint for key : sunPort</pre>
 <h2>
 <a name="Sample5" id="Sample5">Sample 5: Creating SOAP fault messages and changing the direction of a message</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;myFaultHandler&quot;&gt;
         &lt;makefault response=&quot;true&quot;&gt;
@@ -610,7 +610,7 @@
     &lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
 <h2>
 <a name="Sample6" id="Sample6">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;in&gt;
         &lt;header name=&quot;To&quot; value=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
     &lt;/in&gt;
@@ -626,7 +626,7 @@
 <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
 <h2>
 <a name="Sample7" id="Sample7">Sample 7: Introduction to local Registry entries and using Schema validation</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;localEntry key=&quot;validate_schema&quot;&gt;
         &lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;
@@ -676,7 +676,7 @@
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 <h2>
 <a name="Sample8" id="Sample8">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
@@ -727,7 +727,7 @@
 <p>Thus the SimpleURLRegistry allows resource to be cached, and updates detected so that the changes could be reloaded without restarting the Synapse instance. </p>
 <h2>
 <a name="Sample9" id="Sample9">Sample 9: Introduction to dynamic sequences with the Registry</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
         &lt;parameter name=&quot;root&quot;&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
         &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
@@ -758,7 +758,7 @@
 <p>The cache timeout could be tuned appropriately by configuring the URL registry to suit the environment and the needs. </p>
 <h2>
 <a name="Sample10" id="Sample10">Sample 10: Introduction to dynamic endpoints with the Registry</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
         &lt;parameter name=&quot;root&quot;&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
@@ -787,7 +787,7 @@
 <p>Now edit the repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml definition and update the address to &quot;http://localhost:9001/services/SimpleStockQuoteService&quot;. After the cached value expires, the Registry loads the new definition of the endpoint, and then the messages can be seen being routed to the second sample Axis2 server on HTTP port 9001. </p>
 <h2>
 <a name="Sample11" id="Sample11">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
         &lt;parameter name=&quot;root&quot;&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
         &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
@@ -805,7 +805,7 @@
 <pre xml:space="preserve">[HttpServerWorker-1] INFO LogMediator - message = This is a dynamic Synapse configuration</pre>
 <p>The actual synapse.xml loaded is: </p>
 <pre xml:space="preserve">&lt;!-- a registry based Synapse configuration --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;log level=&quot;custom&quot;&gt;
         &lt;property name=&quot;message&quot; value=&quot;This is a dynamic Synapse configuration $$$&quot;/&gt;
     &lt;/log&gt;
@@ -841,7 +841,7 @@ Standard dual channel :: Stock price = $57.16686934968289</pre>
 <a name="Endpoints" id="Endpoints">Advanced mediations with endpoints</a> </h1>
 <h2>
 <a name="Sample50" id="Sample50">Sample 50: POX to SOAP conversion</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;!-- filtering of messages with XPath and regex matches --&gt;
     &lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
         &lt;send&gt;
@@ -877,7 +877,7 @@ Transfer-Encoding: chunked
 &lt;/m0:getQuote&gt;0</pre>
 <h2>
 <a name="Sample51" id="Sample51">Sample 51: MTOM and SwA optimizations and request/response correlation</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;in&gt;
         &lt;filter source=&quot;get-property('Action')&quot; regex=&quot;urn:uploadFileUsingMTOM&quot;&gt;
             &lt;property name=&quot;example&quot; value=&quot;mtom&quot;/&gt;
@@ -985,7 +985,7 @@ Content-ID:
          &lt;urn:uuid:15FD2DA2584A32BF7C1177414169826&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
 <h2>
 <a name="Sample52" id="Sample52">Sample 52: Session less load balancing between 3 endpoints</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
         &lt;in&gt;
@@ -1066,7 +1066,7 @@ Content-ID:
 <p>Now restart MyServer1. You can observe that requests will be again sent to all three servers roughly after 60 seconds. This is because we have specified &lt;suspendDurationOnFailure&gt; as 60 seconds in the configuration. Therefore, load balance endpoint will suspend any failed child endpoint only for 60 seconds after detecting the failure. </p>
 <h2>
 <a name="Sample53" id="Sample53">Sample 53: Failover sending among 3 endpoints</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
         &lt;in&gt;
@@ -1136,7 +1136,7 @@ Content-ID:
 <p>Once a server is detected as failed, it will be added to the active servers list again after 60 seconds (specified in &lt;suspendDurationOnFailure&gt; in the configuration). Therefore, if you have restarted any of the stopped servers and have shutdown all other servers, messages will be directed to the newly started server. </p>
 <h2>
 <a name="Sample54" id="Sample54">Sample 54: Session affinity load balancing between 3 endpoints</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
         &lt;in&gt;
@@ -1208,7 +1208,7 @@ Content-ID:
 <p>You can see that session number 0 is always directed to the server named MyServer1. That means session number 0 is bound to MyServer1. Similarly session 1 and 2 are bound to MyServer3 and MyServer2 respectively. </p>
 <h2>
 <a name="Sample55" id="Sample55">Sample 55: Session affinity load balancing between fail over endpoints</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
         &lt;in&gt;
@@ -1307,7 +1307,7 @@ Content-ID:
 ...</pre>
 <h2>
 <a name="Sample56" id="Sample56">Sample 56: WSDL endpoint</a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuraiton">
 
     <sequence name="main">
         <in>
@@ -1348,7 +1348,7 @@ Content-ID:
 <h2>
 <a name="Sample57" id="Sample57">Sample 57: Dynamic load balancing between 3 nodes</a></h2>
 <pre xml:space="preserve">
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
         &lt;in&gt;
@@ -1418,7 +1418,7 @@ Content-ID:
 <h2>
 <a name="Sample58" id="Sample58">Sample 58: Static load balancing between 3 nodes</a></h2>
 <pre xml:space="preserve">
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
         &lt;in&gt;
@@ -1486,7 +1486,7 @@ Content-ID:
 <a name="MessageMediationQoS" id="MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a> </h1>
 <h2>
 <a name="Sample100" id="Sample100">Sample 100: Using WS-Security for outgoing messages</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;localEntry key=&quot;sec_policy&quot; src=&quot;file:repository/conf/sample/resources/policy/policy_3.xml&quot;/&gt;
 
     &lt;in&gt;
@@ -1562,7 +1562,7 @@ User-Agent: Synapse-HttpComponents-NIO
    &lt;/soapenv:Envelope&gt;0</pre>
 <h2>
 <a name="Sample101" id="Sample101">Sample 101: Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;in&gt;
         &lt;RMSequence single=&quot;true&quot; version=&quot;1.0&quot;/&gt;
@@ -1706,7 +1706,7 @@ User-Agent: Synapse-HttpComponents-NIO
 <a name="ProxyServices" id="ProxyServices">Synapse Proxy service samples</a> </h1>
 <h2>
 <a name="Sample150" id="Sample150">Sample 150: Introduction to proxy services</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -1732,7 +1732,7 @@ User-Agent: Synapse-HttpComponents-NIO
 <p>An 'inSequence' or 'endpoint' or both of these would decide how the message would be handled after the proxy service receives the message. In the above example, the request received is forwarded to the sample service hosted on Axis2. The 'outSequence' defines how the response is handled before it is sent back to the client. By default, a proxy service is exposed over all transports configured for Synapse, unless these are specifically mentioned through the 'transports' attribute. </p>
 <h2>
 <a name="Sample151" id="Sample151">Sample 151: Custom sequences and endpoints with proxy services</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;proxy_1&quot;&gt;
         &lt;send&gt;
@@ -1770,7 +1770,7 @@ User-Agent: Synapse-HttpComponents-NIO
 <br></br>ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy2</pre>
 <h2>
 <a name="Sample152" id="Sample152">Sample 152: Switching transports and message format from SOAP to REST/POX</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;https&quot;&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -1838,7 +1838,7 @@ Connection: Keep-Alive
 <p></p>
 <h2>
 <a name="Sample153" id="Sample153">Sample 153: Routing the messages arrived to a proxy service without processing the security headers</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
             &lt;inSequence&gt;
@@ -1870,7 +1870,7 @@ Connection: Keep-Alive
 <a name="Sample154" id="Sample154">Sample 154: Load Balancing with Proxy Services </a></h2>
 <div>
 <pre xml:space="preserve">   &lt;!-- A proxy service with a loadbalace endpoint --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;LBProxy&quot; transports=&quot;https http&quot; startOnLoad=&quot;true&quot;&gt;
         &lt;target faultSequence=&quot;errorHandler&quot;&gt;
             &lt;inSequence&gt;
@@ -1926,7 +1926,7 @@ Connection: Keep-Alive
 <p>Functionality is similar to the sample #54. </p></div>
 <h2>
 <a name="Sample155" id="Sample155">Sample 155: Dual channel invocation on both client side and serverside of Synapse with Proxy Services</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -1957,7 +1957,7 @@ Connection: Keep-Alive
 <a name="ProxyServiceQoS" id="ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a> </h1>
 <h2>
 <a name="Sample200" id="Sample200">Sample 200: Using WS-Security with policy attachments for proxy services</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;localEntry key=&quot;sec_policy&quot; src=&quot;file:repository/conf/sample/resources/policy/policy_3.xml&quot;/&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
@@ -1992,7 +1992,7 @@ Connection: Keep-Alive
 <p>By following through the debug logs or TCPMon output, you could see that the request received by the proxy service was signed and encrypted. Also, looking up the WSDL of the proxy service by requesting the URLhttp://localhost:8280/services/StockQuoteProxy?wsdl reveals the security policy attachment to the supplied base WSDL. When sending the message to the backend service, you could verify that the security headers were removed, and that the response received does not use WS-Security, but that the response being forwarded back to the client is signed and encrypted as expected by the client. </p>
 <h2>
 <a name="Sample201" id="Sample201">Sample 201: Reliable message exchange between the client and proxy services using WS-ReliableMessaging</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
             &lt;inSequence&gt;
@@ -2028,7 +2028,7 @@ Connection: Keep-Alive
 <a name="Transport" id="Transport">Transport samples and switching transports</a> </h1>
 <h2>
 <a name="Sample250" id="Sample250">Sample 250: Introduction to switching transports - JMS to http/s</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;
 
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
         &lt;target&gt;
@@ -2081,7 +2081,7 @@ it will first try to read the content type from the 'contentType' message proper
 <pre xml:space="preserve">&lt;parameter name=&quot;transport.jms.Destination&quot;&gt;dynamicTopics/something.TestTopic&lt;/parameter&gt;</pre>
 <h2>
 <a name="Sample251" id="Sample251">Sample 251: Switching from http/s to JMS</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;http&quot;&gt;
         &lt;target&gt;
@@ -2120,7 +2120,7 @@ java.naming.provider.url=tcp://localhost:61616</pre>
 <pre xml:space="preserve">Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</pre>
 <h2>
 <a name="Sample252" id="Sample252">Sample 252: Pure text/binary and POX message support with JMS</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;sequence name=&quot;text_proxy&quot;&gt;
         &lt;log level=&quot;full&quot;/&gt;
         &lt;header name=&quot;Action&quot; value=&quot;urn:placeOrder&quot;/&gt;
@@ -2253,7 +2253,7 @@ The sample Axis2 server displays a successful message on the receipt of the mess
 <pre xml:space="preserve">samples.services.SimpleStockQuoteService :: Accepted order for : 19211 stocks of MSFT at $ 172.39703010684752</pre>
 <h2>
 <a name="Sample253" id="Sample253">Sample 253: One way bridging from JMS to http and replying with a 202 Accepted response</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;proxy name=&quot;JMStoHTTPStockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
         &lt;target&gt;
@@ -2313,7 +2313,7 @@ Transfer-Encoding: chunked
 0</pre>
 <h2>
 <a name="Sample254" id="Sample254">Sample 254: Using the file system as transport medium using VFS transport listener and sender</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;vfs&quot;&gt;
         &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;file:///home/user/test/in&lt;/parameter&gt; &lt;!--CHANGE--&gt;
         &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
@@ -2366,7 +2366,7 @@ Transfer-Encoding: chunked
 <em>out</em> directory. </p>
 <h2>
 <a name="Sample255" id="Sample255">Sample 255: Switching from ftp transport listener to mail transport sender</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;vfs&quot;&gt;
             &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;vfs:ftp://guest:guest@localhost/test?vfs.passive=true&lt;/parameter&gt; &lt;!--CHANGE--&gt;
             &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
@@ -2406,7 +2406,7 @@ Transfer-Encoding: chunked
 <p>VFS transport listener will pick the file from the directory in the FTP server and send it to the Axis2 service. The file in the FTP directory will be deleted. The response will be sent to the given email address. </p>
 <h2>
 <a name="Sample256" id="Sample256">Sample 256: Proxy services with the mail transport </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;mailto&quot;&gt;
 
         &lt;parameter name=&quot;transport.mail.Address&quot;&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
@@ -2472,7 +2472,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <h2>
 <a name="Sample257" id="Sample257">Sample 257: Proxy services with the FIX transport </a></h2>
 <pre xml:space="preserve">&lt;!-- Using the FIX transport --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
 
         &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;file:/home/synapse_user/fix-config/fix-synapse.cfg&lt;/parameter&gt;
@@ -2512,7 +2512,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
 <h2>
 <a name="Sample258" id="Sample258">Sample 258: Switching from HTTP to FIX </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;FIXProxy&quot;&gt;
 
         &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:/home/synapse_user/fix-config/synapse-sender.cfg&lt;/parameter&gt;
@@ -2552,7 +2552,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>Synapse will forward the order request to the session with the Executor. The first response coming from the Executor will be sent back over HTTP. Executor generally sends two responses for each incoming order request. But since the response has to be forwarded over HTTP only one can be sent back to the client. </p>
 <h2>
 <a name="Sample259" id="Sample259">Sample 259: Switch from FIX to HTTP </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;localEntry key=&quot;xslt-key-req&quot; src=&quot;file:repository/conf/sample/resources/transform/transform_fix_to_http.xslt&quot; /&gt;
     &lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
         &lt;target&gt;
@@ -2612,7 +2612,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
 <h2>
 <a name="Sample260" id="Sample260">Sample 260: Switch from FIX to AMQP </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 	&lt;proxy name=&quot;FIXProxy&quot; transports=&quot;fix&quot;&gt;
 		&lt;target&gt;
 			&lt;endpoint&gt;
@@ -2658,7 +2658,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
 <h2>
 <a name="Sample261" id="Sample261">Sample 261: Switch between FIX versions </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
      &lt;proxy name=&quot;OrderProcesserProxy41&quot; transports=&quot;fix&quot;&gt;
         &lt;target&gt;
            &lt;endpoint&gt;
@@ -2697,7 +2697,7 @@ SocketAcceptPort=19877</pre>
 <a href="Synapse_Samples_Setup.html#fixparameters">FIX Transport Parameters </a>. </p>
 <h2>
 <a name="Sample262" id="Sample262">Sample 262: CBR of FIX messages</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;sequence name=&quot;CBR_SEQ&quot;&gt;
         &lt;in&gt;
             &lt;switch source=&quot;//message/body/field[@id='55']&quot;&gt;
@@ -2768,7 +2768,7 @@ SocketAcceptPort=19877</pre>
   
 <h2>
 <a name="Sample263" id="Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
         &lt;target&gt;
             &lt;inSequence&gt;
@@ -2838,7 +2838,7 @@ it will first try to read the content type from the 'contentType' message proper
   <h2>
     <a name="Sample264" id="Sample264">Sample 264: Sending Two-Way Messages Using JMS transport</a>
   </h2>
-  <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;    
+  <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;    
     &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;http&quot;&gt;
         &lt;target&gt;        
             &lt;endpoint&gt;
@@ -2885,7 +2885,7 @@ it will first try to read the content type from the 'contentType' message proper
 <a name="Task" id="Task">Introduction to Synapse Tasks</a> </h1>
 <h2>
 <a name="Sample300" id="Sample300">Sample 300: Introduction to Tasks with simple trigger</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;task class=&quot;org.apache.synapse.startup.tasks.MessageInjector&quot; name=&quot;CheckPrice&quot;&gt;
         &lt;property name=&quot;to&quot; value=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
@@ -2930,7 +2930,7 @@ it will first try to read the content type from the 'contentType' message proper
 <pre xml:space="preserve">
 
 &lt;!-- Introduction to the script mediator using js scripts --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
         &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
@@ -2994,7 +2994,7 @@ it will first try to read the content type from the 'contentType' message proper
 <p>Synapse uses the script mediator and the specified JavaScript function to convert the custom request to a standard quote request. Subsequently the response received is transformed and sent back to the client. </p>
 <h2>
 <a name="Sample351" id="Sample351">Sample 351: In-line script mediation with JavaScript</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;in&gt;
         &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
         &lt;script language=&quot;js&quot;&gt;&lt;![CDATA[
@@ -3037,7 +3037,7 @@ it will first try to read the content type from the 'contentType' message proper
 <p></p>
 <h2>
 <a name="Sample352" id="Sample352">Sample 352: Accessing Synapse message context API methods using scripting language</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;in&gt;
        &lt;!-- change the MessageContext into a response and set a response payload --&gt;
        &lt;script language=&quot;js&quot;&gt;&lt;![CDATA[
@@ -3067,7 +3067,7 @@ stockquote:
      [java] Standard :: Stock price = $99.9</pre>
 <h2>
 <a name="Sample353" id="Sample353">Sample 353: Using Ruby scripts for mediation</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;localEntry key=&quot;stockquoteScript&quot; src=&quot;file:repository/conf/sample/resources/script/stockquoteTransform.rb&quot;/&gt;
     &lt;in&gt;
@@ -3120,7 +3120,7 @@ end
 <a name="Sample354" id="Sample354">Sample 354: Using In-lined Ruby scripts for mediation</a></h2>
 <div>
 <pre xml:space="preserve">      &lt;!-- Using In-lined Ruby scripts for mediation --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;in&gt;
         &lt;script language=&quot;rb&quot;&gt;
             &lt;![CDATA[
@@ -3170,7 +3170,7 @@ end
 <p></p>
 <h2>
 <a name="Sample360" id="Sample360">Sample 360: Introduction to dblookup mediator</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;myFaultHandler&quot;&gt;
         &lt;makefault response=&quot;true&quot;&gt;
@@ -3187,7 +3187,7 @@ end
                 &lt;property name=&quot;text&quot;
                           value=&quot;** Looking up from the Database **&quot;/&gt;
             &lt;/log&gt;
-            &lt;dblookup xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;dblookup xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
                 &lt;connection&gt;
                     &lt;pool&gt;
                         &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
@@ -3296,7 +3296,7 @@ end
 <div></div>
 <h2>
 <a name="Sample361" id="Sample361">Sample 361: Introduction to dbreport mediator</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot;&gt;
         &lt;in&gt;
@@ -3312,7 +3312,7 @@ end
                 &lt;property name=&quot;text&quot;
                           value=&quot;** Reporting to the Database **&quot;/&gt;
             &lt;/log&gt;
-            &lt;dbreport xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;dbreport xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
                 &lt;connection&gt;
                     &lt;pool&gt;
                         &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
@@ -3352,7 +3352,7 @@ end
 <div></div>
 <h2>
 <a name="Sample362" id="Sample362">Sample 362: Action of dbreport and dblookup mediators together</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;main&quot;&gt;
         &lt;in&gt;
@@ -3369,7 +3369,7 @@ end
                           value=&quot;** Reporting to the Database **&quot;/&gt;
             &lt;/log&gt;
 
-            &lt;dbreport xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;dbreport xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
                 &lt;connection&gt;
                     &lt;pool&gt;
                         &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
@@ -3390,7 +3390,7 @@ end
                 &lt;property name=&quot;text&quot;
                           value=&quot;** Looking up from the Database **&quot;/&gt;
             &lt;/log&gt;
-            &lt;dblookup xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;dblookup xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
                 &lt;connection&gt;
                     &lt;pool&gt;
                         &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
@@ -3437,7 +3437,7 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
 <div>
 <p>Prior to run this sample please follow the 'Setting up Synapse DataSources' section in the 
 <a href="Synapse_Samples_Setup.html">sample setup guide</a>.</p>
-<pre>&lt;!-- Reusable database connection pool --&gt; &lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt; &lt;sequence name=&quot;myFaultHandler&quot;&gt; &lt;makefault response=&quot;true&quot;&gt; &lt;code value=&quot;tns:Receiver&quot; xmlns:tns=&quot;http://www.w3.org/2003/05/soap-envelope&quot;/&gt; &lt;reason expression=&quot;get-property('ERROR_MESSAGE')&quot;/&gt; &lt;/makefault&gt; &lt;send/&gt; &lt;drop/&gt; &lt;/sequence&gt; &lt;sequence name=&quot;main&quot; onError=&quot;myFaultHandler&quot;&gt; &lt;in&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Looking up from the Database **&quot;/&gt; &lt;/log&gt; &lt;dblookup&gt; &lt;connection&gt; &lt;pool&gt; &lt;dsName&gt;lookupdb&lt;/dsName&gt; &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt; &lt;url&gt;rmi://localhost:2199&lt;/url&gt; &lt;user&gt;synapse&lt;/user&gt; &lt;password&gt;synapse&lt;/password&gt; &lt;/pool&gt; &lt;/connection&gt; &lt;statement&gt; &lt;sql&gt;select * from company where name =?&lt;/sql&gt; &lt;parameter expression=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt; &lt;result name=&quot;company_id&quot; column=&quot;id&quot;/&gt; &lt;/statement&gt; &lt;/dblookup&gt; &lt;switch source=&quot;get-property('company_id')&quot;&gt; &lt;case regex=&quot;c1&quot;&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Company ID - ',get-property('company_id'))&quot;/&gt; &lt;/log&gt; &lt;send&gt; &lt;endpoint&gt; &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt; &lt;/endpoint&gt; &lt;/send&gt; &lt;/case&gt; &lt;case regex=&quot;c2&quot;&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Company ID - ',get-property('company_id'))&quot;/&gt; &lt;/log&gt; &lt;send&gt; &lt;endpoint&gt; &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt; &lt;/endpoint&gt; &lt;/send&gt; &lt;/case&gt; &lt;case regex=&quot;c3&quot;&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Company ID - ',get-property('company_id'))&quot;/&gt; &lt;/log&gt; &lt;send&gt; &lt;endpoint&gt; &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt; &lt;/endpoint&gt; &lt;/send&gt; &lt;/case&gt; &lt;default&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Unrecognized Company ID **&quot;/&gt; &lt;/log&gt; &lt;makefault response=&quot;true&quot;&gt; &lt;code value=&quot;tns:Receiver&quot; xmlns:tns=&quot;http://www.w3.org/2003/05/soap-envelope&quot;/&gt; &lt;reason value=&quot;** Unrecognized Company ID **&quot;/&gt; &lt;/makefault&gt; &lt;send/&gt; &lt;drop/&gt; &lt;/default&gt; &lt;/switch&gt; &lt;drop/&gt; &lt;/in&gt; &lt;out&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Reporting to the Database **&quot;/&gt; &lt;/log&gt; &lt;dbreport&gt; &lt;connection&gt; &lt;pool&gt; &lt;dsName&gt;reportdb&lt;/dsName&gt; &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt; &lt;url&gt;rmi://localhost:2199&lt;/url&gt; &lt;user&gt;synapse&lt;/user&gt; &lt;password&gt;synapse&lt;/password&gt; &lt;/pool&gt; &lt;/connection&gt; &lt;statement&gt; &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt; &lt;parameter expression=&quot;//m0:return/m0:last/child::text()&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;DOUBLE&quot;/&gt; &lt;parameter expression=&quot;//m0:return/m0:symbol/child::text()&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt; &lt;/statement&gt; &lt;/dbreport&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Looking up from the Database **&quot;/&gt; &lt;/log&gt; &lt;dblookup&gt; &lt;connection&gt; &lt;pool&gt; &lt;dsName&gt;reportdb&lt;/dsName&gt; &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt; &lt;url&gt;rmi://localhost:2199&lt;/url&gt; &lt;user&gt;synapse&lt;/user&gt; &lt;password&gt;synapse&lt;/password&gt; &lt;/pool&gt; &lt;/connection&gt; &lt;statement&gt; &lt;sql&gt;select * from company where name =?&lt;/sql&gt; &lt;parameter expression=&quot;//m0:return/m0:symbol/child::text()&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt; &lt;result name=&quot;stock_price&quot; column=&quot;price&quot;/&gt; &lt;/statement&gt; &lt;/dblookup&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Stock price - ',get-property('stock_price'))&quot;/&gt; &lt;/log&gt; &lt;send/&gt; &lt;/out&gt; &lt;/sequence&gt; &lt;/definitions&gt;</pre></div>
+<pre>&lt;!-- Reusable database connection pool --&gt; &lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt; &lt;sequence name=&quot;myFaultHandler&quot;&gt; &lt;makefault response=&quot;true&quot;&gt; &lt;code value=&quot;tns:Receiver&quot; xmlns:tns=&quot;http://www.w3.org/2003/05/soap-envelope&quot;/&gt; &lt;reason expression=&quot;get-property('ERROR_MESSAGE')&quot;/&gt; &lt;/makefault&gt; &lt;send/&gt; &lt;drop/&gt; &lt;/sequence&gt; &lt;sequence name=&quot;main&quot; onError=&quot;myFaultHandler&quot;&gt; &lt;in&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Looking up from the Database **&quot;/&gt; &lt;/log&gt; &lt;dblookup&gt; &lt;connection&gt; &lt;pool&gt; &lt;dsName&gt;lookupdb&lt;/dsName&gt; &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt; &lt;url&gt;rmi://localhost:2199&lt;/url&gt; &lt;user&gt;synapse&lt;/user&gt; &lt;password&gt;synapse&lt;/password&gt; &lt;/pool&gt; &lt;/connection&gt; &lt;statement&gt; &lt;sql&gt;select * from company where name =?&lt;/sql&gt; &lt;parameter expression=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt; &lt;result name=&quot;company_id&quot; column=&quot;id&quot;/&gt; &lt;/statement&gt; &lt;/dblookup&gt; &lt;switch source=&quot;get-property('company_id')&quot;&gt; &lt;case regex=&quot;c1&quot;&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Company ID - ',get-property('company_id'))&quot;/&gt; &lt;/log&gt; &lt;send&gt; &lt;endpoint&gt; &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt; &lt;/endpoint&gt; &lt;/send&gt; &lt;/case&gt; &lt;case regex=&quot;c2&quot;&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Company ID - ',get-property('company_id'))&quot;/&gt; &lt;/log&gt; &lt;send&gt; &lt;endpoint&gt; &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt; &lt;/endpoint&gt; &lt;/send&gt; &lt;/case&gt; &lt;case regex=&quot;c3&quot;&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Company ID - ',get-property('company_id'))&quot;/&gt; &lt;/log&gt; &lt;send&gt; &lt;endpoint&gt; &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt; &lt;/endpoint&gt; &lt;/send&gt; &lt;/case&gt; &lt;default&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Unrecognized Company ID **&quot;/&gt; &lt;/log&gt; &lt;makefault response=&quot;true&quot;&gt; &lt;code value=&quot;tns:Receiver&quot; xmlns:tns=&quot;http://www.w3.org/2003/05/soap-envelope&quot;/&gt; &lt;reason value=&quot;** Unrecognized Company ID **&quot;/&gt; &lt;/makefault&gt; &lt;send/&gt; &lt;drop/&gt; &lt;/default&gt; &lt;/switch&gt; &lt;drop/&gt; &lt;/in&gt; &lt;out&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Reporting to the Database **&quot;/&gt; &lt;/log&gt; &lt;dbreport&gt; &lt;connection&gt; &lt;pool&gt; &lt;dsName&gt;reportdb&lt;/dsName&gt; &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt; &lt;url&gt;rmi://localhost:2199&lt;/url&gt; &lt;user&gt;synapse&lt;/user&gt; &lt;password&gt;synapse&lt;/password&gt; &lt;/pool&gt; &lt;/connection&gt; &lt;statement&gt; &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt; &lt;parameter expression=&quot;//m0:return/m0:last/child::text()&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;DOUBLE&quot;/&gt; &lt;parameter expression=&quot;//m0:return/m0:symbol/child::text()&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt; &lt;/statement&gt; &lt;/dbreport&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; value=&quot;** Looking up from the Database **&quot;/&gt; &lt;/log&gt; &lt;dblookup&gt; &lt;connection&gt; &lt;pool&gt; &lt;dsName&gt;reportdb&lt;/dsName&gt; &lt;icClass&gt;com.sun.jndi.rmi.registry.RegistryContextFactory&lt;/icClass&gt; &lt;url&gt;rmi://localhost:2199&lt;/url&gt; &lt;user&gt;synapse&lt;/user&gt; &lt;password&gt;synapse&lt;/password&gt; &lt;/pool&gt; &lt;/connection&gt; &lt;statement&gt; &lt;sql&gt;select * from company where name =?&lt;/sql&gt; &lt;parameter expression=&quot;//m0:return/m0:symbol/child::text()&quot; xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt; &lt;result name=&quot;stock_price&quot; column=&quot;price&quot;/&gt; &lt;/statement&gt; &lt;/dblookup&gt; &lt;log level=&quot;custom&quot;&gt; &lt;property name=&quot;text&quot; expression=&quot;fn:concat('Stock price - ',get-property('stock_price'))&quot;/&gt; &lt;/log&gt; &lt;send/&gt; &lt;/out&gt; &lt;/sequence&gt; &lt;/definitions&gt;</pre></div>
 <div>
 <p>
 <strong>Objective: Demonstrate the use of reusable database connection pools</strong></p>
@@ -3454,7 +3454,7 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
 <a name="Throttle" id="Throttle">Throttling messages (Throttle Mediator)</a></h2>
 <h2>
 <a name="Sample370" id="Sample370">Sample 370: Introduction to throttle mediator and concurrency throttling</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;sequence name=&quot;main&quot;&gt;
         &lt;in&gt;
             &lt;throttle id=&quot;A&quot;&gt;
@@ -3509,7 +3509,7 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
 <p></p>
 <h2>
 <a name="Sample371" id="Sample371">Sample 371: Restricting requests based on policies </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;sequence name=&quot;main&quot;&gt;
         &lt;in&gt;
             &lt;throttle id=&quot;A&quot;&gt;
@@ -3617,7 +3617,7 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
 <h2>
 <a name="Sample372" id="Sample372">Sample 372: Use of both concurrency throttling and request rate based throttling </a></h2>
 <pre xml:space="preserve">&lt;!-- Use of both concurrency throttling and request rate based throttling --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
         &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
@@ -3680,7 +3680,7 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
 <p>Class mediator can be used to write your own custom mediation in Java and you have access to the SynapseMessageContext and to the full Synapse API in there. This is a useful extension mechanism within Synapse to extend its functionality. This class can contain fields for which you can assign values at runtime through the configuration. </p>
 <h2>
 <a name="Sample380" id="Sample380">Sample 380: Writing your own custom mediation in Java</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;sequence name=&quot;fault&quot;&gt;
         &lt;makefault&gt;
@@ -3818,7 +3818,7 @@ Discounted price: 138.77458254967408</pre>
 <p></p>
 <h2>        
 <a name="Sample381" id="Sample381">Sample 381:Class mediator to CBR binary messages</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 	&lt;proxy name=&quot;JMSBinaryProxy&quot; transports=&quot;jms&quot;&gt;
 		&lt;target inSequence=&quot;BINARY_CBR_SEQ&quot; /&gt;
 	&lt;/proxy&gt;
@@ -3888,7 +3888,7 @@ Discounted price: 138.77458254967408</pre>
 <h2>
 <a name="Sample390" id="Sample390">Sample 390: Introduction to the XQuery mediator</a></h2>
 <pre xml:space="preserve">    &lt;!-- Introduction to the XQuery mediator --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
@@ -3944,7 +3944,7 @@ Discounted price: 138.77458254967408</pre>
 <p></p>
 <h2>
 <a name="Sample391" id="Sample391">Sample 391: How to use data from an external XML document with in XQuery </a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to  URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
@@ -3988,7 +3988,7 @@ Discounted price: 138.77458254967408</pre>
 <a name="Splitter" id="Splitter">Splitting messages in to parts and process in parallel (Iterate / Clone)</a></h2>
 <h2>
 <a name="Sample400" id="Sample400">Sample 400: Message splitting and aggregating the responses</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
 
     &lt;proxy name=&quot;SplitAggregateProxy&quot;&gt;
         &lt;target&gt;
@@ -4032,7 +4032,7 @@ Discounted price: 138.77458254967408</pre>
 <p>Cache mediator can be used to utilize the network bandwidth, to protect the backend service from being loaded with the same type of requests like browser refresh actions and also to speed up the execution of the web service. This mediator should be used with sense, because it is not applicable for each and every service (for example services with dynamic responses for a particular release) </p>
 <h2>
 <a name="Sample420" id="Sample420">Sample 420: Simple cache implemented on Synapse for the actual service</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;in&gt;
         &lt;cache timeout=&quot;20&quot; scope=&quot;per-host&quot; collector=&quot;false&quot;
                hashGenerator=&quot;org.wso2.caching.digest.DOMHASHGenerator&quot;&gt;
@@ -4065,7 +4065,7 @@ Discounted price: 138.77458254967408</pre>
 <h2>
 <a name="Sample430" id="Sample430">Sample 430: Simple Callout Mediator for synchronizing web service invocation</a></h2>
 <pre xml:space="preserve">    &lt;!-- Simple callout  mediator --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;callout serviceURL=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;
              action=&quot;urn:getQuote&quot;&gt;
         &lt;source xmlns:s11=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;
@@ -4096,7 +4096,7 @@ Discounted price: 138.77458254967408</pre>
       &#xa0;
     </p>
 <pre xml:space="preserve">&lt;!-- Simple Eventing configuration --&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
      &lt;eventSource name=&quot;SampleEventSource&quot;&gt;
            &lt;subscriptionManager class=&quot;org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager&quot;&gt;
                &lt;property name=&quot;topicHeaderName&quot; value=&quot;Topic&quot;/&gt;
@@ -4176,7 +4176,7 @@ Discounted price: 138.77458254967408</pre>
       &#xa0;
     </p>
 <pre xml:space="preserve">&lt;!-- Eventing configuration with static subscriptions--&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
      &lt;eventSource name=&quot;SampleEventSource&quot;&gt;
            &lt;subscriptionManager class=&quot;org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager&quot;&gt;
                &lt;property name=&quot;topicHeaderName&quot; value=&quot;Topic&quot;/&gt;
@@ -4233,7 +4233,7 @@ Discounted price: 138.77458254967408</pre>
          &#xa0;
        </p>
    <pre xml:space="preserve">&lt;!-- Eventing configuration with transformation before publish--&gt;
-&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
      &lt;eventSource name=&quot;SampleEventSource&quot;&gt;
            &lt;subscriptionManager class=&quot;org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager&quot;&gt;
                &lt;property name=&quot;topicHeaderName&quot; value=&quot;Topic&quot;/&gt;
@@ -4418,7 +4418,7 @@ Discounted price: 138.77458254967408</pre>
        <p>
          &#xa0;
        </p>
-   <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+   <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;priority-executor name=&quot;exec&quot;&gt;
         &lt;queues&gt;
             &lt;queue size=&quot;100&quot; priority=&quot;1&quot;/&gt;

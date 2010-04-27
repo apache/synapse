@@ -30,7 +30,7 @@ public class RegistrySerializationTest extends AbstractTestCase {
 
     public void testRegistrySerialization() {
 
-        String regitryConfiguration = "<syn:registry xmlns:syn=\"http://ws.apache.org/ns/synapse\" " +
+        String regitryConfiguration = "<syn:registry xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
                 "provider=\"org.apache.synapse.registry.url.SimpleURLRegistry\">" +
                 "<syn:parameter name=\"root\">file:./../../repository/</syn:parameter>" +
                 "<syn:parameter name=\"cachableDuration\">15000</syn:parameter>" +

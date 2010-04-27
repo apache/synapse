@@ -18,7 +18,7 @@
   -->
     
 <!-- Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <in>
         <RMSequence single="true" version="1.0"/>
         <send>

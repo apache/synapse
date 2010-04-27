@@ -45,7 +45,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
     public void testAddressEndpointSerialization() {
 
-        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String sendConfig = "<send xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
                      "<endpoint>" +
                           "<address uri='http://localhost:9000/services/MyService1'>" +
                                "<enableAddressing/>" +
@@ -82,7 +82,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
     public void testWSDLEndpointSerialization() {
 
-        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String sendConfig = "<send xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
                      "<endpoint>" +
                           "<wsdl uri='file:src/test/resources/esbservice.wsdl' service='esbservice' port='esbserviceSOAP11port_http'>" +
                                "<enableAddressing/>" +
@@ -119,7 +119,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
     public void testSimpleLoadbalanceSendSerialization() {
 
-        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String sendConfig = "<send xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
                 "<endpoint>" +
                     "<loadbalance>" +
                         "<endpoint>" +
@@ -168,7 +168,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
     public void testSimpleFailoverSendSerialization() {
 
-        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String sendConfig = "<send xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
                 "<endpoint>" +
                     "<failover>" +
                         "<endpoint>" +
@@ -217,7 +217,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
     public void testNestedLoadbalanceFailoverSendSerialization() {
 
-        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String sendConfig = "<send xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
                 "<endpoint>" +
                     "<loadbalance>" +
                         "<endpoint>" +

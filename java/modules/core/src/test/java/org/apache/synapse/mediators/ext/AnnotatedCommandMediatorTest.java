@@ -72,7 +72,7 @@ public class AnnotatedCommandMediatorTest extends AbstractMediatorTestCase {
         m.setCommand(AnnotatedCommand.class);
 
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
-           "<annotatedCommand name='org.apache.synapse.mediators.ext.AnnotatedCommand2' xmlns='http://ws.apache.org/ns/synapse'/>"));
+           "<annotatedCommand name='org.apache.synapse.mediators.ext.AnnotatedCommand2' xmlns='http://synapse.apache.org/ns/2010/04/configuration'/>"));
 
         MessageContext mc = TestUtils.getTestContext("<m:getQuote xmlns:m=\"http://services.samples/xsd\"><m:request><m:symbol>IBM</m:symbol></m:request></m:getQuote>");
         pcm.mediate(mc);

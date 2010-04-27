@@ -18,7 +18,7 @@
   -->
     
 <!-- MTOM and SwA optimizations and request/response correlation -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <in>
         <filter source="get-property('Action')" regex="urn:uploadFileUsingMTOM">
             <property name="example" value="mtom"/>

@@ -18,7 +18,7 @@
   -->
     
 <!-- Introduction to Synapse -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <!-- log all attributes of messages passing through -->
     <log level="full"/>
 

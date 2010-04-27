@@ -18,7 +18,7 @@
   -->
 
 <!-- Simple callout  mediator -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <callout serviceURL="http://localhost:9000/services/SimpleStockQuoteService"
              action="urn:getQuote">
         <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"

@@ -35,7 +35,7 @@ public class ValidateMediatorSerializationTest extends AbstractTestCase {
 
     public void testValidateMediatorSerialization() throws Exception {
 
-        String validateConfiguration = "<syn:validate xmlns:syn=\"http://ws.apache.org/ns/synapse\" source=\"//regRequest\">" +
+        String validateConfiguration = "<syn:validate xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\" source=\"//regRequest\">" +
                 "<syn:schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
                 "<syn:feature name=\"http://javax.xml.XMLConstants/feature/secure-processing\" value=\"true\"/>" +
                 "<syn:on-fail>" +

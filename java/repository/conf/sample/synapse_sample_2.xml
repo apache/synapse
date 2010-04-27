@@ -18,7 +18,7 @@
   -->
 
 <!-- CBR with the Switch-case mediator, using message properties -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples">
         <case regex="IBM">
             <!-- the property mediator sets a local property on the *current* message -->

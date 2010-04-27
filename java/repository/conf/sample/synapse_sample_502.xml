@@ -18,7 +18,7 @@
   -->
 
 <!-- Eventing configuration with transformation before publish-->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
      <eventSource name="SampleEventSource">
            <subscriptionManager class="org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager">
                <!--property name="registryURL" value="http://localhost:8180/wso2registry"/>

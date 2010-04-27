@@ -18,7 +18,7 @@
   -->
 
 <!-- Introduction to switching transports - JMS to http/s -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <proxy name="StockQuoteProxy" transports="jms">
         <target>

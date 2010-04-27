@@ -22,8 +22,6 @@ package org.apache.synapse.registry;
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -80,7 +78,7 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 1
         System.out.println("Testing basic registry lookup functionality...");
-        MessageContext synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
+        MessageContext synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
         Mediator seq1 = synCtx.getSequence(KEY_DYNAMIC_SEQUENCE_1);
         assertNotNull(seq1);
         assertTrue(((SequenceMediator) seq1).isInitialized());
@@ -90,7 +88,7 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 2
         System.out.println("Testing basic sequence caching...");
-        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
+        synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
         Mediator seq2 = synCtx.getSequence(KEY_DYNAMIC_SEQUENCE_1);
         assertNotNull(seq2);
         assertTrue(((SequenceMediator) seq2).isInitialized());
@@ -101,7 +99,7 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 3
         System.out.println("Testing advanced sequence caching...");
-        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
+        synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
         System.out.println("Waiting for the cache to expire...");
         Thread.sleep(8500L);
         Mediator seq3 = synCtx.getSequence(KEY_DYNAMIC_SEQUENCE_1);
@@ -117,7 +115,7 @@ public class DynamicResourceTest extends TestCase {
         registry.updateResource(KEY_DYNAMIC_SEQUENCE_1, TestUtils.createOMElement(DYNAMIC_SEQUENCE_2));
         System.out.println("Waiting for the cache to expire...");
         Thread.sleep(8500L);
-        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
+        synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
         Mediator seq4 = synCtx.getSequence(KEY_DYNAMIC_SEQUENCE_1);
         assertNotNull(seq4);
         assertTrue(((SequenceMediator) seq4).isInitialized());
@@ -135,7 +133,7 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 1
         System.out.println("Testing basic registry lookup functionality...");
-        MessageContext synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
+        MessageContext synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
         Endpoint ep1 = synCtx.getEndpoint(KEY_DYNAMIC_ENDPOINT_1);
         assertNotNull(ep1);
         assertTrue(ep1.isInitialized());
@@ -144,7 +142,7 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 2
         System.out.println("Testing basic endpoint caching...");
-        synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
+        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
         Endpoint ep2 = synCtx.getEndpoint(KEY_DYNAMIC_ENDPOINT_1);
         assertNotNull(ep2);
         assertEquals(1, registry.getHitCount());
@@ -152,7 +150,7 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 3
         System.out.println("Testing advanced endpoint caching...");
-        synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
+        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
         System.out.println("Waiting for the cache to expire...");
         Thread.sleep(8500L);
         Endpoint ep3 = synCtx.getEndpoint(KEY_DYNAMIC_ENDPOINT_1);
@@ -162,15 +160,15 @@ public class DynamicResourceTest extends TestCase {
 
         // Phase 4
         System.out.println("Testing endpoint reloading...");
-        registry.updateResource(KEY_DYNAMIC_ENDPOINT_1, TestUtils.createOMElement(DYNAMIC_SEQUENCE_2));
+        registry.updateResource(KEY_DYNAMIC_ENDPOINT_1, TestUtils.createOMElement(DYNAMIC_ENDPOINT_2));
         System.out.println("Waiting for the cache to expire...");
         Thread.sleep(8500L);
-        synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
+        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
         Endpoint ep4 = synCtx.getEndpoint(KEY_DYNAMIC_ENDPOINT_1);
         assertNotNull(ep4);
         assertTrue(ep4.isInitialized());
         assertEquals(2, registry.getHitCount());
-        assertEquals("http://test2.url", ((AddressEndpoint) ep1).getDefinition().getAddress());
+        assertEquals("http://test2.url", ((AddressEndpoint) ep4).getDefinition().getAddress());
         assertTrue(ep1 != ep4);
         assertTrue(!ep1.isInitialized());
 

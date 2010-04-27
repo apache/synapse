@@ -130,7 +130,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     }
 
     public boolean isAnonymous() {
-        return anonymous;  //To change body of implemented methods use File | Settings | File Templates.
+        return anonymous;
     }
 
     public void setAnonymous(boolean anonymous) {

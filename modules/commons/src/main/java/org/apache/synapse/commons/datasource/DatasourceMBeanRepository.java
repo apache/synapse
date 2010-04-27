@@ -38,7 +38,8 @@ public class DatasourceMBeanRepository implements MBeanRepository {
             = new HashMap<String, DBPoolView>();
     private final static DatasourceMBeanRepository DATASOURCE_M_BEAN_REPOSITORY
             = new DatasourceMBeanRepository();
-    private final static String MBEAN_CATEGORY_DATABASE_CONNECTION_POOL = "DatabaseConnectionPool";
+    private final static String MBEAN_CATEGORY_DATABASE_CONNECTION_POOL
+            = "DatabaseConnectionPool";
 
     private DatasourceMBeanRepository() {
     }
@@ -76,8 +77,8 @@ public class DatasourceMBeanRepository implements MBeanRepository {
     public void removeMBean(String name) {
 
         dataSourcesMBeans.remove(name);
-        MBeanRegistrar.getInstance().unRegisterMBean(MBEAN_CATEGORY_DATABASE_CONNECTION_POOL,
-                name);
+        MBeanRegistrar.getInstance().unRegisterMBean(
+                MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
     public void clear() {

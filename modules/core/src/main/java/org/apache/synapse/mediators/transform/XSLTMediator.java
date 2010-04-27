@@ -58,7 +58,7 @@ import java.util.List;
  *
  * Additional properties passed into this mediator would become parameters for XSLT.
  * Additional features passed into this mediator would become features except for
- * "http://ws.apache.org/ns/synapse/transform/feature/dom" for the Transformer Factory, which
+ * "http://synapse.apache.org/ns/2010/04/configuration/transform/feature/dom" for the Transformer Factory, which
  * is used to decide between using DOM and Streams during the transformation process. By default
  * this is turned on as an optimization, but should be set to false if issues are detected
  *
@@ -99,19 +99,19 @@ public class XSLTMediator extends AbstractMediator {
      * transformation process
      */
     public static final String USE_DOM_SOURCE_AND_RESULTS =
-        "http://ws.apache.org/ns/synapse/transform/feature/dom";
+        "http://synapse.apache.org/ns/2010/04/configuration/transform/feature/dom";
     
     /**
      * The name of the attribute that allows to specify the {@link SourceBuilderFactory}.
      */
     public static final String SOURCE_BUILDER_FACTORY =
-        "http://ws.apache.org/ns/synapse/transform/attribute/sbf";
+        "http://synapse.apache.org/ns/2010/04/configuration/transform/attribute/sbf";
     
     /**
      * The name of the attribute that allows to specify the {@link ResultBuilderFactory}.
      */
     public static final String RESULT_BUILDER_FACTORY =
-        "http://ws.apache.org/ns/synapse/transform/attribute/rbf";
+        "http://synapse.apache.org/ns/2010/04/configuration/transform/attribute/rbf";
     
     /**
      * The resource key/name which refers to the XSLT to be used for the transformation

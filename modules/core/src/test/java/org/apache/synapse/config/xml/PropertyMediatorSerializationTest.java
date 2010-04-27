@@ -34,37 +34,37 @@ public class PropertyMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testPropertyMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\" name=\"To\" value=\"http://127.0.0.1:10001/services/Services\" action=\"remove\" />";
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"To\" value=\"http://127.0.0.1:10001/services/Services\" action=\"remove\" />";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
 
     public void testPropertyMediatorSerializationSenarioTwo() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\" expression=\"child::*\" name=\"To\" />";
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" expression=\"child::*\" name=\"To\" />";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
 
     public void testPropertyMediatorSerializationSenarioThree() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\" expression=\"child::*\" name=\"To\" action=\"remove\"/>";
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" expression=\"child::*\" name=\"To\" action=\"remove\"/>";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
 
     public void testPropertyMediatorSerializationSenarioFour() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\"  name=\"To\" action=\"remove\"/>";
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"  name=\"To\" action=\"remove\"/>";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
 
     public void testPropertyMediatorSerializationScenarioFive() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\"  name=\"DoubleProperty\" type=\"DOUBLE\" value=\"123.456\"/>";
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"  name=\"DoubleProperty\" type=\"DOUBLE\" value=\"123.456\"/>";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
 
     public void testPropertyMediatorSerializationScenarioSix() throws Exception {
-        String inputXml = "<property xmlns=\"http://ws.apache.org/ns/synapse\"  name=\"OMProperty\"><name>Synapse</name></property>";
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"  name=\"OMProperty\"><name>Synapse</name></property>";
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }

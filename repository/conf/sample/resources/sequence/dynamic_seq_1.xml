@@ -1,4 +1,4 @@
-<sequence name="dynamic_sequence" xmlns="http://ws.apache.org/ns/synapse">
+<sequence name="dynamic_sequence" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 	<in>
 		<log level="custom">
       	   <property name="message" value="*** Test Message 1 ***"/>

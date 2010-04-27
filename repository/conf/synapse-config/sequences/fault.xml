@@ -19,7 +19,7 @@
   -->
 
 <!-- Default fault sequence shipped with the Apache Synapse -->
-<sequence xmlns="http://ws.apache.org/ns/synapse" name="fault">
+<sequence xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="fault">
     
     <!-- Log the message at the full log level with the ERROR_MESSAGE and the ERROR_CODE-->
     <log level="full">

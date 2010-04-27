@@ -18,7 +18,7 @@
   -->
 
 <!-- FIX to HTTP Proxy Service -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 	<localEntry key="xslt-key-req"
 		src="file:repository/conf/sample/resources/transform/transform_fix_to_http.xslt" />
 	<proxy name="FIXProxy" transports="fix">

@@ -18,7 +18,7 @@
   -->
 
 <!-- Manipulating SOAP headers, and filtering incoming and outgoing messages -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <in>
         <header name="To" value="http://localhost:9000/services/SimpleStockQuoteService"/>
     </in>

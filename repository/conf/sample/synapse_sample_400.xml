@@ -18,7 +18,7 @@
   -->
 
 <!-- Message splitting and aggregating the responses -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <proxy name="SplitAggregateProxy">
         <target>

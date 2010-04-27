@@ -18,7 +18,7 @@
   -->
     
 <!-- Introduction to dynamic sequences with the Registry -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <parameter name="root">file:./repository/conf/sample/resources/</parameter>
         <parameter name="cachableDuration">15000</parameter>

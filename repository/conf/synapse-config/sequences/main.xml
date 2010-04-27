@@ -19,7 +19,7 @@
   -->
 
 <!-- Default main sequence shipped with the Apache Synapse -->
-<sequence xmlns="http://ws.apache.org/ns/synapse" name="main">
+<sequence xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="main">
     <in>
         <!-- Log all messages passing through -->
         <log level="full"/>

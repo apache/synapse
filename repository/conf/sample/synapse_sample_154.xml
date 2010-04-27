@@ -17,7 +17,7 @@
   ~  under the License.
   -->
     <!-- A proxy service with a loadbalace endpoint -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <proxy name="LBProxy" transports="http" startOnLoad="true">
         <target faultSequence="errorHandler">

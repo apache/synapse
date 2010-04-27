@@ -456,7 +456,7 @@
 <pre xml:space="preserve">&lt;sequence key="sequence/dynamic_seq_1.xml"/&gt;
 where "sequence/dynamic_seq_1.xml" refers to the following sequence definition from the registry:
 
-&lt;sequence name="dynamic_sequence" xmlns="http://ws.apache.org/ns/synapse"&gt;
+&lt;sequence name="dynamic_sequence" xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;
   ..
 &lt;/sequence&gt;</pre>
     <h2>
@@ -694,7 +694,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       of sessions supported in SAL endpoints. Namely HTTP transport based session
       which identifies the sessions based on http cookies and the client session which
       identifies the session by looking at a SOAP header sent by the client with the QName
-      '{http://ws.apache.org/ns/synapse}ClientID'. The 'failover' attribute mentioned above
+      '{http://synapse.apache.org/ns/2010/04/configuraiton}ClientID'. The 'failover' attribute mentioned above
       is not applicable for session affinity based endpoints and it is always
       considered as set to false. If it is required to have failover behavior in session
       affinity based load balance endpoints, list failover endpoints as the target endpoints.
@@ -1504,7 +1504,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       The 'feature' element defines any features which
       should be explicitly set to the TransformerFactory. The feature
-      'http://ws.apache.org/ns/synapse/transform/feature/dom' turns on DOM based
+      'http://synapse.apache.org/ns/2010/04/configuraiton/transform/feature/dom' turns on DOM based
       transformations instead of serializing elements into Byte streams and/or
       temporary files. Though this would be better in performance than using
       byte streams, sometimes it may not work for all transformations.
@@ -2057,7 +2057,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <h4>
       <a name="spring" id="spring">Spring mediator</a>
     </h4>
-<pre xml:space="preserve"> &lt;spring:spring bean="exampleBean1" key="string" xmlns:spring="http://ws.apache.org/ns/synapse/spring"/&gt;</pre>
+<pre xml:space="preserve"> &lt;spring:spring bean="exampleBean1" key="string" xmlns:spring="http://synapse.apache.org/ns/2010/04/configuraiton/spring"/&gt;</pre>
     <p>
       The &lt;spring&gt; element creates an instance of a mediator, which is
       managed by Spring. This Spring bean must implement the Mediator interface

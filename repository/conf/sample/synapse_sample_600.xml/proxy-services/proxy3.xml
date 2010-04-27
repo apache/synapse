@@ -1,4 +1,4 @@
-<proxy name="CustomStockQuoteProxy2" xmlns="http://ws.apache.org/ns/synapse" transports="http">
+<proxy name="CustomStockQuoteProxy2" xmlns="http://synapse.apache.org/ns/2010/04/configuration" transports="http">
     <target inSequence="customSeq">
         <endpoint key="bar"/>            
         <outSequence>

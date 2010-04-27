@@ -18,7 +18,7 @@
   -->
     
 <!-- POX to SOAP conversion -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <!-- filtering of messages with XPath and regex matches -->
     <filter source="get-property('To')" regex=".*/StockQuote.*">
         <send>

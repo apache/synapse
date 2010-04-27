@@ -18,12 +18,12 @@
   -->
 
 <!-- Introduction to  endpoints /sequence from local registry -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <localEntry key="local-enrty-ep-key"
                 src="file:repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml"/>
 
     <localEntry key="local-enrty-sequence-key">
-        <sequence name="dynamic_sequence" xmlns="http://ws.apache.org/ns/synapse">
+        <sequence name="dynamic_sequence" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
             <log level="custom">
                 <property name="message" value="*** Test Message 1 ***"/>
             </log>

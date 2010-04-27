@@ -411,7 +411,7 @@ public class LoadbalanceFailoverClient {
         envelope.addChild(header);
 
         OMNamespace synNamespace = soapFactory.
-                createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
+                createOMNamespace("http://synapse.apache.org/ns/2010/04/configuration", "syn");
         OMElement clientIDElement = soapFactory.createOMElement("ClientID", synNamespace);
         clientIDElement.setText(clientID);
         header.addChild(clientIDElement);

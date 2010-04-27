@@ -18,7 +18,7 @@
   -->
     
 <!-- Introduction to dblookp mediator -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <sequence name="myFaultHandler">
         <makefault response="true">

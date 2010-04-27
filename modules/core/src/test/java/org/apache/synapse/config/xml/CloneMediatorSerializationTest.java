@@ -34,7 +34,7 @@ public class CloneMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCloneMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<clone xmlns=\"http://ws.apache.org/ns/synapse\" " +
+        String inputXml = "<clone xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
             "continueParent=\"true\"><target sequence=\"sequenceRef1\" " +
             "endpoint=\"endpointRef1\"/><target sequence=\"sequenceRef2\" " +
             "endpoint=\"endpointRef2\"/></clone> ";
@@ -43,7 +43,7 @@ public class CloneMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCloneMediatorSerializationScenarioTwo() throws Exception {
-        String inputXml = "<clone xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String inputXml = "<clone xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
             "<target endpoint=\"endpointRef1\"><sequence><log/></sequence></target>" +
             "<target sequence=\"sequenceRef2\"><endpoint><address uri=\"http://testURL\"/>" +
             "</endpoint></target></clone> ";
@@ -52,7 +52,7 @@ public class CloneMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCloneMediatorSerializationScenarioThree() throws Exception {
-        String inputXml = "<clone xmlns=\"http://ws.apache.org/ns/synapse\">" +
+        String inputXml = "<clone xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
             "<target><sequence><send/></sequence><endpoint><address uri=\"http://testURL2\"/>" +
             "</endpoint></target><target sequence=\"sequenceRef2\" " +
             "endpoint=\"endpointRef2\"/></clone> ";
@@ -61,7 +61,7 @@ public class CloneMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCloneMediatorSerializationScenarioFour() throws Exception {
-        String inputXml = "<clone xmlns=\"http://ws.apache.org/ns/synapse\" " +
+        String inputXml = "<clone xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
             "continueParent=\"true\"><target to=\"http://localhost:7777\"><sequence><send/>" +
             "</sequence><endpoint><address uri=\"http://testURL2\"/></endpoint></target>" +
             "<target soapAction=\"urn:test\" sequence=\"sequenceRef2\" " +

@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<definitions xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration" xmlns:spring="http://synapse.apache.org/ns/2010/04/configuration/spring">
 
 	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
 		<parameter name="root">file:./../../repository/</parameter>

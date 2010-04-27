@@ -17,6 +17,6 @@
 ##  under the License.
 ##
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
 </definitions>

@@ -35,7 +35,7 @@ public class InMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testInMediatorSerialization() throws Exception {
-        String inptXml = " <in xmlns=\"http://ws.apache.org/ns/synapse\"><header name=\"To\" value=\"http://64.124.140.30:9090/soap\"/></in>";
+        String inptXml = " <in xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><header name=\"To\" value=\"http://64.124.140.30:9090/soap\"/></in>";
         assertTrue(serialization(inptXml, inMediatorFactory, inMediatorSerializer));
         assertTrue(serialization(inptXml, inMediatorSerializer));
     }

@@ -18,7 +18,7 @@
   -->
 
 <!-- Local Registry entry definitions, reusable endpoints and sequences -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <!-- define a string resource entry to the local registry -->
     <localEntry key="version">0.1</localEntry>
     <!-- define a reuseable endpoint definition -->

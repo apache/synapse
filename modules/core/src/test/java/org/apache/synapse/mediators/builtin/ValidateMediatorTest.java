@@ -85,7 +85,7 @@ public class ValidateMediatorTest extends TestCase {
             "</CheckPriceRequest>\n";
 
     private static final String DEFAULT_FEATURES_MEDIATOR_CONFIG =
-            "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
+            "<validate xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
             "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <on-fail>" +
             "       <makefault>" +
@@ -96,7 +96,7 @@ public class ValidateMediatorTest extends TestCase {
             "</validate>";
 
     private static final String CUSTOM_FEATURES_MEDIATOR_CONFIG =
-            "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
+            "<validate xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
             "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <feature name=\"" + SCHEMA_FULL_CHECKING_FEATURE_ID + "\" value=\"false\"/>" +
             "   <feature name=\"" + HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID + "\" value=\"true\"/>" +
@@ -109,7 +109,7 @@ public class ValidateMediatorTest extends TestCase {
             "</validate>";
 
     private static final String REG_KEY =
-            "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
+            "<validate xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
             "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <on-fail>" +
             "       <makefault>" +

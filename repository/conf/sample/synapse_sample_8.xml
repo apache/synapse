@@ -18,7 +18,7 @@
   -->
     
 <!-- Introduction to static and dynamic registry resources, and using XSLT transformations -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">

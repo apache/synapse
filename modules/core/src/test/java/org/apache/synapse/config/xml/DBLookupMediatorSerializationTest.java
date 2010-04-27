@@ -33,7 +33,7 @@ public class DBLookupMediatorSerializationTest extends AbstractTestCase {
     public void testDBLookupMediatorSerializationSenarioOne() throws Exception {
 
         String inputXml = 
-            "<syn:dblookup xmlns:syn=\"http://ws.apache.org/ns/synapse\"><syn:connection><syn:pool><syn:driver>com.some.driver.JDBCDriver</syn:driver><syn:url>jdbc:/some/url</syn:url><syn:user>user</syn:user><syn:password>pass</syn:password><syn:property name=\"name1\" value=\"value1\"/></syn:pool></syn:connection><syn:statement><syn:sql><![CDATA[insert into table values (?, ?, ..)]]></syn:sql><syn:parameter value=\"ABC\" type=\"VARCHAR\"/><syn:parameter expression=\"4\" type=\"INTEGER\"/><syn:result name=\"2\" column=\"int\"/></syn:statement></syn:dblookup>";
+            "<syn:dblookup xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\"><syn:connection><syn:pool><syn:driver>com.some.driver.JDBCDriver</syn:driver><syn:url>jdbc:/some/url</syn:url><syn:user>user</syn:user><syn:password>pass</syn:password><syn:property name=\"name1\" value=\"value1\"/></syn:pool></syn:connection><syn:statement><syn:sql><![CDATA[insert into table values (?, ?, ..)]]></syn:sql><syn:parameter value=\"ABC\" type=\"VARCHAR\"/><syn:parameter expression=\"4\" type=\"INTEGER\"/><syn:result name=\"2\" column=\"int\"/></syn:statement></syn:dblookup>";
 
         assertTrue(serialization(inputXml, dbLookupFactory, dbLookupSerializer));
         assertTrue(serialization(inputXml, dbLookupSerializer));

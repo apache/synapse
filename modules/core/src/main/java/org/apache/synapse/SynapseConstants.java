@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
 public final class SynapseConstants {
     public static final String TRUE = "TRUE";
     /** The Synapse namespace */
-    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+    public static final String SYNAPSE_NAMESPACE = "http://synapse.apache.org/ns/2010/04/configuration";
     /** An OMNamespace object for the Synapse NS */
     public static final OMNamespace SYNAPSE_OMNAMESPACE =
             OMAbstractFactory.getOMFactory().createOMNamespace(SYNAPSE_NAMESPACE, "");

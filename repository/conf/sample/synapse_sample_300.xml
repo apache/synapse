@@ -18,7 +18,7 @@
   -->
 
 <!-- Introduction to Tasks with simple trigger -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice">
         <property name="to" value="http://localhost:9000/services/SimpleStockQuoteService"/>

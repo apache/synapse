@@ -35,6 +35,7 @@ import java.io.UnsupportedEncodingException;
  *
  * The source is used to extract the HTTP header or URL param
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class MatchEvaluator implements Evaluator {
 
     private Log log = LogFactory.getLog(MatchEvaluator.class);

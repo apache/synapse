@@ -18,7 +18,7 @@
   -->
     
 <!-- In-line script mediation with JavaScript -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <in>
         <!-- transform the custom quote request into a standard quote requst expected by the service -->
         <script language="js"><![CDATA[

@@ -1,4 +1,4 @@
-<localEntry key="bar" xmlns="http://ws.apache.org/ns/synapse">
+<localEntry key="bar" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 	<endpoint>
 		<address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
 	</endpoint>

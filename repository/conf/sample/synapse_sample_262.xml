@@ -18,7 +18,7 @@
   -->
 
 <!-- CBR of FIX messages, using symbol (tag 55) -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
    <sequence name="CBR_SEQ">
 	<in>
 		<switch source="//message/body/field[@id='55']">

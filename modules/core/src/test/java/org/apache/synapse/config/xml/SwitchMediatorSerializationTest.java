@@ -33,7 +33,7 @@ public class SwitchMediatorSerializationTest extends AbstractTestCase {
 
     public void testSwitchMediatorSerializationScenarioOne() {
 
-        String switchConfiguration = "<syn:switch xmlns:syn=\"http://ws.apache.org/ns/synapse\" source=\"synapse:get-property('to')\">" +
+        String switchConfiguration = "<syn:switch xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\" source=\"synapse:get-property('to')\">" +
                 "<syn:case regex=\"MyService1\"><syn:drop/></syn:case>" +
                 "<syn:case regex=\"MyService2\"><syn:drop/></syn:case>" +
                 "<syn:default><syn:drop/></syn:default>" +
@@ -48,7 +48,7 @@ public class SwitchMediatorSerializationTest extends AbstractTestCase {
 
     public void testSwitchMediatorSerializationScenarioTwo() {
 
-        String switchConfiguration = "<syn:switch xmlns:syn=\"http://ws.apache.org/ns/synapse\" source=\"synapse:get-property('to')\">" +
+        String switchConfiguration = "<syn:switch xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\" source=\"synapse:get-property('to')\">" +
                 "<syn:case regex=\"MyService1\"><syn:drop/></syn:case>" +
                 "<syn:case regex=\"MyService2\"><syn:drop/></syn:case>" +
                 "</syn:switch>";

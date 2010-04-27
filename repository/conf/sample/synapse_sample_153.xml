@@ -18,7 +18,7 @@
   -->
     
 <!-- Routing the messages arrived to a proxy service without processing the security headers -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <proxy name="StockQuoteProxy">
         <target>
             <inSequence>

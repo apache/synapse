@@ -49,7 +49,8 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
         LoadbalanceEndpoint loadbalanceEndpoint = (LoadbalanceEndpoint) endpoint;
 
         String name = loadbalanceEndpoint.getName();
-        if (name != null) {
+        boolean anon = loadbalanceEndpoint.isAnonymous();
+        if (name != null && !anon) {
             endpointElement.addAttribute("name", name, null);
         }
 

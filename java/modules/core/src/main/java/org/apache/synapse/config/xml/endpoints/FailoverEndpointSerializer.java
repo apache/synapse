@@ -49,7 +49,8 @@ public class FailoverEndpointSerializer extends EndpointSerializer {
         endpointElement.addChild(failoverElement);
 
         String name = failoverEndpoint.getName();
-        if (name != null) {
+        boolean anon = failoverEndpoint.isAnonymous();
+        if (name != null && !anon) {
             endpointElement.addAttribute("name", name, null);
         }
 

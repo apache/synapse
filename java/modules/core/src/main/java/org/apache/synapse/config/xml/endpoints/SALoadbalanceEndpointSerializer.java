@@ -53,7 +53,8 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         String name = loadbalanceEndpoint.getName();
-        if (name != null) {
+        boolean anon = loadbalanceEndpoint.isAnonymous();
+        if (name != null && !anon) {
             endpointElement.addAttribute("name", name, null);
         }
 

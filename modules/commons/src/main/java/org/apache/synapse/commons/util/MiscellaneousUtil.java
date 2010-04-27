@@ -72,7 +72,7 @@ public class MiscellaneousUtil {
      * @param type         Expected Type using Class
      * @return Value corresponding to the given property name
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"TypeParameterExplicitlyExtendsObject", "unchecked"})
     public static <T extends Object> T getProperty(
             Properties properties, String name, T defaultValue, Class<? extends T> type) {
 
@@ -185,29 +185,29 @@ public class MiscellaneousUtil {
 
     public static byte[] asBytes(InputStream in) {
 
-          ByteArrayOutputStream out = new ByteArrayOutputStream();
-          byte[] buffer = new byte[1024];
-          int len;
-          try {
-              while ((len = in.read(buffer)) >= 0)
-                  out.write(buffer, 0, len);
-          } catch (IOException e) {
-              throw new SynapseCommonsException("Error during converting a inputstream " +
-                      "into a bytearray ", e, log);
-          } finally {
-              if (in != null) {
-                  try {
-                      in.close();
-                  } catch (IOException ignored) {
-                  }
-              }
-              try {
-                  out.close();
-              } catch (IOException ignored) {
-              }
-          }
-          return out.toByteArray();
-      }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        try {
+            while ((len = in.read(buffer)) >= 0)
+                out.write(buffer, 0, len);
+        } catch (IOException e) {
+            throw new SynapseCommonsException("Error during converting a inputstream " +
+                    "into a bytearray ", e, log);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignored) {
+                }
+            }
+            try {
+                out.close();
+            } catch (IOException ignored) {
+            }
+        }
+        return out.toByteArray();
+    }
 
 
     /**

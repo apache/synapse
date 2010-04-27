@@ -240,7 +240,7 @@ public class TemporaryData {
      * Create a temporary file and write the existing in memory data to it.
      * 
      * @return an open FileOutputStream to the temporary file
-     * @throws IOException
+     * @throws IOException in case of an error in switching to the temp file
      */
     FileOutputStream switchToTempFile() throws IOException {
         temporaryFile = File.createTempFile(tempPrefix, tempSuffix);
@@ -283,7 +283,7 @@ public class TemporaryData {
      * 
      * @param in An InputStream to read data from. This method will not
      *           close the stream.
-     * @throws IOException
+     * @throws IOException in case of an error in reading from <code>InputStream</code>
      */
     public void readFrom(InputStream in) throws IOException {
         while (true) {
@@ -318,7 +318,7 @@ public class TemporaryData {
      * 
      * @param out The output stream to write the data to. This method will
      *            not close the stream.
-     * @throws IOException
+     * @throws IOException  in case of an error in writing to the <code>OutputStream</code>
      */
     public void writeTo(OutputStream out) throws IOException {
         if (temporaryFile != null) {
@@ -346,6 +346,7 @@ public class TemporaryData {
         }
     }
     
+    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     public void release() {
         if (temporaryFile != null) {
             if (log.isDebugEnabled()) {
@@ -355,6 +356,8 @@ public class TemporaryData {
         }
     }
 
+    @SuppressWarnings({"FinalizeDoesntCallSuperFinalize", "ResultOfMethodCallIgnored"})
+    @Override
     protected void finalize() throws Throwable {
         if (temporaryFile != null) {
             log.warn("Cleaning up unreleased temporary file " + temporaryFile);

@@ -19,17 +19,11 @@
 
 package org.apache.synapse.mediators;
 
-import java.io.StringReader;
 import java.util.Map;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
@@ -39,6 +33,8 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 
 public class TestUtils {
 
@@ -82,6 +78,31 @@ public class TestUtils {
         org.apache.axis2.context.MessageContext mc =
                 new org.apache.axis2.context.MessageContext();
         SynapseEnvironment env = new Axis2SynapseEnvironment(config);
+        MessageContext synMc = new Axis2MessageContext(mc, config, env);
+        SOAPEnvelope envelope =
+                OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        OMDocument omDoc =
+                OMAbstractFactory.getSOAP11Factory().createOMDocument();
+        omDoc.addChild(envelope);
+
+        envelope.getBody().addChild(createOMElement(payload));
+
+        synMc.setEnvelope(envelope);
+        return synMc;
+    }
+
+    public static MessageContext createSynapseMessageContext(
+            String payload, SynapseConfiguration config) throws Exception {
+
+        org.apache.axis2.context.MessageContext mc =
+                new org.apache.axis2.context.MessageContext();
+        AxisConfiguration axisConfig = config.getAxisConfiguration();
+        if (axisConfig == null) {
+            axisConfig = new AxisConfiguration();
+            config.setAxisConfiguration(axisConfig);
+        }
+        ConfigurationContext cfgCtx = new ConfigurationContext(axisConfig);
+        SynapseEnvironment env = new Axis2SynapseEnvironment(cfgCtx, config);
         MessageContext synMc = new Axis2MessageContext(mc, config, env);
         SOAPEnvelope envelope =
                 OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();

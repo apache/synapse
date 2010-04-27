@@ -45,7 +45,8 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
 
         WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) endpoint;
         String name = wsdlEndpoint.getName();
-        if (name != null) {
+        boolean anon = wsdlEndpoint.isAnonymous();
+        if (name != null && !anon) {
             endpointElement.addAttribute("name", name, null);
         }
 

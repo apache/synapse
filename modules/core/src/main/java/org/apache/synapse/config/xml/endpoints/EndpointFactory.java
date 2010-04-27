@@ -31,6 +31,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.util.UUIDGenerator;
 
 import javax.xml.namespace.QName;
@@ -108,10 +109,13 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         
         Endpoint ep = createEndpoint(epConfig, anonymousEndpoint);
         // if the endpoint doesn't have a name we will generate a unique name.
-        if (ep.getName() == null) {
+        if (anonymousEndpoint && ep.getName() == null) {
             String uuid = UUIDGenerator.getUUID();
             uuid = uuid.replace(':', '_');
             ep.setName(ENDPOINT_NAME_PREFIX + uuid);
+            if (ep instanceof AbstractEndpoint) {
+                ((AbstractEndpoint) ep).setAnonymous(true);
+            }
         }
         return ep;
     }

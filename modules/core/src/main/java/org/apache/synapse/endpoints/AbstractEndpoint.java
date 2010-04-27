@@ -72,6 +72,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     /** The name of the file where this endpoint is defined */
     protected String fileName;
 
+    protected boolean anonymous = false;
+
     protected AbstractEndpoint() {
         log = LogFactory.getLog(this.getClass());
     }
@@ -125,6 +127,14 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public boolean isAnonymous() {
+        return anonymous;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
     }
 
     public String toString() {

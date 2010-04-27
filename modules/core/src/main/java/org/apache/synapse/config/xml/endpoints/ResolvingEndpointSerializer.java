@@ -44,7 +44,7 @@ public class ResolvingEndpointSerializer extends EndpointSerializer {
         ResolvingEndpoint resolvingEndpoint = (ResolvingEndpoint) endpoint;
         SynapseXPathSerializer.serializeXPath(resolvingEndpoint.getKeyExpression(),
                 endpointElement, "key-expression");
-        if (resolvingEndpoint.getName() != null) {
+        if (resolvingEndpoint.getName() != null && !resolvingEndpoint.isAnonymous()) {
             endpointElement.addAttribute("name", resolvingEndpoint.getName(), null);
         }
 

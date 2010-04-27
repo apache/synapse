@@ -45,7 +45,8 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
 
         DefaultEndpoint defaultEndpoint = (DefaultEndpoint) endpoint;
         String name = defaultEndpoint.getName();
-        if (name != null) {
+        boolean anon = defaultEndpoint.isAnonymous();
+        if (name != null && !anon) {
             endpointElement.addAttribute("name", name, null);
         }
 

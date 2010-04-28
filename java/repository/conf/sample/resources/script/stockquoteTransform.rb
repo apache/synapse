@@ -21,7 +21,7 @@ require 'rexml/document'
 include REXML
 
 def transformRequest(mc)
-  newRequest= Document.new '<m:getQuote xmlns:m="http://services.samples/xsd">'<<
+  newRequest= Document.new '<m:getQuote xmlns:m="http://services.samples">'<<
             '<m:request><m:symbol></m:symbol></m:request></m:getQuote>'
   newRequest.root.elements[1].elements[1].text = mc.getPayloadXML().root.elements[1].get_text
   mc.setPayloadXML(newRequest)
@@ -30,11 +30,11 @@ end
 def transformResponse(mc)
   newResponse = Document.new '<m:CheckPriceResponse xmlns:m="http://services.samples/xsd"><m:Code>' <<
     '</m:Code><m:Price></m:Price></m:CheckPriceResponse>'
-  lastPrice=mc.getPayloadXML().root.elements[1].get_elements('ns:last')
-  code=mc.getPayloadXML().root.elements[1].get_elements('ns:symbol') 
+  lastPrice=mc.getPayloadXML().root.elements[1].get_elements('*:last')
+  code=mc.getPayloadXML().root.elements[1].get_elements('*:symbol')
 
   newResponse.root.elements[1].text =code[0].get_text
-  newResponse.root.elements[2].text =lastPrice[0].get_text 
+  newResponse.root.elements[2].text =lastPrice[0].get_text
   mc.setPayloadXML(newResponse)
 end
 ]]></x>

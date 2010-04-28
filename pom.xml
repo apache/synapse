@@ -845,7 +845,7 @@
         <sandesha2.version>SNAPSHOT</sandesha2.version>
         <neethi.version>2.0.4</neethi.version>
         <wss4j.version>SNAPSHOT</wss4j.version>
-        <jruby.version>0.9.9</jruby.version>
+        <jruby.version>1.3.0</jruby.version>
         <xmlsec.version>1.4.2</xmlsec.version>
         <bcprov.jdk15.version>140</bcprov.jdk15.version>
 

@@ -20,7 +20,7 @@
   function transformRequest(mc) {
      var symbol = mc.getPayloadXML()..*::Code.toString();
      mc.setPayloadXML(
-        <m:getQuote xmlns:m="http://services.samples/xsd">
+        <m:getQuote xmlns:m="http://services.samples">
            <m:request>
               <m:symbol>{symbol}</m:symbol>
            </m:request>

@@ -121,6 +121,12 @@
             <artifactId>bsf-all</artifactId>
             <version>${bsf.version}</version>
         </dependency>
+	<dependency>
+	    <groupId>org.jruby</groupId>
+	    <artifactId>jruby-complete</artifactId>
+	    <version>${jruby.version}</version>
+	    <scope>test</scope>
+	</dependency>
         <dependency>
             <groupId>groovy</groupId>
             <artifactId>groovy-all</artifactId>

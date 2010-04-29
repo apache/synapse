@@ -50,4 +50,17 @@ public class ScriptMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }
+
+    public void testInlineScriptMediatorSerializationScenarioTwo() throws XMLComparisonException {
+        String inputXml = "<syn:script xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\" language='rb'>" +
+                "<![CDATA[" +
+                "require 'rexml/document'\n" +
+                "include REXML\n" +
+                "newRequest= Document.new '<m:getQuote xmlns:m=\"http://services.samples/xsd\"><m:request><m:symbol>...test...</m:symbol></m:request></m:getQuote>'\n" +
+                "newRequest.root.elements[1].elements[1].text = $mc.getPayloadXML().root.elements[1].get_text\n" +
+                "$mc.setPayloadXML(newRequest)" +
+                "]]></syn:script>";
+        assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
+        assertTrue(serialization(inputXml, scriptMediatorSerializer));
+    }
 }

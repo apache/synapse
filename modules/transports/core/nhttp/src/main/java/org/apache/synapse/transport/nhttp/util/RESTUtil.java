@@ -22,6 +22,7 @@ package org.apache.synapse.transport.nhttp.util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
@@ -35,7 +36,6 @@ import org.apache.http.Header;
 import org.apache.synapse.transport.nhttp.NHttpConfiguration;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 
-import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -129,7 +129,7 @@ public class RESTUtil {
                                                   String requestURI, Header contentTypeHeader,
                                                   String httpMethod) throws AxisFault {
 
-        String contentType = getContentType(contentTypeHeader);
+        String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
 
         prepareMessageContext(msgContext, requestURI, httpMethod, out, contentType);
 
@@ -179,30 +179,11 @@ public class RESTUtil {
                                           OutputStream os, String requestURI,
                                           Header contentTypeHeader) throws AxisFault {
 
-        String contentType = getContentType(contentTypeHeader);
-
-        prepareMessageContext(msgContext, requestURI, HTTPConstants.HTTP_METHOD_POST, os, contentType);
-
+        String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
+        prepareMessageContext(msgContext, requestURI, HTTPConstants.HTTP_METHOD_POST,
+                os, contentType);
         org.apache.axis2.transport.http.util.RESTUtil.processXMLRequest(msgContext, is, os,
                 contentType);
-    }
-
-    /**
-     * Given the contentType HTTP header it extracts the content-type of the request
-     *
-     * @param contentTypeHeader content type HTTP header
-     * @return content type value
-     */
-    private static String getContentType(Header contentTypeHeader) {
-
-        String contentTypeStr = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
-        if (contentTypeStr != null) {
-            int index = contentTypeStr.indexOf(';');
-            if (index > 0) {
-                contentTypeStr = contentTypeStr.substring(0, index);
-            }
-        }
-        return contentTypeStr;
     }
 
     /**

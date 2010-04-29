@@ -21,6 +21,7 @@ package org.apache.synapse.config;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
+import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
@@ -102,6 +103,18 @@ public interface SynapseObserver {
      *
      * @param eventSource the SynapseEventSource removed from the configuration 
      */
-    public void eventSourceRemoved(SynapseEventSource eventSource);    
+    public void eventSourceRemoved(SynapseEventSource eventSource);
+
+    /** Event fired when a priority executor is added to the configuration
+     *
+     * @param exec the PriorityExecutor added to the configuration 
+     */
+    public void priorityExecutorAdded(PriorityExecutor exec);
+
+    /** Event fired when a priority executor is removed from the configuration
+     *
+     * @param exec the PriorityExecutor removed from the configuration
+     */
+    public void priorityExecutorRemoved(PriorityExecutor exec);
 
 }

@@ -1137,6 +1137,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
      */
     public synchronized void addPriorityExecutor(String name, PriorityExecutor executor) {
         executors.put(name, executor);
+        for (SynapseObserver o : observers) {
+            o.priorityExecutorAdded(executor);
+        }
     }
 
     /**
@@ -1154,7 +1157,13 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @return removed executor
      */
     public synchronized PriorityExecutor removeExecutor(String name) {
-        return executors.remove(name);        
+        PriorityExecutor executor = executors.remove(name);
+        if (executor != null) {
+            for (SynapseObserver o : observers) {
+                o.priorityExecutorRemoved(executor);
+            }
+        }
+        return executor;
     }
 
     private void assertAlreadyExists(String key, String type) {

@@ -21,6 +21,7 @@ package org.apache.synapse.config;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
+import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -93,6 +94,16 @@ public abstract class AbstractSynapseObserver implements SynapseObserver {
 
     public void eventSourceRemoved(SynapseEventSource eventSource) {
         log.info("Event source : " + eventSource.getName() + " was removed " +
+                "from the Synapse configuration successfully");
+    }
+
+    public void priorityExecutorAdded(PriorityExecutor exec) {
+        log.info("Priority executor : " + exec.getName() + " was added " +
+                "to the Synapse configuration successfully");
+    }
+
+    public void priorityExecutorRemoved(PriorityExecutor exec) {
+        log.info("Priority executor : " + exec.getName() + " was removed " +
                 "from the Synapse configuration successfully");
     }
 }

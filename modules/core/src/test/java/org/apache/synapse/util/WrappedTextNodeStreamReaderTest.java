@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.serialize.StreamingOMSerializer;
-import org.apache.synapse.util.WrappedTextNodeStreamReader;
+import org.apache.axiom.util.stax.WrappedTextNodeStreamReader;
 import org.custommonkey.xmlunit.XMLTestCase;
 
 public class WrappedTextNodeStreamReaderTest extends XMLTestCase {

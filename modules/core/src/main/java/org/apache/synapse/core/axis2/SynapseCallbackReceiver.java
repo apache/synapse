@@ -36,6 +36,8 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.aspects.statistics.ErrorLogFactory;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -325,6 +327,35 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 synapseInMessageContext.setProperty(
                         (String) key, synapseOutMsgCtx.getProperty((String) key));
             }
+
+            Object proxyName = synapseOutMsgCtx.getProperty(SynapseConstants.PROXY_SERVICE);
+            if (proxyName != null) {
+                ProxyService proxy = synapseOutMsgCtx.getConfiguration().
+                        getProxyService((String) proxyName);
+
+                if (proxy.getTargetFaultSequence() != null) {
+                    Mediator faultSequence = synapseOutMsgCtx.getSequence(
+                            proxy.getTargetFaultSequence());
+                    if (faultSequence != null) {
+                        synapseInMessageContext.pushFaultHandler(
+                                new MediatorFaultHandler(faultSequence));
+                    } else {
+                        log.warn("Cloud not find any fault-sequence named :" +
+                                    proxy.getTargetFaultSequence() + "; Setting the deafault" +
+                                    " fault sequence for out path");
+                        synapseInMessageContext.pushFaultHandler(new MediatorFaultHandler(
+                                synapseInMessageContext.getFaultSequence()));
+                    }
+
+                } else if (proxy.getTargetInLineFaultSequence() != null) {
+                    synapseInMessageContext.pushFaultHandler(
+                            new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
+
+                } else {
+                    synapseInMessageContext.pushFaultHandler(new MediatorFaultHandler(
+                            synapseInMessageContext.getFaultSequence()));
+                }
+           }
 
             // If this response is related to session affinity endpoints -Server initiated session
             Dispatcher dispatcher =

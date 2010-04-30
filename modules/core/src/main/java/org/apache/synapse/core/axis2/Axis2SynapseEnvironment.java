@@ -37,6 +37,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.mediators.MediatorWorker;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
@@ -132,6 +133,25 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
         ProxyService proxyService = synCtx.getConfiguration().getProxyService(proxyName);
         if (proxyService != null) {
+
+            if (proxyService.getTargetFaultSequence() != null) {
+                Mediator faultSequence = synCtx.getSequence(proxyService.getTargetFaultSequence());
+                if (faultSequence != null) {
+                    synCtx.pushFaultHandler(new MediatorFaultHandler(faultSequence));
+                } else {
+                    log.warn("Cloud not find any fault-sequence named :" +
+                                proxyService.getTargetFaultSequence() + "; Setting the deafault" +
+                                " fault sequence for out path");
+                    synCtx.pushFaultHandler(new MediatorFaultHandler(synCtx.getFaultSequence()));
+                }
+
+            } else if (proxyService.getTargetInLineFaultSequence() != null) {
+                synCtx.pushFaultHandler(
+                        new MediatorFaultHandler(proxyService.getTargetInLineFaultSequence()));
+
+            } else {
+                synCtx.pushFaultHandler(new MediatorFaultHandler(synCtx.getFaultSequence()));
+            }
 
             Mediator outSequence = getProxyOutSequence(synCtx, proxyService);
             if (outSequence != null) {

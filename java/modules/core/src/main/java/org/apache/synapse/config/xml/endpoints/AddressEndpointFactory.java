@@ -105,7 +105,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         EndpointDefinition endpointDefinition = new EndpointDefinition();
 
         if (address != null) {
-            endpointDefinition.setAddress(address.getAttributeValue());
+            endpointDefinition.setAddress(address.getAttributeValue().trim());
         }
 
         extractCommonEndpointProperties(endpointDefinition, elem);

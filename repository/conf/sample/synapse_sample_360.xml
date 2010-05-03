@@ -47,7 +47,7 @@
                 <statement>
                     <sql>select * from company where name =?</sql>
                     <parameter expression="//m0:getQuote/m0:request/m0:symbol"
-                               xmlns:m0="http://services.samples/xsd" type="VARCHAR"/>
+                               xmlns:m0="http://services.samples" type="VARCHAR"/>
                     <result name="company_id" column="id"/>
                 </statement>
             </dblookup>

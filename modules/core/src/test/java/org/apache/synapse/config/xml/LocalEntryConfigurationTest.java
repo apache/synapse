@@ -41,14 +41,14 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
                 "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
 
         try {
-            OMElement elem = AXIOMUtil.stringToOM(entrySrc);
+            OMElement elem = parseXMLString(entrySrc, true);
             Entry entry = EntryFactory.createEntry(elem);
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(text, (String) entry.getValue());
 
             OMElement serialization = EntrySerializer.serializeEntry(entry, null);
-            OMElement expectedSerialization = parseWithCDATA(serializedSrc);
+            OMElement expectedSerialization = parseXMLString(serializedSrc, false);
             assertTrue(compare(expectedSerialization, serialization));
         } catch (XMLStreamException e) {
             fail("Error while parsing entry definition: " + e.getMessage());
@@ -56,19 +56,26 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
     }
 
     public void testTextEntryWithMarkup() {
+        textEntryWithMarkup(true);
+        textEntryWithMarkup(false);
+    }
+
+    private void textEntryWithMarkup(boolean coalesced) {
+        System.out.println("Testing text entry with markup characters; Coalesced " +
+                "parsing: " + coalesced);
         String text = "mc.setPayloadXML(<xml>data</xml>);";
         String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
                 "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
 
         try {
-            OMElement elem = AXIOMUtil.stringToOM(entrySrc);
+            OMElement elem = parseXMLString(entrySrc, coalesced);
             Entry entry = EntryFactory.createEntry(elem);
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(text, (String) entry.getValue());
 
             OMElement serialization = EntrySerializer.serializeEntry(entry, null);
-            OMElement expectedSerialization = parseWithCDATA(entrySrc);
+            OMElement expectedSerialization = parseXMLString(entrySrc, false);
             assertTrue(compare(expectedSerialization, serialization));
         } catch (XMLStreamException e) {
             fail("Error while parsing entry definition: " + e.getMessage());
@@ -76,22 +83,101 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
     }
 
     public void testTextEntryWithNestedCDATA() {
+        textEntryWithNestedCDATA(true);
+        textEntryWithNestedCDATA(false);
+    }
+
+    private void textEntryWithNestedCDATA(boolean coalesced) {
+        System.out.println("Testing text entry with nested CDATA elements; Coalesced " +
+                "parsing: " + coalesced);
+
         String actualText = "mc.setPayloadXML(<xml><![CDATA[data]]></xml>);";
         String escapedText = "mc.setPayloadXML(<xml><![CDATA[data]]]]><![CDATA[></xml>);";
         String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
                 "key=\"" + key + "\"><![CDATA[" + escapedText + "]]></localEntry>";
 
         try {
-            OMElement elem = AXIOMUtil.stringToOM(entrySrc);
+            OMElement elem = parseXMLString(entrySrc, coalesced);
             Entry entry = EntryFactory.createEntry(elem);
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(actualText, (String) entry.getValue());
 
-            OMElement expectedSerialization = parseWithCDATA(entrySrc);
+            OMElement expectedSerialization = parseXMLString(entrySrc, false);
             OMElement serialization = EntrySerializer.serializeEntry(entry, null);
-            assertTrue(compare(expectedSerialization, serialization));            
+            assertTrue(compare(expectedSerialization, serialization));
 
+        } catch (XMLStreamException e) {
+            fail("Error while parsing entry definition: " + e.getMessage());
+        }
+    }
+
+    public void testLargeTextEntry() {
+        String text = "Apache Synapse is designed to be a simple, lightweight and high performance " +
+                "Enterprise Service Bus (ESB) from Apache. Based on a small asynchronous core, " +
+                "Apache Synapse has excellent support for XML and Web services - as well as binary " +
+                "and text formats. The Synapse engine is configured with a simple XML format and " +
+                "comes with a set of ready-to-use transports and mediators. We recommend you start " +
+                "by reading the QuickStart and then trying out the samples. Synapse is made " +
+                "available under the Apache Software License 2.0. For more information please visit " +
+                "http://synapse.apache.org.";
+
+        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+                "key=\"" + key + "\">" + text + "</localEntry>";
+        String serializedSrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+                "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
+
+        try {
+            OMElement elem = parseXMLString(entrySrc, true);
+            Entry entry = EntryFactory.createEntry(elem);
+            assertEquals(key, entry.getKey());
+            assertEquals(Entry.INLINE_TEXT, entry.getType());
+            assertEquals(text, (String) entry.getValue());
+
+            OMElement serialization = EntrySerializer.serializeEntry(entry, null);
+            OMElement expectedSerialization = parseXMLString(serializedSrc, false);
+            assertEquals(text, serialization.getText());
+            serialization = parseXMLString(serialization.toString(), false);
+            assertTrue(compare(expectedSerialization, serialization));
+        } catch (XMLStreamException e) {
+            fail("Error while parsing entry definition: " + e.getMessage());
+        }       
+    }
+
+    public void testLargeTextEntryWithMarkup() {
+        larseTextEntryWithMarkup(true);
+        larseTextEntryWithMarkup(false);
+    }
+
+    private void larseTextEntryWithMarkup(boolean coalesced) {
+        System.out.println("Testing large text entry with markup characters; Coalesced " +
+                "parsing: " + coalesced);
+
+        String text = "Apache Synapse is designed to be a simple, lightweight and high performance " +
+                "Enterprise Service Bus (ESB) from Apache. Based on a small asynchronous core, " +
+                "Apache Synapse has excellent support for <XML/> and Web services - as well as binary " +
+                "and text formats. The Synapse engine is configured with a simple XML format and " +
+                "comes with a set of ready-to-use transports and mediators. We recommend you start " +
+                "by reading the QuickStart and then trying out the samples. Synapse is made " +
+                "available under the Apache Software License 2.0. For more information please visit " +
+                "http://synapse.apache.org.";
+
+        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+                "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
+
+        try {
+            OMElement elem = parseXMLString(entrySrc, coalesced);
+            Entry entry = EntryFactory.createEntry(elem);
+            assertEquals(key, entry.getKey());
+            assertEquals(Entry.INLINE_TEXT, entry.getType());
+            assertEquals(text, (String) entry.getValue());
+
+            OMElement serialization = EntrySerializer.serializeEntry(entry, null);
+            assertEquals(text, serialization.getText());
+
+            OMElement expectedSerialization = parseXMLString(entrySrc, false);
+            serialization = parseXMLString(serialization.toString(), false);
+            assertTrue(compare(expectedSerialization, serialization));
         } catch (XMLStreamException e) {
             fail("Error while parsing entry definition: " + e.getMessage());
         }
@@ -104,13 +190,13 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
                 "key=\"" + key + "\">" + xml + "</localEntry>";
 
         try {
-            OMElement elem = AXIOMUtil.stringToOM(entrySrc);
+            OMElement elem = parseXMLString(entrySrc, true);
             OMElement expectedSerialization = elem.cloneOMElement();
             Entry entry = EntryFactory.createEntry(elem);
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_XML, entry.getType());
 
-            OMElement valueElem = AXIOMUtil.stringToOM(xml);
+            OMElement valueElem = parseXMLString(xml, true);
             assertTrue(compare(valueElem, (OMElement) entry.getValue()));
 
             OMElement serialization = EntrySerializer.serializeEntry(entry, null);
@@ -121,19 +207,27 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
     }
 
     public void testXMLEntryWithCDATA() {
+        xmlEntryWithCDATA(true);
+        xmlEntryWithCDATA(false);
+    }
+
+    private void xmlEntryWithCDATA(boolean coalesced) {
+        System.out.println("Testing simple XML entry with CDATA elements; Coalesced " +
+                "parsing: " + coalesced);
+
         String xml = "<m:project xmlns:m=\"http://testing.synapse.apache.org\">" +
                 "<![CDATA[<xml>data</xml>]]></m:project>";
         String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
                 "key=\"" + key + "\">" + xml + "</localEntry>";
 
         try {
-            OMElement elem = AXIOMUtil.stringToOM(entrySrc);
+            OMElement elem = parseXMLString(entrySrc, coalesced);
             OMElement expectedSerialization = elem.cloneOMElement();
             Entry entry = EntryFactory.createEntry(elem);
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_XML, entry.getType());
 
-            OMElement valueElem = AXIOMUtil.stringToOM(xml);
+            OMElement valueElem = parseXMLString(xml, coalesced);
             assertTrue(compare(valueElem, (OMElement) entry.getValue()));
 
             OMElement serialization = EntrySerializer.serializeEntry(entry, null);
@@ -232,13 +326,13 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
                 "key=\"" + key + "\">" + xml + "</localEntry>";
 
         try {
-            OMElement elem = AXIOMUtil.stringToOM(entrySrc);
+            OMElement elem = parseXMLString(entrySrc, true);
             OMElement expectedSerialization = elem.cloneOMElement();
             Entry entry = EntryFactory.createEntry(elem);
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_XML, entry.getType());
 
-            OMElement valueElem = AXIOMUtil.stringToOM(xml);
+            OMElement valueElem = parseXMLString(xml, true);
             assertTrue(compare(valueElem, (OMElement) entry.getValue()));
 
             OMElement serialization = EntrySerializer.serializeEntry(entry, null);
@@ -248,14 +342,18 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
         }
     }
 
-    private OMElement parseWithCDATA(String src) throws XMLStreamException {
-        StringReader strReader = new StringReader(src);
-        XMLInputFactory xmlInFac = XMLInputFactory.newInstance();
-        //Non-Coalescing parsing
-        xmlInFac.setProperty("javax.xml.stream.isCoalescing", false);
+    private OMElement parseXMLString(String src, boolean coalesced) throws XMLStreamException {
+        if (coalesced) {
+            return AXIOMUtil.stringToOM(src);
+        } else {
+            StringReader strReader = new StringReader(src);
+            XMLInputFactory xmlInFac = XMLInputFactory.newInstance();
+            //Non-Coalescing parsing
+            xmlInFac.setProperty("javax.xml.stream.isCoalescing", false);
 
-        XMLStreamReader parser = xmlInFac.createXMLStreamReader(strReader);
-        StAXOMBuilder builder = new StAXOMBuilder(parser);
-        return builder.getDocumentElement();
+            XMLStreamReader parser = xmlInFac.createXMLStreamReader(strReader);
+            StAXOMBuilder builder = new StAXOMBuilder(parser);
+            return builder.getDocumentElement();
+        }
     }
 }

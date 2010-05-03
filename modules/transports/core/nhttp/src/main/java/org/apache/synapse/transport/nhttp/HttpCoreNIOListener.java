@@ -107,7 +107,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     /** Metrics collector for this transport */
     private MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
-    private int state = BaseConstants.STOPPED;
+    private volatile int state = BaseConstants.STOPPED;
     /** The ServerHandler */
     private ServerHandler handler = null;
     /** This will execute the requests based on calculate priority */
@@ -204,6 +204,10 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         if (param != null && param.getValue() != null) {
             createPriorityConfiguration(param.getValue().toString());
         }
+    }
+
+    public int getActiveConnectionsSize() {
+        return handler.getActiveConnectionsSize();
     }
 
     private void createPriorityConfiguration(String fileName) throws AxisFault {
@@ -437,6 +441,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         if (state != BaseConstants.STARTED) return;
         try {
             ioReactor.pause();
+            handler.markActiveConnectionsToBeClosed();
             state = BaseConstants.PAUSED;
             log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener Paused");
         } catch (IOException e) {

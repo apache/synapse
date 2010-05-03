@@ -455,6 +455,11 @@ public class Axis2SynapseController implements SynapseController {
                 log.info(new StringBuilder("Waiting for: ").append(pendingSenderThreads)
                         .append(" listener threads to complete").toString());
             }
+            int activeConnections = transportHelper.getActiveConnectionsCount();
+            if (activeConnections > 0) {
+                log.info("Waiting for: " + activeConnections
+                        + " active connections to be closed..");
+            }
             int pendingTransportThreads = pendingListenerThreads + pendingSenderThreads;
             
             int pendingCallbacks = ServerManager.getInstance().getCallbackCount();
@@ -480,8 +485,9 @@ public class Axis2SynapseController implements SynapseController {
                 if (System.currentTimeMillis() < endTime) {
                     log.info(new StringBuilder("Waiting for a maximum of another ")
                             .append((endTime - System.currentTimeMillis()) / 1000)
-                            .append(" seconds until transport threads and tasks become idle,")
-                            .append(" and callbacks complete..").toString());
+                            .append(" seconds until transport threads and tasks become idle, ")
+                            .append("active connections to get closed,")
+                            .append(" and callbacks to be completed..").toString());
                     try {
                         Thread.sleep(waitIntervalMillis);
                     } catch (InterruptedException ignore) {

@@ -3199,7 +3199,7 @@ end
                 &lt;statement&gt;
                     &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
                     &lt;parameter expression=&quot;//m0:getQuote/m0:request/m0:symbol&quot;
-                               xmlns:m0=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt;
+                               xmlns:m0=&quot;http://services.samples&quot; type=&quot;VARCHAR&quot;/&gt;
                     &lt;result name=&quot;company_id&quot; column=&quot;id&quot;/&gt;
                 &lt;/statement&gt;
             &lt;/dblookup&gt;

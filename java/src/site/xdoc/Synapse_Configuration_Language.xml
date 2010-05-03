@@ -1997,6 +1997,18 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       as follows:
     </p>
 <pre xml:space="preserve"> &lt;script language="string"&gt;...script source code...&lt;script/&gt;</pre>
+
+<p>           
+      If the script you specified is calling a function defined in another script,
+      then the latter script should also be included in the script mediator
+      configuration. It's done using the &lt;include&gt; element. The key attribute of the 
+      &lt;include&gt; element should point to the script which has to be included. The included
+      script could be stored as a local entry or in the remote registry.
+      Script includes are defined as follows:
+    </p>
+<pre xml:space="preserve"> &lt;script key="string" language="string" [function="script-function-name"]&gt;
+   &lt;include key="string"/&gt;
+ &lt;/script&gt;</pre>
     <p>
       The execution context environment of the script has access to the Synapse
       MessageContext predefined in a script variable named 'mc' . An example of

@@ -65,6 +65,11 @@ public class NhttpConstants {
     /** The message context property name which holds the exception (if any) for the last encountered exception */
     public static final String ERROR_EXCEPTION = "ERROR_EXCEPTION";
 
+    /** Denotes a connection close is forced if set at the NhttpContext */
+    public static final String FORCE_CLOSING = "forceClosing";
+    /** Denotes a message is being processed by the current connection if this is set at the context */
+    public static final String MESSAGE_IN_FLIGHT = "message-in-flight";
+
     // ********** DO NOT CHANGE THESE UNLESS CORRESPONDING SYNAPSE CONSTANT ARE CHANGED ************
     public static final int RCV_IO_ERROR_SENDING   = 101000;
     public static final int RCV_IO_ERROR_RECEIVING = 101001;

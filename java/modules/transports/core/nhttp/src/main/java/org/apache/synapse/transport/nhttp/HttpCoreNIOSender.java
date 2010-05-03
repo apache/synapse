@@ -36,6 +36,7 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.base.TransportMBeanSupport;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
@@ -93,7 +94,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /** Metrics collector for the sender */
     private MetricsCollector metrics = new MetricsCollector();
     /** state of the listener */
-    private int state = BaseConstants.STOPPED;
+    private volatile int state = BaseConstants.STOPPED;
     /** The proxy host */
     private String proxyHost = null;
     /** The proxy port */
@@ -477,7 +478,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
         }
 
-        if (state == BaseConstants.PAUSED) {
+        if (JavaUtils.isTrueExplicitly(worker.getConn().getContext().getAttribute("forceClosing"))) {
             HttpRequest req = (HttpRequest)
                     worker.getConn().getContext().getAttribute("http.request");
             req.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);

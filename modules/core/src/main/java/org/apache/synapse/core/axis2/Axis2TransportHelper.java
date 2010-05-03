@@ -27,6 +27,7 @@ import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.nhttp.HttpCoreNIOListener;
 
 import java.util.Map;
 
@@ -176,6 +177,19 @@ public class Axis2TransportHelper {
         }
 
         return pendingThreads;
+    }
+
+    public int getActiveConnectionsCount() {
+        Map<String, TransportInDescription> trpIns
+                = configurationContext.getAxisConfiguration().getTransportsIn();
+
+        for (TransportInDescription trpIn : trpIns.values()) {
+            if (trpIn.getReceiver() instanceof HttpCoreNIOListener) {
+                return ((HttpCoreNIOListener) trpIn.getReceiver()).getActiveConnectionsSize();
+            }
+        }
+
+        return 0;
     }
 
     /**

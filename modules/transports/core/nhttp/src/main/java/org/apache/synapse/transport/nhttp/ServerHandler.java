@@ -22,6 +22,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -52,6 +53,8 @@ import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -86,6 +89,9 @@ public class ServerHandler implements NHttpServiceHandler {
     private WorkerPool workerPool = null;
     /** the metrics collector */
     private MetricsCollector metrics = null;
+    
+    /** keeps track of the connection that are alive in the system */
+    private volatile List<NHttpServerConnection> activeConnections = null;
 
     private Parser parser = null;
 
@@ -108,6 +114,7 @@ public class ServerHandler implements NHttpServiceHandler {
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.allocator = new HeapByteBufferAllocator();
+        this.activeConnections = new ArrayList<NHttpServerConnection>();
 
         this.cfg = NHttpConfiguration.getInstance();
        if (executor == null)  {
@@ -132,6 +139,7 @@ public class ServerHandler implements NHttpServiceHandler {
         HttpContext context = conn.getContext();
         HttpRequest request = conn.getHttpRequest();
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+        context.setAttribute(NhttpConstants.MESSAGE_IN_FLIGHT, "true");
 
         // prepare to collect debug information
         conn.getContext().setAttribute(
@@ -357,13 +365,33 @@ public class ServerHandler implements NHttpServiceHandler {
         }
         // record connection creation time for debug logging
         conn.getContext().setAttribute(CONNECTION_CREATION_TIME, System.currentTimeMillis());
+        if (log.isDebugEnabled()) {
+            log.debug("Adding a connection : "
+                + conn + " to the pool, existing pool size : " + activeConnections.size());
+        }
+        activeConnections.add(conn);
     }
 
     public void responseReady(NHttpServerConnection conn) {
 
+        if (JavaUtils.isTrueExplicitly(conn.getContext().getAttribute(NhttpConstants.FORCE_CLOSING))
+                && !JavaUtils.isTrueExplicitly(conn.getContext().getAttribute(
+                NhttpConstants.MESSAGE_IN_FLIGHT))) {
+
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Closing a persisted connection since it is forced : " + conn);
+                }
+                conn.close();
+            } catch (IOException ignore) {}
+            
+            return;
+        }
+
         metrics.notifyReceivedMessageSize(conn.getMetrics().getReceivedBytesCount());
         metrics.notifySentMessageSize(conn.getMetrics().getSentBytesCount());
         conn.getMetrics().reset();
+        conn.getContext().removeAttribute(NhttpConstants.MESSAGE_IN_FLIGHT);
 
         if (log.isTraceEnabled()) {
             log.trace("Ready to send response");
@@ -381,6 +409,17 @@ public class ServerHandler implements NHttpServiceHandler {
 
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
+        }
+    }
+
+    public void markActiveConnectionsToBeClosed() {
+        log.info("Marking the closing signal on the connection pool of size : "
+                + activeConnections.size());
+        synchronized (this) {
+            for (NHttpServerConnection conn : activeConnections) {
+                conn.getContext().setAttribute(NhttpConstants.FORCE_CLOSING, "true");
+                conn.requestOutput();
+            }
         }
     }
 
@@ -469,9 +508,21 @@ public class ServerHandler implements NHttpServiceHandler {
         if (inputBuffer != null) {
             inputBuffer.close();
         }
+
+        synchronized (this) {
+            if (activeConnections.remove(conn) && log.isDebugEnabled()) {
+                log.debug("Removing the connection : " + conn
+                        + " from pool of size : " + activeConnections.size());
+            }
+        }
+
         try {
             conn.shutdown();
         } catch (IOException ignore) {}
+    }
+
+    public int getActiveConnectionsSize() {
+        return activeConnections.size();
     }
 
     /**

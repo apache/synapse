@@ -98,6 +98,13 @@ public class Axis2FlexibleMEPClient {
         }
 
         if (log.isDebugEnabled()) {
+            String to;
+            if (endpoint != null && endpoint.getAddress() != null) {
+                to = endpoint.getAddress();
+            } else {
+                to = synapseOutMessageContext.getTo().toString();
+            }
+
             log.debug(
                 "Sending [add = " + wsAddressingEnabled +
                 "] [sec = " + wsSecurityEnabled +
@@ -111,7 +118,7 @@ public class Axis2FlexibleMEPClient {
                     "] [pox=" + endpoint.isForcePOX() +
                     "] [get=" + endpoint.isForceGET() +
                     "] [encoding=" + endpoint.getCharSetEncoding() : "") +
-                "] [to " + synapseOutMessageContext.getTo() + "]");
+                "] [to=" + to + "]");
         }
 
         // save the original message context wihout altering it, so we can tie the response

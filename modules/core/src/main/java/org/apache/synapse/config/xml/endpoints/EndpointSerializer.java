@@ -162,7 +162,7 @@ public abstract class EndpointSerializer {
             duration.setText(Long.toString(endpointDefinition.getTimeoutDuration()));
             timeout.addChild(duration);
 
-            OMElement action = fac.createOMElement("action", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement action = fac.createOMElement("responseAction", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
                 action.setText("discard");
             } else if (endpointDefinition.getTimeoutAction()

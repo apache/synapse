@@ -51,7 +51,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                                "<enableAddressing/>" +
                                 "<timeout>" +
                                     "<duration>60</duration>" +
-                                    "<action>discard</action>" +
+                                    "<responseAction>discard</responseAction>" +
                                 "</timeout>" +
                           "</address>" +
                      "</endpoint>" +

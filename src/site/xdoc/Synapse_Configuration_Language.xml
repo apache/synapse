@@ -528,8 +528,8 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </p>	
     <p>
       Address endpoints can timeout if responses fail to arrive at Synapse by a
-      predefined timeout-duration specified in seconds. The timeout action
-      specifies whether to discard responses that arrives late, or to trigger a
+      predefined timeout-duration specified in seconds. The timeout responseAction
+      specifies whether to discard responses that arrive late, or to trigger a
       fault. Synapse has a periodic timeout handler that triggers itself at each
       15 second interval. Thus endpoint timeouts will have a +/- error on actual
       trigger time. Though this can be minimized by setting a System property
@@ -558,7 +558,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
   
   &lt;timeout&gt;
     &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
-    &lt;action&gt;discard|fault&lt;/action&gt;
+    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
   &lt;/timeout&gt;?
   
   &lt;markForSuspension&gt;
@@ -613,7 +613,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
 
   &lt;timeout&gt;
     &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
-    &lt;action&gt;discard|fault&lt;/action&gt;
+    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
   &lt;/timeout&gt;?
 
    &lt;markForSuspension&gt;
@@ -650,7 +650,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
   
   &lt;timeout&gt;
     &lt;duration&gt;timeout-duration&lt;/duration&gt;
-    &lt;action&gt;discard|fault&lt;/action&gt;
+    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
   &lt;/timeout&gt;?
   &lt;markForSuspension&gt;
         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]

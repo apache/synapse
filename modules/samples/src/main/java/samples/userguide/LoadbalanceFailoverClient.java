@@ -51,6 +51,8 @@ public class LoadbalanceFailoverClient {
     private final static String COOKIE = "Cookie";
     private final static String SET_COOKIE = "Set-Cookie";
 
+    private final static String DEFAULT_CLIENT_REPO = "client_repo";
+
     /**
      * @param args 0: simple | session
      *             1: port
@@ -127,15 +129,12 @@ public class LoadbalanceFailoverClient {
 
         options.setAction("urn:sampleOperation");
 
-        String repo = System.getProperty("repository");
-        ConfigurationContext configContext;
-        if (repo != null) {
-            configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                    repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
-        } else {
-            configContext = ConfigurationContextFactory.
-                    createConfigurationContextFromFileSystem("client_repo", null);
-        }
+        String repoLocationProperty = System.getProperty("repository");
+        String repo =  repoLocationProperty != null ? repoLocationProperty : DEFAULT_CLIENT_REPO;
+        ConfigurationContext configContext =
+                ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                        repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
+
         ServiceClient client = new ServiceClient(configContext, null);
         long timeout = Integer.parseInt(getProperty("timeout", "10000000"));
         System.out.println("timeout=" + timeout);
@@ -255,8 +254,12 @@ public class LoadbalanceFailoverClient {
             SOAPEnvelope env3 = buildSoapEnvelope("c3", "v1");
             SOAPEnvelope[] envelopes = {env1, env2, env3};
 
-            ConfigurationContext configContext = ConfigurationContextFactory.
-                    createConfigurationContextFromFileSystem("client_repo", null);
+            String repoLocationProperty = System.getProperty("repository");
+            String repo =  repoLocationProperty != null ? repoLocationProperty : DEFAULT_CLIENT_REPO;
+            ConfigurationContext configContext =
+                    ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                            repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
+            
             ServiceClient client = new ServiceClient(configContext, null);
 
             // set addressing, transport and proxy url

@@ -1597,6 +1597,19 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       action attribute specifies whether the mediator should set or remove the
       header. If omitted, it defaults to a set-header.
     </p>
+    <p>
+      The value of the 'name' attribute must be one of the following aliases or
+      a valid QName with a namespace prefix. (In the latter case the namespace prefix
+      must be mapped to a valid namespace URI using the standard xmlns attribute)
+    </p>
+    <ul>
+        <li>To</li>
+        <li>From</li>
+        <li>Action</li>
+        <li>FaultTo</li>
+        <li>ReplyTo</li>
+        <li>RelatesTo</li>
+    </ul>
     <p/>
     <h3>
       Selection Mediators

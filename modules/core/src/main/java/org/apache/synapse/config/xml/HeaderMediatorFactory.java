@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.jaxen.JaxenException;
 
@@ -66,15 +67,25 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
                 String prefix = nameAtt.substring(0, colonPos);
                 String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, elem);
                 if (namespaceURI == null) {
-                    String msg = "Invalid namespace prefix '" + prefix + "' in name attribute";
-                    log.error(msg);
-                    throw new SynapseException(msg);
+                    handleException("Invalid namespace prefix '" + prefix + "' in name attribute");
                 } else {
-                	headerMediator.setQName(new QName(namespaceURI, nameAtt.substring(colonPos+1), prefix));
+                	headerMediator.setQName(new QName(namespaceURI, nameAtt.substring(colonPos+1),
+                            prefix));
                 }
             } else {
                 // no prefix
-                headerMediator.setQName(new QName(nameAtt));
+                if (SynapseConstants.HEADER_TO.equals(nameAtt) ||
+                        SynapseConstants.HEADER_FROM.equals(nameAtt) ||
+                        SynapseConstants.HEADER_ACTION.equals(nameAtt) ||
+                        SynapseConstants.HEADER_FAULT.equals(nameAtt) ||
+                        SynapseConstants.HEADER_REPLY_TO.equals(nameAtt) ||
+                        SynapseConstants.HEADER_RELATES_TO.equals(nameAtt)) {
+
+                    headerMediator.setQName(new QName(nameAtt));
+                } else {
+                    handleException("Invalid SOAP header: " + nameAtt + " specified at the " +
+                            "header mediator. All SOAP headers must be namespace qualified.");
+                }
             }
         }
 
@@ -90,9 +101,8 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
         if (headerMediator.getAction() == HeaderMediator.ACTION_SET &&
             value == null && exprn == null) {
-            String msg = "A 'value' or 'expression' attribute is required for a [set] header mediator";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("A 'value' or 'expression' attribute is required for a [set] " +
+                    "header mediator");
         }
 
         if (value != null && value.getAttributeValue() != null) {
@@ -102,9 +112,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
             try {
                 headerMediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN));
             } catch (JaxenException je) {
-                String msg = "Invalid XPath expression : " + exprn.getAttributeValue();
-                log.error(msg);
-                throw new SynapseException(msg, je);
+                handleException("Invalid XPath expression : " + exprn.getAttributeValue());
             }
         }
 

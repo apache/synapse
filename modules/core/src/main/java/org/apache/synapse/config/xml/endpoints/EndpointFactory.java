@@ -245,7 +245,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             }
 
             OMElement action = timeout.getFirstChildWithName(
-                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "action"));
+                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "responseAction"));
             if (action != null && action.getText() != null) {
                 String actionString = action.getText();
                 if ("discard".equalsIgnoreCase(actionString.trim())) {

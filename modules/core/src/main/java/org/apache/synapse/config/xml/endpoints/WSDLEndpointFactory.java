@@ -55,7 +55,7 @@ import java.net.URL;
  *
  *     &lt;timeout&gt;
  *       &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
- *       &lt;action&gt;discard|fault&lt;/action&gt;
+ *       &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
  *     &lt;/timeout&gt;?
  *
  *     &lt;suspendDurationOnFailure&gt;

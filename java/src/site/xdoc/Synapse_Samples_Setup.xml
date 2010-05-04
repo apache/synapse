@@ -784,6 +784,48 @@ synapse.sh -sample &lt;n&gt;</pre>
       the required database driver jars to the Synapse classpath.
     </p>
     <p/>
+    <h2 id="mysql">
+      Setting Up MySQL database server
+    </h2>
+    <p>
+      You can use a MySQL installation to try out certain database mediator samples.
+      You can download MySQL distribution from <a
+      href="http://dev.mysql.com/downloads/">http://dev.mysql.com/downloads/</a>
+    </p>
+    <ol>
+      <li>
+        Set up and start the MySQL server
+      </li>
+      <li>
+        Create a sample databasae<br/>
+        <pre>CREATE DATABASE synapsedb;</pre>
+      </li>      
+      <li>
+        Create a table in the sample database
+        <pre> USE synapsedb; 
+ CREATE table company(name varchar(10), id varchar(10), price double);</pre>
+      </li>
+      <li>
+        Inserts some data using following statements
+        <pre> INSERT into company values ('IBM','c1',3.7563);
+ INSERT into company values ('SUN','c2',3.8349);
+ INSERT into company values ('MSFT','c3',3.2938);</pre>
+      </li>
+      <li>Create a Stored Procedure<br/>
+        <pre>CREATE PROCEDURE getCompanyDetail(compName VARCHAR(10)) SELECT name, id, price FROM company WHERE name = compName;</pre>
+      </li>
+    </ol>
+    <p>
+      When using MySQL, you need to add mysql-connector-java.jar to the Synapse classpath. This can be done
+      by putting the above mentioned jar into the Synapse lib directory. For testing the samples
+      MySQL-5.0.75 distribution and mysql-connector-java-5.1.12-bin.jar was used.
+    </p>
+    <p>
+      You can use any other database product instead of MySQL. Then you have to
+      change the database connection details accordingly. Also you have to copy
+      the required database driver jars to the Synapse classpath.
+    </p>
+    <p/>
         <h2>Key Stores Configurations</h2>
 
 <div>

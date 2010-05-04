@@ -772,6 +772,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?
       &lt;resource location="..." key="..."/&gt;*
    &lt;/publishWSDL&gt;?
+   &lt;enableAddressing/&gt;? 
    &lt;enableSec/&gt;?
    &lt;enableRM/&gt;?
    &lt;policy key="string" [type="(in | out)"]/&gt;?       // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)

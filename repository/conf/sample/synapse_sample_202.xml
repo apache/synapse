@@ -21,13 +21,7 @@
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
     <proxy name="StockQuoteProxy">
         <target>
-            <inSequence>
-                <header name="wsrm:SequenceAcknowledgement" action="remove"
-                        xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"/>
-                <header name="wsrm:Sequence" action="remove"
-                        xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"/>
-                <header name="wsrm:AckRequested" action="remove"
-                        xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"/>
+            <inSequence>                
                 <send>
                     <endpoint>
                         <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>

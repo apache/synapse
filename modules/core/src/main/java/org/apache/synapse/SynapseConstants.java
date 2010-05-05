@@ -335,7 +335,16 @@ public final class SynapseConstants {
 
     public static final String SYNAPSE_STARTUP_TASK_SCHEDULER = "synapse.startup.taskscheduler";
 
-    public static final String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY = "synapse.startup.taskdescriptions.repository";
+    public static final String SYNAPSE_STARTUP_TASK_DESCRIPTIONS_REPOSITORY =
+            "synapse.startup.taskdescriptions.repository";
+
+    /** proxy server configurations used for retrieving configuration resources over a HTTP proxy */
+    public static final String SYNPASE_HTTP_PROXY_HOST = "synapse.http.proxy.host";
+    public static final String SYNPASE_HTTP_PROXY_PORT = "synapse.http.proxy.port";
+    public static final String SYNPASE_HTTP_PROXY_USER = "synapse.http.proxy.user";
+    public static final String SYNPASE_HTTP_PROXY_PASSWORD = "synapse.http.proxy.password";
+    public static final String SYNAPSE_HTTP_PROXY_EXCLUDED_HOSTS =
+            "synapse.http.proxy.excluded.hosts";
 
     // host and ip synapse is running 
     public static final String SERVER_HOST = "SERVER_HOST";

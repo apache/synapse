@@ -127,8 +127,10 @@ public class Axis2FlexibleMEPClient {
 
         // create a new MessageContext to be sent out as this should not corrupt the original
         // we need to create the response to the original message later on
-        MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx,
-            (String) synapseOutMessageContext.getProperty(SynapseConstants.PRESERVE_WS_ADDRESSING));
+        String preserveAddressingProperty = (String) synapseOutMessageContext.getProperty(
+                SynapseConstants.PRESERVE_WS_ADDRESSING);
+        MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx, preserveAddressingProperty);
+
 
         if (log.isDebugEnabled()) {
             log.debug("Message [Original Request Message ID : "
@@ -266,6 +268,19 @@ public class Axis2FlexibleMEPClient {
             axisOutMsgCtx.setProperty
                     (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
         }
+
+        // remove the headers if we don't need to preserve them.
+        // determine weather we need to preserve the processed headers
+        String preserveHeaderProperty =
+                (String) synapseOutMessageContext.getProperty(
+                       SynapseConstants.PRESERVE_PROCESSED_HEADERS);
+        if (preserveHeaderProperty == null || !Boolean.parseBoolean(preserveHeaderProperty)) {
+            // default behaviour is to remove the headers
+            MessageHelper.removeProcessedHeaders(axisOutMsgCtx,
+                    (preserveAddressingProperty != null &&
+                            Boolean.parseBoolean(preserveAddressingProperty)));
+        }
+
 
         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();
         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();

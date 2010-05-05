@@ -123,12 +123,24 @@ public class Axis2Sender {
                         AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
             }
 
-            String preserveAddressing = (String) smc.getProperty(SynapseConstants.PRESERVE_WS_ADDRESSING);
-            if (Boolean.parseBoolean(preserveAddressing)) {
-                messageContext.setMessageID(smc.getMessageID());
-            } else {
-                MessageHelper.removeAddressingHeaders(messageContext);
-                messageContext.setMessageID(UUIDGenerator.getUUID());
+            String preserveAddressingProperty = (String) smc.getProperty(
+                    SynapseConstants.PRESERVE_WS_ADDRESSING);
+            if (preserveAddressingProperty != null &&
+                    Boolean.parseBoolean(preserveAddressingProperty)) {
+                 messageContext.setMessageID(smc.getMessageID());
+             } else {
+                 MessageHelper.removeAddressingHeaders(messageContext);
+                 messageContext.setMessageID(UUIDGenerator.getUUID());
+             }
+
+            // determine weather we need to preserve the processed headers
+            String preserveHeaderProperty = (String) smc.getProperty(
+                            SynapseConstants.PRESERVE_PROCESSED_HEADERS);
+            if (preserveHeaderProperty == null || !Boolean.parseBoolean(preserveHeaderProperty)) {
+                // remove the processed headers
+                MessageHelper.removeProcessedHeaders(messageContext,
+                        (preserveAddressingProperty != null &&
+                                Boolean.parseBoolean(preserveAddressingProperty)));
             }
 
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197

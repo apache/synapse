@@ -444,6 +444,52 @@ public class MessageHelper {
         return newFault;
     }
 
+    /**
+     * Remove the headers that are marked as processed.
+     * @param axisMsgCtx the Axis2 Message context
+     * @param preserveAddressing if true preserve the addressing headers     
+     */
+    public static void removeProcessedHeaders(org.apache.axis2.context.MessageContext axisMsgCtx,
+                                              boolean preserveAddressing) {
+        SOAPEnvelope env = axisMsgCtx.getEnvelope();
+        SOAPHeader soapHeader = env.getHeader();
+
+        if (soapHeader != null) {
+            Iterator it = soapHeader.getChildElements();
+            while (it.hasNext()) {
+                Object o = it.next();
+                if (o instanceof SOAPHeaderBlock) {
+                    SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
+                    if (!preserveAddressing) {
+                        // if we don't need to preserve addressing headers remove without checking
+                        if (headerBlock.isProcessed()) {
+                            headerBlock.detach();
+                        }
+                    } else {
+                        // else remove only if not an addressing header
+                        if (!isAddressingHeader(headerBlock)) {
+                            if (headerBlock.isProcessed()) {
+                                headerBlock.detach();
+                            }
+                        }
+                    }
+                }
+            }
+        }        
+    }
+
+    /**
+     * Return true if the SOAP header is an addressing header
+     * @param headerBlock SOAP header block to be checked
+     * @return true if the SOAP header is an addressing header
+     */
+    private static boolean isAddressingHeader(SOAPHeaderBlock headerBlock) {
+        OMNamespace ns = headerBlock.getNamespace();
+        return ns != null && (
+                AddressingConstants.Submission.WSA_NAMESPACE.equals(ns.getNamespaceURI()) ||
+                        AddressingConstants.Final.WSA_NAMESPACE.equals(ns.getNamespaceURI()));
+    }
+
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);

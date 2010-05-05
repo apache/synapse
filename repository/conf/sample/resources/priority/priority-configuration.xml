@@ -31,8 +31,10 @@
     <!-- if a message comes that we cannot determine priority, we set a default priority of 1 -->
     <conditions defaultPriority="1">
         <condition priority="10">     
-            <!-- check for the header named priority --> 
-            <equal type="header" source="priority" value="5"/>        
+            <!-- check for the header named priority -->
+            <and>
+            <equal type="header" source="priority" value="5"/>
+            </and>
         </condition>
         <condition priority="1">
             <equal type="header" source="priority" value="1"/>

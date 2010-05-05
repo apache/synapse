@@ -30,13 +30,7 @@
             </endpoint>
         </send>
     </in>
-    <out>
-        <header name="wsrm:SequenceAcknowledgement" action="remove"
-                xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"/>
-        <header name="wsrm:Sequence" action="remove"
-                xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"/>
-        <header name="wsrm:AckRequested" action="remove"
-                xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"/>
+    <out>        
         <send/>
     </out>
 </definitions>

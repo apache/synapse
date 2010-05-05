@@ -22,9 +22,7 @@
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
     <proxy name="StockQuoteProxy">
         <target>
-            <inSequence>
-                <header name="wsse:Security" action="remove"
-                        xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+            <inSequence>                
                 <send>
                     <endpoint>
                         <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>

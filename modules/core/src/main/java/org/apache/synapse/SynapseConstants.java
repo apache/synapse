@@ -351,6 +351,9 @@ public final class SynapseConstants {
 
     public static final String SERVER_IP = "SERVER_IP";
 
+    // Property name. If this property is false synapse will not remove the processed headers
+    public static final String PRESERVE_PROCESSED_HEADERS = "preserveProcessedHeaders";
+
     // Known transport error codes
     public static final int RCV_IO_ERROR_SENDING     = 101000;
     public static final int RCV_IO_ERROR_RECEIVING   = 101001;

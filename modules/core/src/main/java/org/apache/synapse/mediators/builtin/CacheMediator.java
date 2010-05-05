@@ -20,10 +20,12 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.clustering.state.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.saaj.util.SAAJUtil;
+import org.apache.axis2.saaj.util.IDGenerator;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -282,15 +284,30 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 synCtx.setResponse(true);
                 try {
                     MessageFactory mf = MessageFactory.newInstance();
-                    SOAPMessage smsg = mf.createMessage(new MimeHeaders(),
-                        new ByteArrayInputStream(cachedObj.getResponseEnvelope()));
+                    SOAPMessage smsg;
+                    if (synCtx.isSOAP11()) {
+                        smsg = mf.createMessage(new MimeHeaders(),
+                                new ByteArrayInputStream(cachedObj.getResponseEnvelope()));
+                    } else {
+                        MimeHeaders mimeHeaders = new MimeHeaders();
+                        mimeHeaders.addHeader("Content-ID", IDGenerator.generateID());
+                        mimeHeaders.addHeader("content-type",
+                                HTTPConstants.MEDIA_TYPE_APPLICATION_SOAP_XML);
+                        smsg = mf.createMessage(mimeHeaders,
+                                new ByteArrayInputStream((cachedObj).getResponseEnvelope()));
+                    }
 
-                    org.apache.axiom.soap.SOAPEnvelope omSOAPEnv =
-                        SAAJUtil.toOMSOAPEnvelope(smsg.getSOAPPart().getDocumentElement());
-
+                    if (smsg != null) {
+                        org.apache.axiom.soap.SOAPEnvelope omSOAPEnv =
+                                SAAJUtil.toOMSOAPEnvelope(
+                                        smsg.getSOAPPart().getDocumentElement());
+                        synCtx.setEnvelope(omSOAPEnv);
+                    } else {
+                        handleException("Unable to serve from the cache : " +
+                                "Couldn't build the SOAP response from the cached byte stream",
+                                synCtx);
+                    }
                     // todo: if there is a WSA messageID in the response, is that need to be unique on each and every resp
-
-                    synCtx.setEnvelope(omSOAPEnv);
                 } catch (AxisFault axisFault) {
                     handleException("Error setting response envelope from cache : "
                         + cacheManagerKey, synCtx);

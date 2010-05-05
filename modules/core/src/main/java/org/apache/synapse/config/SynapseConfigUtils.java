@@ -773,7 +773,7 @@ public class SynapseConfigUtils {
 
     public static OMElement stringToOM(String xml) {
         try {
-            return AXIOMUtil.stringToOM(xml);  // Just wrapp to add loging for any errors
+            return AXIOMUtil.stringToOM(xml);  // Just wrap to add logging for any errors
         } catch (XMLStreamException e) {
             handleException("Unable to convert a string to OM Node as the string " +
                     "is malformed , String : " + xml, e);

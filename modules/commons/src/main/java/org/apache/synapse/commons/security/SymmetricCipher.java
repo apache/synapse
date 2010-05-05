@@ -27,7 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
 /**
- * SymmetricCipher
+ * The Cipher doing symmetric cryptographic operations  
  * Uses default key when these is no SecretKey
  */
 public class SymmetricCipher extends BaseCipher {

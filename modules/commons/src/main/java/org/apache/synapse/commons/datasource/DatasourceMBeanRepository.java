@@ -36,7 +36,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
 
     private final Map<String, DBPoolView> dataSourcesMBeans
             = new HashMap<String, DBPoolView>();
-    private final static DatasourceMBeanRepository DATASOURCE_M_BEAN_REPOSITORY
+    private final static DatasourceMBeanRepository DATASOURCE_MBEAN_REPOSITORY
             = new DatasourceMBeanRepository();
     private final static String MBEAN_CATEGORY_DATABASE_CONNECTION_POOL
             = "DatabaseConnectionPool";
@@ -45,7 +45,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
     }
 
     public static DatasourceMBeanRepository getInstance() {
-        return DATASOURCE_M_BEAN_REPOSITORY;
+        return DATASOURCE_MBEAN_REPOSITORY;
     }
 
     public void addMBean(String name, Object mBean) {

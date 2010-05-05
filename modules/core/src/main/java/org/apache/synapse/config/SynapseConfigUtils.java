@@ -25,6 +25,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.synapse.*;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
@@ -53,6 +54,8 @@ import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
+import java.util.List;
+import java.util.ArrayList;
 
 public class SynapseConfigUtils {
 
@@ -337,16 +340,15 @@ public class SynapseConfigUtils {
      * @param url Https URL
      * @return
      */
-    private static HttpsURLConnection getHttpsURLConnection(URL url) {
+    private static HttpsURLConnection getHttpsURLConnection(
+            URL url, Properties synapseProperties, Proxy proxy) {
 
-        if (log.isDebugEnabled()) {
+       if (log.isDebugEnabled()) {
             log.debug("Creating a HttpsURL Connection from given URL : " + url);
         }
 
         KeyManager[] keyManagers = null;
         TrustManager[] trustManagers = null;
-
-        Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
 
         IdentityKeyStoreInformation identityInformation =
                 KeyStoreInformationFactory.createIdentityKeyStoreInformation(synapseProperties);
@@ -382,7 +384,12 @@ public class SynapseConfigUtils {
         }
 
         try {
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            HttpsURLConnection connection;
+            if (proxy != null) {
+                connection = (HttpsURLConnection) url.openConnection(proxy);
+            } else {
+                connection = (HttpsURLConnection) url.openConnection();
+            }
             //Create a SSLContext
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(keyManagers,
@@ -452,19 +459,62 @@ public class SynapseConfigUtils {
      */
     public static URLConnection getURLConnection(URL url) {
 
-        try {
+         try {
             if (url == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Provided URL is null");
                 }
                 return null;
             }
+
             URLConnection connection;
-            if (url.getProtocol().equalsIgnoreCase("https")) {
-                connection = getHttpsURLConnection(url);
+            if (url.getProtocol().equalsIgnoreCase("http") ||
+                    url.getProtocol().equalsIgnoreCase("https")) {
+
+                Properties synapseProperties = SynapsePropertiesLoader.loadSynapseProperties();
+
+                String proxyHost = synapseProperties.getProperty(
+                        SynapseConstants.SYNPASE_HTTP_PROXY_HOST);
+                String proxyPort = synapseProperties.getProperty(
+                        SynapseConstants.SYNPASE_HTTP_PROXY_PORT);
+
+                // get the list of excluded hosts for proxy
+                List<String> excludedHosts = getExcludedHostsForProxy(synapseProperties);
+
+                if (proxyHost != null && proxyPort != null && !excludedHosts.contains(proxyHost)) {
+                    SocketAddress sockaddr = new InetSocketAddress(
+                            proxyHost, Integer.parseInt(proxyPort));
+                    Proxy proxy = new Proxy(Proxy.Type.HTTP, sockaddr);
+
+                    if (url.getProtocol().equalsIgnoreCase("https")) {
+                        connection = getHttpsURLConnection(url, synapseProperties, proxy);
+                    } else {
+                        connection = url.openConnection(proxy);
+                    }
+                } else {
+                    if (url.getProtocol().equalsIgnoreCase("https")) {
+                        connection = getHttpsURLConnection(url, synapseProperties, null);
+                    } else {
+                        connection = url.openConnection();
+                    }
+                }
+
+                // try to see weather authentication is required
+                String userName = synapseProperties.getProperty(
+                        SynapseConstants.SYNPASE_HTTP_PROXY_USER);
+                String password = synapseProperties.getProperty(
+                        SynapseConstants.SYNPASE_HTTP_PROXY_PASSWORD);
+                if (userName != null && password != null) {
+                    String header = userName + ":" + password;
+                    byte[] encodedHeaderBytes = new Base64().encode(header.getBytes());
+                    String encodedHeader = new String(encodedHeaderBytes);
+
+                    connection.setRequestProperty("Proxy-Authorization", "Basic " + encodedHeader);
+                }
             } else {
                 connection = url.openConnection();
             }
+
             connection.setReadTimeout(getReadTimeout());
             connection.setConnectTimeout(getConnectTimeout());
             connection.setRequestProperty("Connection", "close"); // if http is being used
@@ -473,6 +523,27 @@ public class SynapseConfigUtils {
             handleException("Error reading at URI ' " + url + " ' ", e);
         }
         return null;
+    }
+
+     /**
+     * Get the exclued host list for proxy server. When a connection is made for these hosts it will
+     * not go through the proxy server
+     * @param synapseProperties properties from the synapse.properties file
+     * @return list of excluded hosts
+     */
+    private static List<String> getExcludedHostsForProxy(Properties synapseProperties) {
+        List<String> excludedHosts = new ArrayList<String>();
+        String excludedHostsConfig = synapseProperties.
+                getProperty(SynapseConstants.SYNAPSE_HTTP_PROXY_EXCLUDED_HOSTS);
+        if (excludedHostsConfig != null) {
+            String [] list = excludedHostsConfig.split(",");
+
+            for (String host : list) {
+                excludedHosts.add(host.trim());
+            }
+        }
+
+        return excludedHosts;
     }
 
     private static void handleException(String msg) {

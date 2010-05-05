@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.eventing.EventFilter;
 import org.wso2.eventing.Event;
-import org.wso2.eventing.exceptions.EventException;
 import org.jaxen.JaxenException;
 
 /**
@@ -39,7 +38,8 @@ public class TopicBasedEventFilter implements EventFilter<MessageContext> {
     private AXIOMXPath sourceXpath;
     private String resultValue;
     private static final String FILTER_SEP = "/";
- private static final Log log = LogFactory.getLog(TopicBasedEventFilter.class);
+
+    private static final Log log = LogFactory.getLog(TopicBasedEventFilter.class);
 
     public String getResultValue() {
         return resultValue;
@@ -63,27 +63,24 @@ public class TopicBasedEventFilter implements EventFilter<MessageContext> {
 
     public boolean match(Event<MessageContext> event) {
         MessageContext messageContext = event.getMessage();
-        String evaluatedValue=null;
+        String evaluatedValue = null;
         try {
-            OMElement topicNode = (OMElement) sourceXpath.selectSingleNode(messageContext.getEnvelope());
+            OMElement topicNode = (OMElement) sourceXpath.selectSingleNode(
+                    messageContext.getEnvelope());
             if (topicNode != null) {
                 evaluatedValue = topicNode.getText();
             }
         } catch (JaxenException e) {
             handleException("Error creating topic xpath",e);
-        }     
-        if (evaluatedValue!=null){
-        if (evaluatedValue.equals(resultValue)) {
-            return true;
-        } else if (evaluatedValue.startsWith((resultValue + FILTER_SEP).trim())) {
-            return true;
         }
+        if (evaluatedValue != null){
+            if (evaluatedValue.equals(resultValue)) {
+                return true;
+            } else if (evaluatedValue.startsWith((resultValue + FILTER_SEP).trim())) {
+                return true;
+            }
         }
         return false;
-    }
-   private void handleException(String message) {
-        log.error(message);
-        throw new SynapseException(message);
     }
 
     private void handleException(String message, Exception e) {

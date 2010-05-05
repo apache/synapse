@@ -26,7 +26,7 @@ import org.apache.synapse.commons.security.keystore.KeyStoreWrapper;
 import java.security.Key;
 
 /**
- * AsymmetricCipher
+ * The Cipher doing asymmetric cryptographic operations
  */
 public class AsymmetricCipher extends BaseCipher {
 

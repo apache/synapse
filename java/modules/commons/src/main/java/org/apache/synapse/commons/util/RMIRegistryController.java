@@ -33,6 +33,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Creates and manages RMI registries
+ */
+
 public class RMIRegistryController {
 
     public static final Log log = LogFactory.getLog(RMIRegistryController.class);
@@ -129,7 +133,7 @@ public class RMIRegistryController {
                     UnicastRemoteObject.unexportObject(registry, true);
                     registriesCache.remove(key);
                 } catch (NoSuchObjectException e) {
-                    String msg = "Error when stopping localregistry(RMI)";
+                    String msg = "Error when stopping local registry(RMI)";
                     handleException(msg, e);
                 }
             }

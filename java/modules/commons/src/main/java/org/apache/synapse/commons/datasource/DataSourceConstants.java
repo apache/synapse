@@ -19,7 +19,7 @@
 package org.apache.synapse.commons.datasource;
 
 /**
- * Constants  related to the DataSource component
+ * Constants related to the DataSource component
  */
 public class DataSourceConstants {
 

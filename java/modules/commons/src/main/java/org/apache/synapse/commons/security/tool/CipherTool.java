@@ -131,52 +131,46 @@ public final class CipherTool {
             String source = getArgument(cmd, SOURCE_IN_LINED, null);
             assertEmpty(source, SOURCE_IN_LINED);
 
-            Key key;
+            Key key = findKey(cmd,cipherInformation);
 
-            // if pass phrase is specified, use simple symmetric en-/decryption
-            String passphrase = getArgument(cmd, PASSPHRASE, null);
             boolean isEncrypt = (cipherInformation.getCipherOperationMode() ==
                     CipherOperationMode.ENCRYPT);
+
             EncryptionProvider encryptionProvider = null;
             DecryptionProvider decryptionProvider = null;
-            if (passphrase != null) {
-                key = new SecretKeySpec(passphrase.getBytes(), cipherInformation.getAlgorithm());
+
+            if (key != null) {
+
                 if (isEncrypt) {
                     encryptionProvider = CipherFactory.createCipher(cipherInformation, key);
                 } else {
                     decryptionProvider = CipherFactory.createCipher(cipherInformation, key);
                 }
+
             } else {
-                // Key information must not contain any password
-                // If Key need to be loaded from a file
-                String keyFile = getArgument(cmd, KEY_FILE, null);
 
                 boolean isTrusted = isArgumentPresent(cmd, TRUSTED);
-                if (keyFile != null) {
-                    key = getKey(keyFile);
-                    if (isEncrypt) {
-                        encryptionProvider = CipherFactory.createCipher(cipherInformation, key);
-                    } else {
-                        decryptionProvider = CipherFactory.createCipher(cipherInformation, key);
-                    }
+
+                KeyStoreWrapper keyStoreWrapper;
+
+                if (isTrusted) {
+                    keyStoreWrapper = new TrustKeyStoreWrapper();
+                    ((TrustKeyStoreWrapper) keyStoreWrapper).init(getTrustKeyStoreInformation(cmd));
                 } else {
-                    KeyStoreWrapper keyStoreWrapper;
-                    if (isTrusted) {
-                        keyStoreWrapper = new TrustKeyStoreWrapper();
-                        ((TrustKeyStoreWrapper) keyStoreWrapper).init(getTrustKeyStoreInformation(cmd));
-                    } else {
-                        keyStoreWrapper = new IdentityKeyStoreWrapper();
-                        //Password for access private key
-                        String keyPass = getArgument(cmd, KEY_PASS, null);
-                        assertEmpty(keyPass, KEY_PASS);
-                        ((IdentityKeyStoreWrapper) keyStoreWrapper).init(
-                                getIdentityKeyStoreInformation(cmd), keyPass);
-                    }
-                    if (isEncrypt) {
-                        encryptionProvider = CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
-                    } else {
-                        decryptionProvider = CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
-                    }
+                    keyStoreWrapper = new IdentityKeyStoreWrapper();
+                    //Password for access private key
+                    String keyPass = getArgument(cmd, KEY_PASS, null);
+                    assertEmpty(keyPass, KEY_PASS);
+                    ((IdentityKeyStoreWrapper) keyStoreWrapper).init(
+                            getIdentityKeyStoreInformation(cmd), keyPass);
+                }
+
+                if (isEncrypt) {
+                    encryptionProvider = CipherFactory.createCipher(cipherInformation,
+                            keyStoreWrapper);
+                } else {
+                    decryptionProvider = CipherFactory.createCipher(cipherInformation,
+                            keyStoreWrapper);
                 }
             }
 
@@ -412,6 +406,34 @@ public final class CipherTool {
             }
         }
         return null;
+    }
+
+    /**
+     * Find the key based on the given command line arguments
+     *
+     * @param cmd               command line arguments
+     * @param cipherInformation cipher information
+     * @return an valid <code>Key</code> if found , otherwise
+     */
+    private static Key findKey(CommandLine cmd, CipherInformation cipherInformation) {
+         // if pass phrase is specified, use simple symmetric en-/decryption
+        String passPhrase = getArgument(cmd, PASSPHRASE, null);
+
+        Key key = null;
+
+        if (passPhrase != null) {
+            key = new SecretKeySpec(passPhrase.getBytes(), cipherInformation.getAlgorithm());
+
+        } else {
+            // Key information must not contain any password
+            // If Key need to be loaded from a file
+            String keyFile = getArgument(cmd, KEY_FILE, null);
+
+            if (keyFile != null) {
+                key = getKey(keyFile);
+            }
+        }
+        return key;
     }
 
     private static void handleException(String msg, Exception e) {

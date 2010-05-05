@@ -80,6 +80,9 @@ public class MessageBuilderTest extends TestCase {
             assertEquals(filterDialect, sub.getFilterDialect());
             assertEquals(filter, sub.getFilterValue());
             assertEquals(date, sub.getExpires().getTime());
+            assertNull(SubscriptionMessageBuilder.getErrorCode());
+            assertNull(SubscriptionMessageBuilder.getErrorReason());
+            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
         } catch (Exception e) {
             fail("Error while constructing the sample subscription request: " + e.getMessage());
         }
@@ -87,28 +90,118 @@ public class MessageBuilderTest extends TestCase {
 
     public void testSubscriptionMessageBuilderScenarioTwo() {
         String addressUrl = "http://synapse.test.com/eventing/subscriptions";
-        String id = UUIDGenerator.getUUID();
 
         String message = "<wse:Unsubscribe xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\"/>";
         try {
             MessageContext msgCtx = TestUtils.getAxis2MessageContext(message, null).
                         getAxis2MessageContext();
             msgCtx.setTo(new EndpointReference(addressUrl));
-            SOAPEnvelope env = msgCtx.getEnvelope();
-            SOAPHeaderBlock header = env.getHeader().addHeaderBlock(
-                    EventingConstants.WSE_EN_IDENTIFIER,
-                    OMAbstractFactory.getSOAP11Factory().
-                            createOMNamespace(EventingConstants.WSE_EVENTING_NS, "wse"));
-            header.setText(id);
+            String id = addIdentifierHeader(msgCtx);
 
             SynapseSubscription sub = SubscriptionMessageBuilder.createUnSubscribeMessage(msgCtx);
             assertEquals(id, sub.getId());
             assertEquals(addressUrl, sub.getAddressUrl());
+            assertNull(SubscriptionMessageBuilder.getErrorCode());
+            assertNull(SubscriptionMessageBuilder.getErrorReason());
+            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
 
         } catch (Exception e) {
             e.printStackTrace();
             fail("Error while constructing the sample subscription request: " + e.getMessage());
         }
+    }
+
+    public void testSubscriptionMessageBuilderScenarioThree() {
+        String addressUrl = "http://synapse.test.com/eventing/subscriptions";
+        Date date = new Date(System.currentTimeMillis() + 3600000);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        String message =
+                "<wse:Renew xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\">\n" +
+                "   <wse:Expires>" + ConverterUtil.convertToString(cal) + "</wse:Expires>\n" +
+                "</wse:Renew>";
+        try {
+            MessageContext msgCtx = TestUtils.getAxis2MessageContext(message, null).
+                        getAxis2MessageContext();
+            msgCtx.setTo(new EndpointReference(addressUrl));
+            String id = addIdentifierHeader(msgCtx);
+
+            SynapseSubscription sub = SubscriptionMessageBuilder.
+                    createRenewSubscribeMessage(msgCtx);
+            assertEquals(id, sub.getId());
+            assertEquals(addressUrl, sub.getAddressUrl());
+            assertEquals(date, sub.getExpires().getTime());
+            assertNull(SubscriptionMessageBuilder.getErrorCode());
+            assertNull(SubscriptionMessageBuilder.getErrorReason());
+            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Error while constructing the sample subscription request: " + e.getMessage());
+        }
+    }
+
+    public void testSubscriptionMessageBuilderScenarioFour() {
+        String addressUrl = "http://synapse.test.com/eventing/subscriptions";
+
+        String message =
+                "<wse:GetStatus xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\"/>";
+        try {
+            MessageContext msgCtx = TestUtils.getAxis2MessageContext(message, null).
+                        getAxis2MessageContext();
+            msgCtx.setTo(new EndpointReference(addressUrl));
+            String id = addIdentifierHeader(msgCtx);
+
+            SynapseSubscription sub = SubscriptionMessageBuilder.createGetStatusMessage(msgCtx);
+            assertEquals(id, sub.getId());
+            assertEquals(addressUrl, sub.getAddressUrl());
+            assertNull(SubscriptionMessageBuilder.getErrorCode());
+            assertNull(SubscriptionMessageBuilder.getErrorReason());
+            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Error while constructing the sample subscription request: " + e.getMessage());
+        }
+    }
+
+    public void testSubscriptionMessageBuilderScenarioFive() {
+        String addressUrl = "http://synapse.test.com/eventing/subscriptions";
+
+        String message =
+                "<wse:Renew xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\">\n" +
+                "   <wse:Expires>2004-06-26T21:07:00.000-08:00</wse:Expires>\n" +
+                "</wse:Renew>";
+        try {
+            MessageContext msgCtx = TestUtils.getAxis2MessageContext(message, null).
+                        getAxis2MessageContext();
+            msgCtx.setTo(new EndpointReference(addressUrl));
+            String id = addIdentifierHeader(msgCtx);
+
+            SynapseSubscription sub = SubscriptionMessageBuilder.
+                    createRenewSubscribeMessage(msgCtx);
+            assertNull(id, sub.getId());
+            assertEquals(addressUrl, sub.getAddressUrl());
+            assertNotNull(SubscriptionMessageBuilder.getErrorCode());
+            assertNotNull(SubscriptionMessageBuilder.getErrorReason());
+            assertNotNull(SubscriptionMessageBuilder.getErrorSubCode());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Error while constructing the sample subscription request: " + e.getMessage());
+        }
+    }
+
+    private String addIdentifierHeader(MessageContext msgCtx) {
+        String id = UUIDGenerator.getUUID();
+        SOAPEnvelope env = msgCtx.getEnvelope();
+        SOAPHeaderBlock header = env.getHeader().addHeaderBlock(
+                EventingConstants.WSE_EN_IDENTIFIER,
+                OMAbstractFactory.getSOAP11Factory().
+                        createOMNamespace(EventingConstants.WSE_EVENTING_NS, "wse"));
+        header.setText(id);
+        return id;
     }
 
 

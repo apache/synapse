@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.nhttp.debug;
 
-import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.RequestLine;
 import org.apache.http.nio.NHttpClientConnection;
@@ -43,7 +42,7 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
 
     private long requestCompletionTime;
     private long responseStartTime;
-    private long responseCompletionTime;
+    private long responseCompletionTime = -1;
     private String responseLine;
 
     private ServerConnectionDebug serverConnectionDebug;
@@ -131,7 +130,8 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
 
         sb.append("S2E-Resp-Start").append(keyValueSeparator).append(format(responseStartTime));
         sb.append(fieldSeparator);
-        sb.append("S2E-Resp-End").append(keyValueSeparator).append(format(responseCompletionTime));
+        sb.append("S2E-Resp-End").append(keyValueSeparator).append(responseCompletionTime != -1 ?
+                format(responseCompletionTime) : "NOT-COMPLETED");
         sb.append(statementSeparator);
 
         sb.append("S2E-Resp-Status").append(keyValueSeparator).append(responseLine);

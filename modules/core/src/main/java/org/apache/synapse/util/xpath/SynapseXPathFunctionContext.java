@@ -77,6 +77,10 @@ public class SynapseXPathFunctionContext implements FunctionContext {
             // function and set it to the xpath
             return new GetPropertyFunction(synCtx);
 
+        } else if (localName != null &&
+                SynapseXPathConstants.BASE64_ENCODE_FUNCTION.equals(localName)) {
+            // create a base64Encode function and set it to the XPath
+            return new Base64EncodeFunction();
         }
 
         // if not the get-property function then try to get it from the parent context

@@ -27,6 +27,9 @@ public final class SynapseXPathConstants {
     /** Get-Property XPath extension function name */
     public static final String GET_PROPERTY_FUNCTION = "get-property";
 
+    /** base64Encode XPath extension function name */
+    public static final String BASE64_ENCODE_FUNCTION = "base64Encode";
+
     /** Body relative XPath variale name for the SOAPBody */
     public static final String SOAP_BODY_VARIABLE = "body";
 

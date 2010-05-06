@@ -33,7 +33,7 @@ public class CloneMediatorSerializationTest extends AbstractTestCase {
         cloneMediatorSerializer = new CloneMediatorSerializer();
     }
 
-    public void testCloneMediatorSerializationSenarioOne() throws Exception {
+    public void testCloneMediatorSerializationScenarioOne() throws Exception {
         String inputXml = "<clone xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
             "continueParent=\"true\"><target sequence=\"sequenceRef1\" " +
             "endpoint=\"endpointRef1\"/><target sequence=\"sequenceRef2\" " +

@@ -34,20 +34,25 @@ public class ClassMediatorSerializationTest extends AbstractTestCase {
         classMediatorSerializer = new ClassMediatorSerializer();
     }
 
-    public void testClassMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<class xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"org.apache.synapse.config.xml.TestMediator\"></class> ";
+    public void testClassMediatorSerializationScenarioOne() throws Exception {
+        String inputXml = "<class xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+                "name=\"org.apache.synapse.config.xml.TestMediator\"></class> ";
         assertTrue(serialization(inputXml, classMediatorFactory, classMediatorSerializer));
         assertTrue(serialization(inputXml, classMediatorSerializer));
     }
 
     public void testClassMediatorSerializationWithProperty() throws Exception {
-        String inputXml = "<class xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"org.apache.synapse.config.xml.TestMediator\"><property name=\"testProp\" value=\"This is a test\"/></class> ";
+        String inputXml = "<class xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+                "name=\"org.apache.synapse.config.xml.TestMediator\"><property name=\"testProp\" " +
+                "value=\"This is a test\"/></class> ";
         assertTrue(serialization(inputXml, classMediatorFactory, classMediatorSerializer));
         assertTrue(serialization(inputXml, classMediatorSerializer));
     }
 
     public void testClassMediatorSerializationWithInlineProperty() throws Exception {
-        String inputXml = "<class xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"org.apache.synapse.config.xml.TestMediator\"><property name=\"testElemProp\"><test/></property></class> ";
+        String inputXml = "<class xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+                "name=\"org.apache.synapse.config.xml.TestMediator\">" +
+                "<property name=\"testElemProp\"><test/></property></class> ";
         assertTrue(serialization(inputXml, classMediatorFactory, classMediatorSerializer));
         assertTrue(serialization(inputXml, classMediatorSerializer));
     }

@@ -59,6 +59,7 @@ public class SynapseEventSourceTest extends TestCase {
     public void testSubscriptionHandling() {
         subscribeTest();
         renewTest();
+        unsubscribeTest();
     }
 
     private void subscribeTest() {
@@ -138,6 +139,28 @@ public class SynapseEventSourceTest extends TestCase {
             assertEquals(FILTER_DIALECT, s.getFilterDialect());
             assertEquals(FILTER, s.getFilterValue());
             assertEquals(date, s.getExpires().getTime());
+        } catch (EventException e) {
+            fail("Eventing exception occured while accessing the subscription manager");
+        }
+
+    }
+
+    public void unsubscribeTest() {
+        String message =
+                "<wse:Unsubscribe xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\"/>";
+
+        try {
+            MessageContext msgCtx = createMessageContext(message, EventingConstants.WSE_UNSUBSCRIBE);
+            QName qname = new QName(EventingConstants.WSE_EVENTING_NS,
+                    EventingConstants.WSE_EN_IDENTIFIER, "wse");
+            TestUtils.addSOAPHeaderBlock(msgCtx, qname, id);
+            source.receive(msgCtx);
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            assertEquals(0, subMan.getSubscriptions().size());
         } catch (EventException e) {
             fail("Eventing exception occured while accessing the subscription manager");
         }

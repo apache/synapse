@@ -31,6 +31,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.wso2.eventing.EventingConstants;
 
+import javax.xml.namespace.QName;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -195,12 +196,9 @@ public class MessageBuilderTest extends TestCase {
 
     private String addIdentifierHeader(MessageContext msgCtx) {
         String id = UUIDGenerator.getUUID();
-        SOAPEnvelope env = msgCtx.getEnvelope();
-        SOAPHeaderBlock header = env.getHeader().addHeaderBlock(
-                EventingConstants.WSE_EN_IDENTIFIER,
-                OMAbstractFactory.getSOAP11Factory().
-                        createOMNamespace(EventingConstants.WSE_EVENTING_NS, "wse"));
-        header.setText(id);
+        QName qname = new QName(EventingConstants.WSE_EVENTING_NS,
+                    EventingConstants.WSE_EN_IDENTIFIER, "wse");
+        TestUtils.addSOAPHeaderBlock(msgCtx, qname, id);
         return id;
     }
 

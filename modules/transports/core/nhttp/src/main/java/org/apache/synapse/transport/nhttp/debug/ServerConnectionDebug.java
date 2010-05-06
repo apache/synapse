@@ -131,21 +131,16 @@ public class ServerConnectionDebug extends AbstractConnectionDebug {
 
         sb.append("Total-Time").append(keyValueSeparator).append(totalTime).append("ms");
         if (clientConnectionDebug != null) {
+            long svcTime = clientConnectionDebug.getResponseCompletionTime()
+                    - clientConnectionDebug.getLastRequestStartTime();
+            svcTime = svcTime < 0 ? clientConnectionDebug.getResponseStartTime()
+                    - clientConnectionDebug.getLastRequestStartTime() : svcTime;
             sb.append(fieldSeparator);
-
-            if (clientConnectionDebug.getResponseCompletionTime() != -1) {
-                long svcTime = clientConnectionDebug.getResponseCompletionTime() -
-                        clientConnectionDebug.getLastRequestStartTime();
-                sb.append("Svc-Time").append(keyValueSeparator).append(svcTime).append("ms");
-                sb.append(fieldSeparator);
-                sb.append("ESB-Time").append(keyValueSeparator).
-                        append(totalTime - svcTime).append("ms");
-                
-            } else {
-                sb.append("Svc-Time").append(keyValueSeparator).append("UNDETERMINED");
-                sb.append(fieldSeparator);
-                sb.append("ESB-Time").append(keyValueSeparator).append("UNDETERMINED");
-            }
+            sb.append("Svc-Time").append(keyValueSeparator).append(svcTime > 0 ?
+                    Long.toString(svcTime) + "ms" : "UNDETERMINED");
+            sb.append(fieldSeparator);
+            sb.append("ESB-Time").append(keyValueSeparator).append(svcTime > 0 ?
+                    Long.toString(totalTime - svcTime) + "ms" : "UNDETERMINED");
         }
 
         return sb.toString();

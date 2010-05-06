@@ -69,13 +69,48 @@ public class LogMediatorSerializationTest extends AbstractTestCase {
 
     }
 
+    public void testLogMediatorSerializationScenarioThree() throws Exception {
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_TRACE),
+                logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_DEBUG),
+                logMediatorFactory, logMediatorSerializer));
+        //assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_INFO), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_WARN),
+                logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_ERROR),
+                logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_FATAL),
+                logMediatorFactory, logMediatorSerializer));
+
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_TRACE),
+                logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_DEBUG),
+                logMediatorSerializer));
+        //assertTrue(serialization(getXmlOfMediatorScenarioThree(INFO), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_WARN),
+                logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_ERROR),
+                logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioThree(LogMediatorFactory.CAT_FATAL),
+                logMediatorSerializer));
+    }
+
     private String getXmlOfMediatorScenarioOne(String level) {
-        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" level=\"" + level + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
+        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" level=\"" +
+                level + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }
 
     private String getXmlOfMediatorScenarioTwo(String level, String seperator) {
-        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" level=\"" + level + "\" separator=\"" + seperator + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
+        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" level=\"" +
+                level + "\" separator=\"" + seperator +
+                "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
+
+    }
+
+    private String getXmlOfMediatorScenarioThree(String category) {
+        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" category=\"" +
+                category + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }
 

@@ -35,6 +35,7 @@ import org.wso2.eventing.EventingConstants;
 import org.wso2.eventing.exceptions.EventException;
 import junit.framework.TestCase;
 
+import javax.xml.namespace.QName;
 import java.util.Date;
 import java.util.Calendar;
 
@@ -42,8 +43,12 @@ public class SynapseEventSourceTest extends TestCase {
 
     private SubscriptionManager subMan;
     private SynapseEventSource source;
+    private String id;
 
     private static final String SUB_MAN_URL = "http://synapse.test.com/eventing/subscriptions";
+    private static final String ADDR_URL = "http://www.other.example.com/OnStormWarning";
+    private static final String FILTER_DIALECT = "http://www.example.org/topicFilter";
+    private static final String FILTER = "weather.storms";
 
     protected void setUp() throws Exception {
         source = new SynapseEventSource("foo");
@@ -53,12 +58,10 @@ public class SynapseEventSourceTest extends TestCase {
 
     public void testSubscriptionHandling() {
         subscribeTest();
+        renewTest();
     }
 
     private void subscribeTest() {
-        String addressUrl = "http://www.other.example.com/OnStormWarning";
-        String filterDialect = "http://www.example.org/topicFilter";
-        String filter = "weather.storms";
         Date date = new Date(System.currentTimeMillis() + 3600000);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -75,7 +78,7 @@ public class SynapseEventSourceTest extends TestCase {
                 "   </wse:EndTo>\n" +
                 "   <wse:Delivery>\n" +
                 "       <wse:NotifyTo>\n" +
-                "         <wsa:Address>" + addressUrl + "</wsa:Address>\n" +
+                "         <wsa:Address>" + ADDR_URL + "</wsa:Address>\n" +
                 "         <wsa:ReferenceProperties>\n" +
                 "             <ew:MySubscription>2597</ew:MySubscription>\n" +
                 "         </wsa:ReferenceProperties>\n" +
@@ -83,13 +86,12 @@ public class SynapseEventSourceTest extends TestCase {
                 "    </wse:Delivery>\n" +
                 "    <wse:Expires>" + ConverterUtil.convertToString(cal) + "</wse:Expires>\n" +
                 "    <wse:Filter xmlns:ow=\"http://www.example.org/oceanwatch\"\n" +
-                "              Dialect=\"" + filterDialect + "\" >" + filter +"</wse:Filter>\n" +
+                "              Dialect=\"" + FILTER_DIALECT + "\" >" + FILTER +"</wse:Filter>\n" +
                 "</wse:Subscribe>";
 
         try {
             MessageContext msgCtx = createMessageContext(message, EventingConstants.WSE_SUBSCRIBE);
             source.receive(msgCtx);
-
         } catch (Exception ignored) {
 
         }
@@ -98,13 +100,48 @@ public class SynapseEventSourceTest extends TestCase {
             assertEquals(1, subMan.getSubscriptions().size());
             SynapseSubscription s = (SynapseSubscription) subMan.getSubscriptions().get(0);
             assertEquals(SUB_MAN_URL, s.getSubManUrl());
-            assertEquals(addressUrl, s.getAddressUrl());
-            assertEquals(filterDialect, s.getFilterDialect());
-            assertEquals(filter, s.getFilterValue());
+            assertEquals(ADDR_URL, s.getAddressUrl());
+            assertEquals(FILTER_DIALECT, s.getFilterDialect());
+            assertEquals(FILTER, s.getFilterValue());
+            assertEquals(date, s.getExpires().getTime());
+            id = s.getId();
+        } catch (EventException e) {
+            fail("Eventing exception occured while accessing the subscription manager");
+        }
+    }
+
+    public void renewTest() {
+        Date date = new Date(System.currentTimeMillis() + 3600000 * 2);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        String message =
+                "<wse:Renew xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\">\n" +
+                "   <wse:Expires>" + ConverterUtil.convertToString(cal) + "</wse:Expires>\n" +
+                "</wse:Renew>";
+
+        try {
+            MessageContext msgCtx = createMessageContext(message, EventingConstants.WSE_RENEW);
+            QName qname = new QName(EventingConstants.WSE_EVENTING_NS,
+                    EventingConstants.WSE_EN_IDENTIFIER, "wse");
+            TestUtils.addSOAPHeaderBlock(msgCtx, qname, id);
+            source.receive(msgCtx);
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            assertEquals(1, subMan.getSubscriptions().size());
+            SynapseSubscription s = (SynapseSubscription) subMan.getSubscription(this.id);
+            assertEquals(SUB_MAN_URL, s.getSubManUrl());
+            assertEquals(ADDR_URL, s.getAddressUrl());
+            assertEquals(FILTER_DIALECT, s.getFilterDialect());
+            assertEquals(FILTER, s.getFilterValue());
             assertEquals(date, s.getExpires().getTime());
         } catch (EventException e) {
             fail("Eventing exception occured while accessing the subscription manager");
         }
+
     }
 
     private MessageContext createMessageContext(String payload, String action) {

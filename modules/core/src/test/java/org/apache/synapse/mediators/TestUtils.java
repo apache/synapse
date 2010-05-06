@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.config.Entry;
@@ -35,6 +36,8 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
+
+import javax.xml.namespace.QName;
 
 public class TestUtils {
 
@@ -118,6 +121,17 @@ public class TestUtils {
 
     public static OMElement createOMElement(String xml) {
         return SynapseConfigUtils.stringToOM(xml);
+    }
+
+    public static void addSOAPHeaderBlock(org.apache.axis2.context.MessageContext msgCtx,
+                                          QName qname, String value) {
+
+        SOAPEnvelope env = msgCtx.getEnvelope();
+        SOAPHeaderBlock header = env.getHeader().addHeaderBlock(
+                qname.getLocalPart(),
+                msgCtx.getEnvelope().getOMFactory().
+                        createOMNamespace(qname.getNamespaceURI(), qname.getPrefix()));
+        header.setText(value);        
     }
 
 }

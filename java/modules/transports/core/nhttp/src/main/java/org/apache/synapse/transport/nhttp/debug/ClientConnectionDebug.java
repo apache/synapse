@@ -104,6 +104,10 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
         return responseCompletionTime;
     }
 
+    public long getResponseStartTime() {
+        return responseStartTime;
+    }
+
     public String dump() {
         StringBuffer sb = new StringBuffer(25);
 

@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.nhttp.debug;
 
-import org.apache.http.Header;
 import org.apache.http.HttpInetConnection;
 import org.apache.http.HttpRequest;
 import org.apache.http.RequestLine;
@@ -132,11 +131,21 @@ public class ServerConnectionDebug extends AbstractConnectionDebug {
 
         sb.append("Total-Time").append(keyValueSeparator).append(totalTime).append("ms");
         if (clientConnectionDebug != null) {
-            long svcTime = clientConnectionDebug.getResponseCompletionTime() - clientConnectionDebug.getLastRequestStartTime();
             sb.append(fieldSeparator);
-            sb.append("Svc-Time").append(keyValueSeparator).append(svcTime).append("ms");
-            sb.append(fieldSeparator);
-            sb.append("ESB-Time").append(keyValueSeparator).append(totalTime - svcTime).append("ms");
+
+            if (clientConnectionDebug.getResponseCompletionTime() != -1) {
+                long svcTime = clientConnectionDebug.getResponseCompletionTime() -
+                        clientConnectionDebug.getLastRequestStartTime();
+                sb.append("Svc-Time").append(keyValueSeparator).append(svcTime).append("ms");
+                sb.append(fieldSeparator);
+                sb.append("ESB-Time").append(keyValueSeparator).
+                        append(totalTime - svcTime).append("ms");
+                
+            } else {
+                sb.append("Svc-Time").append(keyValueSeparator).append("UNDETERMINED");
+                sb.append(fieldSeparator);
+                sb.append("ESB-Time").append(keyValueSeparator).append("UNDETERMINED");
+            }
         }
 
         return sb.toString();

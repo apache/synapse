@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.List;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Implements the XPath extension function synapse:base64Encode(string)
@@ -36,6 +37,8 @@ public class Base64EncodeFunction implements Function {
     private static final Log log = LogFactory.getLog(Base64EncodeFunction.class);
 
     public static final String NULL_STRING = "";
+
+    private static final String DEFAULT_CHARSET = "UTF-8";
 
     /**
      * Returns the base64 encoded string value of the first argument.
@@ -60,24 +63,16 @@ public class Base64EncodeFunction implements Function {
             // get the first argument, it can be a function returning a string as well
             String value = StringFunction.evaluate(args.get(0), context.getNavigator());
 
-            if (value == null || "".equals(value)) {
-                if (debugOn) {
-                    log.debug("Non emprty string value should be provided for encoding");
-                }
+            // use the default UTF-8 encoding
+            return encode(debugOn, DEFAULT_CHARSET, value);
+        } else if (size == 2) {
+            // get the first argument, it can be a function returning a string as well
+            String value = StringFunction.evaluate(args.get(0), context.getNavigator());
 
-                return NULL_STRING;
-            }
-
-            // convert the first argument to a base64 encoded value
-            byte[] encodedValue = new Base64().encode(value.getBytes());
-            String encodedString = new String(encodedValue);
-
-            if (debugOn) {
-                log.debug("Converted string: " + value +
-                        "to base64 encoded value: " + encodedString);
-            }
-
-            return encodedString;
+            // encoding is in the second argument
+            String encoding = StringFunction.evaluate(args.get(1), context.getNavigator());
+            
+            return encode(debugOn, encoding, value);
         } else {
             if (debugOn) {
                 log.debug("base64Encode function expects only one argument, returning empty string");
@@ -85,5 +80,41 @@ public class Base64EncodeFunction implements Function {
         }
         // return empty string if the arguments are wrong
         return NULL_STRING;
+    }
+
+    private Object encode(boolean debugOn, String encoding, String value)
+            throws FunctionCallException {
+        if (value == null || "".equals(value)) {
+            if (debugOn) {
+                log.debug("Non emprty string value should be provided for encoding");
+            }
+
+            return NULL_STRING;
+        }
+
+        byte[] encodedValue;
+        try {
+            encodedValue = new Base64().encode(value.getBytes(encoding));
+        } catch (UnsupportedEncodingException e) {
+            String msg = "Unsupported Encoding";
+            log.error(msg, e);
+            throw new FunctionCallException(msg, e);
+        }
+
+        String encodedString;
+        try {
+            encodedString = new String(encodedValue, encoding);
+        } catch (UnsupportedEncodingException e) {
+            String msg = "Unsupported Encoding";
+            log.error(msg, e);
+            throw new FunctionCallException(msg, e);
+        }
+
+        if (debugOn) {
+            log.debug("Converted string: " + value + " with encoding: " + encoding +
+                    " to base64 encoded value: " + encodedString);
+        }
+
+        return encodedString;
     }
 }

@@ -42,8 +42,12 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         fac = OMAbstractFactory.getOMFactory();
         OMElement endpointElement
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
-
+        
         WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) endpoint;
+
+        // serialize the parameters
+        serializeProperties(wsdlEndpoint, endpointElement);
+
         String name = wsdlEndpoint.getName();
         boolean anon = wsdlEndpoint.isAnonymous();
         if (name != null && !anon) {

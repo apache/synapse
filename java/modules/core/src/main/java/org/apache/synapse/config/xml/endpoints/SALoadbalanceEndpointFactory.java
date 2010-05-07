@@ -118,6 +118,9 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
                     createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
             loadbalanceEndpoint.setAlgorithm(algorithm);
 
+            // process the parameters
+            processProperties(loadbalanceEndpoint, epConfig);
+
             return loadbalanceEndpoint;
         }
 

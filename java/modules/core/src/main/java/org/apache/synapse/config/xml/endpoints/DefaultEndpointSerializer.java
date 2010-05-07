@@ -54,6 +54,9 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
         OMElement defaultElement = serializeEndpointDefinition(epAddress);
         endpointElement.addChild(defaultElement);
 
+        // serialize the properties
+        serializeProperties(defaultEndpoint, endpointElement);
+
         return endpointElement;
     }
 

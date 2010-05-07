@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.ResolvingEndpoint;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
@@ -47,6 +46,9 @@ public class ResolvingEndpointSerializer extends EndpointSerializer {
         if (resolvingEndpoint.getName() != null && !resolvingEndpoint.isAnonymous()) {
             endpointElement.addAttribute("name", resolvingEndpoint.getName(), null);
         }
+
+        // serialize the parameters
+        serializeProperties(resolvingEndpoint, endpointElement);
 
         return endpointElement;
     }

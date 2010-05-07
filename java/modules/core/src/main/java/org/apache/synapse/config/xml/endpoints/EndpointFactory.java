@@ -28,16 +28,21 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.MediatorPropertyFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.PropertyInclude;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.util.UUIDGenerator;
+
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.List;
 
 /**
  * All endpoint factories should extend from this abstract class. Use EndpointFactory to obtain the
@@ -499,6 +504,21 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         }
 
         return endpoints;
+    }
+
+    /**
+     * Helper method to extract endpoint properties.
+     *
+     * @param endpoint actual endpoint to set the properties
+     * @param endpointElement actual endpoint element
+     */
+    protected void processProperties(PropertyInclude endpoint, OMElement endpointElement) {
+        List<MediatorProperty> properties =
+                MediatorPropertyFactory.getMediatorProperties(endpointElement);
+
+        if (properties != null && properties.size() > 0) {
+            endpoint.addProperties(properties);
+        }
     }
 
     protected static void handleException(String msg) {

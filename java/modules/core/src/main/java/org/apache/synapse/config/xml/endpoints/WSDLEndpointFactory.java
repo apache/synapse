@@ -86,6 +86,8 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
             wsdlEndpoint.setName(name.getAttributeValue());
         }
 
+        processProperties(wsdlEndpoint, epConfig);
+
         OMElement wsdlElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
         if (wsdlElement != null) {
@@ -169,6 +171,9 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                 handleException("WSDL is not specified for WSDL endpoint.");
             }
         }
+
+        // process the parameters
+        processProperties(wsdlEndpoint, epConfig);
 
         return wsdlEndpoint;
     }

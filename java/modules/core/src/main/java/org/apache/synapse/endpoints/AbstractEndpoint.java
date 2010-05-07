@@ -26,6 +26,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
@@ -34,13 +35,12 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * An abstract base class for all Endpoint implementations
  */
-public abstract class AbstractEndpoint extends FaultHandler implements Endpoint {
+public abstract class AbstractEndpoint extends FaultHandler implements Endpoint, PropertyInclude {
 
     protected Log log;
     protected static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
@@ -71,6 +71,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
 
     /** The name of the file where this endpoint is defined */
     protected String fileName;
+
+    /** Map for storing configuration parameters */
+    private Map<String, MediatorProperty> properties = new HashMap<String, MediatorProperty>();
 
     protected boolean anonymous = false;
 
@@ -469,5 +472,58 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint 
     public void destroy() {
         MBeanRegistrar.getInstance().unRegisterMBean("Endpoint", endpointName);
         this.initialized = false;
+    }
+
+    /**
+     * Add a property to the endpoint.
+      * @param property property to be added
+     */
+    public void addProperty(MediatorProperty property) {        
+        properties.put(property.getName(), property);
+    }
+
+    /**
+     * Get a property with the given name
+     * @param name name of the property
+     *
+     * @return a property with the given name
+     */
+    public MediatorProperty getProperty(String name) {
+        MediatorProperty value = properties.get(name);
+        if (value == null) {
+            if (getParentEndpoint() instanceof PropertyInclude) {
+                value = ((PropertyInclude)getParentEndpoint()).getProperty(name);
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Return the <code>Collection</code> of properties specified
+     * 
+     * @return <code>Collection</code> of properties
+     */
+    public Collection<MediatorProperty> getProperties() {
+        return properties.values();
+    }
+
+    /**
+     * Remove a property with the given name
+     * @param name name of the property to be removed
+     *
+     * @return the remove property or <code>null</code> if a property doesn't exists
+     */
+    public MediatorProperty removeProperty(String name) {
+        return properties.remove(name);
+    }
+
+    /**
+     * Add all the properties to the endpoint
+     * @param mediatorProperties <code>Collection</code> of properties to be added 
+     */
+    public void addProperties(Collection<MediatorProperty> mediatorProperties) {
+        for (MediatorProperty property : mediatorProperties) {
+            properties.put(property.getName(), property);
+        }
     }
 }

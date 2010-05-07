@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.ResolvingEndpoint;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.axiom.om.OMElement;
@@ -45,8 +44,7 @@ public class ResolvingEndpointFactory extends EndpointFactory {
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
-        ResolvingEndpoint resolvingEndpoint = new ResolvingEndpoint();
-        String ref = epConfig.getAttributeValue(ATTR_KEY_EXPRESSION);
+        ResolvingEndpoint resolvingEndpoint = new ResolvingEndpoint();       
         String name = epConfig.getAttributeValue(new QName("name"));
         if (name != null) {
             resolvingEndpoint.setName(name);
@@ -58,6 +56,10 @@ public class ResolvingEndpointFactory extends EndpointFactory {
             handleException("Couldn't build the ResolvingEndpoint, unable to set " +
                     "the key-expression XPath", e);
         }
+
+        // process the parameters
+        processProperties(resolvingEndpoint, epConfig);
+
         return resolvingEndpoint;
     }
 }

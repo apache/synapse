@@ -25,10 +25,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.PropertyInclude;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.MediatorPropertySerializer;
 import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.EndpointDefinition;
+
+import java.util.Collection;
 
 /**
  * All endpoint serializers should implement this interface. Use EndpointSerializer to
@@ -295,5 +300,12 @@ public abstract class EndpointSerializer {
 
         throw new SynapseException("Serializer for endpoint " +
                 endpoint.getClass().toString() + " is not defined.");
+    }
+
+    protected void serializeProperties(PropertyInclude endpoint, OMElement element) {
+        Collection<MediatorProperty> properties = endpoint.getProperties();
+        if (properties != null && properties.size() > 0) {
+            MediatorPropertySerializer.serializeMediatorProperties(element, properties);
+        }
     }
 }

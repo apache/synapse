@@ -87,6 +87,8 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
             processAuditStatus(definition, addressEndpoint.getName(), addressElement);
         }
 
+        processProperties(addressEndpoint, epConfig);
+
         return addressEndpoint;
     }
 

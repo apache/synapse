@@ -34,7 +34,6 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Creates {@link LoadbalanceEndpoint} using an XML configuration.
@@ -131,6 +130,9 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
             if (failover != null && failover.equalsIgnoreCase("false")) {
                 loadbalanceEndpoint.setFailover(false);
             }
+
+            // process the parameters
+            processProperties(loadbalanceEndpoint, epConfig);
 
             return loadbalanceEndpoint;
         }

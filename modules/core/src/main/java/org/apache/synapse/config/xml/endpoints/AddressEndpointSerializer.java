@@ -45,6 +45,10 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) endpoint;
+
+        // serialize the properties
+        serializeProperties(addressEndpoint, endpointElement);
+
         String name = addressEndpoint.getName();
         boolean anon = addressEndpoint.isAnonymous();
         if (name != null && !anon) {

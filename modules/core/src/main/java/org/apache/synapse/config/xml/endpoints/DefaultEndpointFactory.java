@@ -85,6 +85,9 @@ public class DefaultEndpointFactory extends EndpointFactory {
             defaultEndpoint.setDefinition(endpoint);
             processAuditStatus(endpoint, defaultEndpoint.getName(),defaultElement);
         }
+
+        processProperties(defaultEndpoint, epConfig);
+        
         return defaultEndpoint;
     }
 
@@ -155,5 +158,5 @@ public class DefaultEndpointFactory extends EndpointFactory {
                 }
             }
         }
-    }
+    }   
 }

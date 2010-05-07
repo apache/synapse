@@ -55,6 +55,8 @@ public class DynamicLoadbalanceEndpointSerializer extends EndpointSerializer {
 
         DynamicLoadbalanceEndpoint dynamicLoadbalanceEndpoint = (DynamicLoadbalanceEndpoint) endpoint;
 
+        // serialize the parameters
+        serializeProperties(dynamicLoadbalanceEndpoint, endpointElement);
 
         String name = dynamicLoadbalanceEndpoint.getName();
         boolean anon = dynamicLoadbalanceEndpoint.isAnonymous();
@@ -84,7 +86,7 @@ public class DynamicLoadbalanceEndpointSerializer extends EndpointSerializer {
         membershipHandlerElement.addAttribute("class",loadBalanceMembershipHandler.getClass().getName(),null);
 
         Properties membershipHandlerProperties = loadBalanceMembershipHandler.getProperties();
-        OMElement propertyElement = null;
+        OMElement propertyElement;
         for (Object property : membershipHandlerProperties.keySet()){
             propertyElement = fac.createOMElement("property", SynapseConstants.SYNAPSE_OMNAMESPACE);
             membershipHandlerElement.addChild(propertyElement);

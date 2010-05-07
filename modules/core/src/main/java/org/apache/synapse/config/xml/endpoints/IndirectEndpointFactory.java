@@ -51,6 +51,10 @@ public class IndirectEndpointFactory extends EndpointFactory {
             indirectEndpoint.setName(name);
         }
         indirectEndpoint.setKey(ref);
+
+        // process the parameters
+        processProperties(indirectEndpoint, epConfig);
+
         return indirectEndpoint;
     }
 }

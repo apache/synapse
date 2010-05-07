@@ -23,10 +23,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clustering.Member;
 import org.apache.http.protocol.HTTP;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.*;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -78,6 +75,25 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
             if (algorithmContext == null) {
                 algorithmContext = new AlgorithmContext(isClusteringEnabled, cc, getName());
             }
+
+            // if the loadbalancing algorithm implements the ManagedLifecycle interface
+            // initlize the algorithm
+            if (algorithm != null && algorithm instanceof ManagedLifecycle) {
+                ManagedLifecycle lifecycle = (ManagedLifecycle) algorithm;
+                lifecycle.init(synapseEnvironment);
+            }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+
+        // if the loadbalancing algorithm implements the ManagedLifecycle interface
+        // destroy the algorithm
+        if (algorithm != null && algorithm instanceof ManagedLifecycle) {
+            ManagedLifecycle lifecycle = (ManagedLifecycle) algorithm;
+            lifecycle.destroy();
         }
     }
 

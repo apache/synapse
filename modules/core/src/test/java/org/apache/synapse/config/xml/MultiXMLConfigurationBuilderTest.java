@@ -24,6 +24,8 @@ import junit.framework.TestCase;
 import java.net.URL;
 
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.axis2.util.JavaUtils;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -40,14 +42,24 @@ public class MultiXMLConfigurationBuilderTest extends TestCase {
 
             assertNotNull(synapseConfig.getDefinedSequences().get("main"));
             assertNotNull(synapseConfig.getDefinedSequences().get("fault"));
-            assertNotNull(synapseConfig.getDefinedSequences().get("foo"));
+            SequenceMediator foo = synapseConfig.getDefinedSequences().get("foo");
+            SequenceMediator seq1 = synapseConfig.getDefinedSequences().get("synapse_xml_seq1");
+            assertNotNull(foo);
+            assertNotNull(seq1);
+            assertEquals("foo.xml", foo.getFileName());
+            assertNull(seq1.getFileName());
             assertNull(synapseConfig.getDefinedSequences().get("bar"));
-
+                        
             assertNotNull(synapseConfig.getDefinedEndpoints().get("epr1"));
+            assertNotNull(synapseConfig.getDefinedEndpoints().get("synapse_xml_epr1"));
 
             assertNotNull(synapseConfig.getProxyService("proxy1"));
 
             assertNotNull(synapseConfig.getStartup("task1"));
+
+            assertNotNull(synapseConfig.getRegistry());
+            assertTrue(JavaUtils.isTrueExplicitly(synapseConfig.getProperty(
+                    MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION)));
             
         } catch (XMLStreamException e) {
             fail("Error while parsing a configuration file: " + e.getMessage());

@@ -25,8 +25,6 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
-import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
-import org.apache.synapse.endpoints.algorithms.RoundRobin;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
@@ -51,7 +49,9 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
         fac = OMAbstractFactory.getOMFactory();
         OMElement endpointElement
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
-
+        // serialize the parameters
+        serializeProperties(loadbalanceEndpoint, endpointElement);
+        
         String name = loadbalanceEndpoint.getName();
         boolean anon = loadbalanceEndpoint.isAnonymous();
         if (name != null && !anon) {

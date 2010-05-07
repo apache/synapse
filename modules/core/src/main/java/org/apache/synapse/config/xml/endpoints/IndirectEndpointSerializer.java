@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 
@@ -47,6 +46,9 @@ public class IndirectEndpointSerializer extends EndpointSerializer {
         if (ref != null) {
             endpointElement.addAttribute("key", ref, null);
         }
+
+        // serialize the parameters
+        serializeProperties(indirectEndpoint, endpointElement);
 
         return endpointElement;
     }

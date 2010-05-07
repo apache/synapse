@@ -126,6 +126,8 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                 }
             }
 
+            processProperties(loadbalanceEndpoint, epConfig);
+
             return loadbalanceEndpoint;
         }
         return null;

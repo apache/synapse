@@ -36,6 +36,11 @@ public class EvaluatorContext {
 
     private Map<String, String> params;
 
+    /**
+     * Creates the Evalutor context with the URL and the set of HTTP headers
+     * @param url url
+     * @param headers HTTP header as a Name, Value map
+     */
     public EvaluatorContext(String url, Map<String, String> headers) {
         this.url = url;
         this.headers = headers;

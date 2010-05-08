@@ -20,6 +20,10 @@
 
 package org.apache.synapse.commons.evaluators;
 
+/**
+ * An Exception used by Evaluators to signal configuration errors as
+ * well as execution errors.
+ */
 public class EvaluatorException extends Exception {
 
     public EvaluatorException(String message, Throwable cause) {

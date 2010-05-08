@@ -27,13 +27,13 @@ import java.util.regex.Matcher;
 import java.io.UnsupportedEncodingException;
 
 /**
- * This evaluator uses regular expressions to match a given HTTP request.
+ * This evaluator uses regular expressions to match a given HTTP request.</p>
  *
  * <pre>
  * &lt;match type=&quot;header | param | url&quot; source=&quot;&quot; regex=&quot;&quot;/&gt;
  * </pre>
- *
- * The source is used to extract the HTTP header or URL param
+ * <p>
+ * The source is used to extract the HTTP header or URL param</p>
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class MatchEvaluator implements Evaluator {

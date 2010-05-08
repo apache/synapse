@@ -96,7 +96,11 @@ public class Parser {
         return defaultPriority;
     }
 
-    public void setRules(Condition[] conditions) {
+    /**
+     * Set the Conditions
+     * @param conditions <code>array</code> of conditions
+     */
+    public void setConditions(Condition[] conditions) {
         this.conditions = conditions;
     }
 

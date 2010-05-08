@@ -105,7 +105,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private List<String> knownDirectHosts = new ArrayList<String>();
     /** The list of known hosts to go via proxy */
     private List<String> knownProxyHosts = new ArrayList<String>();
-
+    /** Weather User-Agent header coming from client should be preserved */
+    private boolean preserveUserAgentHeader = false;
+    /** Weather Server header coming from server should be preserved */
+    private boolean preserveServerHeader = true;
     /**
      * Initialize the transport sender, and execute reactor in new seperate thread
      * @param cfgCtx the Axis2 configuration context
@@ -153,6 +156,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             String[] warnOnHttp500 = ((String) param.getValue()).split("\\|");
             cfgCtx.setNonReplicableProperty("warnOnHTTP500", warnOnHttp500);
         }
+
+        preserveUserAgentHeader = NHttpConfiguration.getInstance().isPreserveUserAgentHeader();
+        preserveServerHeader = NHttpConfiguration.getInstance().isPreserveServerHeader();
 
         HttpParams params = getClientParameters();
         try {
@@ -330,10 +336,16 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
                 HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
                 HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
-                HTTP.SERVER_HEADER.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
-                HTTP.CONTENT_LEN.equalsIgnoreCase(headerName) ||
-                HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {
+                HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)) {
+                iter.remove();
+            }
+
+            if (!preserveServerHeader && HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)) {
+                iter.remove();
+            }
+
+            if (!preserveUserAgentHeader && HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {
                 iter.remove();
             }
         }

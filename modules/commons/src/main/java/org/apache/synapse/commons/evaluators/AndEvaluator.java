@@ -21,7 +21,9 @@ package org.apache.synapse.commons.evaluators;
 
 /**
  * This encapsulates two or more boolean conditions. This acts as the "and"
- * boolean operator.   
+ * boolean operator. This evaluates all the boolean expressions and return
+ * the Boolean AND of those expressions.</p>
+ *  
  * <pre>
  * &lt;and&gt;
  *     two or more evaluators

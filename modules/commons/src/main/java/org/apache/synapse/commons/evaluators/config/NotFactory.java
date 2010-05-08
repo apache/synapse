@@ -27,7 +27,15 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
+/**
+ * This Factory creates a <code>NotEvaluator</code> from the following XML configuration.</p>   
+ *
+ * <pre>
+ * &lt;not&gt;
+ *     one evaluator
+ * &lt;/not&gt;
+ * </pre>
+ */
 public class NotFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(NotFactory.class);
 

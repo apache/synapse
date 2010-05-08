@@ -32,6 +32,13 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 import java.util.regex.Pattern;
 
+/**
+ * This Factory creates a <code>MatchEvaluator</code> using the following XML configuration.</p>
+ *
+ * <pre>
+ * &lt;match type=&quot;header | param | url&quot; source=&quot;&quot; regex=&quot;&quot;/&gt;
+ * </pre>
+ */
 public class MatchFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(MatchFactory.class);
 

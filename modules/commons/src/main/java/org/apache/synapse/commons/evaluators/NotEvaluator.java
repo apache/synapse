@@ -20,7 +20,8 @@
 package org.apache.synapse.commons.evaluators;
 
 /**
- * This encapsulates boolean condition. This acts as not boolean operator.   
+ * This encapsulates a boolean expression. This acts as not boolean operator.
+ * It executes the boolean expression inside and return the NOT of this expression.</p>   
  *
  * <pre>
  * &lt;not&gt;

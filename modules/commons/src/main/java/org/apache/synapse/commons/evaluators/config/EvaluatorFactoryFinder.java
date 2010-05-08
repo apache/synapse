@@ -29,8 +29,12 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * Factories for Evaluators are found using the evaluator name. This class stores
+ * information about Evaluator Factories and their corresponding names. This class
+ * is a Singleton class.
+ */
 public class EvaluatorFactoryFinder {
-
     private static final Log log = LogFactory.getLog(EvaluatorFactoryFinder.class);
 
     private static final EvaluatorFactoryFinder finder = new EvaluatorFactoryFinder();
@@ -45,14 +49,30 @@ public class EvaluatorFactoryFinder {
         factories.put(EvaluatorConstants.EQUAL, new EqualFactory());
     }
 
+    /**
+     * Return and instance of the <code>EvaluatorFactoryFinder</code>.
+     * @return the EvaluatorFactoryFinder singleton
+     */
     public static EvaluatorFactoryFinder getInstance() {
         return finder;
     }
 
+    /**
+     * Retun an <code>EvaluatorFactory</code> for a given Evaluator name.
+     * @param name name of the Evaluator
+     * @return an EvaluatorFactory
+     */
     public EvaluatorFactory findEvaluatorFactory(String name) {
         return factories.get(name);
     }
 
+    /**
+     * Retun an <code>EvaluatorFactory</code> for a given Evaluator name.
+     * @param elem A XML element containing the evaluator configuration
+     * @return an Evaluator
+     * @throws org.apache.synapse.commons.evaluators.EvaluatorException if it cannot find
+     * a corresponding factory for creating an evaluator
+     */
     public Evaluator getEvaluator(OMElement elem) throws EvaluatorException {
         
         EvaluatorFactory fac = findEvaluatorFactory(elem.getLocalName());
@@ -69,5 +89,4 @@ public class EvaluatorFactoryFinder {
         log.error(message);
         throw new EvaluatorException(message);
     }
-
 }

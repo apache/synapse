@@ -30,6 +30,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * <p>This factory creates a <code>AndEvaluator</code>. This factory expects the
+ * following XML configuration to create the AndEvaluator.</p>
+ * <pre>
+ * &lt;and&gt;
+ *     two or more evaluators
+ * &lt;and&gt;
+ * </pre>
+ */
+
 public class AndFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(AndFactory.class);
 

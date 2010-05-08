@@ -19,12 +19,20 @@
 
 package org.apache.synapse.commons.evaluators.config;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
+import org.apache.synapse.commons.evaluators.EvaluatorException;
 
 import java.util.Map;
 import java.util.HashMap;
 
-public class EvaluatorFactoryFinder {       
+public class EvaluatorFactoryFinder {
+
+    private static final Log log = LogFactory.getLog(EvaluatorFactoryFinder.class);
+
     private static final EvaluatorFactoryFinder finder = new EvaluatorFactoryFinder();
 
     private Map<String, EvaluatorFactory> factories = new HashMap<String, EvaluatorFactory>();
@@ -43,6 +51,23 @@ public class EvaluatorFactoryFinder {
 
     public EvaluatorFactory findEvaluatorFactory(String name) {
         return factories.get(name);
+    }
+
+    public Evaluator getEvaluator(OMElement elem) throws EvaluatorException {
+        
+        EvaluatorFactory fac = findEvaluatorFactory(elem.getLocalName());
+        if (fac == null) {
+            handleException("Invalid configuration element: " + elem.getLocalName());
+        } else {
+            return fac.create(elem);
+        }
+
+        return null;
+    }
+
+    private void handleException(String message) throws EvaluatorException {
+        log.error(message);
+        throw new EvaluatorException(message);
     }
 
 }

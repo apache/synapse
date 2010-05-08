@@ -65,6 +65,16 @@ public class NhttpConstants {
     /** The message context property name which holds the exception (if any) for the last encountered exception */
     public static final String ERROR_EXCEPTION = "ERROR_EXCEPTION";
 
+    /** Defines weather synapse needs to preserve the original User-Agent header. Configures
+     * through nhttp.properties file or via a system property
+     * */
+    public static final String USER_AGENT_HEADER_PRESERVE = "http.user.agent.preserve";
+
+    /** Defines weather synapse needs to preserve the original Server header. Configures
+     * through nhttp.properties file or via a system property
+     * */
+    public static final String SERVER_HEADER_PRESERVE = "http.server.preserve"; 
+
     /** Denotes a connection close is forced if set at the NhttpContext */
     public static final String FORCE_CLOSING = "forceClosing";
     /** Denotes a message is being processed by the current connection if this is set at the context */

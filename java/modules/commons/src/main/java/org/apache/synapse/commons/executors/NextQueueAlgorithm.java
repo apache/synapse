@@ -22,7 +22,7 @@ package org.apache.synapse.commons.executors;
 import java.util.List;
 
 /**
- * This interface abstracts the algorith for determining the next internal
+ * This interface abstracts the algorithm for determining the next internal
  * queue for picking up the message. This class is created once and initialized.
  * This class should capture any runtime information about the queues since the
  * MultiPriorityBlockingQueue doesn't hold any runtime state information about

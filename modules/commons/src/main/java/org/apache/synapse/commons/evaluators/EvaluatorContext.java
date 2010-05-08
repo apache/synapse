@@ -41,18 +41,36 @@ public class EvaluatorContext {
         this.headers = headers;
     }
 
+    /**
+     * Get the complete URL
+     * @return URL
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * Get all the HTTP headers
+     * @return all the HTTP headers as name value pairs
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * Get all the HTTP parameters
+     * @return all the HTTP parameter as Name Value pairs
+     */
     public Map<String, String> getParams() {
         return params;
     }
 
+    /**
+     * Return the value of a HTTP parameter
+     * @param name name of the parameter
+     * @return value of the parameter
+     * @throws UnsupportedEncodingException if cannot decode the URLs
+     */
     public String getParam(String name) throws UnsupportedEncodingException {
         if (params == null) {
             // build the params
@@ -81,18 +99,35 @@ public class EvaluatorContext {
         return params.get(name);
     }
 
+    /**
+     * Get the HTTP header value for the Header name
+     * @param name name of the header
+     * @return header value
+     */
     public String getHeader(String name) {
-        return headers.get(name);        
+        return headers.get(name);
     }
 
+    /**
+     * Set the URL
+     * @param url to be set
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /**
+     * Set the headers
+     * @param headers as a HeaderName, HeaderValue pair map
+     */
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
+    /**
+     * Set all the HTTP URL parameters
+     * @param params as a ParameterName, ParameterValue pair map
+     */
     public void setParams(Map<String, String> params) {
         this.params = params;
     }

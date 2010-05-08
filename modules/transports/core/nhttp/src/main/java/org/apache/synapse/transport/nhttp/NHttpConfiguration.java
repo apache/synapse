@@ -122,6 +122,14 @@ public final class NHttpConfiguration {
         return getProperty(NhttpConstants.DISABLE_KEEPALIVE, 0) == 1;
     }
 
+    public boolean isPreserveUserAgentHeader() {
+        return getBooleanValue(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false);
+    }
+
+    public boolean isPreserveServerHeader() {
+        return getBooleanValue(NhttpConstants.SERVER_HEADER_PRESERVE, true);
+    }
+
     /**
      * Get properties that tune nhttp transport. Preference to system properties
      * @param name name of the system/config property

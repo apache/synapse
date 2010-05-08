@@ -20,8 +20,9 @@
 package org.apache.synapse.commons.evaluators;
 
 /**
- * This encapsulates two or more boolean conditions. This acts as the "or"
- * boolean operator.
+ * This encapsulates two or more boolean expressions. This acts as the "or"
+ * boolean operator. It executes all the boolean expressions and apply the boolean
+ * OR operator and return the result of this boolean operation.</p> 
  *
  * <pre>
  * &lt;or&gt;

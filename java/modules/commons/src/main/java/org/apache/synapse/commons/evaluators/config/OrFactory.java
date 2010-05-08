@@ -31,6 +31,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * This factory creates a <code>OrFactory</code> using the following XML configuration.</p>
+ *
+ * <pre>
+ * &lt;or&gt;
+ *     two or more evaluators
+ * &lt;/or&gt;
+ * </pre>
+ */
 public class OrFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(OrFactory.class);
 

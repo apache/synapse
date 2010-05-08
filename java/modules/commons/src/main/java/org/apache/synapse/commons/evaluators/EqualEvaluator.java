@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Try to see weather a part of the HTTP request is equal to the value provided.
- * If the values are equal retun true
+ * If the values are equal retun true.</p>
  * <pre>
  * &lt;equal type=&quot;header | param | url&quot; source=&quot;&quot; value=&quot;&quot;/&gt;
  * </pre>

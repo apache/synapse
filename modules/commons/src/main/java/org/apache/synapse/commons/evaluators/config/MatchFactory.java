@@ -63,12 +63,15 @@ public class MatchFactory implements EvaluatorFactory {
         equal.setType(type);
 
         OMAttribute sourceAttr = e.getAttribute(new QName(EvaluatorConstants.SOURCE));
-        if (type != 1 && sourceAttr == null) {
-            handleException(EvaluatorConstants.SOURCE + " attribute is required");
-            return null;
+        if (sourceAttr == null) {
+            if (type != 1) {
+                handleException(EvaluatorConstants.SOURCE + " attribute is required");
+                return null;
+            }
+        } else {
+            equal.setSource(sourceAttr.getAttributeValue());
         }
 
-        equal.setSource(sourceAttr.getAttributeValue());
 
         OMAttribute regExAttr = e.getAttribute(new QName(EvaluatorConstants.REGEX));
         if (regExAttr == null) {

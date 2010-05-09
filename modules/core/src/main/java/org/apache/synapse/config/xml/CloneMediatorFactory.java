@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.eip.splitter.CloneMediator;
 
@@ -28,7 +29,7 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
- * The &lt;clone&gt; element is used to copy messages in Synapse to simillar messages but with
+ * The &lt;clone&gt; element is used to copy messages in Synapse to similar messages but with
  * different message contexts and mediated using the specified targets
  *
  * <pre>
@@ -50,9 +51,11 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
     /**
      * This will hold the QName of the clone mediator element in the xml configuration
      */
-    private static final QName CLONE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "clone");
-    private static final QName ATT_CONTPAR = new QName("continueParent");
-    private static final QName TARGET_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
+    private static final QName CLONE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "clone");
+    private static final QName ATT_CONTINUE_PARENT = new QName("continueParent");
+    private static final QName TARGET_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
 
     /**
      * This method implements the createMediator method of the MediatorFactory interface
@@ -66,10 +69,9 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
         CloneMediator mediator = new CloneMediator();
         processAuditStatus(mediator, elem);
         
-        OMAttribute continueParent = elem.getAttribute(ATT_CONTPAR);
+        OMAttribute continueParent = elem.getAttribute(ATT_CONTINUE_PARENT);
         if (continueParent != null) {
-            mediator.setContinueParent(
-                    Boolean.valueOf(continueParent.getAttributeValue()).booleanValue());
+            mediator.setContinueParent(JavaUtils.isTrueExplicitly(continueParent.getAttributeValue()));
         }
 
         Iterator targetElements = elem.getChildrenWithName(TARGET_Q);
@@ -83,7 +85,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
     /**
      * This method will implement the getTagQName method of the MediatorFactory interface
      *
-     * @return QName of the clone element in xml configuraiton
+     * @return QName of the clone element in xml configuration
      */
     public QName getTagQName() {
         return CLONE_Q;

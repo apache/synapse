@@ -131,7 +131,7 @@ public final class CipherTool {
             String source = getArgument(cmd, SOURCE_IN_LINED, null);
             assertEmpty(source, SOURCE_IN_LINED);
 
-            Key key = findKey(cmd,cipherInformation);
+            Key key = findKey(cmd, cipherInformation);
 
             boolean isEncrypt = (cipherInformation.getCipherOperationMode() ==
                     CipherOperationMode.ENCRYPT);
@@ -176,9 +176,9 @@ public final class CipherTool {
 
             PrintStream out = System.out;
             if (isEncrypt) {
-                out.println("Output : " + encryptionProvider.encrypt(source.getBytes()));
+                out.println("Output : " + new String(encryptionProvider.encrypt(source.getBytes())));
             } else {
-                out.println("Output : " + decryptionProvider.decrypt(source.getBytes()));
+                out.println("Output : " + new String(decryptionProvider.decrypt(source.getBytes())));
             }
 
         } catch (ParseException e) {
@@ -416,7 +416,7 @@ public final class CipherTool {
      * @return an valid <code>Key</code> if found , otherwise
      */
     private static Key findKey(CommandLine cmd, CipherInformation cipherInformation) {
-         // if pass phrase is specified, use simple symmetric en-/decryption
+        // if pass phrase is specified, use simple symmetric en-/decryption
         String passPhrase = getArgument(cmd, PASSPHRASE, null);
 
         Key key = null;

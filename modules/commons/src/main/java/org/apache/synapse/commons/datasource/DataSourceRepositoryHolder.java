@@ -33,7 +33,7 @@ public class DataSourceRepositoryHolder {
 
     private static final Log log = LogFactory.getLog(DataSourceRepositoryHolder.class);
 
-    private static final DataSourceRepositoryHolder DATA_SOURCE_REPOSITORY_HOLDER 
+    private static final DataSourceRepositoryHolder DATA_SOURCE_REPOSITORY_HOLDER
             = new DataSourceRepositoryHolder();
 
     private DataSourceInformationRepository dataSourceInformationRepository;
@@ -95,7 +95,7 @@ public class DataSourceRepositoryHolder {
                     DataSourceInformationRepositoryFactory.createDataSourceInformationRepository(
                             repositoryListener, properties);
         } else {
-            DataSourceInformationRepositoryFactory.setupDatasourceInformationRepository(
+            DataSourceInformationRepositoryFactory.setupDataSourceInformationRepository(
                     repository, properties);
         }
         dataSourceInformationRepository = repository;

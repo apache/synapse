@@ -63,13 +63,19 @@ public class EventSourceSerializer {
                     XMLConfigConstants.SYNAPSE_OMNAMESPACE);
             subManagerElem.addAttribute(fac.createOMAttribute("class", nullNS,
                     eventSource.getSubscriptionManager().getClass().getName()));
-            for (String name : (Collection<String>)eventSource.getSubscriptionManager().getPropertyNames()) {
+            Collection<String> names =
+                    (Collection<String>) eventSource.getSubscriptionManager().getPropertyNames();
+            for (String name : names) {
+                String value;
+                if (eventSource.isContainsConfigurationProperty(name)) {
+                    value = eventSource.getConfigurationProperty(name);
+                } else {
+                    value = eventSource.getSubscriptionManager().getPropertyValue(name);
+                }
                 OMElement propElem =
                         fac.createOMElement("property", XMLConfigConstants.SYNAPSE_OMNAMESPACE);
                 propElem.addAttribute(fac.createOMAttribute("name", nullNS, name));
-                propElem.addAttribute(fac.createOMAttribute(
-                        "value", nullNS,
-                        eventSource.getSubscriptionManager().getPropertyValue(name)));
+                propElem.addAttribute(fac.createOMAttribute("value", nullNS, value));
                 subManagerElem.addChild(propElem);
             }
             evenSourceElem.addChild(subManagerElem);

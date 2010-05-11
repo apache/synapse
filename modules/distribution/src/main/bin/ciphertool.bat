@@ -28,6 +28,7 @@ rem
 rem   JAVA_OPTS       (Optional) Java runtime options
 rem ---------------------------------------------------------------------------
 set CURRENT_DIR=%cd%
+set _XDEBUG="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
 
 rem Make sure prerequisite environment variables are set
 if not "%JAVA_HOME%" == "" goto gotJavaHome
@@ -82,7 +83,7 @@ set _RUNJAVA="%JAVA_HOME%\bin\java"
 
 set JAVA_ENDORSED=".\lib\endorsed";"%JAVA_HOME%\jre\lib\endorsed";"%JAVA_HOME%\lib\endorsed"
 
-%_RUNJAVA% %JAVA_OPTS% -cp "%SYNAPSE_CLASSPATH%" -Djava.endorsed.dirs=%JAVA_ENDORSED%  org.apache.synapse.commons.security.tool.CipherTool %*
+%_RUNJAVA% %JAVA_OPTS% -cp "%SYNAPSE_CLASSPATH%"  %_XDEBUG% -Djava.endorsed.dirs=%JAVA_ENDORSED% org.apache.synapse.commons.security.tool.CipherTool %*
 endlocal
 :end
 

@@ -33,11 +33,11 @@ import java.util.Collections;
 public class JmxSecretAuthenticator implements JMXAuthenticator {
 
     private SecretInformation secretInformation;
-    
+
     public JmxSecretAuthenticator(SecretInformation secretInformation) {
         this.secretInformation = secretInformation;
     }
-    
+
     public Subject authenticate(Object credentials) {
 
         if (credentials == null) {
@@ -58,7 +58,8 @@ public class JmxSecretAuthenticator implements JMXAuthenticator {
         String password = (aCredentials[1] != null ? aCredentials[1] : "");
 
         // perform authentication
-        if (secretInformation.getUser().equals(username) && password.equals(secretInformation.getResolvedSecret())) {
+        if (secretInformation.getUser().equals(username) &&
+                password.equals(secretInformation.getResolvedSecret())) {
             return new Subject(true,
                 Collections.singleton(new JMXPrincipal(username)),
                 Collections.EMPTY_SET,

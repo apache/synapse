@@ -18,16 +18,21 @@
  */
 package org.apache.synapse.commons.security.secret;
 
+import org.apache.synapse.commons.security.SecretResolver;
+
 
 /**
  * Encapsulates the All information related to a DataSource
+ * TODO - properly remove SecretResolve instances
  */
 public class SecretInformation {
 
     private String user;
     private String aliasSecret;
     private String secretPrompt;
-    private SecretCallbackHandler secretProvider;
+    private SecretResolver localSecretResolver;
+    private SecretResolver globalSecretResolver;
+    private String token;
 
     public String getUser() {
         return user;
@@ -61,33 +66,48 @@ public class SecretInformation {
      */
     public String getResolvedSecret() {
 
-        if (secretProvider != null) {
+        SecretResolver secretResolver = null;
+
+        if (localSecretResolver != null && localSecretResolver.isInitialized()) {
+            secretResolver = localSecretResolver;
+        } else if (globalSecretResolver != null && globalSecretResolver.isInitialized()
+                && globalSecretResolver.isTokenProtected(token)) {
+            secretResolver = globalSecretResolver;
+        }
+
+        if (secretResolver != null) {
             if (aliasSecret != null && !"".equals(aliasSecret)) {
-                return getSecret(secretProvider, aliasSecret, secretPrompt);
+                if (secretPrompt == null) {
+                    return secretResolver.resolve(aliasSecret);
+                } else {
+                    return secretResolver.resolve(aliasSecret, secretPrompt);
+                }
             }
         }
         return aliasSecret;
     }
 
-    public SecretCallbackHandler getSecretProvider() {
-        return secretProvider;
+    public SecretResolver getLocalSecretResolver() {
+        return localSecretResolver;
     }
 
-    public void setSecretProvider(SecretCallbackHandler secretProvider) {
-        this.secretProvider = secretProvider;
+    public void setLocalSecretResolver(SecretResolver localSecretResolver) {
+        this.localSecretResolver = localSecretResolver;
     }
 
-    private String getSecret(SecretCallbackHandler secretCallbackHanlder,
-                             String encryptedPassword, String prompt) {
-        SecretLoadingModule secretLoadingModule = new SecretLoadingModule();
-        secretLoadingModule.init(new SecretCallbackHandler[]{secretCallbackHanlder});
-        SingleSecretCallback secretCallback = new SingleSecretCallback(encryptedPassword);
-        if (prompt != null) {
-            secretCallback.setPrompt(prompt);
-        }
-        secretLoadingModule.load(new SecretCallback[]{secretCallback});
-        return secretCallback.getSecret();
+    public SecretResolver getGlobalSecretResolver() {
+        return globalSecretResolver;
     }
 
+    public void setGlobalSecretResolver(SecretResolver globalSecretResolver) {
+        this.globalSecretResolver = globalSecretResolver;
+    }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

@@ -25,9 +25,9 @@ import org.apache.axis2.databinding.utils.ConverterUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.security.PasswordManager;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.eventing.SynapseEventingConstants;
 import org.apache.synapse.eventing.SynapseSubscription;
 import org.wso2.eventing.SubscriptionManager;
 import org.wso2.eventing.exceptions.EventException;
@@ -100,7 +100,24 @@ public class EventSourceFactory {
                                 propElem.getAttribute(new QName("name")).getAttributeValue();
                         String propValue =
                                 propElem.getAttribute(new QName("value")).getAttributeValue();
-                        manager.addProperty(propName, propValue);
+                        if (propName != null && !"".equals(propName.trim()) &&
+                                propValue != null && !"".equals(propValue.trim())) {
+
+                            propName = propName.trim();
+                            propValue = propValue.trim();
+
+                            PasswordManager passwordManager =
+                                    PasswordManager.getInstance();
+                            String key = eventSource.getName() + "." + propName;
+
+                            if (passwordManager.isInitialized()
+                                    && passwordManager.isTokenProtected(key)) {
+                                eventSource.putConfigurationProperty(propName, propValue);
+                                propValue = passwordManager.resolve(propValue);
+                            }
+
+                            manager.addProperty(propName, propValue);
+                        }
                     }
                     eventSource.setSubscriptionManager(manager);
                     eventSource.getSubscriptionManager()

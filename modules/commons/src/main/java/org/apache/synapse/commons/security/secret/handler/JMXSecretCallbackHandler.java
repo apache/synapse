@@ -24,7 +24,7 @@ import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 import org.apache.synapse.commons.security.secret.mbean.JMXSecretsProvider;
 
 /**
- * Get and propagates secrets that have been colleted through JMX Mean
+ * Get and propagates secrets that have been collected through JMX Mean
  */
 public class JMXSecretCallbackHandler extends AbstractSecretCallbackHandler {
 

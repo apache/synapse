@@ -37,7 +37,7 @@ public class SharedSecretCallbackHandler extends AbstractSecretCallbackHandler {
         if (secretCallbackHandler == null) {
             if (log.isWarnEnabled()) {
                 log.warn("There is no shared SecretCallbackHandler. " +
-                        "Please use any other SecretCallbackHandler implementaions");
+                        "Please use any other SecretCallbackHandler implementations");
             }
             return;
         }

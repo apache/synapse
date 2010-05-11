@@ -17,34 +17,22 @@
  *  under the License.
  */
 
-package org.apache.synapse.commons.evaluators;
+package org.apache.synapse.commons.evaluators.config;
 
-/**
- * This encapsulates a boolean expression. This acts as not boolean operator.
- * It executes the boolean expression inside and return the NOT of this expression.</p>   
- *
- * <pre>
- * &lt;not&gt;
- *     one evaluator
- * &lt;/not&gt;
- * </pre>
- */
-public class NotEvaluator implements Evaluator {
-    private Evaluator evaluator;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.commons.evaluators.Evaluator;
+import org.apache.synapse.commons.evaluators.EvaluatorException;
 
-    public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
-        return !evaluator.evaluate(context);
-    }
+public interface EvaluatorSerializer {
 
-    public String getName() {
-        return EvaluatorConstants.NOT;
-    }
-
-    public void setEvaluator(Evaluator evaluator) {
-        this.evaluator = evaluator;
-    }
-
-    public Evaluator getEvaluator() {
-        return evaluator;
-    }
+    /**
+     * Serialze an Evaluator configuration to a XML element.
+     * @param parent if not null the serialize element will be added to the parent
+     * @param evaluator The <code>Evaluator</code> object to be serialized
+     * 
+     * @return <code>OMElement</code> containing the configuration
+     * @throws org.apache.synapse.commons.evaluators.EvaluatorException if an error
+     * occurs while serializing
+     */
+    OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException;
 }

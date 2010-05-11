@@ -49,6 +49,10 @@ public class AndEvaluator implements Evaluator {
     public void setEvaluators(Evaluator[] evaluators) {
         this.evaluators = evaluators;
     }
+
+    public Evaluator[] getEvaluators() {
+        return evaluators;
+    }
 }
 
 

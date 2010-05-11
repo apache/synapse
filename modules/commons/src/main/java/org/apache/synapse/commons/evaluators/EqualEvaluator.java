@@ -37,7 +37,7 @@ public class EqualEvaluator implements Evaluator {
 
     private String source = null;
 
-    private int type = 0;
+    private int type = 3;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         String sourceText = null;
@@ -72,6 +72,18 @@ public class EqualEvaluator implements Evaluator {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public int getType() {
+        return type;
     }
 
     private void handleException(String message) throws EvaluatorException {

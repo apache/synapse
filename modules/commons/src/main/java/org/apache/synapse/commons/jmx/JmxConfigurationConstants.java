@@ -21,9 +21,11 @@ package org.apache.synapse.commons.jmx;
 
 public class JmxConfigurationConstants {
     
-    /** Prefix for all properties in property file*/
+     /** Token for jmx password*/
+    public static final String JMX_PROTECTED_TOKEN = "jmx.password";
+     /** Prefix for all properties in property file*/
     public static final String PROP_SYNAPSE_PREFIX_JMX = "synapse.jmx.";
-    
+
     /** JNDI port property used for the JMX naming directory (RMI registry) */
     public static final String PROP_JNDI_PORT = "jndiPort";
     

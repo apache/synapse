@@ -20,6 +20,8 @@ package org.apache.synapse.commons.security.secret;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.security.SecretResolver;
+import org.apache.synapse.commons.security.SecretResolverFactory;
 import org.apache.synapse.commons.security.SecurityConstants;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 
@@ -65,19 +67,9 @@ public class SecretInformationFactory {
             secretInformation.setAliasSecret(password);
         }
 
-        // set specific password provider if configured
-        SecretCallbackHandler passwordProvider =
-                SecretCallbackHandlerFactory.createSecretCallbackHandler(properties,
-                        configurationPrefix + SecurityConstants.PROP_SECRET_PROVIDER);
-
-        // if no specific password provider configured, use default password provider
-        if (passwordProvider == null) {
-            passwordProvider = SecretCallbackHandlerFactory.createSecretCallbackHandler(
-                    properties,
-                    SecurityConstants.GLOBAL_PREFIX
-                            + SecurityConstants.PROP_SECRET_PROVIDER);
-        }
-        secretInformation.setSecretProvider(passwordProvider);
+        SecretResolver secretResolver = SecretResolverFactory.create(properties,
+                configurationPrefix);
+        secretInformation.setLocalSecretResolver(secretResolver);
         secretInformation.setSecretPrompt(passwordPrompt);
 
         return secretInformation;
@@ -98,8 +90,10 @@ public class SecretInformationFactory {
 
         SecretInformation secretInformation = new SecretInformation();
         secretInformation.setAliasSecret(aliasPassword);
-        secretInformation.setSecretProvider(
+        SecretResolver secretResolver = new SecretResolver();
+        secretResolver.init(
                 SecretCallbackHandlerFactory.createSecretCallbackHandler(secretProvider));
+        secretInformation.setLocalSecretResolver(secretResolver);
         secretInformation.setSecretPrompt(passwordPrompt);
         return secretInformation;
     }

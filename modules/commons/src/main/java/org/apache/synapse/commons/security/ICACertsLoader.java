@@ -22,7 +22,7 @@ import java.security.KeyStore;
 
 /**
  * ICACertsLoader provides an uniform interface to create a keyStore containing CA certs
- * (truststore)
+ * (trust store)
  */
 public interface ICACertsLoader {
     /**

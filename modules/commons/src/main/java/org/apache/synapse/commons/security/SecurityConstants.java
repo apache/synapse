@@ -20,12 +20,16 @@ package org.apache.synapse.commons.security;
 
 public class SecurityConstants {
 
-    public static final String GLOBAL_PREFIX = "synapse.";
     public static final String PROP_USER_NAME = "username";
     public static final String PROP_PASSWORD = "password";
-    public static final String PROP_SECRET_PROVIDER = "secretProvider";
     public static final String PROP_PASSWORD_PROMPT = "passwordPrompt";
     public static final String PROP_SECRET_CALLBACK_HANDLER = "SharedSecretCallbackHandler";
     public static final String PROP_SECURITY_ADMIN_SERVICES = "SecurityAdminServices";
     public static final String PROP_SECRET_MANAGER_ADMIN_MBEAN = "SecretManagerAdmin";
+    public static final String PASSWORD_MANAGER_SIMPLE = "passwordManager";
+    public static final String PASSWORD_PROVIDER_SIMPLE = "passwordProvider";
+    public static final String PROTECTED_TOKENS_SIMPLE = "protectedTokens";
+    public static final String PASSWORD_MANAGER_CAP = "PasswordManager";
+    public static final String PASSWORD_PROVIDER_CAP = "PasswordProvider";
+    public static final String PROTECTED_TOKENS_CAP = "ProtectedTokens";
 }

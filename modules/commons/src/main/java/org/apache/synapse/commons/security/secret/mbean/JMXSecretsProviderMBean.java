@@ -19,7 +19,7 @@
 package org.apache.synapse.commons.security.secret.mbean;
 
 /**
- * Managing MBean for secrct
+ * Managing MBean for secret
  */
 public interface JMXSecretsProviderMBean {
 
@@ -32,7 +32,7 @@ public interface JMXSecretsProviderMBean {
     public void addSecret(String id, String secret);
 
     /**
-     * Remove a Secect for given ID
+     * Remove a Secret for given ID
      *
      * @param id identify for what this secret is
      */

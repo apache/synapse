@@ -54,7 +54,9 @@ public abstract class AbstractKeyStoreLoader implements IKeyStoreLoader {
      * @param provider      Provider
      * @return KeyStore Instance
      */
-    protected KeyStore getKeyStore(String location, String storePassword, String storeType, String provider) {
+    protected KeyStore getKeyStore(String location, String storePassword,
+                                   String storeType,
+                                   String provider) {
 
         File keyStoreFile = new File(location);
         if (!keyStoreFile.exists()) {

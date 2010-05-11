@@ -39,7 +39,9 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
      *                            back from the keystore.
      * @param entryAlias          - alias for the given entry within the keystore.
      */
-    public PKCS8KeyStoreLoader(String pkcs8PrivateKeyPath, String certFilePath, String keyPass, String entryAlias) {
+    public PKCS8KeyStoreLoader(String pkcs8PrivateKeyPath, String certFilePath,
+                               String keyPass,
+                               String entryAlias) {
         pkPath = pkcs8PrivateKeyPath;
         certPath = certFilePath;
         keyPassword = keyPass;

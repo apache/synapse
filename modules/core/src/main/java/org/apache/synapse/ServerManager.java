@@ -21,7 +21,9 @@ package org.apache.synapse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
+import org.apache.synapse.commons.security.PasswordManager;
 import org.apache.synapse.commons.security.SecurityConstants;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.core.axis2.SynapseCallbackReceiver;
 
 import javax.management.NotCompliantMBeanException;
@@ -415,6 +417,10 @@ public class ServerManager {
             // register the ServerManager MBean
             registerMBean();
 
+            // initialize global PasswordManager instance used in synapse
+            PasswordManager.getInstance().init(
+                    SynapsePropertiesLoader.loadSynapseProperties(), SynapseConstants.SYNAPSE);
+
             // initializes the SynapseController
             this.synapseController.init(serverConfigurationInformation, serverContextInformation);
 
@@ -442,6 +448,12 @@ public class ServerManager {
                 serverContextInformation, serverConfigurationInformation);
 
         if (serverState == ServerState.INITIALIZED || serverState == ServerState.STOPPED) {
+
+            // Shutdown global PasswordManager instance used in synapse
+            PasswordManager passwordManager = PasswordManager.getInstance();
+            if (passwordManager.isInitialized()) {
+                PasswordManager.getInstance().shutDown();
+            }
 
             // unregister the ServerManager MBean
             unRegisterMBean();

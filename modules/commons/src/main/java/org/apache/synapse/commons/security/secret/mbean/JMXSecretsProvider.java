@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * SecretsMBean implemetaion
+ * SecretsMBean implementation
  */
 public class JMXSecretsProvider implements JMXSecretsProviderMBean {
 

@@ -49,16 +49,18 @@ import org.wso2.eventing.SubscriptionManager;
 import org.wso2.eventing.exceptions.EventException;
 
 import javax.xml.namespace.QName;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Eventsource that accepts the event requests using a message reciver.
+ * Eventsource that accepts the event requests using a message receiver.
  * Eventsource is responsible on two tasks accepting the subscriptions and subscription related
  * reqests and dispatching events.
- * Subscriptions conatines operations listed in the WS-Eventing specification. {SubscribeOP,
+ * Subscriptions contains operations listed in the WS-Eventing specification. {SubscribeOP,
  * UnsubscribeOP, RenewOP, GetstatusOP, SubscriptionEndOP}
  * based on the action in the request eventsource identify the operation and send it for processing.
- * Eventsource link with a suscription manager to store the subscriptions. 
+ * Eventsource link with a subscription manager to store the subscriptions.
  */
 public class SynapseEventSource extends SynapseMessageReceiver {
 
@@ -66,6 +68,9 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     private SubscriptionManager subscriptionManager;
     private static final Log log = LogFactory.getLog(SynapseEventSource.class);
     private String fileName;
+    /* Contains properties used in the configuration and possess confidential information such as
+     encrypted passwords  */
+    private Map<String, String> configurationProperties = new HashMap<String, String>();
 
     public SynapseEventSource(String name) {
         this.name = name;
@@ -109,7 +114,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
     }
 
     /**
-     * Override the Message reciver method to accept subscriptions and events
+     * Override the Message receiver method to accept subscriptions and events
      *
      * @param mc message context
      * @throws AxisFault
@@ -121,7 +126,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         SynapseEnvironment synEnv = (SynapseEnvironment) mc.getConfigurationContext()
                 .getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV).getValue();
         org.apache.synapse.MessageContext smc = new Axis2MessageContext(mc, synCfg, synEnv);
-        // initialisze the response message builder using the message context
+        // initialize the response message builder using the message context
         ResponseMessageBuilder messageBuilder = new ResponseMessageBuilder(mc);
         try {
             if (EventingConstants.WSE_SUBSCRIBE.equals(mc.getWSAAction())) {
@@ -131,7 +136,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 // Unsubscribe the matching subscription
                 processUnSubscribeRequest(mc, messageBuilder);
             } else if (EventingConstants.WSE_GET_STATUS.equals(mc.getWSAAction())) {
-                // Responce with the status of the subscription
+                // Response with the status of the subscription
                 processGetStatusRequest(mc, messageBuilder);
             } else if (EventingConstants.WSE_RENEW.equals(mc.getWSAAction())) {
                 // Renew subscription
@@ -139,7 +144,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             } else {
                 // Treat as an Event
                 if (log.isDebugEnabled()) {
-                    log.debug("Event recived");
+                    log.debug("Event received");
                 }
                 dispatchEvents(smc);
             }
@@ -458,6 +463,20 @@ public class SynapseEventSource extends SynapseMessageReceiver {
         eventSourceService.addOperation(getStatusOperation);
         eventSourceService.addOperation(subscriptionEndOperation);
         
+    }
+
+    // Methods for accessing configuration properties - self-explainable
+
+    public void putConfigurationProperty(String name, String value) {
+        configurationProperties.put(name, value);
+    }
+
+    public String getConfigurationProperty(String name) {
+        return configurationProperties.get(name);
+    }
+
+    public boolean isContainsConfigurationProperty(String name) {
+        return configurationProperties.containsKey(name);
     }
 
     private void handleException(String message, Exception e) {

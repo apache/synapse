@@ -43,13 +43,13 @@ public class SecretLoadingModule {
     }
 
     /**
-     * Load secrets into given clasbacks. Use all registered call back handlers
+     * Load secrets into given call backs. Use all registered call back handlers
      *
      * @param secretCallbacks SecretCallbacks
      */
     public void load(SecretCallback[] secretCallbacks) {
         for (SecretCallbackHandler secretCallbackHandler : secretCallbackHandlers) {
-            if (secretCallbackHandler != null) {
+            if (secretCallbackHandler != null) {    //TODO
                 secretCallbackHandler.handle(secretCallbacks);
             }
         }

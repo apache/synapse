@@ -20,6 +20,9 @@ package org.apache.synapse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.jmx.JmxConfigurationConstants;
+import org.apache.synapse.commons.security.PasswordManager;
+import org.apache.synapse.commons.security.secret.SecretInformation;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.jmx.JmxInformation;
 import org.apache.synapse.commons.jmx.JmxSecretAuthenticator;
@@ -203,14 +206,21 @@ public class JmxAdapter {
         Map<String, Object> env = new HashMap<String, Object>();
 
         if (jmxInformation.isAuthenticate()) {
-            
+
             if (jmxInformation.getRemotePasswordFile() != null) {
                 env.put("jmx.remote.x.password.file", jmxInformation.getRemotePasswordFile());
             } else {
-                env.put(JMXConnectorServer.AUTHENTICATOR, 
+                SecretInformation secretInformation = jmxInformation.getSecretInformation();
+                // Get the global secret resolver
+                //TODO This should be properly implemented if JMX adapter is going to use out side synapse
+                PasswordManager pwManager = PasswordManager.getInstance();
+                if (pwManager.isInitialized()) {
+                    secretInformation.setGlobalSecretResolver(pwManager.getSecretResolver());
+                }
+                env.put(JMXConnectorServer.AUTHENTICATOR,
                         new JmxSecretAuthenticator(jmxInformation.getSecretInformation()));
             }
-            
+
             if (jmxInformation.getRemoteAccessFile() != null) {
                 env.put("jmx.remote.x.access.file", jmxInformation.getRemoteAccessFile());
             }

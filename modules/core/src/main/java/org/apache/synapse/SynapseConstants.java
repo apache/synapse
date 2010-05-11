@@ -28,6 +28,9 @@ import javax.xml.namespace.QName;
  * Global constants for the Apache Synapse project
  */
 public final class SynapseConstants {
+
+    /** Keyword synapse */
+    public static final String SYNAPSE = "synapse";
     public static final String TRUE = "TRUE";
     /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://synapse.apache.org/ns/2010/04/configuration";

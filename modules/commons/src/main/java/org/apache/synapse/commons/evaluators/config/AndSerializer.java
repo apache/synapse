@@ -27,6 +27,10 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Serialize the {@link AndEvaluator} to the XML configuration defined in
+ * the {@link AndFactory}. 
+ */
 public class AndSerializer extends AbstractEvaluatorSerializer {    
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {        
         if (!(evaluator instanceof AndEvaluator)) {           

@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 import java.util.regex.Pattern;
 
 /**
- * This Factory creates a <code>MatchEvaluator</code> using the following XML configuration.</p>
+ * This Factory creates a {@link MatchEvaluator} using the following XML configuration.</p>
  *
  * <pre>
  * &lt;match type=&quot;header | param | url&quot; source=&quot;&quot; regex=&quot;&quot;/&gt;

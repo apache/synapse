@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This Factory creates a <code>NotEvaluator</code> from the following XML configuration.</p>   
+ * This Factory creates a {@link NotEvaluator} from the following XML configuration.</p>   
  *
  * <pre>
  * &lt;not&gt;

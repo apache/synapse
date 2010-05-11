@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 
 /**
- * <p> This factory creates a <code>EqualEvaluator</code>. This factory expects the
+ * <p> This factory creates a {@link EqualEvaluator}. This factory expects the
  * following XML configuration.</p>
  * <pre>
  * &lt;equal type=&quot;header | param | url&quot; source=&quot;&quot; value=&quot;&quot;/&gt;

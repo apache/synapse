@@ -30,9 +30,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Factories for Evaluators are found using the evaluator name. This class stores
- * information about Evaluator Factories and their corresponding names. This class
- * is a Singleton class.
+ * Factories for creating Evaluators are found using the evaluator name. This class stores
+ * information about Evaluator Factories and their corresponding names. This is a Singleton class.
  */
 public class EvaluatorFactoryFinder {
     private static final Log log = LogFactory.getLog(EvaluatorFactoryFinder.class);

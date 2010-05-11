@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
 import javax.xml.namespace.QName;
 
 /**
- * This factory creates a <code>Condition</code> using the following XML configuration.</p>
+ * This factory creates a {@link Condition} using the following XML configuration.</p>
  * <pre>
  * &lt;condition priority=&quot;priority value as an integer&quot;&gt;
  *           one evaluator, this evaluator can contain other evaluators

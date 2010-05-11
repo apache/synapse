@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * This factory creates a <code>OrFactory</code> using the following XML configuration.</p>
+ * This factory creates a {@link OrFactory} using the following XML configuration.</p>
  *
  * <pre>
  * &lt;or&gt;

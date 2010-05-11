@@ -22,6 +22,11 @@ package org.apache.synapse.commons.evaluators.config;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * {@link EvaluatorSerializer}s for serializing Evaluators are found using the evaluator name.
+ * This class stores information about Evaluator Serializers and their corresponding names. This
+ * is a Singleton.
+ */
 public class EvaluatorSerializerFinder {
     private static final EvaluatorSerializerFinder finder = new EvaluatorSerializerFinder();
 

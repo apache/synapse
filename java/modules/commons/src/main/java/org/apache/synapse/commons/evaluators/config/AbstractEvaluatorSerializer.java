@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Provide common methods for serializers
+ * Provide common methods for {@link EvaluatorSerializer} implementations
  */
 public abstract class AbstractEvaluatorSerializer implements EvaluatorSerializer {
     protected static Log log;

@@ -23,6 +23,10 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 
+/**
+ * This interface should be implemented by the classes to serialize the {@link Evaluator}
+ * object model in to XML configuration.
+ */
 public interface EvaluatorSerializer {
 
     /**

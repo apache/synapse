@@ -31,6 +31,10 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Serialize the {@link Condition} to the XML configuration defined in
+ * the {@link ConditionFactory}. 
+ */
 public class ConditionSerializer {
     private static Log log = LogFactory.getLog(ConditionSerializer.class);
 

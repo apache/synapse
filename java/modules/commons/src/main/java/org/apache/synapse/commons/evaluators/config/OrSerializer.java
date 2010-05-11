@@ -27,6 +27,10 @@ import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Serialize the {@link OrEvaluator} to the XML configuration defined in
+ * the {@link OrFactory}. 
+ */
 public class OrSerializer extends AbstractEvaluatorSerializer {
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof OrEvaluator)) {

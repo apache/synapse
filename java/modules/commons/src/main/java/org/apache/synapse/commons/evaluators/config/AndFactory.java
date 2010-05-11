@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * <p>This factory creates a <code>AndEvaluator</code>. This factory expects the
- * following XML configuration to create the AndEvaluator.</p>
+ * <p>This factory creates a {@link AndEvaluator}. This factory expects the
+ * following XML configuration.</p>
  * <pre>
  * &lt;and&gt;
  *     two or more evaluators

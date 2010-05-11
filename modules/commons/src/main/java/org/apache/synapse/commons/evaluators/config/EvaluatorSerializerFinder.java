@@ -17,34 +17,26 @@
  *  under the License.
  */
 
-package org.apache.synapse.commons.evaluators;
+package org.apache.synapse.commons.evaluators.config;
 
-/**
- * This encapsulates a boolean expression. This acts as not boolean operator.
- * It executes the boolean expression inside and return the NOT of this expression.</p>   
- *
- * <pre>
- * &lt;not&gt;
- *     one evaluator
- * &lt;/not&gt;
- * </pre>
- */
-public class NotEvaluator implements Evaluator {
-    private Evaluator evaluator;
+import java.util.Map;
+import java.util.HashMap;
 
-    public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
-        return !evaluator.evaluate(context);
+public class EvaluatorSerializerFinder {
+    private static final EvaluatorSerializerFinder finder = new EvaluatorSerializerFinder();
+
+    private Map<String, EvaluatorSerializer> serializerMap =
+            new HashMap<String, EvaluatorSerializer>();
+
+    private EvaluatorSerializerFinder() {
+        serializerMap.put("and", new AndSerializer());
     }
 
-    public String getName() {
-        return EvaluatorConstants.NOT;
+    public static EvaluatorSerializerFinder getInstance() {
+        return finder;
     }
 
-    public void setEvaluator(Evaluator evaluator) {
-        this.evaluator = evaluator;
-    }
-
-    public Evaluator getEvaluator() {
-        return evaluator;
+    public EvaluatorSerializer getSerializer(String name) {
+        return serializerMap.get(name);
     }
 }

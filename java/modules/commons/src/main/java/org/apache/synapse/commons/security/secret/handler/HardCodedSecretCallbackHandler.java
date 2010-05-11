@@ -24,7 +24,7 @@ import org.apache.synapse.commons.security.secret.SingleSecretCallback;
 /**
  * Hard-coded passwords as secrets .This is just a demonstration example and need to be adopted
  * as user requirements. In the production environment, this may be 'close sourced' - only provided
- * a binary contains implementation class. Then, it is needed to use de- compliers to see password.
+ * a binary contains implementation class. Then, it is needed to use de- compilers to see password.
  */
 public class HardCodedSecretCallbackHandler extends AbstractSecretCallbackHandler {
 

@@ -38,7 +38,7 @@ import java.util.Properties;
 public class JmxInformationFactory {
 
     private static final Log log = LogFactory.getLog(JmxInformationFactory.class);
-    
+
     private JmxInformationFactory() {
     }
 
@@ -49,25 +49,26 @@ public class JmxInformationFactory {
      * @return DataSourceInformation instance
      */
     public static JmxInformation createJmxInformation(Properties properties, String defaultHostName) {
-        
+
         // Prefix for getting particular JMX properties
         String prefix = JmxConfigurationConstants.PROP_SYNAPSE_PREFIX_JMX;
-        
+
         JmxInformation jmxInformation = new JmxInformation();
 
         SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(
                 properties, prefix, null);
+        secretInformation.setToken(JmxConfigurationConstants.JMX_PROTECTED_TOKEN);
 
         jmxInformation.setSecretInformation(secretInformation);
-        
+
         int jndiPort = MiscellaneousUtil.getProperty(
                 properties, prefix + JmxConfigurationConstants.PROP_JNDI_PORT, -1, Integer.class);
         jmxInformation.setJndiPort(jndiPort);
-        
+
         int rmiPort = MiscellaneousUtil.getProperty(
                 properties, prefix + JmxConfigurationConstants.PROP_RMI_PORT, 0, Integer.class);
         jmxInformation.setRmiPort(rmiPort);
-        
+
         String jmxHostName = MiscellaneousUtil.getProperty(
                 properties, prefix + JmxConfigurationConstants.PROP_HOSTNAME, null);
         if (jmxHostName == null || jmxHostName.trim().length() == 0) {
@@ -77,7 +78,7 @@ public class JmxInformationFactory {
 
         // begin of special JMX security options
         Properties managementProperties = readManagementProperties();
-        
+
         Boolean authenticate;
         String value = getConfigProperty(
                 managementProperties, "com.sun.management.jmxremote.authenticate");
@@ -91,7 +92,7 @@ public class JmxInformationFactory {
             }
         }
         jmxInformation.setAuthenticate(authenticate);
-        
+
         value = getConfigProperty(managementProperties, "com.sun.management.jmxremote.access.file");
         if (value == null || value.trim().length() == 0) {
             value = MiscellaneousUtil.getProperty(
@@ -100,33 +101,33 @@ public class JmxInformationFactory {
         if (value != null && value.trim().length() > 0) {
             jmxInformation.setRemoteAccessFile(value);
         }
-        
+
         value = getConfigProperty(managementProperties, "com.sun.management.jmxremote.password.file");
         if (value != null && value.trim().length() > 0) {
             jmxInformation.setRemotePasswordFile(value);
         }
-        
+
         Boolean remoteSSL;
         value = getConfigProperty(managementProperties, "com.sun.management.jmxremote.ssl");
         if (value != null) {
             remoteSSL = Boolean.valueOf(value);
         } else {
-            remoteSSL = MiscellaneousUtil.getProperty( properties, 
+            remoteSSL = MiscellaneousUtil.getProperty( properties,
                 prefix + JmxConfigurationConstants.PROP_REMOTE_SSL, Boolean.FALSE, Boolean.class);
         }
         jmxInformation.setRemoteSSL(remoteSSL);
-        
+
         return jmxInformation;
     }
-    
+
     /**
      * Retrieves the management properties if a JMX config file has been specified via the system
      * property <code>com.sun.management.config.file</code>.
-     * 
+     *
      * @return JMX management properties
      */
     private static Properties readManagementProperties() {
-        
+
         Properties managementProperties = new Properties();
         String configFileName = System.getProperty("com.sun.management.config.file");
         if (configFileName != null) {
@@ -153,7 +154,7 @@ public class JmxInformationFactory {
         }
         return managementProperties;
     }
-    
+
     /**
      * Retrieves a JMX configuration property (first by looking for a Java system property and if
      * not present by looking for a management property specified in a file specified via<code>

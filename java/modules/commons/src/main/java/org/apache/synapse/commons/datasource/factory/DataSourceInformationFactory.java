@@ -198,7 +198,7 @@ public class DataSourceInformationFactory {
                 MiscellaneousUtil.getProperty(properties,
                         prefix +
                                 DataSourceConstants.
-                                    PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED,
+                                        PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED,
                         false, Boolean.class);
 
         boolean removeAbandoned = MiscellaneousUtil.getProperty(properties,
@@ -272,7 +272,7 @@ public class DataSourceInformationFactory {
 
         SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(
                 properties, prefix, passwordPrompt);
-
+        secretInformation.setToken(dsName + "." + SecurityConstants.PROP_PASSWORD);
         datasourceInformation.setSecretInformation(secretInformation);
 
         return datasourceInformation;

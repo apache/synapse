@@ -21,6 +21,9 @@ package org.apache.synapse.commons.datasource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.SynapseCommonsException;
+import org.apache.synapse.commons.security.SecretResolver;
+import org.apache.synapse.commons.security.SecretResolverFactory;
+import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,14 +44,21 @@ public class DataSourceInformationRepository {
     private DataSourceInformationRepositoryListener listener;
 
     /**
+     * The global secret resolver of the datasources
+     */
+    private SecretResolver secretResolver;
+
+    /**
      * Configuring DataSourceInformationRepository
      *
      * @param configurationProperties properties to be used for configure
      */
-    public void setConfigurationProperties(Properties configurationProperties) {
+    public void configure(Properties configurationProperties) {
         if (listener != null) {
             listener.reConfigure(configurationProperties);
         }
+        secretResolver = SecretResolverFactory.create(configurationProperties,
+                DataSourceConstants.PROP_SYNAPSE_PREFIX_DS);
     }
 
     /**
@@ -60,6 +70,12 @@ public class DataSourceInformationRepository {
 
         if (dataSourceInformation == null) {
             throw new SynapseCommonsException("DataSource information is null", log);
+        }
+
+        // Sets the global secret resolver
+        SecretInformation secretInformation = dataSourceInformation.getSecretInformation();
+        if (secretInformation != null) {
+            secretInformation.setGlobalSecretResolver(secretResolver);
         }
 
         dataSourceInformationMap.put(dataSourceInformation.getAlias(), dataSourceInformation);

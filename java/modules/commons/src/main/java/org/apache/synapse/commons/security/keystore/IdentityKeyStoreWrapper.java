@@ -31,10 +31,6 @@ import java.security.PrivateKey;
  */
 public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
 
-    /**
-     * @see KeyStoreWrapper
-     *      #init(KeyStoreInformation, String, String)
-     */
     public void init(IdentityKeyStoreInformation information, String keyPassword) {
         super.init(information, keyPassword);
     }

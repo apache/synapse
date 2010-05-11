@@ -47,7 +47,7 @@ public abstract class KeyStoreWrapper {
     }
 
     /**
-     * Initialize the KeyStore wrapper based on provided KeyStoreinformation and passwords
+     * Initialize the KeyStore wrapper based on provided KeyStoreInformation and passwords
      *
      * @param information The object that has encapsulated all information for a
      *                    keyStore excepts passwords

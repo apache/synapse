@@ -64,7 +64,7 @@ public class DataSourceInformationRepositoryFactory {
                 new DataSourceInformationRepository();
 
         datasourceInformationRepository.setRepositoryListener(listener);
-        setupDatasourceInformationRepository(datasourceInformationRepository, properties);
+        setupDataSourceInformationRepository(datasourceInformationRepository, properties);
 
         return datasourceInformationRepository;
     }
@@ -77,12 +77,12 @@ public class DataSourceInformationRepositoryFactory {
      *                   an existing data source information repository
      * @param properties DataSource properties
      */
-    public static void setupDatasourceInformationRepository(
+    public static void setupDataSourceInformationRepository(
             DataSourceInformationRepository datasourceInformationRepository,
             Properties properties) {
 
         if (properties != null) {
-            datasourceInformationRepository.setConfigurationProperties(properties);
+            datasourceInformationRepository.configure(properties);
         }
         List<DataSourceInformation> sourceInformationList =
                 DataSourceInformationListFactory.createDataSourceInformationList(properties);

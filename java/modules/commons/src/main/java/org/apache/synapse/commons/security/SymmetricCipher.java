@@ -27,7 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
 /**
- * The Cipher doing symmetric cryptographic operations  
+ * The Cipher doing symmetric cryptographic operations
  * Uses default key when these is no SecretKey
  */
 public class SymmetricCipher extends BaseCipher {
@@ -60,7 +60,7 @@ public class SymmetricCipher extends BaseCipher {
     }
 
     private SecretKeySpec createDefaultKey() {
-        //TODO use key generator
+        //TODO use akey generator
         byte[] keyBytes = new byte[]{
                 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,

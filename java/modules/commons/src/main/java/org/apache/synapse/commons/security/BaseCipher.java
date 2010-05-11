@@ -28,6 +28,7 @@ import org.apache.synapse.commons.security.definition.TrustKeyStoreInformation;
 import org.apache.synapse.commons.security.keystore.IdentityKeyStoreWrapper;
 import org.apache.synapse.commons.security.keystore.KeyStoreWrapper;
 import org.apache.synapse.commons.security.keystore.TrustKeyStoreWrapper;
+import org.apache.synapse.commons.security.secret.SecretInformation;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -64,9 +65,14 @@ public abstract class BaseCipher implements EncryptionProvider, DecryptionProvid
                     (TrustKeyStoreInformation) keystoreInformation);
         } else {
             keyStoreWrapper = new IdentityKeyStoreWrapper();
-            ((IdentityKeyStoreWrapper) keyStoreWrapper).init(
-                    (IdentityKeyStoreInformation) keystoreInformation,
-                    ((IdentityKeyStoreInformation) keystoreInformation).getKeyPasswordProvider().getResolvedSecret());
+            IdentityKeyStoreInformation identityKeyStore =
+                    (IdentityKeyStoreInformation) keystoreInformation;
+
+            SecretInformation secretInformation = identityKeyStore.getKeyPasswordProvider();
+            if (secretInformation != null) { //TODO validate
+                ((IdentityKeyStoreWrapper) keyStoreWrapper).init(identityKeyStore,
+                        secretInformation.getResolvedSecret());
+            }
         }
         init();
     }
@@ -96,12 +102,12 @@ public abstract class BaseCipher implements EncryptionProvider, DecryptionProvid
                     "'" + algorithm + "' in mode '" + opMode + "'");
         }
         try {
-            String provdier = cipherInformation.getProvider();
-            if (provdier != null && !"".equals(provdier)) {
+            String provider = cipherInformation.getProvider();
+            if (provider != null && !"".equals(provider)) {
                 try {
-                    cipher = Cipher.getInstance(algorithm, provdier.trim());
+                    cipher = Cipher.getInstance(algorithm, provider.trim());
                 } catch (NoSuchProviderException e) {
-                    throw new SynapseCommonsException("Invalid Provider : " + provdier, log);
+                    throw new SynapseCommonsException("Invalid Provider : " + provider, log);
                 }
             } else {
                 cipher = Cipher.getInstance(algorithm);
@@ -129,7 +135,7 @@ public abstract class BaseCipher implements EncryptionProvider, DecryptionProvid
         return cipherInformation;
     }
 
-    public KeyStoreInformation getKeystoreInformation() {
+    public KeyStoreInformation getKeyStoreInformation() {
         return keystoreInformation;
     }
 
@@ -142,7 +148,7 @@ public abstract class BaseCipher implements EncryptionProvider, DecryptionProvid
     public abstract Key getKey(CipherOperationMode operationMode);
 
     /**
-     * Do crypto graphic operation
+     * Do cryptographic operation
      *
      * @param inputStream Input Stream
      * @return result

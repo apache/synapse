@@ -125,7 +125,8 @@ public class FileBaseSecretRepository implements SecretRepository {
 
         for (Object alias : cipherProperties.keySet()) {
             //Creates a cipher
-            String decryptedText = new String(baseCipher.decrypt(String.valueOf(alias).getBytes()));
+            String decryptedText = new String(baseCipher.decrypt(
+                    cipherProperties.getProperty(String.valueOf(alias)).getBytes()));
             secrets.put(String.valueOf(alias), decryptedText);
             initialize = true;
         }

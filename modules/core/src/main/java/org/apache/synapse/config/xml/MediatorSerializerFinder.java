@@ -61,7 +61,8 @@ public class MediatorSerializerFinder {
         CalloutMediatorSerializer.class,
         EventPublisherMediatorSerializer.class,
         TransactionMediatorSerializer.class,
-        EnqueueMediatorSerializer.class
+        EnqueueMediatorSerializer.class,
+        ConditionalRouterMediatorSerializer.class
     };
 
     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();

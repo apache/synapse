@@ -24,6 +24,10 @@ import org.apache.synapse.commons.evaluators.*;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Serialize the {@link EqualEvaluator} to the XML configuration defined in
+ * the {@link EqualFactory}. 
+ */
 public class EqualSerializer extends AbstractEvaluatorSerializer{
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof EqualEvaluator)) {

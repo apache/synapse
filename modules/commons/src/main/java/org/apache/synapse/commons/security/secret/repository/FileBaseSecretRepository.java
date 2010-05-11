@@ -119,17 +119,25 @@ public class FileBaseSecretRepository implements SecretRepository {
         CipherInformation cipherInformation = new CipherInformation();
         cipherInformation.setAlgorithm(algorithm);
         cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
-        cipherInformation.setInType(EncodingType.BASE64);
+        cipherInformation.setInType(EncodingType.BASE64); //TODO
         DecryptionProvider baseCipher =
                 CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
 
         for (Object alias : cipherProperties.keySet()) {
-            //Creates a cipher
-            String decryptedText = new String(baseCipher.decrypt(
-                    cipherProperties.getProperty(String.valueOf(alias)).getBytes()));
-            secrets.put(String.valueOf(alias), decryptedText);
-            initialize = true;
+            //decrypt the encrypted text 
+            String key = String.valueOf(alias);
+            String encryptedText = cipherProperties.getProperty(key);
+            if (encryptedText == null || "".equals(encryptedText.trim())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("There is no secret for the alias : " + alias);
+                }
+                continue;
+            }
+
+            String decryptedText = new String(baseCipher.decrypt(encryptedText.trim().getBytes()));            
+            secrets.put(key, decryptedText);
         }
+        initialize = true;
     }
 
     /**

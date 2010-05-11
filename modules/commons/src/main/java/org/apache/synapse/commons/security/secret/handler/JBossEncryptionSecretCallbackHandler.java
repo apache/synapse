@@ -59,7 +59,7 @@ public class JBossEncryptionSecretCallbackHandler extends AbstractSecretCallback
         CipherInformation cipherInformation = new CipherInformation();
         cipherInformation.setAlgorithm(ALGORITHM);
         cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
-        cipherInformation.setInType(EncodingType.BIGINTEGER16);
+        cipherInformation.setInType(EncodingType.BIGINTEGER16); //TODO
         DecryptionProvider decryptionProvider = CipherFactory.createCipher(cipherInformation, key);
         return new String(decryptionProvider.decrypt(encryptedSecret.getBytes()));
     }

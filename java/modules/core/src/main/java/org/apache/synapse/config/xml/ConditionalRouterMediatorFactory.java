@@ -80,48 +80,48 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
 
         Iterator itr = elem.getChildrenWithName(ROUTE_Q);
         while (itr.hasNext()) {
-
             OMElement routeElem = (OMElement) itr.next();
-            if (ROUTE_Q.equals(routeElem.getQName())) {
+            Route route = new Route();
 
-                Route route = new Route();
+            if (routeElem.getAttribute(BREAK_ROUTE_ATTR) != null) {
+                if (JavaUtils.isTrueExplicitly(
+                        routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim())) {
 
-                if (routeElem.getAttribute(BREAK_ROUTE_ATTR) != null) {
-                    if (JavaUtils.isTrueExplicitly(routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim())) {
-                        route.setBreakRoute(true);
-                    } else if (JavaUtils.isFalseExplicitly(routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim())) {
-                        route.setBreakRoute(false);
-                    } else {
-                        handleException("breakRoute attribute value of the route element must " +
-                                "be either 'true' or 'false', the value found is : "
-                                + routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim());
-                    }
-                }
+                    route.setBreakRoute(true);
+                } else if (JavaUtils.isFalseExplicitly(
+                        routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim())) {
 
-                OMElement conditionElem = routeElem.getFirstChildWithName(CONDITION_Q);
-                
-                if (conditionElem == null) {
-                    handleException("Couldn't find the condition of the conditional router");
-                    return null;
-                }
-
-                try {
-                    Evaluator evaluator = EvaluatorFactoryFinder.getInstance().getEvaluator(
-                            conditionElem.getFirstElement());
-                    route.setEvaluator(evaluator);
-                } catch (EvaluatorException ee) {                    
-                    handleException("Couldn't build the condition of the conditional router", ee);
-                }
-                OMElement targetElem = routeElem.getFirstChildWithName(TARGET_Q);
-                Target target = TargetFactory.createTarget(targetElem);
-                if (JavaUtils.isTrueExplicitly(routeElem.getAttributeValue(ASYNCHRONOUS_ATTR))) {
-                    target.setAsynchronous(true);
+                    route.setBreakRoute(false);
                 } else {
-                    target.setAsynchronous(false);
+                    handleException("breakRoute attribute value of the route element must " +
+                            "be either 'true' or 'false', the value found is : "
+                            + routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim());
                 }
-                route.setTarget(target);
-                conditionalRouterMediator.addRoute(route);
             }
+
+            OMElement conditionElem = routeElem.getFirstChildWithName(CONDITION_Q);
+            if (conditionElem == null) {
+                handleException("Couldn't find the condition of the conditional router");
+                return null;
+            }
+
+            try {
+                Evaluator evaluator = EvaluatorFactoryFinder.getInstance().getEvaluator(
+                        conditionElem.getFirstElement());
+                route.setEvaluator(evaluator);
+            } catch (EvaluatorException ee) {
+                handleException("Couldn't build the condition of the conditional router", ee);
+            }
+
+            OMElement targetElem = routeElem.getFirstChildWithName(TARGET_Q);
+            Target target = TargetFactory.createTarget(targetElem);
+            if (JavaUtils.isTrueExplicitly(routeElem.getAttributeValue(ASYNCHRONOUS_ATTR))) {
+                target.setAsynchronous(true);
+            } else {
+                target.setAsynchronous(false);
+            }
+            route.setTarget(target);
+            conditionalRouterMediator.addRoute(route);
         }
         return conditionalRouterMediator;
     }

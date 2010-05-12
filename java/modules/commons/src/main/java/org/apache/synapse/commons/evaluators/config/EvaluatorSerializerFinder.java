@@ -35,6 +35,10 @@ public class EvaluatorSerializerFinder {
 
     private EvaluatorSerializerFinder() {
         serializerMap.put("and", new AndSerializer());
+        serializerMap.put("or", new OrSerializer());
+        serializerMap.put("not", new NotSerializer());
+        serializerMap.put("match", new MatchSerializer());
+        serializerMap.put("equal", new EqualSerializer());
     }
 
     public static EvaluatorSerializerFinder getInstance() {

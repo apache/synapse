@@ -442,8 +442,12 @@ public class SandeshaUtil {
 
 			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO, referenceMessage
 					.getProperty(Constants.OUT_TRANSPORT_INFO));
+			
+			/*
 			newMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_HEADERS));
+			*/
+			
 			newMessageContext.setProperty(MessageContext.TRANSPORT_IN, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_IN));
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
@@ -453,6 +457,7 @@ public class SandeshaUtil {
 					referenceMessage.getProperty(AddressingConstants.WS_ADDRESSING_VERSION));
 			newMessageContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, 
 					referenceMessage.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES));
+			
 			
 			copyConfiguredProperties (referenceMessage,newMessageContext);
 

@@ -32,7 +32,8 @@ import org.apache.axis2.addressing.EndpointReference;
  * as used by common EIP mediators
  */
 public class Target {
-
+    private static final Log log = LogFactory.getLog(Target.class);
+    
     /** An optional To address to be set on the message when handing over to the target */
     private String toAddress = null;
 
@@ -51,9 +52,9 @@ public class Target {
     /** The target endpoint reference key */
     private String endpointRef = null;
 
+    /** if true the mediation will happen in a different thread than the original
+     * thread invoked the mediate method*/
     private boolean asynchronous = true;
-
-    private static final Log log = LogFactory.getLog(Target.class);
 
     /**
      * process the message through this target (may be to mediate
@@ -205,5 +206,9 @@ public class Target {
 
     public void setAsynchronous(boolean asynchronous) {
         this.asynchronous = asynchronous;
+    }
+
+    public boolean isAsynchronous() {
+        return asynchronous;
     }
 }

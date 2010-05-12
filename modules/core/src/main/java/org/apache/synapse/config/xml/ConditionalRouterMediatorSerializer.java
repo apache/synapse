@@ -78,6 +78,10 @@ public class ConditionalRouterMediatorSerializer extends AbstractMediatorSeriali
                 handleException("Route in a conditional router has to have a target");
             }
 
+            if (route.getTarget().isAsynchronous()) {
+                routeElem.addAttribute(fac.createOMAttribute("asynchronous", nullNS, "true"));
+            }
+
             conditionalRouterElem.addChild(routeElem);
         }
 

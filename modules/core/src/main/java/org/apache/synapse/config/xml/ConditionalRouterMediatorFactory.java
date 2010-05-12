@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.config.EvaluatorFactoryFinder;
@@ -69,7 +68,8 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
         if (elem.getAttribute(CONTINUE_AFTER_ATTR) != null) {
             if (JavaUtils.isTrueExplicitly(elem.getAttributeValue(CONTINUE_AFTER_ATTR).trim())) {
                 conditionalRouterMediator.setContinueAfter(true);
-            } else if (JavaUtils.isFalseExplicitly(elem.getAttributeValue(CONTINUE_AFTER_ATTR).trim())) {
+            } else if (JavaUtils.isFalseExplicitly(
+                    elem.getAttributeValue(CONTINUE_AFTER_ATTR).trim())) {
                 conditionalRouterMediator.setContinueAfter(false);
             } else {
                 handleException("continueAfter attribute value of the conditionalRouter must " +

@@ -99,12 +99,18 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
                 }
 
                 OMElement conditionElem = routeElem.getFirstChildWithName(CONDITION_Q);
+                
+                if (conditionElem == null) {
+                    handleException("Couldn't find the condition of the conditional router");
+                    return null;
+                }
+
                 try {
                     Evaluator evaluator = EvaluatorFactoryFinder.getInstance().getEvaluator(
                             conditionElem.getFirstElement());
                     route.setEvaluator(evaluator);
-                } catch (EvaluatorException ee) {
-                    throw new SynapseException("Couldn't build the condition of the conditional router");
+                } catch (EvaluatorException ee) {                    
+                    handleException("Couldn't build the condition of the conditional router", ee);
                 }
                 OMElement targetElem = routeElem.getFirstChildWithName(TARGET_Q);
                 Target target = TargetFactory.createTarget(targetElem);

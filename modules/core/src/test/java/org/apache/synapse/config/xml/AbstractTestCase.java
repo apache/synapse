@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.commons.logging.Log;
@@ -28,10 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.xml.sax.SAXException;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.StringReader;
 import java.io.IOException;
 
 /**

@@ -398,8 +398,8 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
     public String toString() {
         final ReentrantLock lock = this.lock;
         lock.lock();
-        String s = "";
         try {
+            String s = "";
             for (InternalQueue<E> internalQueue : queues) {
                 s += internalQueue.toString();
             }
@@ -426,8 +426,8 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
     public <T> T[] toArray(T[] a) {
         final ReentrantLock lock = this.lock;
         lock.lock();
-        List<E> list = new ArrayList<E>();
         try {
+            List<E> list = new ArrayList<E>();
             for (InternalQueue<E> internalQueue : queues) {
                 list.addAll(internalQueue);
             }
@@ -440,8 +440,8 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
     public Object[] toArray() {
         final ReentrantLock lock = this.lock;
         lock.lock();
-        List<E> list = new ArrayList<E>();
         try {
+            List<E> list = new ArrayList<E>();
             for (InternalQueue<E> internalQueue : queues) {
                 list.addAll(internalQueue);
             }

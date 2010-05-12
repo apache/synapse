@@ -68,4 +68,16 @@ public class PropertyMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
         assertTrue(serialization(inputXml, propertyMediatorSerializer));
     }
+
+    public void testPropertyMediatorSerializationScenarioSeven() throws Exception {
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"  name=\"To\" value=\"myValue\" pattern=\".*\" group=\"1\"/>";
+        assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
+        assertTrue(serialization(inputXml, propertyMediatorSerializer));
+    }
+
+    public void testPropertyMediatorSerializationScenarioEight() throws Exception {
+        String inputXml = "<property xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"  name=\"To\" expression=\"get-property('To')\" pattern=\".*\" group=\"1\"/>";
+        assertTrue(serialization(inputXml, propertyMediatorFactory, propertyMediatorSerializer));
+        assertTrue(serialization(inputXml, propertyMediatorSerializer));
+    }
 }

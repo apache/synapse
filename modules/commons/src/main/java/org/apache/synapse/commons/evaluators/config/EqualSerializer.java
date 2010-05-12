@@ -35,19 +35,28 @@ public class EqualSerializer extends AbstractEvaluatorSerializer{
         }
 
         EqualEvaluator equalEvaluator = (EqualEvaluator) evaluator;
-        OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
+        OMElement eqaulElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
 
-        matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
-                equalEvaluator.getSource()));
+        if (equalEvaluator.getType() != 1) {
+            if (equalEvaluator.getSource() != null) {
+            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
+                    equalEvaluator.getSource()));
+            } else {
+                String msg = "If type is not URL a source value should be specified for " +
+                        "the equal evaluator";
+                log.error(msg);
+                throw new EvaluatorException(msg);
+            }
+        }
 
         if (equalEvaluator.getType() == 1) {
-            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.URL));
         } else if (equalEvaluator.getType() == 2) {
-            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.PARAM));
         } else if (equalEvaluator.getType() == 3) {
-            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.HEADER));
         } else {
             String msg = "Unsupported type value: " + equalEvaluator.getType();
@@ -55,13 +64,13 @@ public class EqualSerializer extends AbstractEvaluatorSerializer{
             throw new EvaluatorException(msg);
         }
 
-        matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,
+        eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,
                 equalEvaluator.getValue()));
 
         if (parent != null) {
-            parent.addChild(matchElement);
+            parent.addChild(eqaulElement);
         }
 
-        return matchElement;
+        return eqaulElement;
     }
 }

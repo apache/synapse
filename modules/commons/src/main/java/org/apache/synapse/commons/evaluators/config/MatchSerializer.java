@@ -20,10 +20,19 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
         }
 
         MatchEvaluator matchEvaluator = (MatchEvaluator) evaluator;
-        OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
+        OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.MATCH));
 
-        matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
-                matchEvaluator.getSource()));
+        if (matchEvaluator.getType() != 1) {
+            if (matchEvaluator.getSource() != null) {
+                matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
+                        matchEvaluator.getSource()));
+            } else {
+                String msg = "If type is not URL a source value should be specified for " +
+                        "the match evaluator";
+                log.error(msg);
+                throw new EvaluatorException(msg);
+            }
+        }
 
         if (matchEvaluator.getType() == 1) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,

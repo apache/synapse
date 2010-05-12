@@ -21,6 +21,9 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.commons.evaluators.config.EvaluatorSerializerFinder;
+import org.apache.synapse.commons.evaluators.config.EvaluatorSerializer;
+import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.mediators.filters.router.ConditionalRouterMediator;
 import org.apache.synapse.mediators.filters.router.Route;
 
@@ -52,6 +55,22 @@ public class ConditionalRouterMediatorSerializer extends AbstractMediatorSeriali
             if (route.isBreakRouteExplicitlySet()) {
                 routeElem.addAttribute("breakRoute", Boolean.toString(route.isBreakRoute()), nullNS);
             }
+            
+            if (route.getEvaluator() != null) {
+                EvaluatorSerializer evaluatorSerializer =
+                        EvaluatorSerializerFinder.getInstance().getSerializer(
+                                route.getEvaluator().getName());
+                if (evaluatorSerializer != null) {
+                    OMElement conditionElement = fac.createOMElement("condition", synNS);
+                    try {
+                        evaluatorSerializer.serialize(conditionElement, route.getEvaluator());
+                    } catch (EvaluatorException e) {
+                        handleException("Cannot serialize the Evaluator", e);
+                    }
+
+                    routeElem.addChild(conditionElement);
+                }
+            }
 
             if (route.getTarget() != null) {
                 routeElem.addChild(TargetSerializer.serializeTarget(route.getTarget()));
@@ -59,9 +78,6 @@ public class ConditionalRouterMediatorSerializer extends AbstractMediatorSeriali
                 handleException("Route in a conditional router has to have a target");
             }
 
-            if (route.getEvaluator() != null) {
-                // todo serialize the route evaluator
-            }
             conditionalRouterElem.addChild(routeElem);
         }
 

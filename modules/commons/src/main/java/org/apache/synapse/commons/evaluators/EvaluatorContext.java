@@ -94,7 +94,7 @@ public class EvaluatorContext {
 
                     for (String param : httpParams) {
                         String temp[] = param.split("=");
-                        if (temp != null && temp.length >= 1) {
+                        if (temp != null && temp.length >= 2) {
                             params.put(temp[0], URIEncoderDecoder.decode(temp[1]));
                         }
                     }

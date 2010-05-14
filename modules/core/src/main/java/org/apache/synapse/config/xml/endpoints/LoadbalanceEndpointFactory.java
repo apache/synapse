@@ -94,6 +94,7 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
                 algorithm =
                         LoadbalanceAlgorithmFactory.
                                 createLoadbalanceAlgorithm(loadbalanceElement, endpoints);
+                algorithm.setLoadBalanceEndpoint(loadbalanceEndpoint);
             } else if (loadbalanceElement.getFirstChildWithName(MEMBER) != null) {
                 if(loadbalanceElement.
                         getChildrenWithName((XMLConfigConstants.ENDPOINT_ELT)).hasNext()){

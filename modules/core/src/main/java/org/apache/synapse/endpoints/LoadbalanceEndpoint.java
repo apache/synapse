@@ -22,7 +22,6 @@ package org.apache.synapse.endpoints;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clustering.Member;
-import org.apache.http.protocol.HTTP;
 import org.apache.synapse.*;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;

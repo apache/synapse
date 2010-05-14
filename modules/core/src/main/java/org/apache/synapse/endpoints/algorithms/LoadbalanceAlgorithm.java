@@ -46,6 +46,13 @@ public interface LoadbalanceAlgorithm {
     void setEndpoints(List<Endpoint> endpoints);
 
     /**
+     * Set the loadbalance endpoint
+     * 
+     * @param endpoint the endpoint which uses this algorithm
+     */
+    void setLoadBalanceEndpoint(Endpoint endpoint);
+
+    /**
      * This method returns the next node according to the algorithm implementation.
      *
      * @param synapseMessageContext SynapseMessageContext of the current message

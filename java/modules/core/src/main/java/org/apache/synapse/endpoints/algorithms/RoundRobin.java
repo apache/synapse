@@ -58,6 +58,8 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         this.endpoints = endpoints;
     }
 
+    public void setLoadBalanceEndpoint(Endpoint endpoint) {}
+
     /**
      * Choose an active endpoint using the round robin algorithm. If there are no active endpoints
      * available, returns null.

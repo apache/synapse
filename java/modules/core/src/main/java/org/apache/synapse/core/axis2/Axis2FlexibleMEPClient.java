@@ -208,16 +208,16 @@ public class Axis2FlexibleMEPClient {
                         endpoint.getCharSetEncoding());
             }
 
+            // add rest request' suffix URI
+            Object restSuffix =
+                    axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX);
+            boolean isRest = SynapseConstants.FORMAT_REST.equals(endpoint.getFormat());
+
+            if (!isRest) {
+                isRest = isRequestRest(originalInMsgCtx);
+            }
+
             if (endpoint.getAddress() != null) {
-                // add rest request' suffix URI
-                Object restSuffix =
-                        axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX);
-                boolean isRest = SynapseConstants.FORMAT_REST.equals(endpoint.getFormat());
-
-                if (!isRest) {
-                    isRest = isRequestRest(originalInMsgCtx);
-                }
-
                 if (isRest && restSuffix != null && !"".equals(restSuffix)) {
                     axisOutMsgCtx.setTo(
                             new EndpointReference(endpoint.getAddress() + restSuffix));
@@ -227,8 +227,16 @@ public class Axis2FlexibleMEPClient {
                 }
 
                 axisOutMsgCtx.setProperty(NhttpConstants.ENDPOINT_PREFIX, endpoint.getAddress());
+            } else {
+                // Supporting RESTful invocation
+                if (isRest && restSuffix != null && !"".equals(restSuffix)) {
+                    EndpointReference epr = axisOutMsgCtx.getTo();
+                    if (epr != null) {
+                        axisOutMsgCtx.setTo(new EndpointReference(epr.getAddress() + restSuffix));
+                    }
+                }
             }
-
+             
             if (endpoint.isUseSeparateListener()) {
                 axisOutMsgCtx.getOptions().setUseSeparateListener(true);
             }

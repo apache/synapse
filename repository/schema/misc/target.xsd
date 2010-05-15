@@ -22,6 +22,8 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
+    <xs:include schemaLocation="../endpoint.xsd"/>
+
     <xs:element name="target" type="Target">
         <xs:annotation>
             <xs:documentation source="description">
@@ -34,6 +36,15 @@
         <xs:annotation>
 
         </xs:annotation>
+        <xs:all>
+            <xs:element name="inSequence" minOccurs="0" maxOccurs="1">
+                
+            </xs:element>
+            <xs:element name="outSequence" minOccurs="0" maxOccurs="1">
+
+            </xs:element>
+            <xs:element name="endpoint" type="Endpoint" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
     </xs:complexType>
 
 </xs:schema>

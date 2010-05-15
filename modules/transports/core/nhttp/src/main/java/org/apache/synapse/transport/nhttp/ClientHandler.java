@@ -561,6 +561,14 @@ public class ClientHandler implements NHttpClientHandler {
                 } else {
                     metrics.incrementBytesSent(bytesWritten);
                 }
+                
+                if (encoder.isCompleted()) {
+                    if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
+                        metrics.incrementMessagesSent(getMessageContext(conn));
+                    } else {
+                        metrics.incrementMessagesSent();
+                    }
+                }
 
                 ClientConnectionDebug ccd = (ClientConnectionDebug)
                         context.getAttribute(CLIENT_CONNECTION_DEBUG);

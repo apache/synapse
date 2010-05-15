@@ -22,6 +22,6 @@
     <!-- log all attributes of messages passing through -->
     <log level="full"/>
 
-    <!-- Send the messageto implicit destination -->
+    <!-- Send the message to implicit destination -->
     <send/>
 </definitions>

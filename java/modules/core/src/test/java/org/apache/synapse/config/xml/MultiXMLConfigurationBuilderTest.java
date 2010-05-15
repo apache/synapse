@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import junit.framework.TestCase;
 
+import java.io.File;
 import java.net.URL;
 
 import org.apache.synapse.config.SynapseConfiguration;
@@ -31,9 +32,9 @@ import javax.xml.stream.XMLStreamException;
 
 public class MultiXMLConfigurationBuilderTest extends TestCase {
 
-    public void testConfigurationBuilder() {
+    public void testConfigurationBuilder() throws Exception {
         URL u = this.getClass().getClassLoader().getResource("synapse-config");
-        String root = u.getPath();
+        String root = new File(u.toURI()).getAbsolutePath();
 
         System.out.println("Using SYNAPSE_CONFIG_HOME=" + root);
         try {

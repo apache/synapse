@@ -436,14 +436,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
             try {
                 axis2Req.streamMessageContents();
-                if (metrics != null) {
-                    if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
-                        metrics.incrementMessagesSent(msgContext);
-                    } else {
-                        metrics.incrementMessagesSent();
-                    }
-                }
-
             } catch (AxisFault af) {
                 throw af;
             }

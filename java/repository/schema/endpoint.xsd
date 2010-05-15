@@ -32,8 +32,57 @@
 
     <xs:complexType name="NamedEndpoint">
         <xs:annotation>
-
+            <xs:documentation source="description">
+                This is a named endpoint which will come on the top level synapse configuration
+            </xs:documentation>
         </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="Endpoint">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
+
+    <xs:complexType name="Endpoint">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This is a representation of an endpoint
+            </xs:documentation>
+        </xs:annotation>
+        <xs:choice minOccurs="1">
+            <xs:group ref="leafEndpoints" minOccurs="0" maxOccurs="1"/>
+            <xs:group ref="aggregatedEndpoints" minOccurs="0" maxOccurs="1"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+    </xs:complexType>
+
+    <xs:group name="leafEndpoints">
+        <xs:choice>
+            <xs:element name="address">
+                <!-- TODO : address endpoint -->
+            </xs:element>
+            <xs:element name="default">
+                <!-- TODO : default endpoint -->
+            </xs:element>
+            <xs:element name="wsdl">
+                <!-- TODO : WSDL endpoint -->
+            </xs:element>
+        </xs:choice>
+    </xs:group>
+
+    <xs:group name="aggregatedEndpoints">
+        <xs:choice>
+            <xs:element name="loadbalance">
+                <xs:complexType>
+                    <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="failover">
+                <xs:complexType>
+                    <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:choice>
+    </xs:group>
 
 </xs:schema>

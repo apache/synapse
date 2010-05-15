@@ -34,7 +34,7 @@ class Wire {
     private void wire(final String header, final byte[] b, int pos, int off) {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < off; i++) {
-            int ch = b[pos + i];
+            int ch = b[pos + i] & 0xFF;
             if (ch == 13) {
                 buffer.append("[\\r]");
             } else if (ch == 10) {

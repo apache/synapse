@@ -61,16 +61,7 @@
                     <xs:attribute name="key" type="xs:string" use="optional"/>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="parameter" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation source="description">
-                        These are the parameters of the proxy service
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="name" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
+            <xs:element ref="parameter" minOccurs="0"/>
         </xs:all>
         <xs:attribute name="name" use="required"/>
         <xs:attribute name="transports" use="optional"/>

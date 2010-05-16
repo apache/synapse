@@ -25,15 +25,24 @@
     <xs:element name="localEntry" type="LocalEntry">
         <xs:annotation>
             <xs:documentation source="description">
-                LocalEntry description
+                LocalEntry defines entries in the local registry within a Synapse Configuration
             </xs:documentation>
         </xs:annotation>
     </xs:element>
 
     <xs:complexType name="LocalEntry">
+        <!-- TODO : need to add the constraints (might need factory refactoring) -->
         <xs:annotation>
-
+            <xs:documentation source="description">
+                This describes the possible types of local entries that you can have
+                in the Synapse Configuration
+            </xs:documentation>
         </xs:annotation>
+        <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="1" processContents="skip"/>
+        </xs:sequence>
+        <xs:attribute name="key" type="xs:string" use="required"/>
+        <xs:attribute name="src" type="xs:anyURI" use="optional"/>
     </xs:complexType>
 
 </xs:schema>

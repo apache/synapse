@@ -562,14 +562,6 @@ public class ClientHandler implements NHttpClientHandler {
                     } else {
                         metrics.incrementBytesSent(bytesWritten);
                     }
-                    
-                    // TODO: executing this when metrics != 0 && bytesWritten > 0 seems strange;
-                    //       shouldn't the condition be encoder.isCompleted() ?!?!?
-                    ClientConnectionDebug ccd = (ClientConnectionDebug)
-                            context.getAttribute(CLIENT_CONNECTION_DEBUG);
-                    if (ccd != null) {
-                        ccd.recordRequestCompletionTime();
-                    }
                 }
                 
                 if (encoder.isCompleted()) {
@@ -578,6 +570,14 @@ public class ClientHandler implements NHttpClientHandler {
                     } else {
                         metrics.incrementMessagesSent();
                     }
+                }
+            }
+
+            if (encoder.isCompleted()) {
+                ClientConnectionDebug ccd = (ClientConnectionDebug)
+                        context.getAttribute(CLIENT_CONNECTION_DEBUG);
+                if (ccd != null) {
+                    ccd.recordRequestCompletionTime();
                 }
             }
 

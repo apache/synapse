@@ -22,18 +22,28 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
+    <xs:include schemaLocation="misc/common.xsd"/>
+
     <xs:element name="registry" type="Registry">
         <xs:annotation>
             <xs:documentation source="description">
-                Registry description
+                Registry declaration of the Synapse Configuration
             </xs:documentation>
         </xs:annotation>
     </xs:element>
 
     <xs:complexType name="Registry">
         <xs:annotation>
-
+            <xs:documentation source="description">
+                This denotes the type of the &lt;registry&gt; element
+                in the top of the Synapse Configuration
+            </xs:documentation>
         </xs:annotation>
+        <xs:sequence>
+            <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="provider" type="xs:string" use="required"
+                      default="org.apache.synapse.registry.url.SimpleURLRegistry"/>
     </xs:complexType>
 
 </xs:schema>

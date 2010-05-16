@@ -22,27 +22,19 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="mediators/mediators.xsd"/>
-
-    <xs:element name="sequence" type="NamedSequence">
+    <xs:include schemaLocation="mediators.xsd"/>
+    
+    <xs:element name="in">
         <xs:annotation>
             <xs:documentation source="description">
-                Sequence description
+                Resources like XSDs to be provided to the WSDL and so forth
             </xs:documentation>
         </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="NamedSequence">
-        <xs:annotation>
-            <xs:documentation source="description">
-                Sequence contains a set of mediators
-            </xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="name" type="xs:string" use="required"/>
-        <xs:attribute name="onError" type="xs:string" use="optional"/>
-    </xs:complexType>
-    
 </xs:schema>

@@ -226,9 +226,9 @@ public class FIXSessionFactory {
             try {
                 SessionSettings settings = new SessionSettings(fixConfigStream);
 
-                MessageStoreFactory storeFactory = getMessageStoreFactory(service, settings, true);
+                MessageStoreFactory storeFactory = getMessageStoreFactory(service, settings, false);
                 MessageFactory messageFactory = new DefaultMessageFactory();
-                quickfix.LogFactory logFactory = getLogFactory(service, settings, true);
+                quickfix.LogFactory logFactory = getLogFactory(service, settings, false);
                 //Get a new FIX Application
                 Application messageHandler = applicationFactory.getFIXApplication(service, senderThreadPool, false);
 

@@ -73,8 +73,15 @@ public class FIXTransportListener extends AbstractTransportListener {
      */
     protected void startListeningForService(AxisService service) {
         try {
-            fixSessionFactory.createFIXAcceptor(service);
-            fixSessionFactory.createFIXInitiator(service);
+            boolean acceptorCreated = fixSessionFactory.createFIXAcceptor(service);
+            boolean initiatorCreated = fixSessionFactory.createFIXInitiator(service);
+
+            if (!acceptorCreated && !initiatorCreated) {
+                log.warn("No acceptor or initiator has been configured for the " +
+                        "service " + service.getName() + " - Disabling the FIX transport for " +
+                        "this service");
+                disableTransportForService(service);
+            }
         } catch (AxisFault axisFault) {
             disableTransportForService(service);
         }

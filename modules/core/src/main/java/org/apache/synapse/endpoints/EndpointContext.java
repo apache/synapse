@@ -226,6 +226,8 @@ public class EndpointContext {
             Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
 
             if ((state == null) || ((state != ST_ACTIVE) && (state != ST_OFF))) {
+                log.info("Endpoint : " + endpointName + " currently " + getStateAsString() +
+                        " will now be marked active since it processed its last message");
                 setState(ST_ACTIVE);
             }
         } else {

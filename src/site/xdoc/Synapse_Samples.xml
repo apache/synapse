@@ -4660,12 +4660,12 @@ Discounted price: 138.77458254967408</pre>
          &#xa0;
        </p>
    <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
-    &lt;priority-executor name=&quot;exec&quot;&gt;
+    &lt;priorityExecutor name=&quot;exec&quot;&gt;
         &lt;queues&gt;
             &lt;queue size=&quot;100&quot; priority=&quot;1&quot;/&gt;
             &lt;queue size=&quot;100&quot; priority=&quot;10&quot;/&gt;
         &lt;/queues&gt;
-    &lt;/priority-executor&gt;
+    &lt;/priorityExecutor&gt;
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
             &lt;inSequence&gt;
@@ -4763,7 +4763,7 @@ Discounted price: 138.77458254967408</pre>
         Here is the priority configuration file used by the NHTTP transport to determine the priority based on HTTP level properties.
     </p>
    <pre xml:space="preserve">&lt;priorityConfiguration&gt;
-    &lt;priority-executor&gt;
+    &lt;priorityExecutor&gt;
         &lt;!-- two priorities specified with priority 10 and 1. Both priority messages has a queue depth of 100 --&gt;
         &lt;queues isFixedCapacity=&quot;true&quot; nextQueue=&quot;org.apache.synapse.commons.executors.PRRNextQueueAlgorithm&quot;&gt;
             &lt;queue size=&quot;100&quot; priority=&quot;10&quot;/&gt;
@@ -4771,7 +4771,7 @@ Discounted price: 138.77458254967408</pre>
         &lt;/queues&gt;
         &lt;!-- these are the default values, values are put here to show their availability --&gt;
         &lt;threads core=&quot;20&quot; max=&quot;100&quot; keep-alive=&quot;5&quot;/&gt;
-    &lt;/priority-executor&gt;
+    &lt;/priorityExecutor&gt;
 
     &lt;!-- if a message comes that we cannot determine priority, we set a default priority of 1 --&gt;
     &lt;conditions defaultPriority=&quot;1&quot;&gt;

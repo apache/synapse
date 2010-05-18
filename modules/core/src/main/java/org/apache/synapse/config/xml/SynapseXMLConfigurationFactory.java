@@ -191,7 +191,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             executor = PriorityExecutorFactory.createExecutor(
                 XMLConfigConstants.SYNAPSE_NAMESPACE, elem, true);
         } catch (AxisFault axisFault) {
-            handleException("Failed to create the priority-executor configuration");
+            handleException("Failed to create the priorityExecutor configuration");
         }
         config.addPriorityExecutor(executor.getName(), executor);
         return executor;

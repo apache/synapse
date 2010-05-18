@@ -34,7 +34,7 @@ public abstract class ExecutorConstants {
     public static final String QUEUES = "queues";
     public static final String QUEUE = "queue";
 
-    public static final String PRIORITY_EXECUTOR = "priority-executor";
+    public static final String PRIORITY_EXECUTOR = "priorityExecutor";
     public static final String THREADS = "threads";
     public static final String MAX = "max";
     public static final String CORE = "core";

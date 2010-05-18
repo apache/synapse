@@ -65,7 +65,7 @@ public class XMLConfigConstants {
     public static final String NULL_NAMESPACE = "";
     public static final Object QUARTZ_QNAME   =
         new QName("http://www.opensymphony.com/quartz/JobSchedulingData", "quartz");
-    public static final QName EXECUTOR_ELT = new QName(SYNAPSE_NAMESPACE, "priority-executor");
+    public static final QName EXECUTOR_ELT = new QName(SYNAPSE_NAMESPACE, "priorityExecutor");
 
 	/** The Trace attribute name, for proxy services, sequences */
 	public static final String TRACE_ATTRIB_NAME = "trace";

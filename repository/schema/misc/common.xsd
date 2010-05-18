@@ -42,10 +42,11 @@
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence>
-                <xs:any minOccurs="1" maxOccurs="1" processContents="skip"/>
-            </xs:sequence>
-            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:complexContent mixed="true">
+                <xs:extension base="xs:anyType">
+                    <xs:attribute name="name" type="xs:string" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
 

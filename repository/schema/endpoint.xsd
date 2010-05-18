@@ -129,7 +129,7 @@
                 <xs:complexType>
                     <xs:all>
                         <xs:element name="duration" minOccurs="0" maxOccurs="1" type="xs:long"/>
-                        <xs:element name="action" minOccurs="0" maxOccurs="1">
+                        <xs:element name="responseAction" minOccurs="0" maxOccurs="1">
                             <xs:simpleType>
                                 <xs:restriction base="xs:string">
                                     <xs:enumeration value="discard"/>
@@ -137,6 +137,25 @@
                                 </xs:restriction>
                             </xs:simpleType>
                         </xs:element> 
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="markForSuspension" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="errorCodes" minOccurs="0" maxOccurs="1" type="xs:string"/>
+                        <xs:element name="retriesBeforeSuspension" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+                        <xs:element name="retryDelay" minOccurs="0" maxOccurs="1" type="xs:long"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="suspendOnFailure" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="errorCodes" minOccurs="0" maxOccurs="1" type="xs:string"/>
+                        <xs:element name="initialDuration" minOccurs="0" maxOccurs="1" type="xs:long"/>
+                        <xs:element name="progressionFactor" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+                        <xs:element name="maximumDuration" minOccurs="0" maxOccurs="1" type="xs:long"/>
                     </xs:all>
                 </xs:complexType>
             </xs:element>

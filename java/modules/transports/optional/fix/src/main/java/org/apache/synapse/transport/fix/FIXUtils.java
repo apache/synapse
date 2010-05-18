@@ -39,7 +39,6 @@ import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.*;
@@ -83,7 +82,8 @@ public class FIXUtils {
 
         SOAPFactory soapFactory = new SOAP11Factory();
         OMElement msg = soapFactory.createOMElement(FIXConstants.FIX_MESSAGE, null);
-        msg.addAttribute(soapFactory.createOMAttribute(FIXConstants.FIX_MESSAGE_INCOMING_SESSION, null, sessionID));
+        msg.addAttribute(soapFactory.createOMAttribute(FIXConstants.FIX_MESSAGE_INCOMING_SESSION,
+                null, sessionID));
         msg.addAttribute(soapFactory.createOMAttribute
                 (FIXConstants.FIX_MESSAGE_COUNTER, null, String.valueOf(counter)));
 
@@ -97,20 +97,22 @@ public class FIXUtils {
             while (iter.hasNext()) {
                 Field<?> field = iter.next();
                 OMElement msgField = soapFactory.createOMElement(FIXConstants.FIX_FIELD, null);
-                msgField.addAttribute(soapFactory.
-                        createOMAttribute(FIXConstants.FIX_FIELD_ID, null, String.valueOf(field.getTag())));
+                msgField.addAttribute(soapFactory.createOMAttribute(FIXConstants.FIX_FIELD_ID,
+                        null, String.valueOf(field.getTag())));
                 Object value = field.getObject();
 
                 if (value instanceof byte[]) {
                     DataSource dataSource = new ByteArrayDataSource((byte[]) value);
                     DataHandler dataHandler = new DataHandler(dataSource);
                     String contentID = msgCtx.addAttachment(dataHandler);
-                    OMElement binaryData = soapFactory.createOMElement(FIXConstants.FIX_BINARY_FIELD, null);
+                    OMElement binaryData = soapFactory.createOMElement(
+                            FIXConstants.FIX_BINARY_FIELD, null);
                     String binaryCID = "cid:" + contentID;
                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
                     msgField.addChild(binaryData);
                 } else {
-                    soapFactory.createOMText(msgField, value.toString(), OMElement.CDATA_SECTION_NODE);
+                    soapFactory.createOMText(msgField, value.toString(),
+                            OMElement.CDATA_SECTION_NODE);
                 }
                 header.addChild(msgField);
             }
@@ -125,19 +127,22 @@ public class FIXUtils {
                 Field<?> field = iter.next();
                 OMElement msgField = soapFactory.createOMElement(FIXConstants.FIX_FIELD, null);
                 msgField.addAttribute(soapFactory.
-                        createOMAttribute(FIXConstants.FIX_FIELD_ID, null, String.valueOf(field.getTag())));
+                        createOMAttribute(FIXConstants.FIX_FIELD_ID, null,
+                        String.valueOf(field.getTag())));
                 Object value = field.getObject();
 
                 if (value instanceof byte[]) {
                     DataSource dataSource = new ByteArrayDataSource((byte[]) value);
                     DataHandler dataHandler = new DataHandler(dataSource);
                     String contentID = msgCtx.addAttachment(dataHandler);
-                    OMElement binaryData = soapFactory.createOMElement(FIXConstants.FIX_BINARY_FIELD, null);
+                    OMElement binaryData = soapFactory.createOMElement(
+                            FIXConstants.FIX_BINARY_FIELD, null);
                     String binaryCID = "cid:" + contentID;
                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
                     msgField.addChild(binaryData);
                 } else {
-                    soapFactory.createOMText(msgField, value.toString(), OMElement.CDATA_SECTION_NODE);
+                    soapFactory.createOMText(msgField, value.toString(),
+                            OMElement.CDATA_SECTION_NODE);
                 }
                 trailer.addChild(msgField);
             }
@@ -174,19 +179,22 @@ public class FIXUtils {
                  Field<?> field = iter.next();
                  OMElement msgField = soapFactory.createOMElement(FIXConstants.FIX_FIELD, null);
                  msgField.addAttribute(soapFactory.
-                         createOMAttribute(FIXConstants.FIX_FIELD_ID, null, String.valueOf(field.getTag())));
+                         createOMAttribute(FIXConstants.FIX_FIELD_ID, null,
+                         String.valueOf(field.getTag())));
                  Object value = field.getObject();
 
                  if (value instanceof byte[]) {
                      DataSource dataSource = new ByteArrayDataSource((byte[]) value);
                      DataHandler dataHandler = new DataHandler(dataSource);
                      String contentID = msgCtx.addAttachment(dataHandler);
-                     OMElement binaryData = soapFactory.createOMElement(FIXConstants.FIX_BINARY_FIELD, null);
+                     OMElement binaryData = soapFactory.createOMElement(
+                             FIXConstants.FIX_BINARY_FIELD, null);
                      String binaryCID = "cid:" + contentID;
                      binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
                      msgField.addChild(binaryData);
                  } else {
-                     soapFactory.createOMText(msgField, value.toString(), OMElement.CDATA_SECTION_NODE);
+                     soapFactory.createOMText(msgField, value.toString(),
+                             OMElement.CDATA_SECTION_NODE);
                  }
 
                  body.addChild(msgField);
@@ -195,63 +203,49 @@ public class FIXUtils {
         
         //process FIX repeating groups
         Iterator<Integer> groupKeyItr = message.groupKeyIterator();
-        if (groupKeyItr != null){
+        if (groupKeyItr != null) {
             while (groupKeyItr.hasNext()) {
-                try {
-                    int groupKey =  groupKeyItr.next();
-                    OMElement groupsField = soapFactory.createOMElement(FIXConstants.FIX_GROUPS, null);
-                    groupsField.addAttribute(FIXConstants.FIX_FIELD_ID,String.valueOf(groupKey),null);
-                    // TODO: Folowing section uses reflections to access the FieldMap.getGroups(Field) method.
-                    // Once QFJ accept the QFJ-330 patch can remove the folowing section.
-                    Class fieldMap;
-                    // Package access method getGroups(int) is a method of FieldMap the parent class of Group , Message and <FIXV>Message
-                    if (message.getClass().getName().equals("quickfix.Group")){    // Not added to constants subject to remove with QFJ-330
-                        fieldMap = message.getClass().getSuperclass();
-                    } else if (message.getClass().getName().equals("quickfix.Message")){ // Not added to constants subject to remove with QFJ-330
-                        fieldMap = message.getClass().getSuperclass();
-                    } else {
-                        fieldMap = message.getClass().getSuperclass().getSuperclass().getSuperclass();
-                    }
+                int groupKey =  groupKeyItr.next();
+                OMElement groupsField = soapFactory.createOMElement(FIXConstants.FIX_GROUPS,
+                        null);
+                groupsField.addAttribute(FIXConstants.FIX_FIELD_ID,
+                        String.valueOf(groupKey),null);
+                List<Group> groupList = message.getGroups(groupKey);
+                Iterator<Group> groupIterator = groupList.iterator();
 
-                    Class[] types = new Class[] { int.class };
-                    Method getGroups = fieldMap.getDeclaredMethod("getGroups", types); // Not added to constants subject to remove with QFJ-330
-                    getGroups.setAccessible(true);
-                    List<Group> groupList = (List<Group>) getGroups.invoke(message, groupKey);
-                    Iterator<Group> groupIterator = groupList.iterator();
-                    while(groupIterator.hasNext()){
-                        Group msgGroup = groupIterator.next();
-                        OMElement groupField = soapFactory.createOMElement(FIXConstants.FIX_GROUP, null);
-                        convertFIXBodyToXML(msgGroup, groupField, soapFactory, msgCtx);    // rec. call the method to process the repeating groups
-                        groupsField.addChild(groupField);
-                    }
-                    body.addChild(groupsField);
-
-                } catch (Exception e) {
-                    throw new AxisFault("Exception occured in FIX message processing : " + e.toString());
+                while(groupIterator.hasNext()) {
+                    Group msgGroup = groupIterator.next();
+                    OMElement groupField = soapFactory.createOMElement(FIXConstants.FIX_GROUP, null);
+                    // rec. call the method to process the repeating groups
+                    convertFIXBodyToXML(msgGroup, groupField, soapFactory, msgCtx);
+                    groupsField.addChild(groupField);
                 }
+                body.addChild(groupsField);
             }
         }
     }
 
 
-    private void generateFIXBody(OMElement node, FieldMap message, MessageContext msgCtx, boolean withNs,
-                                 String nsURI, String nsPrefix) throws IOException {
+    private void generateFIXBody(OMElement node, FieldMap message, MessageContext msgCtx,
+                                 boolean withNs, String nsURI, String nsPrefix) throws IOException {
 
-        Iterator<OMElement> bodyElements = node.getChildElements();
+        Iterator bodyElements = node.getChildElements();
         while (bodyElements.hasNext()) {
-            OMElement bodyNode = bodyElements.next();
+            OMElement bodyNode = (OMElement) bodyElements.next();
             String nodeLocalName = bodyNode.getLocalName();
 
             //handle repeating groups
             if (nodeLocalName.equals(FIXConstants.FIX_GROUPS)){
-                int groupsKey = Integer.parseInt(bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID)));
+                int groupsKey = Integer.parseInt(bodyNode.getAttributeValue(
+                        new QName(FIXConstants.FIX_FIELD_ID)));
                 Group group;
-                Iterator<OMElement> groupElements = bodyNode.getChildElements();
+                Iterator groupElements = bodyNode.getChildElements();
                 while (groupElements.hasNext()){
-                    OMElement groupNode = groupElements.next();
+                    OMElement groupNode = (OMElement) groupElements.next();
                     OMElement delimNode = groupNode.getFirstElement();
-                    int delimKey = Integer.parseInt(delimNode. getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID)));
-                    group = new Group(groupsKey,delimKey);
+                    int delimKey = Integer.parseInt(delimNode.getAttributeValue(
+                            new QName(FIXConstants.FIX_FIELD_ID)));
+                    group = new Group(groupsKey, delimKey);
                     generateFIXBody(groupNode, group, msgCtx, withNs, nsURI, nsPrefix);
                     message.addGroup(group);
                 }
@@ -259,7 +253,8 @@ public class FIXUtils {
             } else {
                 String tag;
                 if (withNs) {
-                    tag = bodyNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
+                    tag = bodyNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID,
+                            nsPrefix));
                 } else {
                     tag = bodyNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
                 }
@@ -270,7 +265,8 @@ public class FIXUtils {
                      String href;
                      if (withNs) {
                          href = bodyNode.getFirstElement().
-                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix)) ;
+                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID,
+                                            nsPrefix)) ;
                      } else {
                          href = bodyNode.getFirstElement().
                                     getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
@@ -304,7 +300,8 @@ public class FIXUtils {
      */
     public Message createFIXMessage(MessageContext msgCtx) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug("Extracting FIX message from the message context (Message ID: " + msgCtx.getMessageID() + ")");
+            log.debug("Extracting FIX message from the message context (Message ID: " +
+                    msgCtx.getMessageID() + ")");
         }
 
         boolean withNs = false;
@@ -330,19 +327,19 @@ public class FIXUtils {
             messageNode = soapBody.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
         }
 
-        Iterator<OMElement> messageElements = messageNode.getChildElements();
+        Iterator messageElements = messageNode.getChildElements();
 
         while (messageElements.hasNext()) {
-            OMElement node = messageElements.next();
+            OMElement node = (OMElement) messageElements.next();
             //create FIX header
             if (node.getQName().getLocalPart().equals(FIXConstants.FIX_HEADER)) {
-                Iterator<OMElement> headerElements = node.getChildElements();
+                Iterator headerElements = node.getChildElements();
                 while (headerElements.hasNext()) {
-                    OMElement headerNode = headerElements.next();
+                    OMElement headerNode = (OMElement) headerElements.next();
                     String tag;
                     if (withNs) {
-                        tag = headerNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID,
-                                nsPrefix));
+                        tag = headerNode.getAttributeValue(new QName(nsURI,
+                                FIXConstants.FIX_FIELD_ID, nsPrefix));
                     } else {
                         tag = headerNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
                     }
@@ -352,8 +349,8 @@ public class FIXUtils {
                     if (child != null) {
                         String href;
                         if (withNs) {
-                            href = headerNode.getFirstElement().
-                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_MESSAGE_REFERENCE, nsPrefix));    
+                            href = headerNode.getFirstElement().getAttributeValue(
+                                    new QName(nsURI, FIXConstants.FIX_MESSAGE_REFERENCE, nsPrefix));
                         } else {
                             href = headerNode.getFirstElement().
                                 getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
@@ -380,12 +377,13 @@ public class FIXUtils {
                 
             } else if (node.getQName().getLocalPart().equals(FIXConstants.FIX_TRAILER)) {
                 //create FIX trailer
-                Iterator<OMElement> trailerElements = node.getChildElements();
+                Iterator trailerElements = node.getChildElements();
                 while (trailerElements.hasNext()) {
-                    OMElement trailerNode = trailerElements.next();
+                    OMElement trailerNode = (OMElement) trailerElements.next();
                     String tag;
                     if (withNs) {
-                        tag = trailerNode.getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
+                        tag = trailerNode.getAttributeValue(new QName(nsURI,
+                                FIXConstants.FIX_FIELD_ID, nsPrefix));
                     } else {
                         tag = trailerNode.getAttributeValue(new QName(FIXConstants.FIX_FIELD_ID));
                     }
@@ -395,8 +393,8 @@ public class FIXUtils {
                     if (child != null) {
                         String href;
                         if (withNs) {
-                            href = trailerNode.getFirstElement().
-                                    getAttributeValue(new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
+                            href = trailerNode.getFirstElement().getAttributeValue(
+                                    new QName(nsURI, FIXConstants.FIX_FIELD_ID, nsPrefix));
                         } else {
                              href = trailerNode.getFirstElement().
                                 getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_REFERENCE));
@@ -644,10 +642,10 @@ public class FIXUtils {
             }
         }
 
-        Map<String, String> trpHeaders = (Map<String, String>) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
+        Map trpHeaders = (Map) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
         //try to get the service from the transport headers
         if (trpHeaders != null) {
-            String serviceName = (trpHeaders.get(FIXConstants.FIX_MESSAGE_SERVICE));
+            String serviceName = (String) trpHeaders.get(FIXConstants.FIX_MESSAGE_SERVICE);
             if (serviceName != null) {
                 return serviceName;
             }
@@ -662,11 +660,11 @@ public class FIXUtils {
      * @return application type of the message
      */
     public static String getFixApplication(MessageContext msgCtx) {
-        Map<String, String> trpHeaders = (Map) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
+        Map trpHeaders = (Map) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
         //try to get the application type from the transport headers
         String fixApplication = null;
         if (trpHeaders != null) {
-            fixApplication = trpHeaders.get(FIXConstants.FIX_MESSAGE_APPLICATION);
+            fixApplication = (String) trpHeaders.get(FIXConstants.FIX_MESSAGE_APPLICATION);
         }
         return fixApplication;
     }
@@ -678,7 +676,9 @@ public class FIXUtils {
      * @param fixApplication FIX application type
      * @return a Map of transport headers
      */
-    public static Map<String, String> getTransportHeaders(String serviceName, String fixApplication) {
+    public static Map<String, String> getTransportHeaders(String serviceName,
+                                                          String fixApplication) {
+
         Map<String, String> trpHeaders = new HashMap<String, String>();
         trpHeaders.put(FIXConstants.FIX_MESSAGE_SERVICE, serviceName);
         trpHeaders.put(FIXConstants.FIX_MESSAGE_APPLICATION, fixApplication);
@@ -705,7 +705,8 @@ public class FIXUtils {
     }
 
     /**
-     * Reads the SOAP body of a message and attempts to retreive the application level sequence number
+     * Reads the SOAP body of a message and attempts to retreive the application level
+     * sequence number
      *
      * @param msgCtx Axis2 MessageContext
      * @return application level sequence number or -1
@@ -730,7 +731,8 @@ public class FIXUtils {
     }
 
     /**
-     * Reads the SOAP body of a message and attempts to retreive the application level sequence number
+     * Reads the SOAP body of a message and attempts to retreive the application level
+     * sequence number
      *
      * @param body Body of the SOAP message
      * @param ns Namespace
@@ -760,7 +762,8 @@ public class FIXUtils {
         OMNamespace ns = getNamespaceOfFIXPayload(body);
         if (ns == null) {
             OMElement messageNode = body.getFirstChildWithName(new QName(FIXConstants.FIX_MESSAGE));
-            srcSession = messageNode.getAttributeValue(new QName(FIXConstants.FIX_MESSAGE_INCOMING_SESSION));
+            srcSession = messageNode.getAttributeValue(new QName(
+                    FIXConstants.FIX_MESSAGE_INCOMING_SESSION));
         } else {
             srcSession = getSourceSession(body, ns);
         }
@@ -768,7 +771,8 @@ public class FIXUtils {
     }
 
     /**
-     * Reads the SOAP body of a message and attempts to retreive the session identifier string with a namesapce
+     * Reads the SOAP body of a message and attempts to retreive the session identifier string
+     * with a namesapce
      *
      * @param body Body of the SOAP message
      * @param ns Namespace

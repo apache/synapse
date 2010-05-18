@@ -59,6 +59,11 @@
     </xs:complexType>
 
     <xs:group name="leafEndpoints">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group represents the set of leaf level endpoints
+            </xs:documentation>
+        </xs:annotation>
         <xs:choice>
             <xs:element name="default" type="DefaultEndpoint"/>
             <xs:element name="address">
@@ -71,6 +76,11 @@
     </xs:group>
 
     <xs:group name="aggregatedEndpoints">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group represents the secondary endpoints like load balance and fail over
+            </xs:documentation>
+        </xs:annotation>
         <xs:choice>
             <xs:element name="loadbalance">
                 <xs:complexType>
@@ -131,7 +141,35 @@
                 </xs:complexType>
             </xs:element>
         </xs:all>
-        <xs:attributeGroup ref="monitoringAspect"/>
+        <xs:attributeGroup ref="commonEndpoint"/>
     </xs:complexType>
+
+    <xs:attributeGroup name="commonEndpoint">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group of attributes represents the common endpoint attribute set
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="format" use="optional">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="soap11"/>
+                    <xs:enumeration value="soap12"/>
+                    <xs:enumeration value="pox"/>
+                    <xs:enumeration value="get"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="optimize" use="optional">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="mtom"/>
+                    <xs:enumeration value="swa"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="encoding" type="xs:string" use="optional"/>
+        <xs:attributeGroup ref="monitoringAspect"/>
+    </xs:attributeGroup>
 
 </xs:schema>

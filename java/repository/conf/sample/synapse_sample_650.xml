@@ -19,12 +19,12 @@
 
 <!-- Introduction to priority based mediation -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-    <priority-executor name="exec">
+    <priorityExecutor name="exec">
         <queues>
             <queue size="100" priority="1"/>
             <queue size="100" priority="10"/>
         </queues>
-    </priority-executor>
+    </priorityExecutor>
     <proxy name="StockQuoteProxy">
         <target>
             <inSequence>

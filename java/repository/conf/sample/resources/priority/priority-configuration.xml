@@ -18,7 +18,7 @@
   -->
         
 <priorityConfiguration>
-    <priority-executor>
+    <priorityExecutor>
         <!-- two priorities specified with priority 10 and 1. Both priority messages has a queue depth of 100 -->
         <queues isFixedCapacity="true" nextQueue="org.apache.synapse.commons.executors.PRRNextQueueAlgorithm">
             <queue size="100" priority="10"/>
@@ -26,7 +26,7 @@
         </queues>
         <!-- these are the default values, values are put here to show their availability -->
         <threads core="20" max="100" keep-alive="5"/>
-    </priority-executor>
+    </priorityExecutor>
 
     <!-- if a message comes that we cannot determine priority, we set a default priority of 1 -->
     <conditions defaultPriority="1">

@@ -67,7 +67,13 @@
         <xs:choice>
             <xs:element name="default" type="DefaultEndpoint"/>
             <xs:element name="address">
-                <!-- TODO : address endpoint -->
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="DefaultEndpoint">
+                            <xs:attribute name="uri" type="xs:anyURI" use="required"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
             </xs:element>
             <xs:element name="wsdl">
                 <!-- TODO : WSDL endpoint -->

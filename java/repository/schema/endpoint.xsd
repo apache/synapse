@@ -25,7 +25,7 @@
     <xs:element name="endpoint" type="NamedEndpoint">
         <xs:annotation>
             <xs:documentation source="description">
-                Endpoint description
+                &lt;endpoint&gt; declarations for the synapse configuration
             </xs:documentation>
         </xs:annotation>
     </xs:element>
@@ -58,11 +58,9 @@
 
     <xs:group name="leafEndpoints">
         <xs:choice>
+            <xs:element name="default" type="DefaultEndpoint"/>
             <xs:element name="address">
                 <!-- TODO : address endpoint -->
-            </xs:element>
-            <xs:element name="default">
-                <!-- TODO : default endpoint -->
             </xs:element>
             <xs:element name="wsdl">
                 <!-- TODO : WSDL endpoint -->
@@ -84,5 +82,53 @@
             </xs:element>
         </xs:choice>
     </xs:group>
+
+    <xs:complexType name="DefaultEndpoint">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This is the type declaration of the default endpoint
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="enableRM" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="policy" type="xs:string" use="optional"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="enableSec" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="policy" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="enableAddressing" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="version" use="optional" default="final">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="final"/>
+                                <xs:enumeration value="submission"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="separateListener" use="optional" type="xs:boolean" default="false"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="timeout" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="duration" minOccurs="0" maxOccurs="1" type="xs:long"/>
+                        <xs:element name="action" minOccurs="0" maxOccurs="1">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="discard"/>
+                                    <xs:enumeration value="fault"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element> 
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
 
 </xs:schema>

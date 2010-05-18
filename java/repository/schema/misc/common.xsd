@@ -51,11 +51,23 @@
     </xs:element>
     
     <xs:attributeGroup name="monitoringAspect">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group of attributes represents the statistics and tracing of sequences,
+                proxy services and endpoints
+            </xs:documentation>
+        </xs:annotation>
         <xs:attribute name="statistics" default="disabled" type="enableDisable" use="optional"/>
         <xs:attribute name="trace" default="disabled" type="enableDisable" use="optional"/>
     </xs:attributeGroup>
 
     <xs:simpleType name="enableDisable">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This simple type represents the possible values for the statistics and tracing
+                attributes
+            </xs:documentation>
+        </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:enumeration value="enable"/>
             <xs:enumeration value="disable"/>

@@ -23,6 +23,7 @@
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <xs:include schemaLocation="mediators/mediators.xsd"/>
+    <xs:include schemaLocation="misc/common.xsd"/>
 
     <xs:element name="sequence" type="NamedSequence">
         <xs:annotation>
@@ -41,6 +42,7 @@
         <xs:sequence>
             <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
+        <xs:attributeGroup ref="monitoringAspect"/>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="onError" type="xs:string" use="optional"/>
     </xs:complexType>

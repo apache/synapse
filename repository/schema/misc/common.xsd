@@ -49,5 +49,17 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    
+    <xs:attributeGroup name="monitoringAspect">
+        <xs:attribute name="statistics" default="disabled" type="enableDisable" use="optional"/>
+        <xs:attribute name="trace" default="disabled" type="enableDisable" use="optional"/>
+    </xs:attributeGroup>
+
+    <xs:simpleType name="enableDisable">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="enable"/>
+            <xs:enumeration value="disable"/>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>

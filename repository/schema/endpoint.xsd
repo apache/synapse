@@ -22,6 +22,8 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
+    <xs:include schemaLocation="misc/common.xsd"/>
+
     <xs:element name="endpoint" type="NamedEndpoint">
         <xs:annotation>
             <xs:documentation source="description">
@@ -129,6 +131,7 @@
                 </xs:complexType>
             </xs:element>
         </xs:all>
+        <xs:attributeGroup ref="monitoringAspect"/>
     </xs:complexType>
 
 </xs:schema>

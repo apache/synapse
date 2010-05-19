@@ -20,13 +20,10 @@
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
-           xmlns="http://synapse.apache.org/ns/2010/04/configuration"
-           xmlns:wsdl11="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl20="http://www.w3.org/ns/wsdl">
+           xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <xs:include schemaLocation="misc/target.xsd"/>
     <xs:include schemaLocation="misc/common.xsd"/>
-    <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="wsdl/wsdl11.xsd"/>
-    <xs:import namespace="http://www.w3.org/ns/wsdl" schemaLocation="wsdl/wsdl20.xsd"/>
 
     <xs:element name="proxy" type="Proxy">
         <xs:annotation>
@@ -68,12 +65,5 @@
         <xs:attribute name="transports" use="optional"/>
         <xs:attribute name="pinnedServers" use="optional"/>
     </xs:complexType>
-
-    <xs:group name="inlineWsdl">
-        <xs:choice>
-            <xs:element ref="wsdl11:definitions" minOccurs="0" maxOccurs="1"/>
-            <xs:element ref="wsdl20:description" minOccurs="0" maxOccurs="1"/>
-        </xs:choice>
-    </xs:group>
 
 </xs:schema>

@@ -76,7 +76,17 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="wsdl">
-                <!-- TODO : WSDL endpoint -->
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="DefaultEndpoint">
+                            <xs:group ref="inlineWsdl" minOccurs="0" maxOccurs="1"/>
+                            <!-- TODO : fix the schema complication by changing the config -->
+                            <xs:attribute name="uri" type="xs:anyURI" use="optional"/>
+                            <xs:attribute name="service" type="xs:string" use="required"/>
+                            <xs:attribute name="port" type="xs:string" use="required"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
             </xs:element>
         </xs:choice>
     </xs:group>

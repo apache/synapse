@@ -125,6 +125,12 @@ public class DynamicResourceTest extends TestCase {
         assertTrue(seq1 != seq4);
         assertTrue(!((SequenceMediator) seq1).isInitialized());
 
+        // Phase 5
+        System.out.println("Testing for non-existing sequences...");
+        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
+        Mediator seq5 = synCtx.getSequence("non-existing-sequence");
+        assertNull(seq5);
+
         System.out.println("Dynamic sequence lookup tests were successful...");
     }
 
@@ -171,6 +177,12 @@ public class DynamicResourceTest extends TestCase {
         assertEquals("http://test2.url", ((AddressEndpoint) ep4).getDefinition().getAddress());
         assertTrue(ep1 != ep4);
         assertTrue(!ep1.isInitialized());
+
+        // Phase 5
+        System.out.println("Testing for non-existing endpoints...");
+        synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
+        Endpoint ep5 = synCtx.getEndpoint("non-existing-endpoint");
+        assertNull(ep5);
 
         System.out.println("Dynamic endpoint lookup tests were successful...");
     }

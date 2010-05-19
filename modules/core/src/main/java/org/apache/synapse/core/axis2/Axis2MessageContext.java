@@ -152,12 +152,16 @@ public class Axis2MessageContext implements MessageContext {
             return (Endpoint) o;
         } else {
             Endpoint e = getConfiguration().getEndpoint(key);
-            synchronized (e) {
+            if (e != null) {
                 if (!e.isInitialized()) {
-                    e.init(synEnv);
+                    synchronized (e) {
+                        if (!e.isInitialized()) {
+                            e.init(synEnv);
+                        }
+                    }
                 }
+                localEntries.put(key, e);
             }
-            localEntries.put(key, e);
             return e;
         }
     }

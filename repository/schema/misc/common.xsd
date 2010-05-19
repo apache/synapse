@@ -20,7 +20,11 @@
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
-           xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+           xmlns="http://synapse.apache.org/ns/2010/04/configuration"
+           xmlns:wsdl11="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl20="http://www.w3.org/ns/wsdl">
+
+    <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="wsdl11.xsd"/>
+    <xs:import namespace="http://www.w3.org/ns/wsdl" schemaLocation="wsdl20.xsd"/>
 
     <xs:element name="resource">
         <xs:annotation>
@@ -49,6 +53,13 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+
+    <xs:group name="inlineWsdl">
+        <xs:choice>
+            <xs:element ref="wsdl11:definitions" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="wsdl20:description" minOccurs="0" maxOccurs="1"/>
+        </xs:choice>
+    </xs:group>
     
     <xs:attributeGroup name="monitoringAspect">
         <xs:annotation>

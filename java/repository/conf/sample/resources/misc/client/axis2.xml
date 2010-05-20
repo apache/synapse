@@ -209,6 +209,8 @@
 
     <!-- transportSender name="tcp"
                      class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
+    <transportSender name="udp"
+                     class="org.apache.axis2.transport.udp.UDPSender"/>
     <transportSender name="local"
                      class="org.apache.axis2.transport.local.LocalTransportSender"/ -->
 	<transportSender name="http"

@@ -234,6 +234,9 @@
         <parameter name="port">6060</parameter>
     </transportReceiver>-->
 
+    <!--Uncomment this for UDP transport support
+    <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>        
+
     <!-- ================================================= -->
     <!-- Transport Outs -->
     <!-- ================================================= -->
@@ -309,6 +312,9 @@
 
     <!--Uncomment this for TCP transport support
     <transportSender name="tcp" class="org.apache.axis2.transport.tcp.TCPTransportSender"/>-->
+
+    <!--Uncomment this for UDP transport support
+    <transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/>
 
     <!-- ================================================= -->
     <!-- Global Modules  -->

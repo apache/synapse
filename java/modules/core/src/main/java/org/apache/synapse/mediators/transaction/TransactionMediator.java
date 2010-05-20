@@ -91,7 +91,7 @@ public class TransactionMediator extends AbstractMediator {
 
             if (status != Status.STATUS_NO_TRANSACTION) {
                 throw new SynapseException("Require to begin a new transaction, " +
-                        "but a tansaction already exist");
+                        "but a transaction already exist");
             }
 
             try {

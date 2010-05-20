@@ -229,6 +229,11 @@
         <parameter name="non-blocking">true</parameter>
     </transportReceiver>-->
 
+    <!--Uncomment this for TCP transport support
+    <transportReceiver name="tcp" class="org.apache.axis2.transport.tcp.TCPServer">
+        <parameter name="port">6060</parameter>
+    </transportReceiver>-->
+
     <!-- ================================================= -->
     <!-- Transport Outs -->
     <!-- ================================================= -->
@@ -301,6 +306,9 @@
     <transportSender name="fix" class="org.apache.synapse.transport.fix.FIXTransportSender">
 	    <parameter name="non-blocking">true</parameter>
     </transportSender>-->
+
+    <!--Uncomment this for TCP transport support
+    <transportSender name="tcp" class="org.apache.axis2.transport.tcp.TCPTransportSender"/>-->
 
     <!-- ================================================= -->
     <!-- Global Modules  -->

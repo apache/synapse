@@ -224,7 +224,9 @@
 <li>
 <a href="#Sample264">Sample 264: Transport switching - HTTP/S to JMS two way messages</a></li>
 <li>
-<a href="#Sample266">Sample 265: Switching from TCP to HTTP/S</a></li>
+<a href="#Sample265">Sample 265: Switching from TCP to HTTP/S</a></li>
+<li>
+<a href="#Sample266">Sample 266: Switching from UDP to HTTP/S</a></li>    
 </ul></li>
 <li>
 <a href="#Task">Introduction to Synapse tasks</a>
@@ -2907,7 +2909,7 @@ it will first try to read the content type from the 'contentType' message proper
   <p>
     <strong>Prerequisites:</strong>
     <br/>You need to configure Synpase to use the TCP transport. The sample Axis2 client should also
-      be setup to send TCP requests. Refer <a href="Synapse_Samples_Setup.html#tcptransport">Setting
+      be setup to send TCP requests. Refer <a href="Synapse_Samples_Setup.html#tcp">Setting
       Up the TCP Transport</a> section in the sample setup guide for more details.
   </p>
   <p>
@@ -2926,6 +2928,47 @@ it will first try to read the content type from the 'contentType' message proper
   <pre xml:space="preserve">ant stockquote -Daddurl=tcp://localhost:6161/services/StockQuoteProxy -Dmode=placeorder</pre>
   <p>The TCP transport will receive the message and hand it over to the mediation engine. Synapse will
   dispatch the request to the StockQuoteProxy service based on the addressing header values.</p>
+  <p>The sample Axis2 server console will print a message indicating that it has received the request: </p>
+  <pre xml:space="preserve">Thu May 20 12:25:01 IST 2010 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 17621 stocks of IBM at $ 73.48068475255796
+</pre>
+
+  <h2>
+    <a name="Sample266" id="Sample266">Sample 266: Switching from UDP to HTTP/S</a>
+  </h2>
+  <pre xml:space="preserve">&lt;proxy xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="StockQuoteProxy" transports="udp"&gt;
+   &lt;target&gt;
+	&lt;endpoint&gt;
+	   &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+	&lt;/endpoint&gt;
+	&lt;inSequence&gt;
+	   &lt;log level="full"/&gt;
+	   &lt;property name="OUT_ONLY" value="true"/&gt;
+	&lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;parameter name="transport.udp.port"&gt;9999&lt;/parameter&gt;
+   &lt;parameter name="transport.udp.contentType"&gt;text/xml&lt;/parameter&gt;
+   &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+&lt;/proxy&gt;</pre>
+  <p>
+    <strong>Objective: Demonstrate receiving SOAP messages over UDP and forwarding them over HTTP</strong>
+  </p>
+  <p>
+    <strong>Prerequisites:</strong>
+    <br/>You need to configure Synpase to use the UDP transport. The sample Axis2 client should also
+      be setup to send UDP requests. Refer <a href="Synapse_Samples_Setup.html#udp">Setting
+      Up the UDP Transport</a> section in the sample setup guide for more details.
+  </p>
+  <p>
+    This sample is similar to <a href="#Sample265">Sample 265</a>. Only difference is instead of the TCP transport
+    we will be using the UDP transport to receive messages.
+  </p>
+  <p>Start Synpase using sample 266.</p>
+  <pre xml:space="preserve">synapse.bat/synapse.sh -sample 266</pre>
+  <p>Start Axis2 server with SimpleStockService deployed</p>
+  <p>Invoke the stockquote client using the following command. Note the UDP URL in the command.</p>
+  <pre xml:space="preserve">ant stockquote -Daddurl=udp://localhost:9999?contentType=text/xml -Dmode=placeorder</pre>
+  <p>Since we have configured the content type as text/xml for the proxy service, incoming messages will be processed
+  as SOAP 1.1 messages.</p>
   <p>The sample Axis2 server console will print a message indicating that it has received the request: </p>
   <pre xml:space="preserve">Thu May 20 12:25:01 IST 2010 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 17621 stocks of IBM at $ 73.48068475255796
 </pre>

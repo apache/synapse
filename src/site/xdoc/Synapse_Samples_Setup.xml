@@ -734,6 +734,23 @@ synapse.sh -sample &lt;n&gt;</pre>
      transport sender configuration in the samples/axis2Client/client_repo/conf/axis2.xml file.
     </p>
     <p/>
+    <h2 id="udp">
+      Setting up the UDP Transport
+    </h2>
+    <p>
+      To enable the UDP transport for samples first you need to download the Axis2 UDP transport
+      jar and copy it to the lib directory of Synapse. Then open up the axis2.xml file and uncomment
+      the UDP transport receiver and sender configurations:
+    </p>
+    <pre xml:space="preserve">
+    &lt;transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/&gt;
+
+    &lt;transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/&gt;</pre>
+    <p>
+     If you wish to use the sample Axis2 client to send UDP messages, you have to uncomment the UDP
+     transport sender configuration in the samples/axis2Client/client_repo/conf/axis2.xml file.
+    </p>
+    <p/>
     <h2 id="script">
       Configuring Synapse for Script Mediator Support
     </h2>

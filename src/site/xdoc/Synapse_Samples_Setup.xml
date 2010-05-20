@@ -715,6 +715,25 @@ synapse.sh -sample &lt;n&gt;</pre>
     refer the <a href="http://www.quickfixj.org/quickfixj/usermanual/usage/configuration.html">Configuring Quickfix/J</a> section of the Quickfix/J 
     documentation.
     </p>
+    <h2 id="tcp">
+      Setting up the TCP Transport
+    </h2>
+    <p>
+      To enable the TCP transport for samples first you need to download the Axis2 TCP transport
+      jar and copy it to the lib directory of Synapse. Then open up the axis2.xml file and uncomment
+      the TCP transport receiver and sender configurations:
+    </p>
+    <pre xml:space="preserve">
+    &lt;transportReceiver name="tcp" class="org.apache.axis2.transport.tcp.TCPServer"&gt;
+	    &lt;parameter name="port"&gt;6060&lt;/parameter&gt;
+    &lt;/transportReceiver&gt;
+
+    &lt;transportSender name="tcp" class="org.apache.axis2.transport.tcp.TCPTransportSender"/&gt;</pre>
+    <p>
+     If you wish to use the sample Axis2 client to send TCP messages, you have to uncomment the TCP
+     transport sender configuration in the samples/axis2Client/client_repo/conf/axis2.xml file.
+    </p>
+    <p/>
     <h2 id="script">
       Configuring Synapse for Script Mediator Support
     </h2>

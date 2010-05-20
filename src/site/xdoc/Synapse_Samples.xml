@@ -223,6 +223,8 @@
 <a href="#Sample263">Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM) </a></li>
 <li>
 <a href="#Sample264">Sample 264: Transport switching - HTTP/S to JMS two way messages</a></li>
+<li>
+<a href="#Sample266">Sample 265: Switching from TCP to HTTP/S</a></li>
 </ul></li>
 <li>
 <a href="#Task">Introduction to Synapse tasks</a>
@@ -2882,6 +2884,51 @@ it will first try to read the content type from the 'contentType' message proper
   <pre xml:space="preserve">Generating quote for : MSFT</pre>
   <p>In the client side it shoud print a message indicating it has received the price.</p>
   <pre xml:space="preserve"> Standard :: Stock price = $154.31851804993238</pre>
+
+  <h2>
+    <a name="Sample265" id="Sample265">Sample 265: Switching from TCP to HTTP/S</a>
+  </h2>
+  <pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+    &lt;proxy name="StockQuoteProxy" transports="tcp"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+		        &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;property name="OUT_ONLY" value="true"/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+  <p>
+    <strong>Objective: Demonstrate receiving SOAP messages over TCP and forwarding them over HTTP</strong>
+  </p>
+  <p>
+    <strong>Prerequisites:</strong>
+    <br/>You need to configure Synpase to use the TCP transport. The sample Axis2 client should also
+      be setup to send TCP requests. Refer <a href="Synapse_Samples_Setup.html#tcptransport">Setting
+      Up the TCP Transport</a> section in the sample setup guide for more details.
+  </p>
+  <p>
+    This sample is similar to <a href="#Sample250">Sample 250</a>. Only difference is instead of the JMS transport
+    we will be using the TCP transport to receive messages. TCP is not an application layer protocol. Hence there
+    are no application level headers available in the requests. Synapse has to simply read the XML content coming
+    through the socket and dispatch it to the right proxy service based on the information available in the message
+    payload itself. The TCP transport is capable of dispatching requests based on addressing headers or the first
+    element in the SOAP body. In this sample, we will get the sample client to send WS-Addressing headers in the
+    request. Therefore the dispatching will take place based on the addressing header values.
+  </p>
+  <p>Start Synpase using sample 265.</p>
+  <pre xml:space="preserve">synapse.bat/synapse.sh -sample 265</pre>
+  <p>Start Axis2 server with SimpleStockService deployed</p>
+  <p>Invoke the stockquote client using the following command. Note the TCP URL in the command.</p>
+  <pre xml:space="preserve">ant stockquote -Daddurl=tcp://localhost:6161/services/StockQuoteProxy -Dmode=placeorder</pre>
+  <p>The TCP transport will receive the message and hand it over to the mediation engine. Synapse will
+  dispatch the request to the StockQuoteProxy service based on the addressing header values.</p>
+  <p>The sample Axis2 server console will print a message indicating that it has received the request: </p>
+  <pre xml:space="preserve">Thu May 20 12:25:01 IST 2010 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 17621 stocks of IBM at $ 73.48068475255796
+</pre>
 
   <h1>
 <a name="Task" id="Task">Introduction to Synapse Tasks</a> </h1>

@@ -235,7 +235,7 @@
     </transportReceiver>-->
 
     <!--Uncomment this for UDP transport support
-    <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>        
+    <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>-->        
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
@@ -314,7 +314,7 @@
     <transportSender name="tcp" class="org.apache.axis2.transport.tcp.TCPTransportSender"/>-->
 
     <!--Uncomment this for UDP transport support
-    <transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/>
+    <transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/>-->
 
     <!-- ================================================= -->
     <!-- Global Modules  -->

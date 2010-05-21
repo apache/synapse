@@ -834,11 +834,13 @@ synapse.sh -sample &lt;n&gt;</pre>
       </li>
       <li>
         Create a sample databasae<br/>
-        <pre>CREATE DATABASE synapsedb;</pre>
+        <pre> DROP DATABASE IF EXISTS synapsedb;
+ CREATE DATABASE synapsedb;</pre>
       </li>      
       <li>
         Create a table in the sample database
         <pre> USE synapsedb; 
+ DROP TABLE IF EXISTS company;
  CREATE table company(name varchar(10), id varchar(10), price double);</pre>
       </li>
       <li>
@@ -847,8 +849,13 @@ synapse.sh -sample &lt;n&gt;</pre>
  INSERT into company values ('SUN','c2',3.8349);
  INSERT into company values ('MSFT','c3',3.2938);</pre>
       </li>
-      <li>Create a Stored Procedure<br/>
-        <pre>CREATE PROCEDURE getCompanyDetail(compName VARCHAR(10)) SELECT name, id, price FROM company WHERE name = compName;</pre>
+      <li>Create a Stored Procedures<br/>
+        <pre> DROP PROCEDURE If EXISTS getCompany;
+ CREATE PROCEDURE getCompany(compName VARCHAR(10)) SELECT name, id, price FROM company WHERE name = compName;
+
+ DROP PROCEDURE If EXISTS updateCompany;
+ CREATE PROCEDURE updateCompany(compPrice DOUBLE,compName VARCHAR(10)) UPDATE company SET price = compPrice WHERE name = compName;
+</pre>
       </li>
     </ol>
     <p>

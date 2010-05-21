@@ -3677,98 +3677,64 @@ instructions given in the 'Setting up MySQL database server' section in the
 
 <pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
 
-    &lt;sequence name="myFaultHandler"&gt;
-        &lt;makefault response="true"&gt;
-            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
-        &lt;/makefault&gt;
-        &lt;send/&gt;
-        &lt;drop/&gt;
-    &lt;/sequence&gt;
-
-    &lt;sequence name="main" onError="myFaultHandler"&gt;
+    &lt;sequence name="main"&gt;
         &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
             &lt;log level="custom"&gt;
-                &lt;property name="text"
-                          value="** Looking up from the Database **"/&gt;
+                &lt;property name="text" value="** Reporting to the Database **"/&gt;
+            &lt;/log&gt;
+
+            &lt;dbreport&gt;
+                &lt;connection&gt;
+                    &lt;pool&gt;
+                        &lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;
+			&lt;url&gt;jdbc:mysql://localhost/synapsedb&lt;/url&gt;
+			&lt;user&gt;root&lt;/user&gt;
+			&lt;password&gt;admin&lt;/password&gt;
+                    &lt;/pool&gt;
+                &lt;/connection&gt;
+                &lt;statement&gt;
+                    &lt;sql&gt;call updateCompany(?,?)&lt;/sql&gt;
+                    &lt;parameter expression="//m0:return/m1:last/child::text()" xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd" type="DOUBLE"/&gt;
+                    &lt;parameter expression="//m0:return/m1:symbol/child::text()" xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd" type="VARCHAR"/&gt;
+                &lt;/statement&gt;
+            &lt;/dbreport&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text" value="** Looking up from the Database **"/&gt;
             &lt;/log&gt;
             &lt;dblookup&gt;
                 &lt;connection&gt;
                     &lt;pool&gt;
                         &lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;
-                        &lt;url&gt;jdbc:mysql://localhost/synapsedb&lt;/url&gt;
-                        &lt;user&gt;root&lt;/user&gt;
-                        &lt;password&gt;admin&lt;/password&gt;
+			&lt;url&gt;jdbc:mysql://localhost/synapsedb&lt;/url&gt;
+			&lt;user&gt;root&lt;/user&gt;
+			&lt;password&gt;admin&lt;/password&gt;
                     &lt;/pool&gt;
                 &lt;/connection&gt;
                 &lt;statement&gt;
-                    &lt;sql&gt;call getCompanyDetail(?)&lt;/sql&gt;
-                    &lt;parameter expression="//m0:getQuote/m0:request/m0:symbol"
-                               xmlns:m0="http://services.samples" type="VARCHAR"/&gt;
-                    &lt;result name="company_id" column="id"/&gt;
+                    &lt;sql&gt;call getCompany(?)&lt;/sql&gt;
+                    &lt;parameter expression="//m0:return/m1:symbol/child::text()" xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd" type="VARCHAR"/&gt;
+                    &lt;result name="stock_prize" column="price"/&gt;
                 &lt;/statement&gt;
             &lt;/dblookup&gt;
-
-            &lt;switch source="get-property('company_id')"&gt;
-                &lt;case regex="c1"&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/case&gt;
-                &lt;case regex="c2"&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/case&gt;
-                &lt;case regex="c3"&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/case&gt;
-                &lt;default&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
-                    &lt;/log&gt;
-                    &lt;makefault response="true"&gt;
-                        &lt;code value="tns:Receiver"
-                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-                        &lt;reason value="** Unrecognized Company ID **"/&gt;
-                    &lt;/makefault&gt;
-                    &lt;send/&gt;
-                    &lt;drop/&gt;
-                &lt;/default&gt;
-            &lt;/switch&gt;
-            &lt;drop/&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text" expression="fn:concat('Stock Prize - ',get-property('stock_prize'))"/&gt;
+            &lt;/log&gt;
             &lt;send/&gt;
         &lt;/out&gt;
-
     &lt;/sequence&gt;
 
 &lt;/definitions&gt;</pre></div>
 <div>
 <p>
-<strong>Objective: Demonstrate the use of dblookup mediator to execute a database Stored Procedure (SP)</strong></p>
+<strong>Objective: Demonstrate the use of dblookup and dbreport mediators to execute a database Stored Procedures</strong></p>
 <p>
 <strong>Prerequisites:</strong>Set up MySQL database server according to the
 <a href="Synapse_Samples_Setup.html#mysql">sample setup guide</a>. Edit the synapse_sample_364.xml

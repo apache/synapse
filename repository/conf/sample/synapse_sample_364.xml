@@ -16,96 +16,62 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-    
-<!-- Executing database stored procedures -->
+
+<!-- Action of dbreport and dblookup mediators together -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <sequence name="myFaultHandler">
-        <makefault response="true">
-            <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-            <reason expression="get-property('ERROR_MESSAGE')"/>
-        </makefault>
-        <send/>
-        <drop/>
-    </sequence>
-
-    <sequence name="main" onError="myFaultHandler">
+    <sequence name="main">
         <in>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
+
+        <out>
             <log level="custom">
-                <property name="text"
-                          value="** Looking up from the Database **"/>
+                <property name="text" value="** Reporting to the Database **"/>
+            </log>
+
+            <dbreport>
+                <connection>
+                    <pool>
+                        <driver>com.mysql.jdbc.Driver</driver>
+			<url>jdbc:mysql://localhost/synapsedb</url>
+			<user>root</user>
+			<password>admin</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>call updateCompany(?,?)</sql>
+                    <parameter expression="//m0:return/m1:last/child::text()" xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd" type="DOUBLE"/>
+                    <parameter expression="//m0:return/m1:symbol/child::text()" xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
             </log>
             <dblookup>
                 <connection>
                     <pool>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost/synapsedb</url>
-                        <user>root</user>
-                        <password>admin</password>
+			<url>jdbc:mysql://localhost/synapsedb</url>
+			<user>root</user>
+			<password>admin</password>
                     </pool>
                 </connection>
                 <statement>
-                    <sql>call getCompanyDetail(?)</sql>
-                    <parameter expression="//m0:getQuote/m0:request/m0:symbol"
-                               xmlns:m0="http://services.samples" type="VARCHAR"/>
-                    <result name="company_id" column="id"/>
+                    <sql>call getCompany(?)</sql>
+                    <parameter expression="//m0:return/m1:symbol/child::text()" xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd" type="VARCHAR"/>
+                    <result name="stock_prize" column="price"/>
                 </statement>
             </dblookup>
-
-            <switch source="get-property('company_id')">
-                <case regex="c1">
-                    <log level="custom">
-                        <property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
-                    </log>
-                    <send>
-                        <endpoint>
-                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-                        </endpoint>
-                    </send>
-                </case>
-                <case regex="c2">
-                    <log level="custom">
-                        <property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
-                    </log>
-                    <send>
-                        <endpoint>
-                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-                        </endpoint>
-                    </send>
-                </case>
-                <case regex="c3">
-                    <log level="custom">
-                        <property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
-                    </log>
-                    <send>
-                        <endpoint>
-                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-                        </endpoint>
-                    </send>
-                </case>
-                <default>
-                    <log level="custom">
-                        <property name="text" value="** Unrecognized Company ID **"/>
-                    </log>
-                    <makefault response="true">
-                        <code value="tns:Receiver"
-                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-                        <reason value="** Unrecognized Company ID **"/>
-                    </makefault>
-                    <send/>
-                    <drop/>
-                </default>
-            </switch>
-            <drop/>
-        </in>
-
-        <out>
+            <log level="custom">
+                <property name="text" expression="fn:concat('Stock Prize - ',get-property('stock_prize'))"/>
+            </log>
             <send/>
         </out>
-
     </sequence>
 
 </definitions>

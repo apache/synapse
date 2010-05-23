@@ -18,12 +18,9 @@
  */
 package org.apache.synapse.transport.pipe;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.ParamUtils;
@@ -58,8 +55,8 @@ public class PipeListener extends AbstractDatagramTransportListener<PipeEndpoint
     private Protocol protocol;
     
     @Override
-    public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn) throws AxisFault {
-        super.init(cfgCtx, transportIn);
+    protected void doInit() throws AxisFault {
+        TransportInDescription transportIn = getTransportInDescription();
         String protocolClassName = ParamUtils.getRequiredParam(transportIn, "protocol");
         Class<? extends Protocol> protocolClass;
         try {

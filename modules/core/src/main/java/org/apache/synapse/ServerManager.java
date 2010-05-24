@@ -21,10 +21,10 @@ package org.apache.synapse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
-import org.apache.synapse.commons.security.PasswordManager;
-import org.apache.synapse.commons.security.SecurityConstants;
 import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.core.axis2.SynapseCallbackReceiver;
+import org.apache.synapse.securevault.PasswordManager;
+import org.apache.synapse.securevault.SecurityConstants;
 
 import javax.management.NotCompliantMBeanException;
 import java.util.Date;
@@ -33,7 +33,7 @@ import java.util.Date;
  * This is the core class that starts up a Synapse instance.
  * <p/>
  * From the command line scripts synapse.sh and synapse-daemon.sh (though the wrapper.conf)
- * the SynapseServer is invoked which inturn calls on this to start the instance
+ * the SynapseServer is invoked which in turn calls on this to start the instance
  * <p/>
  * When the WAR deployment is used, the SynapseStartUpServlet servlet calls on this class to
  * initialize Synapse

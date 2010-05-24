@@ -20,8 +20,8 @@ package org.apache.synapse.commons.datasource.serializer;
 
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.datasource.DataSourceInformation;
-import org.apache.synapse.commons.security.SecurityConstants;
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.securevault.SecurityConstants;
+import org.apache.synapse.securevault.secret.SecretInformation;
 
 import java.util.Properties;
 

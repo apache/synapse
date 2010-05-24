@@ -19,20 +19,20 @@
 package org.apache.synapse;
 
 import org.apache.synapse.config.SynapsePropertiesLoader;
-import org.apache.synapse.commons.security.secret.SecretManager;
-import org.apache.synapse.commons.security.secret.mbean.SecretManagerAdminMBean;
+import org.apache.synapse.securevault.secret.SecretManager;
+import org.apache.synapse.securevault.secret.mbean.SecretManagerAdminMBean;
 
 import javax.management.StandardMBean;
 import javax.management.NotCompliantMBeanException;
 
 
 /**
- *
+ * Admin service for managing SecretManager
  */
 
 public class SecretManagerAdminMBeanImpl extends StandardMBean implements SecretManagerAdminMBean {
 
-    private SecretManager secretManager = SecretManager.getInstance();
+    private final SecretManager secretManager = SecretManager.getInstance();
 
     public SecretManagerAdminMBeanImpl() throws NotCompliantMBeanException {
         super(SecretManagerAdminMBean.class);

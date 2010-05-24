@@ -20,7 +20,7 @@ package org.apache.synapse.commons.datasource;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.securevault.secret.SecretInformation;
 
 import java.util.HashMap;
 import java.util.Map;

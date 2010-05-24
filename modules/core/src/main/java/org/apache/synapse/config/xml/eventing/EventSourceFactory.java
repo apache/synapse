@@ -25,10 +25,10 @@ import org.apache.axis2.databinding.utils.ConverterUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.commons.security.PasswordManager;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.eventing.SynapseSubscription;
+import org.apache.synapse.securevault.PasswordManager;
 import org.wso2.eventing.SubscriptionManager;
 import org.wso2.eventing.exceptions.EventException;
 

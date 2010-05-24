@@ -24,9 +24,9 @@ package org.apache.synapse.commons.datasource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.SynapseCommonsException;
-import org.apache.synapse.commons.security.SecurityConstants;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.util.RMIRegistryController;
+import org.apache.synapse.securevault.SecurityConstants;
 
 import javax.naming.*;
 import javax.sql.DataSource;

@@ -169,6 +169,10 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-securevault</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-commons</artifactId>
         </dependency>
         <dependency>

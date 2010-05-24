@@ -21,9 +21,9 @@ package org.apache.synapse.commons.datasource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.SynapseCommonsException;
-import org.apache.synapse.commons.security.SecretResolver;
-import org.apache.synapse.commons.security.SecretResolverFactory;
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.securevault.SecretResolver;
+import org.apache.synapse.securevault.SecretResolverFactory;
+import org.apache.synapse.securevault.secret.SecretInformation;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -25,9 +25,9 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.datasource.DataSourceInformation;
-import org.apache.synapse.commons.security.SecurityConstants;
-import org.apache.synapse.commons.security.secret.SecretInformation;
-import org.apache.synapse.commons.security.secret.SecretInformationFactory;
+import org.apache.synapse.securevault.SecurityConstants;
+import org.apache.synapse.securevault.secret.SecretInformation;
+import org.apache.synapse.securevault.secret.SecretInformationFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 
 import java.util.Properties;

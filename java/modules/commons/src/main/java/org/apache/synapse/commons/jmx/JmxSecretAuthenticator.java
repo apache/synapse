@@ -19,7 +19,7 @@
 
 package org.apache.synapse.commons.jmx;
 
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.securevault.secret.SecretInformation;
 
 import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXPrincipal;

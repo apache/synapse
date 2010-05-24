@@ -22,7 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.commons.datasource.DataSourceInformation;
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.securevault.secret.SecretInformation;
 import org.apache.synapse.mediators.db.AbstractDBMediator;
 import org.apache.synapse.mediators.db.Statement;
 import org.apache.synapse.util.xpath.SynapseXPath;

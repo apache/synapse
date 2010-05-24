@@ -37,8 +37,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.commons.util.RMIRegistryController;
-import org.apache.synapse.commons.security.SecurityConstants;
-import org.apache.synapse.commons.security.secret.SecretCallbackHandler;
+import org.apache.synapse.securevault.SecurityConstants;
+import org.apache.synapse.securevault.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.jmx.JmxInformation;
@@ -51,7 +51,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.task.*;
-import org.apache.synapse.commons.security.secret.handler.SharedSecretCallbackHandlerCache;
+import org.apache.synapse.securevault.secret.handler.SharedSecretCallbackHandlerCache;
 
 import java.util.*;
 

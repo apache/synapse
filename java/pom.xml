@@ -234,6 +234,11 @@
             <!-- Synapse -->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-securevault</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -797,6 +802,7 @@
     </repositories>
 
     <modules>
+        <module>modules/securevault</module>
         <module>modules/commons</module>
         <module>modules/transports</module>
         <module>modules/tasks</module>

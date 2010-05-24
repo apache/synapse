@@ -29,7 +29,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.datasource.*;
 import org.apache.synapse.commons.datasource.factory.DataSourceFactory;
 import org.apache.synapse.commons.jmx.MBeanRepository;
-import org.apache.synapse.commons.security.secret.SecretManager;
+import org.apache.synapse.securevault.secret.SecretManager;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 

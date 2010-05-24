@@ -924,34 +924,35 @@ synapse.sh -sample &lt;n&gt;</pre>
     <strong>password provider</strong>
     for each keystore.
     This can be done by adding property called
-    <strong>secretProvider= any implementation of org.apache.synapse.commons.security.secret.SecretCallbackHandler
+    <strong>secretProvider= any implementation of
+        org.apache.synapse.securevault.secret.SecretCallbackHandler
     </strong>
     Example
     <pre>
-        keystore.identity.store.secretProvider=org.apache.synapse.commons.security.secret.handler.JMXSecretCallbackHandler
+        keystore.identity.store.secretProvider=org.apache.synapse.securevault.secret.handler.JMXSecretCallbackHandler
     </pre>
 </p>
 <p>
     The  <strong>password provider</strong> should be an implementation of
-     <strong>org.apache.synapse.commons.security.secret.SecretCallbackHandler</strong>.Synapse ships three
+     <strong>org.apache.synapse.securevault.secret.SecretCallbackHandler</strong>.Synapse ships three
     implementations that can be used for this purpose.
 
     <ul>
         <li>
-            org.apache.synapse.commons.security.secret.handler.JMXSecretCallbackHandler
+            org.apache.synapse.securevault.secret.handler.JMXSecretCallbackHandler
         </li>
         <li>
-            org.apache.synapse.commons.security.secret.handler.JlineSecretCallbackHandler
+            org.apache.synapse.securevault.secret.handler.JlineSecretCallbackHandler
         </li>
         <li>
-            org.apache.synapse.commons.security.secret.handler.HardCodedSecretCallbackHandler
+            org.apache.synapse.securevault.secret.handler.HardCodedSecretCallbackHandler
         </li>
         <li>
-            org.apache.synapse.commons.security.secret.handler.JBossEncryptionSecretCallbackHandler
+            org.apache.synapse.securevault.secret.handler.JBossEncryptionSecretCallbackHandler
         </li>
     </ul>
     <p>
-        When use <strong>org.apache.synapse.commons.security.secret.handler.JMXSecretCallbackHandler</strong>
+        When use <strong>org.apache.synapse.securevault.secret.handler.JMXSecretCallbackHandler</strong>
         , It is needed to use a JMX Console. Then , using JMX Console need to access the MBean
         <strong>SecretsProvider</strong>
         and add passwords for following keys. Therese is method to add secret in
@@ -978,7 +979,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     </p>
     <pre>secretRepositories=file
 
-        secretRepositories.file.provider=org.apache.synapse.commons.security.secret.repository.FileBaseSecretRepositoryProvider
+        secretRepositories.file.provider=org.apache.synapse.securevault.secret.repository.FileBaseSecretRepositoryProvider
         secretRepositories.file.location=cipher-text.properties
 
     </pre>
@@ -1070,10 +1071,10 @@ synapse.datasources.reportds.maxWait=10000</pre>
     The
     <strong>password provider</strong>
     should be an implementation of
-    <strong>org.apache.synapse.commons.security.secret.SecretCallbackHandler</strong>. There are few
+    <strong>org.apache.synapse.securevault.secret.SecretCallbackHandler</strong>. There are few
     options but it is
     recommended to use
-    <strong>org.apache.synapse.commons.security.secret.handler.SecretManagerSecretCallbackHandler</strong>
+    <strong>org.apache.synapse.securevault.secret.handler.SecretManagerSecretCallbackHandler</strong>
     in this case
     (i.e. securing data source password).
 </p>
@@ -1085,7 +1086,7 @@ synapse.datasources.reportds.maxWait=10000</pre>
 </strong>
 </p>
 <pre>
-    synapse.datasources.lookupds.secretProvider=org.apache.synapse.commons.security.secret.handler.SecretManagerSecretCallbackHandler
+    synapse.datasources.lookupds.secretProvider=org.apache.synapse.securevault.secret.handler.SecretManagerSecretCallbackHandler
 </pre>  
 </div>
 <h2>Using CipherTool</h2>

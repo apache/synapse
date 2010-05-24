@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.commons.SynapseCommonsException;
-import org.apache.synapse.commons.security.secret.SecretInformation;
-import org.apache.synapse.commons.security.secret.SecretInformationFactory;
+import org.apache.synapse.securevault.secret.SecretInformation;
+import org.apache.synapse.securevault.secret.SecretInformationFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

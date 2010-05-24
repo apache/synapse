@@ -20,9 +20,8 @@ package org.apache.synapse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.jmx.JmxConfigurationConstants;
-import org.apache.synapse.commons.security.PasswordManager;
-import org.apache.synapse.commons.security.secret.SecretInformation;
+import org.apache.synapse.securevault.PasswordManager;
+import org.apache.synapse.securevault.secret.SecretInformation;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.jmx.JmxInformation;
 import org.apache.synapse.commons.jmx.JmxSecretAuthenticator;

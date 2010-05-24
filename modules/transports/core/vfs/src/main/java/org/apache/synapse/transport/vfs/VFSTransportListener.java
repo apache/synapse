@@ -24,9 +24,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.format.DataSourceMessageBuilder;
 import org.apache.axis2.format.ManagedDataSource;
@@ -120,22 +118,14 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
      */
     private boolean globalFileLockingFlag = true;
 
-    /**
-     * Initializes the VFS transport by getting the VFS File System manager
-     * @param cfgCtx the Axsi2 configuration context
-     * @param trpInDesc the VFS transport in description from the axis2.xml
-     * @throws AxisFault on error
-     */
     @Override
-    public void init(ConfigurationContext cfgCtx, TransportInDescription trpInDesc)
-        throws AxisFault {
-        super.init(cfgCtx, trpInDesc);
+    protected void doInit() throws AxisFault {
         try {
             StandardFileSystemManager fsm = new StandardFileSystemManager();
             fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));
             fsm.init();
             fsManager = fsm;
-            Parameter lockFlagParam = trpInDesc.getParameter(VFSConstants.TRANSPORT_FILE_LOCKING);
+            Parameter lockFlagParam = getTransportInDescription().getParameter(VFSConstants.TRANSPORT_FILE_LOCKING);
             if (lockFlagParam != null) {
                 String strLockingFlag = lockFlagParam.getValue().toString();
                 // by-default enabled, if explicitly specified as "disable" make it disable

@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axis2.transport.base.datagram.DatagramEndpoint;
@@ -56,7 +57,7 @@ public class PipeEndpoint extends DatagramEndpoint {
     }
 
     @Override
-	public EndpointReference[] getEndpointReferences(String ip) {
+	public EndpointReference[] getEndpointReferences(AxisService service, String ip) {
 		return new EndpointReference[] { new EndpointReference("pipe://" + pipe.getAbsolutePath()
 		        + "?contentType=" + getContentType()) };
 	}

@@ -120,6 +120,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
 
     @Override
     protected void doInit() throws AxisFault {
+        super.doInit();
         try {
             StandardFileSystemManager fsm = new StandardFileSystemManager();
             fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));

@@ -523,6 +523,8 @@ public class ServerWorker implements Runnable {
                         "Error generating ?wsdl output for service : " + serviceName, e);
                     return;
                 }
+            } else {
+                processGetAndDelete("GET");
             }
 
         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
@@ -547,6 +549,8 @@ public class ServerWorker implements Runnable {
                         "Error generating ?wsdl2 output for service : " + serviceName, e);
                     return;
                 }
+            } else {
+                processGetAndDelete("GET");
             }
 
         } else if (serviceName != null && parameters.containsKey("xsd")) {

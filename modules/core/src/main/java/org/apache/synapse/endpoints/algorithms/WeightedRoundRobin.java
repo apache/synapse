@@ -198,6 +198,9 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
 
     public void destroy() {}
 
+    /**
+     * Implementation of the thread local.
+     */
     private class AlgorithmThreadLocal extends ThreadLocal<Algorithm> {
         @Override
         protected Algorithm initialValue() {
@@ -205,6 +208,10 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
         }
     }
 
+    /**
+     * This is a thread local implementation of the algorith. This way indivudual threads will
+     * do their own weighted round robin without considering the global state of the endpoints
+     */
     private class Algorithm {
         /**
          * We keep a sorted array of endpoint states, first state will point to the
@@ -254,10 +261,13 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
      * Simple class for holding the states about the endpoints. 
      */
     private class EndpointState {
+        /** Position of the endpoint, represented by this state */
         private int endpointPosition = 0;
 
+        /** Weight of the endpoint */
         private int weight = 0;
 
+        /** Current weight of the endpoint */
         private int currentWeight = 0;
 
         public EndpointState(int endpointPosition, int weight) {

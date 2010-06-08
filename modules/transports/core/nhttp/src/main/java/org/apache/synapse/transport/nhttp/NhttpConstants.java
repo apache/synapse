@@ -73,7 +73,7 @@ public class NhttpConstants {
     /** Defines weather synapse needs to preserve the original Server header. Configures
      * through nhttp.properties file or via a system property
      * */
-    public static final String SERVER_HEADER_PRESERVE = "http.server.preserve"; 
+    public static final String SERVER_HEADER_PRESERVE = "http.server.preserve";
 
     /** Denotes a connection close is forced if set at the NhttpContext */
     public static final String FORCE_CLOSING = "forceClosing";
@@ -104,4 +104,9 @@ public class NhttpConstants {
     protected static final String PRIORITY_CONFIG_FILE_NAME = "priorityConfigFile";
     /* This is a workaround  for  axis2 RestUtils behaviour */
     public static final String REST_REQUEST_CONTENT_TYPE = "synapse.internal.rest.contentType";
+    
+    /** This constant is used to hold the open connections map in the ConfigurationContext*/
+    public static final String OPEN_CONNNECTIONS_MAP = "OPEN_CONNNECTIONS_MAP";
+    /** Configuration in nhttp.properties file for enable connection counting */
+    public static final String COUNT_CONNECTIONS = "http.count.connections";
 }

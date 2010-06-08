@@ -55,10 +55,14 @@ import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The client connection handler. An instance of this class is used by each IOReactor, to
@@ -89,6 +93,14 @@ public class ClientHandler implements NHttpClientHandler {
 
     /** Array of content types for which warnings are logged if HTTP status code is 500. */
     private String[] warnOnHttp500;
+
+    /** weather we are counting the connections to the back end servers */
+    private boolean countConnections = false;
+    /** lock to update the connection counts in a thread safe way */
+    private Lock lock = new ReentrantLock();
+
+    /** A map for holding the number of open connections for a host:port pair */
+    private Map<String, AtomicInteger> openConnections = new HashMap<String, AtomicInteger>();
 
     public static final String OUTGOING_MESSAGE_CONTEXT = "synapse.axis2_message_context";
     public static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
@@ -131,6 +143,10 @@ public class ClientHandler implements NHttpClientHandler {
         if (contentTypeList != null) {
             warnOnHttp500 = (String[]) contentTypeList;
         }
+        // check weather we count the connections
+        this.countConnections = NHttpConfiguration.getInstance().isCountConnections();
+        // set the connection map to the configuration context
+        cfgCtx.setProperty(NhttpConstants.OPEN_CONNNECTIONS_MAP, openConnections);
     }
 
     public void requestReady(final NHttpClientConnection conn) {
@@ -164,7 +180,10 @@ public class ClientHandler implements NHttpClientHandler {
         // record connection creation time for debug logging
         conn.getContext().setAttribute(CONNECTION_CREATION_TIME, System.currentTimeMillis());
 
-
+        if (countConnections) {
+            recordConnection(conn);
+        }
+        
         try {
             processConnection(conn, (Axis2HttpRequest) attachment);
         } catch (ConnectionClosedException e) {
@@ -886,13 +905,18 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection to be shutdown
      */
     private void shutdownConnection(final NHttpClientConnection conn) {
-
-        if (log.isDebugEnabled() && conn instanceof HttpInetConnection) {
+        if (conn instanceof HttpInetConnection) {
             HttpInetConnection inetConnection = (HttpInetConnection) conn;
-            log.debug("Connection to remote address : " + inetConnection.getRemoteAddress()
-                    + ":" + inetConnection.getRemotePort() + " from local address : "
-                    + inetConnection.getLocalAddress() + ":" + inetConnection.getLocalPort() +
-                    " is closed!");
+            if (log.isDebugEnabled()) {
+                log.debug("Connection to remote address : " + inetConnection.getRemoteAddress()
+                        + ":" + inetConnection.getRemotePort() + " from local address : "
+                        + inetConnection.getLocalAddress() + ":" + inetConnection.getLocalPort() +
+                        " is closed!");
+            }
+            
+            if (countConnections) {
+                removeConnectionRecord(inetConnection);
+            }
         }
 
         HttpContext context = conn.getContext();
@@ -914,6 +938,82 @@ public class ClientHandler implements NHttpClientHandler {
         context.removeAttribute(REQUEST_SOURCE_BUFFER);
         context.removeAttribute(CLIENT_CONNECTION_DEBUG);
         context.removeAttribute(CONNECTION_CREATION_TIME);
+    }
+
+    /**
+     * Remove a connection record for this host:port pair from active connections records.
+     *
+     * @param inetConnection connection that need to be removed from the active connections records
+     */
+    private void removeConnectionRecord(HttpInetConnection inetConnection) {
+        AtomicInteger connections = openConnections.get(
+                inetConnection.getRemoteAddress().getHostName() + ":"
+                        + inetConnection.getRemotePort());
+        if (connections == null) {
+            connections = openConnections.get(
+                    inetConnection.getRemoteAddress().getHostAddress() + ":"
+                            + inetConnection.getRemotePort());
+        }
+
+        if (connections != null) {
+            int no = connections.getAndDecrement();
+            lock.lock();
+            try {
+                if (no == 0) {
+                    if (null == openConnections.remove(
+                            inetConnection.getRemoteAddress().getHostName()
+                            + ":" + inetConnection.getRemotePort())) {
+
+                    } else {
+                        openConnections.remove(
+                                inetConnection.getRemoteAddress().getHostAddress()
+                                + ":" + inetConnection.getRemotePort());
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    /**
+     * Record a connection in the active connection records.
+     *
+     * @param conn connection to be recorded.
+     */
+    private void recordConnection(NHttpClientConnection conn) {
+        if (conn instanceof HttpInetConnection) {
+            HttpInetConnection inetConnection = (HttpInetConnection) conn;
+            // first we try to get the connection with host_addrss:port key
+            AtomicInteger connections = openConnections.get(
+                    inetConnection.getRemoteAddress().getHostName() + ":"
+                            + inetConnection.getRemotePort());
+            // if we fail try to get the connection with ip_address:port key
+            if (connections == null) {
+                connections = openConnections.get(
+                        inetConnection.getRemoteAddress().getHostAddress() + ":"
+                                + inetConnection.getRemotePort());
+            }
+
+            lock.lock();
+            try {
+                if (connections == null) {
+                    connections = new AtomicInteger();
+                    if (inetConnection.getRemoteAddress().getHostName() != null) {
+                        openConnections.put(
+                                inetConnection.getRemoteAddress().getHostName() + ":"
+                                + inetConnection.getRemotePort(), connections);
+                    } else {
+                        openConnections.put(
+                                inetConnection.getRemoteAddress().getHostAddress() + ":"
+                                + inetConnection.getRemotePort(), connections);
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+            connections.getAndIncrement();
+        }
     }
 
     /**

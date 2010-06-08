@@ -130,6 +130,10 @@ public final class NHttpConfiguration {
         return getBooleanValue(NhttpConstants.SERVER_HEADER_PRESERVE, true);
     }
 
+    public boolean isCountConnections() {
+        return getBooleanValue(NhttpConstants.COUNT_CONNECTIONS, false);
+    }
+
     /**
      * Get properties that tune nhttp transport. Preference to system properties
      * @param name name of the system/config property
@@ -168,6 +172,11 @@ public final class NHttpConfiguration {
                 log.debug("Using nhttp tuning parameter : " + name);
             }
             return true;
+        } else if (val != null && !Boolean.parseBoolean(val)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using nhttp tuning parameter : " + name);
+            }
+            return false;
         }
         return def;
     }

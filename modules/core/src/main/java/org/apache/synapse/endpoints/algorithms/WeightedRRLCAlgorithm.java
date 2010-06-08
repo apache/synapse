@@ -303,6 +303,9 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
 
     public void destroy() {}
 
+    /**
+     * Simple class for holding the states about the endpoints.
+     */
     private class WeightedState {
         /** this is the statics weight specified by the user */
         private int fixedWeight = 0;

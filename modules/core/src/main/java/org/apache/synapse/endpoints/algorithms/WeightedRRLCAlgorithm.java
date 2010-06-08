@@ -169,19 +169,24 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
                     try {
                         url = new URL(addressEndpoint.getDefinition().getAddress());
                     } catch (MalformedURLException e1) {
-                        throw new SynapseException("Mulformed URL in address endpoint");
+                        String msg = "Mulformed URL in address endpoint";
+                        log.error(msg);
+                        throw new SynapseException(msg);
                     }
                 } else if (e instanceof WSDLEndpoint) {
                     WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) e;
                     try {
                         url = new URL(wsdlEndpoint.getDefinition().getAddress());
                     } catch (MalformedURLException e1) {
-                        throw new SynapseException("Mulformed URL in address endpoint");
+                        String msg = "Mulformed URL in address endpoint";
+                        log.error(msg);
+                        throw new SynapseException(msg);
                     }
                 } else {
-                    throw new SynapseException(
-                            "Only AddressEndpoint and WSDLEndpoint can be used " +
-                                    "with WeightedRRLCAlgorithm");
+                    String msg = "Only AddressEndpoint and WSDLEndpoint can be used " +
+                                    "with WeightedRRLCAlgorithm";
+                    log.error(msg);
+                    throw new SynapseException(msg);
                 }
 
                 // construct the key
@@ -249,6 +254,11 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         return totalConnections;
     }
 
+    /**
+     * Recalculate the dynamic weights based on the active connection count.
+     *
+     * @param messageContext synapse message context
+     */
     private void reCalcuateWeights(MessageContext messageContext) {
         Map connectionsMap = null;
         // fetch the connections map
@@ -264,7 +274,9 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         }
 
         if (connectionsMap == null) {
-            throw new SynapseException("Connections map not found");
+            String msg = "Connections map not found";
+            log.error(msg);
+            throw new SynapseException(msg);
         }
 
         for (WeightedState state : list) {
@@ -289,9 +301,7 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         intialize();
     }
 
-    public void destroy() {
-
-    }
+    public void destroy() {}
 
     private class WeightedState {
         /** this is the statics weight specified by the user */

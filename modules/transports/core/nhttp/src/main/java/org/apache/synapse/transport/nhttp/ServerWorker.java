@@ -525,6 +525,7 @@ public class ServerWorker implements Runnable {
                 }
             } else {
                 processGetAndDelete("GET");
+                return;
             }
 
         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
@@ -551,6 +552,7 @@ public class ServerWorker implements Runnable {
                 }
             } else {
                 processGetAndDelete("GET");
+                return;
             }
 
         } else if (serviceName != null && parameters.containsKey("xsd")) {

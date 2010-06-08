@@ -96,7 +96,7 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
                                                  AlgorithmContext algorithmContext) {                
         WeightedState s = list[endpointCursor];
 
-        // once we choose an endpoit we countinue to use that untile all
+        // once we choose an endpoit we countinue to use that until all
         // the chances are over for this round
         if (!s.isSendsAvailable()) {
             // reset this state for this round
@@ -121,6 +121,9 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         return endpoints.get(s.getEndpointPosition());
     }
 
+    /**
+     * Initialize the algorithm reading the configurations from the endpoints.
+     */
     private void intialize() {
         // get the global properties
         if (loadBalanceEndpoint != null && loadBalanceEndpoint instanceof PropertyInclude) {
@@ -274,7 +277,7 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         }
 
         if (connectionsMap == null) {
-            String msg = "Connections map not found";
+            String msg = "Connections map not found.";
             log.error(msg);
             throw new SynapseException(msg);
         }

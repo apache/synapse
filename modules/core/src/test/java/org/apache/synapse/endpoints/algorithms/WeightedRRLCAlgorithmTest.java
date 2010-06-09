@@ -60,7 +60,7 @@ public class WeightedRRLCAlgorithmTest extends TestCase {
         assert algo instanceof WeightedRRLCAlgorithm;                    
         WeightedRRLCAlgorithm algorithm = (WeightedRRLCAlgorithm) algo;
 
-        assertEquals(10 + 5 + 3 + 2 + 1, algorithm.getTotalWeight());
+        assertEquals(6 + 5 + 3 + 2 + 1, algorithm.getTotalWeight());
         assertEquals(0, algorithm.getTotalConnections());
         assertEquals(0, algorithm.getEndpointCursor());
         assertEquals(2, algorithm.getRoundsPerRecalculation());

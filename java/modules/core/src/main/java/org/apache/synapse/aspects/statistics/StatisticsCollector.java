@@ -39,8 +39,11 @@ public class StatisticsCollector {
             new ConcurrentLinkedQueue<StatisticsRecord>();
 
     public StatisticsCollector() {
-        MBeanRegistrar.getInstance().registerMBean(new StatisticsView(this),
-                "StatisticsView", "StatisticsView");
+        MBeanRegistrar registrar = MBeanRegistrar.getInstance();
+        synchronized (registrar) {
+            registrar.registerMBean(new StatisticsView(this),
+                    "StatisticsView", "StatisticsView");
+        }
     }
 
     /**

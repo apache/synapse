@@ -20,15 +20,13 @@ package org.apache.synapse;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.*;
 import org.apache.axis2.dispatchers.SOAPMessageBodyBasedDispatcher;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.Handler;
-import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.engine.Phase;
+import org.apache.axis2.engine.*;
 import org.apache.axis2.format.BinaryBuilder;
 import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.axis2.phaseresolver.PhaseException;
@@ -638,7 +636,13 @@ public class Axis2SynapseController implements SynapseController {
      */
     private void deployMediatorExtensions() {
         log.info("Loading mediator extensions...");
-        configurationContext.getAxisConfiguration().getConfigurator().loadServices();
+        AxisConfigurator configurator = configurationContext.getAxisConfiguration().getConfigurator();
+        if (configurator instanceof DeploymentEngine) {
+            ((DeploymentEngine) configurator).getRepoListener().checkServices();
+        } else {
+            log.warn("Unable to access the repository listener. Custom extensions will " +
+                    "not get loaded now!");
+        }
     }
 
     /**

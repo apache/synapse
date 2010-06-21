@@ -19,75 +19,76 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.ServerManager;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
-import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorSerializer;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.startup.AbstractStartup;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.io.FileUtils;
 import org.apache.axis2.util.XMLPrettyPrinter;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.GregorianCalendar;
 import java.util.Collection;
+import java.util.Date;
 
-/**
- * Serializes the Synapse configuration to a specified directory
- */
 public class MultiXMLConfigurationSerializer {
 
-    /** The directory to where the configuration should be serialized */
+    private static final Log log = LogFactory.getLog(MultiXMLConfigurationSerializer.class);
+
     private File rootDirectory;
-    /** The backup directory to be created when the target directory already exists */
-    private File backupDirectory;
+    private File currentDirectory;
 
     private SynapseArtifactDeploymentStore deploymentStore;
 
-    private static Log log = LogFactory.getLog(MultiXMLConfigurationSerializer.class);
-
     public MultiXMLConfigurationSerializer(String directoryPath) {
         rootDirectory = new File(directoryPath);
+        currentDirectory = rootDirectory;
         deploymentStore = SynapseArtifactDeploymentStore.getInstance();
     }
 
+    /**
+     * Serializes the given SynapseConfiguration to the file system. This method is NOT
+     * thread safe and hence it must not be called by multiple concurrent threads. This method
+     * will first serialize the configuration to a temporary directory at the same level as the
+     * rootDirectory and then rename/move it as the new rootDirectory. If an error occurs
+     * while saving the configuration, the temporaty files will be removed and the old
+     * rootDirectory will be left intact. 
+     *
+     * @param synapseConfig configuration to be serialized
+     */
     public void serialize(SynapseConfiguration synapseConfig) {
         if (log.isDebugEnabled()) {
-            log.debug("Starting to serialize the Synapse configuration to the directory : " +
-                    rootDirectory);
+            log.debug("Serializing Synapse configuration to the file system");
         }
-        
+
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
         OMElement definitions = fac.createOMElement("definitions", synNS);
 
         try {
-            markConfigurationForSerialization();
-            // To start with clean up the existing configuration files
-            cleanUpDirectory();
-            createDirectoryStructure();
+            currentDirectory = createTempDirectoryStructure();
 
-            // Serialize various elements in the SynapseConfiguration
             if (synapseConfig.getRegistry() != null) {
                 serializeSynapseRegistry(synapseConfig.getRegistry(), synapseConfig, definitions);
             }
@@ -97,128 +98,29 @@ public class MultiXMLConfigurationSerializer {
             serializeTasks(synapseConfig.getStartups(), definitions);
             serializeLocalRegistryValues(synapseConfig.getLocalRegistry().values(), definitions);
             serializeExecutors(synapseConfig.getPriorityExecutors().values(), definitions);
-
-            // Now serialize the content to synapse.xml
             serializeSynapseXML(definitions);
 
-            log.info("Done serializing the Synapse configuration to : " + rootDirectory.getPath());
-
-            // If a backup was created, clean it up
-            if (backupDirectory != null) {
+            markConfigurationForSerialization();
+            if (rootDirectory.exists()) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Cleaning up the backup files at : " + backupDirectory.getPath());
+                    log.debug("Deleting existing files at : " + rootDirectory.getAbsolutePath());
                 }
-                FileUtils.deleteDirectory(backupDirectory);
-                backupDirectory = null;
+                FileUtils.deleteDirectory(rootDirectory);
             }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Finished serializing the configuration to : " +
+                        currentDirectory.getAbsolutePath() + " - Moving the directory to : " +
+                        rootDirectory.getAbsolutePath());
+            }
+            FileUtils.moveDirectory(currentDirectory, rootDirectory);
 
         } catch (Exception e) {
             log.error("Error occured while serializing the Synapse configuration.", e);
-            // Attempt to perform a restore using the backups available
-            restoreBackup();
-        }
-    }
 
-    private void markConfigurationForSerialization() throws IOException {
-
-        // get the existing configuration and mark those files to be not to effect on deployers for
-        // deletion
-        SynapseConfiguration synCfg;
-        ServerManager serverManager = ServerManager.getInstance();
-        
-        if (serverManager != null && serverManager.isInitialized()) {
-            synCfg = serverManager.getServerContextInformation().getSynapseConfiguration();
-            if (synCfg == null) {
-                return;
-            }
-        } else {
-            return;
-        }
-
-        for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
-            if (seq.getFileName() != null) {
-                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.SEQUENCES_DIR)).getAbsolutePath() 
-                        + File.separator + seq.getFileName());
-            }
-        }
-
-        for (Endpoint ep : synCfg.getDefinedEndpoints().values()) {
-            if (ep.getFileName() != null) {
-                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.ENDPOINTS_DIR)).getAbsolutePath()
-                        + File.separator + ep.getFileName());
-            }
-        }
-
-        for (ProxyService proxy : synCfg.getProxyServices()) {
-            if (proxy.getFileName() != null) {
-                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR)).getAbsolutePath()
-                        + File.separator + proxy.getFileName());
-            }
-        }
-
-        for (Entry e : synCfg.getDefinedEntries().values()) {
-            if (e.getFileName() != null) {
-                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR)).getAbsolutePath()
-                        + File.separator + e.getFileName());
-            }
-        }
-
-        for (SynapseEventSource es : synCfg.getEventSources()) {
-            if (es.getFileName() != null) {
-                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.EVENTS_DIR)).getAbsolutePath()
-                        + File.separator + es.getFileName());
-            }
-        }
-
-        for (Startup s : synCfg.getStartups()) {
-            if (s.getFileName() != null) {
-                deploymentStore.addBackedUpArtifact((new File(rootDirectory,
-                        MultiXMLConfigurationBuilder.TASKS_DIR)).getAbsolutePath()
-                        + File.separator + s.getFileName());
-            }
-        }
-    }
-
-    public void createDirectoryStructure() throws Exception {
-
-        File proxyDir = new File(rootDirectory, MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR);
-        if (!proxyDir.exists()) {
-            FileUtils.forceMkdir(proxyDir);
-        }
-
-        File eventsDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EVENTS_DIR);
-        if (!eventsDir.exists()) {
-            FileUtils.forceMkdir(eventsDir);
-        }
-
-        File entriesDir = new File(rootDirectory, MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR);
-        if (!entriesDir.exists()) {
-            FileUtils.forceMkdir(entriesDir);
-        }
-
-        File eprDir = new File(rootDirectory, MultiXMLConfigurationBuilder.ENDPOINTS_DIR);
-        if (!eprDir.exists()) {
-            FileUtils.forceMkdir(eprDir);
-        }
-
-        File seqDir = new File(rootDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
-        if (!seqDir.exists()) {
-            FileUtils.forceMkdir(seqDir);
-        }
-
-        File tasksDir = new File(rootDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
-        if (!tasksDir.exists()) {
-            FileUtils.forceMkdir(tasksDir);
-        }
-
-        File executorDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
-        if (!executorDir.exists()) {
-            FileUtils.forceMkdir(executorDir);
+        } finally {
+            deleteTempDirectory();
+            currentDirectory = rootDirectory;
         }
     }
 
@@ -300,15 +202,6 @@ public class MultiXMLConfigurationSerializer {
         serializeSynapseXML(definitions);
     }
 
-    private void serializeSynapseXML(OMElement definitions) throws Exception {
-        File synapseXML = new File(rootDirectory, SynapseConstants.SYNAPSE_XML);
-        if (!rootDirectory.exists()) {
-            FileUtils.forceMkdir(rootDirectory);
-        }
-
-        writeToFile(definitions, synapseXML);
-    }
-
     public OMElement serializeSynapseRegistry(Registry registry, SynapseConfiguration synapseConfig,
                                          OMElement parent) throws Exception {
         OMElement registryElem = RegistrySerializer.serializeRegistry(null, registry);
@@ -318,7 +211,7 @@ public class MultiXMLConfigurationSerializer {
             return registryElem;
         }
 
-        File registryConf = new File(rootDirectory, MultiXMLConfigurationBuilder.REGISTRY_FILE);
+        File registryConf = new File(currentDirectory, MultiXMLConfigurationBuilder.REGISTRY_FILE);
         if (log.isDebugEnabled()) {
             log.debug("Serializing Synapse registry definition to : " + registryConf.getPath());
         }
@@ -329,17 +222,13 @@ public class MultiXMLConfigurationSerializer {
 
     public OMElement serializeProxy(ProxyService service, OMElement parent) throws Exception {
 
-        File proxyDir = new File(rootDirectory, MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR);
-        if (!proxyDir.exists()) {
-            FileUtils.forceMkdir(proxyDir);
-        }
-
+        File proxyDir = createDirectory(currentDirectory,
+                MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR);
         OMElement proxyElem = ProxyServiceSerializer.serializeProxy(null, service);
 
         String fileName = service.getFileName();
         if (fileName != null) {
-            handleDeployment(proxyDir.getAbsolutePath()
-                    + File.separator + fileName, service.getName());
+            handleDeployment(proxyDir, fileName, service.getName());
             File proxyFile = new File(proxyDir, fileName);
             writeToFile(proxyElem, proxyFile);
         } else if (parent != null) {
@@ -352,17 +241,12 @@ public class MultiXMLConfigurationSerializer {
     public OMElement serializeEventSource(SynapseEventSource source,
                                           OMElement parent) throws Exception {
 
-        File eventsDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EVENTS_DIR);
-        if (!eventsDir.exists()) {
-            FileUtils.forceMkdir(eventsDir);
-        }
-
+        File eventsDir = createDirectory(currentDirectory, MultiXMLConfigurationBuilder.EVENTS_DIR);
         OMElement eventSrcElem = EventSourceSerializer.serializeEventSource(null, source);
 
         String fileName = source.getFileName();
         if (fileName != null) {
-            handleDeployment(eventsDir.getAbsolutePath()
-                    + File.separator + fileName, source.getName());
+            handleDeployment(eventsDir, fileName, source.getName());
             File eventSrcFile = new File(eventsDir, source.getFileName());
             writeToFile(eventSrcElem, eventSrcFile);
         } else if (parent != null) {
@@ -374,17 +258,12 @@ public class MultiXMLConfigurationSerializer {
 
     public OMElement serializeTask(Startup task, OMElement parent) throws Exception {
 
-        File tasksDir = new File(rootDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
-        if (!tasksDir.exists()) {
-            FileUtils.forceMkdir(tasksDir);
-        }
-
+        File tasksDir = createDirectory(currentDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
         OMElement taskElem = StartupFinder.getInstance().serializeStartup(null, task);
 
         if (task.getFileName() != null) {
             String fileName = task.getFileName();
-            handleDeployment(tasksDir.getAbsolutePath()
-                    + File.separator +  fileName, task.getName());
+            handleDeployment(tasksDir, fileName, task.getName());
             File taskFile = new File(tasksDir, fileName);
             writeToFile(taskElem, taskFile);
         } else if (parent != null) {
@@ -396,17 +275,13 @@ public class MultiXMLConfigurationSerializer {
 
     public OMElement serializeSequence(SequenceMediator seq, OMElement parent) throws Exception {
 
-        File seqDir = new File(rootDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
-        if (!seqDir.exists()) {
-            FileUtils.forceMkdir(seqDir);
-        }
+        File seqDir = createDirectory(currentDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
 
         OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
                 serializeMediator(null, seq);
         String fileName = seq.getFileName();
         if (fileName != null) {
-            handleDeployment(seqDir.getAbsolutePath()
-                    + File.separator + fileName, seq.getName());
+            handleDeployment(seqDir, fileName, seq.getName());
             File seqFile = new File(seqDir, fileName);
             writeToFile(seqElem, seqFile);
         } else if (parent != null) {
@@ -418,17 +293,12 @@ public class MultiXMLConfigurationSerializer {
 
     public OMElement serializeEndpoint(Endpoint epr, OMElement parent) throws Exception {
 
-        File eprDir = new File(rootDirectory, MultiXMLConfigurationBuilder.ENDPOINTS_DIR);
-        if (!eprDir.exists()) {
-            FileUtils.forceMkdir(eprDir);
-        }
-
+        File eprDir = createDirectory(currentDirectory, MultiXMLConfigurationBuilder.ENDPOINTS_DIR);
         OMElement eprElem = EndpointSerializer.getElementFromEndpoint(epr);
 
         String fileName = epr.getFileName();
         if (fileName != null) {
-            handleDeployment(eprDir.getAbsolutePath()
-                    + File.separator + fileName, epr.getName());
+            handleDeployment(eprDir, fileName, epr.getName());
             File eprFile = new File(eprDir, fileName);
             writeToFile(eprElem, eprFile);
         } else if (parent != null) {
@@ -451,17 +321,13 @@ public class MultiXMLConfigurationSerializer {
                 return null;
             }
 
-            File entriesDir = new File(rootDirectory, MultiXMLConfigurationBuilder.
-                        LOCAL_ENTRY_DIR);
+            File entriesDir = createDirectory(currentDirectory,
+                    MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR);
             OMElement entryElem = EntrySerializer.serializeEntry(entry, null);
-            if (!entriesDir.exists()) {
-                FileUtils.forceMkdir(entriesDir);
-            }
 
             String fileName = entry.getFileName();
             if (fileName != null) {
-                handleDeployment(entriesDir.getAbsolutePath()
-                        + File.separator + fileName, entry.getKey());
+                handleDeployment(entriesDir, fileName, entry.getKey());
                 File entryFile  = new File(entriesDir, fileName);
                 writeToFile(entryElem, entryFile);
             } else if (parent != null) {
@@ -471,6 +337,23 @@ public class MultiXMLConfigurationSerializer {
             return entryElem;
         }
         return null;
+    }
+
+    public OMElement serializeExecutor(PriorityExecutor source, OMElement parent) throws Exception {
+        File executorDir = createDirectory(currentDirectory,
+                MultiXMLConfigurationBuilder.EXECUTORS_DIR);
+
+        OMElement eventDirElem = PriorityExecutorSerializer.serialize(null, source,
+                SynapseConstants.SYNAPSE_NAMESPACE);
+
+        if (source.getFileName() != null) {
+            File eventSrcFile = new File(executorDir, source.getFileName());
+            writeToFile(eventDirElem, eventSrcFile);
+        } else if (parent != null) {
+            parent.addChild(eventDirElem);
+        }
+
+        return eventDirElem;
     }
 
     private void writeToFile(OMElement content, File file) throws Exception {
@@ -484,48 +367,12 @@ public class MultiXMLConfigurationSerializer {
         FileUtils.deleteQuietly(tempFile);
     }
 
-    private void cleanUpDirectory()  throws Exception {
-        // If the target directory already exists and contains any files simply rename it to
-        // create a backup - This method does not delete the target directory
-        if (rootDirectory.exists() && rootDirectory.isDirectory() &&
-                rootDirectory.listFiles().length > 0) {
-
-            if (log.isDebugEnabled()) {
-                log.debug("The directory :" + rootDirectory.getPath() + " already exists. " +
-                        "Creating a backup.");
-            }
-
-            backupDirectory = new File(rootDirectory.getParentFile(), "__tmp" +
-                    new GregorianCalendar().getTimeInMillis());
-            FileUtils.moveDirectory(rootDirectory, backupDirectory);
+    private void handleDeployment(File parent, String child, String artifactName) {
+        String fileName = parent.getAbsolutePath() + File.separator + child;
+        if (!deploymentStore.containsFileName(fileName)) {
+            deploymentStore.addArtifact(fileName, artifactName);
         }
-
-        // Create a new target directory
-        FileUtils.forceMkdir(rootDirectory);
-    }
-
-    private void restoreBackup() {
-        if (backupDirectory != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Attempting to restore the directory : " + rootDirectory.getPath() +
-                        " using the available backups");
-            }
-
-            try {
-                if (rootDirectory.exists() && rootDirectory.isDirectory()) {
-                    FileUtils.deleteDirectory(rootDirectory);
-                }
-
-                FileUtils.moveDirectory(backupDirectory, rootDirectory);
-                log.info("Successfully restored the directory at : " + rootDirectory.getPath());
-                backupDirectory = null;
-
-            } catch (IOException e) {
-                log.error("Failed to restore the directory at : " + rootDirectory.getPath() +
-                        " from the available backup. You will need to restore the directory " +
-                        "manually. A backup is available at : " + backupDirectory.getPath());
-            }
-        }
+        deploymentStore.addRestoredArtifact(fileName);
     }
 
     private void serializeProxyServices(Collection<ProxyService> proxyServices, OMElement parent)
@@ -562,29 +409,119 @@ public class MultiXMLConfigurationSerializer {
         }
     }
 
-    public OMElement serializeExecutor(PriorityExecutor source, OMElement parent) throws Exception {
-        File executorDir = new File(rootDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
-        if (!executorDir.exists()) {
-            FileUtils.forceMkdir(executorDir);
+    private void serializeSynapseXML(OMElement definitions) throws Exception {
+        File synapseXML = new File(currentDirectory, SynapseConstants.SYNAPSE_XML);
+        if (!currentDirectory.exists()) {
+            FileUtils.forceMkdir(currentDirectory);
         }
 
-        OMElement eventDirElem = PriorityExecutorSerializer.serialize(null, source,
-                SynapseConstants.SYNAPSE_NAMESPACE);
-
-        if (source.getFileName() != null) {
-            File eventSrcFile = new File(executorDir, source.getFileName());
-            writeToFile(eventDirElem, eventSrcFile);
-        } else if (parent != null) {
-            parent.addChild(eventDirElem);
-        }
-
-        return eventDirElem;
+        writeToFile(definitions, synapseXML);
     }
 
-    private void handleDeployment(String fileName, String artifactName) {
-        if (!deploymentStore.containsFileName(fileName)) {
-            deploymentStore.addArtifact(fileName, artifactName);
+    private File createTempDirectoryStructure() throws IOException {
+        String tempDirName = "__tmp" + new Date().getTime();
+        File tempDirectory = new File(rootDirectory.getParentFile(), tempDirName);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating temporary files at : " + tempDirectory.getAbsolutePath());
         }
-        deploymentStore.addRestoredArtifact(fileName);
+
+        FileUtils.forceMkdir(tempDirectory);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.EVENTS_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.ENDPOINTS_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
+
+        return tempDirectory;
     }
+
+    private void deleteTempDirectory() {
+        try {
+            if (currentDirectory != rootDirectory && currentDirectory.exists()) {
+                FileUtils.deleteDirectory(currentDirectory);
+            }
+        } catch (IOException e) {
+            log.warn("Error while deleting the temporary files at : " +
+                    currentDirectory.getAbsolutePath() + " - You may delete them manually.", e);
+        }
+    }
+
+    private File createDirectory(File parent, String name) throws IOException {
+        File dir = new File(parent, name);
+        if (!dir.exists()) {
+            FileUtils.forceMkdir(dir);
+        }
+        return dir;
+    }
+
+    /**
+     * Get the existing configuration and mark those files not effect on deployers for
+     * deletion
+     */
+    private void markConfigurationForSerialization() {
+        SynapseConfiguration synCfg;
+        ServerManager serverManager = ServerManager.getInstance();
+
+        if (serverManager != null && serverManager.isInitialized()) {
+            synCfg = serverManager.getServerContextInformation().getSynapseConfiguration();
+            if (synCfg == null) {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
+            if (seq.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        SEQUENCES_DIR), seq.getFileName(), seq.getName());
+            }
+        }
+
+        for (Endpoint ep : synCfg.getDefinedEndpoints().values()) {
+            if (ep.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        ENDPOINTS_DIR), ep.getFileName(), ep.getName());
+            }
+        }
+
+        for (ProxyService proxy : synCfg.getProxyServices()) {
+            if (proxy.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        PROXY_SERVICES_DIR), proxy.getFileName(), proxy.getName());
+            }
+        }
+
+        for (Entry e : synCfg.getDefinedEntries().values()) {
+            if (e.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        LOCAL_ENTRY_DIR), File.separator +e.getFileName(), e.getKey());
+            }
+        }
+
+        for (SynapseEventSource es : synCfg.getEventSources()) {
+            if (es.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        EVENTS_DIR), es.getFileName(), es.getName());
+            }
+        }
+
+        for (Startup s : synCfg.getStartups()) {
+            if (s.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        TASKS_DIR), s.getFileName(), s.getName());
+            }
+        }
+
+        for (PriorityExecutor exec : synCfg.getPriorityExecutors().values()) {
+            if (exec.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        EXECUTORS_DIR), exec.getFileName(), exec.getName());
+            }
+        }
+    }
+
 }

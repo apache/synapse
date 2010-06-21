@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
@@ -34,7 +35,6 @@ import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.startup.AbstractStartup;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
@@ -211,9 +211,7 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     Startup startup = SynapseXMLConfigurationFactory.defineStartup(
                             synapseConfig, document);
-                    if (startup instanceof AbstractStartup) {
-                        ((AbstractStartup) startup).setFileName(file.getName());
-                    }
+                    startup.setFileName(file.getName());
                     SynapseArtifactDeploymentStore.getInstance().addArtifact(
                             file.getAbsolutePath(), startup.getName());
                 } catch (FileNotFoundException ignored) {}

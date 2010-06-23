@@ -242,7 +242,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                 // if timeout codes are not defined, assume only HTTP timeout and connection close
                 boolean isTimeout = SynapseConstants.NHTTP_CONNECTION_TIMEOUT == errorCode;
                 boolean isClosed = SynapseConstants.NHTTP_CONNECTION_CLOSED == errorCode;
-                
+
                 if (isTimeout || isClosed) {
 
                     if (log.isDebugEnabled()) {
@@ -256,7 +256,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                     if (log.isDebugEnabled()) {
                         log.debug("Encountered a mark for suspension error : " + errorCode
                                 + " defined " + "error codes are : "
-                                + definition.getTimeoutErrorCodes());    
+                                + definition.getTimeoutErrorCodes());
                     }
                     return true;
                 }
@@ -266,6 +266,43 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         if (log.isDebugEnabled()) {
             log.debug("Encountered a non-timeout error sending to " + this.toString() +
                 ", error code : " + errorCode);
+        }
+        return false;
+    }
+
+
+    protected boolean isRetryDisabled(MessageContext synCtx) {
+        Integer errorCode = (Integer) synCtx.getProperty(SynapseConstants.ERROR_CODE);
+        if (errorCode != null) {
+            if (definition.getRetryDisabledErrorCodes().isEmpty()) {
+                // if timeout codes are not defined, assume only HTTP timeout and connection close
+                boolean isTimeout = SynapseConstants.NHTTP_CONNECTION_TIMEOUT == errorCode;
+                boolean isClosed = SynapseConstants.NHTTP_CONNECTION_CLOSED == errorCode;
+
+                if (isTimeout || isClosed) {
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Encountered a HTTP connection " + (isClosed ? "close" :
+                                "timeout") + " error : " + errorCode + ", for which retries are " +
+                                "disabled by default");
+                    }
+                    return true;
+                }
+            } else {
+                if (definition.getRetryDisabledErrorCodes().contains(errorCode)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Encountered a retry disabled error : " + errorCode
+                                + ", defined retry disabled error codes are : "
+                                + definition.getRetryDisabledErrorCodes());
+                    }
+                    return true;
+                }
+            }
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Encountered an error sending to endpoint : " + endpointName +
+                    ", with error code : " + errorCode + ", but not a retry disabled error");
         }
         return false;
     }
@@ -431,12 +468,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     }
 
     protected void logOnChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-        if (log.isDebugEnabled()) {
-            log.debug(this.toString() + " detected a failure in a child endpoint : " + endpoint);
-            log.debug(this.toString() + " retrying request [[Message ID : "
-                    + synMessageContext.getMessageID() + "], [To : "
-                    + synMessageContext.getTo() + "]]");
-        }
+        log.warn(this + " Detect a Failure in a child endpoint : " + endpoint);
     }
 
     protected void informFailure(MessageContext synCtx, int errorCode, String errorMsg) {

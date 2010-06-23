@@ -132,9 +132,12 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
             }
             sendToApplicationMember(synCtx, to, faultHandler);
         } else {
+            String msg = "Loadbalance endpoint : " +
+                    (getName() != null ? getName() : SynapseConstants.ANONYMOUS_ENDPOINT) +
+                    " - no ready child endpoints";
+            log.warn(msg);
             // if this is not a retry
-            informFailure(synCtx, SynapseConstants.ENDPOINT_LB_NONE_READY,
-                    "Load-balance " + this.toString() + " - no child endpoints at ready state");
+            informFailure(synCtx, SynapseConstants.ENDPOINT_LB_NONE_READY, msg);
         }
     }
 
@@ -219,7 +222,21 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
         logOnChildEndpointFail(endpoint, synMessageContext);
         // resend (to a different endpoint) only if we support failover
         if (failover) {
-            send(synMessageContext);
+            if (!((AbstractEndpoint)endpoint).isRetryDisabled(synMessageContext)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(this + " Retry Attempt for Request with [Message ID : " +
+                            synMessageContext.getMessageID() + "], [To : " +
+                            synMessageContext.getTo() + "]");
+                }
+                send(synMessageContext);
+            } else {
+                String msg = "Loadbalance endpoint : " +
+                        (getName() != null ? getName() : SynapseConstants.ANONYMOUS_ENDPOINT) +
+                        " - one of the child endpoints encounterd a non-retry error, " +
+                        "not sending message to another endpoint";
+                log.warn(msg);
+                informFailure(synMessageContext, SynapseConstants.ENDPOINT_LB_NONE_READY, msg);
+            }
         } else {
             // we are not informing this to the parent endpoint as the failure of this loadbalance
             // endpoint. there can be more active endpoints under this, and current request has

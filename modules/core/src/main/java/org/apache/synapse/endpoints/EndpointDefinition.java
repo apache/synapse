@@ -148,6 +148,9 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     private int traceState = SynapseConstants.TRACING_UNSET;
 
+    /** A list of error codes which permit the retries */
+    private final List<Integer> retryDisabledErrorCodes = new ArrayList<Integer>();
+
     /**
      * This should return the absolute EPR address referenced by the named endpoint. This may be
      * possibly computed.
@@ -491,12 +494,20 @@ public class EndpointDefinition implements AspectConfigurable {
         return timeoutErrorCodes;
     }
 
+    public List<Integer> getRetryDisabledErrorCodes() {
+        return retryDisabledErrorCodes;
+    }
+
     public void addSuspendErrorCode(int code) {
         suspendErrorCodes.add(code);
     }
 
     public void addTimeoutErrorCode(int code) {
         timeoutErrorCodes.add(code);
+    }
+
+    public void addRetryDisabledErrorCode(int code) {
+        retryDisabledErrorCodes.add(code);
     }
 
     public String toString() {

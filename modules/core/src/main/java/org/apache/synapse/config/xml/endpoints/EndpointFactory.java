@@ -403,6 +403,30 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 }
             }
         }
+
+        OMElement retryConfig = elem.getFirstChildWithName(new QName(
+            SynapseConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.RETRY_CONFIG));
+
+        if (retryConfig != null) {
+
+            OMElement retryDisabledErrorCodes = retryConfig.getFirstChildWithName(new QName(
+                SynapseConstants.SYNAPSE_NAMESPACE, "disabledErrorCodes"));
+            if (retryDisabledErrorCodes != null && retryDisabledErrorCodes.getText() != null) {
+
+                StringTokenizer st = new StringTokenizer(
+                        retryDisabledErrorCodes.getText().trim(), ", ");
+                while (st.hasMoreTokens()) {
+                    String s = st.nextToken();
+                    try {
+                        definition.addRetryDisabledErrorCode(Integer.parseInt(s));
+                    } catch (NumberFormatException e) {
+                        handleException("The suspend error codes should be specified as valid " +
+                                "numbers separated by commas : "
+                                + retryDisabledErrorCodes.getText(), e);
+                    }
+                }
+            }
+        }
     }
 
     protected void extractSpecificEndpointProperties(EndpointDefinition definition,

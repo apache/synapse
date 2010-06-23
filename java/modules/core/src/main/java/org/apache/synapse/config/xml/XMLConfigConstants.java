@@ -90,6 +90,8 @@ public class XMLConfigConstants {
     public static final String RETRIES_BEFORE_SUSPENSION = "retriesBeforeSuspension";
     public static final String RETRY_DELAY = "retryDelay";
 
+    public static final String RETRY_CONFIG = "retryConfig";
+
 	public static final String LOADBALANCE_POLICY = "policy";
 	public static final String LOADBALANCE_ALGORITHM = "algorithm";
 

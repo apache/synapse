@@ -158,15 +158,15 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
         Object o = synCtx.getProperty(
                 SynapseConstants.PROP_SAL_ENDPOINT_FIRST_MESSAGE_IN_SESSION);
 
-        if (o != null && Boolean.TRUE.equals(o)) {
-
+        if (o != null && Boolean.TRUE.equals(o) &&
+                !((AbstractEndpoint) endpoint).isRetryDisabled(synCtx)) {
             // this is the first message. so unbind the session with failed endpoint and start
             // new one by resending.
-            
+
             dispatcher.unbind(synCtx);
-            
-            // As going to be happened retry , we have to remove states related to the previous try 
-            
+
+            // As going to be happened retry , we have to remove states related to the previous try
+
             Object epListObj = synCtx.getProperty(SynapseConstants.PROP_SAL_ENDPOINT_ENDPOINT_LIST);
             if (epListObj instanceof List) {
                 List<Endpoint> endpointList = (List<Endpoint>) epListObj;
@@ -176,20 +176,20 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
                     } else {
                         if (endpointList.contains(this)) {
                             int lastIndex = endpointList.indexOf(this);
-                            List<Endpoint> head = 
-                                    endpointList.subList(lastIndex , endpointList.size());       
+                            List<Endpoint> head =
+                                    endpointList.subList(lastIndex, endpointList.size());
                             head.clear();
                         }
                     }
                 }
             }
-            
+
             send(synCtx);
 
         } else {
             // session has already started. we can't failover.
             informFailure(synCtx, SynapseConstants.ENDPOINT_SAL_FAILED_SESSION,
-                    "Failure an endpoint " + endpoint + "  in the  current session");
+                    "Failure an endpoint " + endpoint + "  in the current session");
         }
     }
 

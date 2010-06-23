@@ -255,6 +255,17 @@ public abstract class EndpointSerializer {
 
             element.addChild(markAsTimedout);
         }
+
+         if (!endpointDefinition.getRetryDisabledErrorCodes().isEmpty()) {
+            OMElement retryConfig = fac.createOMElement(XMLConfigConstants.RETRY_CONFIG,
+                    SynapseConstants.SYNAPSE_OMNAMESPACE);
+            OMElement errorCodes = fac.createOMElement("disabledErrorCodes",
+                    SynapseConstants.SYNAPSE_OMNAMESPACE);
+                errorCodes.setText(endpointDefinition.getRetryDisabledErrorCodes().
+                        toString().replaceAll("[\\[\\] ]", ""));
+                retryConfig.addChild(errorCodes);
+            element.addChild(retryConfig);
+        }
     }
 
     protected void serializeSpecificEndpointProperties(EndpointDefinition endpointDefinition,

@@ -86,16 +86,32 @@ public class FailoverEndpoint extends AbstractEndpoint {
             }
 
             if (!foundEndpoint) {
-                informFailure(synCtx, SynapseConstants.ENDPOINT_FO_NONE_READY, "Failover endpoint : " + getName()
-                        + " - no ready child endpoints");
+                String msg = "Failover endpoint : " +
+                        (getName() != null ? getName() : SynapseConstants.ANONYMOUS_ENDPOINT) +
+                        " - no ready child endpoints";
+                log.warn(msg);
+                informFailure(synCtx, SynapseConstants.ENDPOINT_FO_NONE_READY, msg);
             }
         }
     }
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-
         logOnChildEndpointFail(endpoint, synMessageContext);
-        send(synMessageContext);
+        if (!((AbstractEndpoint)endpoint).isRetryDisabled(synMessageContext)) {
+            if (log.isDebugEnabled()) {
+                log.debug(this + " Retry Attempt for Request with [Message ID : " +
+                        synMessageContext.getMessageID() + "], [To : " +
+                        synMessageContext.getTo() + "]");
+            }
+            send(synMessageContext);
+        } else {
+            String msg = "Failover endpoint : " +
+                    (getName() != null ? getName() : SynapseConstants.ANONYMOUS_ENDPOINT) +
+                    " - one of the child endpoints encounterd a non-retry error, " +
+                    "not sending message to another endpoint";
+            log.warn(msg);
+            informFailure(synMessageContext, SynapseConstants.ENDPOINT_FO_NONE_READY, msg);
+        }
     }
 
     public boolean readyToSend() {

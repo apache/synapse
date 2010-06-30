@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.deployment.Deployer;
+import org.apache.axis2.deployment.AbstractDeployer;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
@@ -39,7 +39,12 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Implements the generic logic for the synapse artifact deployment and provide a deployment framework
@@ -51,7 +56,7 @@ import java.io.*;
  *
  * @see org.apache.axis2.deployment.Deployer
  */
-public abstract class AbstractSynapseArtifactDeployer implements Deployer {
+public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
 
     private static final Log log = LogFactory.getLog(AbstractSynapseArtifactDeployer.class);
     protected  Log deployerLog;
@@ -183,7 +188,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      *
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploySynapseArtifact(String) 
      */
-    public void unDeploy(String fileName) throws DeploymentException {
+    public void undeploy(String fileName) throws DeploymentException {
 
         fileName = FilenameUtils.normalize(fileName);
         if (log.isDebugEnabled()) {

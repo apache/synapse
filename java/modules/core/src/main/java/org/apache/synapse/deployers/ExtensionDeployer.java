@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.deployment.AbstractDeployer;
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentClassLoader;
 import org.apache.axis2.deployment.DeploymentException;
@@ -49,7 +50,7 @@ import org.apache.synapse.config.xml.StartupFinder;
  * This will support the hot deployment and hot update of Synapse extensions (mediators
  * and startups) at runtime using the Axis2 concepts of deployers.
  */
-public class ExtensionDeployer implements Deployer {
+public class ExtensionDeployer extends AbstractDeployer {
 
     /**
      * Holds the log variable for logging purposes
@@ -193,7 +194,7 @@ public class ExtensionDeployer implements Deployer {
      * @param string - filename of the deleted file
      * @throws DeploymentException - incase of an error in undeployment
      */
-    public void unDeploy(String string) throws DeploymentException {
+    public void undeploy(String string) throws DeploymentException {
         // todo: implement the undeployement
     }
 

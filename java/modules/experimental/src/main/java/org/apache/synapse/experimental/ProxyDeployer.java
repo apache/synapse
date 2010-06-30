@@ -19,32 +19,31 @@
 
 package org.apache.synapse.experimental;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.deployment.AbstractDeployer;
+import org.apache.axis2.deployment.DeploymentException;
+import org.apache.axis2.deployment.repository.util.DeploymentFileData;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.ProxyServiceFactory;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.ProxyService;
+
+import javax.xml.stream.XMLStreamException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamException;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.deployment.Deployer;
-import org.apache.axis2.deployment.DeploymentException;
-import org.apache.axis2.deployment.repository.util.DeploymentFileData;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.ProxyServiceFactory;
-import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.core.SynapseEnvironment;
-
-public class ProxyDeployer implements Deployer {
+public class ProxyDeployer extends AbstractDeployer {
     private final Map<String,String> filenameToProxyNameMap = new HashMap<String,String>();
     private ConfigurationContext cfgCtx = null;
 
@@ -122,7 +121,7 @@ public class ProxyDeployer implements Deployer {
     public void setExtension(String extension) {
     }
 
-    public void unDeploy(String fileName) throws DeploymentException {
+    public void undeploy(String fileName) throws DeploymentException {
         String proxyName = filenameToProxyNameMap.get(fileName);
         if (proxyName == null) {
             throw new DeploymentException("Nothing known about file '" + fileName + "'");

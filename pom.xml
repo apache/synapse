@@ -191,6 +191,18 @@
             </releases>
         </pluginRepository>
 
+	  <pluginRepository>
+            <id>snapshot-apache-2</id>
+            <name>2nd Apache Snapshot repository</name>
+            <url>http://repository.apache.org/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+
     </pluginRepositories>
 
     <dependencies>

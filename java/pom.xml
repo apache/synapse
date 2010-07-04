@@ -162,6 +162,9 @@
             <id>apache-snapshots</id>
             <name>Apache Snapshot repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -759,7 +762,7 @@
             <name>Apache Maven 2 Snapshot Repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
             <releases>
-                <updatePolicy>never</updatePolicy>
+                <enabled>false</enabled>
             </releases>
             <snapshots>
                 <updatePolicy>interval:10080</updatePolicy> <!-- i.e. refresh weekly -->
@@ -786,17 +789,6 @@
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>interval:10080</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>asankha</id>
-            <name>Asankha M2 Repository</name>
-            <url>http://people.apache.org/~asankha/repository</url>
-            <releases>
-                <updatePolicy>daily</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:10080</updatePolicy> <!-- i.e. refresh weekly -->
             </snapshots>
         </repository>
     </repositories>

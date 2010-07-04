@@ -95,20 +95,10 @@
         <!--<parameter name="hostname" locked="false">http://myApp.com/ws</parameter>-->
     </transportReceiver>
 
-    <transportReceiver name="tcp"
-                       class="org.apache.axis2.transport.tcp.TCPServer">
-        <parameter name="port" locked="false">6061</parameter>
-        <!--If you want to give your own host address for EPR generation-->
-        <!--uncommet following paramter , and set as you required.-->
-        <!--<parameter name="hostname" locked="false">tcp://myApp.com/ws</parameter>-->
-    </transportReceiver>
-
     <!-- ================================================= -->
     <!-- Transport Outs -->
     <!-- ================================================= -->
 
-    <transportSender name="tcp"
-                     class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
     <transportSender name="local"
                      class="org.apache.axis2.transport.local.LocalTransportSender"/>
     <transportSender name="http"

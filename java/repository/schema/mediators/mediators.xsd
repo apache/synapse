@@ -23,6 +23,7 @@
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <xs:include schemaLocation="in.xsd"/>
+    <xs:include schemaLocation="out.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -32,6 +33,7 @@
         </xs:annotation>
         <xs:choice>
             <xs:element ref="in"/>
+            <xs:element ref="out"/>
         </xs:choice>
     </xs:group>
 

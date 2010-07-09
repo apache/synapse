@@ -23,8 +23,8 @@
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <xs:include schemaLocation="mediators.xsd"/>
-    
-    <xs:element name="in">
+
+    <xs:element name="out">
         <xs:annotation>
             <xs:documentation source="description">
                 Out mediator to filter out the out path messages

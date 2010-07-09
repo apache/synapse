@@ -22,21 +22,31 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="core/in.xsd"/>
-    <xs:include schemaLocation="core/out.xsd"/>
-    <xs:include schemaLocation="core/header.xsd"/>
-
-    <xs:group name="mediatorList">
+    <xs:element name="header">
         <xs:annotation>
             <xs:documentation source="description">
-                This group denotes all the mediator elements that can come inside a sequence
+                Header mediator to process headers of the messages
             </xs:documentation>
         </xs:annotation>
-        <xs:choice>
-            <xs:element ref="in"/>
-            <xs:element ref="out"/>
-            <xs:element ref="header"/>
-        </xs:choice>
-    </xs:group>
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:attribute name="expression" type="xs:string" use="optional"/>
+            <xs:attribute name="action" type="setRemove" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="setRemove">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This simple type represents the possible values for
+                the header mediator action attribute
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="set"/>
+            <xs:enumeration value="remove"/>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>

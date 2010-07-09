@@ -22,8 +22,8 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="in.xsd"/>
-    <xs:include schemaLocation="out.xsd"/>
+    <xs:include schemaLocation="core/in.xsd"/>
+    <xs:include schemaLocation="core/out.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>

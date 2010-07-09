@@ -22,7 +22,7 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="mediators.xsd"/>
+    <xs:include schemaLocation="../mediators.xsd"/>
 
     <xs:element name="out">
         <xs:annotation>

@@ -54,24 +54,6 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="property">
-        <xs:annotation>
-            <xs:documentation source="description">
-                These are the properties which could be name value pairs or could be
-                xpath expression extracting the property value by evaluating over the message
-            </xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:complexContent mixed="true">
-                <xs:extension base="xs:anyType">
-                    <xs:attribute name="name" type="xs:string" use="required"/>
-                    <xs:attribute name="value" type="xs:string" use="optional"/>
-                    <xs:attribute name="expression" type="xs:string" use="optional"/>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-
     <xs:group name="inlineWsdl">
         <xs:choice>
             <xs:element ref="wsdl11:definitions" minOccurs="0" maxOccurs="1"/>
@@ -90,6 +72,36 @@
         <xs:attribute name="trace" default="disabled" type="enableDisable" use="optional"/>
     </xs:attributeGroup>
 
+    <xs:attributeGroup name="nameValueOrExpression">
+        <xs:annotation>
+            <xs:documentation>
+                This group of attributes are mainly used in header and property mediators
+                to provide the name value or expression pairs as its configuration
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+        <xs:attribute name="expression" type="xs:string" use="optional"/>
+        <xs:attribute name="action" type="setRemove" use="optional"/>
+    </xs:attributeGroup>
+
+    <xs:complexType name="mediatorProperty">
+        <xs:annotation>
+            <xs:documentation source="description">
+                These are the properties which could be name value pairs or could be
+                xpath expression extracting the property value by evaluating over
+                the message
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent mixed="true">
+            <xs:extension base="xs:anyType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="value" type="xs:string" use="optional"/>
+                <xs:attribute name="expression" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
     <xs:simpleType name="enableDisable">
         <xs:annotation>
             <xs:documentation source="description">
@@ -100,6 +112,19 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="enable"/>
             <xs:enumeration value="disable"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="setRemove">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This simple type represents the possible values for
+                the header mediator action attribute
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="set"/>
+            <xs:enumeration value="remove"/>
         </xs:restriction>
     </xs:simpleType>
 

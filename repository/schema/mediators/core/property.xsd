@@ -21,13 +21,13 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-    
+
     <xs:include schemaLocation="../../misc/common.xsd"/>
 
-    <xs:element name="header">
+    <xs:element name="property">
         <xs:annotation>
             <xs:documentation source="description">
-                Header mediator to process headers of the messages
+                Property mediator to process properties of the messages
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>

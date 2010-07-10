@@ -26,6 +26,7 @@
     <xs:include schemaLocation="core/out.xsd"/>
     <xs:include schemaLocation="core/header.xsd"/>
     <xs:include schemaLocation="core/send.xsd"/>
+    <xs:include schemaLocation="core/log.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -38,6 +39,7 @@
             <xs:element ref="out"/>
             <xs:element ref="header"/>
             <xs:element ref="send"/>
+            <xs:element ref="log"/>
         </xs:choice>
     </xs:group>
 

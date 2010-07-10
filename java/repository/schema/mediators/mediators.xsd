@@ -29,6 +29,7 @@
     <xs:include schemaLocation="core/log.xsd"/>
     <xs:include schemaLocation="core/property.xsd"/>
     <xs:include schemaLocation="core/drop.xsd"/>
+    <xs:include schemaLocation="core/validate.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -54,6 +55,7 @@
             <xs:element ref="log"/>
             <xs:element ref="property"/>
             <xs:element ref="drop"/>
+            <xs:element ref="validate"/>
         </xs:choice>
     </xs:group>
 

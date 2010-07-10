@@ -54,6 +54,19 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="feature">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This is a feature, with a name value pair as its configuration
+                and mainly used in the validate mediator
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:boolean" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
     <xs:group name="inlineWsdl">
         <xs:choice>
             <xs:element ref="wsdl11:definitions" minOccurs="0" maxOccurs="1"/>

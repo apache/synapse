@@ -37,6 +37,16 @@
             </xs:documentation>
         </xs:annotation>
         <xs:choice>
+            <xs:element name="sequence">
+                <xs:annotation>
+                    <xs:documentation>
+                        This represents the sequence references
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="key" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
             <xs:element ref="in"/>
             <xs:element ref="out"/>
             <xs:element ref="header"/>

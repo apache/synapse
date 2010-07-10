@@ -33,4 +33,8 @@
     <out>
         <send/>
     </out>
+
+    <sequence name="foo">
+        <sequence key="xxx"/>
+    </sequence>
 </definitions>

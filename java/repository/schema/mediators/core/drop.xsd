@@ -22,29 +22,12 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="filter/in.xsd"/>
-    <xs:include schemaLocation="filter/out.xsd"/>
-    <xs:include schemaLocation="core/header.xsd"/>
-    <xs:include schemaLocation="core/send.xsd"/>
-    <xs:include schemaLocation="core/log.xsd"/>
-    <xs:include schemaLocation="core/property.xsd"/>
-    <xs:include schemaLocation="core/drop.xsd"/>
-
-    <xs:group name="mediatorList">
+    <xs:element name="drop">
         <xs:annotation>
             <xs:documentation source="description">
-                This group denotes all the mediator elements that can come inside a sequence
+                Drop mediator to stop a mediation flow of a message
             </xs:documentation>
         </xs:annotation>
-        <xs:choice>
-            <xs:element ref="in"/>
-            <xs:element ref="out"/>
-            <xs:element ref="header"/>
-            <xs:element ref="send"/>
-            <xs:element ref="log"/>
-            <xs:element ref="property"/>
-            <xs:element ref="drop"/>
-        </xs:choice>
-    </xs:group>
+    </xs:element>
 
 </xs:schema>

@@ -39,7 +39,7 @@ import java.util.Map;
  * <pre>
  * &lt;validate [source="xpath"]>
  *   &lt;schema key="string">+
- *   &lt;property name="<validation-feature-name>" value="true|false"/>
+ *   &lt;feature name="<validation-feature-name>" value="true|false"/>
  *   &lt;on-fail>
  *     mediator+
  *   &lt;/on-fail>
@@ -76,7 +76,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         }
 
         if (schemaKeys.size() == 0) {
-            handleException("No schemas specified for the validate mediator");
+            handleException("No schema specified for the validate mediator");
         } else {
             validateMediator.setSchemaKeys(schemaKeys);
         }

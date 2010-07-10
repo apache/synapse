@@ -22,8 +22,8 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="core/in.xsd"/>
-    <xs:include schemaLocation="core/out.xsd"/>
+    <xs:include schemaLocation="filter/in.xsd"/>
+    <xs:include schemaLocation="filter/out.xsd"/>
     <xs:include schemaLocation="core/header.xsd"/>
     <xs:include schemaLocation="core/send.xsd"/>
     <xs:include schemaLocation="core/log.xsd"/>

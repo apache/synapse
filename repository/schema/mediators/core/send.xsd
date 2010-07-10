@@ -22,23 +22,19 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="core/in.xsd"/>
-    <xs:include schemaLocation="core/out.xsd"/>
-    <xs:include schemaLocation="core/header.xsd"/>
-    <xs:include schemaLocation="core/send.xsd"/>
+    <xs:include schemaLocation="../../endpoint.xsd"/>
 
-    <xs:group name="mediatorList">
+    <xs:element name="send">
         <xs:annotation>
             <xs:documentation source="description">
-                This group denotes all the mediator elements that can come inside a sequence
+                Send mediator to send out the messages
             </xs:documentation>
         </xs:annotation>
-        <xs:choice>
-            <xs:element ref="in"/>
-            <xs:element ref="out"/>
-            <xs:element ref="header"/>
-            <xs:element ref="send"/>
-        </xs:choice>
-    </xs:group>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="endpoint" type="Endpoint" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
 </xs:schema>

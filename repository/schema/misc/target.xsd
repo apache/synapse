@@ -23,6 +23,7 @@
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <xs:include schemaLocation="../endpoint.xsd"/>
+    <xs:include schemaLocation="../mediators/mediators.xsd"/>
 
     <xs:element name="target" type="Target">
         <xs:annotation>
@@ -34,14 +35,24 @@
 
     <xs:complexType name="Target">
         <xs:annotation>
-
+            <xs:documentation>
+                This denotes the target for a proxy or for various mediators
+            </xs:documentation>
         </xs:annotation>
         <xs:all>
             <xs:element name="inSequence" minOccurs="0" maxOccurs="1">
-                
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
             <xs:element name="outSequence" minOccurs="0" maxOccurs="1">
-
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
             <xs:element name="endpoint" type="Endpoint" minOccurs="0" maxOccurs="1"/>
         </xs:all>

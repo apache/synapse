@@ -22,14 +22,15 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="filter/in.xsd"/>
-    <xs:include schemaLocation="filter/out.xsd"/>
     <xs:include schemaLocation="core/header.xsd"/>
     <xs:include schemaLocation="core/send.xsd"/>
     <xs:include schemaLocation="core/log.xsd"/>
     <xs:include schemaLocation="core/property.xsd"/>
     <xs:include schemaLocation="core/drop.xsd"/>
     <xs:include schemaLocation="core/validate.xsd"/>
+    <xs:include schemaLocation="filter/in.xsd"/>
+    <xs:include schemaLocation="filter/out.xsd"/>
+    <xs:include schemaLocation="filter/filter.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -56,6 +57,7 @@
             <xs:element ref="property"/>
             <xs:element ref="drop"/>
             <xs:element ref="validate"/>
+            <xs:element ref="filter"/>
         </xs:choice>
     </xs:group>
 

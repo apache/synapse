@@ -38,14 +38,16 @@ This is the synapse migration xslt which will migrate the configuration from the
 
     <xsl:template match="syn:definitions | synNew:definitions" priority="1">
         <xsl:element name="definitions" namespace="http://synapse.apache.org/ns/2010/04/configuration">
-            <xsl:element name="sequence" namespace="http://synapse.apache.org/ns/2010/04/configuration">
-                <xsl:attribute name="name">main</xsl:attribute>
-                <xsl:for-each select="syn:* | synNew:*">
-                    <xsl:if test="local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint'">
-                        <xsl:call-template name="convertNS"/>
-                    </xsl:if>
-                </xsl:for-each>
-            </xsl:element>
+            <xsl:if test="not(syn:sequence[@name='main'] or synNew:sequence[@name='main'])">
+                <xsl:element name="sequence" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+                    <xsl:attribute name="name">main</xsl:attribute>
+                    <xsl:for-each select="syn:* | synNew:*">
+                        <xsl:if test="local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint'">
+                            <xsl:call-template name="convertNS"/>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:element>
+            </xsl:if>
             <xsl:for-each select="syn:* | synNew:*">
                 <xsl:if test="local-name()='sequence' or local-name()='localEntry' or local-name()='proxy' or local-name()='task' or local-name()='endpoint'">
                     <xsl:apply-templates select="."/>

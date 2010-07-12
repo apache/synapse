@@ -21,7 +21,15 @@
 <!--
 This is the synapse migration xslt which will migrate the configuration from the 1.x version to the 2.x compatible version 
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:syn="http://ws.apache.org/ns/synapse">
+
+  <xsl:template match="syn:*">
+      <xsl:element name="{name()}" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+          <xsl:copy-of select="@*"/>
+          <xsl:apply-templates/>
+      </xsl:element>
+  </xsl:template>
 
   <xsl:template match="/ | @* | node() | text() | processing-instruction()">
          <xsl:copy>

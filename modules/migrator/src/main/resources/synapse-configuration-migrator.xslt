@@ -22,25 +22,55 @@
 This is the synapse migration xslt which will migrate the configuration from the 1.x version to the 2.x compatible version 
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:syn="http://ws.apache.org/ns/synapse">
+                xmlns:syn="http://ws.apache.org/ns/synapse"
+                xmlns:synNew="http://synapse.apache.org/ns/2010/04/configuration"
+                exclude-result-prefixes="syn">
 
-  <xsl:template match="syn:*">
-      <xsl:element name="{name()}" namespace="http://synapse.apache.org/ns/2010/04/configuration">
-          <xsl:copy-of select="@*"/>
-          <xsl:apply-templates/>
-      </xsl:element>
-  </xsl:template>
+    <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
-  <xsl:template match="/ | @* | node() | text() | processing-instruction()">
-         <xsl:copy>
-               <xsl:apply-templates select="@* | node()" />
-         </xsl:copy>
-   </xsl:template>
+    <xsl:template match="syn:*" priority="0">
+        <xsl:call-template name="convertNS"/>
+    </xsl:template>
 
-   <xsl:template match="comment()" xml:space="preserve">
-       <xsl:copy>
-               <xsl:apply-templates select="@* | node()" />
-         </xsl:copy>
-   </xsl:template>
+    <xsl:template match="syn:definitions/syn:sequence | syn:definitions/syn:localEntry | syn:definitions/syn:proxy | syn:definitions/syn:task | syn:definitions/syn:endpoint" priority="2">
+        <xsl:call-template name="convertNS"/>
+    </xsl:template>
+
+    <xsl:template match="syn:definitions | synNew:definitions" priority="1">
+        <xsl:element name="definitions" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+            <xsl:element name="sequence" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+                <xsl:attribute name="name">main</xsl:attribute>
+                <xsl:for-each select="syn:* | synNew:*">
+                    <xsl:if test="local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint'">
+                        <xsl:call-template name="convertNS"/>
+                    </xsl:if>
+                </xsl:for-each>
+            </xsl:element>
+            <xsl:for-each select="syn:* | synNew:*">
+                <xsl:if test="local-name()='sequence' or local-name()='localEntry' or local-name()='proxy' or local-name()='task' or local-name()='endpoint'">
+                    <xsl:apply-templates select="."/>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="/ | @* | node() | text() | processing-instruction()">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" />
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="comment()" xml:space="preserve">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" />
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template name="convertNS">
+        <xsl:element name="{local-name()}" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+            <xsl:copy-of select="@*"/>
+            <xsl:apply-templates/>
+        </xsl:element>
+    </xsl:template>
 
 </xsl:stylesheet>

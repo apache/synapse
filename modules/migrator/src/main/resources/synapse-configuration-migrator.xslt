@@ -38,6 +38,9 @@ This is the synapse migration xslt which will migrate the configuration from the
 
     <xsl:template match="syn:definitions | synNew:definitions" priority="1">
         <xsl:element name="definitions" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+            <xsl:text>
+
+</xsl:text>
             <xsl:if test="not(syn:sequence[@name='main'] or synNew:sequence[@name='main'])">
                 <xsl:element name="sequence" namespace="http://synapse.apache.org/ns/2010/04/configuration">
                     <xsl:attribute name="name">main</xsl:attribute>
@@ -60,9 +63,14 @@ This is the synapse migration xslt which will migrate the configuration from the
             <xsl:for-each select="syn:* | synNew:* | comment()">
                 <xsl:if test="local-name()='sequence' or local-name()='localEntry' or local-name()='proxy' or local-name()='task' or local-name()='endpoint'">
                     <xsl:apply-templates select="."/>
+                    <xsl:text>
+
+</xsl:text>
                 </xsl:if>
                 <xsl:if test="self::comment() and (local-name(following-sibling::*[position()=1])='localEntry' or local-name(following-sibling::*[position()=1])='proxy' or local-name(following-sibling::*[position()=1])='task' or local-name(following-sibling::*[position()=1])='sequence' or local-name(following-sibling::*[position()=1])='endpoint')">
                     <xsl:copy-of select="self::comment()" xml:space="preserve"/>
+                    <xsl:text>
+</xsl:text>
                 </xsl:if>
             </xsl:for-each>
         </xsl:element>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,8 +20,12 @@
 
 <!-- Manipulating SOAP headers, and filtering incoming and outgoing messages -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-    <in>
-        <header name="To" value="http://localhost:9000/services/SimpleStockQuoteService"/>
-    </in>
-    <send/>
+
+    <sequence name="main">
+        <in>
+            <header name="To" value="http://localhost:9000/services/SimpleStockQuoteService"/>
+        </in>
+        <send/>
+    </sequence>
+
 </definitions>

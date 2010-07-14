@@ -77,7 +77,7 @@ This is the synapse migration xslt which will migrate the configuration from the
     <xsl:template match="comment()">
         <xsl:choose>
             <xsl:when test="local-name(following-sibling::*[position()=1])='definitions'" xml:space="preserve">
-                <xsl:copy-of select="." xml:space="preserve"/>
+<xsl:copy-of select="." xml:space="preserve"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:copy/>

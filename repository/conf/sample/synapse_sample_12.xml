@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,24 +20,28 @@
 
 <!-- Introduction to  endpoints /sequence from local registry -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+
     <localEntry key="local-enrty-ep-key"
                 src="file:repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml"/>
 
     <localEntry key="local-enrty-sequence-key">
-        <sequence name="dynamic_sequence" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+        <sequence name="dynamic_sequence">
             <log level="custom">
                 <property name="message" value="*** Test Message 1 ***"/>
             </log>
         </sequence>
     </localEntry>
 
-    <in>
-        <sequence key="local-enrty-sequence-key"/>
-        <send>
-            <endpoint key="local-enrty-ep-key"/>
-        </send>
-    </in>
-    <out>
-        <send/>
-    </out>
+    <sequence name="main">
+        <in>
+            <sequence key="local-enrty-sequence-key"/>
+            <send>
+                <endpoint key="local-enrty-ep-key"/>
+            </send>
+        </in>
+        <out>
+            <send/>
+        </out>
+    </sequence>
+
 </definitions>

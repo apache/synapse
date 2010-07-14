@@ -74,10 +74,15 @@ This is the synapse migration xslt which will migrate the configuration from the
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="comment()" xml:space="preserve">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()" />
-        </xsl:copy>
+    <xsl:template match="comment()">
+        <xsl:choose>
+            <xsl:when test="local-name(following-sibling::*[position()=1])='definitions'" xml:space="preserve">
+                <xsl:copy-of select="." xml:space="preserve"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="convertNS">

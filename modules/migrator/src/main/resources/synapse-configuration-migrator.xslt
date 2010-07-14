@@ -32,7 +32,7 @@ This is the synapse migration xslt which will migrate the configuration from the
         <xsl:call-template name="convertNS"/>
     </xsl:template>
 
-    <xsl:template match="syn:definitions/syn:sequence | syn:definitions/syn:localEntry | syn:definitions/syn:proxy | syn:definitions/syn:task | syn:definitions/syn:endpoint" priority="2">
+    <xsl:template match="syn:definitions/syn:sequence | syn:definitions/syn:localEntry | syn:definitions/syn:proxy | syn:definitions/syn:task | syn:definitions/syn:endpoint | syn:definitions/syn:registry" priority="2">
         <xsl:call-template name="convertNS"/>
     </xsl:template>
 
@@ -41,14 +41,27 @@ This is the synapse migration xslt which will migrate the configuration from the
             <xsl:text>
 
 </xsl:text>
-            <xsl:if test="not(syn:sequence[@name='main'] or synNew:sequence[@name='main'])">
+            <xsl:for-each select="syn:* | synNew:* | comment()">
+                <xsl:if test="local-name()='sequence' or local-name()='localEntry' or local-name()='proxy' or local-name()='task' or local-name()='endpoint' or local-name()='registry'">
+                    <xsl:apply-templates select="."/>
+                    <xsl:text>
+
+</xsl:text>
+                </xsl:if>
+                <xsl:if test="self::comment() and (local-name(following-sibling::*[position()=1])='localEntry' or local-name(following-sibling::*[position()=1])='proxy' or local-name(following-sibling::*[position()=1])='task' or local-name(following-sibling::*[position()=1])='sequence' or local-name(following-sibling::*[position()=1])='endpoint' or local-name(following-sibling::*[position()=1])='registry')">
+                    <xsl:copy-of select="self::comment()" xml:space="preserve"/>
+                    <xsl:text>
+</xsl:text>
+                </xsl:if>
+            </xsl:for-each>
+            <xsl:if test="not(syn:sequence[@name='main'] or synNew:sequence[@name='main']) and (count(syn:*[local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint' and local-name()!='registry']) + count(synNew:*[local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint' and local-name()!='registry']))!=0">
                 <xsl:element name="sequence" namespace="http://synapse.apache.org/ns/2010/04/configuration">
                     <xsl:attribute name="name">main</xsl:attribute>
                     <xsl:for-each select="syn:* | synNew:* | comment()">
-                        <xsl:if test="local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint'">
+                        <xsl:if test="local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint' and local-name()!='registry'">
                             <xsl:choose>
                                 <xsl:when test="self::comment()">
-                                    <xsl:if test="local-name(following-sibling::*[position()=1])!='localEntry' and local-name(following-sibling::*[position()=1])!='sequence' and local-name(following-sibling::*[position()=1])!='proxy' and local-name(following-sibling::*[position()=1])!='task' and local-name(following-sibling::*[position()=1])!='endpoint'">
+                                    <xsl:if test="local-name(following-sibling::*[position()=1])!='localEntry' and local-name(following-sibling::*[position()=1])!='sequence' and local-name(following-sibling::*[position()=1])!='proxy' and local-name(following-sibling::*[position()=1])!='task' and local-name(following-sibling::*[position()=1])!='endpoint' and local-name(following-sibling::*[position()=1])!='registry'">
                                         <xsl:copy-of select="self::comment()" xml:space="preserve"/>
                                     </xsl:if>
                                 </xsl:when>
@@ -59,20 +72,10 @@ This is the synapse migration xslt which will migrate the configuration from the
                         </xsl:if>
                     </xsl:for-each>
                 </xsl:element>
-            </xsl:if>
-            <xsl:for-each select="syn:* | synNew:* | comment()">
-                <xsl:if test="local-name()='sequence' or local-name()='localEntry' or local-name()='proxy' or local-name()='task' or local-name()='endpoint'">
-                    <xsl:apply-templates select="."/>
-                    <xsl:text>
+                <xsl:text>
 
 </xsl:text>
-                </xsl:if>
-                <xsl:if test="self::comment() and (local-name(following-sibling::*[position()=1])='localEntry' or local-name(following-sibling::*[position()=1])='proxy' or local-name(following-sibling::*[position()=1])='task' or local-name(following-sibling::*[position()=1])='sequence' or local-name(following-sibling::*[position()=1])='endpoint')">
-                    <xsl:copy-of select="self::comment()" xml:space="preserve"/>
-                    <xsl:text>
-</xsl:text>
-                </xsl:if>
-            </xsl:for-each>
+            </xsl:if>
         </xsl:element>
     </xsl:template>
 

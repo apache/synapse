@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -26,10 +27,10 @@
             <property name="text" value="An unexpected error occured"/>
             <property name="message" expression="get-property('ERROR_MESSAGE')"/>
         </log>
-		<drop/>
+        <drop/>
     </sequence>
 
-	<sequence name="sunErrorHandler">
+    <sequence name="sunErrorHandler">
         <log level="custom">
             <property name="text" value="An unexpected error occured for stock SUN"/>
             <property name="message" expression="get-property('ERROR_MESSAGE')"/>
@@ -40,10 +41,12 @@
 
     <sequence name="main">
         <in>
-            <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples">
+            <switch xmlns:m0="http://services.samples" source="//m0:getQuote/m0:request/m0:symbol">
                 <case regex="IBM">
                     <send>
-                        <endpoint><address uri="http://localhost:9000/services/SimpleStockQuoteService"/></endpoint>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
                     </send>
                 </case>
                 <case regex="MSFT">
@@ -52,7 +55,7 @@
                     </send>
                 </case>
                 <case regex="SUN">
-					<sequence key="sunSequence"/>
+                    <sequence key="sunSequence"/>
                 </case>
             </switch>
             <drop/>
@@ -63,10 +66,10 @@
         </out>
     </sequence>
 
-	<sequence name="sunSequence" onError="sunErrorHandler">
+    <sequence name="sunSequence" onError="sunErrorHandler">
         <send>
             <endpoint key="sunPort"/>
         </send>
-	</sequence>
+    </sequence>
 
 </definitions>

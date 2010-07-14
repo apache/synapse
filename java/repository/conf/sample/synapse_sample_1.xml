@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,14 +20,18 @@
 
 <!-- Simple content based routing (CBR) of messages -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-    <!-- filtering of messages with XPath and regex matches -->
-    <filter source="get-property('To')" regex=".*/StockQuote.*">
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
-        <drop/>
-    </filter>
-    <send/>
-</definitions> 
+
+    <sequence name="main">
+        <!-- filtering of messages with XPath and regex matches -->
+        <filter source="get-property('To')" regex=".*/StockQuote.*">
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+            <drop/>
+        </filter>
+        <send/>
+    </sequence>
+
+</definitions>

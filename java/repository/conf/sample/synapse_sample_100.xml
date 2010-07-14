@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -16,21 +17,27 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-    
+
 <!-- Using WS-Security for outgoing messages -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 
-	<in>
-        <send>
-			<endpoint name="secure">
-			    <address uri="http://localhost:9000/services/SecureStockQuoteService">
-			        <enableSec policy="sec_policy"/>
-			    </address>
-			</endpoint>
-        </send>
-    </in>
-    <out>        
-        <send/>
-    </out>
+    <!-- Test -->
+    <sequence name="main">
+        <in>
+            <send>
+                <!--Test 2-->
+                <endpoint name="secure">
+                    <address uri="http://localhost:9000/services/SecureStockQuoteService">
+                        <enableSec policy="sec_policy"/>
+                    </address>
+                </endpoint>
+            </send>
+        </in>
+        <out>
+            <send/>
+        </out>
+    </sequence>
+
 </definitions>

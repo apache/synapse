@@ -49,6 +49,7 @@ import org.apache.synapse.commons.evaluators.Parser;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
+import org.apache.synapse.transport.nhttp.util.LatencyView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,6 +98,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     private PriorityExecutor executor = null;
 
+    private LatencyView latencyView = null;
+
     public static final String REQUEST_SINK_BUFFER = "synapse.request-sink-buffer";
     public static final String RESPONSE_SOURCE_BUFFER = "synapse.response-source-buffer";
     public static final String CONNECTION_CREATION_TIME = "synapse.connectionCreationTime";
@@ -115,6 +118,7 @@ public class ServerHandler implements NHttpServiceHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.allocator = new HeapByteBufferAllocator();
         this.activeConnections = new ArrayList<NHttpServerConnection>();
+        this.latencyView = new LatencyView(isHttps);
 
         this.cfg = NHttpConfiguration.getInstance();
        if (executor == null)  {
@@ -137,6 +141,7 @@ public class ServerHandler implements NHttpServiceHandler {
     public void requestReceived(final NHttpServerConnection conn) {
 
         HttpContext context = conn.getContext();
+        context.setAttribute(NhttpConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());
         HttpRequest request = conn.getHttpRequest();
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
         context.setAttribute(NhttpConstants.MESSAGE_IN_FLIGHT, "true");
@@ -269,6 +274,21 @@ public class ServerHandler implements NHttpServiceHandler {
             }
 
             if (encoder.isCompleted()) {
+
+                if (context.getAttribute(NhttpConstants.REQ_ARRIVAL_TIME) != null &&
+                    context.getAttribute(NhttpConstants.REQ_DEPARTURE_TIME) != null &&
+                    context.getAttribute(NhttpConstants.RES_ARRIVAL_TIME) != null) {
+
+                    latencyView.notifyTimes(
+                        (Long) context.getAttribute(NhttpConstants.REQ_ARRIVAL_TIME),
+                        (Long) context.getAttribute(NhttpConstants.REQ_DEPARTURE_TIME),
+                        (Long) context.getAttribute(NhttpConstants.RES_ARRIVAL_TIME),
+                        System.currentTimeMillis());
+                }
+
+                context.removeAttribute(NhttpConstants.REQ_ARRIVAL_TIME);
+                context.removeAttribute(NhttpConstants.REQ_DEPARTURE_TIME);
+                context.removeAttribute(NhttpConstants.RES_ARRIVAL_TIME);
                 
                 ((ServerConnectionDebug) conn.getContext().getAttribute(
                         SERVER_CONNECTION_DEBUG)).recordResponseCompletionTime();
@@ -551,6 +571,8 @@ public class ServerHandler implements NHttpServiceHandler {
     }
 
     public void stop() {
+        latencyView.destroy();
+
         try {
             if (workerPool != null) {
                 workerPool.shutdown(1000);

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -18,21 +19,31 @@
   -->
 
 <!-- Introduction to FIX Proxy services in Synapse -->
-
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-   <proxy name="OrderProcesserProxy40" transports="fix">
-      <target>
-         <endpoint>
-            <address uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/>
-         </endpoint>
-         <inSequence><log level="full"/></inSequence>
-         <outSequence><log level="full"/><send/></outSequence>
-      </target>
-         
-      <parameter name="transport.fix.AcceptorConfigURL">file:repository/conf/sample/resources/fix/fix-synapse.cfg</parameter>
-      <parameter name="transport.fix.AcceptorMessageStore">file</parameter>               
-      <parameter name="transport.fix.InitiatorConfigURL">file:repository/conf/sample/resources/fix/synapse-sender.cfg</parameter>
-      <parameter name="transport.fix.InitiatorMessageStore">file</parameter>           
-   </proxy>
-</definitions>
 
+    <proxy name="OrderProcesserProxy40" transports="fix">
+        <target>
+            <endpoint>
+                <address
+                        uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/>
+            </endpoint>
+            <inSequence>
+                <log level="full"/>
+            </inSequence>
+            <outSequence>
+                <log level="full"/>
+                <send/>
+            </outSequence>
+        </target>
+
+        <parameter name="transport.fix.AcceptorConfigURL">
+            file:repository/conf/sample/resources/fix/fix-synapse.cfg
+        </parameter>
+        <parameter name="transport.fix.AcceptorMessageStore">file</parameter>
+        <parameter name="transport.fix.InitiatorConfigURL">
+            file:repository/conf/sample/resources/fix/synapse-sender.cfg
+        </parameter>
+        <parameter name="transport.fix.InitiatorMessageStore">file</parameter>
+    </proxy>
+
+</definitions>

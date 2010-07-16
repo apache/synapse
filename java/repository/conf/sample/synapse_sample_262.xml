@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,46 +20,48 @@
 
 <!-- CBR of FIX messages, using symbol (tag 55) -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-   <sequence name="CBR_SEQ">
-	<in>
-		<switch source="//message/body/field[@id='55']">
-			<case regex="GOOG">
-				<send>
-					<endpoint>
-						<address
-							uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC" />
-						</endpoint>
-				</send>
-			</case>
-			<case regex="MSFT">
-				<send>
-					<endpoint>
-						<address
-							uri="fix://localhost:19877?BeginString=FIX.4.1&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC" />
-					</endpoint>
-				</send>
-			</case>
-                	<default></default>
-		</switch>
-	</in>
-	<out>
-		<send />
-	</out>
-   </sequence>
-   <proxy name="FIXProxy" transports="fix">
-	<target inSequence="CBR_SEQ" />
-	<parameter name="transport.fix.AcceptorConfigURL">
-		file:repository/conf/sample/resources/fix/fix-synapse.cfg
-	</parameter>
-	<parameter name="transport.fix.AcceptorMessageStore">
-		file
-	</parameter>
-	<parameter name="transport.fix.InitiatorConfigURL">
-		file:repository/conf/sample/resources/fix/synapse-sender.cfg
-	</parameter>
-	<parameter name="transport.fix.InitiatorMessageStore">
-		file
-	</parameter>
-   </proxy>
-</definitions>
 
+    <sequence name="CBR_SEQ">
+        <in>
+            <switch source="//message/body/field[@id='55']">
+                <case regex="GOOG">
+                    <send>
+                        <endpoint>
+                            <address
+                                    uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <case regex="MSFT">
+                    <send>
+                        <endpoint>
+                            <address
+                                    uri="fix://localhost:19877?BeginString=FIX.4.1&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <default/>
+            </switch>
+        </in>
+        <out>
+            <send/>
+        </out>
+    </sequence>
+
+    <proxy name="FIXProxy" transports="fix">
+        <target inSequence="CBR_SEQ"/>
+        <parameter name="transport.fix.AcceptorConfigURL">
+            file:repository/conf/sample/resources/fix/fix-synapse.cfg
+        </parameter>
+        <parameter name="transport.fix.AcceptorMessageStore">
+            file
+        </parameter>
+        <parameter name="transport.fix.InitiatorConfigURL">
+            file:repository/conf/sample/resources/fix/synapse-sender.cfg
+        </parameter>
+        <parameter name="transport.fix.InitiatorMessageStore">
+            file
+        </parameter>
+    </proxy>
+
+</definitions>

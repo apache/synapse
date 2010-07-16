@@ -154,10 +154,12 @@ public class Axis2HttpRequest {
 
         if ("POST".equals(httpMethod) || "PUT".equals(httpMethod)) {
 
+            URL url = new URL(epr.getAddress());
             httpRequest = new BasicHttpEntityEnclosingRequest(
                 httpMethod,
                 msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
-                    epr.getAddress() : new URL(epr.getAddress()).getPath(),
+                    epr.getAddress() : url.getPath()
+                        + (url.getQuery() != null ? "?" + url.getQuery() : ""),
                 msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
                     HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
 

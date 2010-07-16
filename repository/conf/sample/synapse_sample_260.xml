@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,28 +20,28 @@
 
 <!-- FIX to AMQP Proxy Service -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-	<proxy name="FIXProxy" transports="fix">
-		<target>
-			<endpoint>
-				<address uri="jms:/QpidStockQuoteService?transport.jms.ConnectionFactoryJNDIName=qpidConnectionfactory&amp;java.naming.factory.initial=org.apache.qpid.jndi.PropertiesFileInitialContextFactory&amp;java.naming.provider.url=repository/conf/sample/resources/fix/conn.properties&amp;transport.jms.ReplyDestination=replyQueue"/>
-			</endpoint>
-			<inSequence>
-				<log level="full" />
-			</inSequence>
-			<outSequence>
-			    <property name="transport.fix.ServiceName"
-					value="FIXProxy" scope="axis2-client" />
-				<log level="full" />
-                <send />
-			</outSequence>
-		</target>
-		<parameter name="transport.fix.AcceptorConfigURL">
-			file:repository/conf/sample/resources/fix/fix-synapse.cfg
-		</parameter>
-		<parameter name="transport.fix.AcceptorMessageStore">
-			file
-		</parameter>
-	</proxy>
+
+    <proxy name="FIXProxy" transports="fix">
+        <target>
+            <endpoint>
+                <address
+                        uri="jms:/QpidStockQuoteService?transport.jms.ConnectionFactoryJNDIName=qpidConnectionfactory&amp;java.naming.factory.initial=org.apache.qpid.jndi.PropertiesFileInitialContextFactory&amp;java.naming.provider.url=repository/conf/sample/resources/fix/conn.properties&amp;transport.jms.ReplyDestination=replyQueue"/>
+            </endpoint>
+            <inSequence>
+                <log level="full"/>
+            </inSequence>
+            <outSequence>
+                <property name="transport.fix.ServiceName" value="FIXProxy" scope="axis2-client"/>
+                <log level="full"/>
+                <send/>
+            </outSequence>
+        </target>
+        <parameter name="transport.fix.AcceptorConfigURL">
+            file:repository/conf/sample/resources/fix/fix-synapse.cfg
+        </parameter>
+        <parameter name="transport.fix.AcceptorMessageStore">
+            file
+        </parameter>
+    </proxy>
+
 </definitions>
-
-

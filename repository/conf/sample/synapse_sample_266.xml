@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -18,17 +19,21 @@
   -->
 
 <!-- Switching from UDP to HTTP/S -->
-<proxy xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="StockQuoteProxy" transports="udp">
-   <target>
-	<endpoint>
-	   <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-	</endpoint>
-	<inSequence>
-	   <log level="full"/>
-	   <property name="OUT_ONLY" value="true"/>
-	</inSequence>
-   </target>
-   <parameter name="transport.udp.port">9999</parameter>
-   <parameter name="transport.udp.contentType">text/xml</parameter>
-   <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-</proxy>   
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+
+    <proxy name="StockQuoteProxy" transports="udp">
+        <target>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+            <inSequence>
+                <log level="full"/>
+                <property name="OUT_ONLY" value="true"/>
+            </inSequence>
+        </target>
+        <parameter name="transport.udp.port">9999</parameter>
+        <parameter name="transport.udp.contentType">text/xml</parameter>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
+
+</definitions>

@@ -24,6 +24,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -237,6 +238,8 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(NhttpConstants.ENDPOINT_PREFIX, axis2Req.getEndpointURLPrefix());
             context.setAttribute(NhttpConstants.HTTP_REQ_METHOD, request.getRequestLine().getMethod());
             context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+            setServerContextAttribute(NhttpConstants.REQ_DEPARTURE_TIME,
+                        System.currentTimeMillis(), conn);
             conn.submitRequest(request);
         } catch (ConnectionClosedException e) {
             throw e;
@@ -506,6 +509,8 @@ public class ClientHandler implements NHttpClientHandler {
             }
 
             if (decoder.isCompleted()) {
+                setServerContextAttribute(NhttpConstants.RES_ARRIVAL_TIME,
+                        System.currentTimeMillis(), conn);
                 ClientConnectionDebug ccd = (ClientConnectionDebug)
                         conn.getContext().getAttribute(CLIENT_CONNECTION_DEBUG);
                 if (ccd != null) {
@@ -1065,5 +1070,16 @@ public class ClientHandler implements NHttpClientHandler {
             return axis2Req.getMsgContext();
         }
         return null;
+    }
+
+    private void setServerContextAttribute(String key, Object value, NHttpClientConnection conn) {
+        MessageContext msgCtx = getMessageContext(conn);
+        if (msgCtx != null) {
+            Object outTransport = msgCtx.getProperty(Constants.OUT_TRANSPORT_INFO);
+            if (outTransport != null && outTransport instanceof ServerWorker) {
+                HttpContext context = ((ServerWorker) outTransport).getConn().getContext();
+                context.setAttribute(key, value);
+            }
+        }
     }
 }

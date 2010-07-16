@@ -109,4 +109,9 @@ public class NhttpConstants {
     public static final String OPEN_CONNNECTIONS_MAP = "OPEN_CONNNECTIONS_MAP";
     /** Configuration in nhttp.properties file for enable connection counting */
     public static final String COUNT_CONNECTIONS = "http.count.connections";
+
+    public static final String REQ_ARRIVAL_TIME = "REQ_ARRIVAL_TIME";
+    public static final String REQ_DEPARTURE_TIME = "REQ_DEPARTURE_TIME";
+    public static final String RES_ARRIVAL_TIME = "RES_ARRIVAL_TIME";
+    public static final String RES_DEPARTURE_TIME = "RES_DEPARTURE_TIME";
 }

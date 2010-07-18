@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -33,15 +34,23 @@
         <trigger interval="5"/>
     </task>
 
-    <in>
-        <send/>
-    </in>
-    <out>
-        <log level="custom">
-            <property name="Stock_Quote_on" expression="//ns:return/ax21:lastTradeTimestamp/child::text()" xmlns:ax21="http://services.samples/xsd" xmlns:ns="http://services.samples"/>
-            <property name="For_the_organization" expression="//ns:return/ax21:name/child::text()" xmlns:ax21="http://services.samples/xsd" xmlns:ns="http://services.samples"/>
-            <property name="Last_Value" expression="//ns:return/ax21:last/child::text()" xmlns:ax21="http://services.samples/xsd" xmlns:ns="http://services.samples"/>
-        </log>
-    </out>
+    <sequence name="main">
+        <in>
+            <send/>
+        </in>
+        <out>
+            <log level="custom">
+                <property xmlns:ax21="http://services.samples/xsd"
+                          xmlns:ns="http://services.samples" name="Stock_Quote_on"
+                          expression="//ns:return/ax21:lastTradeTimestamp/child::text()"/>
+                <property xmlns:ax21="http://services.samples/xsd"
+                          xmlns:ns="http://services.samples" name="For_the_organization"
+                          expression="//ns:return/ax21:name/child::text()"/>
+                <property xmlns:ax21="http://services.samples/xsd"
+                          xmlns:ns="http://services.samples" name="Last_Value"
+                          expression="//ns:return/ax21:last/child::text()"/>
+            </log>
+        </out>
+    </sequence>
 
 </definitions>

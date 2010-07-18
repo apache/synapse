@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -30,20 +31,22 @@
     <localEntry key="stockquoteScript"
                 src="file:repository/conf/sample/resources/script/stockquoteTransformRequest.js"/>
 
-    <in>
-        <!-- transform the custom quote request into a standard quote request expected by the service -->
-        <script language="js" key="stockquoteScript" function="transformRequest"/>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
-    </in>
+    <sequence name="main">
+        <in>
+            <!-- transform the custom quote request into a standard quote request expected by the service -->
+            <script language="js" key="stockquoteScript" function="transformRequest"/>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
+        <out>
+            <!-- transform the standard response back into the custom format the client expects -->
+            <script language="js" key="script/stockquoteTransformResponse.js"
+                    function="transformResponse"/>
+            <send/>
+        </out>
+    </sequence>
 
-    <out>
-        <!-- transform the standard response back into the custom format the client expects -->
-        <script language="js" key="script/stockquoteTransformResponse.js"
-                function="transformResponse"/>
-        <send/>
-    </out>
 </definitions>

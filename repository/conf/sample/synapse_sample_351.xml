@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -16,37 +17,41 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-    
+
 <!-- In-line script mediation with JavaScript -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-    <in>
-        <!-- transform the custom quote request into a standard quote requst expected by the service -->
-        <script language="js"><![CDATA[
-               var symbol = mc.getPayloadXML()..*::Code.toString();
-               mc.setPayloadXML(
-                  <m:getQuote xmlns:m="http://services.samples/xsd">
-                     <m:request>
-                        <m:symbol>{symbol}</m:symbol>
-                     </m:request>
-                  </m:getQuote>);
-        ]]></script>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
-    </in>
-    <out>
-        <!-- transform the standard response back into the custom format the client expects -->
-        <script language="js"><![CDATA[
-               var symbol = mc.getPayloadXML()..*::symbol.toString();
-               var price = mc.getPayloadXML()..*::last.toString();
-               mc.setPayloadXML(
-                  <m:CheckPriceResponse xmlns:m="http://services.samples/xsd">
-               <m:Code>{symbol}</m:Code>
-               <m:Price>{price}</m:Price>
-                  </m:CheckPriceResponse>);
-            ]]></script>
-        <send/>
-    </out>
+
+    <sequence name="main">
+        <in>
+            <!-- transform the custom quote request into a standard quote requst expected by the service -->
+            <script language="js">
+                var symbol = mc.getPayloadXML()..*::Code.toString();
+                mc.setPayloadXML(
+                &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
+                &lt;m:request&gt;
+                &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+                &lt;/m:request&gt;
+                &lt;/m:getQuote&gt;);
+            </script>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
+        <out>
+            <!-- transform the standard response back into the custom format the client expects -->
+            <script language="js">
+                var symbol = mc.getPayloadXML()..*::symbol.toString();
+                var price = mc.getPayloadXML()..*::last.toString();
+                mc.setPayloadXML(
+                &lt;m:CheckPriceResponse xmlns:m="http://services.samples/xsd"&gt;
+                &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
+                &lt;m:Price&gt;{price}&lt;/m:Price&gt;
+                &lt;/m:CheckPriceResponse&gt;);
+            </script>
+            <send/>
+        </out>
+    </sequence>
+
 </definitions>

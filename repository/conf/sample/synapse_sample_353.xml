@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -16,25 +17,30 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-    
+
 <!-- Using Ruby scripts for mediation -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>
-    <in>
-        <!-- transform the custom quote request into a standard quote request expected by the service -->
-        <script language="rb" key="stockquoteScript" function="transformRequest"/>
+    <localEntry key="stockquoteScript"
+                src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>
 
-        <!-- send message to real endpoint referenced by name "stockquote" and stop -->
-        <send>
-            <endpoint name="stockquote">
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
-    </in>
-    <out>
-        <!-- transform the standard response back into the custom format the client expects -->
-        <script language="rb" key="stockquoteScript" function="transformResponse"/>
-        <send/>
-    </out>
+    <sequence name="main">
+        <in>
+            <!-- transform the custom quote request into a standard quote request expected by the service -->
+            <script language="rb" key="stockquoteScript" function="transformRequest"/>
+
+            <!-- send message to real endpoint referenced by name "stockquote" and stop -->
+            <send>
+                <endpoint name="stockquote">
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
+        <out>
+            <!-- transform the standard response back into the custom format the client expects -->
+            <script language="rb" key="stockquoteScript" function="transformResponse"/>
+            <send/>
+        </out>
+    </sequence>
+
 </definitions>

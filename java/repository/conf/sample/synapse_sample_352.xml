@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,18 +20,22 @@
 
 <!-- Accessing Synapse message context API methods using scripting language -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-    <in>
-       <!-- change the MessageContext into a response and set a response payload -->
-       <script language="js"><![CDATA[
-          mc.setTo(mc.getReplyTo());
-          mc.setProperty("RESPONSE", "true");
-          mc.setPayloadXML(
-             <ns:getQuoteResponse xmlns:ns="http://services.samples/xsd">
-                <ns:return>
-                   <ns:last>99.9</ns:last>
-                </ns:return>
-             </ns:getQuoteResponse>);
-       ]]></script>
-    </in>
-    <send/>
+
+    <sequence name="main">
+        <in>
+            <!-- change the MessageContext into a response and set a response payload -->
+            <script language="js">
+                mc.setTo(mc.getReplyTo());
+                mc.setProperty("RESPONSE", "true");
+                mc.setPayloadXML(
+                &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
+                &lt;ns:return&gt;
+                &lt;ns:last&gt;99.9&lt;/ns:last&gt;
+                &lt;/ns:return&gt;
+                &lt;/ns:getQuoteResponse&gt;);
+            </script>
+        </in>
+        <send/>
+    </sequence>
+
 </definitions>

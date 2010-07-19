@@ -48,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.evaluators.Parser;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.executors.PriorityExecutor;
+import org.apache.synapse.commons.jmx.ThreadingView;
 import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.LatencyView;
 
@@ -99,6 +100,7 @@ public class ServerHandler implements NHttpServiceHandler {
     private PriorityExecutor executor = null;
 
     private LatencyView latencyView = null;
+    private ThreadingView threadingView = null;
 
     public static final String REQUEST_SINK_BUFFER = "synapse.request-sink-buffer";
     public static final String RESPONSE_SOURCE_BUFFER = "synapse.response-source-buffer";
@@ -119,9 +121,10 @@ public class ServerHandler implements NHttpServiceHandler {
         this.allocator = new HeapByteBufferAllocator();
         this.activeConnections = new ArrayList<NHttpServerConnection>();
         this.latencyView = new LatencyView(isHttps);
+        this.threadingView = new ThreadingView("HttpServerWorker", true, 50);
 
         this.cfg = NHttpConfiguration.getInstance();
-       if (executor == null)  {
+        if (executor == null)  {
             this.workerPool = WorkerPoolFactory.getWorkerPool(
                 cfg.getServerCoreThreads(),
                 cfg.getServerMaxThreads(),
@@ -572,6 +575,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public void stop() {
         latencyView.destroy();
+        threadingView.destroy();
 
         try {
             if (workerPool != null) {

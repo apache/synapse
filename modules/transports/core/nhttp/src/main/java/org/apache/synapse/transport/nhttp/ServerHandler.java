@@ -51,6 +51,7 @@ import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.jmx.ThreadingView;
 import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.LatencyView;
+import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,7 +91,7 @@ public class ServerHandler implements NHttpServiceHandler {
     /** the thread pool to process requests */
     private WorkerPool workerPool = null;
     /** the metrics collector */
-    private MetricsCollector metrics = null;
+    private NhttpMetricsCollector metrics = null;
     
     /** keeps track of the connection that are alive in the system */
     private volatile List<NHttpServerConnection> activeConnections = null;
@@ -108,7 +109,7 @@ public class ServerHandler implements NHttpServiceHandler {
     public static final String SERVER_CONNECTION_DEBUG = "synapse.server-connection-debug";
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
-        final boolean isHttps, final MetricsCollector metrics,
+        final boolean isHttps, final NhttpMetricsCollector metrics,
         Parser parser, PriorityExecutor executor) {
         super();
         this.cfgCtx = cfgCtx;
@@ -343,8 +344,8 @@ public class ServerHandler implements NHttpServiceHandler {
      * HttpProcessor and submits it to be sent out. Re-Throws exceptions, after closing connections
      * @param conn the connection being processed
      * @param response the response to commit over the connection
-     * @throws IOException
-     * @throws HttpException
+     * @throws IOException if an IO error occurs while sending the response
+     * @throws HttpException if a HTTP protocol violation occurs while sending the response
      */
     public void commitResponse(final NHttpServerConnection conn,
         final HttpResponse response) throws IOException, HttpException {
@@ -386,6 +387,9 @@ public class ServerHandler implements NHttpServiceHandler {
         if (log.isTraceEnabled()) {
             log.trace("New incoming connection");
         }
+
+        metrics.connected();
+
         // record connection creation time for debug logging
         conn.getContext().setAttribute(CONNECTION_CREATION_TIME, System.currentTimeMillis());
         if (log.isDebugEnabled()) {
@@ -433,6 +437,7 @@ public class ServerHandler implements NHttpServiceHandler {
         if (log.isTraceEnabled()) {
             log.trace("Connection closed");
         }
+        metrics.disconnected();
     }
 
     public void markActiveConnectionsToBeClosed() {

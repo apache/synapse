@@ -59,6 +59,7 @@ import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /** JMX support */
     private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for the sender */
-    private MetricsCollector metrics = new MetricsCollector();
+    private NhttpMetricsCollector metrics = null;
     /** state of the listener */
     private volatile int state = BaseConstants.STOPPED;
     /** The proxy host */
@@ -183,6 +184,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             log.error("Error starting the IOReactor", e);
         }
 
+        metrics = new NhttpMetricsCollector(false, sslContext != null);
         handler = new ClientHandler(cfgCtx, params, metrics);
         final IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslIOSessionHandler, params, transportOut);
@@ -669,6 +671,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             log.warn("Error shutting down IOReactor", e);
         }
         mbeanSupport.unregister();
+        metrics.destroy();
     }
 
     /**

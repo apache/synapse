@@ -53,6 +53,7 @@ import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
 import org.apache.synapse.commons.evaluators.Parser;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
+import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.stream.XMLStreamException;
@@ -105,7 +106,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     /** JMX support */
     private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for this transport */
-    private MetricsCollector metrics = new MetricsCollector();
+    private NhttpMetricsCollector metrics = null;
     /** state of the listener */
     private volatile int state = BaseConstants.STOPPED;
     /** The ServerHandler */
@@ -198,6 +199,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         mbeanSupport
             = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
         mbeanSupport.register();
+        metrics = new NhttpMetricsCollector(true, sslContext != null);
 
         // create the priority based executor and parser
         param = transprtIn.getParameter(NhttpConstants.PRIORITY_CONFIG_FILE_NAME);
@@ -572,6 +574,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         ioReactor = null;
         cfgCtx.getAxisConfiguration().getObserversList().remove(axisObserver);
         mbeanSupport.unregister();
+        metrics.destroy();
     }
 
     /**

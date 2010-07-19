@@ -57,6 +57,7 @@ import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
+import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 import org.apache.synapse.commons.jmx.ThreadingView;
 
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class ClientHandler implements NHttpClientHandler {
 
     private WorkerPool workerPool = null;
     /** the metrics collector */
-    private MetricsCollector metrics = null;
+    private NhttpMetricsCollector metrics = null;
 
     /** Array of content types for which warnings are logged if HTTP status code is 500. */
     private String[] warnOnHttp500;
@@ -125,7 +126,7 @@ public class ClientHandler implements NHttpClientHandler {
      * @param metrics statistics collection metrics
      */
     public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params,
-        final MetricsCollector metrics) {
+        final NhttpMetricsCollector metrics) {
         
         super();
         this.cfgCtx = cfgCtx;
@@ -182,6 +183,9 @@ public class ClientHandler implements NHttpClientHandler {
         if (log.isDebugEnabled() ) {
             log.debug("ClientHandler connected : " + conn);
         }
+
+        metrics.connected();
+
         // record connection creation time for debug logging
         conn.getContext().setAttribute(CONNECTION_CREATION_TIME, System.currentTimeMillis());
 
@@ -291,6 +295,7 @@ public class ClientHandler implements NHttpClientHandler {
         shutdownConnection(conn);
         context.removeAttribute(RESPONSE_SINK_BUFFER);
         context.removeAttribute(REQUEST_SOURCE_BUFFER);
+        metrics.disconnected();
     }
 
     /**

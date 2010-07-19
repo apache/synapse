@@ -54,7 +54,7 @@ import java.util.Calendar;
  */
 public class LatencyView implements LatencyViewMBean {
 
-    private static final String NHTTP_LATENCY_VIEW = "NHTTPLatencyView";
+    private static final String NHTTP_LATENCY_VIEW = "NhttpTransportLatency";
 
     private static final int SMALL_DATA_COLLECTION_PERIOD = 5;
     private static final int LARGE_DATA_COLLECTION_PERIOD = 5 * 60;
@@ -93,11 +93,9 @@ public class LatencyView implements LatencyViewMBean {
 
     public LatencyView(boolean isHttps) {
         name = "nio-http" + (isHttps ? "s" : "");
-        Runnable shortTermDataCollector = getShortTermDataCollector();
-        Runnable longTermDataCollector = getLongTermDataCollector();
-        scheduler.scheduleAtFixedRate(shortTermDataCollector, SMALL_DATA_COLLECTION_PERIOD,
+        scheduler.scheduleAtFixedRate(new ShortTermDataCollector(), SMALL_DATA_COLLECTION_PERIOD,
                 SMALL_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(longTermDataCollector, LARGE_DATA_COLLECTION_PERIOD,
+        scheduler.scheduleAtFixedRate(new LongTermDataCollector(), LARGE_DATA_COLLECTION_PERIOD,
                 LARGE_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
         MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
     }
@@ -213,49 +211,45 @@ public class LatencyView implements LatencyViewMBean {
         return sum/samples;
     }
 
-    private Runnable getShortTermDataCollector() {
-        return new Runnable() {
-            public void run() {
-                long latency = lastLatency.get();
+    private class ShortTermDataCollector implements Runnable {
+        public void run() {
+            long latency = lastLatency.get();
 
-                // calculate all time average latency
-                int size = latencyDataQueue.size();
-                if (size > 0) {
-                    long sum = 0;
-                    for (int i = 0; i < size; i++) {
-                        sum += latencyDataQueue.poll();
-                    }
-                    allTimeAvgLatency = (allTimeAvgLatency * count + sum)/(count + size);
-                    count = count + size;
+            // calculate all time average latency
+            int size = latencyDataQueue.size();
+            if (size > 0) {
+                long sum = 0;
+                for (int i = 0; i < size; i++) {
+                    sum += latencyDataQueue.poll();
                 }
-
-                if (shortTermLatencyDataQueue.size() == 0 && latency == 0) {
-                    // we haven't started collecting data yet - skip ahead...
-                    return;
-                }
-
-                // take a sample for the short term latency calculation
-                if (shortTermLatencyDataQueue.size() == SAMPLES_PER_MINUTE * 15) {
-                    shortTermLatencyDataQueue.remove();
-                }
-                shortTermLatencyDataQueue.offer(latency);
+                allTimeAvgLatency = (allTimeAvgLatency * count + sum)/(count + size);
+                count = count + size;
             }
-        };
+
+            if (shortTermLatencyDataQueue.size() == 0 && latency == 0) {
+                // we haven't started collecting data yet - skip ahead...
+                return;
+            }
+
+            // take a sample for the short term latency calculation
+            if (shortTermLatencyDataQueue.size() == SAMPLES_PER_MINUTE * 15) {
+                shortTermLatencyDataQueue.remove();
+            }
+            shortTermLatencyDataQueue.offer(latency);
+        }
     }
 
-    private Runnable getLongTermDataCollector() {
-        return new Runnable() {
-            public void run() {
-                long latency = lastLatency.get();
-                if (longTermLatencyDataQueue.size() == 0 && latency == 0) {
-                    return;
-                }
-
-                if (longTermLatencyDataQueue.size() == SAMPLES_PER_HOUR * 24) {
-                    longTermLatencyDataQueue.remove();
-                }
-                longTermLatencyDataQueue.offer(latency);
+    private class LongTermDataCollector implements Runnable {
+        public void run() {
+            long latency = lastLatency.get();
+            if (longTermLatencyDataQueue.size() == 0 && latency == 0) {
+                return;
             }
-        };
+
+            if (longTermLatencyDataQueue.size() == SAMPLES_PER_HOUR * 24) {
+                longTermLatencyDataQueue.remove();
+            }
+            longTermLatencyDataQueue.offer(latency);
+        }
     }
 }

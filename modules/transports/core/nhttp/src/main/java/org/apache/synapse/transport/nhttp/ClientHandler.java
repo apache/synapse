@@ -57,6 +57,7 @@ import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
+import org.apache.synapse.commons.jmx.ThreadingView;
 
 import java.io.IOException;
 import java.util.Map;
@@ -100,6 +101,8 @@ public class ClientHandler implements NHttpClientHandler {
     /** lock to update the connection counts in a thread safe way */
     private Lock lock = new ReentrantLock();
 
+    private ThreadingView threadingView = null;
+
     /** A map for holding the number of open connections for a host:port pair */
     private Map<String, AtomicInteger> openConnections = new HashMap<String, AtomicInteger>();
 
@@ -131,6 +134,7 @@ public class ClientHandler implements NHttpClientHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.metrics = metrics;
         this.allocator = new HeapByteBufferAllocator();
+        this.threadingView = new ThreadingView("HttpClientWorker", true, 50);
 
         this.cfg = NHttpConfiguration.getInstance();
         workerPool = WorkerPoolFactory.getWorkerPool(
@@ -1045,6 +1049,8 @@ public class ClientHandler implements NHttpClientHandler {
     }
         
     public void stop() {
+        threadingView.destroy();
+
         try {
             workerPool.shutdown(1000);
         } catch (InterruptedException ignore) {}

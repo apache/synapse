@@ -756,7 +756,7 @@ public class Axis2SynapseController implements SynapseController {
         HandlerDescription handlerMD = new HandlerDescription(SynapseDispatcher.NAME);
         // <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
         PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
-        rule.setBefore(SynapseMustUnderstandHandler.NAME);
+        rule.setAfter(SOAPMessageBodyBasedDispatcher.NAME);
         handlerMD.setRules(rule);
         SynapseDispatcher synapseDispatcher = new SynapseDispatcher();
         synapseDispatcher.initDispatcher();
@@ -769,7 +769,7 @@ public class Axis2SynapseController implements SynapseController {
                 = new HandlerDescription(SynapseMustUnderstandHandler.NAME);
         // <order after="SynapseDispatcher" phase="Dispatch"/>
         PhaseRule rule = new PhaseRule(PhaseMetadata.PHASE_DISPATCH);
-        rule.setPhaseLast(true);
+        rule.setAfter(SynapseDispatcher.NAME);
         handlerMD.setRules(rule);
         SynapseMustUnderstandHandler synapseMustUnderstandHandler
                 = new SynapseMustUnderstandHandler();

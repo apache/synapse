@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -23,15 +24,14 @@
     <proxy name="SplitAggregateProxy">
         <target>
             <inSequence>
-                <iterate expression="//m0:getQuote/m0:request" preservePayload="true"
-                         attachPath="//m0:getQuote"
-                         xmlns:m0="http://services.samples">
+                <iterate xmlns:m0="http://services.samples" expression="//m0:getQuote/m0:request"
+                         preservePayload="true" attachPath="//m0:getQuote">
                     <target>
                         <sequence>
                             <send>
                                 <endpoint>
                                     <address
-                                        uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                                            uri="http://localhost:9000/services/SimpleStockQuoteService"/>
                                 </endpoint>
                             </send>
                         </sequence>
@@ -40,12 +40,13 @@
             </inSequence>
             <outSequence>
                 <aggregate>
-                    <onComplete expression="//m0:getQuoteResponse"
-                                xmlns:m0="http://services.samples">
+                    <onComplete xmlns:m0="http://services.samples"
+                                expression="//m0:getQuoteResponse">
                         <send/>
                     </onComplete>
                 </aggregate>
             </outSequence>
         </target>
     </proxy>
+
 </definitions>

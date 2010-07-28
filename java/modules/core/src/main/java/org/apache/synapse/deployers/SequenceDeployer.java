@@ -162,8 +162,6 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                             + artifactName + " : Completed");
                 }
                 log.info("Sequence named '" + seq.getName() + "' has been undeployed");
-            } else {
-                log.error("Couldn't find the sequence named : " + artifactName);
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError(

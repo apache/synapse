@@ -131,8 +131,6 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                             + artifactName + " : Completed");
                 }
                 log.info("LocalEntry named '" + e.getKey() + "' has been undeployed");
-            } else {
-                log.error("Couldn't find the LocalEntry named : " + artifactName);
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError(

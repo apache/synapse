@@ -135,8 +135,6 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
                             + artifactName + " : Completed");
                 }
                 log.info("StartupTask named '" + st.getName() + "' has been undeployed");
-            } else {
-                log.error("Couldn't find the StartupTask named : " + artifactName);
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError(

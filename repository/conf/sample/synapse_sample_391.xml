@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -40,8 +41,8 @@
             <outSequence>
                 <out>
                     <xquery key="xquery/xquery_commisson.xq">
-                        <variable name="payload" type="ELEMENT"></variable>
-                        <variable name="commission" type="ELEMENT" key="misc/commission.xml"></variable>
+                        <variable name="payload" type="ELEMENT"/>
+                        <variable name="commission" type="ELEMENT" key="misc/commission.xml"/>
                     </xquery>
                     <send/>
                 </out>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -19,22 +20,25 @@
 
 <!-- Simple Eventing configuration -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
-     <eventSource name="SampleEventSource">
-           <subscriptionManager class="org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager">
-               <!--property name="registryURL" value="http://localhost:8180/wso2registry"/>
-               <property name="username" value="admin"/>
-               <property name="password" value="admin"/-->
-               <property name="topicHeaderName" value="Topic"/>
-               <property name="topicHeaderNS" value="http://apache.org/aip"/>
-           </subscriptionManager>
-     </eventSource>
 
-    <sequence name="PublicEventSource" >
-           <log level="full"/>
-           <eventPublisher eventSourceName="SampleEventSource"/>
+    <eventSource name="SampleEventSource">
+        <subscriptionManager
+                class="org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager">
+            <!--property name="registryURL" value="http://localhost:8180/wso2registry"/>
+          <property name="username" value="admin"/>
+          <property name="password" value="admin"/-->
+            <property name="topicHeaderName" value="Topic"/>
+            <property name="topicHeaderNS" value="http://apache.org/aip"/>
+        </subscriptionManager>
+    </eventSource>
+
+    <sequence name="PublicEventSource">
+        <log level="full"/>
+        <eventPublisher eventSourceName="SampleEventSource"/>
     </sequence>
 
     <proxy name="EventingProxy">
-        <target inSequence="PublicEventSource" />
+        <target inSequence="PublicEventSource"/>
     </proxy>
+
 </definitions>

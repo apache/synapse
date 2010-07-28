@@ -146,8 +146,6 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                             + artifactName + " : Completed");
                 }
                 log.info("Endpoint named '" + ep.getName() + "' has been undeployed");
-            } else {
-                log.error("Couldn't find the endpoint named : " + artifactName);
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError("Endpoint Undeployement of endpoint named : "

@@ -156,6 +156,8 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                             + artifactName + " : Completed");
                 }
                 log.info("ProxyService named '" + proxy.getName() + "' has been undeployed");
+            } else if (log.isDebugEnabled()) {
+                log.debug("Proxy service " + artifactName + " has already been undeployed");
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError(

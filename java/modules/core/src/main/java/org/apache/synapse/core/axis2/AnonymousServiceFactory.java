@@ -92,10 +92,16 @@ public class AnonymousServiceFactory {
             case 3 :
                 servicekey = SEC_AND_ADDR;
                 break;
-            case 4 & 5 :
+            case 4 :
                 servicekey = RM_AND_ADDR;
                 break;
-            case 6 & 7 :
+            case 5 :
+                servicekey = RM_AND_ADDR;
+                break;
+            case 6:
+                servicekey = RM_SEC_AND_ADDR;
+                break;
+            case 7:
                 servicekey = RM_SEC_AND_ADDR;
                 break;
             default :

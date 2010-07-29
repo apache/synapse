@@ -391,6 +391,13 @@ public class Axis2FlexibleMEPClient {
         originalInMsgCtx.getOperationContext().setProperty(
             org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
 
+        // if the transport out is explicitly set use it
+        Object o = originalInMsgCtx.getProperty("TRANSPORT_OUT");
+        if (o != null && o instanceof TransportOutDescription) {
+            axisOutMsgCtx.setTransportOut((TransportOutDescription) o);
+            clientOptions.setTransportOut((TransportOutDescription) o);
+        }
+
         mepClient.execute(true);
         if (wsRMEnabled) {
             Object rm11 = clientOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);

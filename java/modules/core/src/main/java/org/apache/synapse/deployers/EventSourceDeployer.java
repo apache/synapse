@@ -139,6 +139,8 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                             + artifactName + " : Completed");
                 }
                 log.info("EventSource named '" + es.getName() + "' has been undeployed");
+            } else if (log.isDebugEnabled()) {
+                log.debug("Event source " + artifactName + " has already been undeployed");
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError("EventSource Undeployement of EventSource named : "

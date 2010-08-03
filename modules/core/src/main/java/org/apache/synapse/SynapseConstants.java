@@ -215,7 +215,7 @@ public final class SynapseConstants {
         /**
          * The default endpoint suspend duration on failure (i hour)
          */
-        public static final long DEFAULT_ENDPOINT_SUSPEND_TIME = 60 * 60 * 1000;
+        public static final long DEFAULT_ENDPOINT_SUSPEND_TIME = 30 * 1000;
 
         /**
          * This is a system wide interval for handling otherwise non-expiring callbacks to

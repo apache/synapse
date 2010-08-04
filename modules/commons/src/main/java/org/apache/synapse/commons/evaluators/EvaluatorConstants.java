@@ -41,4 +41,8 @@ public class EvaluatorConstants {
     public static final String CONDITION = "condition";
     public static final String PRIORITY = "priority";
     public static final String DEFAULT_PRIORITY = "defaultPriority";
+
+    public static final int MATCH_TYPE_URL = 1;
+    public static final int MATCH_TYPE_PARAM = 2;
+    public static final int MATCH_TYPE_HEADER = 3;
 }

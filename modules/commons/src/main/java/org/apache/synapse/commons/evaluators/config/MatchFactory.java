@@ -52,11 +52,11 @@ public class MatchFactory implements EvaluatorFactory {
         if (typeAttr != null) {
             String value = typeAttr.getAttributeValue();
             if (value.equals(EvaluatorConstants.HEADER)) {
-                type = 3;
+                type = EvaluatorConstants.MATCH_TYPE_HEADER;
             } else if (value.equals(EvaluatorConstants.PARAM)) {
-                type = 2;
+                type = EvaluatorConstants.MATCH_TYPE_PARAM;
             } else if (value.equals(EvaluatorConstants.URL)) {
-                type = 1;
+                type = EvaluatorConstants.MATCH_TYPE_URL;
             }
         }
 

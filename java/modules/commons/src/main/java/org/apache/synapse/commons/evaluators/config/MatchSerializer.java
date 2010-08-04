@@ -34,13 +34,13 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
             }
         }
 
-        if (matchEvaluator.getType() == 1) {
+        if (matchEvaluator.getType() == EvaluatorConstants.MATCH_TYPE_URL) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.URL));
-        } else if (matchEvaluator.getType() == 2) {
+        } else if (matchEvaluator.getType() == EvaluatorConstants.MATCH_TYPE_PARAM) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.PARAM));
-        } else if (matchEvaluator.getType() == 3) {
+        } else if (matchEvaluator.getType() == EvaluatorConstants.MATCH_TYPE_HEADER) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.HEADER));
         } else {

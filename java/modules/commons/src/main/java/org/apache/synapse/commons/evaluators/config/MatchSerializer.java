@@ -22,7 +22,7 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
         MatchEvaluator matchEvaluator = (MatchEvaluator) evaluator;
         OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.MATCH));
 
-        if (matchEvaluator.getType() != 1) {
+        if (matchEvaluator.getType() != EvaluatorConstants.TYPE_URL) {
             if (matchEvaluator.getSource() != null) {
                 matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
                         matchEvaluator.getSource()));
@@ -34,13 +34,13 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
             }
         }
 
-        if (matchEvaluator.getType() == EvaluatorConstants.MATCH_TYPE_URL) {
+        if (matchEvaluator.getType() == EvaluatorConstants.TYPE_URL) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.URL));
-        } else if (matchEvaluator.getType() == EvaluatorConstants.MATCH_TYPE_PARAM) {
+        } else if (matchEvaluator.getType() == EvaluatorConstants.TYPE_PARAM) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.PARAM));
-        } else if (matchEvaluator.getType() == EvaluatorConstants.MATCH_TYPE_HEADER) {
+        } else if (matchEvaluator.getType() == EvaluatorConstants.TYPE_HEADER) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.HEADER));
         } else {

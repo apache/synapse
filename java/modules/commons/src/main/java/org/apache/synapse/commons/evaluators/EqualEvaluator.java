@@ -37,20 +37,20 @@ public class EqualEvaluator implements Evaluator {
 
     private String source = null;
 
-    private int type = 3;
+    private int type = EvaluatorConstants.TYPE_HEADER;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         String sourceText = null;
 
-        if (type == 1) {
+        if (type == EvaluatorConstants.TYPE_URL) {
             sourceText = context.getUrl();
-        } else if (type == 2) {
+        } else if (type == EvaluatorConstants.TYPE_PARAM) {
             try {
                 sourceText = context.getParam(source);
             } catch (UnsupportedEncodingException e) {
                 handleException("Error retrieving paramter: " + source);
             }
-        } else if (type == 3) {
+        } else if (type == EvaluatorConstants.TYPE_HEADER) {
             sourceText = context.getHeader(source);
         }
 

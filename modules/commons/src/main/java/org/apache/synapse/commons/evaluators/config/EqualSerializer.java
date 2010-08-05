@@ -37,7 +37,7 @@ public class EqualSerializer extends AbstractEvaluatorSerializer{
         EqualEvaluator equalEvaluator = (EqualEvaluator) evaluator;
         OMElement eqaulElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
 
-        if (equalEvaluator.getType() != 1) {
+        if (equalEvaluator.getType() != EvaluatorConstants.TYPE_URL) {
             if (equalEvaluator.getSource() != null) {
             eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
                     equalEvaluator.getSource()));
@@ -49,13 +49,13 @@ public class EqualSerializer extends AbstractEvaluatorSerializer{
             }
         }
 
-        if (equalEvaluator.getType() == 1) {
+        if (equalEvaluator.getType() == EvaluatorConstants.TYPE_URL) {
             eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.URL));
-        } else if (equalEvaluator.getType() == 2) {
+        } else if (equalEvaluator.getType() == EvaluatorConstants.TYPE_PARAM) {
             eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.PARAM));
-        } else if (equalEvaluator.getType() == 3) {
+        } else if (equalEvaluator.getType() == EvaluatorConstants.TYPE_HEADER) {
             eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.HEADER));
         } else {

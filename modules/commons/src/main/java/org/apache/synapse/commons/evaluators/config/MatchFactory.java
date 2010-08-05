@@ -47,16 +47,16 @@ public class MatchFactory implements EvaluatorFactory {
 
         OMAttribute typeAttr = e.getAttribute(new QName(EvaluatorConstants.TYPE));
 
-        int type = 3;
+        int type = EvaluatorConstants.TYPE_HEADER;
 
         if (typeAttr != null) {
             String value = typeAttr.getAttributeValue();
             if (value.equals(EvaluatorConstants.HEADER)) {
-                type = EvaluatorConstants.MATCH_TYPE_HEADER;
+                type = EvaluatorConstants.TYPE_HEADER;
             } else if (value.equals(EvaluatorConstants.PARAM)) {
-                type = EvaluatorConstants.MATCH_TYPE_PARAM;
+                type = EvaluatorConstants.TYPE_PARAM;
             } else if (value.equals(EvaluatorConstants.URL)) {
-                type = EvaluatorConstants.MATCH_TYPE_URL;
+                type = EvaluatorConstants.TYPE_URL;
             }
         }
 

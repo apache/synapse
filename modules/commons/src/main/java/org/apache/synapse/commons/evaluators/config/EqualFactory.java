@@ -45,16 +45,16 @@ public class EqualFactory implements EvaluatorFactory {
 
         OMAttribute typeAttr = e.getAttribute(new QName(EvaluatorConstants.TYPE));
 
-        int type = 3;
+        int type = EvaluatorConstants.TYPE_HEADER;
 
         if (typeAttr != null) {
             String value = typeAttr.getAttributeValue();
             if (value.equals(EvaluatorConstants.HEADER)) {
-                type = 3;
+                type = EvaluatorConstants.TYPE_HEADER;
             } else if (value.equals(EvaluatorConstants.PARAM)) {
-                type = 2;
+                type = EvaluatorConstants.TYPE_PARAM;
             } else if (value.equals(EvaluatorConstants.URL)) {
-                type = 1;
+                type = EvaluatorConstants.TYPE_URL;
             }
         }
 
@@ -62,7 +62,7 @@ public class EqualFactory implements EvaluatorFactory {
 
         OMAttribute sourceAttr = e.getAttribute(new QName(EvaluatorConstants.SOURCE));
         if (sourceAttr == null) {
-            if (type != 1) {
+            if (type != EvaluatorConstants.TYPE_URL) {
                 handleException(EvaluatorConstants.SOURCE + " attribute is required");
                 return null;
             }

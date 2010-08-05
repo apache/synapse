@@ -40,7 +40,7 @@ public class MatchEvaluator implements Evaluator {
 
     private Log log = LogFactory.getLog(MatchEvaluator.class);
 
-    private int type = EvaluatorConstants.MATCH_TYPE_HEADER;
+    private int type = EvaluatorConstants.TYPE_HEADER;
 
     private String source = null;
 
@@ -49,15 +49,15 @@ public class MatchEvaluator implements Evaluator {
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         String sourceText = null;
 
-        if (type == EvaluatorConstants.MATCH_TYPE_URL) {
+        if (type == EvaluatorConstants.TYPE_URL) {
             sourceText = context.getUrl();
-        } else if (type == EvaluatorConstants.MATCH_TYPE_PARAM) {
+        } else if (type == EvaluatorConstants.TYPE_PARAM) {
             try {
                 sourceText = context.getParam(source);
             } catch (UnsupportedEncodingException e) {
                 handleException("Error retrieving paramter: " + source);
             }
-        } else if (type == EvaluatorConstants.MATCH_TYPE_HEADER) {
+        } else if (type == EvaluatorConstants.TYPE_HEADER) {
             sourceText = context.getHeader(source);
         }
 

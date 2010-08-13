@@ -24,25 +24,13 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.om.OMElement;
 import org.custommonkey.xmlunit.XMLTestCase;
 
-public class MatchSerializerTest extends XMLTestCase {
-    
-    private MatchSerializer serializer = new MatchSerializer();
-    private MatchFactory fac = new MatchFactory();
+public class EqualSerializerTest extends XMLTestCase {
 
-    public void testHeaderMatchSerializer() {
-        String input = "<match type=\"header\" source=\"foo\" regex=\"bar\"/>";
+    private EqualSerializer serializer = new EqualSerializer();
+    private EqualFactory fac = new EqualFactory();
 
-        try {
-            Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
-            OMElement output = serializer.serialize(null, eval);
-            assertXMLEqual(input, output.toString());
-        } catch (Exception e) {
-            fail("Error while parsing the input XML");
-        }
-    }
-
-    public void testParameterMatchSerializer() {
-        String input = "<match type=\"param\" source=\"foo\" regex=\"bar\"/>";
+    public void testHeaderEqualSerializer() {
+        String input = "<equal type=\"header\" source=\"foo\" value=\"bar\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
@@ -53,8 +41,20 @@ public class MatchSerializerTest extends XMLTestCase {
         }
     }
 
-    public void testURLMatchSerializer() {
-        String input = "<match type=\"url\" regex=\"http://foo.org\"/>";
+    public void testParameterEqualSerializer() {
+        String input = "<equal type=\"param\" source=\"foo\" value=\"bar\"/>";
+
+        try {
+            Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
+            OMElement output = serializer.serialize(null, eval);
+            assertXMLEqual(input, output.toString());
+        } catch (Exception e) {
+            fail("Error while parsing the input XML");
+        }
+    }
+
+    public void testURLEqualSerializer() {
+        String input = "<equal type=\"url\" value=\"http://foo.org\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));

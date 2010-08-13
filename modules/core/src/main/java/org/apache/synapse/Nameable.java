@@ -19,7 +19,7 @@
 package org.apache.synapse;
 
 /**
- * Namable indicates whether an abstraction has a name.
+ * Nameable indicates whether an abstraction has a name.
  */
 public interface Nameable {
     /**

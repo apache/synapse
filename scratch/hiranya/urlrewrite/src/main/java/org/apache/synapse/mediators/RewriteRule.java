@@ -42,13 +42,14 @@ public class RewriteRule {
                         Map<String,String> headers) {
 
         EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
-        try {
-            if (condition != null && !condition.evaluate(ctx)) {
+        if (condition != null) {
+            try {
+                if (!condition.evaluate(ctx)) {
+                    return;
+                }
+            } catch (EvaluatorException e) {
                 return;
             }
-        } catch (EvaluatorException e) {
-            e.printStackTrace();
-            return;
         }
 
         String result;
@@ -68,7 +69,6 @@ public class RewriteRule {
                 fragments[4] = uri.getPath();
                 fragments[5] = uri.getQuery();
                 fragments[6] = uri.getFragment();
-
             } catch (URISyntaxException e) {
                 return;
             }

@@ -21,15 +21,13 @@ package org.apache.synapse.mediators;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.commons.evaluators.EqualEvaluator;
+import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMDocument;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,12 +53,13 @@ public class URLRewriteTest extends TestCase {
         }
     }
 
-    public void testMediate() {
+    public void testMediate() throws Exception {
         org.apache.axis2.context.MessageContext mc =
                 new org.apache.axis2.context.MessageContext();
         SynapseConfiguration config = new SynapseConfiguration();
         SynapseEnvironment env = new Axis2SynapseEnvironment(config);
         MessageContext synMc = new Axis2MessageContext(mc, config, env);
+        synMc.setProperty("prop1", "ref1");
 
         URLRewriteMediator mediator = new URLRewriteMediator();
 
@@ -72,6 +71,17 @@ public class URLRewriteTest extends TestCase {
         r2.setValue("/services/TestService");
         r2.setFragmentIndex(URLRewriteMediator.PATH);
         mediator.addRule(r2);
+
+        EqualEvaluator eval = new EqualEvaluator();
+        URLTextRetriever txtRtvr = new URLTextRetriever();
+        txtRtvr.setFragment("port");
+        eval.setTextRetriever(txtRtvr);
+        eval.setValue("8080");
+        RewriteRule r3 = new RewriteRule();
+        r3.setCondition(eval);
+        r3.setXpath(new SynapseXPath("get-property('prop1')"));
+        r3.setFragmentIndex(URLRewriteMediator.REF);
+        mediator.addRule(r3);
 
         mediator.mediate(synMc);
         System.out.println(synMc.getTo());

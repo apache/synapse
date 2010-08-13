@@ -8,6 +8,7 @@ import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
 import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
 import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
+import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 
 import javax.xml.namespace.QName;
 
@@ -41,6 +42,11 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
         } else {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.URL));
+            URLTextRetriever urlTextRetriever = (URLTextRetriever) textRetriever;
+            if (urlTextRetriever.getFragment() != null) {
+                matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.FRAGMENT,
+                        nullNS, urlTextRetriever.getFragment()));
+            }
         }
 
         matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.REGEX, nullNS,

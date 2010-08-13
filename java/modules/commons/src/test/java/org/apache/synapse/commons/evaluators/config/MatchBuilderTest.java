@@ -31,6 +31,7 @@ public class MatchBuilderTest extends TestCase {
 
     private static final String SOURCE = "foo";
     private static final String REGEX = "bar";
+    private static final String FRAGMENT = "protocol";
 
     private MatchFactory fac = new MatchFactory();
 
@@ -72,6 +73,23 @@ public class MatchBuilderTest extends TestCase {
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getRegex().pattern(), REGEX);
+            assertNull(((URLTextRetriever) txtRtvr).getFragment());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Error while parsing the input XML");
+        }
+    }
+
+    public void testURLMatch2() {
+        String input = "<match type=\"url\" regex=\"" + REGEX + "\" fragment=\"" +
+                FRAGMENT +"\"/>";
+
+        try {
+            MatchEvaluator eval = (MatchEvaluator) fac.create(AXIOMUtil.stringToOM(input));
+            SourceTextRetriever txtRtvr = eval.getTextRetriever();
+            assertTrue(txtRtvr instanceof URLTextRetriever);
+            assertEquals(eval.getRegex().pattern(), REGEX);
+            assertEquals(((URLTextRetriever) txtRtvr).getFragment(), FRAGMENT);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
         }

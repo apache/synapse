@@ -68,6 +68,10 @@ public class EqualFactory implements EvaluatorFactory {
                 }
             } else if (value.equals(EvaluatorConstants.URL)) {
                 textRetriever = new URLTextRetriever();
+                OMAttribute fragAttr = e.getAttribute(new QName(EvaluatorConstants.FRAGMENT));
+                if (fragAttr != null) {
+                    ((URLTextRetriever) textRetriever).setFragment(fragAttr.getAttributeValue());
+                }
             } else {
                 handleException("Unknown equal evaluator type: " + value);
             }

@@ -22,7 +22,10 @@ package org.apache.synapse.commons.evaluators.config;
 import junit.framework.TestCase;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.synapse.commons.evaluators.MatchEvaluator;
-import org.apache.synapse.commons.evaluators.EvaluatorConstants;
+import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
+import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
+import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
+import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 
 public class MatchBuilderTest extends TestCase {
 
@@ -37,8 +40,9 @@ public class MatchBuilderTest extends TestCase {
 
         try {
             MatchEvaluator eval = (MatchEvaluator) fac.create(AXIOMUtil.stringToOM(input));
-            assertEquals(eval.getType(), EvaluatorConstants.TYPE_HEADER);
-            assertEquals(eval.getSource(), SOURCE);
+            SourceTextRetriever txtRtvr = eval.getTextRetriever();
+            assertTrue(txtRtvr instanceof HeaderTextRetriever);
+            assertEquals(((HeaderTextRetriever) txtRtvr).getSource(), SOURCE);
             assertEquals(eval.getRegex().pattern(), REGEX);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
@@ -51,8 +55,9 @@ public class MatchBuilderTest extends TestCase {
 
         try {
             MatchEvaluator eval = (MatchEvaluator) fac.create(AXIOMUtil.stringToOM(input));
-            assertEquals(eval.getType(), EvaluatorConstants.TYPE_PARAM);
-            assertEquals(eval.getSource(), SOURCE);
+            SourceTextRetriever txtRtvr = eval.getTextRetriever();
+            assertTrue(txtRtvr instanceof ParameterTextRetriever);
+            assertEquals(((ParameterTextRetriever) txtRtvr).getSource(), SOURCE);
             assertEquals(eval.getRegex().pattern(), REGEX);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
@@ -64,8 +69,8 @@ public class MatchBuilderTest extends TestCase {
 
         try {
             MatchEvaluator eval = (MatchEvaluator) fac.create(AXIOMUtil.stringToOM(input));
-            assertEquals(eval.getType(), EvaluatorConstants.TYPE_URL);
-            assertNull(eval.getSource());
+            SourceTextRetriever txtRtvr = eval.getTextRetriever();
+            assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getRegex().pattern(), REGEX);
         } catch (Exception e) {
             fail("Error while parsing the input XML");

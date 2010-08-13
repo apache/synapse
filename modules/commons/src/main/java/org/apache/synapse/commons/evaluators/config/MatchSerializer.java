@@ -5,6 +5,9 @@ import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.MatchEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
+import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
+import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
+import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
 
 import javax.xml.namespace.QName;
 
@@ -22,31 +25,22 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
         MatchEvaluator matchEvaluator = (MatchEvaluator) evaluator;
         OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.MATCH));
 
-        if (matchEvaluator.getType() != EvaluatorConstants.TYPE_URL) {
-            if (matchEvaluator.getSource() != null) {
-                matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
-                        matchEvaluator.getSource()));
-            } else {
-                String msg = "If type is not URL a source value should be specified for " +
-                        "the match evaluator";
-                log.error(msg);
-                throw new EvaluatorException(msg);
-            }
-        }
-
-        if (matchEvaluator.getType() == EvaluatorConstants.TYPE_URL) {
-            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.URL));
-        } else if (matchEvaluator.getType() == EvaluatorConstants.TYPE_PARAM) {
-            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.PARAM));
-        } else if (matchEvaluator.getType() == EvaluatorConstants.TYPE_HEADER) {
+        SourceTextRetriever textRetriever = matchEvaluator.getTextRetriever();
+        if (textRetriever instanceof HeaderTextRetriever) {
             matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.HEADER));
+            HeaderTextRetriever headerTextRetriever = (HeaderTextRetriever) textRetriever;
+            addSourceAttribute(headerTextRetriever.getSource(), matchElement);
+
+        } else if (textRetriever instanceof ParameterTextRetriever) {
+            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+                    EvaluatorConstants.PARAM));
+            ParameterTextRetriever paramTextRetriever = (ParameterTextRetriever) textRetriever;
+            addSourceAttribute(paramTextRetriever.getSource(), matchElement);
+
         } else {
-            String msg = "Unsupported type value: " + matchEvaluator.getType();
-            log.error(msg);
-            throw new EvaluatorException(msg);
+            matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+                    EvaluatorConstants.URL));
         }
 
         matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.REGEX, nullNS,
@@ -57,5 +51,19 @@ public class MatchSerializer extends AbstractEvaluatorSerializer {
         }
 
         return matchElement;
+    }
+
+    private void addSourceAttribute(String source, OMElement equalElement)
+            throws EvaluatorException {
+
+        if (source != null) {
+            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
+                    source));
+        } else {
+            String msg = "If type is not URL a source value should be specified for " +
+                            "the match evaluator";
+            log.error(msg);
+            throw new EvaluatorException(msg);
+        }
     }
 }

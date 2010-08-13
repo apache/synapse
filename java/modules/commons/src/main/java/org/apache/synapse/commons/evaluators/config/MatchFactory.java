@@ -57,6 +57,8 @@ public class MatchFactory implements EvaluatorFactory {
                 type = EvaluatorConstants.TYPE_PARAM;
             } else if (value.equals(EvaluatorConstants.URL)) {
                 type = EvaluatorConstants.TYPE_URL;
+            } else {
+                handleException("Unknown match evaluator type: " + value);
             }
         }
 

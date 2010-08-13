@@ -64,4 +64,16 @@ public class MatchSerializerTest extends XMLTestCase {
             fail("Error while parsing the input XML");
         }
     }
+
+    public void testURLMatchSerializer2() {
+        String input = "<match type=\"url\" regex=\"http://foo.org\" fragment=\"protocol\"/>";
+
+        try {
+            Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
+            OMElement output = serializer.serialize(null, eval);
+            assertXMLEqual(input, output.toString());
+        } catch (Exception e) {
+            fail("Error while parsing the input XML");
+        }
+    }
 }

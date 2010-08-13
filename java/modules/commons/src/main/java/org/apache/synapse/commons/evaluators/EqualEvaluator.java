@@ -21,8 +21,8 @@ package org.apache.synapse.commons.evaluators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
 
-import java.io.UnsupportedEncodingException;
 
 /**
  * Try to see weather a part of the HTTP request is equal to the value provided.
@@ -32,30 +32,15 @@ import java.io.UnsupportedEncodingException;
  * </pre>
  */
 public class EqualEvaluator implements Evaluator {
+
     private Log log = LogFactory.getLog(EqualEvaluator.class);
     private String value = null;
 
-    private String source = null;
-
-    private int type = EvaluatorConstants.TYPE_HEADER;
+    private SourceTextRetriever textRetriever;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
-        String sourceText = null;
-
-        if (type == EvaluatorConstants.TYPE_URL) {
-            sourceText = context.getUrl();
-        } else if (type == EvaluatorConstants.TYPE_PARAM) {
-            try {
-                sourceText = context.getParam(source);
-            } catch (UnsupportedEncodingException e) {
-                handleException("Error retrieving paramter: " + source);
-            }
-        } else if (type == EvaluatorConstants.TYPE_HEADER) {
-            sourceText = context.getHeader(source);
-        }
-
+        String sourceText = textRetriever.getSourceText(context);
         return sourceText != null && sourceText.equalsIgnoreCase(value);
-
     }
 
     public String getName() {
@@ -66,28 +51,16 @@ public class EqualEvaluator implements Evaluator {
         this.value = value;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public void setType(int type) {
-        this.type = type;
+    public void setTextRetriever(SourceTextRetriever textRetriever) {
+        this.textRetriever = textRetriever;
     }
 
     public String getValue() {
         return value;
     }
 
-    public String getSource() {
-        return source;
+    public SourceTextRetriever getTextRetriever() {
+        return textRetriever;
     }
-
-    public int getType() {
-        return type;
-    }
-
-    private void handleException(String message) throws EvaluatorException {
-        log.error(message);
-        throw new EvaluatorException(message);
-    }
+    
 }

@@ -59,6 +59,11 @@ public class EqualSerializer extends AbstractEvaluatorSerializer{
         } else {
             equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.URL));
+            URLTextRetriever urlTextRetriever = (URLTextRetriever) textRetriever;
+            if (urlTextRetriever.getFragment() != null) {
+                equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.FRAGMENT,
+                        nullNS, urlTextRetriever.getFragment()));
+            }
         }
 
         equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,

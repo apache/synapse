@@ -64,4 +64,16 @@ public class EqualSerializerTest extends XMLTestCase {
             fail("Error while parsing the input XML");
         }
     }
+
+    public void testURLEqualSerializer2() {
+        String input = "<equal type=\"url\" value=\"http://foo.org\" fragment=\"protocol\"/>";
+
+        try {
+            Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
+            OMElement output = serializer.serialize(null, eval);
+            assertXMLEqual(input, output.toString());
+        } catch (Exception e) {
+            fail("Error while parsing the input XML");
+        }
+    }
 }

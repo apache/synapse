@@ -21,10 +21,51 @@ package org.apache.synapse.commons.evaluators.source;
 
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
+import org.apache.synapse.commons.evaluators.EvaluatorConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class URLTextRetriever implements SourceTextRetriever {
 
+    private static final Log log = LogFactory.getLog(URLTextRetriever.class);
+
+    private EvaluatorConstants.URI_FRAGMENTS fragment = null;
+
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
-        return context.getUrl();
+        if (fragment == null) {
+            return context.getUrl();
+        }
+
+        try {
+            URI uri = new URI(context.getUrl());
+            switch (fragment) {
+                case protocol: return uri.getScheme();
+                case user: return uri.getUserInfo();
+                case host: return uri.getHost();
+                case port: return String.valueOf(uri.getPort());
+                case path: return uri.getPath();
+                case query: return uri.getQuery();
+                case ref: return uri.getFragment();
+                default: return context.getUrl();
+            }
+        } catch (URISyntaxException e) {
+            String message = "Error parsing URL: " + context.getUrl();
+            log.error(message);
+            throw new EvaluatorException(message);
+        }
+    }
+
+    public String getFragment() {
+        if (fragment != null) {
+            return fragment.name();
+        }
+        return null;
+    }
+
+    public void setFragment(String fragment) {
+        this.fragment = EvaluatorConstants.URI_FRAGMENTS.valueOf(fragment);
     }
 }

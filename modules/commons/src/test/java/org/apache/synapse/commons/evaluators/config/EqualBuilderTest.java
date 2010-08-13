@@ -31,6 +31,7 @@ public class EqualBuilderTest extends TestCase {
 
     private static final String SOURCE = "foo";
     private static final String VALUE = "bar";
+    private static final String FRAGMENT = "protocol";
 
     private EqualFactory fac = new EqualFactory();
 
@@ -72,6 +73,22 @@ public class EqualBuilderTest extends TestCase {
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getValue(), VALUE);
+            assertNull(((URLTextRetriever) txtRtvr).getFragment());
+        } catch (Exception e) {
+            fail("Error while parsing the input XML");
+        }
+    }
+
+    public void testURLEqual2() {
+        String input = "<equal type=\"url\" value=\"" + VALUE + "\"" +
+                " fragment=\"" + FRAGMENT + "\"/>";
+
+        try {
+            EqualEvaluator eval = (EqualEvaluator) fac.create(AXIOMUtil.stringToOM(input));
+            SourceTextRetriever txtRtvr = eval.getTextRetriever();
+            assertTrue(txtRtvr instanceof URLTextRetriever);
+            assertEquals(eval.getValue(), VALUE);
+            assertEquals(((URLTextRetriever) txtRtvr).getFragment(), FRAGMENT);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
         }

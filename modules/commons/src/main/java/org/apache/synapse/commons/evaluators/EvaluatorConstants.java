@@ -36,13 +36,20 @@ public class EvaluatorConstants {
     public static final String SOURCE = "source";
     public static final String REGEX = "regex";
     public static final String VALUE = "value";
+    public static final String FRAGMENT = "fragment";
 
     public static final String CONDITIONS = "conditions";
     public static final String CONDITION = "condition";
     public static final String PRIORITY = "priority";
     public static final String DEFAULT_PRIORITY = "defaultPriority";
 
-    public static final int TYPE_URL = 1;
-    public static final int TYPE_PARAM = 2;
-    public static final int TYPE_HEADER = 3;
+    public static enum URI_FRAGMENTS {
+        protocol,
+        user,
+        host,
+        port,
+        path,
+        query,
+        ref
+    }
 }

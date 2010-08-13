@@ -31,7 +31,7 @@ public class EqualBuilderTest extends TestCase {
 
     private EqualFactory fac = new EqualFactory();
 
-    public void testHeaderMatch() {
+    public void testHeaderEqual() {
         String input = "<equal type=\"header\" source=\"" + SOURCE +
                 "\" value=\"" + VALUE + "\"/>";
 
@@ -45,7 +45,7 @@ public class EqualBuilderTest extends TestCase {
         }
     }
 
-    public void testParameterMatch() {
+    public void testParameterEqual() {
         String input = "<equal type=\"param\" source=\"" + SOURCE +
                 "\" value=\"" + VALUE + "\"/>";
 
@@ -59,7 +59,7 @@ public class EqualBuilderTest extends TestCase {
         }
     }
 
-    public void testURLMatch() {
+    public void testURLEqual() {
         String input = "<equal type=\"url\" value=\"" + VALUE + "\"/>";
 
         try {

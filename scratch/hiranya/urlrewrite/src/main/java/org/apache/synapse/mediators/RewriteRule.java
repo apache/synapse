@@ -24,12 +24,16 @@ import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class RewriteRule {
+
+    private static final Log log = LogFactory.getLog(RewriteRule.class);
 
     private Evaluator condition;
 
@@ -41,13 +45,25 @@ public class RewriteRule {
     public void rewrite(Object[] fragments, MessageContext messageContext, String uriString,
                         Map<String,String> headers) {
 
-        EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
         if (condition != null) {
+            EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
+            if (log.isDebugEnabled()) {
+                log.debug("Evaluating condition with URI: " + uriString);
+            }
+
             try {
                 if (!condition.evaluate(ctx)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Condition evaluated to 'false' - Skipping the current action");
+                    }
                     return;
                 }
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Condition evaluated to 'true' - Performing the stated action");
+                }
             } catch (EvaluatorException e) {
+                log.warn("Error while evaluating the condition - Skipping the rule as it failed", e);
                 return;
             }
         }
@@ -61,16 +77,35 @@ public class RewriteRule {
 
         if (fragmentIndex == URLRewriteMediator.FULL_URI) {
             try {
-                URI uri = new URI(result);
+                URI uri;
+                if (result != null) {
+                    uri = new URI(result);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Setting the URI to: " + result);
+                    }
+                } else {
+                    uri = new URI("");
+                }
+
                 fragments[0] = uri.getScheme();
                 fragments[1] = uri.getUserInfo();
                 fragments[2] = uri.getHost();
                 fragments[3] = uri.getPort();
-                fragments[4] = uri.getPath();
+                // The uri.getPath() return the empty string for empty URIs
+                // We are better off setting it to null
+                fragments[4] = "".equals(uri.getPath()) ? null : uri.getPath();
                 fragments[5] = uri.getQuery();
                 fragments[6] = uri.getFragment();
+
             } catch (URISyntaxException e) {
                 return;
+            }
+        } else if (fragmentIndex == URLRewriteMediator.PORT) {
+            // When setting the port we must first convert the value into an integer
+            if (result != null) {
+                fragments[fragmentIndex] = Integer.parseInt(result);
+            } else {
+                fragments[fragmentIndex] = -1;
             }
         } else {
             fragments[fragmentIndex] = result;

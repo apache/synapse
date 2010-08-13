@@ -44,7 +44,7 @@ public class URLRewriteTest extends TestCase {
     }
 
     public void testURIParser() {
-        String uriTxt = "/services/MyService";
+        String uriTxt = "";
         try {
             URI uri = new URI(uriTxt);
             printURLFragmetns(uri);

@@ -21,10 +21,10 @@ package org.apache.synapse.commons.evaluators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.io.UnsupportedEncodingException;
 
 /**
  * This evaluator uses regular expressions to match a given HTTP request.</p>
@@ -40,26 +40,12 @@ public class MatchEvaluator implements Evaluator {
 
     private Log log = LogFactory.getLog(MatchEvaluator.class);
 
-    private int type = EvaluatorConstants.TYPE_HEADER;
-
-    private String source = null;
+    private SourceTextRetriever textRetriever;
 
     private Pattern regex = null;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
-        String sourceText = null;
-
-        if (type == EvaluatorConstants.TYPE_URL) {
-            sourceText = context.getUrl();
-        } else if (type == EvaluatorConstants.TYPE_PARAM) {
-            try {
-                sourceText = context.getParam(source);
-            } catch (UnsupportedEncodingException e) {
-                handleException("Error retrieving paramter: " + source);
-            }
-        } else if (type == EvaluatorConstants.TYPE_HEADER) {
-            sourceText = context.getHeader(source);
-        }
+        String sourceText = textRetriever.getSourceText(context);
 
         if (sourceText == null) {
             return false;
@@ -73,28 +59,20 @@ public class MatchEvaluator implements Evaluator {
         return EvaluatorConstants.MATCH;
     }
 
-    public int getType() {
-        return type;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
     public Pattern getRegex() {
         return regex;
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
     public void setRegex(Pattern regex) {
         this.regex = regex;
+    }
+
+    public SourceTextRetriever getTextRetriever() {
+        return textRetriever;
+    }
+
+    public void setTextRetriever(SourceTextRetriever textRetriever) {
+        this.textRetriever = textRetriever;
     }
 
     private void handleException(String message) throws EvaluatorException {

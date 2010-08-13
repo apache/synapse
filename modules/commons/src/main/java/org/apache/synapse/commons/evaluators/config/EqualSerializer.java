@@ -21,6 +21,10 @@ package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.commons.evaluators.*;
+import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
+import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
+import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
+import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 
 import javax.xml.namespace.QName;
 
@@ -29,48 +33,55 @@ import javax.xml.namespace.QName;
  * the {@link EqualFactory}. 
  */
 public class EqualSerializer extends AbstractEvaluatorSerializer{
+
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
+
         if (!(evaluator instanceof EqualEvaluator)) {
             throw new IllegalArgumentException("Evalutor should be a EqualEvalutor");
         }
 
         EqualEvaluator equalEvaluator = (EqualEvaluator) evaluator;
-        OMElement eqaulElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
+        OMElement equalElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
 
-        if (equalEvaluator.getType() != EvaluatorConstants.TYPE_URL) {
-            if (equalEvaluator.getSource() != null) {
-            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
-                    equalEvaluator.getSource()));
-            } else {
-                String msg = "If type is not URL a source value should be specified for " +
-                        "the equal evaluator";
-                log.error(msg);
-                throw new EvaluatorException(msg);
-            }
-        }
-
-        if (equalEvaluator.getType() == EvaluatorConstants.TYPE_URL) {
-            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.URL));
-        } else if (equalEvaluator.getType() == EvaluatorConstants.TYPE_PARAM) {
-            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.PARAM));
-        } else if (equalEvaluator.getType() == EvaluatorConstants.TYPE_HEADER) {
-            eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+        SourceTextRetriever textRetriever = equalEvaluator.getTextRetriever();
+        if (textRetriever instanceof HeaderTextRetriever) {
+            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
                     EvaluatorConstants.HEADER));
+            HeaderTextRetriever headerTextRetriever = (HeaderTextRetriever) textRetriever;
+            addSourceAttribute(headerTextRetriever.getSource(), equalElement);
+
+        } else if (textRetriever instanceof ParameterTextRetriever) {
+            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+                    EvaluatorConstants.PARAM));
+            ParameterTextRetriever paramTextRetriever = (ParameterTextRetriever) textRetriever;
+            addSourceAttribute(paramTextRetriever.getSource(), equalElement);
+
         } else {
-            String msg = "Unsupported type value: " + equalEvaluator.getType();
-            log.error(msg);
-            throw new EvaluatorException(msg);
+            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
+                    EvaluatorConstants.URL));
         }
 
-        eqaulElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,
+        equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,
                 equalEvaluator.getValue()));
 
         if (parent != null) {
-            parent.addChild(eqaulElement);
+            parent.addChild(equalElement);
         }
 
-        return eqaulElement;
+        return equalElement;
+    }
+
+    private void addSourceAttribute(String source, OMElement equalElement)
+            throws EvaluatorException {
+
+        if (source != null) {
+            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
+                    source));
+        } else {
+            String msg = "If type is not URL a source value should be specified for " +
+                            "the equal evaluator";
+            log.error(msg);
+            throw new EvaluatorException(msg);
+        }
     }
 }

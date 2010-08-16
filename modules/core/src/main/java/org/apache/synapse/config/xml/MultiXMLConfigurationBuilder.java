@@ -51,7 +51,7 @@ import java.io.*;
  *  <li>CONF_HOME/local-entries</li>
  *  <li>CONF_HOME/tasks</li>
  *  <li>CONF_HOME/event-sources</li>
- *  <li>CONF_HOME/priorityExecutors</li>
+ *  <li>CONF_HOME/priority-executors</li>
  * </ul>
  *
  * Each of these directories will house a set of XML files. Each file will define exactly
@@ -74,7 +74,7 @@ public class MultiXMLConfigurationBuilder {
     public static final String LOCAL_ENTRY_DIR     = "local-entries";
     public static final String TASKS_DIR           = "tasks";
     public static final String EVENTS_DIR          = "event-sources";
-    public static final String EXECUTORS_DIR       = "priorityExecutors";
+    public static final String EXECUTORS_DIR       = "priority-executors";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 

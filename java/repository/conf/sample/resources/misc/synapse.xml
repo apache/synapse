@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -16,7 +17,6 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
@@ -32,12 +32,6 @@
         <header name="Action" value="urn:commodity"/>
     </sequence>
 
-    <!-- Check if the URL matches the stockquote gateway/dumb case -->
-    <filter source="get-property('To')" regex=".*/CommodityQuote.*">
-        <sequence key="commodityQuote"/>
-    </filter>
-
-    <send/>
     <proxy name="StockQuoteProxy">
         <target>
             <endpoint>
@@ -51,5 +45,13 @@
             <resource location="test_proxy_1.xsd" key="misc/proxy/test_proxy_1.xsd"/>
         </publishWSDL>
     </proxy>
+
+    <sequence name="main">
+        <!-- Check if the URL matches the stockquote gateway/dumb case -->
+        <filter source="get-property('To')" regex=".*/CommodityQuote.*">
+            <sequence key="commodityQuote"/>
+        </filter>
+        <send/>
+    </sequence>
 
 </definitions>

@@ -57,14 +57,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         SynapseConfiguration config = SynapseConfigUtils.newConfiguration();               
         config.setDefaultQName(definitions.getQName());
 
-        SequenceMediator rootSequence = new SequenceMediator();
-        rootSequence.setName(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY);
-
-        // aspect configuration
-        AspectConfiguration configuration = new AspectConfiguration(rootSequence.getName());
-        rootSequence.configure(configuration);
         Iterator iter = definitions.getChildren();
-
         while (iter.hasNext()) {
             Object o = iter.next();
             if (o instanceof OMElement) {
@@ -72,10 +65,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 if (XMLConfigConstants.SEQUENCE_ELT.equals(elt.getQName())) {
                     String key = elt.getAttributeValue(
                             new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
-                    // this could be a sequence def or a mediator of the main sequence
+                    // this could be a sequence def or a referred sequence
                     if (key != null) {
-                        Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
-                        rootSequence.addChild(m);
+                        handleException("Referred sequences are not allowed at the top level");
                     } else {
                         defineSequence(config, elt);
                     }
@@ -94,25 +86,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt);
                 } else {
-                    Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
-                    rootSequence.addChild(m);
+                    handleException("Invalid configuration element at the top level, one of \'sequence\', " +
+                            "\'endpoint\', \'proxy\', \'eventSource\', \'localEntry\', \'priorityExecutor\' " +
+                            "or \'registry\' is expected");
                 }
             }
-        }
-
-        // if there is no sequence named main defined locally look for the set of mediators in
-        // the root level before trying to look in the registry (hence config.getMainSequence
-        // can not be used here)
-        if (!config.getLocalRegistry().containsKey(SynapseConstants.MAIN_SEQUENCE_KEY)) {
-            // if the root tag contains child mediators & registry does not have an
-            // entry with key 'main' then set as main sequence
-            if (!rootSequence.getList().isEmpty() && config.getMainSequence() == null) {
-                config.addSequence(rootSequence.getName(), rootSequence);
-            }
-        } else if (!rootSequence.getList().isEmpty()) {
-            handleException("Invalid Synapse Configuration : Conflict in resolving the \"main\" " +
-                    "mediator\n\tSynapse Configuration cannot have sequence named \"main\" and " +
-                    "toplevel mediators simultaniously");
         }
 
         return config;

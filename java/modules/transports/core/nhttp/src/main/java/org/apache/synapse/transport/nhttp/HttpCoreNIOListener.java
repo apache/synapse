@@ -375,7 +375,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
                 try {
                     ioReactor.execute(ioEventDispatch);
                 } catch (InterruptedIOException ex) {
-                    log.fatal("Reactor Interrupted");
+                    log.fatal("Reactor Interrupted", ex);
                 } catch (IOException e) {
                     log.fatal("Encountered an I/O error: " + e.getMessage(), e);
                 } catch (Exception e) {

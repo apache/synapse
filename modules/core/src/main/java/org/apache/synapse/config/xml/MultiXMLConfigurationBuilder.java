@@ -51,6 +51,7 @@ import java.io.*;
  *  <li>CONF_HOME/local-entries</li>
  *  <li>CONF_HOME/tasks</li>
  *  <li>CONF_HOME/event-sources</li>
+ *  <li>CONF_HOME/priorityExecutors</li>
  * </ul>
  *
  * Each of these directories will house a set of XML files. Each file will define exactly
@@ -99,7 +100,7 @@ public class MultiXMLConfigurationBuilder {
             synapseConfig.setDefaultQName(XMLConfigConstants.DEFINITIONS_ELT);
         } else if (log.isDebugEnabled()) {
             log.debug("Found a synapse configuration in the " + SynapseConstants.SYNAPSE_XML
-                    + " file at the artifact repository root, which gets the presedence "
+                    + " file at the artifact repository root, which gets the precedence "
                     + "over other definitions");
         }
 

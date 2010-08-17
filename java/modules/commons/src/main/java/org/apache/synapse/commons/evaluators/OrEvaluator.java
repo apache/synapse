@@ -31,6 +31,7 @@ package org.apache.synapse.commons.evaluators;
  * </pre>
  */
 public class OrEvaluator implements Evaluator {
+
     private Evaluator[] evaluators;
 
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {

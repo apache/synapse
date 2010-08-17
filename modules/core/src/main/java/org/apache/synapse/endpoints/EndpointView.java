@@ -19,13 +19,13 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 import org.apache.axis2.transport.base.MessageLevelMetricsCollector;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is the metrics collector and JMX control point for Endpoints
@@ -672,11 +672,11 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     //---------- utility methods ---------------
     private static void addTableMaps(Map<Integer, Long> t, Map<Integer, Long> s) {
-        for (Integer o : s.keySet()) {
-            if (t.containsKey(o)) {
-                t.put(o, t.get(o) + s.get(o));
+        for (Map.Entry<Integer, Long> o : s.entrySet()) {
+            if (t.containsKey(o.getKey())) {
+                t.put(o.getKey(), o.getValue() + s.get(o.getKey()));
             } else {
-                t.put(o, s.get(o));
+                t.put(o.getKey(), s.get(o.getKey()));
             }
         }
     }

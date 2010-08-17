@@ -23,6 +23,7 @@ package org.apache.synapse.commons.evaluators;
  * Encapsulates a condition. Every condition has a priority and a boolean expression.  
  */
 public class Condition {
+
     private int priority = 0;
 
     private Evaluator evaluator = null;

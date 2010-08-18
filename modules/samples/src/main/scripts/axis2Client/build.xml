@@ -111,6 +111,14 @@
             [-Dsymbol=DELL]
             [-Dqty=1000]
             [-Dprice=100.10]
+
+    ant jsonclient
+        A client that sends get-quote requests using the JSON content interchange format over HTTP
+
+        example:
+        ant jsonclient
+            [-Daddurl=http://localhost:8280/services/JSONProxy]
+            [-Dsymbol=DELL]
     </echo>
     </target>
 
@@ -329,6 +337,17 @@
             <sysproperty key="topic"    value="${topic}"/>
             <sysproperty key="action"    value="${action}"/>
             <sysproperty key="topicns"    value="${topicns}"/>
+        </java>
+    </target>
+
+    <target name="jsonclient" depends="compile">
+        <java classname="samples.userguide.JSONClient"
+              classpathref="javac.classpath" fork="true">
+            <sysproperty key="symbol" value="${symbol}"/>
+            <sysproperty key="addurl" value="${addurl}"/>
+            <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="repository" value="${repository}"/>
         </java>
     </target>
 

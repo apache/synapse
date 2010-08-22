@@ -39,8 +39,9 @@ import org.springframework.core.io.InputStreamResource;
  *
  * A Spring mediator is instantiated by Spring (see www.springframework.org). The mediator
  * refers to a Spring bean name, and also either a Spring configuration defined to Synapse
- * or an inlined Spring configuration.
+ * or an in-lined Spring configuration.
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class SpringMediator extends AbstractMediator implements ManagedLifecycle {
 
     /**

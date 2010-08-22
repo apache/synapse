@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
  * <p/>
  * <spring bean="exampleBean1" key="string""/>
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class SpringMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName TAG_NAME =

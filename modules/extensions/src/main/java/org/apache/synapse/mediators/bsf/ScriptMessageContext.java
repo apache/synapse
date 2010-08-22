@@ -52,6 +52,7 @@ import org.apache.commons.logging.LogFactory;
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the
  * message payload XML in a way natural to the scripting languageS
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class ScriptMessageContext implements MessageContext {
 
     /** The actual Synapse message context reference */
@@ -69,7 +70,8 @@ public class ScriptMessageContext implements MessageContext {
      * The payload is the first element inside the SOAP <Body> tags
      *
      * @return the XML SOAP Body
-     * @throws ScriptException For erroing when geting the XML representation of SOAP Body payload
+     * @throws ScriptException in-case of an error in getting
+     * the XML representation of SOAP Body payload
      */
     public Object getPayloadXML() throws ScriptException {
         return xmlHelper.toScriptXML(mc.getEnvelope().getBody().getFirstElement());
@@ -79,8 +81,8 @@ public class ScriptMessageContext implements MessageContext {
      * Set the SOAP body payload from XML
      *
      * @param payload Message payload
-     * @throws ScriptException For errors in converitng xml To OM
-     * @throws OMException     For errors in OM manipulaion
+     * @throws ScriptException For errors in converting xml To OM
+     * @throws OMException     For errors in OM manipulation
      */
 
     public void setPayloadXML(Object payload) throws OMException, ScriptException {
@@ -130,7 +132,8 @@ public class ScriptMessageContext implements MessageContext {
     /**
      * Get the XML representation of the complete SOAP envelope
      * @return return an object that represents the payload in the current scripting language
-     * @throws ScriptException For erroing when geting the XML representation of SOAP envelope
+     * @throws ScriptException in-case of an error in getting
+     * the XML representation of SOAP envelope
      */
     public Object getEnvelopeXML() throws ScriptException {
         return xmlHelper.toScriptXML(mc.getEnvelope());

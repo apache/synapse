@@ -44,7 +44,7 @@ import java.util.TreeMap;
  *    &lt;/script&gt;
  * </pre>
  * <p/>
- * The boolean response from the inlined mediator is either the response from the evaluation of the
+ * The boolean response from the in-lined mediator is either the response from the evaluation of the
  * script statements or if that result is not a boolean then a response of true is assumed.
  * <p/>
  * The MessageContext passed in to the script mediator has additional methods over the Synapse
@@ -57,11 +57,11 @@ import java.util.TreeMap;
  */
 public class ScriptMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName TAG_NAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "script");
+    private static final QName TAG_NAME
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "script");
 
-    private static final QName INCLUDE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "include");
+    private static final QName INCLUDE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "include");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -70,7 +70,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
                 "key"));
         OMAttribute langAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                 "language"));
-        OMAttribute funcAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
+        OMAttribute functionAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                 "function"));
 
         if (langAtt == null) {
@@ -78,7 +78,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
                     " a script mediator");
             // TODO: couldn't this be determined from the key in some scenarios?
         }
-        if (keyAtt == null && funcAtt != null) {
+        if (keyAtt == null && functionAtt != null) {
             throw new SynapseException("Cannot use 'function' attribute without 'key' " +
                     "attribute for a script mediator");
         }
@@ -86,7 +86,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
         Map<String, Object> includeKeysMap = getIncludeKeysMap(elem);
 
         if (keyAtt != null) {
-            String functionName = (funcAtt == null ? null : funcAtt.getAttributeValue());
+            String functionName = (functionAtt == null ? null : functionAtt.getAttributeValue());
             mediator = new ScriptMediator(langAtt.getAttributeValue(),
                     includeKeysMap, keyAtt.getAttributeValue(), functionName);
         } else {
@@ -105,9 +105,9 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
 
         // TreeMap used to keep given scripts order if needed
         Map<String, Object> includeKeysMap = new TreeMap<String, Object>();
-        Iterator iter = elem.getChildrenWithName(INCLUDE_Q);
-        while (iter.hasNext()) {
-            OMElement includeElem = (OMElement) iter.next();
+        Iterator itr = elem.getChildrenWithName(INCLUDE_Q);
+        while (itr.hasNext()) {
+            OMElement includeElem = (OMElement) itr.next();
             OMAttribute key = includeElem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                     "key"));
 

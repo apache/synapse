@@ -29,6 +29,7 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 /**
  * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class SpringMediatorSerializer extends AbstractMediatorSerializer
     implements MediatorSerializer {
 

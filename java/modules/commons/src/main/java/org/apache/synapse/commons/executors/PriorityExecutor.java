@@ -57,7 +57,7 @@ public class PriorityExecutor {
      * it will be captured and logged to prevent the threads from dying. 
      *
      * @param task task to be executed
-     * @param priority priority of the tast
+     * @param priority priority of the task
      */
     public void execute(final Runnable task, int priority) {
         // create a dummy worker to execute the task
@@ -239,7 +239,7 @@ public class PriorityExecutor {
     }
 
     /**
-     * Private class for executing the tasks submited. This class is used for
+     * Private class for executing the tasks submitted. This class is used for
      * prevent the threads from dying in case of unhandled exceptions. Also
      * this class implements the Importance for carrying the priority.     
      */

@@ -22,7 +22,6 @@ package org.apache.synapse.commons.jmx;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
-import org.apache.synapse.commons.SynapseCommonsException;
 import org.apache.synapse.securevault.secret.SecretInformation;
 import org.apache.synapse.securevault.secret.SecretInformationFactory;
 
@@ -46,6 +45,7 @@ public class JmxInformationFactory {
      * Factory method to create a JmxInformation instance based on given properties
      *
      * @param properties Properties to create and configure DataSource
+     * @param defaultHostName the default host name tobe used in case of a the host name is not set
      * @return DataSourceInformation instance
      */
     public static JmxInformation createJmxInformation(Properties properties, String defaultHostName) {
@@ -160,6 +160,7 @@ public class JmxInformationFactory {
      * not present by looking for a management property specified in a file specified via<code>
      * com.sun.management.config.file</code> system property.
      *
+     * @param managementProperties properties tobe looked up if the system property is not set
      * @param   name  the name of the property to look up
      *
      * @return  the config property value or null if the property is not configured
@@ -172,13 +173,4 @@ public class JmxInformationFactory {
         return result;
     }
 
-    /**
-     * Helper methods for handle errors.
-     *
-     * @param msg The error message
-     */
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseCommonsException(msg);
-    }
 }

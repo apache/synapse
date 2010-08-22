@@ -117,8 +117,6 @@ public class JmxInformation {
     
     /**
      * Builds the JMX URL depending on the existence of RMI port.
-     *
-     * @return  the JMX URL to connect the server to
      */
     public void updateJMXUrl() {
         StringBuilder sb = new StringBuilder();

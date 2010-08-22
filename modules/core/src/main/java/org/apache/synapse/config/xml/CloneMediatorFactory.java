@@ -64,7 +64,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      *  to build the CloneMediator
      * @return Mediator of the type CloneMediator built from the config element
      */
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         CloneMediator mediator = new CloneMediator();
         processAuditStatus(mediator, elem);

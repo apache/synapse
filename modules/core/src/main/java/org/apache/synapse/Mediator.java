@@ -23,9 +23,16 @@ package org.apache.synapse;
 /**
  * All Synapse mediators must implement this Mediator interface. As a message passes
  * through the Synapse system, each mediator's mediate() method is invoked in the
- * sequence/order defined in the SynapseConfiguration.
+ * sequence/order defined in the SynapseConfiguration.</p>
+ *
+ * <p>It is recommended to extend the abstract class
+ * {@link org.apache.synapse.mediators.AbstractMediator} or the
+ * {@link org.apache.synapse.mediators.AbstractListMediator} as appropriate instead of
+ * directly implementing this interface
+ *
+ * @see org.apache.synapse.mediators.AbstractMediator
  */
-public interface Mediator {
+public interface Mediator extends SynapseArtifact {
 
     /**
      * Invokes the mediator passing the current message for mediation. Each

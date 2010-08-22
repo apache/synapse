@@ -56,7 +56,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
         return LOG_Q;
     }
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         LogMediator logMediator = new LogMediator();
 

@@ -63,7 +63,7 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
     protected static final String RAUM_ACTION = "ReadAndUpdateMessage";
     protected static final String RAUC_ACTION = "ReadAndUpdateContext";
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         POJOCommandMediator pojoMediator = new POJOCommandMediator();
 

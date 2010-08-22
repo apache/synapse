@@ -29,12 +29,13 @@ import javax.xml.namespace.QName;
 
 
 public class EnqueueMediatorFactory extends AbstractMediatorFactory{
+
     public static final QName ENQUEUE_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "enqueue");
     public static final QName SEQUENCE_ATT = new QName("sequence");
     public static final QName PRIORITY_ATT = new QName("priority");
     public static final QName QUEUE_ATT = new QName("executor");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
         EnqueueMediator mediator = new EnqueueMediator();
 
         OMAttribute seqAtt = elem.getAttribute(SEQUENCE_ATT);

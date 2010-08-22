@@ -68,7 +68,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
     private static final String SOAP12 = "soap12";
     private static final String POX = "pox";
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         FaultMediator faultMediator = new FaultMediator();
 

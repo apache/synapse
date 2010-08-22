@@ -55,7 +55,7 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
     private static final QName CLASS_ATTR
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
 
-    public Mediator createMediator(OMElement omElement) {
+    public Mediator createSpecificMediator(OMElement omElement) {
 
         SamplingThrottleMediator samplingThrottleMediator = new SamplingThrottleMediator();
         processAuditStatus(samplingThrottleMediator, omElement);

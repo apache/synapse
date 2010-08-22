@@ -55,7 +55,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(IterateMediatorFactory.class);
 
     /**
-     * Holds the QName for the IterateMeditor xml configuration
+     * Holds the QName for the IterateMediator xml configuration
      */
     private static final QName ITERATE_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "iterate");
     private static final QName ATT_CONTPAR = new QName("continueParent");
@@ -68,7 +68,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
      * @param elem OMElement describing the configuration of the IterateMediaotr
      * @return IterateMediator created from the given configuration
      */
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         IterateMediator mediator = new IterateMediator();
         processAuditStatus(mediator, elem);

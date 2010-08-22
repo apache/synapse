@@ -44,7 +44,7 @@ public class EventPublisherMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
         EventPublisherMediator eventPublisherMediator = new EventPublisherMediator();
         OMAttribute attEventSource = elem.getAttribute(PROP_NAME);
         if (attEventSource != null) {

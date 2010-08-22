@@ -25,13 +25,21 @@ import org.apache.synapse.Mediator;
 import javax.xml.namespace.QName;
 
 /**
- * A mediator factory capable of creating an instance of a mediator through a given
- * XML should implement this interface
+ * A mediator factory capable of creating an instance of a {@link org.apache.synapse.Mediator}
+ * through a given XML should implement this interface</p>
+ *
+ * <p>It is recommended to extend the abstract class
+ * {@link org.apache.synapse.config.xml.AbstractMediatorFactory} or the
+ * {@link org.apache.synapse.config.xml.AbstractListMediatorFactory} instead of
+ * implementing this interface
+ *
+ * @see org.apache.synapse.Mediator
+ * @see org.apache.synapse.config.xml.AbstractMediatorFactory
  */
 public interface MediatorFactory {
     /**
      * Creates an instance of the mediator using the OMElement
-     * @param elem
+     * @param elem configuration element describing the mediator properties
      * @return the created mediator
      */
     public Mediator createMediator(OMElement elem);

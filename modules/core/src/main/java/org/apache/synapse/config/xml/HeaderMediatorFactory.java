@@ -47,7 +47,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
     private static final QName HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "header");
     private static final QName ATT_ACTION = new QName("action");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         HeaderMediator headerMediator = new HeaderMediator();
         OMAttribute name   = elem.getAttribute(ATT_NAME);

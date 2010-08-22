@@ -48,7 +48,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
     private static final QName TAG_NAME
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "throttle");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         ThrottleMediator throttleMediator = new ThrottleMediator();
         OMElement policy = elem.getFirstChildWithName(

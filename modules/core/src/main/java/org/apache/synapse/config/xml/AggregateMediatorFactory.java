@@ -70,7 +70,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
     private static final QName SEQUENCE_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         AggregateMediator mediator = new AggregateMediator();
         processAuditStatus(mediator, elem);

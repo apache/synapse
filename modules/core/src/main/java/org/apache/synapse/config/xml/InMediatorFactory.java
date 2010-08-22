@@ -39,7 +39,7 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName IN_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "in");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
         InMediator filter = new InMediator();
         // after successfully creating the mediator
         // set its common attributes such as tracing etc

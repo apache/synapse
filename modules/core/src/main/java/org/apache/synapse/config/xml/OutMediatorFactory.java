@@ -38,7 +38,7 @@ public class OutMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName OUT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "out");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
         OutMediator filter = new OutMediator();
 
         // after successfully creating the mediator

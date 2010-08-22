@@ -46,7 +46,7 @@ public class TransactionMediatorFactory extends AbstractMediatorFactory {
      * @param elem the OMElement that specifies the Transaction mediator configuration
      * @return the Transaction mediator instance created
      */
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         TransactionMediator tm = new TransactionMediator();
         OMAttribute action

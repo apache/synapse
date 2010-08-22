@@ -19,9 +19,9 @@
 
 package org.apache.synapse.core;
 
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
-import org.apache.synapse.commons.util.TemporaryData;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -77,7 +77,7 @@ public interface SynapseEnvironment {
      *
      * @return a TemporaryData created from the parameters provided in the synapse.properties
      */
-    public TemporaryData createTemporaryData();
+    public OverflowBlob createOverflowBlob();
 
    /**
      * This method returns the <code>StatisticsCollector</code> responsible for

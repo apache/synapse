@@ -36,7 +36,6 @@ import java.util.Map;
 /**
  * Creates and manages RMI registries
  */
-
 public class RMIRegistryController {
 
     public static final Log log = LogFactory.getLog(RMIRegistryController.class);

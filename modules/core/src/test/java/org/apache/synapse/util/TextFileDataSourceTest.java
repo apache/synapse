@@ -19,6 +19,10 @@
 
 package org.apache.synapse.util;
 
+import junit.framework.TestCase;
+import org.apache.axiom.om.OMSourcedElement;
+import org.apache.axiom.util.blob.OverflowBlob;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,16 +30,11 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
-import org.apache.axiom.om.OMSourcedElement;
-import org.apache.synapse.commons.util.TemporaryData;
-
 public class TextFileDataSourceTest extends TestCase {
     private static final Charset UTF8 = Charset.forName("UTF-8");
     
     private OMSourcedElement createSourcedElement(String content, Charset charset) throws IOException {
-        TemporaryData tmp = new TemporaryData(4, 1024, "tmp_", ".dat");
+        OverflowBlob tmp = new OverflowBlob(4, 1024, "tmp_", ".dat");
         OutputStream out = tmp.getOutputStream();
         out.write(content.getBytes(charset.name()));
         out.close();

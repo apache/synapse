@@ -19,36 +19,35 @@
 
 package org.apache.synapse.util.jaxp;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
+import org.apache.axiom.util.blob.OverflowBlob;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.util.TextFileDataSource;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.commons.util.TemporaryData;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.util.TextFileDataSource;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * {@link ResultBuilder} implementation that produces a {@link StreamResult} backed by a
- * {@link TemporaryData} object.
+ * {@link org.apache.axiom.util.blob.OverflowBlob} object.
  */
 public class StreamResultBuilder implements ResultBuilder {
     private static final Log log = LogFactory.getLog(StreamResultBuilder.class);
     
     private final SynapseEnvironment synEnv;
     private final ResultBuilderFactory.Output expectedOutput;
-    private TemporaryData tmp;
+    private OverflowBlob tmp;
     private OutputStream out;
     
     public StreamResultBuilder(SynapseEnvironment synEnv,
@@ -58,7 +57,7 @@ public class StreamResultBuilder implements ResultBuilder {
     }
 
     public Result getResult() {
-        tmp = synEnv.createTemporaryData();
+        tmp = synEnv.createOverflowBlob();
         out = tmp.getOutputStream();
         return new StreamResult(out);
     }

@@ -19,8 +19,8 @@
 
 package org.apache.synapse.util;
 
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.commons.util.TemporaryData;
 
 import javax.activation.DataSource;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class SynapseBinaryDataSource implements DataSource {
     private String contentType;
 
     /** Hessian message is kept inside the DataSource as a byte array */
-    private TemporaryData data;
+    private OverflowBlob data;
 
     /**
      * Constructs the HessianDataSource from the given InputStream. Inside the HessianDataSource,
@@ -52,9 +52,9 @@ public class SynapseBinaryDataSource implements DataSource {
     public SynapseBinaryDataSource(InputStream inputstream, String contentType) throws IOException {
 
         this.contentType = contentType;
-        this.data = new TemporaryData(4, 1024, "tmp_", ".dat");
+        this.data = new OverflowBlob(4, 1024, "tmp_", ".dat");
 
-        data.readFrom(inputstream);
+        data.readFrom(inputstream, -1);
         inputstream.close();
     }
 
@@ -62,9 +62,9 @@ public class SynapseBinaryDataSource implements DataSource {
         SynapseEnvironment synEnv) throws IOException {
 
         this.contentType = contentType;
-        this.data = synEnv.createTemporaryData();
+        this.data = synEnv.createOverflowBlob();
 
-        data.readFrom(inputstream);
+        data.readFrom(inputstream, -1);
         inputstream.close();
     }
 

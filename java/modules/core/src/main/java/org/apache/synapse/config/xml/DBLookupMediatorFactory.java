@@ -62,7 +62,7 @@ public class DBLookupMediatorFactory extends AbstractDBMediatorFactory {
     private static final QName DBLOOKUP_Q =
         new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dblookup");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         DBLookupMediator mediator = new DBLookupMediator();
         buildDataSource(elem, mediator);

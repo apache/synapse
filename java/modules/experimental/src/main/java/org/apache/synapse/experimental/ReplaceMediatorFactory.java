@@ -29,6 +29,7 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 public class ReplaceMediatorFactory extends AbstractMediatorFactory {
+
     private static final QName TAG_NAME
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "replace");
     private static final QName ATT_PROPERTY = new QName("property");
@@ -37,7 +38,7 @@ public class ReplaceMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public ReplaceMediator createMediator(OMElement elem) {
+    public ReplaceMediator createSpecificMediator(OMElement elem) {
         ReplaceMediator mediator = new ReplaceMediator();
 
         OMAttribute attTarget = elem.getAttribute(ATT_TARGET);

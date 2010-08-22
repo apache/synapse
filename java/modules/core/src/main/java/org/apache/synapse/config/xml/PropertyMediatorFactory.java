@@ -33,17 +33,19 @@ import java.util.regex.Pattern;
  * Creates a property mediator through the supplied XML configuration
  * <p/>
  * <pre>
- * &lt;property name="string" [action=set/remove] (value="literal" | expression="xpath") [scope=(axis2 | axis2-client | transport)]/&gt;
+ * &lt;property name="string" [action=set/remove] (value="literal" | expression="xpath")
+ * [scope=(axis2 | axis2-client | transport)]/&gt;
  * </pre>
  */
 public class PropertyMediatorFactory extends AbstractMediatorFactory {
+
     private static final QName ATT_SCOPE = new QName("scope");
     private static final QName ATT_ACTION = new QName("action");
     private static final QName ATT_TYPE = new QName("type");
     private static final QName ATT_PATTERN = new QName("pattern");
     private static final QName ATT_GROUP = new QName("group");
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
 
         PropertyMediator propMediator = new PropertyMediator();
         OMAttribute name = elem.getAttribute(ATT_NAME);

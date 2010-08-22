@@ -38,6 +38,7 @@ import java.util.Map;
 /**
  * Parent class for all the {@link MediatorFactory} implementations
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public abstract class AbstractMediatorFactory implements MediatorFactory {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
@@ -59,7 +60,9 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     protected static final QName FEATURE_Q
         = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature");
     protected static final QName TARGET_Q
-        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
+    private static final QName DESCRIPTION_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "description");
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -67,6 +70,37 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     protected AbstractMediatorFactory() {
         log = LogFactory.getLog(this.getClass());
     }
+
+    /**
+     * This method handles extracting the common information from the respective element.
+     * It delegates the mediator specific building to the
+     * {@link #createSpecificMediator(org.apache.axiom.om.OMElement)} method, which has tobe
+     * implemented by the respective mediators</p>
+     *
+     * <p>This method has been marked as <code>final</code> to avoid mistakenly overwriting
+     * this method instead of the {@link #createSpecificMediator(org.apache.axiom.om.OMElement)}
+     * by the sub classes
+     *
+     * @param elem configuration element of the mediator to be built
+     * @return built mediator using the above element
+     */
+    public final Mediator createMediator(OMElement elem) {
+        Mediator mediator = createSpecificMediator(elem);
+        OMElement descElem = elem.getFirstChildWithName(DESCRIPTION_Q);
+        if (descElem != null) {
+            mediator.setDescription(descElem.getText());
+        }
+        return mediator;
+    }
+
+    /**
+     * Specific mediator factory implementations should implement this method to build the
+     * {@link org.apache.synapse.Mediator} by the given XML configuration
+     *
+     * @param elem configuration element describing the properties of the mediator
+     * @return built mediator of that specific type
+     */
+    protected abstract Mediator createSpecificMediator(OMElement elem);
 
     /**
      * This is to Initialize the mediator with the default attributes.
@@ -88,7 +122,7 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * @param mediator of which trace state has to be set
      * @param mediatorOmElement from which the trace state is extracted
      * 
-     * @since 1.3
+     * @since 2.0
      */
     protected void processAuditStatus(Mediator mediator, OMElement mediatorOmElement) {
 
@@ -134,10 +168,12 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * Collect the <tt>name</tt> and <tt>value</tt> attributes from the children
      * with a given QName.
      *  
-     * @return
+     * @param elem element to be traversed to find the specified <code>childElementName</code>
+     * @param childElementName t be used to extract elements to collect the name value pairs
+     * @return collected name value pairs
      */
-    protected Map<String,String> collectNameValuePairs(OMElement elem, QName childElementName) {
-        Map<String,String> result = new LinkedHashMap<String,String>();
+    protected Map<String, String> collectNameValuePairs(OMElement elem, QName childElementName) {
+        Map<String,String> result = new LinkedHashMap<String, String>();
         for (Iterator it = elem.getChildrenWithName(childElementName); it.hasNext(); ) {
             OMElement child = (OMElement)it.next();
             OMAttribute attName = child.getAttribute(ATT_NAME);

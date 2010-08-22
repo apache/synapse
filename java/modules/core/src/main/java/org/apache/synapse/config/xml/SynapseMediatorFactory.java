@@ -43,7 +43,7 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
         return RULES_Q;
     }
 
-    public Mediator createMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem) {
         SynapseMediator sm = new SynapseMediator();
 
         // after successfully creating the mediator

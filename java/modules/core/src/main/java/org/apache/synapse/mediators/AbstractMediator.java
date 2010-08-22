@@ -26,7 +26,7 @@ import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.AspectConfiguration;
 
 /**
- * This is the superclass of all mediators, and defines common logging, tracing other aspects
+ * This is the super class of all mediators, and defines common logging, tracing other aspects
  * for all mediators who extend from this.
  * elements of a mediator class.
  */
@@ -43,6 +43,8 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
     protected int traceState = SynapseConstants.TRACING_UNSET;
 
     private AspectConfiguration aspectConfiguration;
+
+    private String description;
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -78,6 +80,22 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      */
     public void setTraceState(int traceState) {
         this.traceState = traceState;
+    }
+
+    /**
+     * Set the description of the mediator
+     * @param description tobe set to the mediator
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Gives the description of the mediator
+     * @return description of the mediator
+     */
+    public String getDescription() {
+        return this.description;
     }
 
     /**

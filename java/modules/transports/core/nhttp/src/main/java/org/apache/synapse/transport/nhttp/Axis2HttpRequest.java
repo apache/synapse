@@ -19,6 +19,7 @@
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -31,28 +32,27 @@ import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpVersion;
-import org.apache.http.nio.util.ContentOutputBuffer;
-import org.apache.http.nio.entity.ContentOutputStream;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.nio.entity.ContentOutputStream;
+import org.apache.http.nio.util.ContentOutputBuffer;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
-import org.apache.synapse.commons.util.TemporaryData;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.channels.ClosedChannelException;
-import java.util.Iterator;
-import java.util.Map;
 import java.net.URL;
+import java.nio.channels.ClosedChannelException;
+import java.util.Map;
 
 /**
  * Represents an outgoing Axis2 HTTP/s request. It holds the EPR of the destination, the
  * Axis2 MessageContext to be sent, an HttpHost object which captures information about the
  * destination, and a Pipe used to write the message stream to the destination
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class Axis2HttpRequest {
 
     private static final Log log = LogFactory.getLog(Axis2HttpRequest.class);
@@ -142,6 +142,7 @@ public class Axis2HttpRequest {
     /**
      * Create and return a new HttpPost request to the destination EPR
      * @return the HttpRequest to be sent out
+     * @throws IOException in error retrieving the <code>HttpRequest</code>
      */
     public HttpRequest getRequest() throws IOException {
 
@@ -150,7 +151,7 @@ public class Axis2HttpRequest {
             httpMethod = "POST";
         }
         endpointURLPrefix = (String) msgContext.getProperty(NhttpConstants.ENDPOINT_PREFIX);
-        HttpRequest httpRequest = null;
+        HttpRequest httpRequest;
 
         if ("POST".equals(httpMethod) || "PUT".equals(httpMethod)) {
 
@@ -208,9 +209,7 @@ public class Axis2HttpRequest {
         Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
         if (o != null && o instanceof Map) {
             Map headers = (Map) o;
-            Iterator iter = headers.keySet().iterator();
-            while (iter.hasNext()) {
-                Object header = iter.next();
+            for (Object header : headers.keySet()) {
                 Object value = headers.get(header);
                 if (header instanceof String && value != null && value instanceof String) {
                     if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) header)) {
@@ -326,7 +325,7 @@ public class Axis2HttpRequest {
      * @throws IOException if an exception occurred while writing data
      */
     private void setStreamAsTempData(BasicHttpEntity entity) throws IOException {
-        TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
+        OverflowBlob serialized = new OverflowBlob(256, 4096, "http-nio_", ".dat");
         OutputStream out = serialized.getOutputStream();
         try {
             messageFormatter.writeTo(msgContext, format, out, true);
@@ -343,8 +342,8 @@ public class Axis2HttpRequest {
      * @throws IOException if an exception occurred while writing data
      */
     private void writeMessageFromTempData(OutputStream out) throws IOException {
-        TemporaryData serialized =
-                (TemporaryData) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
+        OverflowBlob serialized =
+                (OverflowBlob) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
         try {
             serialized.writeTo(out);
         } finally {

@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -31,13 +32,12 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
-import org.apache.synapse.commons.util.TemporaryData;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
-import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.MediatorFaultHandler;
+import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
@@ -256,7 +256,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return created TemporaryData object as per in the synapse.properties file
      */
-    public TemporaryData createTemporaryData() {
+    public OverflowBlob createOverflowBlob() {
 
         String chkSize = synapseConfig.getProperty(SynapseConstants.CHUNK_SIZE);
         String chukNumber = synapseConfig.getProperty(SynapseConstants.THRESHOLD_CHUNKS);
@@ -276,7 +276,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         String tempSuffix = synapseConfig.getProperty(SynapseConstants.TEMP_FILE_SUFIX,
                 SynapseConstants.DEFAULT_TEMPFILE_SUFIX);
 
-        return new TemporaryData(numberOfChunks, chunkSize, tempPrefix, tempSuffix);
+        return new OverflowBlob(numberOfChunks, chunkSize, tempPrefix, tempSuffix);
     }
 
     /**

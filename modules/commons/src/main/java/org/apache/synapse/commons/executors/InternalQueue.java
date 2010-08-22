@@ -27,6 +27,7 @@ import java.util.concurrent.locks.Condition;
  * Interface implemented by the internal queues.
  * @param <E>
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public interface InternalQueue<E> extends Queue<E> {
     /**
      * Get the Priority of the queue

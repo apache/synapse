@@ -40,7 +40,7 @@ public class PRRNextQueueAlgorithm<E> implements NextQueueAlgorithm<E> {
     /** Reference to the actual queue */
     private List<InternalQueue<E>> queues;
 
-    /** Number of queues, we keep this to avoid the overhead of calculatin this again and again */
+    /** Number of queues, we keep this to avoid the overhead of calculation this again and again */
     private int size = 0;
 
     /** Current queue we are operating on */

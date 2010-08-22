@@ -33,11 +33,11 @@ import java.lang.management.ThreadInfo;
 /**
  * ThreadingView can be used to monitor a named thread group over JMX. Data
  * gathered by this monitor can be classified as short term data and long term data.
- * Short term data is the statitics related to last 15 minutes of execution and they
+ * Short term data is the statistics related to last 15 minutes of execution and they
  * get updated every 2 seconds. Long term data is related to last 24 hours of execution
  * and they get updated every 5 minutes. This monitor can also be configured to log a
  * summary of the thread states periodically. If needed a margin can be set for the blocked
- * thread percentage, upon exeeding which a system alert will be logged as a warning. By
+ * thread percentage, upon exceeding which a system alert will be logged as a warning. By
  * default both periodic logs and alerts are turned off.
  */
 public class ThreadingView implements ThreadingViewMBean {
@@ -99,7 +99,7 @@ public class ThreadingView implements ThreadingViewMBean {
 
     public void destroy() {
         if (log.isDebugEnabled()) {
-            log.debug("Unregistering the Synapse threading view for the thread group: " +
+            log.debug("Un-registering the Synapse threading view for the thread group: " +
                     threadNamePrefix);
         }
         MBeanRegistrar.getInstance().unRegisterMBean(SYNAPSE_THREADING_VIEW, threadNamePrefix);
@@ -223,8 +223,8 @@ public class ThreadingView implements ThreadingViewMBean {
             return true;
         } else if (state.equals(Thread.State.WAITING) ||
                 state.equals(Thread.State.TIMED_WAITING)) {
-            StackTraceElement[] stacktrace = threadInfo.getStackTrace();
-            if (stacktrace.length > 0 && !"park".equals(stacktrace[0].getMethodName())) {
+            StackTraceElement[] stackTrace = threadInfo.getStackTrace();
+            if (stackTrace.length > 0 && !"park".equals(stackTrace[0].getMethodName())) {
                 return true;
             }
         }
@@ -233,7 +233,7 @@ public class ThreadingView implements ThreadingViewMBean {
     }
 
     /**
-     * Get a sumarry of all threads running in the JVM.
+     * Get a summary of all threads running in the JVM.
      *
      * @return an array of ThreadInfo objects
      */
@@ -245,7 +245,7 @@ public class ThreadingView implements ThreadingViewMBean {
     }
 
     /**
-     * Calculates and returns the average bloked worker percentage during last 'n' munites
+     * Calculates and returns the average blocked worker percentage during last 'n' minutes
      * of execution
      *
      * @param n Number of minutes in the execution history
@@ -257,11 +257,11 @@ public class ThreadingView implements ThreadingViewMBean {
         Double[] array = shortTermDataQueue.toArray(new Double[shortTermDataQueue.size()]);
 
         if (samples > array.length) {
-            // If we don't have anough samples in the queue, try to approximate
+            // If we don't have enough samples in the queue, try to approximate
             // the value using all the available samples
             samples = array.length;
-            for (int i = 0; i < array.length; i++) {
-                sum += array[i];
+            for (Double anArray : array) {
+                sum += anArray;
             }
         } else {
             for (int i = 0; i < samples; i++) {
@@ -276,7 +276,7 @@ public class ThreadingView implements ThreadingViewMBean {
     }
 
     /**
-     * Calculates and returns the average bloked worker percentage during last 'n' hours
+     * Calculates and returns the average blocked worker percentage during last 'n' hours
      * of execution
      *
      * @param n Number of hours in the execution history
@@ -289,8 +289,8 @@ public class ThreadingView implements ThreadingViewMBean {
 
         if (samples > array.length) {
             samples = array.length;
-            for (int i = 0; i < array.length; i++) {
-                sum += array[i];
+            for (Double anArray : array) {
+                sum += anArray;
             }
         } else {
             for (int i = 0; i < samples; i++) {

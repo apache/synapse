@@ -19,6 +19,7 @@
 
 package org.apache.synapse.mediators.bsf;
 
+import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.bsf.xml.XMLHelper;
@@ -28,16 +29,13 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 
-import javax.script.*;
 import javax.activation.DataHandler;
-import java.util.TreeMap;
-import java.util.Map;
+import javax.script.*;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-
-import com.sun.phobos.script.javascript.RhinoScriptEngine;
-import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
@@ -233,7 +231,7 @@ public class ScriptMediator extends AbstractMediator {
             throws ScriptException, NoSuchMethodException {
         prepareExternalScript(synCtx);
         ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
-        return invocableScript.invokeFunction(function, new Object[]{scriptMC});
+        return invocableScript.invokeFunction(function, scriptMC);
     }
 
     /**

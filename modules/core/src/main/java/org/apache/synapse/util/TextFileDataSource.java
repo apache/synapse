@@ -29,9 +29,9 @@ import org.apache.axiom.om.impl.MTOMXMLStreamWriter;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.impl.serialize.StreamingOMSerializer;
 import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axiom.util.stax.WrappedTextNodeStreamReader;
 import org.apache.axis2.transport.base.BaseConstants;
-import org.apache.synapse.commons.util.TemporaryData;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -46,17 +46,17 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 
 public class TextFileDataSource extends OMDataSourceExtBase {
-    private final TemporaryData temporaryData;
+    private final OverflowBlob overflowBlob;
     private final Charset charset;
 
-    public TextFileDataSource(TemporaryData temporaryData, Charset charset) {
-        this.temporaryData = temporaryData;
+    public TextFileDataSource(OverflowBlob overflowBlob, Charset charset) {
+        this.overflowBlob = overflowBlob;
         this.charset = charset;
     }
     
-    public static OMSourcedElement createOMSourcedElement(TemporaryData temporaryData, Charset charset) {
+    public static OMSourcedElement createOMSourcedElement(OverflowBlob overflowBlob, Charset charset) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
-        TextFileDataSource txtFileDS = new TextFileDataSource(temporaryData, charset);
+        TextFileDataSource txtFileDS = new TextFileDataSource(overflowBlob, charset);
         return new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
     }
 
@@ -85,16 +85,17 @@ public class TextFileDataSource extends OMDataSourceExtBase {
     public XMLStreamReader getReader() throws XMLStreamException {
         InputStream is;
         try {
-            is = temporaryData.getInputStream();
+            is = overflowBlob.getInputStream();
         }
         catch (IOException ex) {
             throw new XMLStreamException(ex);
         }
-        return new WrappedTextNodeStreamReader(BaseConstants.DEFAULT_TEXT_WRAPPER, new InputStreamReader(is, charset));
+        return new WrappedTextNodeStreamReader(
+                BaseConstants.DEFAULT_TEXT_WRAPPER, new InputStreamReader(is, charset));
     }
 
     public Object getObject() {
-        return temporaryData;
+        return overflowBlob;
     }
 
     public boolean isDestructiveRead() {
@@ -113,6 +114,6 @@ public class TextFileDataSource extends OMDataSourceExtBase {
     }
 
     public OMDataSourceExt copy() {
-        return new TextFileDataSource(temporaryData, charset);
+        return new TextFileDataSource(overflowBlob, charset);
     }
 }

@@ -19,30 +19,29 @@
 
 package org.apache.synapse.util.jaxp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.commons.util.TemporaryData;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * {@link SourceBuilder} implementation that serializes the AXIOM tree
- * to {@link TemporaryData} object and produces a {@link StreamSource}.
+ * to {@link org.apache.axiom.util.blob.OverflowBlob} object and produces a {@link StreamSource}.
  */
 public class StreamSourceBuilder implements SourceBuilder {
     private static final Log log = LogFactory.getLog(StreamSourceBuilder.class);
     
     private final SynapseEnvironment synEnv;
-    private TemporaryData tmp;
+    private OverflowBlob tmp;
     private InputStream in;
     
     public StreamSourceBuilder(SynapseEnvironment synEnv) {
@@ -50,7 +49,7 @@ public class StreamSourceBuilder implements SourceBuilder {
     }
 
     public Source getSource(OMElement node) {
-        tmp = synEnv.createTemporaryData();
+        tmp = synEnv.createOverflowBlob();
         OutputStream out = tmp.getOutputStream();
         try {
             node.serialize(out);

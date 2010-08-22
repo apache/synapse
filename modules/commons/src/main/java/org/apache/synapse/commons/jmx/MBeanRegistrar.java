@@ -40,19 +40,19 @@ public class MBeanRegistrar {
     private MBeanRegistrar() {
     }
 
-    public void registerMBean(Object mbeanInstance, String category, String id) {
-        assertNull(mbeanInstance, "Mbean instance is null");
-        assertNull(category, "Mbean instance category is null");
-        assertNull(id, "Mbean instance name is null");
+    public void registerMBean(Object mBeanInstance, String category, String id) {
+        assertNull(mBeanInstance, "MBean instance is null");
+        assertNull(category, "MBean instance category is null");
+        assertNull(id, "MBean instance name is null");
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName(getObjectName(category, id));
             Set set = mbs.queryNames(name, null);
             if (set != null && set.isEmpty()) {
-                mbs.registerMBean(mbeanInstance, name);
+                mbs.registerMBean(mBeanInstance, name);
             } else {
                 mbs.unregisterMBean(name);
-                mbs.registerMBean(mbeanInstance, name);
+                mbs.registerMBean(mBeanInstance, name);
             }
         } catch (Exception e) {
             log.warn("Error registering a MBean with name ' " + id +

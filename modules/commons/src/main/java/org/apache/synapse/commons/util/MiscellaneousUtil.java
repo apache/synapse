@@ -183,6 +183,7 @@ public class MiscellaneousUtil {
         return result;
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static byte[] asBytes(InputStream in) {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -192,8 +193,8 @@ public class MiscellaneousUtil {
             while ((len = in.read(buffer)) >= 0)
                 out.write(buffer, 0, len);
         } catch (IOException e) {
-            throw new SynapseCommonsException("Error during converting a inputstream " +
-                    "into a bytearray ", e, log);
+            throw new SynapseCommonsException("Error during converting a input stream " +
+                    "into a byte array ", e, log);
         } finally {
             if (in != null) {
                 try {

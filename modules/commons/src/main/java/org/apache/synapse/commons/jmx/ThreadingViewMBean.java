@@ -21,6 +21,7 @@ package org.apache.synapse.commons.jmx;
 
 import java.util.Date;
 
+@SuppressWarnings({"UnusedDeclaration"})
 public interface ThreadingViewMBean {
 
     public int getTotalWorkerCount();

@@ -23,6 +23,7 @@ package org.apache.synapse.commons.executors;
  * This class determines the priority of a Worker. It can also hold some properties
  * for assisting the queue selecting algorithms.
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public interface Importance {
     /**
      * Get the priority

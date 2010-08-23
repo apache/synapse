@@ -98,8 +98,31 @@ public class URLRewriteTest extends TestCase {
         synMc.setTo(new EndpointReference("http://wso2.org:9763/services/MyService"));
 
         mediator.mediate(synMc);
-        System.out.println(synMc.getTo().getAddress());
-        System.out.println(synMc.getProperty("outputURL"));
+        assertEquals("https://wso2.com:9443/esb/services/StockQuoteService", synMc.getProperty("outputURL"));
+    }
+
+    public void testMediateWithFactory2() throws Exception {
+        String xml =
+                "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" outProperty=\"outputURL\">\n" +
+                        "    <rule>\n" +
+                        "        <action fragment=\"full\" value=\"http://www.test.org:8080\"/>\n" +
+                        "        <action fragment=\"path\" value=\"/services/TestService\"/>\n" +
+                        "        <action fragment=\"query\" value=\"foo=bar\"/>\n" +
+                        "        <action fragment=\"ref\" xpath=\"get-property('ref')\"/>\n" +
+                        "    </rule>    \n" +
+                        "</rewrite>";
+        URLRewriteMediatorFactory fac = new URLRewriteMediatorFactory();
+        Mediator mediator = fac.createMediator(AXIOMUtil.stringToOM(xml));
+
+        org.apache.axis2.context.MessageContext mc =
+                new org.apache.axis2.context.MessageContext();
+        SynapseConfiguration config = new SynapseConfiguration();
+        SynapseEnvironment env = new Axis2SynapseEnvironment(config);
+        MessageContext synMc = new Axis2MessageContext(mc, config, env);
+        synMc.setProperty("ref", "id");
+
+        mediator.mediate(synMc);
+        assertEquals("http://www.test.org:8080/services/TestService?foo=bar#id", synMc.getProperty("outputURL"));
     }
 
     public void testMediate() throws Exception {

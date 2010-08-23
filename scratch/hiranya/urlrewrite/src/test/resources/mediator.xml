@@ -1,8 +1,8 @@
-<rewrite xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<rewrite xmlns="http://synapse.apache.org/ns/2010/04/configuration" outProperty="outputURL">
     <rule>
-        <condition>
-            <match type="url" fragment="host" regex="foo"/>
-        </condition>
-        <action fragment="host" value="bar"/>            
+        <action fragment="full" value="http://www.test.org:8080"/>
+        <action fragment="path" value="/services/TestServuce"/>
+        <action fragment="query" value="foo=bar"/>
+        <action fragment="ref" xpath="get-property('ref')"/>
     </rule>
-</rewrite>
+</rewrite>    

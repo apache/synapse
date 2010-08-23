@@ -84,6 +84,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
     private RewriteAction parseAction(OMElement actionElt) {
         String value = actionElt.getAttributeValue(new QName("value"));
         String xpath = actionElt.getAttributeValue(new QName("xpath"));
+        String type = actionElt.getAttributeValue(new QName("type"));
 
         if (value == null && xpath == null) {
             handleException("value or xpath attribute is required on the action element");
@@ -124,6 +125,19 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
         } else {
             action.setFragmentIndex(URLRewriteMediator.FULL_URI);
         }
+
+        if (type != null) {
+            if ("set".equals(type)) {
+                action.setActionType(RewriteAction.ACTION_SET);
+            } else if ("append".equals(type)) {
+                action.setActionType(RewriteAction.ACTION_APPEND);
+            } else if ("prepend".equals(type)) {
+                action.setActionType(RewriteAction.ACTION_PREPEND);
+            } else {
+                handleException("Unknown action type: " + type);
+            }
+        }
+
         return action;
     }
 

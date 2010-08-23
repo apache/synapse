@@ -31,9 +31,14 @@ public class RewriteAction {
 
     private static final Log log = LogFactory.getLog(RewriteAction.class);
 
+    public static final int ACTION_SET = 0;
+    public static final int ACTION_APPEND = 1;
+    public static final int ACTION_PREPEND = 2;
+
     private String value;
     private SynapseXPath xpath;
     private int fragmentIndex = URLRewriteMediator.FULL_URI;
+    private int actionType = ACTION_SET;
 
     public void execute(Object[] fragments, MessageContext messageContext) {
         String result;
@@ -76,7 +81,19 @@ public class RewriteAction {
                 fragments[fragmentIndex] = -1;
             }
         } else {
-            fragments[fragmentIndex] = result;
+            switch (actionType) {
+                case ACTION_SET:
+                    fragments[fragmentIndex] = result;
+                    break;
+
+                case ACTION_PREPEND:
+                    fragments[fragmentIndex] = result + fragments[fragmentIndex];
+                    break;
+
+                case ACTION_APPEND:
+                    fragments[fragmentIndex] = fragments[fragmentIndex] + result;
+                    break;
+            }
         }
     }
 
@@ -102,5 +119,13 @@ public class RewriteAction {
 
     public void setXpath(SynapseXPath xpath) {
         this.xpath = xpath;
+    }
+
+    public int getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(int actionType) {
+        this.actionType = actionType;
     }
 }

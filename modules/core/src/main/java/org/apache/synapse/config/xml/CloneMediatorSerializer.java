@@ -49,12 +49,10 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
      * This method will implement the serializeMediator method of the MediatorSerializer interface
      * and implements the serialization of CloneMediator to its configuration
      *
-     * @param parent OMElement describing the parent element to which the newlly generated
-     *          clone element should be attached as a child, if provided
      * @param m Mediator of the type CloneMediator which is subjected to the serialization
      * @return OMElement serialized in to xml from the given parameters
      */
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         OMElement cloneElem = fac.createOMElement("clone", synNS);
         saveTracingState(cloneElem, m);
@@ -69,11 +67,6 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
             if (o instanceof Target) {
                 cloneElem.addChild(TargetSerializer.serializeTarget((Target) o));
             }
-        }
-
-        // attach the serialized element to the parent if specified
-        if (parent != null) {
-            parent.addChild(cloneElem);
         }
 
         return cloneElem;

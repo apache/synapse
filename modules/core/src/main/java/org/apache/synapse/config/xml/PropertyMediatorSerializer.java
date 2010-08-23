@@ -20,8 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 
@@ -34,7 +32,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
  */
 public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof PropertyMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -86,9 +84,6 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
 
-        if (parent != null) {
-            parent.addChild(property);
-        }
         return property;
     }
 

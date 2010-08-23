@@ -48,16 +48,12 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
      * This method will implement the serialization logic of the IterateMediator class to the
      * relevant xml configuration
      *
-     * @param parent
-     *              OMElement specifying the parent element to which the created configurtaion
-     *              element will be attached
-     *
      * @param m
      *          IterateMediator to be serialized
      *
      * @return OMElement describing the serialized configuration of the IterateMediator
      */
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof IterateMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -86,11 +82,6 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
         }
 
         itrElem.addChild(TargetSerializer.serializeTarget(itrMed.getTarget()));
-
-        // attach the serialized element to the parent if specified
-        if (parent != null) {
-            parent.addChild(itrElem);
-        }
 
         return itrElem;
     }

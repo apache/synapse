@@ -39,7 +39,7 @@ import org.apache.synapse.mediators.filters.router.Route;
  */
 public class ConditionalRouterMediatorSerializer extends AbstractMediatorSerializer {
     
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
         OMElement conditionalRouterElem = fac.createOMElement("conditionalRouter", synNS);
         saveTracingState(conditionalRouterElem, m);
 
@@ -83,10 +83,6 @@ public class ConditionalRouterMediatorSerializer extends AbstractMediatorSeriali
             }
 
             conditionalRouterElem.addChild(routeElem);
-        }
-
-        if (parent != null) {
-            parent.addChild(conditionalRouterElem);
         }
 
         return conditionalRouterElem;

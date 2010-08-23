@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
     private static final QName ATTRIBUTE_Q
                 = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof XSLTMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -85,9 +84,6 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         
         ResourceMapSerializer.serializeResourceMap(xslt, mediator.getResourceMap());
         
-        if (parent != null) {
-            parent.addChild(xslt);
-        }
         return xslt;
     }
 

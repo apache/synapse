@@ -29,7 +29,7 @@ import org.apache.synapse.mediators.eventing.EventPublisherMediator;
  */
 public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof EventPublisherMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -46,9 +46,6 @@ public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer
         }
         saveTracingState(elmEventPublisher, mediator);
 
-        if (parent != null) {
-            parent.addChild(elmEventPublisher);
-        }
         return elmEventPublisher;
     }
 

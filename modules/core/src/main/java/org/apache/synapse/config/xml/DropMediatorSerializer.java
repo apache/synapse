@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.builtin.DropMediator;
  */
 public class DropMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DropMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -38,11 +38,8 @@ public class DropMediatorSerializer extends AbstractMediatorSerializer {
 
         DropMediator mediator = (DropMediator) m;
         OMElement drop = fac.createOMElement("drop", synNS);
-        saveTracingState(drop,mediator);
+        saveTracingState(drop, mediator);
 
-        if (parent != null) {
-            parent.addChild(drop);
-        }
         return drop;
     }
 

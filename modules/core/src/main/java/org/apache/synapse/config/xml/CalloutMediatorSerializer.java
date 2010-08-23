@@ -34,7 +34,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
  */
 public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof CalloutMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -78,9 +78,6 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
                 "key", nullNS, mediator.getTargetKey()));
         }
 
-        if (parent != null) {
-            parent.addChild(callout);
-        }
         return callout;
     }
 

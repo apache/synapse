@@ -33,6 +33,7 @@ import org.apache.synapse.config.xml.MediatorPropertySerializer;
 import org.apache.synapse.endpoints.*;
 import org.apache.synapse.endpoints.EndpointDefinition;
 
+import javax.xml.namespace.QName;
 import java.util.Collection;
 
 /**
@@ -61,7 +62,15 @@ public abstract class EndpointSerializer {
      * @return XML format of the serialized endpoint
      */
     public static OMElement getElementFromEndpoint(Endpoint endpoint) {
-        return getEndpointSerializer(endpoint).serializeEndpoint(endpoint);
+
+        EndpointSerializer endpointSerializer = getEndpointSerializer(endpoint);
+        OMElement elem = endpointSerializer.serializeEndpoint(endpoint);
+
+        OMElement descriptionElem = endpointSerializer.getSerializedDescription(endpoint);
+        if (descriptionElem != null) {
+            elem.addChild(descriptionElem);
+        }
+        return elem;
     }
 
     /**
@@ -72,8 +81,21 @@ public abstract class EndpointSerializer {
      */
     protected abstract OMElement serializeEndpoint(Endpoint endpoint);
 
+    private OMElement getSerializedDescription(Endpoint endpoint) {
+
+        OMElement descriptionElem = fac.createOMElement(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
+
+        if (endpoint.getDescription() != null) {
+            descriptionElem.setText(endpoint.getDescription());
+            return descriptionElem;
+        } else {
+            return null;
+        }
+    }
+
     /**
-     * Serializes the QoS infomation of the endpoint to the XML element
+     * Serializes the QoS information of the endpoint to the XML element
      *
      * @param endpointDefinition specifies the QoS information of the endpoint
      * @param element            to which the QoS information will be serialized

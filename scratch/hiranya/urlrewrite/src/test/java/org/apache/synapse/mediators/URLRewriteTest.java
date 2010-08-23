@@ -63,8 +63,8 @@ public class URLRewriteTest extends TestCase {
                 "    <rule>" +
                 "        <condition>" +
                 "            <and>" +
-                "               <match type=\"url\" fragment=\"host\" regex=\"wso2.org\"/>" +
-                "               <match type=\"url\" fragment=\"port\" regex=\"9763\"/>" +
+                "               <equal type=\"url\" fragment=\"host\" value=\"wso2.org\"/>" +
+                "               <equal type=\"url\" fragment=\"port\" value=\"9763\"/>" +
                 "            </and>" +
                 "        </condition>" +
                 "        <action fragment=\"host\" value=\"wso2.com\"/>" +
@@ -73,6 +73,12 @@ public class URLRewriteTest extends TestCase {
                 "    </rule>" +
                 "    <rule>" +
                 "        <action fragment=\"path\" value=\"/esb\" type=\"prepend\"/>" +
+                "    </rule>" +
+                "    <rule>" +
+                "        <condition>" +
+                "           <match type=\"url\" fragment=\"path\" regex=\".*/MyService\"/>" +
+                "        </condition>" +
+                "        <action fragment=\"path\" value=\"StockQuoteService\" regex=\"MyService\" type=\"replace\"/>" +
                 "    </rule>" +
                 "</rewrite>";
         URLRewriteMediatorFactory fac = new URLRewriteMediatorFactory();

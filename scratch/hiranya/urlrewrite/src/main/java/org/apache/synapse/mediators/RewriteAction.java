@@ -34,9 +34,11 @@ public class RewriteAction {
     public static final int ACTION_SET = 0;
     public static final int ACTION_APPEND = 1;
     public static final int ACTION_PREPEND = 2;
+    public static final int ACTION_REPLACE = 3;
 
     private String value;
     private SynapseXPath xpath;
+    private String regex;
     private int fragmentIndex = URLRewriteMediator.FULL_URI;
     private int actionType = ACTION_SET;
 
@@ -96,6 +98,13 @@ public class RewriteAction {
                             (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "") +
                                     result;
                     break;
+
+                case ACTION_REPLACE:
+                    String str = (fragments[fragmentIndex] != null ?
+                            (String) fragments[fragmentIndex] : "");
+                    str = str.replaceAll(regex, result);
+                    fragments[fragmentIndex] = str;
+                    break;
             }
         }
     }
@@ -122,6 +131,14 @@ public class RewriteAction {
 
     public void setXpath(SynapseXPath xpath) {
         this.xpath = xpath;
+    }
+
+    public String getRegex() {
+        return regex;
+    }
+
+    public void setRegex(String regex) {
+        this.regex = regex;
     }
 
     public int getActionType() {

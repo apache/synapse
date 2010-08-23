@@ -144,6 +144,14 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
                 action.setActionType(RewriteAction.ACTION_APPEND);
             } else if ("prepend".equals(type)) {
                 action.setActionType(RewriteAction.ACTION_PREPEND);
+            } else if ("replace".equals(type)) {
+                action.setActionType(RewriteAction.ACTION_REPLACE);
+                String regex = actionElt.getAttributeValue(new QName("regex"));
+                if (regex != null) {
+                    action.setRegex(regex);
+                } else {
+                    handleException("regex attribute is required for replace action");
+                }
             } else {
                 handleException("Unknown action type: " + type);
             }

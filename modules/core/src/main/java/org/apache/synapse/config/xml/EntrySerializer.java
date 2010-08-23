@@ -29,6 +29,8 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
+
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import java.net.URL;
 
@@ -41,7 +43,8 @@ public class EntrySerializer {
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS = SynapseConstants.SYNAPSE_OMNAMESPACE;
-    protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+    protected static final OMNamespace nullNS
+            = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**
      * Serialize the Entry object to an OMElement representing the entry
@@ -50,27 +53,27 @@ public class EntrySerializer {
      * @return OMElement representing the entry
      */
     public static OMElement serializeEntry(Entry entry, OMElement parent) {
-        OMElement propertyElement = fac.createOMElement("localEntry", synNS);
-        propertyElement.addAttribute(fac.createOMAttribute(
+        OMElement entryElement = fac.createOMElement("localEntry", synNS);
+        entryElement.addAttribute(fac.createOMAttribute(
                 "key", nullNS, entry.getKey().trim()));
         int type = entry.getType();
         if (type == Entry.URL_SRC) {
             URL srcUrl = entry.getSrc();
             if (srcUrl != null) {
-                propertyElement.addAttribute(fac.createOMAttribute(
+                entryElement.addAttribute(fac.createOMAttribute(
                         "src", nullNS, srcUrl.toString().trim()));
             }
         } else if (type == Entry.INLINE_XML) {
             Object value = entry.getValue();
             if (value != null && value instanceof OMElement) {
-                propertyElement.addChild((OMElement) value);
+                entryElement.addChild((OMElement) value);
             }
         } else if (type == Entry.INLINE_TEXT) {
             Object value = entry.getValue();
             if (value != null && value instanceof String) {
                 OMTextImpl textData = (OMTextImpl) fac.createOMText(((String) value).trim());
                 textData.setType(XMLStreamConstants.CDATA);
-                propertyElement.addChild(textData);
+                entryElement.addChild(textData);
             }
         } else if (type == Entry.REMOTE_ENTRY) {
             // nothing to serialize
@@ -78,10 +81,19 @@ public class EntrySerializer {
         } else {
             handleException("Entry type undefined");
         }
-        if (parent != null) {
-            parent.addChild(propertyElement);
+
+        if (entry.getDescription() != null) {
+
+            OMElement descriptionElem = fac.createOMElement(
+                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
+            descriptionElem.setText(entry.getDescription());
+            entryElement.addChild(descriptionElem);
         }
-        return propertyElement;
+
+        if (parent != null) {
+            parent.addChild(entryElement);
+        }
+        return entryElement;
     }
 
     private static void handleException(String msg) {

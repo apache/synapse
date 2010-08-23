@@ -35,6 +35,7 @@ public class RewriteAction {
     public static final int ACTION_APPEND = 1;
     public static final int ACTION_PREPEND = 2;
     public static final int ACTION_REPLACE = 3;
+    public static final int ACTION_REMOVE = 4;
 
     private String value;
     private SynapseXPath xpath;
@@ -83,29 +84,32 @@ public class RewriteAction {
                 fragments[fragmentIndex] = -1;
             }
         } else {
+            String str;
             switch (actionType) {
-                case ACTION_SET:
-                    fragments[fragmentIndex] = result;
-                    break;
-
                 case ACTION_PREPEND:
-                    fragments[fragmentIndex] = result +
+                    str = result +
                             (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "");
                     break;
 
                 case ACTION_APPEND:
-                    fragments[fragmentIndex] =
+                    str =
                             (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "") +
                                     result;
                     break;
 
                 case ACTION_REPLACE:
-                    String str = (fragments[fragmentIndex] != null ?
-                            (String) fragments[fragmentIndex] : "");
+                    str = (fragments[fragmentIndex] != null ? (String) fragments[fragmentIndex] : "");
                     str = str.replaceAll(regex, result);
-                    fragments[fragmentIndex] = str;
                     break;
-            }
+
+                case ACTION_REMOVE:
+                    str = null;
+                    break;
+
+                default:
+                    str = result;
+            }            
+            fragments[fragmentIndex] = str;
         }
     }
 

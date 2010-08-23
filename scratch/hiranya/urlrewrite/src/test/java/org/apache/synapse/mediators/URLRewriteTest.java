@@ -79,6 +79,10 @@ public class URLRewriteTest extends TestCase {
                 "           <match type=\"url\" fragment=\"path\" regex=\".*/MyService\"/>" +
                 "        </condition>" +
                 "        <action fragment=\"path\" value=\"StockQuoteService\" regex=\"MyService\" type=\"replace\"/>" +
+                "        <action fragment=\"ref\" value=\"summary\"/>" +
+                "    </rule>" +
+                "    <rule>" +
+                "        <action fragment=\"ref\" type=\"remove\"/>" +
                 "    </rule>" +
                 "</rewrite>";
         URLRewriteMediatorFactory fac = new URLRewriteMediatorFactory();

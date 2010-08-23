@@ -97,7 +97,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
         String xpath = actionElt.getAttributeValue(new QName("xpath"));
         String type = actionElt.getAttributeValue(new QName("type"));
 
-        if (value == null && xpath == null) {
+        if (value == null && xpath == null && !"remove".equals(type)) {
             handleException("value or xpath attribute is required on the action element");
         }
 
@@ -138,6 +138,11 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
         }
 
         if (type != null) {
+            if (action.getFragmentIndex() == URLRewriteMediator.FULL_URI ||
+                    action.getFragmentIndex() == URLRewriteMediator.PORT) {
+                handleException("type attribute is not allowed for 'port' and 'full URI' rewrites");    
+            }
+
             if ("set".equals(type)) {
                 action.setActionType(RewriteAction.ACTION_SET);
             } else if ("append".equals(type)) {
@@ -152,6 +157,8 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
                 } else {
                     handleException("regex attribute is required for replace action");
                 }
+            } else if ("remove".equals(type)) {
+                action.setActionType(RewriteAction.ACTION_REMOVE);                
             } else {
                 handleException("Unknown action type: " + type);
             }

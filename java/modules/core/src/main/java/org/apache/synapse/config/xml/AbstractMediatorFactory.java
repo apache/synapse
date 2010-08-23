@@ -72,10 +72,10 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     }
 
     /**
-     * This method handles extracting the common information from the respective element.
-     * It delegates the mediator specific building to the
-     * {@link #createSpecificMediator(org.apache.axiom.om.OMElement)} method, which has tobe
-     * implemented by the respective mediators</p>
+     * Creates the mediator by looking at the given XML element. This method handles
+     * extracting the common information from the respective element. It delegates the mediator
+     * specific building to the {@link #createSpecificMediator(org.apache.axiom.om.OMElement)}
+     * method, which has tobe implemented by the respective mediators</p>
      *
      * <p>This method has been marked as <code>final</code> to avoid mistakenly overwriting
      * this method instead of the {@link #createSpecificMediator(org.apache.axiom.om.OMElement)}

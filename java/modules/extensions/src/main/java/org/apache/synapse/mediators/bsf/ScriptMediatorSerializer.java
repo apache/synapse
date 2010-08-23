@@ -34,7 +34,7 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
  */
 public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
         if (!(m instanceof ScriptMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
         }

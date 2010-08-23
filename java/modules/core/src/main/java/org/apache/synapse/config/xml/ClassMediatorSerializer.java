@@ -38,7 +38,7 @@ import java.util.Iterator;
  */
 public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof ClassMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

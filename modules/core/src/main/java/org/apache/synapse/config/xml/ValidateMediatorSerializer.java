@@ -32,9 +32,9 @@ import java.util.List;
  * @see ValidateMediatorSerializer
  */
 public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
-    implements MediatorSerializer {
+        implements MediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof ValidateMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

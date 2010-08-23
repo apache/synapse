@@ -29,7 +29,7 @@ import org.apache.synapse.mediators.eventing.EventPublisherMediator;
  */
 public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof EventPublisherMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

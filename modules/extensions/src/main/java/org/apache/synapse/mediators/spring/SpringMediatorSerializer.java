@@ -31,12 +31,12 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class SpringMediatorSerializer extends AbstractMediatorSerializer
-    implements MediatorSerializer {
+        implements MediatorSerializer {
 
     private static final OMNamespace sprNS =
             fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE+"/spring", "spring");
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof SpringMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

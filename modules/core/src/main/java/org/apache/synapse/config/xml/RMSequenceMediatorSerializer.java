@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.builtin.RMSequenceMediator;
  */
 public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof RMSequenceMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

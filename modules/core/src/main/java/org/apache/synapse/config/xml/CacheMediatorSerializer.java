@@ -38,7 +38,7 @@ import org.apache.synapse.mediators.builtin.CacheMediator;
  */
 public class CacheMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof CacheMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

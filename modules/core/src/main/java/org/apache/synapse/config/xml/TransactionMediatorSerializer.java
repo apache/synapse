@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.transaction.TransactionMediator;
  */
 public class TransactionMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof TransactionMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

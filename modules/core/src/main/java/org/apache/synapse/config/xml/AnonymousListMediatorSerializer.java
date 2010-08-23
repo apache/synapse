@@ -28,21 +28,13 @@ import org.apache.synapse.Mediator;
 public class AnonymousListMediatorSerializer extends AbstractListMediatorSerializer {
 
     /**
-     * To serialize an  anonymous list mediator
+     * To serialize an anonymous list mediator
      *
-     * @param parent
      * @param m
      * @return OMElement
      */
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
-        
-        if (!(m instanceof AnonymousListMediator)) {
-            handleException("Unsupported mediator passed in for serialization : " + m.getType());
-        } else {
-            AnonymousListMediator mediator = (AnonymousListMediator) m;
-            serializeChildren(parent, mediator.getList());
-        }
-        return parent;
+    public OMElement serializeSpecificMediator(Mediator m) {
+        throw new UnsupportedOperationException("Anonymous list mediator has nothing specific");
     }
 
     public String getMediatorClassName() {

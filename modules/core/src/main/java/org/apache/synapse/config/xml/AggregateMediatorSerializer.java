@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
  */
 public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         AggregateMediator mediator = null;
         if (!(m instanceof AggregateMediator)) {
@@ -79,10 +79,6 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
                     onCompleteElem, mediator.getOnCompleteSequence().getList());
         }
         aggregator.addChild(onCompleteElem);
-
-        if (parent != null) {
-            parent.addChild(aggregator);
-        }
 
         return aggregator;
     }

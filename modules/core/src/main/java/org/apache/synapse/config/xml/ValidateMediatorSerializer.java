@@ -31,10 +31,9 @@ import java.util.List;
  * 
  * @see ValidateMediatorSerializer
  */
-public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
-        implements MediatorSerializer {
+public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof ValidateMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -72,9 +71,6 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
         OMElement onFail = fac.createOMElement("on-fail", synNS, validate);
         serializeChildren(onFail, mediator.getList());
 
-        if (parent != null) {
-            parent.addChild(validate);
-        }
         return validate;
     }
 

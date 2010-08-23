@@ -45,7 +45,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
         return sequence;
     }
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SequenceMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -80,9 +80,6 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
             }
         }
 
-        if (parent != null) {
-            parent.addChild(sequence);
-        }
         return sequence;
     }
 

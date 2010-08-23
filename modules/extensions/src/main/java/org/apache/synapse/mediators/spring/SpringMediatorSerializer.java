@@ -30,13 +30,12 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
  * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class SpringMediatorSerializer extends AbstractMediatorSerializer
-        implements MediatorSerializer {
+public class SpringMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final OMNamespace sprNS =
             fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE+"/spring", "spring");
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SpringMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -60,9 +59,6 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer
 
         // TODO add support for src attribute - or replace with a reg key!
 
-        if (parent != null) {
-            parent.addChild(spring);
-        }
         return spring;
     }
 

@@ -33,7 +33,7 @@ import org.apache.synapse.mediators.eip.sample.SamplingThrottleMediator;
  */
 public class SamplingThrottleMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement omElement, Mediator mediator) {
+    public OMElement serializeSpecificMediator(Mediator mediator) {
         OMElement samplerElem = fac.createOMElement("sampler", synNS);
         saveTracingState(samplerElem, mediator);
 
@@ -60,10 +60,6 @@ public class SamplingThrottleMediatorSerializer extends AbstractMediatorSerializ
         } else {
             handleException("Couldn't find the target for the sampler. " +
                     "Target is mandatory for a sampler");
-        }
-
-        if (omElement != null) {
-            omElement.addChild(samplerElem);
         }
 
         return samplerElem;

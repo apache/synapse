@@ -1,0 +1,8 @@
+<rewrite xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+    <rule>
+        <condition>
+            <match type="url" fragment="host" regex="foo"/>
+        </condition>
+        <action fragment="host" value="bar"/>            
+    </rule>
+</rewrite>

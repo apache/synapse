@@ -21,6 +21,8 @@ package org.apache.synapse.mediators;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.xml.URLRewriteMediatorFactory;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.commons.evaluators.EqualEvaluator;
 import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
@@ -28,6 +30,8 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axis2.addressing.EndpointReference;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,6 +57,32 @@ public class URLRewriteTest extends TestCase {
         }
     }
 
+    public void testMediateWithFactory() throws Exception {
+        String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                "    <rule>" +
+                "        <condition>" +
+                "            <match type=\"url\" fragment=\"host\" regex=\"wso2.org\"/>" +
+                "        </condition>" +
+                "        <action fragment=\"host\" value=\"wso2.com\"/>" +
+                "        <action fragment=\"port\" value=\"9443\"/>" +
+                "        <action fragment=\"protocol\" value=\"https\"/>" +
+                "    </rule>" +
+                "</rewrite>";
+        URLRewriteMediatorFactory fac = new URLRewriteMediatorFactory();
+        Mediator mediator = fac.createMediator(AXIOMUtil.stringToOM(xml));
+
+        org.apache.axis2.context.MessageContext mc =
+                new org.apache.axis2.context.MessageContext();
+        SynapseConfiguration config = new SynapseConfiguration();
+        SynapseEnvironment env = new Axis2SynapseEnvironment(config);
+        MessageContext synMc = new Axis2MessageContext(mc, config, env);
+        synMc.setProperty("prop1", "ref1");
+        synMc.setTo(new EndpointReference("http://wso2.org:9763/services/MyService"));
+
+        mediator.mediate(synMc);
+        System.out.println(synMc.getTo().getAddress());
+    }
+
     public void testMediate() throws Exception {
         org.apache.axis2.context.MessageContext mc =
                 new org.apache.axis2.context.MessageContext();
@@ -64,12 +94,16 @@ public class URLRewriteTest extends TestCase {
         URLRewriteMediator mediator = new URLRewriteMediator();
 
         RewriteRule r1 = new RewriteRule();
-        r1.setValue("http://localhost:8080/");
+        RewriteAction a1 = new RewriteAction();
+        a1.setValue("http://localhost:8080/");
+        r1.addRewriteAction(a1);
         mediator.addRule(r1);
 
         RewriteRule r2 = new RewriteRule();
-        r2.setValue("/services/TestService");
-        r2.setFragmentIndex(URLRewriteMediator.PATH);
+        RewriteAction a2 = new RewriteAction();
+        a2.setValue("/services/TestService");
+        a2.setFragmentIndex(URLRewriteMediator.PATH);
+        r2.addRewriteAction(a2);
         mediator.addRule(r2);
 
         EqualEvaluator eval = new EqualEvaluator();
@@ -78,9 +112,11 @@ public class URLRewriteTest extends TestCase {
         eval.setTextRetriever(txtRtvr);
         eval.setValue("8080");
         RewriteRule r3 = new RewriteRule();
+        RewriteAction a3 = new RewriteAction();
         r3.setCondition(eval);
-        r3.setXpath(new SynapseXPath("get-property('prop1')"));
-        r3.setFragmentIndex(URLRewriteMediator.REF);
+        a3.setXpath(new SynapseXPath("get-property('prop1')"));
+        a3.setFragmentIndex(URLRewriteMediator.REF);
+        r3.addRewriteAction(a3);
         mediator.addRule(r3);
 
         mediator.mediate(synMc);

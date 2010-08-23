@@ -48,6 +48,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     /** Hold the logical name of an endpoint */
     private String endpointName = null;
 
+    /** Hold the description of an endpoint */
+    private String description = null;
+
     /** The parent endpoint for this endpoint */
     private Endpoint parentEndpoint = null;
 
@@ -138,6 +141,14 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     public void setAnonymous(boolean anonymous) {
         this.anonymous = anonymous;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 
     public String toString() {

@@ -64,6 +64,9 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
 
     private static final String ENDPOINT_NAME_PREFIX = "endpoint_";
 
+    private static final QName DESCRIPTION_Q
+            = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
+
     /**
      * Core method which is exposed for the external use, and this will find the proper
      * {@link EndpointFactory} and create the endpoint which is of the format {@link Endpoint}.
@@ -106,13 +109,18 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     /**
      *  Make sure that the endpoints created by the factory has a name
      * 
-     * @param epConfig          OMElement conatining the endpoint configuration.
+     * @param epConfig          OMElement containing the endpoint configuration.
      * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
      * @return Endpoint implementation for the given configuration.
      */
     private Endpoint createEndpointWithName(OMElement epConfig, boolean anonymousEndpoint) {
         
         Endpoint ep = createEndpoint(epConfig, anonymousEndpoint);
+        OMElement descriptionElem = epConfig.getFirstChildWithName(DESCRIPTION_Q);
+        if (descriptionElem != null) {
+            ep.setDescription(descriptionElem.getText());
+        }
+
         // if the endpoint doesn't have a name we will generate a unique name.
         if (anonymousEndpoint && ep.getName() == null) {
             String uuid = UUIDGenerator.getUUID();

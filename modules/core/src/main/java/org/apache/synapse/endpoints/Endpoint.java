@@ -21,6 +21,8 @@ package org.apache.synapse.endpoints;
 
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Nameable;
+import org.apache.synapse.SynapseArtifact;
 
 import java.util.List;
 
@@ -33,7 +35,7 @@ import java.util.List;
  * endpoint url. Endpoints may contain zero or more endpoints in them and build up a hierarchical
  * structure of endpoints.
  */
-public interface Endpoint extends ManagedLifecycle {
+public interface Endpoint extends ManagedLifecycle, SynapseArtifact, Nameable {
 
     /**
      * Sends the message context according to an endpoint specific behavior.
@@ -60,21 +62,6 @@ public interface Endpoint extends ManagedLifecycle {
      *                       callback.
      */
     public void setParentEndpoint(Endpoint parentEndpoint);
-
-    /**
-     * Returns the name of the endpoint.
-     *
-     * @return Endpoint name.
-     */
-    public String getName();
-
-    /**
-     * Sets the name of the endpoint. Local registry use this name as the key for storing the
-     * endpoint.
-     *
-     * @param name Name for the endpoint.
-     */
-    public void setName(String name);
 
     /**
      * An event notification whenever endpoint invocation is successful

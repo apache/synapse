@@ -781,6 +781,38 @@ synapse.sh -sample &lt;n&gt;</pre>
       here</a>.
     </p>
     <p/>
+    <h2 id="json">
+      Configuring Synapse for JSON Support
+    </h2>
+    <p/>
+    <p>
+      <a href="http://json.org">JSON</a> is a lightweight data-interchange format.
+      It can be used as an alternative to the XML or SOAP. To enable the JSON support
+      in Synapse, following two jar files should be deployed into the 'lib' directory
+      of Synapse.
+    </p>
+    <ul>
+        <li><a href="http://repo1.maven.org/maven2/org/apache/axis2/axis2-saaj">axis2-saaj.jar</a></li>
+        <li><a href="http://jettison.codehaus.org/Download">jettison.jar</a></li>
+    </ul>
+    <p>
+      Having deployed the necessary libraries you should now register the JSON message
+      builder and formatter with Synapse. Open up 'repository/conf/axis2.xml' file
+      of Synapse and add the following two entries under the 'messageBuilders' and
+      'messageFormatters' sections respectively.
+    </p>
+    <pre>
+      &lt;messageBuilder contentType="application/json"
+                         class="org.apache.axis2.json.JSONOMBuilder"/&gt;
+
+      &lt;messageFormatter contentType="application/json"
+                         class="org.apache.axis2.json.JSONMessageFormatter"/&gt;
+    </pre>
+    <p>
+      If you are planning to run sample 440, you should also add the above two entries
+      to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.
+    </p>    
+    <p/>
     <h2 id="derby">
       Setting up Derby database server
     </h2>

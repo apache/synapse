@@ -61,7 +61,7 @@ public class JSONClient {
         String trpUrl = getProperty("trpurl", null);
         String prxUrl = getProperty("prxurl", null);
         String repo = getProperty("repository", "client_repo");
-        String symbol = getProperty("symbol", "WSO2");
+        String symbol = getProperty("symbol", "IBM");
 
         if (repo != null && !"null".equals(repo)) {
             configContext =

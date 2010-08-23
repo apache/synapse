@@ -17,6 +17,9 @@ import java.io.*;
  * is divided into a given number of fixed size chunks that are allocated
  * on demand. Since a temporary file may be created it is mandatory to
  * call {@link #release()} to discard the temporary data.
+ *
+ * @deprecated this class is deprecated and will be removed from the next release,
+ * please use the {@link org.apache.axiom.util.blob.OverflowBlob} from axiom instead
  */
 @Deprecated
 public class TemporaryData {

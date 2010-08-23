@@ -35,7 +35,6 @@ import org.apache.axis2.addressing.EndpointReference;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.io.InputStream;
 
 public class URLRewriteTest extends TestCase {
 
@@ -60,10 +59,13 @@ public class URLRewriteTest extends TestCase {
 
     public void testMediateWithFactory() throws Exception {
         String xml =
-                "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" inProperty=\"inputURL\">" +
                 "    <rule>" +
                 "        <condition>" +
-                "            <match type=\"url\" fragment=\"host\" regex=\"wso2.org\"/>" +
+                "            <and>" +
+                "               <match type=\"url\" fragment=\"host\" regex=\"wso2.org\"/>" +
+                "               <match type=\"url\" fragment=\"port\" regex=\"9763\"/>" +
+                "            </and>" +
                 "        </condition>" +
                 "        <action fragment=\"host\" value=\"wso2.com\"/>" +
                 "        <action fragment=\"port\" value=\"9443\"/>" +
@@ -82,7 +84,8 @@ public class URLRewriteTest extends TestCase {
         SynapseEnvironment env = new Axis2SynapseEnvironment(config);
         MessageContext synMc = new Axis2MessageContext(mc, config, env);
         synMc.setProperty("foo", "/esb");
-        synMc.setTo(new EndpointReference("http://wso2.org:9763/services/MyService"));
+        synMc.setProperty("inputURL", "http://wso2.org:9763/services/MyService");
+        //synMc.setTo(new EndpointReference("http://wso2.org:9763/services/MyService"));
 
         mediator.mediate(synMc);
         System.out.println(synMc.getTo().getAddress());

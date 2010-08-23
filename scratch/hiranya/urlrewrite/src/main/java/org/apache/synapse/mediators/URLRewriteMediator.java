@@ -42,14 +42,16 @@ public class URLRewriteMediator extends AbstractMediator {
     public static final int REF         = 6;
 
     private List<RewriteRule> rules = new ArrayList<RewriteRule>();
+    private String inputProperty;
 
     public boolean mediate(MessageContext messageContext) {
         Object[] fragments = newFragmentSet();
         URI uri;
 
-        if (messageContext.getTo() != null) {
+        String address = getInputAddress(messageContext);
+        if (address != null) {
             try {
-                uri = new URI(messageContext.getTo().getAddress());
+                uri = new URI(address);
                 fragments[0] = uri.getScheme();
                 fragments[1] = uri.getUserInfo();
                 fragments[2] = uri.getHost();
@@ -59,7 +61,7 @@ public class URLRewriteMediator extends AbstractMediator {
                 fragments[6] = uri.getFragment();
 
             } catch (URISyntaxException e) {
-                handleException("Malformed URI in the To header", e, messageContext);
+                handleException("Malformed URI in the input address field", e, messageContext);
                 return false;
             }
         } else {
@@ -74,6 +76,18 @@ public class URLRewriteMediator extends AbstractMediator {
 
         messageContext.setTo(new EndpointReference(uri.toString()));
         return true;
+    }
+
+    private String getInputAddress(MessageContext messageContext) {
+        if (inputProperty != null) {
+            Object prop = messageContext.getProperty(inputProperty);
+            if (prop != null && prop instanceof String) {
+                return (String) prop;
+            }
+        } else if (messageContext.getTo() != null) {
+            return messageContext.getTo().getAddress();
+        }
+        return null;
     }
 
     private Object[] newFragmentSet() {
@@ -119,5 +133,13 @@ public class URLRewriteMediator extends AbstractMediator {
 
     public void addRule(RewriteRule rule) {
         rules.add(rule);
+    }
+
+    public String getInputProperty() {
+        return inputProperty;
+    }
+
+    public void setInputProperty(String inputProperty) {
+        this.inputProperty = inputProperty;
     }
 }

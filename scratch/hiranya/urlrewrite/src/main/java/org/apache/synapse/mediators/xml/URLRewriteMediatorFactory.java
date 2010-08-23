@@ -42,7 +42,13 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
 
     public Mediator createMediator(OMElement element) {
         Iterator rules = element.getChildrenWithName(new QName("rule"));
+        String inputProperty = element.getAttributeValue(new QName("inProperty"));
+
         URLRewriteMediator mediator = new URLRewriteMediator();
+        if (inputProperty != null) {
+            mediator.setInputProperty(inputProperty);    
+        }
+
         while (rules.hasNext()) {
             RewriteRule rule = parseRule((OMElement) rules.next());
             mediator.addRule(rule);

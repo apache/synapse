@@ -87,11 +87,14 @@ public class RewriteAction {
                     break;
 
                 case ACTION_PREPEND:
-                    fragments[fragmentIndex] = result + fragments[fragmentIndex];
+                    fragments[fragmentIndex] = result +
+                            (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "");
                     break;
 
                 case ACTION_APPEND:
-                    fragments[fragmentIndex] = fragments[fragmentIndex] + result;
+                    fragments[fragmentIndex] =
+                            (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "") +
+                                    result;
                     break;
             }
         }

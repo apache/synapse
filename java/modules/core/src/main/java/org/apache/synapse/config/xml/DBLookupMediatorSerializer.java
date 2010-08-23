@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.db.DBLookupMediator;
  */
 public class DBLookupMediatorSerializer extends AbstractDBMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DBLookupMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -41,9 +41,6 @@ public class DBLookupMediatorSerializer extends AbstractDBMediatorSerializer {
         saveTracingState(dbLookup,mediator);
         serializeDBInformation(mediator, dbLookup);
 
-        if (parent != null) {
-            parent.addChild(dbLookup);
-        }
         return dbLookup;
     }
 

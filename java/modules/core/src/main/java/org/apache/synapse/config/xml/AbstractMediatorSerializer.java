@@ -64,13 +64,16 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
      * Serializes the given mediator into XML element. This method handles
      * adding the common information from the respective mediators to the element it get by
      * delegating the mediator specific serialization to the
-     * {@link #serializeSpecificMediator(org.apache.axiom.om.OMElement,
-     * org.apache.synapse.Mediator)} method, which has tobe implemented by the
-     * respective mediators</p>
+     * {@link #serializeSpecificMediator(org.apache.synapse.Mediator)} method, which has tobe
+     * implemented by the respective mediators</p>
+     *
+     * <p>It is treating the {@link org.apache.synapse.config.xml.AnonymousListMediator} as a
+     * special case and calls it's children serialization, since there is nothing specific to be
+     * serialized in that case</p>
      *
      * <p>This method has been marked as <code>final</code> to avoid mistakenly overwriting
-     * this method instead of the {@link #serializeSpecificMediator(org.apache.axiom.om.OMElement,
-     * org.apache.synapse.Mediator)} by the sub classes
+     * this method instead of the {@link #serializeSpecificMediator(org.apache.synapse.Mediator)}
+     * by the sub classes
      *
      * @param parent the OMElement to which the serialization should be attached
      * @param m mediator to be serialized
@@ -78,24 +81,35 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
      */
     public final OMElement serializeMediator(OMElement parent, Mediator m) {
 
-        OMElement elem = serializeSpecificMediator(parent, m);
-        if (m.getDescription() != null) {
-            OMElement descriptionElem = fac.createOMElement(DESCRIPTION_Q);
-            descriptionElem.setText(m.getDescription());
-            elem.addChild(descriptionElem);
+        if (m instanceof AnonymousListMediator) {
+            ((AnonymousListMediatorSerializer) this).serializeChildren(parent,
+                    ((AnonymousListMediator) m).getList());
+            return parent;
+        } else {
+
+            OMElement elem = serializeSpecificMediator(m);
+            if (m.getDescription() != null) {
+                OMElement descriptionElem = fac.createOMElement(DESCRIPTION_Q);
+                descriptionElem.setText(m.getDescription());
+                elem.addChild(descriptionElem);
+            }
+
+            if (parent != null) {
+                parent.addChild(elem);
+            }
+            return elem;
         }
-        return elem;
+
     }
 
     /**
      * Specific mediator factory implementations should implement this method to build the
      * {@link org.apache.synapse.Mediator} by the given XML configuration
      *
-     * @param parent element to which the serialized element is attached to as the child
      * @param m mediator to be serialized
      * @return serialized element of the mediator
      */
-    protected abstract OMElement serializeSpecificMediator(OMElement parent, Mediator m);
+    protected abstract OMElement serializeSpecificMediator(Mediator m);
 
     /**
      * Perform common functions and finalize the mediator serialization.

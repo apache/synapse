@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.filters.SwitchMediator;
  */
 public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SwitchMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -72,9 +72,7 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
                 switchMed.addChild(caseDefaultElem);
             }
         }
-        if (parent != null) {
-            parent.addChild(switchMed);
-        }
+        
         return switchMed;
     }
 

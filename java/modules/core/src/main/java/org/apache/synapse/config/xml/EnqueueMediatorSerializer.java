@@ -26,7 +26,7 @@ import org.apache.synapse.mediators.builtin.EnqueueMediator;
 
 public class EnqueueMediatorSerializer extends AbstractMediatorSerializer{
 
-    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(Mediator m) {
         assert m instanceof EnqueueMediator :
                 "Unsupported mediator passed in for serialization : " + m.getType();
 
@@ -50,10 +50,6 @@ public class EnqueueMediatorSerializer extends AbstractMediatorSerializer{
 
         enqueue.addAttribute(fac.createOMAttribute(
                 "priority", nullNS, mediator.getPriority() + ""));
-
-        if (parent != null) {
-            parent.addChild(enqueue);
-        }
 
         return enqueue;
     }

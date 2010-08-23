@@ -59,7 +59,7 @@ public class URLRewriteTest extends TestCase {
 
     public void testMediateWithFactory() throws Exception {
         String xml =
-                "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" inProperty=\"inputURL\">" +
+                "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" outProperty=\"outputURL\">" +
                 "    <rule>" +
                 "        <condition>" +
                 "            <and>" +
@@ -85,10 +85,11 @@ public class URLRewriteTest extends TestCase {
         MessageContext synMc = new Axis2MessageContext(mc, config, env);
         synMc.setProperty("foo", "/esb");
         synMc.setProperty("inputURL", "http://wso2.org:9763/services/MyService");
-        //synMc.setTo(new EndpointReference("http://wso2.org:9763/services/MyService"));
+        synMc.setTo(new EndpointReference("http://wso2.org:9763/services/MyService"));
 
         mediator.mediate(synMc);
         System.out.println(synMc.getTo().getAddress());
+        System.out.println(synMc.getProperty("outputURL"));
     }
 
     public void testMediate() throws Exception {

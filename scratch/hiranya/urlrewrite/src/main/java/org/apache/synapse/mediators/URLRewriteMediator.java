@@ -43,6 +43,7 @@ public class URLRewriteMediator extends AbstractMediator {
 
     private List<RewriteRule> rules = new ArrayList<RewriteRule>();
     private String inputProperty;
+    private String outputProperty;
 
     public boolean mediate(MessageContext messageContext) {
         Object[] fragments = newFragmentSet();
@@ -74,7 +75,11 @@ public class URLRewriteMediator extends AbstractMediator {
             uri = getURI(fragments, messageContext);
         }
 
-        messageContext.setTo(new EndpointReference(uri.toString()));
+        if (outputProperty != null) {
+            messageContext.setProperty(outputProperty, uri.toString());
+        } else {
+            messageContext.setTo(new EndpointReference(uri.toString()));
+        }
         return true;
     }
 
@@ -141,5 +146,13 @@ public class URLRewriteMediator extends AbstractMediator {
 
     public void setInputProperty(String inputProperty) {
         this.inputProperty = inputProperty;
+    }
+
+    public String getOutputProperty() {
+        return outputProperty;
+    }
+
+    public void setOutputProperty(String outputProperty) {
+        this.outputProperty = outputProperty;
     }
 }

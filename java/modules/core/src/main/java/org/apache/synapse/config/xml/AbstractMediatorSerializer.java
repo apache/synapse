@@ -87,6 +87,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
             return parent;
         } else {
 
+            // delegate the specific serializations to it's serializer
             OMElement elem = serializeSpecificMediator(m);
             if (m.getDescription() != null) {
                 OMElement descriptionElem = fac.createOMElement(DESCRIPTION_Q);
@@ -94,6 +95,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
                 elem.addChild(descriptionElem);
             }
 
+            // attach the serialized element to the parent
             if (parent != null) {
                 parent.addChild(elem);
             }

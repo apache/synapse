@@ -21,6 +21,7 @@ package org.apache.synapse.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.SynapseException;
 
 import java.net.URL;
@@ -30,7 +31,7 @@ import java.net.URL;
  *
  * @see org.apache.synapse.config.SynapseConfiguration#localRegistry
  */
-public class Entry {
+public class Entry implements SynapseArtifact {
 
     private static final Log log = LogFactory.getLog(Entry.class);
 
@@ -50,6 +51,8 @@ public class Entry {
     private long expiryTime;
     /** The name of the file where this entry is defined */
     private String fileName;
+    /** The description of the local entry */
+    private String description;
 
     public Entry() {}
     
@@ -153,6 +156,14 @@ public class Entry {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public boolean isExpired() {

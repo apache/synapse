@@ -19,6 +19,7 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
@@ -39,6 +40,9 @@ import java.net.MalformedURLException;
 public class EntryFactory implements XMLToObjectMapper {
 
     private static Log log = LogFactory.getLog(EntryFactory.class);
+
+    private static final QName DESCRIPTION_Q
+            = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
     public static Entry createEntry(OMElement elem) {
 
@@ -78,6 +82,12 @@ public class EntryFactory implements XMLToObjectMapper {
                 	entry.setValue(elem.getText());
 				}
             }
+
+            OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
+            if (descriptionElem != null) {
+                entry.setDescription(descriptionElem.getText());
+            }
+
             return entry;
         }
     }

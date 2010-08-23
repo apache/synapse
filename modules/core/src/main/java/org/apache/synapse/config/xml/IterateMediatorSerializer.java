@@ -57,7 +57,7 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
      *
      * @return OMElement describing the serialized configuration of the IterateMediator
      */
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof IterateMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

@@ -50,6 +50,8 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
     protected static final QName PROP_Q
         = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
+    protected static final QName DESCRIPTION_Q
+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "description");
 
     /**
      * A constructor that makes subclasses pick up the correct logger
@@ -57,6 +59,43 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
     protected AbstractMediatorSerializer() {
         log = LogFactory.getLog(this.getClass());
     }
+
+    /**
+     * Serializes the given mediator into XML element. This method handles
+     * adding the common information from the respective mediators to the element it get by
+     * delegating the mediator specific serialization to the
+     * {@link #serializeSpecificMediator(org.apache.axiom.om.OMElement,
+     * org.apache.synapse.Mediator)} method, which has tobe implemented by the
+     * respective mediators</p>
+     *
+     * <p>This method has been marked as <code>final</code> to avoid mistakenly overwriting
+     * this method instead of the {@link #serializeSpecificMediator(org.apache.axiom.om.OMElement,
+     * org.apache.synapse.Mediator)} by the sub classes
+     *
+     * @param parent the OMElement to which the serialization should be attached
+     * @param m mediator to be serialized
+     * @return the serialized Element
+     */
+    public final OMElement serializeMediator(OMElement parent, Mediator m) {
+
+        OMElement elem = serializeSpecificMediator(parent, m);
+        if (m.getDescription() != null) {
+            OMElement descriptionElem = fac.createOMElement(DESCRIPTION_Q);
+            descriptionElem.setText(m.getDescription());
+            elem.addChild(descriptionElem);
+        }
+        return elem;
+    }
+
+    /**
+     * Specific mediator factory implementations should implement this method to build the
+     * {@link org.apache.synapse.Mediator} by the given XML configuration
+     *
+     * @param parent element to which the serialized element is attached to as the child
+     * @param m mediator to be serialized
+     * @return serialized element of the mediator
+     */
+    protected abstract OMElement serializeSpecificMediator(OMElement parent, Mediator m);
 
     /**
      * Perform common functions and finalize the mediator serialization.

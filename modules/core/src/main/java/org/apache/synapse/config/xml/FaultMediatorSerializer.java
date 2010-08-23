@@ -37,7 +37,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final String POX = "pox";
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof FaultMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

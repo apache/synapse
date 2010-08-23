@@ -34,7 +34,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
  */
 public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof PropertyMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

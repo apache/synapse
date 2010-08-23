@@ -35,10 +35,11 @@ import javax.xml.namespace.QName;
  * @see XSLTMediatorFactory
  */
 public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
+
     private static final QName ATTRIBUTE_Q
                 = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof XSLTMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

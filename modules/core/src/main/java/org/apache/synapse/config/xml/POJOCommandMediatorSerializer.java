@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.ext.POJOCommandMediator;
  */
 public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeMediator(OMElement parent, Mediator m) {
+    public OMElement serializeSpecificMediator(OMElement parent, Mediator m) {
         
         if (!(m instanceof POJOCommandMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

@@ -46,20 +46,20 @@ public class RewriteRule {
         if (condition != null) {
             String uriString = getURIString(fragments);
             EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
-            if (log.isDebugEnabled()) {
-                log.debug("Evaluating condition with URI: " + uriString);
+            if (log.isTraceEnabled()) {
+                log.trace("Evaluating condition with URI: " + uriString);
             }
 
             try {
                 if (!condition.evaluate(ctx)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Condition evaluated to 'false' - Skipping the current action");
+                    if (log.isTraceEnabled()) {
+                        log.trace("Condition evaluated to 'false' - Skipping the current action");
                     }
                     return;
                 }
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Condition evaluated to 'true' - Performing the stated action");
+                if (log.isTraceEnabled()) {
+                    log.trace("Condition evaluated to 'true' - Performing the stated action");
                 }
             } catch (EvaluatorException e) {
                 log.warn("Error while evaluating the condition - Skipping the rule as it failed", e);
@@ -87,13 +87,13 @@ public class RewriteRule {
     private String getURIString(Object[] fragments) {
         try {
             return new URI(
-                    (String) fragments[0],
-                    (String) fragments[1],
-                    (String) fragments[2],
-                    (Integer) fragments[3],
-                    (String) fragments[4],
-                    (String) fragments[5],
-                    (String) fragments[6]).toString();
+                    (String) fragments[URLRewriteMediator.PROTOCOL],
+                    (String) fragments[URLRewriteMediator.USER_INFO],
+                    (String) fragments[URLRewriteMediator.HOST],
+                    (Integer) fragments[URLRewriteMediator.PORT],
+                    (String) fragments[URLRewriteMediator.PATH],
+                    (String) fragments[URLRewriteMediator.QUERY],
+                    (String) fragments[URLRewriteMediator.REF]).toString();
         } catch (URISyntaxException e) {
             String msg = "Error while constructing the URI from fragments";
             log.error(msg, e);

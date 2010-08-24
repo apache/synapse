@@ -21,6 +21,7 @@ package org.apache.synapse.mediators;
 
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,11 +32,11 @@ public class RewriteAction {
 
     private static final Log log = LogFactory.getLog(RewriteAction.class);
 
-    public static final int ACTION_SET = 0;
-    public static final int ACTION_APPEND = 1;
-    public static final int ACTION_PREPEND = 2;
-    public static final int ACTION_REPLACE = 3;
-    public static final int ACTION_REMOVE = 4;
+    public static final int ACTION_SET      = 0;
+    public static final int ACTION_APPEND   = 1;
+    public static final int ACTION_PREPEND  = 2;
+    public static final int ACTION_REPLACE  = 3;
+    public static final int ACTION_REMOVE   = 4;
 
     private String value;
     private SynapseXPath xpath;
@@ -56,25 +57,27 @@ public class RewriteAction {
                 URI uri;
                 if (result != null) {
                     uri = new URI(result);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Setting the URI to: " + result);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Setting the URI to: " + result);
                     }
                 } else {
                     uri = new URI("");
                 }
 
-                fragments[0] = uri.getScheme();
-                fragments[1] = uri.getUserInfo();
-                fragments[2] = uri.getHost();
-                fragments[3] = uri.getPort();
+                fragments[URLRewriteMediator.PROTOCOL] = uri.getScheme();
+                fragments[URLRewriteMediator.USER_INFO] = uri.getUserInfo();
+                fragments[URLRewriteMediator.HOST] = uri.getHost();
+                fragments[URLRewriteMediator.PORT] = uri.getPort();
                 // The uri.getPath() return the empty string for empty URIs
                 // We are better off setting it to null
-                fragments[4] = "".equals(uri.getPath()) ? null : uri.getPath();
-                fragments[5] = uri.getQuery();
-                fragments[6] = uri.getFragment();
+                fragments[URLRewriteMediator.PATH] = "".equals(uri.getPath()) ? null : uri.getPath();
+                fragments[URLRewriteMediator.QUERY] = uri.getQuery();
+                fragments[URLRewriteMediator.REF] = uri.getFragment();
 
             } catch (URISyntaxException e) {
-                return;
+                String msg = "Error while setting the URL to: " + result;
+                log.error(msg, e);
+                throw new SynapseException(msg, e);
             }
         } else if (fragmentIndex == URLRewriteMediator.PORT) {
             // When setting the port we must first convert the value into an integer
@@ -92,8 +95,7 @@ public class RewriteAction {
                     break;
 
                 case ACTION_APPEND:
-                    str =
-                            (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "") +
+                    str = (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "") +
                                     result;
                     break;
 

@@ -17,7 +17,7 @@
  *
  */
 
-package org.apache.synapse.mediators.xml;
+package org.apache.synapse.mediators.config.xml;
 
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;

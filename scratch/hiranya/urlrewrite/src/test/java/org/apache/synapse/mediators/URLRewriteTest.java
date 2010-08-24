@@ -22,7 +22,7 @@ package org.apache.synapse.mediators;
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.xml.URLRewriteMediatorFactory;
+import org.apache.synapse.mediators.config.xml.URLRewriteMediatorFactory;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.commons.evaluators.EqualEvaluator;
 import org.apache.synapse.commons.evaluators.source.URLTextRetriever;

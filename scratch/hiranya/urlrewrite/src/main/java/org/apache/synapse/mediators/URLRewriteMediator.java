@@ -65,15 +65,14 @@ public class URLRewriteMediator extends AbstractMediator {
                 handleException("Malformed URI in the input address field", e, messageContext);
                 return false;
             }
-        } else {
-            uri = getURI(fragments, messageContext);
         }
 
         Map<String, String> headers = getHeaders(messageContext);
         for (RewriteRule r : rules) {
-            r.rewrite(fragments, messageContext, uri.toString(), headers);
-            uri = getURI(fragments, messageContext);
+            r.rewrite(fragments, messageContext, headers);
         }
+
+        uri = getURI(fragments, messageContext);
 
         if (outputProperty != null) {
             messageContext.setProperty(outputProperty, uri.toString());

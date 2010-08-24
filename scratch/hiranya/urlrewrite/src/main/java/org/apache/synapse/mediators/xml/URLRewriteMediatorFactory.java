@@ -40,7 +40,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName REWRITE_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "rewrite");
 
-    public Mediator createMediator(OMElement element) {
+    public Mediator createSpecificMediator(OMElement element) {
         Iterator rules = element.getChildrenWithName(new QName("rule"));
         String inputProperty = element.getAttributeValue(new QName("inProperty"));
         String outputProperty = element.getAttributeValue(new QName("outProperty"));

@@ -23,12 +23,15 @@ import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class RewriteRule {
 
@@ -37,10 +40,11 @@ public class RewriteRule {
     private Evaluator condition;
     private List<RewriteAction> actions = new ArrayList<RewriteAction>();
 
-    public void rewrite(Object[] fragments, MessageContext messageContext, String uriString,
+    public void rewrite(Object[] fragments, MessageContext messageContext,
                         Map<String,String> headers) {
 
         if (condition != null) {
+            String uriString = getURIString(fragments);
             EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
             if (log.isDebugEnabled()) {
                 log.debug("Evaluating condition with URI: " + uriString);
@@ -78,5 +82,22 @@ public class RewriteRule {
 
     public void addRewriteAction(RewriteAction action) {
         actions.add(action);
+    }
+
+    private String getURIString(Object[] fragments) {
+        try {
+            return new URI(
+                    (String) fragments[0],
+                    (String) fragments[1],
+                    (String) fragments[2],
+                    (Integer) fragments[3],
+                    (String) fragments[4],
+                    (String) fragments[5],
+                    (String) fragments[6]).toString();
+        } catch (URISyntaxException e) {
+            String msg = "Error while constructing the URI from fragments";
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
     }
 }

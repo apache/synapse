@@ -32,72 +32,56 @@ import java.util.ArrayList;
 
 public class URLRewriteMediator extends AbstractMediator {
 
-    public static final int FULL_URI    = -1;
-    public static final int PROTOCOL    = 0;
-    public static final int USER_INFO   = 1;
-    public static final int HOST        = 2;
-    public static final int PORT        = 3;
-    public static final int PATH        = 4;
-    public static final int QUERY       = 5;
-    public static final int REF         = 6;
-
     private List<RewriteRule> rules = new ArrayList<RewriteRule>();
     private String inputProperty;
     private String outputProperty;
 
     public boolean mediate(MessageContext messageContext) {
-        Object[] fragments = newFragmentSet();
-        URI uri;
-
-        String address = getInputAddress(messageContext);
-        if (address != null) {
-            try {
-                uri = new URI(address);
-                fragments[0] = uri.getScheme();
-                fragments[1] = uri.getUserInfo();
-                fragments[2] = uri.getHost();
-                fragments[3] = uri.getPort();
-                fragments[4] = uri.getPath();
-                fragments[5] = uri.getQuery();
-                fragments[6] = uri.getFragment();
-
-            } catch (URISyntaxException e) {
-                handleException("Malformed URI in the input address field", e, messageContext);
-                return false;
-            }
+        URIFragments fragments;
+        URI inputURI = getInputAddress(messageContext);
+        if (inputURI != null) {
+            fragments = new URIFragments(inputURI);
+        } else {
+            fragments = new URIFragments();
         }
 
         Map<String, String> headers = getHeaders(messageContext);
-        for (RewriteRule r : rules) {
-            r.rewrite(fragments, messageContext, headers);
-        }
 
-        uri = getURI(fragments, messageContext);
+        try {
+            for (RewriteRule r : rules) {
+                r.rewrite(fragments, messageContext, headers);
+            }
 
-        if (outputProperty != null) {
-            messageContext.setProperty(outputProperty, uri.toString());
-        } else {
-            messageContext.setTo(new EndpointReference(uri.toString()));
+            if (outputProperty != null) {
+                messageContext.setProperty(outputProperty, fragments.toURIString());
+            } else {
+                messageContext.setTo(new EndpointReference(fragments.toURIString()));
+            }
+        } catch (URISyntaxException e) {
+            handleException("Error while constructing a URI from the fragments", e, messageContext);
         }
         return true;
     }
 
-    private String getInputAddress(MessageContext messageContext) {
+    private URI getInputAddress(MessageContext messageContext) {
+        String uriString = null;
         if (inputProperty != null) {
             Object prop = messageContext.getProperty(inputProperty);
             if (prop != null && prop instanceof String) {
-                return (String) prop;
+                uriString = (String) prop;
             }
         } else if (messageContext.getTo() != null) {
-            return messageContext.getTo().getAddress();
+            uriString = messageContext.getTo().getAddress();
+        }
+
+        if (uriString != null) {
+            try {
+                return new URI(uriString);
+            } catch (URISyntaxException e) {
+                handleException("Malformed input URI: " + uriString, e, messageContext);
+            }
         }
         return null;
-    }
-
-    private Object[] newFragmentSet() {
-        return new Object[] {
-            null, null, null, -1, null, null, null
-        };
     }
 
     private Map<String, String> getHeaders(MessageContext synCtx) {
@@ -117,22 +101,6 @@ public class URLRewriteMediator extends AbstractMediator {
             }
         }
         return evaluatorHeaders;
-    }
-
-    private URI getURI(Object[] fragments, MessageContext messageContext) {
-        try {
-            return new URI(
-                    (String) fragments[0],
-                    (String) fragments[1],
-                    (String) fragments[2],
-                    (Integer) fragments[3],
-                    (String) fragments[4],
-                    (String) fragments[5],
-                    (String) fragments[6]);
-        } catch (URISyntaxException e) {
-            handleException("Error while constructing the URI from fragments", e, messageContext);
-        }
-        return null;
     }
 
     public void addRule(RewriteRule rule) {

@@ -23,14 +23,12 @@ import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 public class RewriteRule {
@@ -40,11 +38,11 @@ public class RewriteRule {
     private Evaluator condition;
     private List<RewriteAction> actions = new ArrayList<RewriteAction>();
 
-    public void rewrite(Object[] fragments, MessageContext messageContext,
-                        Map<String,String> headers) {
+    public void rewrite(URIFragments fragments, MessageContext messageContext,
+                        Map<String,String> headers) throws URISyntaxException {
 
         if (condition != null) {
-            String uriString = getURIString(fragments);
+            String uriString = fragments.toURIString();
             EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
             if (log.isTraceEnabled()) {
                 log.trace("Evaluating condition with URI: " + uriString);
@@ -82,22 +80,5 @@ public class RewriteRule {
 
     public void addRewriteAction(RewriteAction action) {
         actions.add(action);
-    }
-
-    private String getURIString(Object[] fragments) {
-        try {
-            return new URI(
-                    (String) fragments[URLRewriteMediator.PROTOCOL],
-                    (String) fragments[URLRewriteMediator.USER_INFO],
-                    (String) fragments[URLRewriteMediator.HOST],
-                    (Integer) fragments[URLRewriteMediator.PORT],
-                    (String) fragments[URLRewriteMediator.PATH],
-                    (String) fragments[URLRewriteMediator.QUERY],
-                    (String) fragments[URLRewriteMediator.REF]).toString();
-        } catch (URISyntaxException e) {
-            String msg = "Error while constructing the URI from fragments";
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
-        }
     }
 }

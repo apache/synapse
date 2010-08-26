@@ -144,7 +144,7 @@ public class URLRewriteTest extends TestCase {
         RewriteRule r2 = new RewriteRule();
         RewriteAction a2 = new RewriteAction();
         a2.setValue("/services/TestService");
-        a2.setFragmentIndex(URLRewriteMediator.PATH);
+        a2.setFragmentIndex(URIFragments.PATH);
         r2.addRewriteAction(a2);
         mediator.addRule(r2);
 
@@ -157,7 +157,7 @@ public class URLRewriteTest extends TestCase {
         RewriteAction a3 = new RewriteAction();
         r3.setCondition(eval);
         a3.setXpath(new SynapseXPath("get-property('prop1')"));
-        a3.setFragmentIndex(URLRewriteMediator.REF);
+        a3.setFragmentIndex(URIFragments.REF);
         r3.addRewriteAction(a3);
         mediator.addRule(r3);
 

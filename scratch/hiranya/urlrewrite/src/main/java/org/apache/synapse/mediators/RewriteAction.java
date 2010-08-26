@@ -21,7 +21,6 @@ package org.apache.synapse.mediators;
 
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,10 +40,12 @@ public class RewriteAction {
     private String value;
     private SynapseXPath xpath;
     private String regex;
-    private int fragmentIndex = URLRewriteMediator.FULL_URI;
+    private int fragmentIndex = URIFragments.FULL_URI;
     private int actionType = ACTION_SET;
 
-    public void execute(Object[] fragments, MessageContext messageContext) {
+    public void execute(URIFragments fragments,
+                        MessageContext messageContext) throws URISyntaxException {
+
         String result;
         if (xpath != null) {
             result = xpath.stringValueOf(messageContext);
@@ -52,66 +53,41 @@ public class RewriteAction {
             result = value;
         }
 
-        if (fragmentIndex == URLRewriteMediator.FULL_URI) {
-            try {
-                URI uri;
-                if (result != null) {
-                    uri = new URI(result);
-                    if (log.isTraceEnabled()) {
-                        log.trace("Setting the URI to: " + result);
-                    }
-                } else {
-                    uri = new URI("");
+        if (fragmentIndex == URIFragments.FULL_URI) {
+            URI uri;
+            if (result != null) {
+                uri = new URI(result);
+                if (log.isTraceEnabled()) {
+                    log.trace("Setting the URI to: " + result);
                 }
-
-                fragments[URLRewriteMediator.PROTOCOL] = uri.getScheme();
-                fragments[URLRewriteMediator.USER_INFO] = uri.getUserInfo();
-                fragments[URLRewriteMediator.HOST] = uri.getHost();
-                fragments[URLRewriteMediator.PORT] = uri.getPort();
-                // The uri.getPath() return the empty string for empty URIs
-                // We are better off setting it to null
-                fragments[URLRewriteMediator.PATH] = "".equals(uri.getPath()) ? null : uri.getPath();
-                fragments[URLRewriteMediator.QUERY] = uri.getQuery();
-                fragments[URLRewriteMediator.REF] = uri.getFragment();
-
-            } catch (URISyntaxException e) {
-                String msg = "Error while setting the URL to: " + result;
-                log.error(msg, e);
-                throw new SynapseException(msg, e);
+            } else {
+                uri = new URI("");
             }
-        } else if (fragmentIndex == URLRewriteMediator.PORT) {
+
+            fragments.setFragments(uri);
+
+        } else if (fragmentIndex == URIFragments.PORT) {
             // When setting the port we must first convert the value into an integer
             if (result != null) {
-                fragments[fragmentIndex] = Integer.parseInt(result);
+                fragments.setPort(Integer.parseInt(result));
             } else {
-                fragments[fragmentIndex] = -1;
+                fragments.setPort(-1);
             }
         } else {
             String str;
+            String currentValue = fragments.getStringFragment(fragmentIndex);
+            if (currentValue == null) {
+                currentValue = "";
+            }
+
             switch (actionType) {
-                case ACTION_PREPEND:
-                    str = result +
-                            (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "");
-                    break;
-
-                case ACTION_APPEND:
-                    str = (fragments[fragmentIndex] != null ? fragments[fragmentIndex] : "") +
-                                    result;
-                    break;
-
-                case ACTION_REPLACE:
-                    str = (fragments[fragmentIndex] != null ? (String) fragments[fragmentIndex] : "");
-                    str = str.replaceAll(regex, result);
-                    break;
-
-                case ACTION_REMOVE:
-                    str = null;
-                    break;
-
-                default:
-                    str = result;
+                case ACTION_PREPEND : str = result + currentValue; break;
+                case ACTION_APPEND  : str = currentValue + result; break;
+                case ACTION_REPLACE : str = currentValue.replaceAll(regex, result); break;
+                case ACTION_REMOVE  : str = null; break;
+                default             : str = result;
             }            
-            fragments[fragmentIndex] = str;
+            fragments.setStringFragment(fragmentIndex, str);
         }
     }
 

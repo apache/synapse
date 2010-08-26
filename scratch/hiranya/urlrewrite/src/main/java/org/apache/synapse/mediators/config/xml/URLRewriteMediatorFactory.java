@@ -30,6 +30,7 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.mediators.URLRewriteMediator;
 import org.apache.synapse.mediators.RewriteRule;
 import org.apache.synapse.mediators.RewriteAction;
+import org.apache.synapse.mediators.URIFragments;
 import org.apache.axiom.om.OMElement;
 import org.jaxen.JaxenException;
 
@@ -115,34 +116,29 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
         String fragment = actionElt.getAttributeValue(new QName("fragment"));
         if (fragment != null) {
             if ("protocol".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.PROTOCOL);
+                action.setFragmentIndex(URIFragments.PROTOCOL);
             } else if ("user".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.USER_INFO);
+                action.setFragmentIndex(URIFragments.USER_INFO);
             } else if ("host".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.HOST);
+                action.setFragmentIndex(URIFragments.HOST);
             } else if ("port".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.PORT);
+                action.setFragmentIndex(URIFragments.PORT);
             } else if ("path".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.PATH);
+                action.setFragmentIndex(URIFragments.PATH);
             } else if ("query".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.QUERY);
+                action.setFragmentIndex(URIFragments.QUERY);
             } else if ("ref".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.REF);
+                action.setFragmentIndex(URIFragments.REF);
             } else if ("full".equals(fragment)) {
-                action.setFragmentIndex(URLRewriteMediator.FULL_URI);
+                action.setFragmentIndex(URIFragments.FULL_URI);
             } else {
                 handleException("Unknown URL fragment name: " + fragment);
             }
         } else {
-            action.setFragmentIndex(URLRewriteMediator.FULL_URI);
+            action.setFragmentIndex(URIFragments.FULL_URI);
         }
 
         if (type != null) {
-            if (action.getFragmentIndex() == URLRewriteMediator.FULL_URI ||
-                    action.getFragmentIndex() == URLRewriteMediator.PORT) {
-                handleException("type attribute is not allowed for 'port' and 'full URI' rewrites");    
-            }
-
             if ("set".equals(type)) {
                 action.setActionType(RewriteAction.ACTION_SET);
             } else if ("append".equals(type)) {

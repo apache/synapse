@@ -82,7 +82,7 @@ public class URLRewriteMediatorSerializer extends AbstractMediatorSerializer {
         if (a.getValue() != null) {
             action.addAttribute("value", a.getValue(), null);
         } else if (a.getXpath() != null) {
-            action.addAttribute("xpath", a.getValue(), null);
+            action.addAttribute("xpath", a.getXpath().toString(), null);
         }
 
         if (a.getRegex() != null) {

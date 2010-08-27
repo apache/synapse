@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.transform.url;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.xml.URLRewriteMediatorFactory;
 import org.apache.synapse.commons.evaluators.EqualEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.synapse.commons.evaluators.MatchEvaluator;
@@ -28,6 +29,8 @@ import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
 
 import java.util.regex.Pattern;
 
@@ -188,5 +191,47 @@ public class URLRewriteMediatorTest extends TestCase {
         mediator.mediate(msgCtx);
 
         assertEquals(targetURL, msgCtx.getProperty("outURL"));
+    }
+
+    public void testFullRewriteScenario1() throws Exception {
+        String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">\n" +
+                "    <rule>\n" +
+                "        <condition>\n" +
+                "            <and>\n" +
+                "                <equal type=\"url\" fragment=\"protocol\" value=\"http\"/>\n" +
+                "                <equal type=\"url\" fragment=\"host\" value=\"test.org\"/>\n" +
+                "            </and>\n" +
+                "        </condition>\n" +
+                "        <action value=\"https\" fragment=\"protocol\"/>\n" +
+                "        <action value=\"test.com\" fragment=\"host\"/>\n" +
+                "        <action value=\"9443\" fragment=\"port\"/>\n" +
+                "    </rule>\n" +
+                "    <rule>\n" +
+                "        <condition>\n" +
+                "            <not>\n" +
+                "                <match type=\"url\" fragment=\"path\" regex=\"/services/.*\"/>\n" +
+                "            </not>\n" +
+                "        </condition>\n" +
+                "        <action value=\"/services\" type=\"prepend\" fragment=\"path\"/>\n" +
+                "    </rule>\n" +
+                "    <rule>\n" +
+                "        <condition>\n" +
+                "            <match type=\"url\" fragment=\"path\" regex=\".*/MyService\"/>\n" +
+                "        </condition>        \n" +
+                "        <action fragment=\"path\" value=\"StockQuoteService\" regex=\"MyService\" type=\"replace\"/>\n" +
+                "        <action fragment=\"ref\" value=\"id\"/>\n" +
+                "    </rule>\n" +
+                "</rewrite>";
+
+        OMElement element = AXIOMUtil.stringToOM(xml);
+        URLRewriteMediator mediator = (URLRewriteMediator) new URLRewriteMediatorFactory().
+                createMediator(element);
+
+        MessageContext msgCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>");
+        msgCtx.setTo(new EndpointReference("http://test.org:9763/MyService"));
+        mediator.mediate(msgCtx);
+
+        assertEquals("https://test.com:9443/services/StockQuoteService#id",
+                msgCtx.getTo().getAddress());
     }
 }

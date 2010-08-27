@@ -21,13 +21,10 @@ package org.apache.synapse.mediators.transform.url;
 
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -53,11 +50,9 @@ public class URLRewriteMediator extends AbstractMediator {
             fragments = new URIFragments();
         }
 
-        Map<String, String> headers = getHeaders(messageContext);
-
         try {
             for (RewriteRule r : rules) {
-                r.rewrite(fragments, messageContext, headers);
+                r.rewrite(fragments, messageContext);
             }
 
             if (outputProperty != null) {
@@ -90,25 +85,6 @@ public class URLRewriteMediator extends AbstractMediator {
             }
         }
         return null;
-    }
-
-    private Map<String, String> getHeaders(MessageContext synCtx) {
-        Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
-        org.apache.axis2.context.MessageContext axis2MessageCtx =
-                axis2smc.getAxis2MessageContext();
-        Object headers = axis2MessageCtx.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        Map<String, String> evaluatorHeaders = new HashMap<String, String>();
-
-        if (headers != null && headers instanceof Map) {
-            Map headersMap = (Map) headers;
-            for (Object key : headersMap.keySet()) {
-                if (key instanceof String && headersMap.get(key) instanceof String) {
-                    evaluatorHeaders.put((String) key, (String) headersMap.get(key));
-                }
-            }
-        }
-        return evaluatorHeaders;
     }
 
     public void addRule(RewriteRule rule) {

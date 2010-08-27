@@ -25,10 +25,12 @@ import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.net.URISyntaxException;
 
 /**
@@ -47,12 +49,14 @@ public class RewriteRule {
     private Evaluator condition;
     private List<RewriteAction> actions = new ArrayList<RewriteAction>();
 
-    public void rewrite(URIFragments fragments, MessageContext messageContext,
-                        Map<String,String> headers) throws URISyntaxException {
+    public void rewrite(URIFragments fragments,
+                        MessageContext messageContext) throws URISyntaxException {
 
         if (condition != null) {
             String uriString = fragments.toURIString();
+            Map<String, String> headers = getHeaders(messageContext);
             EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
+            
             if (log.isTraceEnabled()) {
                 log.trace("Evaluating condition with URI: " + uriString);
             }
@@ -77,6 +81,25 @@ public class RewriteRule {
         for (RewriteAction action : actions) {
             action.execute(fragments, messageContext);
         }
+    }
+
+    private Map<String, String> getHeaders(MessageContext synCtx) {
+        Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+        org.apache.axis2.context.MessageContext axis2MessageCtx =
+                axis2smc.getAxis2MessageContext();
+        Object headers = axis2MessageCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        Map<String, String> evaluatorHeaders = new HashMap<String, String>();
+
+        if (headers != null && headers instanceof Map) {
+            Map headersMap = (Map) headers;
+            for (Object key : headersMap.keySet()) {
+                if (key instanceof String && headersMap.get(key) instanceof String) {
+                    evaluatorHeaders.put((String) key, (String) headersMap.get(key));
+                }
+            }
+        }
+        return evaluatorHeaders;
     }
 
     public Evaluator getCondition() {

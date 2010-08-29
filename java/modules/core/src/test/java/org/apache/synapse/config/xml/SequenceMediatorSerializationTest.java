@@ -47,8 +47,20 @@ public class SequenceMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(xml, sequenceMediatorSerializer));
     }
 
+    public void testSequenceMediatorSerializationSenarioTwoWithDescription() throws Exception {
+        String xml = "<sequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"namedsequence\"  onError=\"ErrorHandler\"><description>Test documentation</description><header name=\"To\" value=\"http://localhost:9000/services/TestService\"/><send/></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+
     public void testSequenceMediatorSerializationSenarioThree() throws Exception {
         String xml = "<sequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"sequenceone\"></sequence>";
+        assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
+        assertTrue(serialization(xml, sequenceMediatorSerializer));
+    }
+
+    public void testSequenceMediatorSerializationSenarioThreeWithDescription() throws Exception {
+        String xml = "<sequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"sequenceone\"><description>Test description</description></sequence>";
         assertTrue(serialization(xml, sequenceMediatorFactory, sequenceMediatorSerializer));
         assertTrue(serialization(xml, sequenceMediatorSerializer));
     }

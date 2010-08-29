@@ -60,6 +60,10 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             seqMediator.setErrorHandler(e.getAttributeValue());
         }
         processAuditStatus(seqMediator, elem);
+        OMElement descElem = elem.getFirstChildWithName(DESCRIPTION_Q);
+        if (descElem != null) {
+            seqMediator.setDescription(descElem.getText());
+        }
         addChildren(elem, seqMediator);         
         return seqMediator;
     }

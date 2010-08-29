@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 
 /**
  * Creates an instance of a Spring mediator that refers to the given Spring
- * configuration and bean. Optionally, one could specify an inlined Spring
+ * configuration and bean. Optionally, one could specify an in-lined Spring
  * configuration as opposed to a globally defined Spring configuration
  * <p/>
  * <spring bean="exampleBean1" key="string""/>
@@ -37,8 +37,7 @@ import javax.xml.namespace.QName;
 @SuppressWarnings({"UnusedDeclaration"})
 public class SpringMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName TAG_NAME =
-            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE + "/spring", "spring");
+    private static final QName TAG_NAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "spring");
 
     /**
      * Create a Spring mediator instance referring to the bean and configuration given

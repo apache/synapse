@@ -94,7 +94,7 @@ public class ScriptMediator extends AbstractMediator {
      */
     private CompiledScript compiledScript;
     /**
-     * The Invocable script. Only used for external scripts
+     * The Invokable script. Only used for external scripts
      */
     private Invocable invocableScript;
     /**
@@ -125,7 +125,7 @@ public class ScriptMediator extends AbstractMediator {
      * Create a script mediator for the given language and given script entry key and function
      *
      * @param language       the BSF language
-     * @param includeKeysMap Inclued script keys
+     * @param includeKeysMap Include script keys
      * @param key            the registry entry key to load the script
      * @param function       the function to be invoked
      */
@@ -224,8 +224,8 @@ public class ScriptMediator extends AbstractMediator {
      *
      * @param synCtx the message context
      * @return script result
-     * @throws ScriptException       For any errors , when comiple , run the script
-     * @throws NoSuchMethodException If the funcation is not defined in the script
+     * @throws ScriptException       For any errors , when compile, run the script
+     * @throws NoSuchMethodException If the function is not defined in the script
      */
     private Object mediateWithExternalScript(MessageContext synCtx)
             throws ScriptException, NoSuchMethodException {
@@ -239,7 +239,7 @@ public class ScriptMediator extends AbstractMediator {
      *
      * @param synCtx message context
      * @return true, or the script return value
-     * @throws ScriptException For any errors , when comiple , run the script
+     * @throws ScriptException For any errors , when compile , run the script
      */
     private Object mediateForInlineScript(MessageContext synCtx) throws ScriptException {
 
@@ -273,11 +273,11 @@ public class ScriptMediator extends AbstractMediator {
                 }
                 compiledScript = ((Compilable) scriptEngine).compile(scriptSourceCode);
             } else {
-                // do nothing. If the script enging doesn't support Compilable then
+                // do nothing. If the script engine doesn't support Compilable then
                 // the inline script will be evaluated on each invocation
                 if (log.isDebugEnabled()) {
                     log.debug("Script engine does not support the Compilable interface, " +
-                            "inlined script would be evaluated on each invocation..");
+                            "in-lined script would be evaluated on each invocation..");
                 }
             }
 
@@ -290,7 +290,7 @@ public class ScriptMediator extends AbstractMediator {
      * Prepares the mediator for the invocation of an external script
      *
      * @param synCtx MessageContext script
-     * @throws ScriptException For any errors , when comiple the script
+     * @throws ScriptException For any errors , when compile the script
      */
     protected synchronized void prepareExternalScript(MessageContext synCtx)
             throws ScriptException {

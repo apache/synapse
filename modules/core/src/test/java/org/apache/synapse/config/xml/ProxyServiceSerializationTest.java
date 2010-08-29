@@ -55,7 +55,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
     public void testProxyServiceSerializationSenarioThree() throws Exception {
         String inputXml = "<proxy xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
             "name=\"name\" startOnLoad=\"true\"  transports=\"http\"><description>" +
-            "description</description><target><inSequence onError=\"ref\"><send/></inSequence>" +
+            "description</description><target><inSequence onError=\"ref\"><description>Test documentation</description><send/></inSequence>" +
             "<outSequence><send/></outSequence></target><publishWSDL  key=\"key\"></publishWSDL>" +
             "<policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);

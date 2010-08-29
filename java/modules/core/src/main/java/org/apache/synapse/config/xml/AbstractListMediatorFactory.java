@@ -36,13 +36,15 @@ public abstract class AbstractListMediatorFactory extends AbstractMediatorFactor
         Iterator it = el.getChildElements();
         while (it.hasNext()) {
             OMElement child = (OMElement) it.next();
-            Mediator med = MediatorFactoryFinder.getInstance().getMediator(child);
-            if (med != null) {
-                m.addChild(med);
-            } else {
-                String msg = "Unknown mediator : " + child.getLocalName();
-                log.error(msg);
-                throw new SynapseException(msg);
+            if (!DESCRIPTION_Q.equals(child.getQName())) { // neglect the description tag
+                Mediator med = MediatorFactoryFinder.getInstance().getMediator(child);
+                if (med != null) {
+                    m.addChild(med);
+                } else {
+                    String msg = "Unknown mediator : " + child.getLocalName();
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
             }
         }
     }

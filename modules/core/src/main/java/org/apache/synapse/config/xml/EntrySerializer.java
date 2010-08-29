@@ -53,7 +53,17 @@ public class EntrySerializer {
      * @return OMElement representing the entry
      */
     public static OMElement serializeEntry(Entry entry, OMElement parent) {
+
         OMElement entryElement = fac.createOMElement("localEntry", synNS);
+        
+        if (entry.getDescription() != null) {
+
+            OMElement descriptionElem = fac.createOMElement(
+                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
+            descriptionElem.setText(entry.getDescription());
+            entryElement.addChild(descriptionElem);
+        }
+
         entryElement.addAttribute(fac.createOMAttribute(
                 "key", nullNS, entry.getKey().trim()));
         int type = entry.getType();
@@ -80,14 +90,6 @@ public class EntrySerializer {
             return null;
         } else {
             handleException("Entry type undefined");
-        }
-
-        if (entry.getDescription() != null) {
-
-            OMElement descriptionElem = fac.createOMElement(
-                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
-            descriptionElem.setText(entry.getDescription());
-            entryElement.addChild(descriptionElem);
         }
 
         if (parent != null) {

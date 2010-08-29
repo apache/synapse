@@ -17,8 +17,7 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"
-             xmlns:spring="http://synapse.apache.org/ns/2010/04/configuration/spring">
+<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <parameter name="root">file:./../../repository/</parameter>
@@ -29,8 +28,8 @@
                 src="file:./../../repository/conf/sample/resources/spring/springsample.xml"/>
 
     <sequence name="main">
-        <spring:spring bean="springtest" key="conf/sample/resources/spring/springsample.xml"/>
-        <spring:spring bean="springtest" key="springconfig2"/>
+        <spring bean="springtest" key="conf/sample/resources/spring/springsample.xml"/>
+        <spring bean="springtest" key="springconfig2"/>
     </sequence>
 
 </definitions>

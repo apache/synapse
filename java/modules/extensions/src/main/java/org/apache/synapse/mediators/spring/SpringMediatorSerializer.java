@@ -22,9 +22,8 @@ package org.apache.synapse.mediators.spring;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.config.xml.MediatorSerializer;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 
 /**
  * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>
@@ -33,7 +32,7 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 public class SpringMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final OMNamespace sprNS =
-            fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE+"/spring", "spring");
+            fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "spring");
 
     public OMElement serializeSpecificMediator(Mediator m) {
 

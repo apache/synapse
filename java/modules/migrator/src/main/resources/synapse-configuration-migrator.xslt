@@ -19,16 +19,18 @@
   -->
 
 <!--
-This is the synapse migration xslt which will migrate the configuration from the 1.x version to the 2.x compatible version 
+This is the synapse migration xslt which will migrate the configuration from the 1.x
+version to the 2.x compatible version
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:syn="http://ws.apache.org/ns/synapse"
+                xmlns:spring="http://ws.apache.org/ns/synapse/spring"
                 xmlns:synNew="http://synapse.apache.org/ns/2010/04/configuration"
                 exclude-result-prefixes="syn">
 
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
-    <xsl:template match="syn:*" priority="0">
+    <xsl:template match="syn:* | spring:*" priority="0">
         <xsl:call-template name="convertNS"/>
     </xsl:template>
 

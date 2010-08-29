@@ -38,6 +38,11 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
                     "onError", nullNS, mediator.getErrorHandler()));
         }
         saveTracingState(sequence, mediator);
+        if (mediator.getDescription() != null) {
+            OMElement descriptionElem = fac.createOMElement(DESCRIPTION_Q);
+            descriptionElem.setText(mediator.getDescription());
+            sequence.addChild(descriptionElem);
+        }
         serializeChildren(sequence, mediator.getList());
         if (parent != null) {
             parent.addChild(sequence);

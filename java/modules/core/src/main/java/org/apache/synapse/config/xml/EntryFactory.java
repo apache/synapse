@@ -54,6 +54,13 @@ public class EntryFactory implements XMLToObjectMapper {
         } else {
 
             Entry entry = new Entry(key.getAttributeValue());
+
+            OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
+            if (descriptionElem != null) {
+                entry.setDescription(descriptionElem.getText());
+                descriptionElem.detach();
+            }
+
             String src  = elem.getAttributeValue(
                     new QName(XMLConfigConstants.NULL_NAMESPACE, "src"));
 
@@ -81,11 +88,6 @@ public class EntryFactory implements XMLToObjectMapper {
                     entry.setType(Entry.INLINE_TEXT);
                 	entry.setValue(elem.getText());
 				}
-            }
-
-            OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
-            if (descriptionElem != null) {
-                entry.setDescription(descriptionElem.getText());
             }
 
             return entry;

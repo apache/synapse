@@ -23,16 +23,16 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.java2wsdl.Java2WSDLConstants;
-import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEvent;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
+import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfigurable;
@@ -43,12 +43,11 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.PolicyInfo;
-import org.apache.synapse.util.resolver.CustomXmlSchemaURIResolver;
 import org.apache.synapse.util.resolver.CustomWSDLLocator;
+import org.apache.synapse.util.resolver.CustomXmlSchemaURIResolver;
 import org.apache.synapse.util.resolver.ResourceMap;
 import org.xml.sax.InputSource;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -83,7 +82,8 @@ import java.util.*;
  *    </parameter>?
  * </proxy-service>
  */
-public class ProxyService implements AspectConfigurable {
+@SuppressWarnings({"UnusedDeclaration"})
+public class ProxyService implements AspectConfigurable, SynapseArtifact {
 
     private static final Log log = LogFactory.getLog(ProxyService.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
@@ -132,11 +132,11 @@ public class ProxyService implements AspectConfigurable {
      */
     private SequenceMediator targetInLineInSequence = null;
     /**
-     * The inlined definition of the target out-sequence, if defined
+     * The in-lined definition of the target out-sequence, if defined
      */
     private SequenceMediator targetInLineOutSequence = null;
     /**
-     * The inlined definition of the target fault-sequence, if defined
+     * The in-lined definition of the target fault-sequence, if defined
      */
     private SequenceMediator targetInLineFaultSequence = null;
     /**
@@ -152,7 +152,7 @@ public class ProxyService implements AspectConfigurable {
      */
     private URI wsdlURI;
     /**
-     * The inlined representation of the service WSDL, if defined inline
+     * The in-lined representation of the service WSDL, if defined inline
      */
     private Object inLineWSDL;
     /**
@@ -406,7 +406,7 @@ public class ProxyService implements AspectConfigurable {
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
 
-                        // this is to clear the bindinigs and ports already in the WSDL so that the
+                        // this is to clear the bindings and ports already in the WSDL so that the
                         // service will generate the bindings on calling the printWSDL otherwise
                         // the WSDL which will be shown is same as the original WSDL except for the
                         // service name

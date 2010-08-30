@@ -21,6 +21,9 @@ package org.apache.synapse.startup;
 
 /**
  * Defines the Task for a SimpleQuartzStartup.
+ *
+ * @deprecated use the interface {@link org.apache.synapse.task.Task} instead
  */
+@Deprecated
 public interface Task extends org.apache.synapse.task.Task {
 }

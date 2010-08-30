@@ -40,6 +40,7 @@ import java.util.*;
 /**
  * An abstract base class for all Endpoint implementations
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public abstract class AbstractEndpoint extends FaultHandler implements Endpoint, PropertyInclude {
 
     protected Log log;

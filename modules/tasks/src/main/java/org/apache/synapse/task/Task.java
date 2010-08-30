@@ -19,7 +19,7 @@
 package org.apache.synapse.task;
 
 /**
- * Represents a executable Task
+ * Represents an executable Task
  */
 public interface Task {
     /**

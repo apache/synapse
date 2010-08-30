@@ -45,7 +45,8 @@ import java.util.*;
  * The SynapseConfiguration holds the global configuration for a Synapse
  * instance.
  */
-public class SynapseConfiguration implements ManagedLifecycle {
+@SuppressWarnings({"UnusedDeclaration"})
+public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
     private static final Log log = LogFactory.getLog(SynapseConfiguration.class);
 
@@ -122,6 +123,11 @@ public class SynapseConfiguration implements ManagedLifecycle {
     private Map<String, PriorityExecutor> executors = new HashMap<String, PriorityExecutor>();
 
     /**
+     * Description/documentation of the configuration
+     */
+    private String description = null;
+
+    /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
      * key a runtime exception is thrown.
      *
@@ -131,7 +137,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      *            a Sequence mediator
      */
     public synchronized void addSequence(String key, Mediator mediator) {
-        assertAlreadyExists(key,SEQUENCE);
+        assertAlreadyExists(key, SEQUENCE);
         localRegistry.put(key, mediator);
 
         for (SynapseObserver o : observers) {
@@ -153,7 +159,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
      * @deprecated
      */
     public void addSequence(String key, Entry entry) {
-        assertAlreadyExists(key,ENTRY);
+        assertAlreadyExists(key, ENTRY);
         localRegistry.put(key, entry);
     }
 
@@ -223,8 +229,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
             }
         }
 
-        assertEnrtyNull(entry, key);
+        assertEntryNull(entry, key);
 
+        //noinspection ConstantConditions
         if (entry.getMapper() == null) {
             entry.setMapper(MediatorFactoryFinder.getInstance());
         }
@@ -576,8 +583,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
             }
         }
 
-        assertEnrtyNull(entry, key);
+        assertEntryNull(entry, key);
 
+        //noinspection ConstantConditions
         if (entry.getMapper() == null) {
             entry.setMapper(XMLToEndpointMapper.getInstance());
         }
@@ -1144,7 +1152,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
     /**
      * Get the executors map
-     * @return exectors map, stored as name of executor and executor
+     * @return executors map, stored as name of executor and executor
      */
     public Map<String, PriorityExecutor> getPriorityExecutors() {
         return executors;
@@ -1166,18 +1174,37 @@ public class SynapseConfiguration implements ManagedLifecycle {
         return executor;
     }
 
+    /**
+     * Sets the description of the configuration
+     *
+     * @param description tobe set to the artifact
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Gets the configuration description
+     *
+     * @return description of the configuration
+     */
+    public String getDescription() {
+        return description;
+    }
+
     private void assertAlreadyExists(String key, String type) {
 
         if (key == null || "".equals(key)) {
             handleException("Given entry key is empty or null.");
         }
 
+        //noinspection ConstantConditions
         if (localRegistry.containsKey(key.trim())) {
             handleException("Duplicate " + type + " definition for key : " + key);
         }
     }
 
-    private void assertEnrtyNull(Entry entry, String key) {
+    private void assertEntryNull(Entry entry, String key) {
         if (entry == null) {
             handleException("Cannot locate an either local or remote enrty for key : " + key);
         }

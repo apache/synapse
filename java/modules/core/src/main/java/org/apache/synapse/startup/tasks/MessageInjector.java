@@ -30,7 +30,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.startup.Task;
+import org.apache.synapse.task.Task;
 import org.apache.synapse.util.PayloadHelper;
 
 /**

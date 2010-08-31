@@ -50,17 +50,19 @@ public class SynapseConfigurationBuilder {
     public static SynapseConfiguration getDefaultConfiguration() {
         // programatically create an empty configuration which just log and drop the messages 
         SynapseConfiguration config = SynapseConfigUtils.newConfiguration();
-        SequenceMediator mainmediator = new SequenceMediator();
-        mainmediator.addChild(new LogMediator());
-        mainmediator.addChild(new DropMediator());
-        mainmediator.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
-        config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, mainmediator);
-        SequenceMediator faultmediator = new SequenceMediator();
+        SequenceMediator mainMediator = new SequenceMediator();
+        mainMediator.addChild(new LogMediator());
+        mainMediator.addChild(new DropMediator());
+        mainMediator.setName(SynapseConstants.MAIN_SEQUENCE_KEY);
+        config.addSequence(SynapseConstants.MAIN_SEQUENCE_KEY, mainMediator);
+        SequenceMediator faultMediator = new SequenceMediator();
         LogMediator fault = new LogMediator();
         fault.setLogLevel(LogMediator.FULL);
-        faultmediator.addChild(fault);
-        faultmediator.setName(SynapseConstants.FAULT_SEQUENCE_KEY);
-        config.addSequence(SynapseConstants.FAULT_SEQUENCE_KEY, faultmediator);
+        faultMediator.addChild(fault);
+        faultMediator.setName(SynapseConstants.FAULT_SEQUENCE_KEY);
+        config.addSequence(SynapseConstants.FAULT_SEQUENCE_KEY, faultMediator);
+        config.setDescription("The default configuration of the ESB, that is created " +
+                "programatically at the startup");
         return config;
     }
 

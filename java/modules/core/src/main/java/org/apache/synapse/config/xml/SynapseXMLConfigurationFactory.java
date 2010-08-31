@@ -57,9 +57,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         SynapseConfiguration config = SynapseConfigUtils.newConfiguration();               
         config.setDefaultQName(definitions.getQName());
 
-        Iterator iter = definitions.getChildren();
-        while (iter.hasNext()) {
-            Object o = iter.next();
+        Iterator itr = definitions.getChildren();
+        while (itr.hasNext()) {
+            Object o = itr.next();
             if (o instanceof OMElement) {
                 OMElement elt = (OMElement) o;
                 if (XMLConfigConstants.SEQUENCE_ELT.equals(elt.getQName())) {
@@ -85,6 +85,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineExecutor(config,  elt);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt);
+                } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
+                    config.setDescription(elt.getText());
                 } else {
                     handleException("Invalid configuration element at the top level, one of \'sequence\', " +
                             "\'endpoint\', \'proxy\', \'eventSource\', \'localEntry\', \'priorityExecutor\' " +

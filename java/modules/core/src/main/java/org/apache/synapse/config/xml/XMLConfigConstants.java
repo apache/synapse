@@ -56,6 +56,7 @@ public class XMLConfigConstants {
 
     //- configuration language constants -
     public static final QName DEFINITIONS_ELT = new QName(SYNAPSE_NAMESPACE, "definitions");
+    public static final QName DESCRIPTION_ELT = new QName(SYNAPSE_NAMESPACE, "description");
     public static final QName SEQUENCE_ELT    = new QName(SYNAPSE_NAMESPACE, "sequence");
     public static final QName ENDPOINT_ELT    = new QName(SYNAPSE_NAMESPACE, "endpoint");
     public static final QName ENTRY_ELT       = new QName(SYNAPSE_NAMESPACE, "localEntry");

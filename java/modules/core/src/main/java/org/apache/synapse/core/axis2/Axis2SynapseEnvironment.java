@@ -31,6 +31,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -55,6 +56,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private ConfigurationContext configContext;
     private ExecutorService executorService;
     private boolean initialized = false;
+    private SynapseTaskManager taskManager;
 
     /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector = new StatisticsCollector();
@@ -87,6 +89,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 SynapseThreadPool.SYNAPSE_THREAD_GROUP),
             synCfg.getProperty(SynapseThreadPool.SYN_THREAD_IDPREFIX,
                 SynapseThreadPool.SYNAPSE_THREAD_ID_PREFIX));
+
+        taskManager = new SynapseTaskManager();                
     }
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
@@ -334,6 +338,16 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      */
     public SynapseConfiguration getSynapseConfiguration() {
         return this.synapseConfig;
+    }
+
+    /**
+     * Retrive the {@link org.apache.synapse.task.SynapseTaskManager} from the
+     * <code>envioronment</code>.
+     *
+     * @return SynapseTaskManager of this synapse environment
+     */
+    public SynapseTaskManager getTaskManager() {
+        return this.taskManager;
     }
 
     /**

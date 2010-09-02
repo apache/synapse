@@ -21,6 +21,7 @@ package org.apache.synapse.core;
 
 import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -123,4 +124,12 @@ public interface SynapseEnvironment {
      * @return configuration of the synapse
      */
     public SynapseConfiguration getSynapseConfiguration();
+
+    /**
+     * Retrive the {@link org.apache.synapse.task.SynapseTaskManager} from the
+     * <code>envioronment</code>.
+     *
+     * @return SynapseTaskManager of this synapse environment
+     */
+    public SynapseTaskManager getTaskManager();
 }

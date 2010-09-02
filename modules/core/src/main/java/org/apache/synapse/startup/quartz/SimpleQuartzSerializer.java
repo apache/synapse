@@ -25,8 +25,6 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionSerializer;
-import org.apache.synapse.task.TaskDescriptionRepository;
-import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
 import org.apache.synapse.config.xml.StartupSerializer;
 
 public class SimpleQuartzSerializer implements StartupSerializer {

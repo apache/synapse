@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.task.*;
 
@@ -48,6 +47,8 @@ public class SimpleQuartz extends AbstractStartup {
 
     private TaskDescription taskDescription;
 
+    private SynapseTaskManager taskManager;
+
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
     }
@@ -61,16 +62,15 @@ public class SimpleQuartz extends AbstractStartup {
             return;
         }
 
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
-        if (synapseTaskManager.isInitialized()) {
+        if (taskManager.isInitialized()) {
 
-            TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
+            TaskScheduler taskScheduler = taskManager.getTaskScheduler();
 
             if (taskScheduler != null && taskScheduler.isInitialized()) {
                 taskScheduler.deleteTask(taskDescription.getName(), taskDescription.getGroup());
             }
 
-            TaskDescriptionRepository repository = synapseTaskManager.getTaskDescriptionRepository();
+            TaskDescriptionRepository repository = taskManager.getTaskDescriptionRepository();
             if (repository != null) {
                 repository.removeTaskDescription(taskDescription.getName());
             }
@@ -83,17 +83,19 @@ public class SimpleQuartz extends AbstractStartup {
             handleException("Error while initializing the startup. TaskDescription is null.");
         }
 
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
-        if (!synapseTaskManager.isInitialized()) {
+        taskManager = synapseEnvironment.getTaskManager();
+
+        if (!taskManager.isInitialized()) {
             log.warn("SynapseTaskManager is not properly initialized. Initializing now with " +
                     "default parameters.");
-            synapseTaskManager.init(null, null);
+            taskManager.init(null, null);
         }
 
-        TaskDescriptionRepository repository = synapseTaskManager.getTaskDescriptionRepository();
+        TaskDescriptionRepository repository = taskManager.getTaskDescriptionRepository();
 
         if (repository == null) {
             handleException("Task Description Repository cannot be found");
+            return;
         }
 
         repository.addTaskDescription(taskDescription);
@@ -134,7 +136,7 @@ public class SimpleQuartz extends AbstractStartup {
 
         try {
 
-            TaskScheduler taskScheduler = synapseTaskManager.getTaskScheduler();
+            TaskScheduler taskScheduler = taskManager.getTaskScheduler();
             if (taskScheduler != null) {
                 if (!taskScheduler.isInitialized()) {
                     taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());

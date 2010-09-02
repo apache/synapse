@@ -85,6 +85,10 @@ public class Axis2SynapseController implements SynapseController {
     /** JMX Adapter */
     private JmxAdapter jmxAdapter;
 
+    private TaskDescriptionRepository taskDescriptionRepository;
+
+    private TaskScheduler taskScheduler;
+
     /**
      * {@inheritDoc}
      *
@@ -127,10 +131,24 @@ public class Axis2SynapseController implements SynapseController {
                         + " invalid, expected an Axis2 ConfigurationContext instance");
             }
         }
+
+        if (serverContextInformation != null) {
+            // we retrieve these properties to initialize the task scheduler in the envrionment
+            Object repo =
+                    serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
+            Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
+
+            if (repo != null && (repo instanceof TaskDescriptionRepository)) {
+                this.taskDescriptionRepository = (TaskDescriptionRepository) repo;
+            }
+
+            if (taskScheduler != null && (taskScheduler instanceof TaskScheduler)) {
+                this.taskScheduler = (TaskScheduler) taskScheduler;
+            }
+        }
         
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
         deployMediatorExtensions();
-        initTaskManager(serverContextInformation);
         initDataSourceHelper(serverContextInformation);
         initSharedSecretCallbackHandlerCache(serverContextInformation);
         initialized = true;
@@ -225,7 +243,7 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.pauseSenders();
 
         // put tasks on hold
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        SynapseTaskManager synapseTaskManager = synapseEnvironment.getTaskManager();
         if (synapseTaskManager.isInitialized()) {
             synapseTaskManager.pauseAll();
         }
@@ -245,7 +263,7 @@ public class Axis2SynapseController implements SynapseController {
         transportHelper.resumeSenders();
 
         // resume tasks
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+        SynapseTaskManager synapseTaskManager = synapseEnvironment.getTaskManager();
         if (synapseTaskManager.isInitialized()) {
             synapseTaskManager.resumeAll();
         }
@@ -259,7 +277,7 @@ public class Axis2SynapseController implements SynapseController {
     public void stop() {
         try {
             // stop tasks
-            SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+            SynapseTaskManager synapseTaskManager = synapseEnvironment.getTaskManager();
             if (synapseTaskManager.isInitialized()) {
                 synapseTaskManager.cleanup();
             }
@@ -347,6 +365,8 @@ public class Axis2SynapseController implements SynapseController {
                     "' to the Axis2 configuration : " + e.getMessage(), e);
 
         }
+
+        synapseEnvironment.getTaskManager().init(taskDescriptionRepository, taskScheduler);
         synapseConfiguration.init(synapseEnvironment);
         synapseEnvironment.setInitialized(true);
         return synapseEnvironment;
@@ -466,7 +486,7 @@ public class Axis2SynapseController implements SynapseController {
             }
 
             int runningTasks = 0;
-            SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
+            SynapseTaskManager synapseTaskManager = synapseEnvironment.getTaskManager();
             if (synapseTaskManager.isInitialized()) {
                 runningTasks = synapseTaskManager.getTaskScheduler().getRunningTaskCount();
                 if (runningTasks > 0) {
@@ -702,30 +722,7 @@ public class Axis2SynapseController implements SynapseController {
         if (handler instanceof SecretCallbackHandler) {
             cache.setSecretCallbackHandler((SecretCallbackHandler) handler);
         }
-    }
-
-    /**
-     *  Initialize Task Manager - with any existing  TaskDescriptionRepository and TaskScheduler
-     *  or without those
-     * @param serverContextInformation  ServerContextInformation instance
-     */
-    private void initTaskManager(ServerContextInformation serverContextInformation) {
-
-        SynapseTaskManager synapseTaskManager = SynapseTaskManager.getInstance();
-
-        Object repo = 
-            serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
-        Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
-
-        if (repo != null && !(repo instanceof TaskDescriptionRepository)) {
-            handleFatal("Invalid property value specified for TaskDescriptionRepository");
-        } else if (taskScheduler != null && !(taskScheduler instanceof TaskScheduler)) {
-            handleFatal("Invalid property value specified for TaskScheduler");
-        } else {
-            synapseTaskManager.init(
-                    (TaskDescriptionRepository) repo, (TaskScheduler) taskScheduler);
-        }
-    }
+    }    
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
         if (axisConf.getMessageBuilder("text/plain") == null) {

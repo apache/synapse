@@ -30,8 +30,6 @@ import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionFactory;
-import org.apache.synapse.task.TaskDescriptionRepositoryFactory;
-import org.apache.synapse.task.TaskDescriptionRepository;
 
 /**
  * &lt;task class="org.my.synapse.Task" name="string"&gt;
@@ -61,8 +59,9 @@ public class SimpleQuartzFactory implements StartupFactory {
             TaskDescription taskDescription =
                     TaskDescriptionFactory.createTaskDescription(el,
                             XMLConfigConstants.SYNAPSE_OMNAMESPACE);
-            if(taskDescription == null){
-                handleException("Invalid task - Task description can not be created  form :"+el);
+            if (taskDescription == null) {
+                handleException("Invalid task - Task description can not be created  from :" + el);
+                return null;
             }          
             simpleQuartz.setName(taskDescription.getName());
             simpleQuartz.setTaskDescription(taskDescription);

@@ -35,13 +35,7 @@ public class SynapseTaskManager {
     private TaskScheduler taskScheduler;
     private boolean initialized = false;
 
-    private static final SynapseTaskManager INSTANCE = new SynapseTaskManager();
-
-    public static SynapseTaskManager getInstance() {
-        return INSTANCE;
-    }
-
-    private SynapseTaskManager() {
+    public SynapseTaskManager() {
         if (log.isDebugEnabled()) {
             log.debug("Created the SynapseTaskManager singleton instance");
         }
@@ -114,7 +108,7 @@ public class SynapseTaskManager {
     public void cleanup() {
         assertInitialized();
         log.info("Shutting down the task manager");
-        taskDescriptionRepository.clear();
+        /*taskDescriptionRepository.clear();*/
         taskScheduler.shutDown();
         initialized = false;
     }

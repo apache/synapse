@@ -37,6 +37,11 @@ public abstract class AbstractStartup implements Startup {
     protected String fileName;
 
     /**
+     * Holds the description of the startup
+     */
+    protected String description;
+
+    /**
      * This will return the name of the startup
      *
      * @return String representing the name
@@ -64,7 +69,6 @@ public abstract class AbstractStartup implements Startup {
         return fileName;
     }
 
-
     /**
      * Set the name of the file name where this startup is defined
      *
@@ -72,5 +76,23 @@ public abstract class AbstractStartup implements Startup {
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    /**
+     * Gets the description of the startup
+     *
+     * @return description of the startup
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of the startup
+     *
+     * @param description tobe set to the artifact
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

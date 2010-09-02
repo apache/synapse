@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 /**
  * This startup interface will be instantiated to create startup tasks.
  */
-public interface Startup extends ManagedLifecycle, Nameable {
+public interface Startup extends ManagedLifecycle, Nameable, SynapseArtifact {
 
     /**
      * This will return the configuration tag QName of the implemented startup

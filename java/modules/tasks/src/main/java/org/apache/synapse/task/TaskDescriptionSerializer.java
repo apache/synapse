@@ -69,6 +69,11 @@ public class TaskDescriptionSerializer {
                     NULL_OMNS, pinnedServersStr));
         }
 
+        if (taskDescription.getDescription() != null) {
+            OMElement descElem = omFactory.createOMElement("description", targetNamespace, task);
+            descElem.setText(taskDescription.getDescription());
+        }
+
         OMElement el = omFactory.createOMElement("trigger", targetNamespace, task);
         if (taskDescription.getInterval() == 1 && taskDescription.getCount() == 1) {
             el.addAttribute("once", "true", NULL_OMNS);

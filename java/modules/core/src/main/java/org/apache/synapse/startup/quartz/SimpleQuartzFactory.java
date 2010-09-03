@@ -65,6 +65,7 @@ public class SimpleQuartzFactory implements StartupFactory {
             }          
             simpleQuartz.setName(taskDescription.getName());
             simpleQuartz.setTaskDescription(taskDescription);
+            simpleQuartz.setDescription(taskDescription.getDescription());
             return simpleQuartz;
         } else {
             handleException("Syntax error in the task : wrong QName for the task");

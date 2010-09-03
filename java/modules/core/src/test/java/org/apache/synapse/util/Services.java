@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.utils;
+package org.apache.synapse.util;
 
 public class Services {
     public int commodity(String commodity) {

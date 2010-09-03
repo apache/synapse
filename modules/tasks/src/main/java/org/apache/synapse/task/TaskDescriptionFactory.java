@@ -41,6 +41,7 @@ public class TaskDescriptionFactory {
     private final static String TASK = "task";
     private final static String TRIGGER = "trigger";
     private final static String PROPERTY = "property";
+    private static final String DESCRIPTION = "description";
 
     public static TaskDescription createTaskDescription(OMElement el, OMNamespace tagetNamespace) {
 
@@ -79,6 +80,11 @@ public class TaskDescriptionFactory {
             } else {
                 log.warn("TaskClass cannot be found." +
                         "Task implementation may need a task class if there is no default one");
+            }
+            
+            OMElement descElem = el.getFirstChildWithName(createQName(DESCRIPTION, tagetNamespace));
+            if (descElem != null) {
+                taskDescription.setDescription(descElem.getText());
             }
 
             // set pinned server list

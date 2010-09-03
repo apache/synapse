@@ -41,6 +41,7 @@ public class TaskDescription {
     private final List<String> pinnedServers = new ArrayList<String>();
     private final Set<OMElement> xmlProperties = new HashSet<OMElement>();
     private String name;
+    private String description;
     private String group = DEFAULT_GROUP;
     private Date startTime;
     private Date endTime;
@@ -138,6 +139,14 @@ public class TaskDescription {
 
     public void setVolatility(boolean volatility) {
         this.volatility = volatility;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

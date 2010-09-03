@@ -33,6 +33,7 @@ import org.apache.synapse.task.TaskDescriptionFactory;
 
 /**
  * &lt;task class="org.my.synapse.Task" name="string"&gt;
+ *  &lt;description&gt;description in text&lt;/description&gt;
  *  &lt;property name="stringProp" value="String"/&gt;
  *  &lt;property name="xmlProp"&gt;
  *   &lt;somexml&gt;config&lt;/somexml&gt;

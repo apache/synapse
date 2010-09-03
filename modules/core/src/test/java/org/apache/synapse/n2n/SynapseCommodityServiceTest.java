@@ -32,16 +32,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.engine.MessageReceiver;
-import org.apache.axis2.transport.TransportListener;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ServerManager;
 import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.synapse.utils.Services;
+import org.apache.synapse.util.Services;
 
 import java.util.HashMap;
 import java.util.Iterator;

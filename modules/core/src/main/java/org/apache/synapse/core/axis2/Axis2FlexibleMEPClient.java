@@ -392,7 +392,7 @@ public class Axis2FlexibleMEPClient {
             org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
 
         // if the transport out is explicitly set use it
-        Object o = originalInMsgCtx.getProperty("TRANSPORT_OUT");
+        Object o = originalInMsgCtx.getProperty("TRANSPORT_OUT_DESCRIPTION");
         if (o != null && o instanceof TransportOutDescription) {
             axisOutMsgCtx.setTransportOut((TransportOutDescription) o);
             clientOptions.setTransportOut((TransportOutDescription) o);

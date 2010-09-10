@@ -112,6 +112,11 @@ public class EndpointContext {
         NEXT_RETRY_TIME_KEY = KEY_PREFIX + endpointName + NEXT_RETRY_TIME;
         REMAINING_RETRIES_KEY = KEY_PREFIX + endpointName + REMAINING_RETRIES;
         LAST_SUSPEND_DURATION_KEY = KEY_PREFIX + endpointName + LAST_SUSPEND_DURATION;
+
+        if (isClustered) {
+            //In a clustered environment, we need to set the state of an Endpoint when it is created.
+            cfgCtx.setNonReplicableProperty(STATE_KEY, ST_ACTIVE);
+        }
     }
 
     /**
@@ -225,7 +230,7 @@ public class EndpointContext {
         if (isClustered) {
             Integer state = (Integer) cfgCtx.getPropertyNonReplicable(STATE_KEY);
 
-            if ((state == null) || ((state != ST_ACTIVE) && (state != ST_OFF))) {
+            if ((state != null) && ((state != ST_ACTIVE) && (state != ST_OFF))) {
                 log.info("Endpoint : " + endpointName + " currently " + getStateAsString() +
                         " will now be marked active since it processed its last message");
                 setState(ST_ACTIVE);

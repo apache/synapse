@@ -20,10 +20,12 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
@@ -47,7 +49,15 @@ public class MessageContextCreatorForAxis2 {
             throw new SynapseException(msg);
         }
 
-        return new Axis2MessageContext(axisMsgCtx, synCfg, synEnv);
+        // we should try to get the synapse configuration and environment from
+        // the axis2 configuration.
+        SynapseEnvironment synapseEnvironment = getSynapseEnvironment(axisMsgCtx);
+        SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisMsgCtx);
+        if (synapseConfiguration != null && synapseEnvironment != null) {
+            return new Axis2MessageContext(axisMsgCtx, synapseConfiguration, synapseEnvironment);
+        } else {
+            return new Axis2MessageContext(axisMsgCtx, synCfg, synEnv);
+        }
     }
 
     public static void setSynConfig(SynapseConfiguration synCfg) {
@@ -56,5 +66,19 @@ public class MessageContextCreatorForAxis2 {
 
     public static void setSynEnv(SynapseEnvironment synEnv) {
         MessageContextCreatorForAxis2.synEnv = synEnv;
+    }
+
+    private static SynapseConfiguration getSynapseConfiguration(
+            org.apache.axis2.context.MessageContext axisMsgCtx) {
+        AxisConfiguration axisCfg = axisMsgCtx.getConfigurationContext().getAxisConfiguration();
+        return (SynapseConfiguration) axisCfg.getParameter(
+                SynapseConstants.SYNAPSE_CONFIG).getValue();
+    }
+
+    private static SynapseEnvironment getSynapseEnvironment(
+            org.apache.axis2.context.MessageContext axisMsgCtx) {
+        AxisConfiguration axisCfg = axisMsgCtx.getConfigurationContext().getAxisConfiguration();
+        return (SynapseEnvironment) axisCfg.getParameter(
+                SynapseConstants.SYNAPSE_ENV).getValue();
     }
 }

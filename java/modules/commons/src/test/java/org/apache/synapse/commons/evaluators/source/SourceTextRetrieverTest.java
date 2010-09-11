@@ -23,11 +23,20 @@ import junit.framework.TestCase;
 import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.AxisFault;
 
+import javax.xml.stream.XMLStreamException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Properties;
 
 public class SourceTextRetrieverTest extends TestCase {
 
@@ -80,6 +89,49 @@ public class SourceTextRetrieverTest extends TestCase {
 
         txtRtvr = new ParameterTextRetriever("bogusKey");
         assertNull(txtRtvr.getSourceText(context));
+    }
+
+    public void testPropertyTextRetriver() throws EvaluatorException {
+        Properties props = new Properties();
+        props.setProperty("key1", "value1");
+        props.setProperty("key2", "value2");
+        EvaluatorContext context = new EvaluatorContext(null, null);
+        context.setProperties(props);
+
+        PropertyTextRetriever txtRtvr = new PropertyTextRetriever("key1");
+        assertEquals(props.getProperty("key1"), txtRtvr.getSourceText(context));
+
+        txtRtvr = new PropertyTextRetriever("key2");
+        assertEquals(props.getProperty("key2"), txtRtvr.getSourceText(context));
+
+        txtRtvr = new PropertyTextRetriever("bogusKey");
+        assertNull(txtRtvr.getSourceText(context));
+    }
+
+    public void testSOAPEnvelopeTextRetriever() throws Exception {
+        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
+        SOAPEnvelope env = fac.getDefaultEnvelope();
+
+        OMElement payload = AXIOMUtil.stringToOM(fac,
+                "<getQuote id=\"attr\"><symbol>TEST</symbol><property>1</property>" +
+                        "<property>2</property></getQuote>");
+        env.getBody().addChild(payload);
+        MessageContext msgCtx = new MessageContext();
+        msgCtx.setEnvelope(env);
+        EvaluatorContext context = new EvaluatorContext(null, null);
+        context.setMessageContext(msgCtx);
+
+        SOAPEnvelopeTextRetriever txtRtvr = new SOAPEnvelopeTextRetriever("//symbol");
+        assertEquals("TEST", txtRtvr.getSourceText(context));
+
+        txtRtvr = new SOAPEnvelopeTextRetriever("//getQuote/@id");
+        assertEquals("attr", txtRtvr.getSourceText(context));
+
+        txtRtvr = new SOAPEnvelopeTextRetriever("//property[1]");
+        assertEquals("1", txtRtvr.getSourceText(context));
+
+        txtRtvr = new SOAPEnvelopeTextRetriever("//property[2]");
+        assertEquals("2", txtRtvr.getSourceText(context));
     }
 
 }

@@ -34,6 +34,7 @@ import java.util.List;
 public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
 
     private String xpath;
+    private AXIOMXPath compiledXPath;
 
     public SOAPEnvelopeTextRetriever(String xpath) {
         this.xpath = xpath;
@@ -41,44 +42,46 @@ public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
 
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
         SOAPEnvelope envelope = context.getMessageContext().getEnvelope();
+        Object result;
+        
         try {
-            AXIOMXPath axiomXPath = new AXIOMXPath(xpath);
-            Object result = axiomXPath.evaluate(envelope);
+            if (compiledXPath == null) {
+                compiledXPath = new AXIOMXPath(xpath);
+            }
+            result = compiledXPath.evaluate(envelope);
+        } catch (JaxenException e) {
+            throw new EvaluatorException("Error while parsing the XPath expression: " + xpath, e);
+        }
 
-            if (result instanceof List) {
-                List list = (List) result;
-                if (list.size() == 1 && list.get(0) == null) {
-                    return null;
-                }
-
-                StringBuffer textValue = new StringBuffer();
-                for (Object o : list) {
-                    if (o instanceof OMTextImpl) {
-                        textValue.append(((OMTextImpl) o).getText());
-
-                    } else if (o instanceof OMElementImpl) {
-                        String s = ((OMElementImpl) o).getText();
-                        if (s.trim().length() == 0) {
-                            s = o.toString();
-                        }
-                        textValue.append(s);
-
-                    } else if (o instanceof OMDocumentImpl) {
-                        textValue.append(((OMDocumentImpl) o).getOMDocumentElement().toString());
-                    } else if (o instanceof OMAttribute) {
-                        textValue.append(((OMAttribute) o).getAttributeValue());
-                    }
-                }
-
-                return textValue.toString();
-
-            } else {
-                return result.toString();
+        if (result instanceof List) {
+            List list = (List) result;
+            if (list.size() == 1 && list.get(0) == null) {
+                return null;
             }
 
+            StringBuffer textValue = new StringBuffer();
+            for (Object o : list) {
+                if (o instanceof OMTextImpl) {
+                    textValue.append(((OMTextImpl) o).getText());
 
-        } catch (JaxenException e) {
-            throw new EvaluatorException("", e);
+                } else if (o instanceof OMElementImpl) {
+                    String s = ((OMElementImpl) o).getText();
+                    if (s.trim().length() == 0) {
+                        s = o.toString();
+                    }
+                    textValue.append(s);
+
+                } else if (o instanceof OMDocumentImpl) {
+                    textValue.append(((OMDocumentImpl) o).getOMDocumentElement().toString());
+                } else if (o instanceof OMAttribute) {
+                    textValue.append(((OMAttribute) o).getAttributeValue());
+                }
+            }
+
+            return textValue.toString();
+
+        } else {
+            return result.toString();
         }
     }
 

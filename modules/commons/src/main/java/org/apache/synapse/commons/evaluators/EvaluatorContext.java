@@ -20,21 +20,24 @@
 package org.apache.synapse.commons.evaluators;
 
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
+import org.apache.axis2.context.MessageContext;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Holds the information about the HTTP request. Created on per request basis and
  * passed to each and every evaluator.
  */
 public class EvaluatorContext {
+
     private String url;
-
     private Map<String, String> headers;
-
     private Map<String, String> params;
+    private MessageContext messageContext;
+    private Properties properties;
 
     /**
      * Creates the Evalutor context with the URL and the set of HTTP headers
@@ -114,6 +117,28 @@ public class EvaluatorContext {
     }
 
     /**
+     * Get the message context associated with this evaluator context
+     *
+     * @return an Axis2 MessageContext instance or null
+     */
+    public MessageContext getMessageContext() {
+        return messageContext;
+    }
+
+    /**
+     * Get the value of the named property
+     *
+     * @param name Name of the property
+     * @return A string property value or null
+     */
+    public String getProperty(String name) {
+        if (properties != null) {
+            return properties.getProperty(name);
+        }
+        return null;
+    }
+
+    /**
      * Set the URL
      * @param url to be set
      */
@@ -135,5 +160,23 @@ public class EvaluatorContext {
      */
     public void setParams(Map<String, String> params) {
         this.params = params;
+    }
+
+    /**
+     * Set the current Axis2 MessageContext to this evaluator context
+     *
+     * @param messageContext an Axis2 MessageContext object
+     */
+    public void setMessageContext(MessageContext messageContext) {
+        this.messageContext = messageContext;
+    }
+
+    /**
+     * Associate a set of properties with this evaluator context
+     *
+     * @param properties a Properties map
+     */
+    public void setProperties(Properties properties) {
+        this.properties = properties;
     }
 }

@@ -24,17 +24,17 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 
 public class PropertyTextRetriever implements SourceTextRetriever {
 
-    private String key;
+    private String source;
 
-    public PropertyTextRetriever(String key) {
-        this.key = key;
+    public PropertyTextRetriever(String source) {
+        this.source = source;
     }
 
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
-        return context.getProperty(key);
+        return context.getProperty(source);
     }
 
-    public String getKey() {
-        return key;
+    public String getSource() {
+        return source;
     }
 }

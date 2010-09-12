@@ -29,9 +29,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.AxisFault;
 
-import javax.xml.stream.XMLStreamException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -48,16 +46,16 @@ public class SourceTextRetrieverTest extends TestCase {
             URLTextRetriever txtRtvr = new URLTextRetriever();
             assertEquals(uri.toString(), txtRtvr.getSourceText(context));
 
-            txtRtvr.setFragment(EvaluatorConstants.URI_FRAGMENTS.host.name());
+            txtRtvr.setSource(EvaluatorConstants.URI_FRAGMENTS.host.name());
             assertEquals(uri.getHost(), txtRtvr.getSourceText(context));
 
-            txtRtvr.setFragment(EvaluatorConstants.URI_FRAGMENTS.port.name());
+            txtRtvr.setSource(EvaluatorConstants.URI_FRAGMENTS.port.name());
             assertEquals(String.valueOf(uri.getPort()), txtRtvr.getSourceText(context));
 
-            txtRtvr.setFragment(EvaluatorConstants.URI_FRAGMENTS.protocol.name());
+            txtRtvr.setSource(EvaluatorConstants.URI_FRAGMENTS.protocol.name());
             assertEquals(uri.getScheme(), txtRtvr.getSourceText(context));
 
-            txtRtvr.setFragment(EvaluatorConstants.URI_FRAGMENTS.path.name());
+            txtRtvr.setSource(EvaluatorConstants.URI_FRAGMENTS.path.name());
             assertEquals(uri.getPath(), txtRtvr.getSourceText(context));
         } catch (URISyntaxException ignore) {
 

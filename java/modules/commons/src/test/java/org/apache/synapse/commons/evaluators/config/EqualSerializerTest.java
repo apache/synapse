@@ -66,7 +66,7 @@ public class EqualSerializerTest extends XMLTestCase {
     }
 
     public void testURLEqualSerializer2() {
-        String input = "<equal type=\"url\" value=\"http://foo.org\" fragment=\"protocol\"/>";
+        String input = "<equal type=\"url\" value=\"http://foo.org\" source=\"protocol\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));

@@ -58,14 +58,14 @@ public class URLTextRetriever implements SourceTextRetriever {
         }
     }
 
-    public String getFragment() {
+    public String getSource() {
         if (fragment != null) {
             return fragment.name();
         }
         return null;
     }
 
-    public void setFragment(String fragment) {
+    public void setSource(String fragment) {
         this.fragment = EvaluatorConstants.URI_FRAGMENTS.valueOf(fragment);
     }
 }

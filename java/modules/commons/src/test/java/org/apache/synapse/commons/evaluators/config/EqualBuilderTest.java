@@ -43,7 +43,7 @@ public class EqualBuilderTest extends TestCase {
             EqualEvaluator eval = (EqualEvaluator) fac.create(AXIOMUtil.stringToOM(input));
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof HeaderTextRetriever);
-            assertEquals(((HeaderTextRetriever) txtRtvr).getSource(), SOURCE);
+            assertEquals(txtRtvr.getSource(), SOURCE);
             assertEquals(eval.getValue(), VALUE);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
@@ -73,7 +73,7 @@ public class EqualBuilderTest extends TestCase {
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getValue(), VALUE);
-            assertNull(((URLTextRetriever) txtRtvr).getFragment());
+            assertNull(txtRtvr.getSource());
         } catch (Exception e) {
             fail("Error while parsing the input XML");
         }
@@ -81,14 +81,14 @@ public class EqualBuilderTest extends TestCase {
 
     public void testURLEqual2() {
         String input = "<equal type=\"url\" value=\"" + VALUE + "\"" +
-                " fragment=\"" + FRAGMENT + "\"/>";
+                " source=\"" + FRAGMENT + "\"/>";
 
         try {
             EqualEvaluator eval = (EqualEvaluator) fac.create(AXIOMUtil.stringToOM(input));
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getValue(), VALUE);
-            assertEquals(((URLTextRetriever) txtRtvr).getFragment(), FRAGMENT);
+            assertEquals(txtRtvr.getSource(), FRAGMENT);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
         }

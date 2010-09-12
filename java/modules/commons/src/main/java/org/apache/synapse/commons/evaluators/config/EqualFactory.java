@@ -24,13 +24,8 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.EqualEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
-import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
-import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
-import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
@@ -41,50 +36,11 @@ import javax.xml.namespace.QName;
  * &lt;equal type=&quot;header | param | url&quot; source=&quot;&quot; value=&quot;&quot;/&gt;
  * </pre>
  */
-public class EqualFactory implements EvaluatorFactory {
-    private Log log = LogFactory.getLog(EqualFactory.class);
+public class EqualFactory extends TextProcessingEvaluatorFactory {
 
     public Evaluator create(OMElement e) throws EvaluatorException {
         EqualEvaluator equal = new EqualEvaluator();
-
-        OMAttribute typeAttr = e.getAttribute(new QName(EvaluatorConstants.TYPE));
-        OMAttribute sourceAttr = e.getAttribute(new QName(EvaluatorConstants.SOURCE));
-
-        SourceTextRetriever textRetriever = null;
-
-        if (typeAttr != null) {
-            String value = typeAttr.getAttributeValue();
-            if (value.equals(EvaluatorConstants.HEADER)) {
-                if (sourceAttr != null) {
-                    textRetriever = new HeaderTextRetriever(sourceAttr.getAttributeValue());
-                } else {
-                    handleException(EvaluatorConstants.SOURCE + " attribute is required");
-                }
-            } else if (value.equals(EvaluatorConstants.PARAM)) {
-                if (sourceAttr != null) {
-                    textRetriever = new ParameterTextRetriever(sourceAttr.getAttributeValue());
-                } else {
-                    handleException(EvaluatorConstants.SOURCE + " attribute is required");
-                }
-            } else if (value.equals(EvaluatorConstants.URL)) {
-                textRetriever = new URLTextRetriever();
-                OMAttribute fragAttr = e.getAttribute(new QName(EvaluatorConstants.FRAGMENT));
-                if (fragAttr != null) {
-                    ((URLTextRetriever) textRetriever).setFragment(fragAttr.getAttributeValue());
-                }
-            } else {
-                handleException("Unknown equal evaluator type: " + value);
-            }
-        }
-
-        if (textRetriever == null) {
-            if (sourceAttr != null) {
-                textRetriever = new HeaderTextRetriever(sourceAttr.getAttributeValue());
-            } else {
-                handleException(EvaluatorConstants.SOURCE + " attribute is required");
-            }
-        }
-
+        SourceTextRetriever textRetriever = getSourceTextRetriever(e);
         equal.setTextRetriever(textRetriever);
 
         OMAttribute valueAttr = e.getAttribute(new QName(EvaluatorConstants.VALUE));
@@ -96,10 +52,5 @@ public class EqualFactory implements EvaluatorFactory {
 
         equal.setValue(valueAttr.getAttributeValue());
         return equal;
-    }
-
-    private void handleException(String message) throws EvaluatorException {
-        log.error(message);
-        throw new EvaluatorException(message);
     }
 }

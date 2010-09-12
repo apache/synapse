@@ -23,20 +23,24 @@ package org.apache.synapse.commons.evaluators;
  * Constants used through out the evaluators
  */
 public class EvaluatorConstants {
+
     public static final String AND = "and";
     public static final String OR = "or";
     public static final String NOT = "not";
     public static final String MATCH = "match";
     public static final String EQUAL = "equal";
 
-    public static final String TYPE = "type";
+    // Types of source text retrievers
     public static final String HEADER = "header";
     public static final String PARAM = "param";
     public static final String URL = "url";
+    public static final String PROPERTY = "property";
+    public static final String SOAP = "soap";
+
+    public static final String TYPE = "type";
     public static final String SOURCE = "source";
     public static final String REGEX = "regex";
     public static final String VALUE = "value";
-    public static final String FRAGMENT = "fragment";
 
     public static final String CONDITIONS = "conditions";
     public static final String CONDITION = "condition";

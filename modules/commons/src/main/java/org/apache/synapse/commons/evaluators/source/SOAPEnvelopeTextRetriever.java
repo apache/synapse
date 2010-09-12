@@ -33,11 +33,11 @@ import java.util.List;
 
 public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
 
-    private String xpath;
+    private String source;
     private AXIOMXPath compiledXPath;
 
-    public SOAPEnvelopeTextRetriever(String xpath) {
-        this.xpath = xpath;
+    public SOAPEnvelopeTextRetriever(String source) {
+        this.source = source;
     }
 
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
@@ -46,11 +46,11 @@ public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
         
         try {
             if (compiledXPath == null) {
-                compiledXPath = new AXIOMXPath(xpath);
+                compiledXPath = new AXIOMXPath(source);
             }
             result = compiledXPath.evaluate(envelope);
         } catch (JaxenException e) {
-            throw new EvaluatorException("Error while parsing the XPath expression: " + xpath, e);
+            throw new EvaluatorException("Error while parsing the XPath expression: " + source, e);
         }
 
         if (result instanceof List) {
@@ -85,7 +85,7 @@ public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
         }
     }
 
-    public String getXpath() {
-        return xpath;
+    public String getSource() {
+        return source;
     }
 }

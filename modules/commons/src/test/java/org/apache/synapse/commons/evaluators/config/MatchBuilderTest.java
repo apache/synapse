@@ -43,7 +43,7 @@ public class MatchBuilderTest extends TestCase {
             MatchEvaluator eval = (MatchEvaluator) fac.create(AXIOMUtil.stringToOM(input));
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof HeaderTextRetriever);
-            assertEquals(((HeaderTextRetriever) txtRtvr).getSource(), SOURCE);
+            assertEquals(txtRtvr.getSource(), SOURCE);
             assertEquals(eval.getRegex().pattern(), REGEX);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
@@ -58,7 +58,7 @@ public class MatchBuilderTest extends TestCase {
             MatchEvaluator eval = (MatchEvaluator) fac.create(AXIOMUtil.stringToOM(input));
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof ParameterTextRetriever);
-            assertEquals(((ParameterTextRetriever) txtRtvr).getSource(), SOURCE);
+            assertEquals(txtRtvr.getSource(), SOURCE);
             assertEquals(eval.getRegex().pattern(), REGEX);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
@@ -73,7 +73,7 @@ public class MatchBuilderTest extends TestCase {
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getRegex().pattern(), REGEX);
-            assertNull(((URLTextRetriever) txtRtvr).getFragment());
+            assertNull(txtRtvr.getSource());
         } catch (Exception e) {
             e.printStackTrace();
             fail("Error while parsing the input XML");
@@ -81,7 +81,7 @@ public class MatchBuilderTest extends TestCase {
     }
 
     public void testURLMatch2() {
-        String input = "<match type=\"url\" regex=\"" + REGEX + "\" fragment=\"" +
+        String input = "<match type=\"url\" regex=\"" + REGEX + "\" source=\"" +
                 FRAGMENT +"\"/>";
 
         try {
@@ -89,7 +89,7 @@ public class MatchBuilderTest extends TestCase {
             SourceTextRetriever txtRtvr = eval.getTextRetriever();
             assertTrue(txtRtvr instanceof URLTextRetriever);
             assertEquals(eval.getRegex().pattern(), REGEX);
-            assertEquals(((URLTextRetriever) txtRtvr).getFragment(), FRAGMENT);
+            assertEquals(txtRtvr.getSource(), FRAGMENT);
         } catch (Exception e) {
             fail("Error while parsing the input XML");
         }

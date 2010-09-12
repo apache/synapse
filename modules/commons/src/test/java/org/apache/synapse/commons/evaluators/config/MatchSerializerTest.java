@@ -66,7 +66,7 @@ public class MatchSerializerTest extends XMLTestCase {
     }
 
     public void testURLMatchSerializer2() {
-        String input = "<match type=\"url\" regex=\"http://foo.org\" fragment=\"protocol\"/>";
+        String input = "<match type=\"url\" regex=\"http://foo.org\" source=\"protocol\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));

@@ -396,6 +396,7 @@ public class Axis2FlexibleMEPClient {
         if (o != null && o instanceof TransportOutDescription) {
             axisOutMsgCtx.setTransportOut((TransportOutDescription) o);
             clientOptions.setTransportOut((TransportOutDescription) o);
+            clientOptions.setProperty("TRANSPORT_OUT_DESCRIPTION", o);
         }
 
         mepClient.execute(true);

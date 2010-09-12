@@ -67,7 +67,7 @@ public abstract class TextProcessingEvaluatorSerializer extends AbstractEvaluato
                     source));
         } else {
             String msg = "If type is not URL a source value should be specified for " +
-                            "the equal evaluator";
+                            "the evaluator";
             log.error(msg);
             throw new EvaluatorException(msg);
         }

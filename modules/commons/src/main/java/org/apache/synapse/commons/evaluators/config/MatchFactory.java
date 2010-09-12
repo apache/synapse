@@ -24,14 +24,9 @@ import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.MatchEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
-import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
-import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
-import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import java.util.regex.Pattern;
@@ -43,50 +38,11 @@ import java.util.regex.Pattern;
  * &lt;match type=&quot;header | param | url&quot; source=&quot;&quot; regex=&quot;&quot;/&gt;
  * </pre>
  */
-public class MatchFactory implements EvaluatorFactory {
-    private Log log = LogFactory.getLog(MatchFactory.class);
+public class MatchFactory extends TextProcessingEvaluatorFactory {
 
     public Evaluator create(OMElement e) throws EvaluatorException {
         MatchEvaluator equal = new MatchEvaluator();
-
-        OMAttribute typeAttr = e.getAttribute(new QName(EvaluatorConstants.TYPE));
-        OMAttribute sourceAttr = e.getAttribute(new QName(EvaluatorConstants.SOURCE));
-
-        SourceTextRetriever textRetriever = null;
-
-        if (typeAttr != null) {
-            String value = typeAttr.getAttributeValue();
-            if (value.equals(EvaluatorConstants.HEADER)) {
-                if (sourceAttr != null) {
-                    textRetriever = new HeaderTextRetriever(sourceAttr.getAttributeValue());
-                } else {
-                    handleException(EvaluatorConstants.SOURCE + " attribute is required");
-                }
-            } else if (value.equals(EvaluatorConstants.PARAM)) {
-                if (sourceAttr != null) {
-                    textRetriever = new ParameterTextRetriever(sourceAttr.getAttributeValue());
-                } else {
-                    handleException(EvaluatorConstants.SOURCE + " attribute is required");
-                }
-            } else if (value.equals(EvaluatorConstants.URL)) {
-                textRetriever = new URLTextRetriever();
-                OMAttribute fragAttr = e.getAttribute(new QName(EvaluatorConstants.FRAGMENT));
-                if (fragAttr != null) {
-                    ((URLTextRetriever) textRetriever).setFragment(fragAttr.getAttributeValue());
-                }
-            } else {
-                handleException("Unknown match evaluator type: " + value);
-            }
-        }
-
-        if (textRetriever == null) {
-            if (sourceAttr != null) {
-                textRetriever = new HeaderTextRetriever(sourceAttr.getAttributeValue());
-            } else {
-                handleException(EvaluatorConstants.SOURCE + " attribute is required");
-            }
-        }
-
+        SourceTextRetriever textRetriever = getSourceTextRetriever(e);
         equal.setTextRetriever(textRetriever);
 
         OMAttribute regExAttr = e.getAttribute(new QName(EvaluatorConstants.REGEX));
@@ -96,12 +52,6 @@ public class MatchFactory implements EvaluatorFactory {
         }
 
         equal.setRegex(Pattern.compile(regExAttr.getAttributeValue()));
-
         return equal;
-    }
-
-    private void handleException(String message) throws EvaluatorException {
-        log.error(message);
-        throw new EvaluatorException(message);
     }
 }

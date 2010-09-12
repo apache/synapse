@@ -24,6 +24,8 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 
 public interface SourceTextRetriever {
 
+    public String getSource();
+
     public String getSourceText(EvaluatorContext context) throws EvaluatorException;
     
 }

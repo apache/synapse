@@ -21,10 +21,6 @@ package org.apache.synapse.commons.evaluators.config;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.commons.evaluators.*;
-import org.apache.synapse.commons.evaluators.source.SourceTextRetriever;
-import org.apache.synapse.commons.evaluators.source.HeaderTextRetriever;
-import org.apache.synapse.commons.evaluators.source.ParameterTextRetriever;
-import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
 
 import javax.xml.namespace.QName;
 
@@ -32,39 +28,17 @@ import javax.xml.namespace.QName;
  * Serialize the {@link EqualEvaluator} to the XML configuration defined in
  * the {@link EqualFactory}. 
  */
-public class EqualSerializer extends AbstractEvaluatorSerializer{
+public class EqualSerializer extends TextProcessingEvaluatorSerializer {
 
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
 
         if (!(evaluator instanceof EqualEvaluator)) {
-            throw new IllegalArgumentException("Evalutor should be a EqualEvalutor");
+            throw new IllegalArgumentException("Evalutor must be an EqualEvalutor");
         }
 
         EqualEvaluator equalEvaluator = (EqualEvaluator) evaluator;
         OMElement equalElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
-
-        SourceTextRetriever textRetriever = equalEvaluator.getTextRetriever();
-        if (textRetriever instanceof HeaderTextRetriever) {
-            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.HEADER));
-            HeaderTextRetriever headerTextRetriever = (HeaderTextRetriever) textRetriever;
-            addSourceAttribute(headerTextRetriever.getSource(), equalElement);
-
-        } else if (textRetriever instanceof ParameterTextRetriever) {
-            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.PARAM));
-            ParameterTextRetriever paramTextRetriever = (ParameterTextRetriever) textRetriever;
-            addSourceAttribute(paramTextRetriever.getSource(), equalElement);
-
-        } else {
-            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.TYPE, nullNS,
-                    EvaluatorConstants.URL));
-            URLTextRetriever urlTextRetriever = (URLTextRetriever) textRetriever;
-            if (urlTextRetriever.getFragment() != null) {
-                equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.FRAGMENT,
-                        nullNS, urlTextRetriever.getFragment()));
-            }
-        }
+        serializeSourceTextRetriever(equalEvaluator.getTextRetriever(), equalElement);
 
         equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,
                 equalEvaluator.getValue()));
@@ -74,19 +48,5 @@ public class EqualSerializer extends AbstractEvaluatorSerializer{
         }
 
         return equalElement;
-    }
-
-    private void addSourceAttribute(String source, OMElement equalElement)
-            throws EvaluatorException {
-
-        if (source != null) {
-            equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.SOURCE, nullNS,
-                    source));
-        } else {
-            String msg = "If type is not URL a source value should be specified for " +
-                            "the equal evaluator";
-            log.error(msg);
-            throw new EvaluatorException(msg);
-        }
     }
 }

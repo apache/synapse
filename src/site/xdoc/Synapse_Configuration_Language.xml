@@ -1072,7 +1072,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       A mediator token refers to any of the following tokens:
     </p>
 <pre xml:space="preserve">
-    <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#header">header</a>  | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a>
+    <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#rewrite">rewrite</a> | <a href="#header">header</a>  | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a>
     | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a> | <a href="#eventPublisher">eventPublisher</a>
     </pre>
     <p>
@@ -1584,6 +1584,49 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
         XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT
       </li>
     </ul>
+    <p/>
+    <h4>
+      <a name="rewrite" id="rewrite">URLRewrite</a>
+    </h4>
+<pre xml:space="preserve">&lt;rewrite [inProperty="string"] [outProperty="string"]&gt;
+   &lt;rule&gt;
+      &lt;condition&gt;
+         ...
+      &lt;/condition&gt;?
+      &lt;action [type="append|prepend|replace|remove|set"] [value="string"]
+          [xpath="xpath"] [fragment="protocol|host|port|path|query|ref|user|full"] [regex="regex"]&gt;+
+   &lt;/rule&gt;+
+&lt;/rewrite&gt;</pre>
+    <p/>
+    <p>
+      The URL rewrite mediator is used to modify and transform the URL values available
+      in the message. By default the mediator will take the 'To' header of the message and
+      apply the provided rewrite rules on it. Alternatively one can specify a property name
+      in the 'inProperty' attribute, in which case the mediator will take the value of the
+      specified property as the input URL. Similarly the mediator by default sets the transformed
+      URL as the 'To' header of the message. Alternatively you can use the 'outProperty'
+      attribute to instruct the mediator to set the resulting URL as a property.
+    </p>
+    <p>
+      The rewrite mediator applies URL transformations by evaluating a set of rules on
+      the message. Rules are specified using the 'rule' element. Rules are evaluated in the
+      order they are specified. A rule can consist of an optional condition and one or more
+      rewrite actions. If the condition is provided it will be evaluated first. If it evaluates
+      to 'true' all the specified rewrite actions will be executed. Otherwise the set of
+      actions will be skipped. If no condition is specified, the provided rewrite actions
+      will be always executed. The condition should be wrapped in a 'condition' element within
+      the 'rule' element. Rewrite actions are specified using 'action' elements.
+    </p>
+    <p>
+      The 'type' attribute on the 'action' element states which type of action should be
+      executed on the URL. This defaults to 'set' value. The 'fragment' attribute can be
+      used to specify the URL fragment on which the action should be executed. If not specified
+      this will be taken as 'full' URL, which is the complete URL. The value to 'set', 'append'
+      or 'prepend' must be specified using either the 'value' attribute or the 'xpath' attribute.
+      One of these two attributes are always needed unless the value of the 'type' attribute is
+      set to 'remove'. When the 'type' is set to 'replace' an additional 'regex' attribute must
+      be specified which indicates the portion that should be replaced with the given value.
+    </p>
     <p/>
     <h4>
       <a name="header" id="header">Header</a>

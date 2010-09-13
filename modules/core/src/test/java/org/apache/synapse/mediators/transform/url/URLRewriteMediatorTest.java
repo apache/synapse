@@ -26,6 +26,7 @@ import org.apache.synapse.commons.evaluators.EqualEvaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.synapse.commons.evaluators.MatchEvaluator;
 import org.apache.synapse.commons.evaluators.source.URLTextRetriever;
+import org.apache.synapse.commons.evaluators.source.SOAPEnvelopeTextRetriever;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.axis2.addressing.EndpointReference;
@@ -193,6 +194,32 @@ public class URLRewriteMediatorTest extends TestCase {
         assertEquals(targetURL, msgCtx.getProperty("outURL"));
     }
 
+    public void testConditionalRewriteScenario4() throws Exception {
+        URLRewriteMediator mediator = new URLRewriteMediator();
+        mediator.setOutputProperty("outURL");
+
+        RewriteAction action1 = new RewriteAction();
+        action1.setRegex("MyService");
+        action1.setValue("SimpleStockQuoteService");
+        action1.setFragmentIndex(URIFragments.PATH);
+        action1.setActionType(RewriteAction.ACTION_REPLACE);
+        RewriteRule rule1 = new RewriteRule();
+        rule1.addRewriteAction(action1);
+        EqualEvaluator eval1 = new EqualEvaluator();
+        SOAPEnvelopeTextRetriever txtRtvr1 = new SOAPEnvelopeTextRetriever("//symbol");
+        eval1.setTextRetriever(txtRtvr1);
+        eval1.setValue("IBM");
+        rule1.setCondition(eval1);
+        mediator.addRule(rule1);
+
+        MessageContext msgCtx = TestUtils.createLightweightSynapseMessageContext(
+                "<getQuote><symbol>IBM</symbol></getQuote>");
+        msgCtx.setTo(new EndpointReference("http://localhost:9000/services/MyService"));
+        mediator.mediate(msgCtx);
+
+        assertEquals(targetURL, msgCtx.getProperty("outURL"));
+    }
+
     public void testFullRewriteScenario1() throws Exception {
         String xml =
                 "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">\n" +
@@ -217,7 +244,10 @@ public class URLRewriteMediatorTest extends TestCase {
                 "    </rule>\n" +
                 "    <rule>\n" +
                 "        <condition>\n" +
-                "            <match type=\"url\" source=\"path\" regex=\".*/MyService\"/>\n" +
+                "            <and>\n" +
+                "               <match type=\"url\" source=\"path\" regex=\".*/MyService\"/>\n" +
+                "               <equal type=\"property\" source=\"prop1\" value=\"value1\"/>\n" +
+                "            </and>\n" +
                 "        </condition>        \n" +
                 "        <action fragment=\"path\" value=\"StockQuoteService\" regex=\"MyService\" type=\"replace\"/>\n" +
                 "        <action fragment=\"ref\" value=\"id\"/>\n" +
@@ -230,6 +260,7 @@ public class URLRewriteMediatorTest extends TestCase {
 
         MessageContext msgCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>");
         msgCtx.setTo(new EndpointReference("http://test.org:9763/MyService"));
+        msgCtx.setProperty("prop1", "value1");
         mediator.mediate(msgCtx);
 
         assertEquals("https://test.com:9443/services/StockQuoteService#id",

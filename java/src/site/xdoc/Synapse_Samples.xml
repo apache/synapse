@@ -302,6 +302,12 @@
 <a href="#Sample430">Sample 430: Simple Callout Mediator for synchronize web service invocation</a></li>
 <li>
 <a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
+<li>
+<a href="#Sample450">Sample 450: Introduction to the URL Rewrite mediator</a></li>
+<li>
+<a href="#Sample451">Sample 451: Conditional URL rewriting</a></li>
+<li>
+<a href="#Sample452">Sample 452: Conditional URL rewriting with multiple rules</a></li>
 </ul></li></ul></li>
         <li>
           <a href="#Task">Introduction to Eventing</a>
@@ -4456,6 +4462,132 @@ will be converted into a JSON message and sent back to the JSON client.</p>
  is shown below:</p>
 <pre>{"getQuote":{"request":{"symbol":"IBM"}}}</pre>
 <pre>{"getQuoteResponse":{"return":{"change":3.853593376681722,"earnings":12.802850763714854,"high":67.92488310190126,"last":66.14619264746406,"lastTradeTimestamp":"Mon Aug 23 16:48:40 IST 2010","low":-66.04000424423522,"marketCap":-9334516.42324327,"name":"IBM Company","open":-64.61950137150009,"peRatio":-19.78600441437058,"percentageChange":5.411779328273005,"prevClose":71.2075112994578,"symbol":"IBM","volume":16842}}}</pre>
+</div>
+
+<h2>
+    <a name="Sample450" id="Sample450">Sample 450: Introduction to the URL Rewrite Mediator</a>
+</h2>
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+    &lt;sequence xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="main"&gt;
+        &lt;in&gt;
+            &lt;rewrite&gt;
+               &lt;rule&gt;
+                  &lt;action type="replace" regex="soap" value="services" fragment="path"/&gt;
+               &lt;/rule&gt;
+            &lt;/rewrite&gt;
+            &lt;send/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+<div>
+<p>
+<strong>Objective:</strong> Demonstrate the basic functions of the URL rewrite mediator</p>
+<p>
+<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
+<p>Start Synapse with the sample configuration 450 (i.e. synapse -sample 450). </p>
+<p>Invoke the Axis2 client as follows. </p>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280 -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService</pre>
+<p>Note that the address URL of the client request contains the context 'soap'. But in the Axis2 server all the
+services are deployed under a context named 'services' by default. Synapse will rewrite the To header of the request
+by replacing the 'soap' context with 'services. Hence the request will be delivered to the Axis2 server and the
+Axis2 client will receive a valid response.</p>
+</div>
+<h2>
+    <a name="Sample451" id="Sample451">Sample 451: Conditional URL Rewriting</a>
+</h2>
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+    &lt;sequence xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="main"&gt;
+        &lt;in&gt;
+            &lt;rewrite&gt;
+               &lt;rule&gt;
+                  &lt;condition&gt;
+                     &lt;and&gt;
+                        &lt;equal type="url" source="host" value="localhost"/&gt;
+                        &lt;not&gt;
+                           &lt;equal type="url" source="protocol" value="https"/&gt;
+                        &lt;/not&gt;
+                     &lt;/and&gt;
+                  &lt;/condition&gt;
+                  &lt;action fragment="protocol" value="https"/&gt;
+                  &lt;action fragment="port" value="9002"/&gt;
+               &lt;/rule&gt;
+            &lt;/rewrite&gt;
+            &lt;log level="full"/&gt;
+            &lt;send/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+<div>
+<p>
+<strong>Objective:</strong> Demonstrate the ability of the URL rewrite mediator to evaluate conditions on messages and
+perform rewrites based on the results.</p>
+<p>
+<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
+<p>Start Synapse with the sample configuration 451 (i.e. synapse -sample 451). </p>
+<p>Invoke the Axis2 client and send some requests to Synapse with different address URL values. If the address
+URL value contains localhost as the hostname and https as the protocol prefix, Synapse will route the message as
+it is. But if the hostname is localhost and the protocol is not https, Synapse will rewrite the URL by setting
+https as the protocol. The port number will also be set to the HTTPS port of the Axis2 server.</p>
+<p>The condition evaluation feature is provided by the Synapse evaluator framework. Currently one can evaluate
+expressions on URL values, query parameters, transport headers, properties and SOAP envelope content using this
+framework. Hence URL rewriting can be done based on any of these aspects.</p>    
+</div>
+
+<h2>
+    <a name="Sample452" id="Sample452">Sample 452: Conditional URL Rewriting with Multiple Rules</a>
+</h2>
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;property name="http.port" value="9000"/&gt;
+            &lt;property name="https.port" value="9002"/&gt;
+            &lt;rewrite&gt;
+                &lt;rule&gt;
+                    &lt;action fragment="host" value="localhost"/&gt;
+                    &lt;action fragment="path" type="prepend" value="/services"/&gt;
+                &lt;/rule&gt;
+                &lt;rule&gt;
+                    &lt;condition&gt;
+                        &lt;equal type="url" source="protocol" value="http"/&gt;
+                    &lt;/condition&gt;
+                    &lt;action fragment="port" xpath="get-property('http.port')"/&gt;
+                &lt;/rule&gt;
+                &lt;rule&gt;
+                    &lt;condition&gt;
+                        &lt;equal type="url" source="protocol" value="https"/&gt;
+                    &lt;/condition&gt;
+                    &lt;action fragment="port" xpath="get-property('https.port')"/&gt;
+                &lt;/rule&gt;
+            &lt;/rewrite&gt;
+            &lt;log level="full"/&gt;
+            &lt;send/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+<div>
+<p>
+<strong>Objective:</strong> Demonstrate the ability of the URL rewrite mediator to perform rewrites based
+on multiple rules.</p>
+<p>
+<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
+<p>Start Synapse with the sample configuration 452 (i.e. synapse -sample 452). </p>
+<p>Invoke the Axis2 client as follows. </p>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280 -Daddurl=http://test.com/SimpleStockQuoteService</pre>
+<p>The provided address URL does not contain a port number and the context. The URL rewrite mediator will replace
+the hostname to be 'localhost' and add the context '/services' to the path. Then it will add the appropriate
+port number to the URL by looking at the protocol prefix. Ultimately the service request will be routed the sample Axis2
+server and the client will receive a valid response.</p>
+<p>Another important aspect shown by this sample is the ability of the URL rewirte mediator to obtain the necessary
+values by executing XPath expressions. The port numbers are calculated by executing an XPath on the messages.</p>
 </div>
    <h2>
       <a name="Sample500" id="Sample500">Sample 500: Simple Eventing Sample</a>

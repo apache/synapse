@@ -31,7 +31,11 @@ public class PropertyTextRetriever implements SourceTextRetriever {
     }
 
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
-        return context.getProperty(source);
+        Object value = context.getProperty(source);
+        if (value != null) {
+            return value.toString();
+        }
+        return null;
     }
 
     public String getSource() {

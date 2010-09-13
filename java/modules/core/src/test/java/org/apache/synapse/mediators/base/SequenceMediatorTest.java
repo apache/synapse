@@ -30,6 +30,8 @@ import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.context.ConfigurationContext;
 
 public class SequenceMediatorTest extends TestCase {
 
@@ -123,6 +125,13 @@ public class SequenceMediatorTest extends TestCase {
         MessageContextCreatorForAxis2.setSynEnv(new Axis2SynapseEnvironment(synConfig));
         org.apache.axis2.context.MessageContext mc =
             new org.apache.axis2.context.MessageContext();
+        AxisConfiguration axisConfig = synConfig.getAxisConfiguration();
+        if (axisConfig == null) {
+            axisConfig = new AxisConfiguration();
+            synConfig.setAxisConfiguration(axisConfig);
+        }
+        ConfigurationContext cfgCtx = new ConfigurationContext(axisConfig);
+        mc.setConfigurationContext(cfgCtx);
         mc.setEnvelope(TestUtils.getTestContext("<empty/>").getEnvelope());
 
         new SynapseMessageReceiver().receive(mc);

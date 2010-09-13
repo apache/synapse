@@ -182,6 +182,16 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    /**
+     * Get a read-only view of all the properties currently set on this
+     * message context
+     *
+     * @return an unmodifiable map of message context properties
+     */
+    public Map<String,Object> getProperties() {
+        return Collections.unmodifiableMap(properties);
+    }
+
     public Object getProperty(String key) {
         return properties.get(key);
     }

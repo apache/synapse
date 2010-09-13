@@ -56,6 +56,8 @@ public class RewriteRule {
             String uriString = fragments.toURIString();
             Map<String, String> headers = getHeaders(messageContext);
             EvaluatorContext ctx = new EvaluatorContext(uriString, headers);
+            ctx.setProperties(((Axis2MessageContext) messageContext).getProperties());
+            ctx.setMessageContext(((Axis2MessageContext) messageContext).getAxis2MessageContext());
             
             if (log.isTraceEnabled()) {
                 log.trace("Evaluating condition with URI: " + uriString);

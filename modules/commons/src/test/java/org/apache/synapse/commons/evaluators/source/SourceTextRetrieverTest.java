@@ -34,7 +34,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Properties;
 
 public class SourceTextRetrieverTest extends TestCase {
 
@@ -90,17 +89,17 @@ public class SourceTextRetrieverTest extends TestCase {
     }
 
     public void testPropertyTextRetriver() throws EvaluatorException {
-        Properties props = new Properties();
-        props.setProperty("key1", "value1");
-        props.setProperty("key2", "value2");
+        Map<String,Object> props = new HashMap<String,Object>();
+        props.put("key1", "value1");
+        props.put("key2", "value2");
         EvaluatorContext context = new EvaluatorContext(null, null);
         context.setProperties(props);
 
         PropertyTextRetriever txtRtvr = new PropertyTextRetriever("key1");
-        assertEquals(props.getProperty("key1"), txtRtvr.getSourceText(context));
+        assertEquals(props.get("key1"), txtRtvr.getSourceText(context));
 
         txtRtvr = new PropertyTextRetriever("key2");
-        assertEquals(props.getProperty("key2"), txtRtvr.getSourceText(context));
+        assertEquals(props.get("key2"), txtRtvr.getSourceText(context));
 
         txtRtvr = new PropertyTextRetriever("bogusKey");
         assertNull(txtRtvr.getSourceText(context));

@@ -40,7 +40,7 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
 
     public void testSerializationScenario2() {
         String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
-                "<rule><condition><match xmlns=\"\" type=\"url\" fragment=\"host\" regex=\"localhost\"/>" +
+                "<rule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/><action " +
                 "fragment=\"port\" value=\"9090\" type=\"set\"/><action fragment=\"path\" " +
@@ -52,13 +52,13 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
     public void testSerializationScenario3() {
         String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><rule>" +
                 "<action fragment=\"full\" value=\"http://localhost:8080/synapse\" type=\"set\"/></rule>" +
-                "<rule><condition><match xmlns=\"\" type=\"url\" fragment=\"host\" regex=\"localhost\"/>" +
+                "<rule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/>" +
                 "<action fragment=\"port\" xpath=\"get-property('port')\" type=\"set\"/>" +
                 "<action fragment=\"path\" value=\"/services\" type=\"prepend\"/></rule><rule>" +
-                "<condition><and xmlns=\"\"><match type=\"url\" fragment=\"host\" regex=\"www.test.com\"/>" +
-                "<equal type=\"url\" fragment=\"port\" value=\"9090\"/></and></condition>" +
+                "<condition><and xmlns=\"\"><match type=\"url\" source=\"host\" regex=\"www.test.com\"/>" +
+                "<equal type=\"url\" source=\"port\" value=\"9090\"/></and></condition>" +
                 "<action fragment=\"path\" regex=\".*/FooService\" type=\"replace\" " +
                 "value=\"/BarService\"/></rule>" +
                 "</rewrite>";

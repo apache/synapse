@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,14 +72,20 @@ public class MessageContextCreatorForAxis2 {
     private static SynapseConfiguration getSynapseConfiguration(
             org.apache.axis2.context.MessageContext axisMsgCtx) {
         AxisConfiguration axisCfg = axisMsgCtx.getConfigurationContext().getAxisConfiguration();
-        return (SynapseConfiguration) axisCfg.getParameter(
-                SynapseConstants.SYNAPSE_CONFIG).getValue();
+        Parameter param = axisCfg.getParameter(SynapseConstants.SYNAPSE_CONFIG);
+        if (param != null) {
+            return (SynapseConfiguration) param.getValue();
+        }
+        return null;
     }
 
     private static SynapseEnvironment getSynapseEnvironment(
             org.apache.axis2.context.MessageContext axisMsgCtx) {
         AxisConfiguration axisCfg = axisMsgCtx.getConfigurationContext().getAxisConfiguration();
-        return (SynapseEnvironment) axisCfg.getParameter(
-                SynapseConstants.SYNAPSE_ENV).getValue();
+        Parameter param = axisCfg.getParameter(SynapseConstants.SYNAPSE_ENV);
+        if (param != null) {
+            return (SynapseEnvironment) param.getValue();
+        }
+        return null;
     }
 }

@@ -111,7 +111,7 @@ public class URLRewriteMediatorTest extends TestCase {
         RewriteRule rule = new RewriteRule();
         EqualEvaluator eval = new EqualEvaluator();
         URLTextRetriever txtRtvr = new URLTextRetriever();
-        txtRtvr.setFragment(EvaluatorConstants.URI_FRAGMENTS.port.name());
+        txtRtvr.setSource(EvaluatorConstants.URI_FRAGMENTS.port.name());
         eval.setTextRetriever(txtRtvr);
         eval.setValue("8280");
         rule.setCondition(eval);
@@ -135,7 +135,7 @@ public class URLRewriteMediatorTest extends TestCase {
         RewriteRule rule = new RewriteRule();
         EqualEvaluator eval = new EqualEvaluator();
         URLTextRetriever txtRtvr = new URLTextRetriever();
-        txtRtvr.setFragment(EvaluatorConstants.URI_FRAGMENTS.port.name());
+        txtRtvr.setSource(EvaluatorConstants.URI_FRAGMENTS.port.name());
         eval.setTextRetriever(txtRtvr);
         eval.setValue("8280");
         rule.setCondition(eval);
@@ -160,7 +160,7 @@ public class URLRewriteMediatorTest extends TestCase {
         rule1.addRewriteAction(action1);
         EqualEvaluator eval1 = new EqualEvaluator();
         URLTextRetriever txtRtvr1 = new URLTextRetriever();
-        txtRtvr1.setFragment(EvaluatorConstants.URI_FRAGMENTS.host.name());
+        txtRtvr1.setSource(EvaluatorConstants.URI_FRAGMENTS.host.name());
         eval1.setTextRetriever(txtRtvr1);
         eval1.setValue("myhost");
         rule1.setCondition(eval1);
@@ -179,7 +179,7 @@ public class URLRewriteMediatorTest extends TestCase {
         rule2.addRewriteAction(action3);
         MatchEvaluator eval2 = new MatchEvaluator();
         URLTextRetriever txtRtvr2 = new URLTextRetriever();
-        txtRtvr2.setFragment(EvaluatorConstants.URI_FRAGMENTS.path.name());
+        txtRtvr2.setSource(EvaluatorConstants.URI_FRAGMENTS.path.name());
         eval2.setTextRetriever(txtRtvr2);
         eval2.setRegex(Pattern.compile(".*/MyService"));
         rule2.setCondition(eval2);
@@ -199,8 +199,8 @@ public class URLRewriteMediatorTest extends TestCase {
                 "    <rule>\n" +
                 "        <condition>\n" +
                 "            <and>\n" +
-                "                <equal type=\"url\" fragment=\"protocol\" value=\"http\"/>\n" +
-                "                <equal type=\"url\" fragment=\"host\" value=\"test.org\"/>\n" +
+                "                <equal type=\"url\" source=\"protocol\" value=\"http\"/>\n" +
+                "                <equal type=\"url\" source=\"host\" value=\"test.org\"/>\n" +
                 "            </and>\n" +
                 "        </condition>\n" +
                 "        <action value=\"https\" fragment=\"protocol\"/>\n" +
@@ -210,14 +210,14 @@ public class URLRewriteMediatorTest extends TestCase {
                 "    <rule>\n" +
                 "        <condition>\n" +
                 "            <not>\n" +
-                "                <match type=\"url\" fragment=\"path\" regex=\"/services/.*\"/>\n" +
+                "                <match type=\"url\" source=\"path\" regex=\"/services/.*\"/>\n" +
                 "            </not>\n" +
                 "        </condition>\n" +
                 "        <action value=\"/services\" type=\"prepend\" fragment=\"path\"/>\n" +
                 "    </rule>\n" +
                 "    <rule>\n" +
                 "        <condition>\n" +
-                "            <match type=\"url\" fragment=\"path\" regex=\".*/MyService\"/>\n" +
+                "            <match type=\"url\" source=\"path\" regex=\".*/MyService\"/>\n" +
                 "        </condition>        \n" +
                 "        <action fragment=\"path\" value=\"StockQuoteService\" regex=\"MyService\" type=\"replace\"/>\n" +
                 "        <action fragment=\"ref\" value=\"id\"/>\n" +

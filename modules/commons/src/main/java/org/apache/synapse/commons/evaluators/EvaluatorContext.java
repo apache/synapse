@@ -25,7 +25,6 @@ import org.apache.axis2.context.MessageContext;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Holds the information about the HTTP request. Created on per request basis and
@@ -37,7 +36,7 @@ public class EvaluatorContext {
     private Map<String, String> headers;
     private Map<String, String> params;
     private MessageContext messageContext;
-    private Properties properties;
+    private Map<String,Object> properties;
 
     /**
      * Creates the Evalutor context with the URL and the set of HTTP headers
@@ -131,9 +130,9 @@ public class EvaluatorContext {
      * @param name Name of the property
      * @return A string property value or null
      */
-    public String getProperty(String name) {
+    public Object getProperty(String name) {
         if (properties != null) {
-            return properties.getProperty(name);
+            return properties.get(name);
         }
         return null;
     }
@@ -176,7 +175,7 @@ public class EvaluatorContext {
      *
      * @param properties a Properties map
      */
-    public void setProperties(Properties properties) {
+    public void setProperties(Map<String,Object> properties) {
         this.properties = properties;
     }
 }

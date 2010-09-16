@@ -34,10 +34,22 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class VFSUtils extends BaseUtils {
 
     private static final Log log = LogFactory.getLog(VFSUtils.class);
+
+    /**
+     * URL pattern
+     */
+    private static final Pattern URL_PATTERN = Pattern.compile("[a-z]+://.*");
+
+    /**
+     * Password pattern
+     */
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile(":(?:[^/]+)@");
 
     /**
      * Get a String property from FileContent message
@@ -167,6 +179,23 @@ public class VFSUtils extends BaseUtils {
                     + fo.getName() + " after processing");
         }
     }
+
+    /**
+     * Mask the password of the connection url with ***
+     * @param url the actual url
+     * @return the masked url
+     */
+    public static String maskURLPassword(String url) {
+        final Matcher urlMatcher = URL_PATTERN.matcher(url);
+        String maskUrl;
+        if (urlMatcher.find()) {
+            final Matcher pwdMatcher = PASSWORD_PATTERN.matcher(url);
+            maskUrl = pwdMatcher.replaceFirst("\":***@\"");
+            return maskUrl;
+        }
+        return url;
+    }
+
 
     private static boolean verifyLock(byte[] lockValue, FileObject lockObject) {
         try {

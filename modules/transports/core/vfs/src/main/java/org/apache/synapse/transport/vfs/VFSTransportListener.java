@@ -156,7 +156,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
         FileObject fileObject = null;
 
         if (log.isDebugEnabled()) {
-            log.debug("Scanning directory or file : " + fileURI);
+            log.debug("Scanning directory or file : " + VFSUtils.maskURLPassword(fileURI));
         }
 
         boolean wasError = true;
@@ -295,11 +295,11 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 entry.setNextPollTime(now + entry.getPollInterval());
 
             } else if (log.isDebugEnabled()) {
-                log.debug("Unable to access or read file or directory : " + fileURI);
+                log.debug("Unable to access or read file or directory : " + VFSUtils.maskURLPassword(fileURI));
             }
             onPollCompletion(entry);
         } catch (FileSystemException e) {
-            processFailure("Error checking for existence and readability : " + fileURI, e, entry);
+            processFailure("Error checking for existence and readability : " + VFSUtils.maskURLPassword(fileURI), e, entry);
         }
     }
 

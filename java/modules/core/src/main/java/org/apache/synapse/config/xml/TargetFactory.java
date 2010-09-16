@@ -87,6 +87,19 @@ public class TargetFactory {
             target.setEndpointRef(endpointAttr.getAttributeValue());
         }
 
+        OMAttribute syncAttribute = elem.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "sequencial"));
+        if (syncAttribute != null) {
+            if (syncAttribute.getAttributeValue().equals("true")) {
+                target.setAsynchronous(false);
+            } else if (syncAttribute.getAttributeValue().equals("false")) {
+                target.setAsynchronous(true);
+            } else {
+                handleException("Only true or false expected for Target sequencial " +
+                        "attribute, specified value is: " + syncAttribute.getAttributeValue());
+            }
+        }
+
         OMElement sequence = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"));
         if (sequence != null) {

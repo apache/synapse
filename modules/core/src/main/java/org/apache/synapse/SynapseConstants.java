@@ -273,6 +273,9 @@ public final class SynapseConstants {
     public static final String PROP_SAL_ENDPOINT_CURRENT_ENDPOINT_LIST
             = "synapse.sal.current.endpoint.list";
 
+    public static final String PROP_SAL_ENDPOINT_CURRENT_MEMBER
+            = "synapse.sal.current.member";
+
     public static final String PROP_SAL_ENDPOINT_CURRENT_DISPATCHER
             = "synape.sal.endpoints.dispatcher";   
 

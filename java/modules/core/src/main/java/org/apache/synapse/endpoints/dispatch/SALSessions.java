@@ -20,6 +20,7 @@
 package org.apache.synapse.endpoints.dispatch;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.clustering.Member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -28,6 +29,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
+import org.apache.synapse.endpoints.DynamicLoadbalanceEndpoint;
 import org.apache.synapse.util.Replicator;
 
 import java.util.*;
@@ -141,6 +143,7 @@ public class SALSessions {
                 SynapseConstants.PROP_SAL_CURRENT_SESSION_INFORMATION);
 
         List<Endpoint> endpoints = null;
+        Member currentMember = null; 
 
         if (oldSession == null) {
 
@@ -149,8 +152,11 @@ public class SALSessions {
             }
             endpoints = (List<Endpoint>) synCtx.getProperty(
                     SynapseConstants.PROP_SAL_ENDPOINT_ENDPOINT_LIST);
-            createSession = true;
 
+            currentMember = (Member) synCtx.getProperty(
+                    SynapseConstants.PROP_SAL_ENDPOINT_CURRENT_MEMBER);
+            
+            createSession = true;
         } else {
 
             String oldSessionID = oldSession.getId();
@@ -162,6 +168,7 @@ public class SALSessions {
                 }
                 removeSession(oldSessionID);
                 endpoints = oldSession.getEndpointList();
+                currentMember = oldSession.getMember();
                 createSession = true;
 
             } else {
@@ -174,6 +181,7 @@ public class SALSessions {
                         log.debug("Recovering lost session information for session id " + sessionID);
                     }
                     endpoints = oldSession.getEndpointList();
+                    currentMember = oldSession.getMember();
                     createSession = true;
                 } else {
                     if (log.isDebugEnabled()) {
@@ -184,9 +192,12 @@ public class SALSessions {
         }
 
         if (createSession) {
-
-            SessionInformation newInformation = createSessionInformation(
-                    synCtx, sessionID, endpoints);
+            SessionInformation newInformation;
+            if(currentMember == null){
+                newInformation = createSessionInformation(synCtx, sessionID, endpoints);
+            } else {
+                newInformation = createSessionInformation(synCtx, sessionID, currentMember);
+            }
 
             if (log.isDebugEnabled()) {
                 log.debug("Establishing a session with id :" +
@@ -420,7 +431,8 @@ public class SALSessions {
     }
 
     /*
-     * Helper method to get a list of endpoints from a list of endpoint name maps - This is for clustered env.
+     * Helper method to get a list of endpoints from a list of endpoint name maps -
+     * This is for clustered env.
      */
     private List<Endpoint> getEndpoints(List<String> endpointNames, String root) {
 
@@ -507,9 +519,11 @@ public class SALSessions {
     }
 
     /*
-     * Factory method to create a session information using given endpoint list , session id and other informations
+     * Factory method to create a session information using given endpoint list,
+     * session id and other informations
      */
-    private SessionInformation createSessionInformation(MessageContext synCtx, String id, List<Endpoint> endpoints) {
+    private SessionInformation createSessionInformation(MessageContext synCtx,
+                                                        String id, List<Endpoint> endpoints) {
 
         if (endpoints == null || endpoints.isEmpty()) {
             handleException("Invalid request to create sessions . Cannot find a endpoint sequence.");
@@ -555,6 +569,63 @@ public class SALSessions {
         if (isClustered) {
             List<String> epNameList = getEndpointNames(endpoints);
             information.setPath(epNameList);
+            information.setRootEndpointName(getEndpointName(rootEndpoint));
+        }
+        return information;
+    }
+
+    /*
+     * Factory method to create a session information using a given member node ,
+     * session id and other informations
+     */
+    private SessionInformation createSessionInformation(MessageContext synCtx,
+                                                        String id, Member currentMember) {
+
+        if (currentMember == null) {
+            handleException("Invalid request to create sessions.");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating a session information for given session id  " + id
+                    + " with member Host:" + currentMember.getHostName() + " Port:"
+                    + currentMember.getPort());
+        }
+
+        long expireTimeWindow = -1;
+        List<Endpoint> endpoints = (List<Endpoint>)synCtx.getProperty(
+                SynapseConstants.PROP_SAL_ENDPOINT_ENDPOINT_LIST);
+
+        assert endpoints != null;
+        for (Endpoint endpoint : endpoints) {
+            if (endpoint instanceof DynamicLoadbalanceEndpoint) {
+                long sessionsTimeout = ((DynamicLoadbalanceEndpoint) endpoint).getSessionTimeout();
+                if (expireTimeWindow == -1) {
+                    expireTimeWindow = sessionsTimeout;
+                } else if (expireTimeWindow > sessionsTimeout) {
+                    expireTimeWindow = sessionsTimeout;
+                }
+            }
+        }
+
+        if (expireTimeWindow == -1) {
+            expireTimeWindow = synCtx.getConfiguration().getProperty(
+                    SynapseConstants.PROP_SAL_ENDPOINT_DEFAULT_SESSION_TIMEOUT,
+                    SynapseConstants.SAL_ENDPOINTS_DEFAULT_SESSION_TIMEOUT);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("For session with id " + id +
+                    " : expiry time interval : " + expireTimeWindow);
+        }
+
+        long expiryTime = System.currentTimeMillis() + expireTimeWindow;
+
+        Endpoint rootEndpoint = endpoints.get(0);
+
+        SessionInformation information = new SessionInformation(id,
+                currentMember, expiryTime);
+
+        if (isClustered) {
             information.setRootEndpointName(getEndpointName(rootEndpoint));
         }
         return information;

@@ -21,6 +21,7 @@ package org.apache.synapse.endpoints.dispatch;
 
 
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.axis2.clustering.Member;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,11 +36,18 @@ public class SessionInformation implements Serializable {
     private String rootEndpointName;
     private List<String> path;
     private long expiryTime;
-    private final transient List<Endpoint> endpointList;
+    private transient List<Endpoint> endpointList;
+    private transient Member member;
 
     public SessionInformation(String id, List<Endpoint> endpointList, long expiryTime) {
         this.id = id;
         this.endpointList = endpointList;
+        this.expiryTime = expiryTime;
+    }
+
+    public SessionInformation(String id, Member member, long expiryTime) {
+        this.id = id;
+        this.member = member;
         this.expiryTime = expiryTime;
     }
 
@@ -83,5 +91,8 @@ public class SessionInformation implements Serializable {
         return expiryTime < System.currentTimeMillis();
     }
 
+    public Member getMember(){
+        return member;
+    }
 }
 

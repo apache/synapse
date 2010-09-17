@@ -29,6 +29,9 @@ import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory
 import org.apache.synapse.core.LoadBalanceMembershipHandler;
 import org.apache.synapse.endpoints.DynamicLoadbalanceEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.dispatch.Dispatcher;
+import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
 import javax.xml.namespace.QName;
@@ -80,7 +83,37 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                 loadbalanceEndpoint.setName(name.getAttributeValue());
             }
 
-            //TODO: Handle session affinity
+            // get the session for this endpoint
+            OMElement sessionElement = epConfig.
+                    getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "session"));
+            if (sessionElement != null) {
+
+                OMElement sessionTimeout = sessionElement.getFirstChildWithName(
+                        new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sessionTimeout"));
+
+                if (sessionTimeout != null) {
+                    try {
+                        loadbalanceEndpoint.setSessionTimeout(Long.parseLong(
+                                sessionTimeout.getText().trim()));
+                    } catch (NumberFormatException nfe) {
+                        handleException("Invalid session timeout value : " + sessionTimeout.getText());
+                    }
+                }
+
+                String type = sessionElement.getAttributeValue(new QName("type"));
+
+                if (type.equalsIgnoreCase("soap")) {
+                    Dispatcher soapDispatcher = new SoapSessionDispatcher();
+                    loadbalanceEndpoint.setDispatcher(soapDispatcher);
+
+                } else if (type.equalsIgnoreCase("http")) {
+                    Dispatcher httpDispatcher = new HttpSessionDispatcher();
+                    loadbalanceEndpoint.setDispatcher(httpDispatcher);
+
+                }
+
+                loadbalanceEndpoint.setSessionAffinity(true);
+            }
 
             // set if failover is turned off
             String failover = loadbalanceElement.getAttributeValue(new QName("failover"));

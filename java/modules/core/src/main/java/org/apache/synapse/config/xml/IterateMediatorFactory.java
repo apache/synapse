@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.eip.splitter.IterateMediator;
+import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
@@ -61,6 +62,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_CONTPAR = new QName("continueParent");
     private static final QName ATT_PREPLD = new QName("preservePayload");
     private static final QName ATT_ATTACHPATH = new QName("attachPath");
+    private static final QName ATT_ASYNCHRONOUS = new QName("asynchronous");
 
     /**
      * This method will create the IterateMediator by parsing the given xml configuration
@@ -76,13 +78,13 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
         OMAttribute continueParent = elem.getAttribute(ATT_CONTPAR);
         if (continueParent != null) {
             mediator.setContinueParent(
-                Boolean.valueOf(continueParent.getAttributeValue()).booleanValue());
+                    Boolean.valueOf(continueParent.getAttributeValue()));
         }
 
         OMAttribute preservePayload = elem.getAttribute(ATT_PREPLD);
         if (preservePayload != null) {
             mediator.setPreservePayload(
-                Boolean.valueOf(preservePayload.getAttributeValue()).booleanValue());
+                    Boolean.valueOf(preservePayload.getAttributeValue()));
         }
 
         OMAttribute expression = elem.getAttribute(ATT_EXPRN);
@@ -116,9 +118,19 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
                 attachPathValue, e);
         }
 
+        boolean asynchronous = true;
+        OMAttribute asynchronousAttr = elem.getAttribute(ATT_ASYNCHRONOUS);
+        if (asynchronousAttr != null && asynchronousAttr.getAttributeValue().equals("false")) {
+            asynchronous = true;
+        }
+
         OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);
         if (targetElement != null) {
-            mediator.setTarget(TargetFactory.createTarget(targetElement));
+            Target target = TargetFactory.createTarget(targetElement);
+            if (target != null) {
+                target.setAsynchronous(asynchronous);
+                mediator.setTarget(target);
+            }
         } else {
             handleException("Target for an iterate mediator is required :: missing target");
         }

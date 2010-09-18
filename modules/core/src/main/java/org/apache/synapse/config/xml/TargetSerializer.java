@@ -73,11 +73,7 @@ public class TargetSerializer {
 
         if (target.getEndpointRef() != null) {
             targetElem.addAttribute("endpoint", target.getEndpointRef(), nullNS);
-        }
-
-        if (!target.isAsynchronous()) {
-            targetElem.addAttribute("sequencial", "true", nullNS);
-        }
+        }        
 
         if (target.getSequence() != null) {
             SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();

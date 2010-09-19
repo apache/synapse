@@ -54,15 +54,16 @@ import java.util.List;
  * The XSLT mediator performs an XSLT transformation requested, using
  * the current message. The source attribute (if available) specifies the source element
  * on which the transformation would be applied. It will default to the first child of
- * the messages' SOAP body, if it is omitted.
+ * the messages' SOAP body, if it is omitted.</p>
  *
- * Additional properties passed into this mediator would become parameters for XSLT.
+ * <p>Additional properties passed into this mediator would become parameters for XSLT.
  * Additional features passed into this mediator would become features except for
- * "http://synapse.apache.org/ns/2010/04/configuration/transform/feature/dom" for the Transformer Factory, which
- * is used to decide between using DOM and Streams during the transformation process. By default
- * this is turned on as an optimization, but should be set to false if issues are detected
+ * "http://synapse.apache.org/ns/2010/04/configuration/transform/feature/dom" for the
+ * Transformer Factory, which is used to decide between using DOM and Streams during
+ * the transformation process. By default this is turned on as an optimization, but
+ * should be set to false if issues are detected</p>
  *
- *  Note: Set the TransformerFactory system property to generate and use translets
+ * <p> Note: Set the TransformerFactory system property to generate and use translets
  *  -Djavax.xml.transform.TransformerFactory=org.apache.xalan.xsltc.trax.TransformerFactoryImpl
  * 
  */
@@ -84,12 +85,12 @@ public class XSLTMediator extends AbstractMediator {
         }
         
         public void error(TransformerException e) throws TransformerException {
-            synLog.error("Error occured in " + activity + " : " + e);
+            synLog.error("Error occurred in " + activity + " : " + e);
             throw e;
         }
         
         public void fatalError(TransformerException e) throws TransformerException {
-            synLog.error("Fatal error occured in " + activity + " : " + e);
+            synLog.error("Fatal error occurred in " + activity + " : " + e);
             throw e;
         }
     }
@@ -157,7 +158,7 @@ public class XSLTMediator extends AbstractMediator {
     private Templates cachedTemplates = null;
 
     /**
-     * The TransformerFactory instance which use to create Templates...This is not thread-safe.
+     * The TransformerFactory instance which use to create Templates. This is not thread-safe.
      * @see javax.xml.transform.TransformerFactory
      */
     private final TransformerFactory transFact = TransformerFactory.newInstance();
@@ -310,14 +311,14 @@ public class XSLTMediator extends AbstractMediator {
                     }
 
                 } else if (isSoapBody) {
-                    for (Iterator iter = synCtx.getEnvelope().getBody().getChildElements();
-                        iter.hasNext(); ) {
-                        OMElement child = (OMElement) iter.next();
+                    for (Iterator itr = synCtx.getEnvelope().getBody().getChildElements();
+                        itr.hasNext(); ) {
+                        OMElement child = (OMElement) itr.next();
                         child.detach();
                     }
 
-                    for (Iterator iter = result.getChildElements(); iter.hasNext(); ) {
-                        OMElement child = (OMElement) iter.next();
+                    for (Iterator itr = result.getChildElements(); itr.hasNext(); ) {
+                        OMElement child = (OMElement) itr.next();
                         synCtx.getEnvelope().getBody().addChild(child);
                     }
 
@@ -333,7 +334,7 @@ public class XSLTMediator extends AbstractMediator {
     }
 
     /**
-     * Create a XSLT template object and assing it to the cachedTemplates variable
+     * Create a XSLT template object and assign it to the cachedTemplates variable
      * @param synCtx current message
      * @param synLog logger to use
      */
@@ -455,7 +456,7 @@ public class XSLTMediator extends AbstractMediator {
             try {
                 transFact.setFeature(featureName, isFeatureEnable);
             } catch (TransformerConfigurationException e) {
-                String msg = "Error occured when setting features to the TransformerFactory";
+                String msg = "Error occurred when setting features to the TransformerFactory";
                 log.error(msg, e);
                 throw new SynapseException(msg, e);
             }
@@ -500,7 +501,7 @@ public class XSLTMediator extends AbstractMediator {
             try {
                 transFact.setAttribute(name, value);
             } catch (IllegalArgumentException e) {
-                String msg = "Error occured when setting attribute to the TransformerFactory";
+                String msg = "Error occurred when setting attribute to the TransformerFactory";
                 log.error(msg, e);
                 throw new SynapseException(msg, e);
             }

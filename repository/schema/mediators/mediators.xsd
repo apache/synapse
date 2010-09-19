@@ -31,6 +31,7 @@
     <xs:include schemaLocation="filter/in.xsd"/>
     <xs:include schemaLocation="filter/out.xsd"/>
     <xs:include schemaLocation="filter/filter.xsd"/>
+    <xs:include schemaLocation="filter/switch.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -58,6 +59,7 @@
             <xs:element ref="drop"/>
             <xs:element ref="validate"/>
             <xs:element ref="filter"/>
+            <xs:element ref="switch"/>
         </xs:choice>
     </xs:group>
 

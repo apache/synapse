@@ -43,7 +43,7 @@ version to the 2.x compatible version
             <xsl:text>
 
 </xsl:text>
-            <xsl:for-each select="syn:* | synNew:* | comment()">
+            <xsl:for-each select="syn:* | synNew:* | spring:* | comment()">
                 <xsl:if test="local-name()='sequence' or local-name()='localEntry' or local-name()='proxy' or local-name()='task' or local-name()='endpoint' or local-name()='eventSource' or local-name()='priorityExecutor' or local-name()='registry'">
                     <xsl:apply-templates select="."/>
                     <xsl:text>
@@ -59,7 +59,7 @@ version to the 2.x compatible version
             <xsl:if test="not(syn:sequence[@name='main'] or synNew:sequence[@name='main']) and (count(syn:*[local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint' and local-name()!='eventSource' and local-name()!='registry']) + count(synNew:*[local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint' and local-name()!='eventSource' and local-name()!='priorityExecutor' and local-name()!='registry']))!=0">
                 <xsl:element name="sequence" namespace="http://synapse.apache.org/ns/2010/04/configuration">
                     <xsl:attribute name="name">main</xsl:attribute>
-                    <xsl:for-each select="syn:* | synNew:* | comment()">
+                    <xsl:for-each select="syn:* | synNew:* | spring:* | comment()">
                         <xsl:if test="local-name()!='sequence' and local-name()!='localEntry' and local-name()!='proxy' and local-name()!='task' and local-name()!='endpoint' and local-name()!='eventSource' and local-name()!='priorityExecutor' and local-name()!='registry'">
                             <xsl:choose>
                                 <xsl:when test="self::comment()">

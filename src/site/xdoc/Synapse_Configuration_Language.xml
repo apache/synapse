@@ -1073,7 +1073,8 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </p>
 <pre xml:space="preserve">
     <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#rewrite">rewrite</a> | <a href="#header">header</a>  | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a>
-    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a> | <a href="#eventPublisher">eventPublisher</a>
+    | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a> | <a href="#eventPublisher">eventPublisher</a> | <a href="#transaction">transaction</a>
+
     </pre>
     <p>
       In addition to the above, Synapse will be able to load custom mediators
@@ -2155,8 +2156,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       should be specified. With the version attribute the WS-RM specification
       version to be used can be specified, 1.0 or 1.1.
     </p>
-    </h3>
-        <h4>
+    <h4>
       <a name="eventPublisher" id="eventPublisher">eventPublisher</a>
     </h4>
 <pre xml:space="preserve"> &lt;eventPublisher eventSourceName="string"/&gt;</pre>
@@ -2171,7 +2171,35 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
         mediators using sequences before the eventPublisher mediator. Quality of service like security
         can add to the events by applying QOS to the proxy service that holds the  eventPublisher mediator.
     </p>
-    <p/>
+
+        <h4>
+            <a name="transaction" id="transaction">Transaction</a>
+        </h4>
+      <pre xml:space="preserve">
+        &lt;transaction
+           action="new|use-existing-or-new|fault-if-no-tx|commit|rollback|suspend|resume"&gt;
+        &lt;/transaction&gt;
+      </pre>
+        <p>The action attribute has the following meanings.</p>
+        <p>1. new - Create a new jta transaction. Generate a fault if a transaction already exist.
+        </p>
+        <p>2. use-existing-or-new - Create a new jta transaction. Do nothing if a transaction exist.
+        </p>
+        <p>3. fault-if-no-tx - Generate a fault if no transaction exist. Do nothing if a transaction
+            exist.
+        </p>
+        <p>4. commit - Commit transaction. Generate a fault if no transaction exist.</p>
+        <p>5. rollback - Rollback transaction. Generate a fault if no transaction exist.</p>
+        <p>6. suspend - Suspend transaction. Generate a fault if no transaction exist.</p>
+        <p>7. resume - Resume transaction. Generate a fault if no transaction exist.</p>
+
+        <p>
+            The transaction mediator can use to define a distributed transaction. It has the
+            transaction markers which can be used to mark the start and end of
+            a transaction. Transaction mediator required a JTA provider in the system to work.
+        </p>
+
+        <p/>
     <p/>
   </body>
 </document>  

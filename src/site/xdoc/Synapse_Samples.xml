@@ -308,6 +308,8 @@
 <a href="#Sample451">Sample 451: Conditional URL rewriting</a></li>
 <li>
 <a href="#Sample452">Sample 452: Conditional URL rewriting with multiple rules</a></li>
+<li>
+<a href="#Sample460">Sample 460: How to initialize and use a Spring Bean as a Mediator</a></li>
 </ul></li></ul></li>
         <li>
           <a href="#Task">Introduction to Eventing</a>
@@ -4588,6 +4590,52 @@ port number to the URL by looking at the protocol prefix. Ultimately the service
 server and the client will receive a valid response.</p>
 <p>Another important aspect shown by this sample is the ability of the URL rewirte mediator to obtain the necessary
 values by executing XPath expressions. The port numbers are calculated by executing an XPath on the messages.</p>
+</div>
+
+<h2>
+<a name="Sample460" id="Sample460">Sample 460: How to initialize and use a Spring Bean as a Mediator</a></h2>
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+        &lt;parameter name="root">file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;parameter name="cachableDuration">15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;!--Setting the Spring Mediator and its Spring Beans xml file location --&gt;
+        &lt;!--Note that springtest is the bean id used in springCustomLogger.xml --&gt;
+        &lt;spring bean="springtest" key="spring/springCustomLogger.xml"/&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;
+
+</pre>
+<p>springCustomLogger.xml file</p>
+<pre xml:space="preserve">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE beans PUBLIC  "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd"&gt;
+
+&lt;beans&gt;
+
+   &lt;bean id="springtest" class="samples.mediators.extentions.SpringCustomLogger" singleton="false"&gt;
+	   &lt;property name="userName"&gt;&lt;value&gt;"Synapse User"&lt;/value&gt;&lt;/property&gt;
+	   &lt;property name="email"&gt;&lt;value&gt;"usr@synapse.org"&lt;/value&gt;&lt;/property&gt;
+   &lt;/bean&gt;
+
+&lt;/beans&gt;
+
+</pre>
+<div>
+<p>
+<strong>Objective:</strong> Demonstrate How to initialize and use a SpringBean as a mediator  </p>
+<p>
+<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
+<p>Start Synapse with the sample configuration 460 (i.e. synapse -sample 460). </p>
+<p>In this sample, the Spring Bean, SpringCustomLogger get initialized using springCustomLogger.xml file and then it log the message Id.</p>
+<p>Invoke the client as follows. </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
 </div>
    <h2>
       <a name="Sample500" id="Sample500">Sample 500: Simple Eventing Sample</a>

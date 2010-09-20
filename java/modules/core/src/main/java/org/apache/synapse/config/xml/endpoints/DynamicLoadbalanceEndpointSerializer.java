@@ -23,6 +23,10 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.LoadBalanceMembershipHandler;
 import org.apache.synapse.endpoints.DynamicLoadbalanceEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.dispatch.Dispatcher;
+import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
 
 import java.util.Properties;
 
@@ -62,6 +66,30 @@ public class DynamicLoadbalanceEndpointSerializer extends EndpointSerializer {
         boolean anon = dynamicLoadbalanceEndpoint.isAnonymous();
         if (name != null && !anon) {
             endpointElement.addAttribute("name", name, null);
+        }
+
+        Dispatcher dispatcher = dynamicLoadbalanceEndpoint.getDispatcher();
+        if (dispatcher != null) {
+
+            OMElement sessionElement = fac.createOMElement("session", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            if (dispatcher instanceof SoapSessionDispatcher) {
+                sessionElement.addAttribute("type", "soap", null);
+            } else if (dispatcher instanceof HttpSessionDispatcher) {
+                sessionElement.addAttribute("type", "http", null);
+            } else if (dispatcher instanceof SimpleClientSessionDispatcher) {
+                sessionElement.addAttribute("type", "simpleClientSession", null);
+            } else {
+                handleException("invalid session dispatcher : " + dispatcher.getClass().getName());
+            }
+
+            long sessionTimeout = dynamicLoadbalanceEndpoint.getSessionTimeout();
+            if (sessionTimeout != -1) {
+                OMElement sessionTimeoutElement = fac.createOMElement("sessionTimeout",
+                        SynapseConstants.SYNAPSE_OMNAMESPACE);
+                sessionTimeoutElement.setText(String.valueOf(sessionTimeout));
+                sessionElement.addChild(sessionTimeoutElement);
+            }
+            endpointElement.addChild(sessionElement);
         }
 
         OMElement dynamicLoadbalanceElement

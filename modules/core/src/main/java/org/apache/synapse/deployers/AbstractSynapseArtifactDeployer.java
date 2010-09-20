@@ -61,11 +61,9 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
     private static final Log log = LogFactory.getLog(AbstractSynapseArtifactDeployer.class);
     protected  Log deployerLog;
     protected ConfigurationContext cfgCtx;
-    private SynapseArtifactDeploymentStore deploymentStore;
 
     protected AbstractSynapseArtifactDeployer() {
         deployerLog = LogFactory.getLog(this.getClass());
-        deploymentStore = SynapseArtifactDeploymentStore.getInstance();
     }
 
     /**
@@ -104,6 +102,9 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
             }
             return;
         }
+
+        SynapseArtifactDeploymentStore deploymentStore =
+                getSynapseConfiguration().getArtifactDeploymentStore();
 
         // check whether this is triggered by a restore, if it is a restore we do not want to deploy it again
         if (deploymentStore.isRestoredFile(filename)) {
@@ -195,6 +196,9 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
             log.debug("UnDeployment of the synapse artifact from file : " + fileName + " : STARTED");
         }
 
+        SynapseArtifactDeploymentStore deploymentStore =
+                getSynapseConfiguration().getArtifactDeploymentStore();
+
         // We want to eliminate the undeployment when we are backing up these files
         if (deploymentStore.isBackedUpArtifact(fileName)) {
 
@@ -280,7 +284,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      *
      * @param artifactName name of the artifact to be undeployed
      *
-     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#unDeploy(String) 
+     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploy(String)  
      */
     public abstract void undeploySynapseArtifact(String artifactName);
 
@@ -314,6 +318,8 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
 
     protected void writeToFile(OMElement content, String fileName) throws Exception {
         // this is not good, but I couldn't think of a better design :-(
+        SynapseArtifactDeploymentStore deploymentStore =
+                getSynapseConfiguration().getArtifactDeploymentStore();
         deploymentStore.addRestoredArtifact(fileName);
         OutputStream out = new FileOutputStream(new File(fileName));
         XMLPrettyPrinter.prettify(content, out);
@@ -331,9 +337,11 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         throw new SynapseArtifactDeploymentException(msg, e);
     }
 
-    private void handleDeploymentError(String msg, Exception e, String fileName) {
+    private void handleDeploymentError(String msg, Exception e, String fileName) throws DeploymentException {
         fileName = FilenameUtils.normalize(fileName);
         log.error(msg, e);
+        SynapseArtifactDeploymentStore deploymentStore =
+                getSynapseConfiguration().getArtifactDeploymentStore();
         if (deploymentStore.isUpdatingArtifact(fileName)) {
             backupFile(new File(fileName));
             log.info("Restoring the existing artifact into the file : " + fileName);
@@ -344,8 +352,12 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         }
     }
 
-    private String backupFile(File file) {
+    private String backupFile(File file) throws DeploymentException {
         String filePath = FilenameUtils.normalize(file.getAbsolutePath());
+
+        SynapseArtifactDeploymentStore deploymentStore =
+                getSynapseConfiguration().getArtifactDeploymentStore();
+
         deploymentStore.addBackedUpArtifact(filePath);
         String backupFilePath = filePath + ".back";
         int backupIndex = 0;

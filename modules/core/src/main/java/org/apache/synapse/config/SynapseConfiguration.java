@@ -24,6 +24,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.commons.executors.PriorityExecutor;
@@ -126,6 +127,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Description/documentation of the configuration
      */
     private String description = null;
+
+    /**
+     * The artifact deployment store to keep track of the items deployed
+     */
+    SynapseArtifactDeploymentStore artifactDeploymentStore = new SynapseArtifactDeploymentStore();
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -1190,6 +1196,16 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Get the SynapseArtifactDeploymentStore which is used to store the information about
+     * the deployed artifacts
+     *
+     * @return the SynapseArtifactDeploymentStore for this configuration
+     */
+    public SynapseArtifactDeploymentStore getArtifactDeploymentStore() {
+        return artifactDeploymentStore;
     }
 
     private void assertAlreadyExists(String key, String type) {

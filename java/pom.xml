@@ -867,7 +867,7 @@
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>
-        <wso2caching.version>3.3.0-SNAPSHOT</wso2caching.version>
+        <wso2caching.version>3.4.0</wso2caching.version>
         <wso2throttle.version>SNAPSHOT</wso2throttle.version>
         <wso2eventing-api.version>SNAPSHOT</wso2eventing-api.version>
         <xbean.version>2.2.0</xbean.version>

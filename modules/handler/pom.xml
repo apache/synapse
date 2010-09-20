@@ -48,6 +48,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Private-Package>
                             org.apache.synapse.handler.util,
                             org.apache.synapse.handler,

@@ -745,6 +745,18 @@ public class Axis2SynapseController implements SynapseController {
         if (ipAddress != null && !"".equals(ipAddress)) {
             Entry entry = new Entry(SynapseConstants.SERVER_IP);
             entry.setValue(ipAddress);
+            if (synapseConfiguration.getAxisConfiguration().getTransportsIn() != null) {
+                Map<String, TransportInDescription> transportInConfigMap = synapseConfiguration.getAxisConfiguration().getTransportsIn();
+                if (transportInConfigMap != null) {
+                    TransportInDescription transportInDescription = transportInConfigMap.get("http");
+                    if (transportInDescription != null) {
+                        Parameter bindAddressParam = transportInDescription.getParameter("bind-address");
+                        if (bindAddressParam != null) {
+                            entry.setValue(bindAddressParam.getValue());
+                        }
+                    }
+                }
+            }
             synapseConfiguration.addEntry(SynapseConstants.SERVER_IP, entry);
         }
     }

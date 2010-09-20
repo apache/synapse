@@ -43,7 +43,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -71,7 +70,9 @@ public class ClientWorker implements Runnable {
      * context sent
      * @param cfgCtx the Axis2 configuration context
      * @param in the InputStream to read the body of the response message received
+     * @param response HTTP response received from the server
      * @param outMsgCtx the original outgoing message context (i.e. corresponding request)
+     * @param endpointURLPrefix The endpoint URL prefix
      */
     public ClientWorker(ConfigurationContext cfgCtx, InputStream in,
         HttpResponse response, MessageContext outMsgCtx, String endpointURLPrefix) {
@@ -187,9 +188,7 @@ public class ClientWorker implements Runnable {
                 }
 
                 responseMsgCtx.setProperty(
-                    Constants.Configuration.CHARACTER_SET_ENCODING,
-                    contentType.indexOf(HTTP.CHARSET_PARAM) > 0 ?
-                        charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);
+                        Constants.Configuration.CHARACTER_SET_ENCODING, charSetEnc);
 
                 // workaround for Axis2 TransportUtils.createSOAPMessage() issue, where a response
                 // of content type "text/xml" is thought to be REST if !MC.isServerSide(). This
@@ -290,11 +289,5 @@ public class ClientWorker implements Runnable {
 
         // Unable to determine the content type - Return default value
         return NhttpConstants.DEFAULT_CONTENT_TYPE;
-    }
-
-    // -------------- utility methods -------------
-    private void handleException(String msg, Exception e) throws AxisFault {
-        log.error(msg, e);
-        throw new AxisFault(msg, e);
     }
 }

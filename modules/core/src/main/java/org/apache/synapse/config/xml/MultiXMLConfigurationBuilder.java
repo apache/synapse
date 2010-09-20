@@ -31,7 +31,6 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -169,7 +168,7 @@ public class MultiXMLConfigurationBuilder {
                     Entry entry = SynapseXMLConfigurationFactory.defineEntry(
                             synapseConfig, document);
                     entry.setFileName(file.getName());
-                    SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), entry.getKey());
                 } catch (FileNotFoundException ignored) {}
             }
@@ -191,7 +190,7 @@ public class MultiXMLConfigurationBuilder {
                     ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(
                             synapseConfig, document);
                     proxy.setFileName(file.getName());
-                    SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), proxy.getName());
                 } catch (FileNotFoundException ignored) {}
             }
@@ -213,7 +212,7 @@ public class MultiXMLConfigurationBuilder {
                     Startup startup = SynapseXMLConfigurationFactory.defineStartup(
                             synapseConfig, document);
                     startup.setFileName(file.getName());
-                    SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), startup.getName());
                 } catch (FileNotFoundException ignored) {}
             }
@@ -237,7 +236,7 @@ public class MultiXMLConfigurationBuilder {
                     if (seq instanceof SequenceMediator) {
                         SequenceMediator sequence = (SequenceMediator) seq;
                         sequence.setFileName(file.getName());
-                        SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), sequence.getName());
                     }
                 } catch (FileNotFoundException ignored) {}
@@ -260,7 +259,7 @@ public class MultiXMLConfigurationBuilder {
                     Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
                             synapseConfig, document);
                     endpoint.setFileName(file.getName());
-                    SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), endpoint.getName());
                 } catch (FileNotFoundException ignored) {}
             }
@@ -282,7 +281,7 @@ public class MultiXMLConfigurationBuilder {
                     SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
                             defineEventSource(synapseConfig, document);
                     eventSource.setFileName(file.getName());
-                    SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), eventSource.getName());
                 } catch (FileNotFoundException ignored) {}
            }
@@ -304,7 +303,7 @@ public class MultiXMLConfigurationBuilder {
                     PriorityExecutor executor = SynapseXMLConfigurationFactory.
                             defineExecutor(synapseConfig, document);
                     executor.setFileName(file.getName());
-                    SynapseArtifactDeploymentStore.getInstance().addArtifact(
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), executor.getName());
                 } catch (FileNotFoundException ignored) {}
            }

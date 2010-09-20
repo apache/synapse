@@ -41,6 +41,7 @@ import java.util.Map;
  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
  */
 public final class SynapseArtifactDeploymentStore {
+    public static final String SYNAPSE_ARTIFACT_DEPLOYMENT_STORE = "SYNAPSE_ARTIFACT_DEPLOYMENT_STORE"; 
 
     /** Keeps track of the deployed artifacts in the synapse environment */
     private static Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
@@ -53,24 +54,8 @@ public final class SynapseArtifactDeploymentStore {
 
     /** Keeps track of the backed up artifacts in the synapse environment in a particular instance */
     private List<String> backedUpFiles = new ArrayList<String>();
-
-    private static SynapseArtifactDeploymentStore _instance;
+   
     private static final Log log = LogFactory.getLog(SynapseArtifactDeploymentStore.class);
-    private SynapseArtifactDeploymentStore() {}
-
-    /**
-     * Provides the <code>singleton</code> instance of
-     * {@link SynapseArtifactDeploymentStore}
-     *
-     * @return the singleton instance of SynapseArtifactDeploymentStore
-     */
-    public static SynapseArtifactDeploymentStore getInstance() {
-        
-        if (_instance == null) {
-            _instance = new SynapseArtifactDeploymentStore();
-        }
-        return _instance;
-    }
 
     /**
      * Adds artifacts indexed with the respective filename

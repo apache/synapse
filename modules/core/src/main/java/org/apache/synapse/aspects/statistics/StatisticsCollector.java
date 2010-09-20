@@ -18,8 +18,6 @@
  */
 package org.apache.synapse.aspects.statistics;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.statistics.mbean.StatisticsView;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
@@ -32,8 +30,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 @SuppressWarnings("unused")
 public class StatisticsCollector {
-
-    private static final Log log = LogFactory.getLog(StatisticsCollector.class);
 
     private final ConcurrentLinkedQueue<StatisticsRecord> statisticsCollection =
             new ConcurrentLinkedQueue<StatisticsRecord>();

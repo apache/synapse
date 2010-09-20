@@ -21,11 +21,11 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.saaj.util.IDGenerator;
+import org.apache.axis2.saaj.util.SAAJUtil;
 import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.clustering.state.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.saaj.util.SAAJUtil;
-import org.apache.axis2.saaj.util.IDGenerator;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -43,14 +43,14 @@ import org.wso2.caching.CachingConstants;
 import org.wso2.caching.CachingException;
 import org.wso2.caching.digest.DigestGenerator;
 
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.MimeHeaders;
 import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 
 /**
  * CacheMediator will cache the response messages indexed using the hash value of the
@@ -74,15 +74,16 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
     private SequenceMediator onCacheHitSequence = null;
     private String onCacheHitRef = null;
     private int maxMessageSize = 0;
-    private String cacheManagerKey = CachingConstants.CACHE_MANAGER; // default per-host
-    private static final String CACHE_MANAGER_PREFIX = "synapse.cache_manager_";
+    private static final String CACHE_KEY_PREFIX = "synapse.cache_key_";
+
+    private String cacheKey = "synapse.cache_key";
 
     public void init(SynapseEnvironment se) {
         if (onCacheHitSequence != null) {
             onCacheHitSequence.init(se);
         }
     }
-    
+
     public void destroy() {
         if (onCacheHitSequence != null) {
             onCacheHitSequence.destroy();
@@ -125,45 +126,45 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Looking up cache at scope : " + scope + " with ID : "
-                    + cacheManagerKey);
+                    + cacheKey);
         }
 
         // look up cache
-        Object prop = cfgCtx.getPropertyNonReplicable(cacheManagerKey);
+        Object prop = cfgCtx.getPropertyNonReplicable(CachingConstants.CACHE_MANAGER);
         CacheManager cacheManager;
         if (prop != null && prop instanceof CacheManager) {
             cacheManager = (CacheManager) prop;
         } else {
             synchronized (cfgCtx) {
                 // check again after taking the lock to make sure no one else did it before us
-                prop = cfgCtx.getPropertyNonReplicable(cacheManagerKey);
+                prop = cfgCtx.getPropertyNonReplicable(CachingConstants.CACHE_MANAGER);
                 if (prop != null && prop instanceof CacheManager) {
                     cacheManager = (CacheManager) prop;
 
                 } else {
                     synLog.traceOrDebug("Creating/recreating the cache object");
                     cacheManager = new CacheManager();
-                    cfgCtx.setProperty(cacheManagerKey, cacheManager);
+                    cfgCtx.setProperty(CachingConstants.CACHE_MANAGER, cacheManager);
                 }
             }
         }
 
         boolean result = true;
         try {
-            
+
             if (synCtx.isResponse()) {
                 processResponseMessage(synCtx, cfgCtx, synLog, cacheManager);
 
             } else {
                 result = processRequestMessage(synCtx, cfgCtx, synLog, cacheManager);
             }
-            
+
         } catch (ClusteringFault clusteringFault) {
             synLog.traceOrDebug("Unable to replicate Cache mediator state among the cluster");
         }
 
         synLog.traceOrDebug("End : Cache mediator");
-        
+
         return result;
     }
 
@@ -189,16 +190,16 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         if (requestHash != null) {
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Storing the response message into the cache at scope : " +
-                    scope + " with ID : " + cacheManagerKey + " for request hash : " + requestHash);
+                    scope + " with ID : " + cacheKey + " for request hash : " + requestHash);
             }
 
-            CachedObject cachedObj = cacheManager.getResponseForKey(requestHash, cfgCtx);
+            CachedObject cachedObj = cacheManager.getResponseForKey(cacheKey, requestHash, cfgCtx);
             if (cachedObj != null) {
 
                 if (synLog.isTraceOrDebugEnabled()) {
                     synLog.traceOrDebug("Storing the response for the message with ID : " +
                         synCtx.getMessageID() + " with request hash ID : " +
-                        cachedObj.getRequestHash() + " in the cache : " + cacheManagerKey);
+                        cachedObj.getRequestHash() + " in the cache : " + cacheKey);
                 }
 
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -221,7 +222,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                     cachedObj.setExpireTimeMillis(System.currentTimeMillis() + cachedObj.getTimeout());
                 }
 
-                cfgCtx.setProperty(cacheManagerKey, cacheManager);
+                cfgCtx.setProperty(CachingConstants.CACHE_MANAGER, cacheManager);
 //                Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
                 Replicator.replicate(cfgCtx);
             } else {
@@ -255,7 +256,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         }
 
         String requestHash = null;
-        try {  
+        try {
             requestHash = digestGenerator.getDigest(
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext());
             synCtx.setProperty(CachingConstants.REQUEST_HASH, requestHash);
@@ -267,12 +268,12 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
             synLog.traceOrDebug("Generated request hash : " + requestHash);
         }
 
-        if (cacheManager.containsKey(requestHash) &&
-            cacheManager.getResponseForKey(requestHash, cfgCtx) != null) {
+        if (cacheManager.containsKey(cacheKey, requestHash) &&
+            cacheManager.getResponseForKey(cacheKey, requestHash, cfgCtx) != null) {
 
             // get the response from the cache and attach to the context and change the
             // direction of the message
-            CachedObject cachedObj = cacheManager.getResponseForKey(requestHash, cfgCtx);
+            CachedObject cachedObj = cacheManager.getResponseForKey(cacheKey, requestHash, cfgCtx);
 
             if (!cachedObj.isExpired() && cachedObj.getResponseEnvelope() != null) {
 
@@ -307,16 +308,17 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                                 "Couldn't build the SOAP response from the cached byte stream",
                                 synCtx);
                     }
+
                     // todo: if there is a WSA messageID in the response, is that need to be unique on each and every resp
                 } catch (AxisFault axisFault) {
                     handleException("Error setting response envelope from cache : "
-                        + cacheManagerKey, synCtx);
+                        + cacheKey, synCtx);
                 } catch (IOException ioe) {
                     handleException("Error setting response envelope from cache : "
-                        + cacheManagerKey, ioe, synCtx);
+                        + cacheKey, ioe, synCtx);
                 } catch (SOAPException soape) {
                     handleException("Error setting response envelope from cache : "
-                        + cacheManagerKey, soape, synCtx);
+                        + cacheKey, soape, synCtx);
                 }
 
                 // take specified action on cache hit
@@ -338,7 +340,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
                     if (synLog.isTraceOrDebugEnabled()) {
                         synLog.traceOrDebug("Request message " + synCtx.getMessageID() +
-                            " was served from the cache : " + cacheManagerKey);
+                            " was served from the cache : " + cacheKey);
                     }
                     // send the response back if there is not onCacheHit is specified
                     synCtx.setTo(null);
@@ -353,7 +355,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
                 cachedObj.setTimeout(timeout);
                 synLog.traceOrDebug("Existing cached response has expired. Reset cache element");
 
-                cfgCtx.setProperty(cacheManagerKey, cacheManager);
+                cfgCtx.setProperty(CachingConstants.CACHE_MANAGER, cacheManager);
 //                Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
                 Replicator.replicate(cfgCtx);
             }
@@ -361,9 +363,9 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
         } else {
 
             // if not found in cache, check if we can cache this request
-            if (cacheManager.getCacheKeys().size() == inMemoryCacheSize) {
-                cacheManager.removeExpiredResponses(cfgCtx);
-                if (cacheManager.getCacheKeys().size() == inMemoryCacheSize) {
+            if (cacheManager.getCacheKeys(cacheKey).size() == inMemoryCacheSize) {
+                cacheManager.removeExpiredResponses(cacheKey, cfgCtx);
+                if (cacheManager.getCacheKeys(cacheKey).size() == inMemoryCacheSize) {
                     synLog.traceOrDebug("In-memory cache is full. Unable to cache");
                 } else {
                     storeRequestToCache(cfgCtx, requestHash, cacheManager);
@@ -385,15 +387,15 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
      */
     private void storeRequestToCache(ConfigurationContext cfgCtx,
         String requestHash, CacheManager cacheManager) throws ClusteringFault {
-        
+
         CachedObject cachedObj = new CachedObject();
         cachedObj.setRequestHash(requestHash);
         // this does not set the expiretime but just sets the timeout and the espiretime will
         // be set when the response is availabel
         cachedObj.setTimeout(timeout);
-        cacheManager.addResponseWithKey(requestHash, cachedObj, cfgCtx);
+        cacheManager.addResponseWithKey(cacheKey, requestHash, cachedObj, cfgCtx);
 
-        cfgCtx.setProperty(cacheManagerKey, cacheManager);
+        cfgCtx.setProperty(CachingConstants.CACHE_MANAGER, cacheManager);
 //        Replicator.replicate(cfgCtx, new String[]{cacheManagerKey});
         Replicator.replicate(cfgCtx);
     }
@@ -413,7 +415,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
     public void setScope(String scope) {
         this.scope = scope;
         if (CachingConstants.SCOPE_PER_MEDIATOR.equals(scope)) {
-            cacheManagerKey = CACHE_MANAGER_PREFIX + id;
+            cacheKey = CACHE_KEY_PREFIX + id;
         }
     }
 

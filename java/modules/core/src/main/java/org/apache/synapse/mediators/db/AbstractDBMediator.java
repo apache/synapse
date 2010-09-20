@@ -353,26 +353,26 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         if (finder.isInitialized()) {
             // first try a lookup based on the data source name only
             dataSource = finder.find(dataSourceName);
+        }
 
-            if (dataSource != null) {
-                MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();
-                Object mBean = mBeanRepository.getMBean(dataSourceName);
-                if (mBean instanceof DBPoolView) {
-                    setDbPoolView((DBPoolView) mBean);
-                }
-            } else {
-                // decrypt the password if needed
-                String password = jndiProperties.getProperty(Context.SECURITY_CREDENTIALS);
-                if (password != null && !"".equals(password)) {
-                    jndiProperties.put(Context.SECURITY_CREDENTIALS, getActualPassword(password));
-                }
-
-                // lookup the data source using the specified jndi properties
-                dataSource = DataSourceFinder.find(dataSourceName, jndiProperties);
-                if (dataSource == null) {
-                    handleException("Cannot find a DataSource " + dataSourceName + " for given JNDI properties :" + jndiProperties);
-                }
+        if(dataSource == null){
+        // decrypt the password if needed
+            String password = jndiProperties.getProperty(Context.SECURITY_CREDENTIALS);
+            if (password != null && !"".equals(password)) {
+                jndiProperties.put(Context.SECURITY_CREDENTIALS, getActualPassword(password));
             }
+
+            // lookup the data source using the specified jndi properties
+            dataSource = DataSourceFinder.find(dataSourceName, jndiProperties);
+            if (dataSource == null) {
+                handleException("Cannot find a DataSource " + dataSourceName + " for given JNDI" +
+                        " properties :" + jndiProperties);
+            }
+        }
+        MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();
+        Object mBean = mBeanRepository.getMBean(dataSourceName);
+        if (mBean instanceof DBPoolView) {
+            setDbPoolView((DBPoolView) mBean);
         }
         log.info("Sunccessfully looked up datasource " + dataSourceName + ".");
 

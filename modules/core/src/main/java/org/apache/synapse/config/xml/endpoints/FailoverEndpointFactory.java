@@ -21,10 +21,12 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
 
 import javax.xml.namespace.QName;
+import java.util.List;
 
 /**
  * Creates {@link FailoverEndpoint} using a XML configuration.
@@ -57,6 +59,16 @@ public class FailoverEndpointFactory extends EndpointFactory {
             if (name != null) {
                 failoverEndpoint.setName(name);
             }
+
+            List<Endpoint> childEndpoints = getEndpoints(failoverElement, failoverEndpoint);
+            if(childEndpoints == null || childEndpoints.size() == 0){
+                String msg = "Invalid Synapse configuration.\n"
+                        + "A FailOver must have child elements, but the FailOver "
+                        + "'" + failoverEndpoint.getName() + "' does not have any child elements.";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+
             // set endpoints and return
             failoverEndpoint.setChildren(getEndpoints(failoverElement, failoverEndpoint));
             // process the parameters

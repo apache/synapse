@@ -396,6 +396,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Private-Package>samples.*</Private-Package>
                         <Import-Package>
                             !org.apache.commons.logging,

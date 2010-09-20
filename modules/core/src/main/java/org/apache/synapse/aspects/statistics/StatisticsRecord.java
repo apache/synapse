@@ -18,8 +18,6 @@
  */
 package org.apache.synapse.aspects.statistics;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.ComponentType;
 
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class StatisticsRecord {
 
-    private static final Log log = LogFactory.getLog(StatisticsRecord.class);
     private String id;
     private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();
     private String clientIP;

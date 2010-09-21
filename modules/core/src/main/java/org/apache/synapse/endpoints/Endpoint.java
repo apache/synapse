@@ -110,4 +110,18 @@ public interface Endpoint extends ManagedLifecycle, SynapseArtifact, Nameable {
      * @param fileName from which the endpoint is loaded
      */
     public void setFileName(String fileName);
+
+
+    /**
+     * Get the MessageStore name associated with the Endpoint
+     * @return String message store name
+     */
+    public String getOnFaultMessageStore();
+
+    /**
+     * Set the Message Store name associated with the Endpoint
+     * @param onFaultMessageStore, name of the message store
+     */
+    public void setOnFaultMessageStore(String onFaultMessageStore);
+
 }

@@ -24,6 +24,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.eventing.SynapseEventSource;
@@ -122,6 +123,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Executors for executing sequences with priorities
      */
     private Map<String, PriorityExecutor> executors = new HashMap<String, PriorityExecutor>();
+
+    /**
+     * Messages stores for the synapse configuration.
+     */
+    private Map<String, MessageStore> messageStores =new HashMap<String, MessageStore>();
 
     /**
      * Description/documentation of the configuration
@@ -1065,6 +1071,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         for (PriorityExecutor executor : getPriorityExecutors().values()) {
             executor.init();
         }
+
+        //initialize message stores
+        for(MessageStore messageStore : messageStores.values()) {
+            ((ManagedLifecycle) messageStore).init(se);
+        }
     }
 
     private void handleException(String msg) {
@@ -1178,6 +1189,38 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             }
         }
         return executor;
+    }
+
+    /**
+     * Get the Message store for the configuration with a given name.
+     *
+     * @param name Name of the message store
+     * @return a MessageStore instance or null
+     */
+    public MessageStore getMessageStore(String name) {
+        return messageStores.get(name) ;
+    }
+
+    /**
+     * Add MessageStore to the configuration with a given name.
+     *
+     * @param name Name of the message store
+     * @param messageStore a MessageStore instance
+     */
+    public void addMessageStore(String name,MessageStore messageStore) {
+        if (!messageStores.containsKey(name)){
+            messageStores.put(name,messageStore);
+        } else {
+            handleException("Duplicate message store by the name: " + name);
+        }
+    }
+
+    /**
+     * Get Message sotres defined
+     * @return  message store map stored as name of the message store and message store
+     */
+    public Map<String, MessageStore> getMessageStores() {
+        return messageStores;
     }
 
     /**

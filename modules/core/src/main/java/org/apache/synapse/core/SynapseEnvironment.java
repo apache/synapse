@@ -32,8 +32,9 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * The SynapseEnvironment allows access into the the host SOAP engine. It allows
- * the sending of messages, classloader access etc.
+ * the sending of messages, class loader access etc.
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public interface SynapseEnvironment {
 
     /**
@@ -50,7 +51,7 @@ public interface SynapseEnvironment {
     /**
      * This method injects a new message into the Synapse engine for the mediation
      * by the specified sequence. This is used by custom mediation tasks like splitting message
-     * in EIP mediations. This method will do the mediation asynchronously using a separate
+     * in EIP mediation. This method will do the mediation asynchronously using a separate
      * thread from the environment thread pool
      *
      * @param smc - Synapse message context to be injected
@@ -127,8 +128,8 @@ public interface SynapseEnvironment {
     public SynapseConfiguration getSynapseConfiguration();
 
     /**
-     * Retrive the {@link org.apache.synapse.task.SynapseTaskManager} from the
-     * <code>envioronment</code>.
+     * Retrieve the {@link org.apache.synapse.task.SynapseTaskManager} from the
+     * <code>environment</code>.
      *
      * @return SynapseTaskManager of this synapse environment
      */
@@ -136,7 +137,7 @@ public interface SynapseEnvironment {
 
 
     /**
-     * Get the inforamtion about the synape environment.
+     * Get the information about the synapse environment.
      * 
      * @return {@link org.apache.synapse.ServerContextInformation} of this synapse environment
      */

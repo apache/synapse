@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class ServerContextInformation {
     
-    /* Underlying server's context - EX : Axis2 ConfigurationConext */
+    /* Underlying server's context - EX : Axis2 ConfigurationContext */
     private Object serverContext;
     /* A map to hold any context information*/
     private final Map<String, Object> properties = new HashMap<String, Object>();

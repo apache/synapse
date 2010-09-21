@@ -29,9 +29,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.synapse.*;
+import org.apache.synapse.core.SynapseEnvironment;
 
 /**
- * This will be the Module class for the Synapse handler based mediations inside axis2 server. This
+ * This will be the Module class for the Synapse handler based mediation inside axis2 server. This
  * will just set the default system property of SYNAPSE_XML to the repository/conf/synapse.xml in
  * the axis2 servers repository and call the normal Synapse startup.
  */
@@ -44,27 +45,31 @@ public class SynapseModule implements Module {
 
     /**
      * This method will call the normal initiation after setting the SYNAPSE_XML file to get from
-     * the axis2 respository/conf folder
+     * the axis2 repository/conf folder
      *
      * @param configurationContext - ConfigurationContext of the Axis2 env
      * @param axisModule - AxisModule describing handler initializationModule of Synapse
-     * @throws AxisFault - incase of a failure in initiation
+     * @throws AxisFault - in-case of a failure in initiation
      */
     public void init(ConfigurationContext configurationContext, AxisModule axisModule)
             throws AxisFault {
 
-        ServerManager serverManager = ServerManager.getInstance();
-        if (!(serverManager.getServerState() == ServerState.STARTED)) {
+        Object synEnvParameter = configurationContext.getAxisConfiguration().getParameterValue(
+                SynapseConstants.SYNAPSE_ENV);
+
+        if (synEnvParameter != null && !(((SynapseEnvironment) synEnvParameter)
+                .getServerContextInformation().getServerState() == ServerState.STARTED)) {
             log.info("Initializing the Synapse as a handler");
             ServerConfigurationInformation configurationInformation =
                     ServerConfigurationInformationFactory.createServerConfigurationInformation(
                             configurationContext.getAxisConfiguration());
             ServerContextInformation contextInfo
-                    = new ServerContextInformation(configurationContext);
+                    = new ServerContextInformation(configurationContext, configurationInformation);
+            ServerManager serverManager = new ServerManager();
             serverManager.init(configurationInformation, contextInfo);
             serverManager.start();
         } else {
-            log.info("Detected an already strated synapse instance using that for the mediation");
+            log.info("Detected an already started synapse instance using that for the mediation");
         }
     }
 

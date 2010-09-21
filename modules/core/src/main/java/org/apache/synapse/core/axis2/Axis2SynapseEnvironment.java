@@ -65,10 +65,10 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         int coreThreads = SynapseThreadPool.SYNAPSE_CORE_THREADS;
         int maxThreads  = SynapseThreadPool.SYNAPSE_MAX_THREADS;
         long keepAlive  = SynapseThreadPool.SYNAPSE_KEEP_ALIVE;
-        int qlength     = SynapseThreadPool.SYNAPSE_THREAD_QLEN;
+        int qLength     = SynapseThreadPool.SYNAPSE_THREAD_QLEN;
 
         try {
-            qlength = Integer.parseInt(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_QLEN));
+            qLength = Integer.parseInt(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_QLEN));
         } catch (Exception ignore) {}
 
         try {
@@ -83,7 +83,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             keepAlive = Long.parseLong(synCfg.getProperty(SynapseThreadPool.SYN_THREAD_ALIVE));
         } catch (Exception ignore) {}
 
-        this.executorService = new SynapseThreadPool(coreThreads, maxThreads, keepAlive, qlength,
+        this.executorService = new SynapseThreadPool(coreThreads, maxThreads, keepAlive, qLength,
             synCfg.getProperty(SynapseThreadPool.SYN_THREAD_GROUP,
                 SynapseThreadPool.SYNAPSE_THREAD_GROUP),
             synCfg.getProperty(SynapseThreadPool.SYN_THREAD_IDPREFIX,
@@ -356,7 +356,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     /**
-     * Retrive the {@link org.apache.synapse.ServerContextInformation} from the <code>environment.
+     * Retrieve the {@link org.apache.synapse.ServerContextInformation} from the <code>environment.
      * 
      * @return ServerContextInformation of the environment
      */

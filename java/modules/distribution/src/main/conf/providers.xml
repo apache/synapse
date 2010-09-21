@@ -20,12 +20,12 @@
     <provider class-name="org.apache.commons.vfs.provider.local.DefaultLocalFileProvider">
         <scheme name="file"/>
     </provider>
-    <provider class-name="org.apache.commons.vfs.provider.truezip.TzFileProvider">
+    <provider class-name="org.apache.commons.vfs.provider.zip.ZipFileProvider">
         <scheme name="zip"/>
     </provider>
-    <provider class-name="org.apache.commons.vfs.provider.truezip.TzFileProvider">
+    <provider class-name="org.apache.commons.vfs.provider.tar.TarFileProvider">
         <scheme name="tar"/>
-        <!--<if-available class-name="org.apache.commons.vfs.provider.tar.TarInputStream"/>-->
+        <if-available class-name="org.apache.commons.vfs.provider.tar.TarInputStream"/>
     </provider>
 
     <provider class-name="org.apache.commons.vfs.provider.bzip2.Bzip2FileProvider">
@@ -36,7 +36,7 @@
         <scheme name="gz"/>
     </provider>
 
-    <provider class-name="org.apache.commons.vfs.provider.truezip.TzFileProvider">
+    <provider class-name="org.apache.commons.vfs.provider.jar.JarFileProvider">
         <scheme name="jar"/>
         <scheme name="sar"/>
         <scheme name="ear"/>
@@ -66,6 +66,11 @@
     </provider>
     <provider class-name="org.apache.commons.vfs.provider.res.ResourceFileProvider">
         <scheme name="res"/>
+    </provider>
+        <provider class-name="org.apache.commons.vfs.provider.webdav.WebdavFileProvider">
+        <scheme name="webdav"/>
+        <if-available class-name="org.apache.commons.httpclient.HttpClient"/>
+        <if-available class-name="org.apache.jackrabbit.webdav.client.methods.DavMethod"/>
     </provider>
     <!--
     <provider class-name="org.apache.commons.vfs.provider.svn.SvnFileProvider">

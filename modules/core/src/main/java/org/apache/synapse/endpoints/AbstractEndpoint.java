@@ -23,6 +23,7 @@ import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
@@ -226,6 +227,18 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         // set message level metrics collector
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
             BaseConstants.METRICS_COLLECTOR, metricsMBean);
+
+        // if the envelope preserving set build the envelope
+        MediatorProperty preserveEnv = getProperty(SynapseConstants.PRESERVE_ENVELOPE);
+        if (JavaUtils.isTrueExplicitly(preserveEnv.getValue() != null ?
+                preserveEnv.getValue() : preserveEnv.getEvaluatedExpression(synCtx))) {
+            if (traceOrDebugOn) {
+                traceOrDebug(traceOn, "Preserving the envelope by building it before " +
+                        "sending, since it is explicitly set");
+            }
+            synCtx.getEnvelope().build();
+        }
+
         // Send the message through this endpoint
         synCtx.getEnvironment().send(definition, synCtx);
     }

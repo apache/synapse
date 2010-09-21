@@ -359,6 +359,8 @@ public final class SynapseConstants {
 
     // Property name. If this property is false synapse will not remove the processed headers
     public static final String PRESERVE_PROCESSED_HEADERS = "preserveProcessedHeaders";
+    // Property name for preserving the envelope before sending
+    public static final String PRESERVE_ENVELOPE = "PRESERVE_ENVELOPE";
 
     // Known transport error codes
     public static final int RCV_IO_ERROR_SENDING     = 101000;

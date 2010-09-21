@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorSerializer;
 import org.apache.synapse.config.Entry;
@@ -127,6 +128,10 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
 
         // Executors
         serializeExecutors(definitions, synCfg.getPriorityExecutors());
+
+       // Message stores
+        serializeMessageStores(definitions, synCfg.getMessageStores());        
+
         return definitions;
     }
 
@@ -169,6 +174,14 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
                 PriorityExecutorSerializer.serialize(definitions, executor,
                         XMLConfigConstants.SYNAPSE_NAMESPACE);
             }
+        }
+    }
+
+    private static void serializeMessageStores(OMElement definitions,
+                                               Map<String, MessageStore> messageStores ){
+
+        for (String name : messageStores.keySet()) {
+            MessageStoreSerializer.serializeMessageStore(definitions,messageStores.get(name));
         }
     }
 

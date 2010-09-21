@@ -26,9 +26,9 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
-import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -37,7 +37,6 @@ import org.apache.synapse.config.xml.eventing.EventSourceFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 
@@ -82,7 +81,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 } else if (XMLConfigConstants.EVENT_SOURCE_ELT.equals(elt.getQName())) {
                     defineEventSource(config, elt);
                 } else if (XMLConfigConstants.EXECUTOR_ELT.equals(elt.getQName())) {
-                    defineExecutor(config,  elt);
+                    defineExecutor(config, elt);
+                } else if(XMLConfigConstants.MESSAGE_STORE_ELT.equals(elt.getQName())) {
+                    defineMessageStore(config, elt);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
@@ -175,6 +176,12 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
         config.addPriorityExecutor(executor.getName(), executor);
         return executor;
+    }
+
+    public static MessageStore defineMessageStore(SynapseConfiguration config , OMElement elem) {
+        MessageStore messageStore = MessageStoreFactory.createMessageStore(elem);
+        config.addMessageStore(messageStore.getName(),messageStore);
+        return messageStore;
     }
 
     private static void handleException(String msg) {

@@ -146,6 +146,7 @@
                             org.apache.synapse.endpoints.*,
                             org.apache.synapse.eventing.*,
                             org.apache.synapse.mediators.*,
+                            org.apache.synapse.message.*,
                             org.apache.synapse.metrics.*,
                             org.apache.synapse.registry.*,
                             org.apache.synapse.startup.*,

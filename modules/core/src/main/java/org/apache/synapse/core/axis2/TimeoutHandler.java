@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.aspects.statistics.StatisticsCleaner;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -58,9 +59,11 @@ public class TimeoutHandler extends TimerTask {
     private long globalTimeout = SynapseConstants.DEFAULT_GLOBAL_TIMEOUT;
     private static final String SEND_TIMEOUT_MESSAGE = "Send timeout";
     private StatisticsCleaner statisticsCleaner;
+    private ServerContextInformation contextInfo = null;
 
-    public TimeoutHandler(Map callbacks) {
+    public TimeoutHandler(Map callbacks, ServerContextInformation contextInfo) {
         this.callbackStore = callbacks;
+        this.contextInfo = contextInfo;
         this.globalTimeout = SynapseConfigUtils.getGlobalTimeoutInterval();
         log.info("This engine will expire all callbacks after : " + (globalTimeout / 1000) +
                 " seconds, irrespective of the timeout action," +
@@ -87,7 +90,7 @@ public class TimeoutHandler extends TimerTask {
 
         //clear the expired statistics
         if (statisticsCleaner == null) {
-            StatisticsCollector collector = SynapseConfigUtils.getStatisticsCollector();
+            StatisticsCollector collector = SynapseConfigUtils.getStatisticsCollector(contextInfo);
             if (collector != null) {
                 statisticsCleaner = new StatisticsCleaner(collector);
             }

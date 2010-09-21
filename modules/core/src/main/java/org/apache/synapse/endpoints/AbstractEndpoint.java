@@ -240,7 +240,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
         // if the envelope preserving set build the envelope
         MediatorProperty preserveEnv = getProperty(SynapseConstants.PRESERVE_ENVELOPE);
-        if (JavaUtils.isTrueExplicitly(preserveEnv.getValue() != null ?
+        if (preserveEnv != null && JavaUtils.isTrueExplicitly(preserveEnv.getValue() != null ?
                 preserveEnv.getValue() : preserveEnv.getEvaluatedExpression(synCtx))) {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Preserving the envelope by building it before " +

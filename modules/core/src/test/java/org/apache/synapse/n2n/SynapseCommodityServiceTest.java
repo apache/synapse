@@ -77,8 +77,9 @@ public class SynapseCommodityServiceTest extends TestCase {
         synTrsIn.getParameter("port").setValue("12100");
         startServer(synapseConfigCtx);
 
-        ServerContextInformation contextInformation = new ServerContextInformation(synapseConfigCtx);
-        ServerManager serverManager = ServerManager.getInstance();
+        ServerContextInformation contextInformation =
+                new ServerContextInformation(synapseConfigCtx, information);
+        ServerManager serverManager = new ServerManager();
         serverManager.init(information, contextInformation);
         serverManager.start();
 

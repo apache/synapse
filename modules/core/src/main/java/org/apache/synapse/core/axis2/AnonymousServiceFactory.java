@@ -21,16 +21,13 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisMessage;
-import org.apache.axis2.description.OutOnlyAxisOperation;
-import org.apache.axis2.description.AxisServiceGroup;
+import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.config.SynapseConfiguration;
 
 import javax.xml.namespace.QName;
@@ -164,7 +161,7 @@ public class AnonymousServiceFactory {
         try {
             DynamicAxisOperation dynamicOperation =
                 new DynamicAxisOperation(new QName(OUT_IN_OPERATION));
-            dynamicOperation.setMessageReceiver(getCallbackReceiver(synCfg));
+            dynamicOperation.setMessageReceiver(getCallbackReceiver(synCfg, axisCfg));
             AxisMessage inMsg = new AxisMessage();
             inMsg.setName("in-message");
             inMsg.setParent(dynamicOperation);
@@ -176,7 +173,7 @@ public class AnonymousServiceFactory {
 
             OutOnlyAxisOperation asyncOperation =
                 new OutOnlyAxisOperation(new QName(OUT_ONLY_OPERATION));
-            asyncOperation.setMessageReceiver(getCallbackReceiver(synCfg));
+            asyncOperation.setMessageReceiver(getCallbackReceiver(synCfg, axisCfg));
             AxisMessage outOnlyMsg = new AxisMessage();
             outOnlyMsg.setName("out-message");
             outOnlyMsg.setParent(asyncOperation);
@@ -205,14 +202,29 @@ public class AnonymousServiceFactory {
     /**
      * Create a single callback receiver if required, and return its reference
      * @param synCfg the Synapse configuration
+     * @param axisCfg axis configuration
      * @return the callback receiver thats created or now exists
      */
     private static synchronized SynapseCallbackReceiver getCallbackReceiver(
-        SynapseConfiguration synCfg) {
+            SynapseConfiguration synCfg, AxisConfiguration axisCfg) {
 
         if (synapseCallbackReceiver == null) {
-            synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg);
-            ServerManager.getInstance().setSynapseCallbackReceiver(synapseCallbackReceiver);
+            Parameter serverCtxParam =
+                    axisCfg.getParameter(
+                            SynapseConstants.SYNAPSE_SERVER_CTX_INFO);
+            if (serverCtxParam == null ||
+                    !(serverCtxParam.getValue() instanceof ServerContextInformation)) {
+                String msg = "ServerContextInformation not found";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+
+            ServerContextInformation contextInformation =
+                    (ServerContextInformation) serverCtxParam.getValue();
+
+            synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg, contextInformation);
+
+            contextInformation.setSynapseCallbackReceiver(synapseCallbackReceiver);
         }
         return synapseCallbackReceiver;
     }

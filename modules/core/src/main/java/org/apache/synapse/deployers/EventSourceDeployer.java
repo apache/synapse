@@ -160,8 +160,7 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                     = getSynapseConfiguration().getEventSource(artifactName);
             OMElement esElem = EventSourceSerializer.serializeEventSource(null, es);
             if (es.getFileName() != null) {
-                String fileName = ServerManager.getInstance()
-                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.EVENTS_DIR
                         + File.separator + es.getFileName();
                 writeToFile(esElem, fileName);

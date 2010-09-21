@@ -42,19 +42,23 @@ public class SynapseStartUpServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(SynapseStartUpServlet.class);
     private static final String ALREADY_INITED = "synapseAlreadyInited";
 
+    public static final String SYNAPSE_SERVER_MANAGER = "synapse.server.manager";
+
     public void init() throws ServletException {
         ServletConfig servletConfig = getServletConfig();
         ServletContext servletContext = servletConfig.getServletContext();
         if (Boolean.TRUE.equals(servletContext.getAttribute(ALREADY_INITED))) {
             return;
         }
-        ServerManager serverManager = ServerManager.getInstance();
+        ServerManager serverManager = new ServerManager();
         ServerConfigurationInformation information =
                 ServerConfigurationInformationFactory.
                         createServerConfigurationInformation(servletConfig);
         serverManager.init(information, null);
         serverManager.start();
         servletContext.setAttribute(ALREADY_INITED, Boolean.TRUE);
+
+        servletContext.setAttribute(SYNAPSE_SERVER_MANAGER, serverManager);
     }
 
 
@@ -68,9 +72,13 @@ public class SynapseStartUpServlet extends HttpServlet {
 
     public void destroy() {
         try {
-            ServerManager serverManager = ServerManager.getInstance();
-            serverManager.stop();
-            getServletContext().removeAttribute(ALREADY_INITED);
+            Object o = (ServerManager) getServletConfig().getServletContext().
+                    getAttribute(SYNAPSE_SERVER_MANAGER);
+            if (o != null && o instanceof ServerManager) {
+                ServerManager serverManager = (ServerManager) o;
+                serverManager.stop();
+                getServletContext().removeAttribute(ALREADY_INITED);
+            }
         } catch (Exception e) {
             log.error("Error stopping the Synapse listener manager", e);
         }

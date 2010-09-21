@@ -167,8 +167,7 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                     = getSynapseConfiguration().getDefinedEndpoints().get(artifactName);
             OMElement epElem = EndpointSerializer.getElementFromEndpoint(ep);
             if (ep.getFileName() != null) {
-                String fileName = ServerManager.getInstance()
-                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.ENDPOINTS_DIR
                         + File.separator + ep.getFileName();
                 writeToFile(epElem, fileName);

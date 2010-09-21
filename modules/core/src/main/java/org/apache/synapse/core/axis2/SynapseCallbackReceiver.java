@@ -36,6 +36,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.aspects.statistics.ErrorLogFactory;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -66,13 +67,15 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      * Create the *single* instance of this class that would be used by all anonymous services
      * used for outgoing messaging.
      * @param synCfg the Synapse configuration
+     * @param contextInformation server runtime information
      */
-    public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
+    public SynapseCallbackReceiver(SynapseConfiguration synCfg,
+                                   ServerContextInformation contextInformation) {
 
         callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
 
         // create the Timer object and a TimeoutHandler task
-        TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
+        TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore, contextInformation);
         
         Timer timeOutTimer = synCfg.getSynapseTimer();
         long timeoutHandlerInterval = SynapseConfigUtils.getTimeoutHandlerInterval();

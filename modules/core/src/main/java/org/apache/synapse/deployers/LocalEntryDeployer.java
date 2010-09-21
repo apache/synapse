@@ -151,8 +151,7 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
             Entry e = getSynapseConfiguration().getDefinedEntries().get(artifactName);
             OMElement entryElem = EntrySerializer.serializeEntry(e, null);
             if (e.getFileName() != null) {
-                String fileName = ServerManager.getInstance()
-                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR
                         + File.separator + e.getFileName();
                 writeToFile(entryElem, fileName);

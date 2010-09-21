@@ -32,9 +32,7 @@ import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.ServerState;
-import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.*;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
@@ -93,7 +91,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
             log.debug("Deployment of the synapse artifact from file : " + filename + " : STARTED");
         }
 
-        if (ServerManager.getInstance().getServerState() != ServerState.STARTED) {
+        if (getServerContextInformation().getServerState() != ServerState.STARTED) {
             // synapse server has not yet being started
             if (log.isDebugEnabled()) {
                 log.debug("Skipped the artifact deployment (since the Synapse " +
@@ -314,6 +312,30 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                     "Are you sure that you are running Synapse?");
         }
         return (SynapseEnvironment) synCfgParam.getValue();
+    }
+
+    protected ServerConfigurationInformation getServerConfigurationInformation() 
+            throws DeploymentException {
+        Parameter serverCfgParam =
+                cfgCtx.getAxisConfiguration().getParameter(
+                        SynapseConstants.SYNAPSE_SERVER_CONFIG_INFO);
+        if (serverCfgParam == null) {
+            throw new DeploymentException("SynapseConfigurationInformation not found. " +
+                    "Are you sure that you are running Synapse?");
+        }
+        return (ServerConfigurationInformation) serverCfgParam.getValue();
+    }
+
+    protected ServerContextInformation getServerContextInformation()
+            throws DeploymentException {
+        Parameter serverCtxParam =
+                cfgCtx.getAxisConfiguration().getParameter(
+                        SynapseConstants.SYNAPSE_SERVER_CTX_INFO);
+        if (serverCtxParam == null) {
+            throw new DeploymentException("ServerContextInformation not found. " +
+                    "Are you sure that you are running Synapse?");
+        }
+        return (ServerContextInformation) serverCtxParam.getValue();
     }
 
     protected void writeToFile(OMElement content, String fileName) throws Exception {

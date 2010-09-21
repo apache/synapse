@@ -396,4 +396,12 @@ public final class SynapseConstants {
     // callout operation failed
     public static final int CALLOUT_OPERATION_FAILED    = 401000;
 
+
+    /**Message Context properties used for Message Store*/
+
+    // Number of attempts that has been tried to redeliver the message
+    public static final String MESSAGE_STORE_REDELIVERY_COUNT = "message.store.redelivery.count";
+
+    // Does message as attemted all its redelivered
+    public static final String MESSAGE_STORE_REDELIVERED = "message.store.redelivery.redelivered";
 }

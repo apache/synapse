@@ -39,6 +39,8 @@ import java.util.Map;
  */
 public abstract class AbstractAutomationTestCase extends XMLTestCase {
 
+    private ServerManager serverManager;
+
     protected void setUp() throws java.lang.Exception {
         super.setUp();
         SampleAxis2Server.main(new String[]{"-repo", "modules/samples/target/test_repos/axis2Server/",
@@ -55,8 +57,9 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
         System.setProperty("axis2.xml", "modules/samples/target/test_repos/synapse/conf/axis2.xml");
         ServerConfigurationInformation information = new ServerConfigurationInformation();
         information.setAxis2RepoLocation(SYNAPSE_REPO);
-        ServerManager.getInstance().init(information, null);
-        ServerManager.getInstance().start();
+        serverManager = new ServerManager();
+        serverManager.init(information, null);
+        serverManager.start();
     }
 
     protected void setUpNSContext() {
@@ -85,7 +88,7 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
     }
 
     protected void tearDown() throws Exception {
-        ServerManager.getInstance().stop();
+        serverManager.stop();
         super.tearDown();
     }
 

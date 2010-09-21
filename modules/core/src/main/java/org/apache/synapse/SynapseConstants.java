@@ -120,6 +120,10 @@ public final class SynapseConstants {
     public static final String SYNAPSE_CONFIG = "synapse.config";
     /** The name of the Parameter set on the Axis2Configuration to hold the Synapse Environment */
     public static final String SYNAPSE_ENV = "synapse.env";
+    /** The name of the Parameter set on AxisConfiguration to hold the ServerContextInformation */
+    public static final String SYNAPSE_SERVER_CTX_INFO = "synapse.server.context.info";
+    /** The name of the Parameter set on AxisConfiguration to hold the ServerContextInformation */
+    public static final String SYNAPSE_SERVER_CONFIG_INFO = "synapse.server.config.info";
 
     /** The name of the system property that will hold the Synapse home directory */
     public static final String SYNAPSE_HOME = "synapse.home";

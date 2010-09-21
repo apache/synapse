@@ -28,7 +28,11 @@ public class ServerManagerView implements ServerManagerViewMBean {
 
     private static final Log log = LogFactory.getLog(ServerManagerView.class);
 
-    private final ServerManager serverManager = ServerManager.getInstance();
+    private final ServerManager serverManager;
+
+    public ServerManagerView(ServerManager serverManager) {
+        this.serverManager = serverManager;
+    }
 
     /**
      * {@inheritDoc}

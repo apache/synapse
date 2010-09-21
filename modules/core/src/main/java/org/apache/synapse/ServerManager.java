@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.SynapsePropertiesLoader;
-import org.apache.synapse.core.axis2.SynapseCallbackReceiver;
 import org.apache.synapse.securevault.PasswordManager;
 import org.apache.synapse.securevault.SecurityConstants;
 
@@ -36,14 +35,14 @@ import java.util.Date;
  * the SynapseServer is invoked which in turn calls on this to start the instance
  * <p/>
  * When the WAR deployment is used, the SynapseStartUpServlet servlet calls on this class to
- * initialize Synapse
+ * initialize Synapse.
+ * <p/>
+ * This is the entry point for starting an Syanpse instance. All the synapse related management
+ * oprations are exposed through this class. 
  */
 public class ServerManager {
 
     private static final Log log = LogFactory.getLog(ServerManager.class);
-
-    /* Keeps the ServerManager instance */
-    private final static ServerManager instance = new ServerManager();
 
     /**
      * The controller for synapse create and Destroy synapse artifacts in a particular environment
@@ -69,15 +68,10 @@ public class ServerManager {
      */
     private ClassLoader classLoader;
 
-    private SynapseCallbackReceiver synapseCallbackReceiver;
-
     /**
-     * Gives the access to the singleton instance of the ServerManager
-     *
-     * @return the ServerManager instance
+     * Construct a server manager.
      */
-    public static ServerManager getInstance() {
-        return instance;
+    public ServerManager() {
     }
 
     /**
@@ -99,7 +93,8 @@ public class ServerManager {
         this.serverConfigurationInformation = serverConfigurationInformation;
 
         if (serverContextInformation == null) {
-            this.serverContextInformation = new ServerContextInformation();
+            this.serverContextInformation =
+                    new ServerContextInformation(serverConfigurationInformation);
         } else {
             this.serverContextInformation = serverContextInformation;
         }
@@ -387,22 +382,6 @@ public class ServerManager {
     }
 
     /**
-     * Returns the number of current callbacks.
-     * 
-     * @return the number of current callbacks.
-     */
-    public int getCallbackCount() {
-        if (synapseCallbackReceiver != null) {
-            return synapseCallbackReceiver.getCallbackCount();
-        }
-        return 0;
-    }
-
-    public void setSynapseCallbackReceiver(SynapseCallbackReceiver synapseCallbackReceiver) {
-        this.synapseCallbackReceiver = synapseCallbackReceiver;
-    }
-
-    /**
      * Helper method for initializing the ServerManager
      */
     private void doInit() {
@@ -423,15 +402,7 @@ public class ServerManager {
 
             // initializes the SynapseController
             this.synapseController.init(serverConfigurationInformation, serverContextInformation);
-
-            // sets the server context and the controller context
-            if (this.serverContextInformation == null) {
-                this.serverContextInformation = new ServerContextInformation(
-                        this.synapseController.getContext());
-            } else if (this.serverContextInformation.getServerContext() == null) {
-                this.serverContextInformation.setServerContext(this.synapseController.getContext());
-            }
-
+            
             // mark as initialized
             changeState(ServerState.INITIALIZED);
         } else {
@@ -497,7 +468,7 @@ public class ServerManager {
     }
 
     private void registerMBean() {
-        MBeanRegistrar.getInstance().registerMBean(new ServerManagerView(),
+        MBeanRegistrar.getInstance().registerMBean(new ServerManagerView(this),
                 SynapseConstants.SERVER_MANAGER_MBEAN, SynapseConstants.SERVER_MANAGER_MBEAN);
         try {
             MBeanRegistrar.getInstance().registerMBean(

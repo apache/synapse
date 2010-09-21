@@ -40,6 +40,9 @@ public class SynapseServer {
                     "<resolve_root> <deployment mode>" +
                     "\n Opts: -? this message";
 
+    /** This is the class to control the synapse server */
+    private static ServerManager serverManager;
+
     public static void printUsage() {
         System.out.println(USAGE_TXT);
         System.exit(1);
@@ -58,7 +61,7 @@ public class SynapseServer {
         ServerConfigurationInformation configurationInformation =
                 ServerConfigurationInformationFactory.createServerConfigurationInformation(args);
 
-        ServerManager serverManager = ServerManager.getInstance();
+        serverManager = new ServerManager();
         serverManager.init(configurationInformation, null);
 
         try {
@@ -82,7 +85,7 @@ public class SynapseServer {
             public void run() {
                 log.info("Shutting down Apache Synapse...");
                 try {
-                    ServerManager.getInstance().shutdown();
+                    serverManager.shutdown();
                     log.info("Apache Synapse shutdown complete");
                     log.info("Halting JVM");
                 } catch (Exception e) {

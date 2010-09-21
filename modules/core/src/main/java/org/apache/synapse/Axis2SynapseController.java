@@ -82,6 +82,9 @@ public class Axis2SynapseController implements SynapseController {
     /** ServerConfiguration Information */
     private ServerConfigurationInformation serverConfigurationInformation;
 
+    /** Runtime information about the server */
+    private ServerContextInformation serverContextInformation;
+
     /** JMX Adapter */
     private JmxAdapter jmxAdapter;
 
@@ -100,16 +103,23 @@ public class Axis2SynapseController implements SynapseController {
                      ServerContextInformation serverContextInformation) {
 
         log.info("Initializing Synapse at : " + new Date());
+        if (serverConfigurationInformation == null) {
+            throw new IllegalArgumentException("ServerConfigurationInformation cannot be null");
+        }
+
+        if (serverContextInformation == null) {
+            throw new IllegalArgumentException("ServerContextInformation cannot be null");
+        }
 
         this.serverConfigurationInformation = serverConfigurationInformation;
-        
+        this.serverContextInformation = serverContextInformation;
         /* If no system property for the JMX agent is specified from outside, use a default one
            to show all MBeans (including the Axis2-MBeans) within the Synapse tree */
         if (System.getProperty(JMX_AGENT_NAME) == null) {
             System.setProperty(JMX_AGENT_NAME, "org.apache.synapse");
         }
 
-        if (serverContextInformation == null || serverContextInformation.getServerContext() == null 
+        if (serverContextInformation.getServerContext() == null
                 || serverConfigurationInformation.isCreateNewInstance()) {
 
             if (log.isDebugEnabled()) {
@@ -131,20 +141,33 @@ public class Axis2SynapseController implements SynapseController {
                         + " invalid, expected an Axis2 ConfigurationContext instance");
             }
         }
+        // set the configuration context
+        serverContextInformation.setServerContext(configurationContext);
 
-        if (serverContextInformation != null) {
-            // we retrieve these properties to initialize the task scheduler in the envrionment
-            Object repo =
-                    serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
-            Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
+        // set the ServerContextInformation as a parameter
+        Parameter serverContextParameter = new Parameter(
+                SynapseConstants.SYNAPSE_SERVER_CTX_INFO, serverContextInformation);
+        // set the ServerConfiguration as a parameter
+        Parameter serverConfigParameter = new Parameter(
+                SynapseConstants.SYNAPSE_SERVER_CONFIG_INFO, serverConfigurationInformation);
+        try {
+            configurationContext.getAxisConfiguration().addParameter(serverContextParameter);
+            configurationContext.getAxisConfiguration().addParameter(serverConfigParameter);
+        } catch (AxisFault ignored) {
+            log.fatal("Error adding the parameter to the Axis Configuration");            
+        }
 
-            if (repo != null && (repo instanceof TaskDescriptionRepository)) {
-                this.taskDescriptionRepository = (TaskDescriptionRepository) repo;
-            }
+        // we retrieve these properties to initialize the task scheduler in the envrionment
+        Object repo =
+                serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
+        Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
 
-            if (taskScheduler != null && (taskScheduler instanceof TaskScheduler)) {
-                this.taskScheduler = (TaskScheduler) taskScheduler;
-            }
+        if (repo != null && (repo instanceof TaskDescriptionRepository)) {
+            this.taskDescriptionRepository = (TaskDescriptionRepository) repo;
+        }
+
+        if (taskScheduler != null && (taskScheduler instanceof TaskScheduler)) {
+            this.taskScheduler = (TaskScheduler) taskScheduler;
         }
         
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
@@ -353,7 +376,7 @@ public class Axis2SynapseController implements SynapseController {
         }
 
         synapseEnvironment = new Axis2SynapseEnvironment(
-                configurationContext, synapseConfiguration);
+                configurationContext, synapseConfiguration, serverContextInformation);
         MessageContextCreatorForAxis2.setSynEnv(synapseEnvironment);
         
         Parameter synapseEnvironmentParameter = new Parameter(
@@ -480,7 +503,7 @@ public class Axis2SynapseController implements SynapseController {
             }
             int pendingTransportThreads = pendingListenerThreads + pendingSenderThreads;
             
-            int pendingCallbacks = ServerManager.getInstance().getCallbackCount();
+            int pendingCallbacks = serverContextInformation.getCallbackCount();
             if (pendingCallbacks > 0) {
                 log.info("Waiting for: " + pendingCallbacks + " callbacks/replies..");
             }

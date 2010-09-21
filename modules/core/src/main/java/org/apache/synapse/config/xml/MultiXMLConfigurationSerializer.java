@@ -29,7 +29,6 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ServerManager;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorSerializer;
@@ -101,7 +100,7 @@ public class MultiXMLConfigurationSerializer {
             serializeExecutors(synapseConfig.getPriorityExecutors().values(), definitions);
             serializeSynapseXML(definitions);
 
-            markConfigurationForSerialization(synapseConfig.getArtifactDeploymentStore());
+            markConfigurationForSerialization(synapseConfig);
             if (rootDirectory.exists()) {
                 if (log.isDebugEnabled()) {
                     log.debug("Deleting existing files at : " + rootDirectory.getAbsolutePath());
@@ -480,43 +479,33 @@ public class MultiXMLConfigurationSerializer {
     /**
      * Get the existing configuration and mark those files not effect on deployers for
      * deletion
-     * @param deploymentStore store to store the artifacts deployed
+     * @param synapseConfig synapse configuration
      */
-    private void markConfigurationForSerialization(SynapseArtifactDeploymentStore deploymentStore) {
-        SynapseConfiguration synCfg;
-        ServerManager serverManager = ServerManager.getInstance();
+    private void markConfigurationForSerialization(SynapseConfiguration synapseConfig) {                
+        SynapseArtifactDeploymentStore deploymentStore = synapseConfig.getArtifactDeploymentStore();
 
-        if (serverManager != null && serverManager.isInitialized()) {
-            synCfg = serverManager.getServerContextInformation().getSynapseConfiguration();
-            if (synCfg == null) {
-                return;
-            }
-        } else {
-            return;
-        }
-
-        for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
+        for (SequenceMediator seq : synapseConfig.getDefinedSequences().values()) {
             if (seq.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         SEQUENCES_DIR), seq.getFileName(), seq.getName(), deploymentStore);
             }
         }
 
-        for (Endpoint ep : synCfg.getDefinedEndpoints().values()) {
+        for (Endpoint ep : synapseConfig.getDefinedEndpoints().values()) {
             if (ep.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         ENDPOINTS_DIR), ep.getFileName(), ep.getName(), deploymentStore);
             }
         }
 
-        for (ProxyService proxy : synCfg.getProxyServices()) {
+        for (ProxyService proxy : synapseConfig.getProxyServices()) {
             if (proxy.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         PROXY_SERVICES_DIR), proxy.getFileName(), proxy.getName(), deploymentStore);
             }
         }
 
-        for (Entry e : synCfg.getDefinedEntries().values()) {
+        for (Entry e : synapseConfig.getDefinedEntries().values()) {
             if (e.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         LOCAL_ENTRY_DIR), File.separator +e.getFileName(), e.getKey(),
@@ -524,21 +513,21 @@ public class MultiXMLConfigurationSerializer {
             }
         }
 
-        for (SynapseEventSource es : synCfg.getEventSources()) {
+        for (SynapseEventSource es : synapseConfig.getEventSources()) {
             if (es.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         EVENTS_DIR), es.getFileName(), es.getName(), deploymentStore);
             }
         }
 
-        for (Startup s : synCfg.getStartups()) {
+        for (Startup s : synapseConfig.getStartups()) {
             if (s.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         TASKS_DIR), s.getFileName(), s.getName(), deploymentStore);
             }
         }
 
-        for (PriorityExecutor exec : synCfg.getPriorityExecutors().values()) {
+        for (PriorityExecutor exec : synapseConfig.getPriorityExecutors().values()) {
             if (exec.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         EXECUTORS_DIR), exec.getFileName(), exec.getName(), deploymentStore);

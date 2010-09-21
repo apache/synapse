@@ -27,10 +27,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.*;
 import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -60,6 +57,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector = new StatisticsCollector();
+
+    private ServerContextInformation contextInformation;
 
     public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
 
@@ -98,6 +97,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         this(synapseConfig);
         this.configContext = cfgCtx;
         this.synapseConfig = synapseConfig;
+    }
+
+    public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
+        SynapseConfiguration synapseConfig, ServerContextInformation contextInformation) {
+        this(cfgCtx, synapseConfig);
+        this.contextInformation = contextInformation;        
     }
 
     public boolean injectMessage(final MessageContext synCtx) {
@@ -348,6 +353,15 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      */
     public SynapseTaskManager getTaskManager() {
         return this.taskManager;
+    }
+
+    /**
+     * Retrive the {@link org.apache.synapse.ServerContextInformation} from the <code>environment.
+     * 
+     * @return ServerContextInformation of the environment
+     */
+    public ServerContextInformation getServerContextInformation() {
+        return contextInformation;
     }
 
     /**

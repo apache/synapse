@@ -155,8 +155,7 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
             Startup st = getSynapseConfiguration().getStartup(artifactName);
             OMElement stElem = StartupFinder.getInstance().serializeStartup(null, st);
             if (st.getFileName() != null) {
-                String fileName = ServerManager.getInstance()
-                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR
                         + File.separator + st.getFileName();
                 writeToFile(stElem, fileName);

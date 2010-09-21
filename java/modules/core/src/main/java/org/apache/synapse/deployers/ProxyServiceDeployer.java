@@ -177,8 +177,7 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                     = getSynapseConfiguration().getProxyService(artifactName);
             OMElement proxyElem = ProxyServiceSerializer.serializeProxy(null, proxy);
             if (proxy.getFileName() != null) {
-                String fileName = ServerManager.getInstance()
-                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR
                         + File.separator + proxy.getFileName();
                 writeToFile(proxyElem, fileName);

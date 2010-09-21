@@ -57,6 +57,7 @@ import java.util.Properties;
 import java.util.List;
 import java.util.ArrayList;
 
+
 public class SynapseConfigUtils {
 
     private static final Log log = LogFactory.getLog(SynapseConfigUtils.class);
@@ -709,62 +710,60 @@ public class SynapseConfigUtils {
     }
 
     public static String getSynapseHome() {
-        ServerManager serverManager = ServerManager.getInstance();
+        //TODO SUPUN
+        /*ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
                     serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getSynapseHome();
             }
-        }
+        }*/
         return "";
     }
 
     public static String getServerName() {
-        ServerManager serverManager = ServerManager.getInstance();
+        // TODO SUPUN
+        /*ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
                     serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getServerName();
             }
-        }
+        }*/
         return "";
     }
 
     public static String getResolveRoot() {
-        ServerManager serverManager = ServerManager.getInstance();
+        //TODO SUPUN
+        /*ServerManager serverManager = ServerManager.getInstance();
         if (serverManager.isInitialized()) {
             ServerConfigurationInformation information =
                     serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getResolveRoot();
             }
-        }
+        }*/
         return "";
     }
 
     /**
      * Get the StatisticsCollector from synapse env.
      *
+     * @param contextInfo server information
      * @return StatisticsCollector instance if there is any
      */
-    public static StatisticsCollector getStatisticsCollector() {
-
-        ServerManager serverManager = ServerManager.getInstance();
-        if (serverManager.isInitialized()) {
-            ServerContextInformation information =
-                    serverManager.getServerContextInformation();
-            if (information != null) {
-                Object o = information.getServerContext();
-                if (o instanceof ConfigurationContext) {
-                    ConfigurationContext context = (ConfigurationContext) o;
-                    SynapseEnvironment environment =
-                            (SynapseEnvironment) context.getAxisConfiguration().getParameterValue(
-                                    SynapseConstants.SYNAPSE_ENV);
-                    if (environment != null) {
-                        return environment.getStatisticsCollector();
-                    }
+    public static StatisticsCollector getStatisticsCollector(ServerContextInformation contextInfo) {
+        if (contextInfo != null && contextInfo.getServerState() == ServerState.INITIALIZED) {
+            Object o = contextInfo.getServerContext();
+            if (o instanceof ConfigurationContext) {
+                ConfigurationContext context = (ConfigurationContext) o;
+                SynapseEnvironment environment =
+                        (SynapseEnvironment) context.getAxisConfiguration().getParameterValue(
+                                SynapseConstants.SYNAPSE_ENV);
+                if (environment != null) {
+                    return environment.getStatisticsCollector();
                 }
             }
         }

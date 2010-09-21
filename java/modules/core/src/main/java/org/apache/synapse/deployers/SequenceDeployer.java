@@ -184,8 +184,7 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
             OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
                     serializeMediator(null, seq);
             if (seq.getFileName() != null) {
-                String fileName = ServerManager.getInstance()
-                        .getServerConfigurationInformation().getSynapseXMLLocation()
+                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR
                         + File.separator + seq.getFileName();
                 writeToFile(seqElem, fileName);

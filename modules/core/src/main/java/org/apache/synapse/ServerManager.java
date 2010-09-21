@@ -37,9 +37,10 @@ import java.util.Date;
  * When the WAR deployment is used, the SynapseStartUpServlet servlet calls on this class to
  * initialize Synapse.
  * <p/>
- * This is the entry point for starting an Syanpse instance. All the synapse related management
- * oprations are exposed through this class. 
+ * This is the entry point for starting an Synapse instance. All the synapse related management
+ * operations are exposed through this class.
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class ServerManager {
 
     private static final Log log = LogFactory.getLog(ServerManager.class);
@@ -64,7 +65,7 @@ public class ServerManager {
 
     /**
      * Save the TCCL of the initial thread that starts the ESB for future use. When JMX calls are
-     * received via RMI connections, re-start etc may otherwise fail due to classloading issues. 
+     * received via RMI connections, re-start etc may otherwise fail due to class loading issues.
      */
     private ClassLoader classLoader;
 
@@ -76,7 +77,7 @@ public class ServerManager {
 
     /**
      * Initializes the server, if we need to create a new axis2 instance, calling this will create
-     * the new axis2 environment, but this won't start the transport lsiteners
+     * the new axis2 environment, but this won't start the transport listeners
      *
      * @param serverConfigurationInformation ServerConfigurationInformation instance
      * @param serverContextInformation       ServerContextInformation instance
@@ -297,7 +298,7 @@ public class ServerManager {
      *
      * @param maxWaitMillis the maximum number of ms to wait until a graceful stop is achieved,
      *                      before forcing a stop
-     * @return if successfull ServerState#STOPPED
+     * @return if successful ServerState#STOPPED
      *                      
      * @throws SynapseException 
      */
@@ -351,9 +352,9 @@ public class ServerManager {
     }
 
     /** 
-     * Returns the context classloader of the original thread.
+     * Returns the context class loader of the original thread.
      * 
-     * @return the context classloader of the original thread.
+     * @return the context class loader of the original thread.
      */
     public ClassLoader getClassLoader() {
         return classLoader;
@@ -426,7 +427,7 @@ public class ServerManager {
                 PasswordManager.getInstance().shutDown();
             }
 
-            // unregister the ServerManager MBean
+            // un-register the ServerManager MBean
             unRegisterMBean();
 
             // destroy the SynapseController

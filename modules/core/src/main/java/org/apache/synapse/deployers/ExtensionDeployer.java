@@ -32,7 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.deployment.AbstractDeployer;
+import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentClassLoader;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
@@ -49,7 +49,7 @@ import org.apache.synapse.config.xml.StartupFinder;
  * This will support the hot deployment and hot update of Synapse extensions (mediators
  * and startups) at runtime using the Axis2 concepts of deployers.
  */
-public class ExtensionDeployer extends AbstractDeployer {
+public class ExtensionDeployer implements Deployer {
 
     /**
      * Holds the log variable for logging purposes
@@ -90,8 +90,7 @@ public class ExtensionDeployer extends AbstractDeployer {
             boolean isDirectory = deploymentFileData.getFile().isDirectory();
             deploymentFileData.setClassLoader(isDirectory, getClass().getClassLoader(),
                     (File) cfgCtx.getAxisConfiguration().getParameterValue(
-                            Constants.Configuration.ARTIFACTS_TEMP_DIR),
-                    cfgCtx.getAxisConfiguration().isChildFirstClassLoading());
+                            Constants.Configuration.ARTIFACTS_TEMP_DIR));
 
             DeploymentClassLoader urlCl
                 = (DeploymentClassLoader)deploymentFileData.getClassLoader();
@@ -193,7 +192,7 @@ public class ExtensionDeployer extends AbstractDeployer {
      * @param string - filename of the deleted file
      * @throws DeploymentException - incase of an error in undeployment
      */
-    public void undeploy(String string) throws DeploymentException {
+    public void unDeploy(String string) throws DeploymentException {
         // todo: implement the undeployement
     }
 

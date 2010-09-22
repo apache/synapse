@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.deployment.AbstractDeployer;
+import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
@@ -55,7 +55,7 @@ import java.util.Properties;
  *
  * @see org.apache.axis2.deployment.Deployer
  */
-public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
+public abstract class AbstractSynapseArtifactDeployer implements Deployer {
 
     private static final Log log = LogFactory.getLog(AbstractSynapseArtifactDeployer.class);
     protected  Log deployerLog;

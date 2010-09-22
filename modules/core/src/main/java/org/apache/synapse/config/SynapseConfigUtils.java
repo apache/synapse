@@ -572,7 +572,7 @@ public class SynapseConfigUtils {
      * Utility method to resolve url(only If need) path using synapse home system property
      *
      * @param path Path to the URL
-     * @return Valid URL instance or null(if it is inavalid or can not open a connection to it )
+     * @return Valid URL instance or null(if it is invalid or can not open a connection to it )
      */
     public static URL getURLFromPath(String path) {
         if (path == null || "null".equals(path)) {

@@ -28,6 +28,7 @@ import org.wso2.caching.digest.DigestGenerator;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Creates an instance of a Cache mediator using XML configuration specified
@@ -61,7 +62,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
     private static final long DEFAULT_TIMEOUT = 5000L;
     private static final int DEFAULT_DISK_CACHE_SIZE = 200;
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         if (!CACHE_Q.equals(elem.getQName())) {
             handleException("Unable to create the cache mediator. " +
@@ -131,8 +132,8 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                 if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
                     cache.setOnCacheHitRef(sequenceAttr.getAttributeValue());
                 } else if (onCacheHitElem.getFirstElement() != null) {
-                    cache.setOnCacheHitSequence(
-                        new SequenceMediatorFactory().createAnonymousSequence(onCacheHitElem));
+                    cache.setOnCacheHitSequence(new SequenceMediatorFactory()
+                            .createAnonymousSequence(onCacheHitElem, properties));
                 }
             }
 

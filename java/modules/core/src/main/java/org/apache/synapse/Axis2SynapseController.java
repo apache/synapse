@@ -417,22 +417,25 @@ public class Axis2SynapseController implements SynapseController {
     public SynapseConfiguration createSynapseConfiguration() {
 
         String synapseXMLLocation = serverConfigurationInformation.getSynapseXMLLocation();
+        Properties properties = SynapsePropertiesLoader.loadSynapseProperties();
+        if (serverConfigurationInformation.getResolveRoot() != null) {
+            properties.put(SynapseConstants.RESOLVE_ROOT,
+                    serverConfigurationInformation.getResolveRoot());
+        }
 
         if (synapseXMLLocation != null) {
-            synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(synapseXMLLocation);
+            synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(
+                    synapseXMLLocation, properties);
         } else {
             log.warn("System property or init-parameter '" + SynapseConstants.SYNAPSE_XML +
                     "' is not specified. Using default configuration..");
             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
-        Properties properties = SynapsePropertiesLoader.loadSynapseProperties();
-        if (properties != null) {
-            Enumeration keys =  properties.keys();
-            while (keys.hasMoreElements()) {
-                String key = (String) keys.nextElement();
-                synapseConfiguration.setProperty(key, properties.getProperty(key));
-            }
+        Enumeration keys = properties.keys();
+        while (keys.hasMoreElements()) {
+            String key = (String) keys.nextElement();
+            synapseConfiguration.setProperty(key, properties.getProperty(key));
         }
 
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration

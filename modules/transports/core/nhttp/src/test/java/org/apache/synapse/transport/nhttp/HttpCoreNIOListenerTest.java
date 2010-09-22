@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.axis2.transport.testkit.ManagedTestSuite;
+import org.apache.axis2.transport.testkit.axis2.SimpleTransportDescriptionFactory;
 import org.apache.axis2.transport.testkit.axis2.TransportDescriptionFactory;
 import org.apache.axis2.transport.testkit.http.HttpTransportTestSuiteBuilder;
 
@@ -33,7 +34,9 @@ public class HttpCoreNIOListenerTest extends TestCase {
         // These tests don't work because of a problem similar to SYNAPSE-418
         suite.addExclude("(test=EchoXML)");
         
-        TransportDescriptionFactory tdfNIO = new HttpTransportDescriptionFactory();
+        TransportDescriptionFactory tdfNIO =
+            new SimpleTransportDescriptionFactory("http", HttpCoreNIOListener.class,
+                                                  HttpCoreNIOSender.class);
         
         HttpTransportTestSuiteBuilder builder = new HttpTransportTestSuiteBuilder(suite, tdfNIO);
         

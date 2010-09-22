@@ -25,6 +25,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transaction.TransactionMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * The Factory for create transaction mediator- InLine XML need to provide
@@ -44,9 +45,10 @@ public class TransactionMediatorFactory extends AbstractMediatorFactory {
      * by the OMElement declaration
      *
      * @param elem the OMElement that specifies the Transaction mediator configuration
+     * @param properties
      * @return the Transaction mediator instance created
      */
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         TransactionMediator tm = new TransactionMediator();
         OMAttribute action

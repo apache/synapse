@@ -144,9 +144,10 @@ public class SynapseConfigUtils {
      * treated as XML and an OMNode would be returned
      *
      * @param url the URL to the resource
+     * @param properties bag of properties to pass in any information to the factory
      * @return an Object created from the given URL
      */
-    public static Object getObject(URL url) {
+    public static Object getObject(URL url, Properties properties) {
         try {
             if (url != null && "file".equals(url.getProtocol())) {
                 try {
@@ -203,7 +204,7 @@ public class SynapseConfigUtils {
                 omElem.build();
 
                 if (xmlToObject != null) {
-                    return xmlToObject.getObjectFromOMNode(omElem);
+                    return xmlToObject.getObjectFromOMNode(omElem, properties);
                 } else {
                     return omElem;
                 }
@@ -722,19 +723,6 @@ public class SynapseConfigUtils {
                     serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getSynapseHome();
-            }
-        }*/
-        return "";
-    }
-
-    public static String getResolveRoot() {
-        //TODO SUPUN
-        /*ServerManager serverManager = ServerManager.getInstance();
-        if (serverManager.isInitialized()) {
-            ServerConfigurationInformation information =
-                    serverManager.getServerConfigurationInformation();
-            if (information != null) {
-                return information.getResolveRoot();
             }
         }*/
         return "";

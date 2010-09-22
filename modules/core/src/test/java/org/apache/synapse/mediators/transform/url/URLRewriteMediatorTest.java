@@ -33,6 +33,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 public class URLRewriteMediatorTest extends TestCase {
@@ -256,7 +257,7 @@ public class URLRewriteMediatorTest extends TestCase {
 
         OMElement element = AXIOMUtil.stringToOM(xml);
         URLRewriteMediator mediator = (URLRewriteMediator) new URLRewriteMediatorFactory().
-                createMediator(element);
+                createMediator(element, new Properties());
 
         MessageContext msgCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>");
         msgCtx.setTo(new EndpointReference("http://test.org:9763/MyService"));

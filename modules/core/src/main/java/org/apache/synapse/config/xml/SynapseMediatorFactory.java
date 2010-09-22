@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.base.SynapseMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Builds the main mediator (@see SynapseConfiguration) of the Synapse instance
@@ -43,14 +44,14 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
         return RULES_Q;
     }
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         SynapseMediator sm = new SynapseMediator();
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(sm,elem);
 
-        addChildren(elem, sm);
+        addChildren(elem, sm, properties);
         return sm;
     }
 

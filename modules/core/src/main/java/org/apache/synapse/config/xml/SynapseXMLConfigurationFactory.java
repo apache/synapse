@@ -42,12 +42,13 @@ import org.apache.axis2.AxisFault;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
 
-    public SynapseConfiguration getConfiguration(OMElement definitions) {
+    public SynapseConfiguration getConfiguration(OMElement definitions, Properties properties) {
 
         if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) {
             throw new SynapseException(
@@ -68,24 +69,24 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     if (key != null) {
                         handleException("Referred sequences are not allowed at the top level");
                     } else {
-                        defineSequence(config, elt);
+                        defineSequence(config, elt, properties);
                     }
                 } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
-                    defineEndpoint(config, elt);
+                    defineEndpoint(config, elt, properties);
                 } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
-                    defineEntry(config, elt);
+                    defineEntry(config, elt, properties);
                 } else if (XMLConfigConstants.PROXY_ELT.equals(elt.getQName())) {
-                    defineProxy(config, elt);
+                    defineProxy(config, elt, properties);
                 } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
-                    defineRegistry(config, elt);
+                    defineRegistry(config, elt, properties);
                 } else if (XMLConfigConstants.EVENT_SOURCE_ELT.equals(elt.getQName())) {
-                    defineEventSource(config, elt);
+                    defineEventSource(config, elt, properties);
                 } else if (XMLConfigConstants.EXECUTOR_ELT.equals(elt.getQName())) {
-                    defineExecutor(config, elt);
+                    defineExecutor(config, elt, properties);
                 } else if(XMLConfigConstants.MESSAGE_STORE_ELT.equals(elt.getQName())) {
-                    defineMessageStore(config, elt);
+                    defineMessageStore(config, elt, properties);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
-                    defineStartup(config, elt);
+                    defineStartup(config, elt, properties);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
                     config.setDescription(elt.getText());
                 } else {
@@ -99,38 +100,43 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return config;
     }
 
-    public static Registry defineRegistry(SynapseConfiguration config, OMElement elem) {
+    public static Registry defineRegistry(SynapseConfiguration config, OMElement elem,
+                                          Properties properties) {
         if (config.getRegistry() != null) {
             handleException("Only one remote registry can be defined within a configuration");
         }
-        Registry registry = RegistryFactory.createRegistry(elem);
+        Registry registry = RegistryFactory.createRegistry(elem, properties);
         config.setRegistry(registry);
         return registry;
     }
 
-    public static Startup defineStartup(SynapseConfiguration config, OMElement elem) {
-        Startup startup = StartupFinder.getInstance().getStartup(elem);
+    public static Startup defineStartup(SynapseConfiguration config, OMElement elem,
+                                        Properties properties) {
+        Startup startup = StartupFinder.getInstance().getStartup(elem, properties);
         config.addStartup(startup);
         return startup;
     }
 
-    public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem) {
-        ProxyService proxy = ProxyServiceFactory.createProxy(elem);
+    public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem,
+                                           Properties properties) {
+        ProxyService proxy = ProxyServiceFactory.createProxy(elem, properties);
         config.addProxyService(proxy.getName(), proxy);
         return proxy;
     }
 
-   public static Entry defineEntry(SynapseConfiguration config, OMElement elem) {
-        Entry entry = EntryFactory.createEntry(elem);
+   public static Entry defineEntry(SynapseConfiguration config, OMElement elem,
+                                   Properties properties) {
+        Entry entry = EntryFactory.createEntry(elem, properties);
         config.addEntry(entry.getKey(), entry);
         return entry;
     }
 
-    public static Mediator defineSequence(SynapseConfiguration config, OMElement ele) {
+    public static Mediator defineSequence(SynapseConfiguration config, OMElement ele,
+                                          Properties properties) {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
-            Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(ele);
+            Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
             config.addSequence(name, mediator);
             // mandatory sequence is treated as a speciall sequence because it will be fetched for
             // each and every message and keeps a direct reference to that from the configuration
@@ -145,11 +151,12 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return null;
     }
 
-    public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele) {
+    public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele,
+                                          Properties properties) {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(ele, false);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(ele, false, properties);
             config.addEndpoint(name.trim(), endpoint);
             return endpoint;
         } else {
@@ -159,28 +166,30 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     }
 
     public static SynapseEventSource defineEventSource(SynapseConfiguration config,
-                                                       OMElement elem) {
-        SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem);
+                                                       OMElement elem, Properties properties) {
+        SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem, properties);
         config.addEventSource(eventSource.getName(), eventSource);
         return eventSource;
     }
 
     public static PriorityExecutor defineExecutor(SynapseConfiguration config,
-                                                       OMElement elem) {
+                                                       OMElement elem, Properties properties) {
         PriorityExecutor executor = null;
         try {
             executor = PriorityExecutorFactory.createExecutor(
-                XMLConfigConstants.SYNAPSE_NAMESPACE, elem, true);
+                XMLConfigConstants.SYNAPSE_NAMESPACE, elem, true, properties);
         } catch (AxisFault axisFault) {
             handleException("Failed to create the priorityExecutor configuration");
         }
+        assert executor != null;
         config.addPriorityExecutor(executor.getName(), executor);
         return executor;
     }
 
-    public static MessageStore defineMessageStore(SynapseConfiguration config , OMElement elem) {
-        MessageStore messageStore = MessageStoreFactory.createMessageStore(elem);
-        config.addMessageStore(messageStore.getName(),messageStore);
+    public static MessageStore defineMessageStore(SynapseConfiguration config ,
+                                                  OMElement elem, Properties properties) {
+        MessageStore messageStore = MessageStoreFactory.createMessageStore(elem, properties);
+        config.addMessageStore(messageStore.getName(), messageStore);
         return messageStore;
     }
 

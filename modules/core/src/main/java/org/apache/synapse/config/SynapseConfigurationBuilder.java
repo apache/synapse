@@ -34,6 +34,7 @@ import org.apache.synapse.registry.Registry;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Properties;
 
 /**
  * Builds a Synapse Configuration model with a given input
@@ -70,9 +71,10 @@ public class SynapseConfigurationBuilder {
      * Build a Synapse configuration from a given XML configuration file
      *
      * @param configFile Path to the Synapse configuration file or directory
+     * @param properties bag of properties to be passed into the builder
      * @return the Synapse configuration model
      */
-    public static SynapseConfiguration getConfiguration(String configFile) {
+    public static SynapseConfiguration getConfiguration(String configFile, Properties properties) {
 
         File synapseConfigLocation = new File(configFile);
         if (!synapseConfigLocation.exists()) {
@@ -86,7 +88,8 @@ public class SynapseConfigurationBuilder {
         if (synapseConfigLocation.isFile()) {
             // build the Synapse configuration parsing the XML config file
             try {
-                synCfg = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
+                synCfg = XMLConfigurationBuilder.getConfiguration(
+                        new FileInputStream(configFile), properties);
                 log.info("Loaded Synapse configuration from : " + configFile);
             } catch (Exception e) {
                 handleException("Could not initialize Synapse : " + e.getMessage(), e);
@@ -95,7 +98,7 @@ public class SynapseConfigurationBuilder {
         } else if (synapseConfigLocation.isDirectory()) {
             // build the Synapse configuration by processing given directory hierarchy
             try {
-                synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile);
+                synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile, properties);
                 log.info("Loaded Synapse configuration from the artifact " +
                         "repository at : " + configFile);
             } catch (XMLStreamException e) {
@@ -117,7 +120,7 @@ public class SynapseConfigurationBuilder {
             if (remoteConfigNode != null) {
                 try {
                     synCfg = XMLConfigurationBuilder.getConfiguration(SynapseConfigUtils
-                            .getStreamSource(remoteConfigNode).getInputStream());
+                            .getStreamSource(remoteConfigNode).getInputStream(), properties);
                     // TODO: when you fetch the configuration and serialize the config in any case
                     // TODO: the remote config is serialized to the synapse.xml we should prevent
                     // TODO: that, and should serialize the config to the registry

@@ -32,6 +32,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.util.List;
 import java.io.StringReader;
+import java.util.Properties;
 
 public class SendMediatorSerializationTest extends AbstractTestCase {
 
@@ -58,10 +59,10 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "</send>";
 
         OMElement config1 = createOMElement(sendConfig);
-        SendMediator send1 = (SendMediator) factory.createMediator(config1);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
 
         OMElement config2 = serializer.serializeMediator(null, send1);
-        SendMediator send2 = (SendMediator) factory.createMediator(config2);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
 
         assertTrue("Top level endpoint should be a address endpoint.",
                 send1.getEndpoint() instanceof AddressEndpoint);
@@ -91,10 +92,10 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "</send>";
 
         OMElement config1 = createOMElement(sendConfig);
-        SendMediator send1 = (SendMediator) factory.createMediator(config1);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
 
         OMElement config2 = serializer.serializeMediator(null, send1);
-        SendMediator send2 = (SendMediator) factory.createMediator(config2);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
 
         assertTrue("Top level endpoint should be a WSDL endpoint.",
                 send1.getEndpoint() instanceof WSDLEndpoint);
@@ -142,10 +143,10 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "</send>";
 
         OMElement config1 = createOMElement(sendConfig);
-        SendMediator send1 = (SendMediator) factory.createMediator(config1);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
 
         OMElement config2 = serializer.serializeMediator(null, send1);
-        SendMediator send2 = (SendMediator) factory.createMediator(config2);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
 
         assertTrue("Top level endpoint should be a load balance endpoint.",
                 send2.getEndpoint() instanceof LoadbalanceEndpoint);
@@ -191,10 +192,10 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "</send>";
 
         OMElement config1 = createOMElement(sendConfig);
-        SendMediator send1 = (SendMediator) factory.createMediator(config1);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
 
         OMElement config2 = serializer.serializeMediator(null, send1);
-        SendMediator send2 = (SendMediator) factory.createMediator(config2);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
 
         assertTrue("Top level endpoint should be a failover endpoint.",
                 send2.getEndpoint() instanceof FailoverEndpoint);
@@ -244,10 +245,10 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "</send>";
 
         OMElement config1 = createOMElement(sendConfig);
-        SendMediator send1 = (SendMediator) factory.createMediator(config1);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
 
         OMElement config2 = serializer.serializeMediator(null, send1);
-        SendMediator send2 = (SendMediator) factory.createMediator(config2);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
 
         assertTrue("Top level endpoint should be a load balance endpoint.",
                 send2.getEndpoint() instanceof LoadbalanceEndpoint);

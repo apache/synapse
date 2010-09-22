@@ -26,6 +26,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link SequenceMediator} instances.
@@ -53,7 +54,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return SEQUENCE_Q;
     }
 
-    public SequenceMediator createAnonymousSequence(OMElement elem) {
+    public SequenceMediator createAnonymousSequence(OMElement elem, Properties properties) {
         SequenceMediator seqMediator = new SequenceMediator();
         OMAttribute e = elem.getAttribute(ATT_ONERROR);
         if (e != null) {
@@ -64,11 +65,11 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         if (descElem != null) {
             seqMediator.setDescription(descElem.getText());
         }
-        addChildren(elem, seqMediator);         
+        addChildren(elem, seqMediator, properties);
         return seqMediator;
     }
     
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SequenceMediator seqMediator = new SequenceMediator();
 
@@ -80,7 +81,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 seqMediator.setErrorHandler(e.getAttributeValue());
             }
             processAuditStatus(seqMediator, elem);
-            addChildren(elem, seqMediator);
+            addChildren(elem, seqMediator, properties);
 
         } else {
             n = elem.getAttribute(ATT_KEY);

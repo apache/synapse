@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  *
@@ -33,7 +34,7 @@ public class SEDAMediatorFactory extends AbstractMediatorFactory {
     private static final QName SEDA_Q =
             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "seda");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         final SEDAMediator mediator = new SEDAMediator();
         String mediatorKey = elem.getAttributeValue(ATT_KEY);

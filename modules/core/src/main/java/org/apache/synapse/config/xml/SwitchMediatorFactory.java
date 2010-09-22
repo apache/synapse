@@ -28,6 +28,7 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -48,11 +49,14 @@ import java.util.regex.PatternSyntaxException;
  */
 public class SwitchMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName SWITCH_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "switch");
-    private static final QName CASE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "case");
-    private static final QName DEFAULT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "default");
+    private static final QName SWITCH_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "switch");
+    private static final QName CASE_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "case");
+    private static final QName DEFAULT_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "default");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SwitchMediator switchMediator = new SwitchMediator();
         OMAttribute source = elem.getAttribute(ATT_SOURCE);
@@ -87,17 +91,20 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
             try {
                 aCase.setRegex(Pattern.compile(regex.getAttributeValue()));
             } catch (PatternSyntaxException pse) {
-                String msg = "Invalid Regular Expression for attribute 'regex' : " + regex.getAttributeValue();
+                String msg = "Invalid Regular Expression for attribute 'regex' : "
+                        + regex.getAttributeValue();
                 log.error(msg);
                 throw new SynapseException(msg);
             }
-            aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator(caseElem));
+            aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator(
+                    caseElem, properties));
             switchMediator.addCase(aCase);
         }
         iter = elem.getChildrenWithName(DEFAULT_Q);
         while (iter.hasNext()) {
             SwitchCase aCase = new SwitchCase();
-            aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator((OMElement) iter.next()));
+            aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator(
+                    (OMElement) iter.next(), properties));
             switchMediator.setDefaultCase(aCase);
             break; // add only the *first* default if multiple are specified, ignore rest if any
         }

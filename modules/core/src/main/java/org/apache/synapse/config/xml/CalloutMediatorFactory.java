@@ -26,6 +26,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link CalloutMediator} instances.
@@ -53,7 +54,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
     private static final QName Q_TARGET
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CalloutMediator callout = new CalloutMediator();
 

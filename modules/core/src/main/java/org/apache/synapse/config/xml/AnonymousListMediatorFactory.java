@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * This is factory for creating an anonymous list mediator(an unnamed list of mediators )
@@ -37,12 +38,14 @@ public abstract class AnonymousListMediatorFactory extends AbstractListMediatorF
     /**
      * To create an anonymous list mediator form OMElement
      * @param el
+     * @param properties bag of properties with additional information
      * @return List mediator
      */
-    public static AnonymousListMediator createAnonymousListMediator(OMElement el) {
+    public static AnonymousListMediator createAnonymousListMediator(
+            OMElement el, Properties properties) {
         AnonymousListMediator mediator = new AnonymousListMediator();
         {
-            addChildren(el, mediator);
+            addChildren(el, mediator, properties);
         }
         return mediator;
     }

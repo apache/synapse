@@ -28,6 +28,7 @@ import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link AggregateMediator} instances from the config;
@@ -70,7 +71,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
     private static final QName SEQUENCE_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         AggregateMediator mediator = new AggregateMediator();
         processAuditStatus(mediator, elem);
@@ -127,8 +128,8 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             if (onCompleteSequence != null) {
                 mediator.setOnCompleteSequenceRef(onCompleteSequence.getAttributeValue());
             } else if (onComplete.getFirstElement() != null) {
-                mediator.setOnCompleteSequence(
-                        (new SequenceMediatorFactory()).createAnonymousSequence(onComplete));
+                mediator.setOnCompleteSequence((new SequenceMediatorFactory())
+                        .createAnonymousSequence(onComplete, properties));
             } else {
                 SequenceMediator sequence = new SequenceMediator();
                 sequence.addChild(new DropMediator());

@@ -27,10 +27,7 @@ import org.jaxen.JaxenException;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Factory for {@link ValidateMediator} instances.
@@ -52,7 +49,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName ON_FAIL_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "on-fail");
     private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ValidateMediator validateMediator = new ValidateMediator();
 
@@ -100,7 +97,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         }
 
         if (onFail != null && onFail.getChildElements().hasNext()) {
-            addChildren(onFail, validateMediator);
+            addChildren(onFail, validateMediator, properties);
         } else {
             handleException("A non-empty <on-fail> child element is required for " +
                 "the <validate> mediator");

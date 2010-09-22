@@ -34,6 +34,7 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.net.URL;
+import java.util.Properties;
 
 /**
  * Creates an {@link WSDLEndpoint} based endpoint from a XML configuration.
@@ -76,7 +77,8 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         WSDLEndpoint wsdlEndpoint = new WSDLEndpoint();
         OMAttribute name = epConfig.getAttribute(new QName(
@@ -137,12 +139,14 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                 }
             }
 
-            // check if the wsdl 1.1 document is suppled inline
+            // check if the wsdl 1.1 document is supplied inline
             OMElement definitionElement = wsdlElement.getFirstChildWithName
                     (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "definitions"));
             if (endpoint == null && definitionElement != null) {
                 wsdlEndpoint.setWsdlDoc(definitionElement);
-                String resolveRoot = SynapseConfigUtils.getResolveRoot();
+
+                String resolveRoot = properties.get(SynapseConstants.RESOLVE_ROOT).toString();
+//                String resolveRoot = SynapseConfigUtils.getResolveRoot();
                 String baseUri = "file:./";
                 if (resolveRoot != null) {
                     baseUri = resolveRoot.trim();

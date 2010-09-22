@@ -30,6 +30,7 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Creates a XQuery mediator from the given XML
@@ -55,7 +56,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
     public static final QName ATT_TYPE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "type");
 
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         XQueryMediator xQueryMediator = new XQueryMediator();
         OMAttribute xqueryKey = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,

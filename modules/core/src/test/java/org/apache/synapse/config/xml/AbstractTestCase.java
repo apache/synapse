@@ -28,6 +28,7 @@ import org.custommonkey.xmlunit.XMLTestCase;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  *
@@ -56,7 +57,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
     protected boolean serialization(String inputXml, MediatorFactory mediatorFactory, MediatorSerializer mediatorSerializer) {
 
         OMElement inputOM = createOMElement(inputXml);
-        Mediator mediator = mediatorFactory.createMediator(inputOM);
+        Mediator mediator = mediatorFactory.createMediator(inputOM, new Properties());
         OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
         try {
             assertXMLEqual(resultOM.toString(), inputXml);
@@ -71,7 +72,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
 
     protected boolean serialization(String inputXml, MediatorSerializer mediatorSerializer) {
         OMElement inputOM = createOMElement(inputXml);
-        Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(inputOM);
+        Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(inputOM, new Properties());
         OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
         try {
             assertXMLEqual(resultOM.toString(), inputXml);

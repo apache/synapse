@@ -88,11 +88,11 @@ public class SynapsePropertiesLoader {
     /**
      * Load a value of the property from the synapse properties
      *
-     * @param key           Key of the property
-     * @param deafaultValue Default value
-     * @return Value of the propoerty
+     * @param key Key of the property
+     * @param defaultValue Default value
+     * @return Value of the property
      */
-    public static String getPropertyValue(String key, String deafaultValue) {
-        return MiscellaneousUtil.getProperty(loadSynapseProperties(), key, deafaultValue);
+    public static String getPropertyValue(String key, String defaultValue) {
+        return MiscellaneousUtil.getProperty(loadSynapseProperties(), key, defaultValue);
     }
 }

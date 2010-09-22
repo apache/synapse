@@ -23,6 +23,7 @@ import org.apache.axiom.om.*;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.codec.binary.Base64;
@@ -726,6 +727,10 @@ public class SynapseConfigUtils {
             }
         }*/
         return "";
+    }
+
+    public static SynapseEnvironment getSynapseEnvironment(AxisConfiguration axisCfg) {
+        return (SynapseEnvironment) axisCfg.getParameterValue(SynapseConstants.SYNAPSE_CONFIG);
     }
 
     /**

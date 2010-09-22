@@ -26,6 +26,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 
 public class EnqueueMediatorFactory extends AbstractMediatorFactory{
@@ -35,7 +36,7 @@ public class EnqueueMediatorFactory extends AbstractMediatorFactory{
     public static final QName PRIORITY_ATT = new QName("priority");
     public static final QName QUEUE_ATT = new QName("executor");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         EnqueueMediator mediator = new EnqueueMediator();
 
         OMAttribute seqAtt = elem.getAttribute(SEQUENCE_ATT);

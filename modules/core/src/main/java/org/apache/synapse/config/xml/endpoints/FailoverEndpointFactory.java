@@ -27,6 +27,7 @@ import org.apache.synapse.endpoints.FailoverEndpoint;
 
 import javax.xml.namespace.QName;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Creates {@link FailoverEndpoint} using a XML configuration.
@@ -47,7 +48,8 @@ public class FailoverEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         OMElement failoverElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
@@ -60,7 +62,8 @@ public class FailoverEndpointFactory extends EndpointFactory {
                 failoverEndpoint.setName(name);
             }
 
-            List<Endpoint> childEndpoints = getEndpoints(failoverElement, failoverEndpoint);
+            List<Endpoint> childEndpoints = getEndpoints(
+                    failoverElement, failoverEndpoint, properties);
             if(childEndpoints == null || childEndpoints.size() == 0){
                 String msg = "Invalid Synapse configuration.\n"
                         + "A FailOver must have child elements, but the FailOver "
@@ -70,7 +73,8 @@ public class FailoverEndpointFactory extends EndpointFactory {
             }
 
             // set endpoints and return
-            failoverEndpoint.setChildren(getEndpoints(failoverElement, failoverEndpoint));
+            failoverEndpoint.setChildren(getEndpoints(
+                    failoverElement, failoverEndpoint, properties));
             // process the parameters
             processProperties(failoverEndpoint, epConfig);
 

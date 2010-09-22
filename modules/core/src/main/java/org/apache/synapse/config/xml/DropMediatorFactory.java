@@ -24,6 +24,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link DropMediator} instances.
@@ -37,7 +38,7 @@ public class DropMediatorFactory extends AbstractMediatorFactory  {
 
     private static final QName DROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "drop");
 
-    public Mediator createSpecificMediator(OMElement el) {
+    public Mediator createSpecificMediator(OMElement el, Properties properties) {
 
         Mediator dropMediator = new DropMediator();
         // after successfully creating the mediator

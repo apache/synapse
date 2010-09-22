@@ -42,9 +42,10 @@ public abstract class AbstractRegistry implements Registry {
     /**
      * Get the resource for the given key from this registry
      * @param entry The Enrty instance that contains meta-data
+     * @param properties bag of properties with additional information
      * @return the matching resultant object
      */
-    public Object getResource(Entry entry) {
+    public Object getResource(Entry entry, Properties properties) {
 
         OMNode omNode = null;
         RegistryEntry re = null;
@@ -107,7 +108,7 @@ public abstract class AbstractRegistry implements Registry {
         // if we have a XMLToObjectMapper for this entry, use it to convert this
         // resource into the appropriate object - e.g. sequence or endpoint
         if (entry.getMapper() != null) {
-            entry.setValue(entry.getMapper().getObjectFromOMNode(omNode));
+            entry.setValue(entry.getMapper().getObjectFromOMNode(omNode, properties));
 
             if (entry.getValue() instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) entry.getValue();
@@ -126,7 +127,7 @@ public abstract class AbstractRegistry implements Registry {
                 XMLToObjectMapper mapper = getMapper(re.getType());
                 if (mapper != null) {
                     entry.setMapper(mapper);
-                    entry.setValue(mapper.getObjectFromOMNode(omNode));
+                    entry.setValue(mapper.getObjectFromOMNode(omNode, properties));
 
                 } else {
                     entry.setValue(omNode);

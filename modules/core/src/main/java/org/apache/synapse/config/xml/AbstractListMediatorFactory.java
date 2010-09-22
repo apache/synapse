@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ListMediator;
 
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * This implements the basic logic to build a list mediator from a given XML
@@ -32,12 +33,12 @@ import java.util.Iterator;
  */
 public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
 
-    protected static void addChildren(OMElement el, ListMediator m) {
+    protected static void addChildren(OMElement el, ListMediator m, Properties properties) {
         Iterator it = el.getChildElements();
         while (it.hasNext()) {
             OMElement child = (OMElement) it.next();
             if (!DESCRIPTION_Q.equals(child.getQName())) { // neglect the description tag
-                Mediator med = MediatorFactoryFinder.getInstance().getMediator(child);
+                Mediator med = MediatorFactoryFinder.getInstance().getMediator(child, properties);
                 if (med != null) {
                     m.addChild(med);
                 } else {

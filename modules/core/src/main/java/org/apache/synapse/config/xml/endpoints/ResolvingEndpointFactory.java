@@ -26,6 +26,7 @@ import org.apache.axiom.om.OMElement;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * 
@@ -42,7 +43,8 @@ public class ResolvingEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         ResolvingEndpoint resolvingEndpoint = new ResolvingEndpoint();       
         String name = epConfig.getAttributeValue(new QName("name"));

@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.exception.XMLComparisonException;
 import org.apache.synapse.registry.Registry;
 
+import java.util.Properties;
+
 public class RegistrySerializationTest extends AbstractTestCase {
 
     public RegistrySerializationTest() {
@@ -37,7 +39,7 @@ public class RegistrySerializationTest extends AbstractTestCase {
                 "</syn:registry>";
 
         OMElement registryElement = createOMElement(regitryConfiguration);
-        Registry registry = RegistryFactory.createRegistry(registryElement);
+        Registry registry = RegistryFactory.createRegistry(registryElement, new Properties());
         OMElement serializedElement = RegistrySerializer.serializeRegistry(null, registry);
         try {
             assertTrue(compare(registryElement, serializedElement));

@@ -35,10 +35,7 @@ import org.apache.synapse.util.PolicyInfo;
 import javax.xml.namespace.QName;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Factory for {@link ProxyService} instances.
@@ -73,7 +70,7 @@ public class ProxyServiceFactory {
 
     private static final Log log = LogFactory.getLog(ProxyServiceFactory.class);
 
-    public static ProxyService createProxy(OMElement elem) {
+    public static ProxyService createProxy(OMElement elem, Properties properties) {
 
         ProxyService proxy = null;
 
@@ -92,7 +89,7 @@ public class ProxyServiceFactory {
                 // default to all transports using service name as destination
             } else {
                 StringTokenizer st = new StringTokenizer(transports, " ,");
-                ArrayList transportList = new ArrayList();
+                ArrayList<String> transportList = new ArrayList<String>();
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
                     if (token.length() != 0) {
@@ -111,7 +108,7 @@ public class ProxyServiceFactory {
                 // default to all servers
             } else {
                 StringTokenizer st = new StringTokenizer(pinnedServersValue, " ,");
-                List pinnedServersList = new ArrayList();
+                List<String> pinnedServersList = new ArrayList<String>();
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
                     if (token.length() != 0) {
@@ -173,7 +170,7 @@ public class ProxyServiceFactory {
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "inSequence"));
                 if (inSequenceElement != null) {
                     proxy.setTargetInLineInSequence(
-                            mediatorFactory.createAnonymousSequence(inSequenceElement));
+                            mediatorFactory.createAnonymousSequence(inSequenceElement, properties));
                     isTargetOk = true;
                 }
             }
@@ -185,8 +182,8 @@ public class ProxyServiceFactory {
                 OMElement outSequenceElement = target.getFirstChildWithName(
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "outSequence"));
                 if (outSequenceElement != null) {
-                    proxy.setTargetInLineOutSequence(
-                            mediatorFactory.createAnonymousSequence(outSequenceElement));
+                    proxy.setTargetInLineOutSequence(mediatorFactory
+                            .createAnonymousSequence(outSequenceElement, properties));
                 }
             }
             OMAttribute faultSequence = target.getAttribute(
@@ -197,8 +194,8 @@ public class ProxyServiceFactory {
                 OMElement faultSequenceElement = target.getFirstChildWithName(
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "faultSequence"));
                 if (faultSequenceElement != null) {
-                    proxy.setTargetInLineFaultSequence(
-                            mediatorFactory.createAnonymousSequence(faultSequenceElement));
+                    proxy.setTargetInLineFaultSequence(mediatorFactory
+                            .createAnonymousSequence(faultSequenceElement, properties));
                 }
             }
             OMAttribute tgtEndpt = target.getAttribute(
@@ -210,8 +207,8 @@ public class ProxyServiceFactory {
                 OMElement endpointElement = target.getFirstChildWithName(
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
                 if (endpointElement != null) {
-                    proxy.setTargetInLineEndpoint(
-                            EndpointFactory.getEndpointFromElement(endpointElement, true));
+                    proxy.setTargetInLineEndpoint(EndpointFactory.getEndpointFromElement(
+                            endpointElement, true, properties));
                     isTargetOk = true;
                 }
             }

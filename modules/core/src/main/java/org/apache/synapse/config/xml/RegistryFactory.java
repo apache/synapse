@@ -41,11 +41,15 @@ public class RegistryFactory {
 
     private static final Log log = LogFactory.getLog(RegistryFactory.class);
 
-    public static final QName PROVIDER_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "provider");
-    public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
-    public static final QName NAME_Q     = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
+    public static final QName PROVIDER_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "provider");
+    public static final QName PARAMETER_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
+    public static final QName NAME_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
 
-    public static Registry createRegistry(OMElement elem) {
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static Registry createRegistry(OMElement elem, Properties properties) {
 
         OMAttribute prov = elem.getAttribute(PROVIDER_Q);
         if (prov != null) {
@@ -66,7 +70,8 @@ public class RegistryFactory {
                     prov.getAttributeValue(), e);
             }
         } else {
-            handleException("The registry 'provider' attribute is required for a registry definition");
+            handleException("The registry 'provider' " +
+                    "attribute is required for a registry definition");
         }
 
         return null;

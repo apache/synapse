@@ -21,6 +21,8 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.core.axis2.ProxyService;
 
+import java.util.Properties;
+
 /**
  *
  *
@@ -36,7 +38,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
             "<publishWSDL uri=\"http://uri\" ></publishWSDL><policy key=\"key\"/>" +
             "<parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
-        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
+        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM, new Properties());
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -47,7 +49,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
             "<target endpoint=\"epr\" outSequence=\"out\"/><publishWSDL key=\"key\">" +
             "</publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
-        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
+        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM, new Properties());
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -59,7 +61,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
             "<outSequence><send/></outSequence></target><publishWSDL  key=\"key\"></publishWSDL>" +
             "<policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
-        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
+        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM, new Properties());
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -71,7 +73,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
             "<outSequence><send/></outSequence></target><enableAddressing/><publishWSDL  key=\"key\"></publishWSDL>" +
             "<policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
-        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
+        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM, new Properties());
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -83,7 +85,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
             "</outSequence></target><publishWSDL uri=\"http://uri\"></publishWSDL><policy key=\"key\"/>" +
             "<parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
-        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
+        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM, new Properties());
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -102,7 +104,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
             "<resource location=\"test1.xsd\" key=\"test-key1\"/><resource location=\"test2.xsd\"" +
             " key=\"test-key2\"/></publishWSDL></proxy>";
         OMElement inputOM = createOMElement(inputXml);
-        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
+        ProxyService proxy = ProxyServiceFactory.createProxy(inputOM, new Properties());
         assertNotNull(proxy.getResourceMap());
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
         assertTrue(compare(resultOM, inputOM));

@@ -19,7 +19,7 @@
 
 package org.apache.synapse.endpoints;
 
-import org.apache.axis2.clustering.ClusteringAgent;
+import org.apache.axis2.clustering.ClusterManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.description.AxisOperation;
@@ -177,8 +177,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                 ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
         if (!initialized) {
             // The check for clustering environment
-            ClusteringAgent clusteringAgent = cc.getAxisConfiguration().getClusteringAgent();
-            if (clusteringAgent != null && clusteringAgent.getStateManager() != null) {
+            ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+            if (clusterManager != null && clusterManager.getContextManager() != null) {
                 isClusteringEnabled = Boolean.TRUE;
             } else {
                 isClusteringEnabled = Boolean.FALSE;

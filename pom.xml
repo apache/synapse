@@ -707,7 +707,7 @@
                         <link>http://java.sun.com/j2ee/1.4/docs/api/</link>
                         <link>http://jaxen.codehaus.org/apidocs/</link>
                         <link>http://ws.apache.org/commons/axiom/apidocs/</link>
-                        <link>http://ws.apache.org/axis2/1_3/api/</link>
+                        <link>http://ws.apache.org/axis2/1_5_1/api/</link>
                     </links>
                     <aggregate>true</aggregate>
                 </configuration>

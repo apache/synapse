@@ -18,9 +18,9 @@
  */
 package org.apache.synapse.core.axis2;
 
-import org.apache.axis2.clustering.ClusteringAgent;
+import org.apache.axis2.clustering.ClusterManager;
+import org.apache.axis2.clustering.LoadBalanceEventHandler;
 import org.apache.axis2.clustering.Member;
-import org.apache.axis2.clustering.management.GroupManagementAgent;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +38,7 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
     private static final Log log = LogFactory.getLog(Axis2LoadBalanceMembershipHandler.class);
 
     private String lbDomain;
-    private GroupManagementAgent groupMgtAgent;
+    private LoadBalanceEventHandler lbEventHandler;
     private ConfigurationContext configCtx;
     private LoadbalanceAlgorithm algorithm;
     private Properties properties;
@@ -61,15 +61,15 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
         this.configCtx = configCtx;
 
         // The following code does the bridging between Axis2 and Synapse load balancing
-        ClusteringAgent clusteringAgent = configCtx.getAxisConfiguration().getClusteringAgent();
-        if(clusteringAgent == null){
+        ClusterManager clusterManager = configCtx.getAxisConfiguration().getClusterManager();
+        if(clusterManager == null){
             String msg = "In order to enable load balancing across an Axis2 cluster, " +
                          "the cluster entry should be enabled in the axis2.xml file";
             log.error(msg);
             throw new SynapseException(msg);
         }
-        groupMgtAgent = clusteringAgent.getGroupManagementAgent(lbDomain);
-        if(groupMgtAgent == null){
+        lbEventHandler = clusterManager.getLoadBalanceEventHandler(lbDomain);
+        if(lbEventHandler == null){
             String msg =
                     "A LoadBalanceEventHandler has not been specified in the axis2.xml " +
                     "file for the domain " + lbDomain;
@@ -89,7 +89,7 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
      * @return The current member
      */
     public Member getNextApplicationMember(AlgorithmContext context) {
-        algorithm.setApplicationMembers(groupMgtAgent.getMembers());
+        algorithm.setApplicationMembers(lbEventHandler.getMembers());
         return algorithm.getNextApplicationMember(context);
     }
 

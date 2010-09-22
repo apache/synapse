@@ -20,7 +20,6 @@ package org.apache.synapse.transport.vfs;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.AbstractPollTableEntry;
 import org.apache.axis2.transport.base.ParamUtils;
@@ -74,7 +73,7 @@ public class PollTableEntry extends AbstractPollTableEntry {
     }
 
     @Override
-    public EndpointReference[] getEndpointReferences(AxisService service, String ip) {
+    public EndpointReference[] getEndpointReferences(String ip) {
         return new EndpointReference[] { new EndpointReference("vfs:" + fileURI) };
     }
 

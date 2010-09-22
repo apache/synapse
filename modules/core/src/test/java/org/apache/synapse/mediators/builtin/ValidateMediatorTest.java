@@ -32,6 +32,7 @@ import org.jaxen.JaxenException;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Properties;
 
 public class ValidateMediatorTest extends TestCase {
 
@@ -249,7 +250,7 @@ public class ValidateMediatorTest extends TestCase {
 
         ValidateMediatorFactory mf = new ValidateMediatorFactory();
         ValidateMediator validate = (ValidateMediator) mf.createMediator(
-                SynapseConfigUtils.stringToOM(DEFAULT_FEATURES_MEDIATOR_CONFIG));
+                SynapseConfigUtils.stringToOM(DEFAULT_FEATURES_MEDIATOR_CONFIG), new Properties());
 
         assertNull(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID));
         assertNull(validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
@@ -260,7 +261,7 @@ public class ValidateMediatorTest extends TestCase {
     public void testValidateMediatorCustomFeatures() throws Exception {
         ValidateMediatorFactory mf = new ValidateMediatorFactory();
         ValidateMediator validate = (ValidateMediator) mf.createMediator(
-                SynapseConfigUtils.stringToOM(CUSTOM_FEATURES_MEDIATOR_CONFIG));
+                SynapseConfigUtils.stringToOM(CUSTOM_FEATURES_MEDIATOR_CONFIG), new Properties());
 
         assertNotNull(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID));
         assertFalse("true".equals(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID)));

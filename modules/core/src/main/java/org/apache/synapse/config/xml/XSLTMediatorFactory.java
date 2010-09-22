@@ -27,6 +27,7 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Factory for {@link XSLTMediator} instances.
@@ -52,7 +53,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         XSLTMediator transformMediator = new XSLTMediator();
 

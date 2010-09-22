@@ -21,6 +21,8 @@ package org.apache.synapse.config;
 
 import org.apache.axiom.om.OMNode;
 
+import java.util.Properties;
+
 /**
  * Defines the interface which should be implemented by a mapper that could
  * convert a XML resource into a known Object such as WSDL, XSD, etc..
@@ -30,7 +32,8 @@ public interface XMLToObjectMapper {
     /**
      * Create an application object from the given OMNode
      * @param om the XML
+     * @param properties bag of properties to pass in any information to the factory
      * @return a suitable application object
      */
-    public Object getObjectFromOMNode(OMNode om);
+    public Object getObjectFromOMNode(OMNode om, Properties properties);
 }

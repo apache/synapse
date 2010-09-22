@@ -20,6 +20,7 @@
 package org.apache.synapse.config.xml;
 
 import java.io.InputStream;
+import java.util.Properties;
 
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
@@ -36,14 +37,16 @@ public class XMLConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(XMLConfigurationBuilder.class);
 
-    public static SynapseConfiguration getConfiguration(InputStream is) throws XMLStreamException {
+    public static SynapseConfiguration getConfiguration(InputStream is, Properties properties)
+            throws XMLStreamException {
 
         log.info("Generating the Synapse configuration model by parsing the XML configuration");
         
         OMElement definitions = new StAXOMBuilder(is).getDocumentElement();
         definitions.build();
 
-        return ConfigurationFactoryAndSerializerFinder.getInstance().getConfiguration(definitions);
+        return ConfigurationFactoryAndSerializerFinder.getInstance()
+                .getConfiguration(definitions, properties);
         
     }
 }

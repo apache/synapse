@@ -191,7 +191,7 @@ public abstract class AbstractSynapseArtifactDeployer implements Deployer {
      *
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploySynapseArtifact(String) 
      */
-    public void undeploy(String fileName) throws DeploymentException {
+    public void unDeploy(String fileName) throws DeploymentException {
 
         fileName = FilenameUtils.normalize(fileName);
         if (log.isDebugEnabled()) {

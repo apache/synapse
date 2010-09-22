@@ -19,20 +19,18 @@
 package org.apache.synapse.mediators.throttle;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.clustering.ClusterManager;
 import org.apache.axis2.clustering.ClusteringFault;
-
-import org.apache.axis2.clustering.ClusteringAgent;
-import org.apache.axis2.clustering.state.Replicator;
-
+import org.apache.axis2.clustering.context.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.neethi.PolicyEngine;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.wso2.throttle.*;
@@ -121,9 +119,9 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
             //To ensure check for clustering environment only happens one time
             if ((throttle == null && !isResponse) || (isResponse
                     && concurrentAccessController == null)) {
-                ClusteringAgent clusteringAgent = cc.getAxisConfiguration().getClusteringAgent();
-                if (clusteringAgent != null &&
-                        clusteringAgent.getStateManager() != null) {
+                ClusterManager clusterManager = cc.getAxisConfiguration().getClusterManager();
+                if (clusterManager != null &&
+                    clusterManager.getContextManager() != null) {
                     isClusteringEnable = true;
                 }
             }

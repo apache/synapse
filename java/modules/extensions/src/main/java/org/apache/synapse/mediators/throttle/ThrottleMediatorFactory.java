@@ -26,6 +26,7 @@ import org.apache.synapse.config.xml.SequenceMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 
 /**
@@ -48,7 +49,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
     private static final QName TAG_NAME
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "throttle");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ThrottleMediator throttleMediator = new ThrottleMediator();
         OMElement policy = elem.getFirstChildWithName(
@@ -93,7 +94,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
                     new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.ONREJECT));
             if (onRejectMediatorElement != null) {
                 throttleMediator.setOnRejectMediator(mediatorFactory.createAnonymousSequence(
-                        onRejectMediatorElement));
+                        onRejectMediatorElement, properties));
             }
         }
         OMAttribute onAccept = elem.getAttribute(
@@ -108,7 +109,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
                     new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.ONACCEPT));
             if (onAcceptMediatorElement != null) {
                 throttleMediator.setOnAcceptMediator(mediatorFactory.createAnonymousSequence(
-                        onAcceptMediatorElement));
+                        onAcceptMediatorElement, properties));
             }
         }
         return throttleMediator;

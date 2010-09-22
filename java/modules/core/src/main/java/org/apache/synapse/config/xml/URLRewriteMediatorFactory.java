@@ -33,6 +33,7 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Creates an instance of the URLRewriteMediator given an XML configuration which
@@ -82,7 +83,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
     public static final String FRAGMENT_REF = "ref";
     public static final String FRAGMENT_FULL_URI = "full";
 
-    protected Mediator createSpecificMediator(OMElement element) {
+    protected Mediator createSpecificMediator(OMElement element, Properties properties) {
         Iterator rules = element.getChildrenWithName(RULE_Q);
         String inputProperty = element.getAttributeValue(ATT_IN_PROPERTY);
         String outputProperty = element.getAttributeValue(ATT_OUT_PROPERTY);

@@ -27,6 +27,7 @@ import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.StartupFinder;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *  Handles the <code>Startup Task</code> deployment and undeployment
@@ -38,14 +39,14 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
     private static Log log = LogFactory.getLog(TaskDeployer.class);
 
     @Override
-    public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {
+    public String deploySynapseArtifact(OMElement artifactConfig, String fileName, Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("StartupTask Deployment from file : " + fileName + " : Started");
         }
 
         try {
-            Startup st = StartupFinder.getInstance().getStartup(artifactConfig);
+            Startup st = StartupFinder.getInstance().getStartup(artifactConfig, properties);
                 st.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("StartupTask named '" + st.getName()
@@ -72,14 +73,14 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
 
     @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                        String existingArtifactName) {
+                                        String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("StartupTask Update from file : " + fileName + " : Started");
         }
 
         try {
-            Startup st = StartupFinder.getInstance().getStartup(artifactConfig);
+            Startup st = StartupFinder.getInstance().getStartup(artifactConfig, properties);
                 st.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
                     log.debug("StartupTask named '" + st.getName()

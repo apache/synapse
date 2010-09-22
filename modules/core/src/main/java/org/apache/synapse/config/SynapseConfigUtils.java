@@ -266,12 +266,13 @@ public class SynapseConfigUtils {
      * Return an OMElement from a URL source
      *
      * @param urlStr a URL string
+     * @param synapseHome synapse home parameter to be used
      * @return an OMElement of the resource
      * @throws IOException for invalid URL's or IO errors
      */
-    public static OMNode getOMElementFromURL(String urlStr) throws IOException {
+    public static OMNode getOMElementFromURL(String urlStr, String synapseHome) throws IOException {
 
-        URL url = getURLFromPath(urlStr);
+        URL url = getURLFromPath(urlStr, synapseHome);
         if (url == null) {
             return null;
         }
@@ -572,9 +573,10 @@ public class SynapseConfigUtils {
      * Utility method to resolve url(only If need) path using synapse home system property
      *
      * @param path Path to the URL
+     * @param synapseHome synapse home parameter value to be used
      * @return Valid URL instance or null(if it is invalid or can not open a connection to it )
      */
-    public static URL getURLFromPath(String path) {
+    public static URL getURLFromPath(String path, String synapseHome) {
         if (path == null || "null".equals(path)) {
             if (log.isDebugEnabled()) {
                 log.debug("Can not create a URL from 'null' ");
@@ -591,10 +593,8 @@ public class SynapseConfigUtils {
                     handleException("Invalid URL reference : " + path, e);
                 } catch (IOException ignored) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Can not open a connection to the URL with a path :" +
-                                path);
+                        log.debug("Can not open a connection to the URL with a path :" + path);
                     }
-                    String synapseHome = getSynapseHome();
                     if (synapseHome != null) {
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
@@ -716,21 +716,9 @@ public class SynapseConfigUtils {
 
     }
 
-    public static String getSynapseHome() {
-        //TODO SUPUN
-        /*ServerManager serverManager = ServerManager.getInstance();
-        if (serverManager.isInitialized()) {
-            ServerConfigurationInformation information =
-                    serverManager.getServerConfigurationInformation();
-            if (information != null) {
-                return information.getSynapseHome();
-            }
-        }*/
-        return "";
-    }
-
     public static SynapseEnvironment getSynapseEnvironment(AxisConfiguration axisCfg) {
-        return (SynapseEnvironment) axisCfg.getParameterValue(SynapseConstants.SYNAPSE_CONFIG);
+        return axisCfg != null && axisCfg.getParameter(SynapseConstants.SYNAPSE_HOME) != null ? (SynapseEnvironment)
+                axisCfg.getParameterValue(SynapseConstants.SYNAPSE_CONFIG) : null;
     }
 
     /**

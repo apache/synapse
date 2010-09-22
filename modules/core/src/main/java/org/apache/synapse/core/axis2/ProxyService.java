@@ -245,6 +245,10 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         boolean wsdlFound = false;
         String publishWSDL = null;
 
+        SynapseEnvironment synEnv = SynapseConfigUtils.getSynapseEnvironment(axisCfg);
+        String synapseHome = synEnv != null ? synEnv.getServerContextInformation()
+                .getServerConfigurationInformation().getSynapseHome() : "";
+
         if (wsdlKey != null) {
             synCfg.getEntryDefinition(wsdlKey);
             Object keyObject = synCfg.getEntry(wsdlKey);
@@ -260,7 +264,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
             	URL url = wsdlURI.toURL();
                 publishWSDL = url.toString();
 
-                OMNode node = SynapseConfigUtils.getOMElementFromURL(publishWSDL);
+                OMNode node = SynapseConfigUtils.getOMElementFromURL(publishWSDL, synapseHome);
                 if (node instanceof OMElement) {
                     wsdlElement = (OMElement) node;
                 }
@@ -363,10 +367,8 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                                     "Could not get the WSDL to Axis Service Builder");
                         }
 
-                        wsdlToAxisServiceBuilder.setBaseUri(wsdlURI != null ? wsdlURI.toString() :
-                                SynapseConfigUtils.getSynapseEnvironment(axisCfg)
-                                        .getServerContextInformation()
-                                        .getServerConfigurationInformation().getSynapseHome());
+                        wsdlToAxisServiceBuilder.setBaseUri(wsdlURI != null ?
+                                wsdlURI.toString() : synapseHome);
 
                         if (trace()) {
                             trace.info("Setting up custom resolvers");

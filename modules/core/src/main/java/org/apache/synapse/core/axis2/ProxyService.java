@@ -562,7 +562,9 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                     axisCfg.addServiceGroup(proxyServiceGroup);
                 } else {
                     // Simply add the service to the existing group
-                    axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);
+                    AxisServiceGroup proxyServiceGroup = axisCfg.getServiceGroup(serviceGroup);
+                    proxyService.setParent(proxyServiceGroup);
+                    proxyServiceGroup.addService(proxyService);
                 }
             }
             this.setRunning(true);
@@ -649,7 +651,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
 
             AxisService as = axisConfig.getServiceForActivation(this.getName());
             as.setActive(true);
-            axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_START, as), as);
+            axisConfig.notifyObservers(AxisEvent.SERVICE_START, as);
             this.setRunning(true);
             auditInfo("Started the proxy service : " + name);
         } else {
@@ -680,7 +682,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                 AxisService as = axisConfig.getService(this.getName());
                 if (as != null) {
                     as.setActive(false);
-                    axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_STOP, as), as);
+                    axisConfig.notifyObservers(AxisEvent.SERVICE_STOP, as);
                 }
                 this.setRunning(false);
                 auditInfo("Stopped the proxy service : " + name);

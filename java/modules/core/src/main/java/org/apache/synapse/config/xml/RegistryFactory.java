@@ -48,7 +48,6 @@ public class RegistryFactory {
     public static final QName NAME_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
 
-    @SuppressWarnings({"UnusedDeclaration"})
     public static Registry createRegistry(OMElement elem, Properties properties) {
 
         OMAttribute prov = elem.getAttribute(PROVIDER_Q);
@@ -56,7 +55,7 @@ public class RegistryFactory {
             try {
                 Class provider = Class.forName(prov.getAttributeValue());
                 Registry registry = (Registry) provider.newInstance();
-                registry.init(getProperties(elem));
+                registry.init(getProperties(elem, properties));
                 return registry;
 
             } catch (ClassNotFoundException e) {
@@ -77,9 +76,9 @@ public class RegistryFactory {
         return null;
     }
 
-    private static Properties getProperties(OMElement elem) {
+    private static Properties getProperties(OMElement elem, Properties topLevelProps) {
         Iterator params = elem.getChildrenWithName(PARAMETER_Q);
-        Properties props =new Properties();
+        Properties props = new Properties(topLevelProps);
         while (params.hasNext()) {
             Object o = params.next();
             if (o instanceof OMElement) {

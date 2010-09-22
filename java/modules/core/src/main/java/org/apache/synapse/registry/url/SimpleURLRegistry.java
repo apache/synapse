@@ -23,6 +23,7 @@ import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.registry.AbstractRegistry;
@@ -60,7 +61,9 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             log.debug("==> Repository fetch of resource with key : " + key);
 
         }
-        URL url = SynapseConfigUtils.getURLFromPath(root + key);
+        URL url = SynapseConfigUtils.getURLFromPath(root + key, properties.get(
+                SynapseConstants.SYNAPSE_HOME) != null ?
+                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
         if (url == null) {
             return null;
         }
@@ -143,7 +146,9 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         if (log.isDebugEnabled()) {
             log.debug("Perform RegistryEntry lookup for key : " + key);
         }
-        URL url = SynapseConfigUtils.getURLFromPath(root + key);
+        URL url = SynapseConfigUtils.getURLFromPath(root + key, properties.get(
+                SynapseConstants.SYNAPSE_HOME) != null ?
+                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
         if (url == null) {
             return null;
         }
@@ -222,7 +227,9 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             entryImpl.setKey("");
             entry = entryImpl;
         }
-        url = SynapseConfigUtils.getURLFromPath(root + entry.getKey());
+        url = SynapseConfigUtils.getURLFromPath(root + entry.getKey(), properties.get(
+                SynapseConstants.SYNAPSE_HOME) != null ?
+                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
         if (url == null) {
             return null;
         }

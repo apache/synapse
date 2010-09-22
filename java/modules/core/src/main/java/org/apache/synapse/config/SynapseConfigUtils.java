@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 
+@SuppressWarnings({"UnusedDeclaration"})
 public class SynapseConfigUtils {
 
     private static final Log log = LogFactory.getLog(SynapseConfigUtils.class);
@@ -336,10 +337,12 @@ public class SynapseConfigUtils {
     }
 
     /**
-     * Helper method to create a HttpSURLCOnnection with provided KeyStores
+     * Helper method to create a HttpSURLConnection with provided KeyStores
      *
      * @param url Https URL
-     * @return
+     * @param synapseProperties properties for extracting info
+     * @param proxy if there is a proxy
+     * @return gives out the connection created
      */
     private static HttpsURLConnection getHttpsURLConnection(
             URL url, Properties synapseProperties, Proxy proxy) {
@@ -644,6 +647,7 @@ public class SynapseConfigUtils {
         }
 
         if (parentLocation == null) {
+            assert importUri != null;
             return importUri.toString();
         } else {
             // if the import-uri is absolute
@@ -674,6 +678,7 @@ public class SynapseConfigUtils {
                         handleException("Invalid URI ' " + resolvedPath + " '", e);
                     }
                 } else {
+                    assert importUri != null;
                     return importUri.toString();
                 }
             }
@@ -717,19 +722,6 @@ public class SynapseConfigUtils {
                     serverManager.getServerConfigurationInformation();
             if (information != null) {
                 return information.getSynapseHome();
-            }
-        }*/
-        return "";
-    }
-
-    public static String getServerName() {
-        // TODO SUPUN
-        /*ServerManager serverManager = ServerManager.getInstance();
-        if (serverManager.isInitialized()) {
-            ServerConfigurationInformation information =
-                    serverManager.getServerConfigurationInformation();
-            if (information != null) {
-                return information.getServerName();
             }
         }*/
         return "";

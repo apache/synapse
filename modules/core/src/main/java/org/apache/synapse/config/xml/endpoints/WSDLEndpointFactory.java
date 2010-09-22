@@ -112,8 +112,9 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
                 try {
-                    OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(
-                            new URL(wsdlURI).toString());
+                    OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI)
+                            .toString(), properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
+                            properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
                     if (wsdlOM != null && wsdlOM instanceof OMElement) {
                         OMElement omElement = (OMElement) wsdlOM;
                         OMNamespace ns = omElement.getNamespace();

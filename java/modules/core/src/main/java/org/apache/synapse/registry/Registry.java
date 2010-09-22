@@ -49,10 +49,11 @@ public interface Registry {
      * the content from the registry and cache if required.
      *
      * @param entry the registry Entry
+     * @param properties
      * @return the value from the registry or local cache
      * @see AbstractRegistry
      */
-    public Object getResource(Entry entry);
+    public Object getResource(Entry entry, Properties properties);
 
     /**
      * Get the registry entry for the given key

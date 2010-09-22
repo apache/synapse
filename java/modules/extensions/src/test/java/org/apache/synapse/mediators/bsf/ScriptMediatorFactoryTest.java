@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.bsf;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -51,7 +52,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
 
     public void testInlineScriptMediatorFactory() throws XMLStreamException {
         ScriptMediatorFactory mf = new ScriptMediatorFactory();
-        Mediator mediator = mf.createMediator(INLINE_MEDIATOR_CONFIG);
+        Mediator mediator = mf.createMediator(INLINE_MEDIATOR_CONFIG, new Properties());
         try{
             MessageContext mc = TestUtils.getTestContext("<foo/>",null);
             assertTrue(mediator.mediate(mc));
@@ -70,7 +71,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
         MessageContext mc = TestUtils.getTestContext("<foo/>", props);
 
         ScriptMediatorFactory mf = new ScriptMediatorFactory();
-        Mediator mediator = mf.createMediator(REG_PROP_MEDIATOR_CONFIG);
+        Mediator mediator = mf.createMediator(REG_PROP_MEDIATOR_CONFIG, new Properties());
         assertTrue(mediator.mediate(mc));
     }
 
@@ -82,7 +83,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
         MessageContext mc = TestUtils.getTestContext("<foo/>", props);
 
         ScriptMediatorFactory mf = new ScriptMediatorFactory();
-        Mediator mediator = mf.createMediator(REG_PROP_FOO_FUNC_MEDIATOR_CONFIG);
+        Mediator mediator = mf.createMediator(REG_PROP_FOO_FUNC_MEDIATOR_CONFIG, new Properties());
         assertTrue(mediator.mediate(mc));
     }
 

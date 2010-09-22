@@ -329,8 +329,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         
         if (entry.getType() == Entry.URL_SRC && entry.getValue() == null) {
             try {
+                SynapseEnvironment synEnv = SynapseConfigUtils.getSynapseEnvironment(
+                        axisConfiguration);
                 entry.setValue(SynapseConfigUtils.getOMElementFromURL(entry.getSrc()
-                        .toString()));
+                        .toString(), synEnv != null ? synEnv.getServerContextInformation()
+                        .getServerConfigurationInformation().getSynapseHome() : ""));
                 localRegistry.put(key, entry);
                 for (SynapseObserver o : observers) {
                     o.entryAdded(entry);

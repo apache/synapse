@@ -65,7 +65,8 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         OMElement loadbalanceElement =
                 epConfig.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
@@ -132,7 +133,7 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                 try {
                     LoadBalanceMembershipHandler lbMembershipHandler =
                             (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
-                    Properties properties = new Properties();
+                    Properties lbProperties = new Properties();
                     for (Iterator props = eventHandler.getChildrenWithName(new QName(
                             SynapseConstants.SYNAPSE_NAMESPACE, "property")); props.hasNext();) {
                         OMElement prop = (OMElement) props.next();
@@ -142,14 +143,14 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                         String propValue =
                                 prop.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
                                                                  "value")).trim();
-                        properties.put(propName, propValue);
+                        lbProperties.put(propName, propValue);
                     }
 
                     // Set load balance algorithm
                     LoadbalanceAlgorithm algorithm =
                             LoadbalanceAlgorithmFactory.
                                     createLoadbalanceAlgorithm(loadbalanceElement, null);
-                    lbMembershipHandler.init(properties, algorithm);
+                    lbMembershipHandler.init(lbProperties, algorithm);
                     loadbalanceEndpoint.setLoadBalanceMembershipHandler(lbMembershipHandler);
                 } catch (Exception e) {
                     String msg = "Could not instantiate " +

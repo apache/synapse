@@ -27,6 +27,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.eventing.EventPublisherMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link org.apache.synapse.mediators.eventing.EventPublisherMediator} instances.
@@ -44,7 +45,7 @@ public class EventPublisherMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         EventPublisherMediator eventPublisherMediator = new EventPublisherMediator();
         OMAttribute attEventSource = elem.getAttribute(PROP_NAME);
         if (attEventSource != null) {

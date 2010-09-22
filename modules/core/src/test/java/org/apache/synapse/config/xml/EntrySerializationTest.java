@@ -22,6 +22,8 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.Entry;
 
+import java.util.Properties;
+
 /**
  *
  */
@@ -31,7 +33,7 @@ public class EntrySerializationTest extends AbstractTestCase {
         String inputXml = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"key\" " +
             "><description>description</description><foo/></localEntry>";
         OMElement inputOM = createOMElement(inputXml);
-        Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement());
+        Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement(), new Properties());
         OMElement resultOM = EntrySerializer.serializeEntry(entry, null);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -40,7 +42,7 @@ public class EntrySerializationTest extends AbstractTestCase {
         String inputXml = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"key\"" +
             "><description>description</description></localEntry>";
         OMElement inputOM = createOMElement(inputXml);
-        Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement());
+        Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement(), new Properties());
         OMElement resultOM = EntrySerializer.serializeEntry(entry, null);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -49,7 +51,7 @@ public class EntrySerializationTest extends AbstractTestCase {
         String inputXml = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"key\" " +
             "/>";
         OMElement inputOM = createOMElement(inputXml);
-        Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement());
+        Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement(), new Properties());
         OMElement resultOM = EntrySerializer.serializeEntry(entry, null);
         assertTrue(compare(resultOM, inputOM));
     }

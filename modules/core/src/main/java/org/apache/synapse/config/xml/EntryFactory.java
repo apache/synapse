@@ -20,6 +20,7 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
@@ -33,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Properties;
 
 /**
  * Factory for {@link Entry} instances.
@@ -44,7 +46,7 @@ public class EntryFactory implements XMLToObjectMapper {
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
-    public static Entry createEntry(OMElement elem) {
+    public static Entry createEntry(OMElement elem, Properties properties) {
 
         OMAttribute key = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
         if (key == null) {
@@ -71,8 +73,7 @@ public class EntryFactory implements XMLToObjectMapper {
                 try {
                     entry.setSrc(new URL(src.trim()));
                     entry.setType(Entry.URL_SRC);
-                    entry.setValue(
-                        org.apache.synapse.config.SynapseConfigUtils.getObject(entry.getSrc()));
+                    entry.setValue(SynapseConfigUtils.getObject(entry.getSrc(), properties));
                 } catch (MalformedURLException e) {
                     handleException("The entry with key : " + key + " refers to an invalid URL");
                 }
@@ -99,9 +100,9 @@ public class EntryFactory implements XMLToObjectMapper {
         throw new SynapseException(msg);
     }
 
-    public Object getObjectFromOMNode(OMNode om) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
-            return createEntry((OMElement) om);
+            return createEntry((OMElement) om, properties);
         } else {
             handleException("Invalid XML configuration for an Entry. OMElement expected");
         }

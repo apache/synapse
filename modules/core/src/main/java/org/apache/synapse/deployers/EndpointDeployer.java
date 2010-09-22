@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.endpoints.Endpoint;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *  Handles the <code>Endpoint</code> deployment and undeployment tasks
@@ -39,14 +40,15 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
     private static Log log = LogFactory.getLog(EndpointDeployer.class);
 
     @Override
-    public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {
+    public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
+                                        Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("Endpoint Deployment from file : " + fileName + " : Started");
         }
 
         try {
-            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false);
+            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties);
             if (ep != null) {
                 ep.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
@@ -78,14 +80,14 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
 
     @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                        String existingArtifactName) {
+                                        String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("Endpoint Update from file : " + fileName + " : Started");
         }
 
         try {
-            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false);
+            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties);
             if (ep != null) {
                 ep.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {

@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 
 /**
  * Implements the generic logic for the synapse artifact deployment and provide a deployment framework
@@ -81,8 +82,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      * @param deploymentFileData file to be used for the deployment
      * @throws DeploymentException in-case of an error in deploying the file
      * 
-     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#deploySynapseArtifact(
-     * org.apache.axiom.om.OMElement, String)
+     * @see AbstractSynapseArtifactDeployer#deploySynapseArtifact(org.apache.axiom.om.OMElement, String,java.util.Properties)
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
@@ -122,6 +122,10 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 // since all synapse artifacts are XML based
                 OMElement element = new StAXOMBuilder(
                         StAXUtils.createXMLStreamReader(in)).getDocumentElement();
+                Properties properties = new Properties();
+                properties.put(SynapseConstants.RESOLVE_ROOT, getSynapseEnvironment()
+                        .getServerContextInformation()
+                        .getServerConfigurationInformation().getResolveRoot());
                 String artifatcName = null;
                 if (deploymentStore.isUpdatingArtifact(filename)) {
 
@@ -134,7 +138,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                     deploymentStore.removeUpdatingArtifact(filename);
                     try {
                         artifatcName = updateSynapseArtifact(
-                                element, filename, existingArtifactName);
+                                element, filename, existingArtifactName, properties);
                     } catch (SynapseArtifactDeploymentException sade) {
                         log.error("Update of the Synapse Artifact from file : "
                                 + filename + " : Failed!", sade);
@@ -147,7 +151,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 } else {
                     // new artifact hot-deployment case
                     try {
-                        artifatcName = deploySynapseArtifact(element, filename);
+                        artifatcName = deploySynapseArtifact(element, filename, properties);
                     } catch (SynapseArtifactDeploymentException sade) {
                         log.error("Deployment of the Synapse Artifact from file : "
                                 + filename + " : Failed!", sade);
@@ -257,12 +261,14 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      *
      * @param artifactConfig built element representing the artifact to be deployed loaded from the file
      * @param fileName file name from which this artifact is being loaded
+     * @param properties
      * @return String artifact name created by the deployment task
      * 
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#deploy(
      * org.apache.axis2.deployment.repository.util.DeploymentFileData)
      */
-    public abstract String deploySynapseArtifact(OMElement artifactConfig, String fileName);
+    public abstract String deploySynapseArtifact(OMElement artifactConfig, String fileName,
+                                                 Properties properties);
 
     /**
      * All synapse artifact deployers MUST implement this method and it handles artifact specific update
@@ -271,10 +277,12 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      * @param artifactConfig built element representing the artifact to be deployed loaded from the file
      * @param fileName file name from which this artifact is being loaded
      * @param existingArtifactName name of the artifact that was being deployed using the updated file
+     * @param properties bag of properties with the additional infroamtion
      * @return String artifact name created by the update task
      */
     public abstract String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                                 String existingArtifactName);
+                                                 String existingArtifactName,
+                                                 Properties properties);
 
     /**
      * All synapse artifact deployers MUST implement this method and it handles artifact specific undeployment

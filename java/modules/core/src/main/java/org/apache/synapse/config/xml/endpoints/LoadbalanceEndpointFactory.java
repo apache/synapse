@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Creates {@link LoadbalanceEndpoint} using an XML configuration.
@@ -57,7 +58,8 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         // create the endpoint, manager and the algorithms
 
@@ -89,7 +91,7 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
                     throw new SynapseException(msg);
                 }
                 List<Endpoint> endpoints
-                        = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
+                        = getEndpoints(loadbalanceElement, loadbalanceEndpoint, properties);
                 loadbalanceEndpoint.setChildren(endpoints);
                 algorithm =
                         LoadbalanceAlgorithmFactory.

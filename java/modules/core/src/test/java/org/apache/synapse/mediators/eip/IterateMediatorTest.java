@@ -26,6 +26,8 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 
+import java.util.Properties;
+
 /**
  *
  */
@@ -49,7 +51,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
     public void testIterationScenarioOne() throws Exception {
         Mediator iterate = fac.createMediator(createOMElement("<iterate " +
             "expression=\"//original/itr\" xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
-            "<target soapAction=\"urn:iterate\" sequence=\"seqRef\"/></iterate>"));
+            "<target soapAction=\"urn:iterate\" sequence=\"seqRef\"/></iterate>"), new Properties());
         helperMediator.clearMediatedContexts();
         iterate.mediate(testCtx);
         while(helperMediator.getMediatedContext(1) == null) {
@@ -70,7 +72,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
         Mediator iterate = fac.createMediator(createOMElement("<iterate " +
             "expression=\"//original/itr\" preservePayload=\"true\" attachPath=\"//original\" " +
             "xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><target soapAction=\"urn:iterate\" " +
-            "sequence=\"seqRef\"/></iterate>"));
+            "sequence=\"seqRef\"/></iterate>"), new Properties());
         iterate.mediate(testCtx);
         while(helperMediator.getMediatedContext(1) == null) {
             Thread.sleep(100);

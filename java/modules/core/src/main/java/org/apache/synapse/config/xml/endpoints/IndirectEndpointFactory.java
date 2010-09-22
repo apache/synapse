@@ -24,6 +24,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Creates an {@link IndirectEndpoint} using a XML configuration. Key can be a name of an endpoint defined
@@ -42,7 +43,8 @@ public class IndirectEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         IndirectEndpoint indirectEndpoint = new IndirectEndpoint();
         String ref = epConfig.getAttributeValue(new QName("key"));

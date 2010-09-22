@@ -25,6 +25,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Created a Log mediator that logs messages using commons-logging.
@@ -56,7 +57,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
         return LOG_Q;
     }
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         LogMediator logMediator = new LogMediator();
 

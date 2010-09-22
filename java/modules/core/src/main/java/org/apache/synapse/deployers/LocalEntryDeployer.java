@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.EntrySerializer;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *  Handles the <code>LocalEntry</code> deployment and undeployment tasks
@@ -39,14 +40,15 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
     private static Log log = LogFactory.getLog(LocalEntryDeployer.class);
 
     @Override
-    public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {
+    public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
+                                        Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("LocalEntry Deployment from file : " + fileName + " : Started");
         }
 
         try {
-            Entry e = EntryFactory.createEntry(artifactConfig);
+            Entry e = EntryFactory.createEntry(artifactConfig, properties);
             if (e != null) {
                 e.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
@@ -74,14 +76,14 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
 
     @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                        String existingArtifactName) {
+                                        String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("LocalEntry Update from file : " + fileName + " : Started");
         }
 
         try {
-            Entry e = EntryFactory.createEntry(artifactConfig);
+            Entry e = EntryFactory.createEntry(artifactConfig, properties);
             if (e != null) {
                 e.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {

@@ -31,6 +31,7 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * The &lt;iterate&gt; element is used to split messages in Synapse to smaller messages with only
@@ -68,9 +69,10 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
      * This method will create the IterateMediator by parsing the given xml configuration
      *
      * @param elem OMElement describing the configuration of the IterateMediaotr
+     * @param properties
      * @return IterateMediator created from the given configuration
      */
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         IterateMediator mediator = new IterateMediator();
         processAuditStatus(mediator, elem);
@@ -126,7 +128,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
 
         OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);
         if (targetElement != null) {
-            Target target = TargetFactory.createTarget(targetElement);
+            Target target = TargetFactory.createTarget(targetElement, properties);
             if (target != null) {
                 target.setAsynchronous(asynchronous);
                 mediator.setTarget(target);

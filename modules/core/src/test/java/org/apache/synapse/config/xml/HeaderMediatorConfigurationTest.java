@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 
 import javax.xml.stream.XMLStreamException;
+import java.util.Properties;
 
 public class HeaderMediatorConfigurationTest extends TestCase {
 
@@ -32,7 +33,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
@@ -43,7 +44,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
@@ -56,7 +57,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"m:MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
@@ -67,7 +68,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"m:MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
@@ -89,7 +90,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"" + header + "\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
         }
@@ -97,7 +98,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"" + header + "\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
         }
@@ -107,7 +108,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
         }
@@ -115,7 +116,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         try {
             String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
-            fac.createMediator(AXIOMUtil.stringToOM(inputXml));
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
             fail("Error while parsing header mediator configuration");
         }

@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.filters.FilterMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -59,7 +60,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
     private static final QName THEN_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "then");
     private static final QName ELSE_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "else");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         
         FilterMediator filter = new FilterMediator();
 
@@ -132,7 +133,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                 filter.setThenKey(sequenceAttr.getAttributeValue());
 
             } else {
-                addChildren(thenElem, filter);
+                addChildren(thenElem, filter, properties);
             }
 
             OMElement elseElem = elem.getFirstChildWithName(ELSE_Q);
@@ -147,8 +148,8 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
 
                 } else {
 
-                    AnonymousListMediator listMediator =
-                        AnonymousListMediatorFactory.createAnonymousListMediator(elseElem);
+                    AnonymousListMediator listMediator = AnonymousListMediatorFactory
+                            .createAnonymousListMediator(elseElem, properties);
                     filter.setElseMediator(listMediator);
                 }
             }
@@ -156,7 +157,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
         } else {
 
             filter.setThenElementPresent(false);
-            addChildren(elem, filter);
+            addChildren(elem, filter, properties);
         }
 
         return filter;

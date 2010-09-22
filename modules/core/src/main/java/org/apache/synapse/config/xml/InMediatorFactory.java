@@ -24,6 +24,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.InMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link InMediator} instances.
@@ -39,12 +40,12 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName IN_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "in");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         InMediator filter = new InMediator();
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(filter,elem);
-        addChildren(elem, filter);
+        addChildren(elem, filter, properties);
         return filter;
     }
 

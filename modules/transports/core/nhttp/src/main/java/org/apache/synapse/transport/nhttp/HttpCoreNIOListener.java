@@ -68,6 +68,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * NIO transport listener for Axis2 based on HttpCore and NIO extensions
@@ -234,7 +235,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
                     " configuration is mandatory for priority based routing");
         }
 
-        executor = PriorityExecutorFactory.createExecutor(null, executorElem, false);
+        executor = PriorityExecutorFactory.createExecutor(
+                null, executorElem, false, new Properties());
         OMElement conditionsElem = definitions.getFirstChildWithName(
                 new QName(EvaluatorConstants.CONDITIONS));
         if (conditionsElem == null) {

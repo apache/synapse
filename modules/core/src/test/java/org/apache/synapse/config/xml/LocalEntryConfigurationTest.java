@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.StringReader;
+import java.util.Properties;
 
 public class LocalEntryConfigurationTest extends AbstractTestCase {
 
@@ -42,7 +43,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         try {
             OMElement elem = parseXMLString(entrySrc, true);
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(text, (String) entry.getValue());
@@ -69,7 +70,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         try {
             OMElement elem = parseXMLString(entrySrc, coalesced);
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(text, (String) entry.getValue());
@@ -98,7 +99,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         try {
             OMElement elem = parseXMLString(entrySrc, coalesced);
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(actualText, (String) entry.getValue());
@@ -129,7 +130,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         try {
             OMElement elem = parseXMLString(entrySrc, true);
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(text, (String) entry.getValue());
@@ -167,7 +168,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         try {
             OMElement elem = parseXMLString(entrySrc, coalesced);
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_TEXT, entry.getType());
             assertEquals(text, (String) entry.getValue());
@@ -192,7 +193,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
         try {
             OMElement elem = parseXMLString(entrySrc, true);
             OMElement expectedSerialization = elem.cloneOMElement();
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_XML, entry.getType());
 
@@ -223,7 +224,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
         try {
             OMElement elem = parseXMLString(entrySrc, coalesced);
             OMElement expectedSerialization = elem.cloneOMElement();
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_XML, entry.getType());
 
@@ -328,7 +329,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
         try {
             OMElement elem = parseXMLString(entrySrc, true);
             OMElement expectedSerialization = elem.cloneOMElement();
-            Entry entry = EntryFactory.createEntry(elem);
+            Entry entry = EntryFactory.createEntry(elem, new Properties());
             assertEquals(key, entry.getKey());
             assertEquals(Entry.INLINE_XML, entry.getType());
 

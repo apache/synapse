@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.eventing.SynapseEventSource;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *  Handles the <code>EventSource</code> deployment and undeployment tasks
@@ -39,14 +40,16 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
     private static Log log = LogFactory.getLog(EventSourceDeployer.class);
 
     @Override
-    public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {
+    public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
+                                        Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("EventSource Deployment from file : " + fileName + " : Started");
         }
 
         try {
-            SynapseEventSource es = EventSourceFactory.createEventSource(artifactConfig);
+            SynapseEventSource es = EventSourceFactory.createEventSource(
+                    artifactConfig, properties);
             if (es != null) {
                 es.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
@@ -78,14 +81,15 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
 
     @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                        String existingArtifactName) {
+                                        String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("EventSource Update from file : " + fileName + " : Started");
         }
 
         try {
-            SynapseEventSource es = EventSourceFactory.createEventSource(artifactConfig);
+            SynapseEventSource es = EventSourceFactory.createEventSource(
+                    artifactConfig, properties);
             if (es != null) {
                 es.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {

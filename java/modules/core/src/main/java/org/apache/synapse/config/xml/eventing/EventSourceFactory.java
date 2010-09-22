@@ -34,6 +34,7 @@ import org.wso2.eventing.exceptions.EventException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * <eventSource name="blah">
@@ -54,8 +55,6 @@ public class EventSourceFactory {
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "subscriptionManager");
     private static final QName PROPERTIES_QNAME =
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
-    private static final QName WS_EVENTING_QNAME
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "wsEventing");
     private static final QName SUBSCRIPTION_QNAME =
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "subscription");
     private static final QName FILTER_QNAME =
@@ -71,7 +70,8 @@ public class EventSourceFactory {
     private static final QName ID_QNAME = new QName("id");
     private static final QName EP_URI_QNAME = new QName("uri");
 
-    public static SynapseEventSource createEventSource(OMElement elem) {
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static SynapseEventSource createEventSource(OMElement elem, Properties properties) {
 
         SynapseEventSource eventSource = null;
 
@@ -160,8 +160,9 @@ public class EventSourceFactory {
     /**
      * Generate the static subscriptions
      *
-     * @param elem
-     * @param synapseEventSource
+     * @param elem containing the static subscription configurations
+     * @param synapseEventSource event source to which the static subscriptions belong to
+     * @throws EventException in-case of a failure in creating static subscriptions
      */
     private static void createStaticSubscriptions(OMElement elem,
                                                   SynapseEventSource synapseEventSource)

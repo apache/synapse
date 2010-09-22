@@ -39,10 +39,7 @@ import org.apache.synapse.util.UUIDGenerator;
 
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.List;
+import java.util.*;
 
 /**
  * All endpoint factories should extend from this abstract class. Use EndpointFactory to obtain the
@@ -64,7 +61,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
 
     private static final String ENDPOINT_NAME_PREFIX = "endpoint_";
 
-    public static final QName ONFAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "onFault");
+    public static final QName ON_FAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "onFault");
 
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
@@ -75,21 +72,24 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      *
      * @param elem        XML from which the endpoint will be built
      * @param isAnonymous whether this is an anonymous endpoint or not
+     * @param properties bag of properties to pass in any information to the factory
      * @return created endpoint
      */
-    public static Endpoint getEndpointFromElement(OMElement elem, boolean isAnonymous) {
-        return getEndpointFactory(elem).createEndpointWithName(elem, isAnonymous);
+    public static Endpoint getEndpointFromElement(OMElement elem, boolean isAnonymous,
+                                                  Properties properties) {
+        return getEndpointFactory(elem).createEndpointWithName(elem, isAnonymous, properties);
     }
 
     /**
      * Creates the {@link Endpoint} object from the provided {@link OMNode}
      *
      * @param om XML node from which the endpoint will be built
+     * @param properties bag of properties to pass in any information to the factory
      * @return created endpoint as an {@link Object}
      */
-    public Object getObjectFromOMNode(OMNode om) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
-            return createEndpointWithName((OMElement) om, false);
+            return createEndpointWithName((OMElement) om, false, properties);
         } else {
             handleException("Invalid XML configuration for an Endpoint. OMElement expected");
         }
@@ -102,22 +102,26 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * immediate child element of the definitions tag it should have a name, which is used as the
      * key in local registry.
      *
-     * @param epConfig          OMElement conatining the endpoint configuration.
+     * @param epConfig          OMElement containing the endpoint configuration.
      * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
+     * @param properties bag of properties to pass in any information to the factory
      * @return Endpoint implementation for the given configuration.
      */
-    protected abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint);
+    protected abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                               Properties properties);
 
     /**
      *  Make sure that the endpoints created by the factory has a name
      * 
      * @param epConfig          OMElement containing the endpoint configuration.
      * @param anonymousEndpoint false if the endpoint has a name. true otherwise.
+     * @param properties bag of properties to pass in any information to the factory
      * @return Endpoint implementation for the given configuration.
      */
-    private Endpoint createEndpointWithName(OMElement epConfig, boolean anonymousEndpoint) {
+    private Endpoint createEndpointWithName(OMElement epConfig, boolean anonymousEndpoint,
+                                            Properties properties) {
         
-        Endpoint ep = createEndpoint(epConfig, anonymousEndpoint);
+        Endpoint ep = createEndpoint(epConfig, anonymousEndpoint, properties);
         OMElement descriptionElem = epConfig.getFirstChildWithName(DESCRIPTION_Q);
         if (descriptionElem != null) {
             ep.setDescription(descriptionElem.getText());
@@ -133,7 +137,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             }
         }
 
-        OMAttribute onFaultAtt = epConfig.getAttribute(ONFAULT_Q);
+        OMAttribute onFaultAtt = epConfig.getAttribute(ON_FAULT_Q);
         if (onFaultAtt != null) {
             ep.setOnFaultMessageStore(onFaultAtt.getAttributeValue());
         }
@@ -291,13 +295,13 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             }
         }
 
-        OMElement markAsTimedout = elem.getFirstChildWithName(new QName(
+        OMElement markAsTimedOut = elem.getFirstChildWithName(new QName(
             SynapseConstants.SYNAPSE_NAMESPACE,
             XMLConfigConstants.MARK_FOR_SUSPENSION));
 
-        if (markAsTimedout != null) {
+        if (markAsTimedOut != null) {
 
-            OMElement timeoutCodes = markAsTimedout.getFirstChildWithName(new QName(
+            OMElement timeoutCodes = markAsTimedOut.getFirstChildWithName(new QName(
                 SynapseConstants.SYNAPSE_NAMESPACE,
                 XMLConfigConstants.ERROR_CODES));
             if (timeoutCodes != null && timeoutCodes.getText() != null) {
@@ -313,7 +317,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 }
             }
 
-            OMElement retriesBeforeSuspend = markAsTimedout.getFirstChildWithName(new QName(
+            OMElement retriesBeforeSuspend = markAsTimedOut.getFirstChildWithName(new QName(
                 SynapseConstants.SYNAPSE_NAMESPACE,
                 XMLConfigConstants.RETRIES_BEFORE_SUSPENSION));
             if (retriesBeforeSuspend != null && retriesBeforeSuspend.getText() != null) {
@@ -326,7 +330,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
                 }
             }
 
-            OMElement retryDelay = markAsTimedout.getFirstChildWithName(new QName(
+            OMElement retryDelay = markAsTimedOut.getFirstChildWithName(new QName(
                 SynapseConstants.SYNAPSE_NAMESPACE,
                 XMLConfigConstants.RETRY_DELAY));
             if (retryDelay != null && retryDelay.getText() != null) {
@@ -500,7 +504,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         OMElement dlbElement = configElement.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dynamicLoadbalance"));
         if (dlbElement != null) {
-            //TODO: Handle Session affinitiy & failover
+            //TODO: Handle Session affinity & failover
             return DynamicLoadbalanceEndpointFactory.getInstance();
         }
 
@@ -519,17 +523,19 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * Helper method to construct children endpoints
      *
      * @param listEndpointElement OMElement representing  the children endpoints
-     * @param parent              Parent endpoint
+     * @param parent Parent endpoint
+     * @param properties bag of properties to pass in any information to the factory
      * @return List of children endpoints
      */
-    protected ArrayList<Endpoint> getEndpoints(OMElement listEndpointElement, Endpoint parent) {
+    protected ArrayList<Endpoint> getEndpoints(OMElement listEndpointElement, Endpoint parent,
+                                               Properties properties) {
 
         ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
         ArrayList<String> keys = new ArrayList<String>();
         Iterator iter = listEndpointElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {
             OMElement endptElem = (OMElement) iter.next();
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true, properties);
             if (endpoint instanceof IndirectEndpoint) {
                 String key = ((IndirectEndpoint) endpoint).getKey();
                 if (!keys.contains(key)) {

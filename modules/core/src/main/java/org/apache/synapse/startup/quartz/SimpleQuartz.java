@@ -22,7 +22,6 @@ package org.apache.synapse.startup.quartz;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.task.*;
@@ -103,11 +102,12 @@ public class SimpleQuartz extends AbstractStartup {
         // this server name given by system property SynapseServerName
         // otherwise take host-name
         // else assume localhost
-        String thisServerName = SynapseConfigUtils.getServerName();
+        String thisServerName = synapseEnvironment.getServerContextInformation()
+                .getServerConfigurationInformation().getServerName();
         if (thisServerName == null || thisServerName.equals("")) {
             try {
-                InetAddress addr = InetAddress.getLocalHost();
-                thisServerName = addr.getHostName();
+                InetAddress address = InetAddress.getLocalHost();
+                thisServerName = address.getHostName();
 
             } catch (UnknownHostException e) {
                 log.warn("Could not get the host name", e);

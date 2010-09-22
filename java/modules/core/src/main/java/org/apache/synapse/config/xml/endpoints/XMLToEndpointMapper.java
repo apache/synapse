@@ -24,6 +24,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMElement;
 
+import java.util.Properties;
+
 /**
  * This is a generic XMLToObjectMapper implementation for all endpoint types. Use this if the
  * endpoint type is not known at the time mapper is created. If the endpoint type is known use
@@ -44,13 +46,13 @@ public class XMLToEndpointMapper implements XMLToObjectMapper {
     /**
      * Constructs the Endpoint implementation for the given OMNode.
      *
-     * @param om OMNode containig endpoint configuration. This should be an OMElement.
-     * @return Endpoint implementaiotn for the given OMNode.
+     * @param om OMNode containing endpoint configuration. This should be an OMElement.
+     * @return Endpoint implementation for the given OMNode.
      */
-    public Object getObjectFromOMNode(OMNode om) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             OMElement epElement = (OMElement) om;
-            return EndpointFactory.getEndpointFromElement(epElement, false);
+            return EndpointFactory.getEndpointFromElement(epElement, false, properties);
         } else {
             throw new SynapseException("Configuration is not in proper format.");
         }

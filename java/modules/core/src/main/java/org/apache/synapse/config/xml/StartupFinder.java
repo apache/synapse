@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -30,11 +31,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Startup;
+import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.startup.quartz.SimpleQuartzFactory;
 
 import sun.misc.Service;
 
-public class StartupFinder {
+public class StartupFinder implements XMLToObjectMapper {
 
     private static final Log log = LogFactory
             .getLog(ConfigurationFactoryAndSerializerFinder.class);
@@ -126,8 +128,8 @@ public class StartupFinder {
     /**
      * Check whether an element with the given qualified name defines a startup.
      * 
-     * @param name
-     * @return
+     * @param name to be identified whether it is a startup or not
+     * @return true if there is a startup registered with the factory map in the name, false if not
      */
     public boolean isStartup(QName name) {
         return factoryMap.containsKey(name);
@@ -138,10 +140,12 @@ public class StartupFinder {
      * recursively by the elements which contain processor elements themselves
      * (e.g. rules)
      *
-     * @param element
+     * @param element configuration for creating the startup
+     * @param properties bag of properties with additional information
      * @return Processor
      */
-    public Startup getStartup(OMElement element) {
+    @SuppressWarnings({"UnusedDeclaration"})
+    public Startup getStartup(OMElement element, Properties properties) {
 
         QName qName = element.getQName();
         if (log.isDebugEnabled()) {
@@ -226,12 +230,13 @@ public class StartupFinder {
      * Allow the startup finder to act as an XMLToObjectMapper for
      * Startup (i.e. Startup) loaded dynamically from a Registry
      *
-     * @param om
-     * @return
+     * @param om to build the startup object
+     * @param properties bag of properties with additional information
+     * @return startup created
      */
-    public Startup getObjectFromOMNode(OMNode om) {
+    public Startup getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
-            return getStartup((OMElement) om);
+            return getStartup((OMElement) om, properties);
         } else {
 			handleException("Invalid configuration XML : " + om);
 		}

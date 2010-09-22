@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.eip.splitter.CloneMediator;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * The &lt;clone&gt; element is used to copy messages in Synapse to similar messages but with
@@ -62,21 +63,24 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      * 
      * @param elem - OMElement describing the element which will be parsed
      *  to build the CloneMediator
+     * @param properties
      * @return Mediator of the type CloneMediator built from the config element
      */
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CloneMediator mediator = new CloneMediator();
         processAuditStatus(mediator, elem);
         
         OMAttribute continueParent = elem.getAttribute(ATT_CONTINUE_PARENT);
         if (continueParent != null) {
-            mediator.setContinueParent(JavaUtils.isTrueExplicitly(continueParent.getAttributeValue()));
+            mediator.setContinueParent(JavaUtils.isTrueExplicitly(
+                    continueParent.getAttributeValue()));
         }
 
         Iterator targetElements = elem.getChildrenWithName(TARGET_Q);
         while (targetElements.hasNext()) {
-            mediator.addTarget(TargetFactory.createTarget((OMElement) targetElements.next()));
+            mediator.addTarget(TargetFactory.createTarget(
+                    (OMElement) targetElements.next(), properties));
         }
 
         return mediator;

@@ -28,6 +28,8 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
+import java.util.Properties;
+
 public class DetachMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName TAG_NAME
@@ -38,7 +40,7 @@ public class DetachMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public DetachMediator createSpecificMediator(OMElement elem) {
+    public DetachMediator createSpecificMediator(OMElement elem, Properties properties) {
         DetachMediator mediator = new DetachMediator();
 
         OMAttribute attSource = elem.getAttribute(ATT_SOURCE);

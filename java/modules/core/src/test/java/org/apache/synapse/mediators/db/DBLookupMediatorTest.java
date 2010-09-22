@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.synapse.mediators.TestUtils;
 
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DBLookupMediatorTest extends AbstractMediatorTestCase {
 
@@ -81,7 +82,7 @@ public class DBLookupMediatorTest extends AbstractMediatorTestCase {
                             "    <result name=\"categoryProp\" column=\"2\"/>\n" +
                             "  </statement>\n" +
                             "</dblookup>"
-                    ));
+                    ), new Properties());
 
                 lookup.init(new Axis2SynapseEnvironment(new SynapseConfiguration()));
 

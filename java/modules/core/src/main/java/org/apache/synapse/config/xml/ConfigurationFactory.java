@@ -24,6 +24,8 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.SynapseConfiguration;
 
+import java.util.Properties;
+
 /**
  * This interface defines the configuration factories of Synapse
  */
@@ -44,7 +46,7 @@ public interface ConfigurationFactory {
      * @param element OMElement describing the configuration to be build
      * @return SynapseConfiguration build using the relevant factory
      */
-    SynapseConfiguration getConfiguration(OMElement element);
+    SynapseConfiguration getConfiguration(OMElement element, Properties properties);
 
     /**
      * Get the class which serializes the specified element

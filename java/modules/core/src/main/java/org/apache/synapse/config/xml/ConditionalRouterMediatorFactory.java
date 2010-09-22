@@ -31,6 +31,7 @@ import org.apache.synapse.mediators.filters.router.Route;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * <pre>
@@ -60,7 +61,7 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
     private static final QName ASYNCHRONOUS_ATTR
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "asynchronous");
     
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ConditionalRouterMediator conditionalRouterMediator = new ConditionalRouterMediator();
         processAuditStatus(conditionalRouterMediator, elem);
@@ -114,7 +115,7 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
             }
 
             OMElement targetElem = routeElem.getFirstChildWithName(TARGET_Q);
-            Target target = TargetFactory.createTarget(targetElem);
+            Target target = TargetFactory.createTarget(targetElem, properties);
             if (JavaUtils.isTrueExplicitly(routeElem.getAttributeValue(ASYNCHRONOUS_ATTR))) {
                 target.setAsynchronous(true);
             } else {

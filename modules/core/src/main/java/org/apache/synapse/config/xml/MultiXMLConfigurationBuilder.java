@@ -37,6 +37,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.util.Properties;
 
 /**
  * <p>
@@ -87,13 +88,14 @@ public class MultiXMLConfigurationBuilder {
         }
     };
 
-    public static SynapseConfiguration getConfiguration(String root) throws XMLStreamException {
+    public static SynapseConfiguration getConfiguration(String root, Properties properties)
+            throws XMLStreamException {
 
         log.info("Building synapse configuration from the " +
                 "synapse artifact repository at : " + root);
 
         // First try to load the configuration from synapse.xml
-        SynapseConfiguration synapseConfig = createConfigurationFromSynapseXML(root);
+        SynapseConfiguration synapseConfig = createConfigurationFromSynapseXML(root, properties);
         if (synapseConfig == null) {
             synapseConfig = SynapseConfigUtils.newConfiguration();
             synapseConfig.setDefaultQName(XMLConfigConstants.DEFINITIONS_ELT);
@@ -105,38 +107,39 @@ public class MultiXMLConfigurationBuilder {
 
         if (synapseConfig.getRegistry() == null) {
             // If the synapse.xml does not define a registry look for a registry.xml
-            createRegistry(synapseConfig, root);
+            createRegistry(synapseConfig, root, properties);
         } else if (log.isDebugEnabled()) {
             log.debug("Using the registry defined in the " + SynapseConstants.SYNAPSE_XML
                     + " as the registry, any definitions in the "
                     + REGISTRY_FILE + " will be neglected");
         }
 
-        createLocalEntries(synapseConfig, root);
-        createEndpoints(synapseConfig, root);
-        createSequences(synapseConfig, root);
-        createProxyServices(synapseConfig, root);
-        createTasks(synapseConfig, root);
-        createEventSources(synapseConfig, root);
-        createExecutors(synapseConfig, root);
+        createLocalEntries(synapseConfig, root, properties);
+        createEndpoints(synapseConfig, root, properties);
+        createSequences(synapseConfig, root, properties);
+        createProxyServices(synapseConfig, root, properties);
+        createTasks(synapseConfig, root, properties);
+        createEventSources(synapseConfig, root, properties);
+        createExecutors(synapseConfig, root, properties);
 
         return synapseConfig;
     }
 
-    private static SynapseConfiguration createConfigurationFromSynapseXML(String rootDirPath)
-            throws XMLStreamException {
+    private static SynapseConfiguration createConfigurationFromSynapseXML(
+            String rootDirPath, Properties properties) throws XMLStreamException {
 
         File synapseXML = new File(rootDirPath, SynapseConstants.SYNAPSE_XML);
         if (synapseXML.exists() && synapseXML.isFile()) {
             try {
-                return XMLConfigurationBuilder.getConfiguration(new FileInputStream(synapseXML));
+                return XMLConfigurationBuilder.getConfiguration(
+                        new FileInputStream(synapseXML), properties);
             } catch (FileNotFoundException ignored) {}
         }
         return null;
     }
 
-    private static void createRegistry(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createRegistry(SynapseConfiguration synapseConfig, String rootDirPath,
+                                       Properties properties) throws XMLStreamException {
 
         File registryDef = new File(rootDirPath, REGISTRY_FILE);
         if (registryDef.exists() && registryDef.isFile()) {
@@ -146,15 +149,15 @@ public class MultiXMLConfigurationBuilder {
             }
             try {
                 OMElement document = parseFile(registryDef);
-                SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document);
+                SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document, properties);
                 synapseConfig.setProperty(SEPARATE_REGISTRY_DEFINITION,
                         String.valueOf(Boolean.TRUE));
             } catch (FileNotFoundException ignored) {}
         }
     }
 
-    private static void createLocalEntries(SynapseConfiguration synapseConfig, String rootDirPath) 
-            throws XMLStreamException {
+    private static void createLocalEntries(SynapseConfiguration synapseConfig, String rootDirPath,
+                                           Properties properties) throws XMLStreamException {
 
         File localEntriesDir = new File(rootDirPath, LOCAL_ENTRY_DIR);
         if (localEntriesDir.exists()) {
@@ -166,7 +169,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     Entry entry = SynapseXMLConfigurationFactory.defineEntry(
-                            synapseConfig, document);
+                            synapseConfig, document, properties);
                     entry.setFileName(file.getName());
                     synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), entry.getKey());
@@ -175,8 +178,8 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-    private static void createProxyServices(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createProxyServices(SynapseConfiguration synapseConfig, String rootDirPath,
+                                            Properties properties) throws XMLStreamException {
 
         File proxyServicesDir = new File(rootDirPath, PROXY_SERVICES_DIR);
         if (proxyServicesDir.exists()) {
@@ -188,7 +191,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(
-                            synapseConfig, document);
+                            synapseConfig, document, properties);
                     proxy.setFileName(file.getName());
                     synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), proxy.getName());
@@ -197,8 +200,8 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-    private static void createTasks(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createTasks(SynapseConfiguration synapseConfig, String rootDirPath,
+                                    Properties properties) throws XMLStreamException {
 
         File tasksDir = new File(rootDirPath, TASKS_DIR);
         if (tasksDir.exists()) {
@@ -210,7 +213,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     Startup startup = SynapseXMLConfigurationFactory.defineStartup(
-                            synapseConfig, document);
+                            synapseConfig, document, properties);
                     startup.setFileName(file.getName());
                     synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), startup.getName());
@@ -219,8 +222,8 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-    private static void createSequences(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createSequences(SynapseConfiguration synapseConfig, String rootDirPath,
+                                        Properties properties) throws XMLStreamException {
 
         File sequencesDir = new File(rootDirPath, SEQUENCES_DIR);
         if (sequencesDir.exists()) {
@@ -232,7 +235,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     Mediator seq = SynapseXMLConfigurationFactory.defineSequence(
-                            synapseConfig, document);
+                            synapseConfig, document, properties);
                     if (seq instanceof SequenceMediator) {
                         SequenceMediator sequence = (SequenceMediator) seq;
                         sequence.setFileName(file.getName());
@@ -244,8 +247,8 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-    private static void createEndpoints(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createEndpoints(SynapseConfiguration synapseConfig, String rootDirPath,
+                                        Properties properties) throws XMLStreamException {
 
         File endpointsDir = new File(rootDirPath, ENDPOINTS_DIR);
         if (endpointsDir.exists()) {
@@ -257,7 +260,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
-                            synapseConfig, document);
+                            synapseConfig, document, properties);
                     endpoint.setFileName(file.getName());
                     synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), endpoint.getName());
@@ -266,8 +269,8 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-    private static void createEventSources(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createEventSources(SynapseConfiguration synapseConfig, String rootDirPath,
+                                           Properties properties) throws XMLStreamException {
 
         File eventsDir = new File(rootDirPath, EVENTS_DIR);
         if (eventsDir.exists()) {
@@ -279,7 +282,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
-                            defineEventSource(synapseConfig, document);
+                            defineEventSource(synapseConfig, document, properties);
                     eventSource.setFileName(file.getName());
                     synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), eventSource.getName());
@@ -288,8 +291,8 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-    private static void createExecutors(SynapseConfiguration synapseConfig, String rootDirPath)
-            throws XMLStreamException {
+    private static void createExecutors(SynapseConfiguration synapseConfig, String rootDirPath,
+                                        Properties properties) throws XMLStreamException {
 
         File eventsDir = new File(rootDirPath, EXECUTORS_DIR);
         if (eventsDir.exists()) {
@@ -301,7 +304,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = parseFile(file);
                     PriorityExecutor executor = SynapseXMLConfigurationFactory.
-                            defineExecutor(synapseConfig, document);
+                            defineExecutor(synapseConfig, document, properties);
                     executor.setFileName(file.getName());
                     synapseConfig.getArtifactDeploymentStore().addArtifact(
                             file.getAbsolutePath(), executor.getName());

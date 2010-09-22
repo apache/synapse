@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * Create an instance of the given Message Store, and sets properties on it.
@@ -65,7 +66,8 @@ public class MessageStoreFactory {
     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             "parameter");
 
-    public static MessageStore createMessageStore(OMElement elem) {
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static MessageStore createMessageStore(OMElement elem, Properties properties) {
 
         OMAttribute clss = elem.getAttribute(CLASS_Q);
         MessageStore messageStore;

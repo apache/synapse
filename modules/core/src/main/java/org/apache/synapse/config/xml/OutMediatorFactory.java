@@ -24,6 +24,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.OutMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Creates an Out mediator instance
@@ -38,14 +39,14 @@ public class OutMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName OUT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "out");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         OutMediator filter = new OutMediator();
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(filter,elem);
 
-        addChildren(elem, filter);
+        addChildren(elem, filter, properties);
         return filter;
     }
 

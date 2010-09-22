@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  *
@@ -147,9 +148,10 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 	 * (e.g. rules)
 	 * 
 	 * @param element XML representation of a mediator
+     * @param properties bag of properties to pass in any information to the factory
      * @return Processor
 	 */
-	public Mediator getMediator(OMElement element) {
+	public Mediator getMediator(OMElement element, Properties properties) {
 
         String localName = element.getLocalName();
         QName qName;
@@ -180,7 +182,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 
         try {
 			MediatorFactory mf = (MediatorFactory) cls.newInstance();
-			return mf.createMediator(element);
+			return mf.createMediator(element, properties);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing mediator factory : " + cls;
@@ -208,9 +210,9 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      * @param om node from which the object is expected
      * @return Object buit from the om node
      */
-    public Object getObjectFromOMNode(OMNode om) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
-            return getMediator((OMElement) om);
+            return getMediator((OMElement) om, properties);
         } else {
             handleException("Invalid mediator configuration XML : " + om);
         }

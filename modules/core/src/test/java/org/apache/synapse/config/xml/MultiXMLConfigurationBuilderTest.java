@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Properties;
 
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -39,7 +40,7 @@ public class MultiXMLConfigurationBuilderTest extends TestCase {
         System.out.println("Using SYNAPSE_CONFIG_HOME=" + root);
         try {
             SynapseConfiguration synapseConfig =
-                    MultiXMLConfigurationBuilder.getConfiguration(root);
+                    MultiXMLConfigurationBuilder.getConfiguration(root, new Properties());
 
             assertNotNull(synapseConfig.getDefinedSequences().get("main"));
             assertNotNull(synapseConfig.getDefinedSequences().get("fault"));

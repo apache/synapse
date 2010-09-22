@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.TestUtils;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DBReportMediatorTest extends AbstractMediatorTestCase {
 
@@ -86,7 +87,7 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
                             "    <parameter value=\"GOLD\" type=\"VARCHAR\"/>\n" +
                             "  </statement>\n" +
                             "</dblookup>"
-                    ));
+                    ), new Properties());
                 
                 report.init(new Axis2SynapseEnvironment(new SynapseConfiguration()));
 

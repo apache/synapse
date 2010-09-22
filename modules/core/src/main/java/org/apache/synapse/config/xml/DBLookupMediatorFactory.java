@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.db.DBLookupMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link DBLookupMediator} instances.
@@ -62,7 +63,7 @@ public class DBLookupMediatorFactory extends AbstractDBMediatorFactory {
     private static final QName DBLOOKUP_Q =
         new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dblookup");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         DBLookupMediator mediator = new DBLookupMediator();
         buildDataSource(elem, mediator);

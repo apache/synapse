@@ -23,6 +23,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.CloneMediatorFactory;
 
+import java.util.Properties;
+
 /**
  *
  */
@@ -42,7 +44,7 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
         Mediator clone = fac.createMediator(createOMElement("<clone " +
             "xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><target soapAction=\"urn:clone\" " +
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
-            "key=\"seqRef\"/></sequence></target></clone>"));
+            "key=\"seqRef\"/></sequence></target></clone>"), new Properties());
         clone.mediate(testCtx);
         while(helperMediator.getMediatedContext(1) == null) {
             Thread.sleep(100);
@@ -62,7 +64,7 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
         Mediator clone = fac.createMediator(createOMElement("<clone continueParent=\"true\" " +
             "xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><target soapAction=\"urn:clone\" " +
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
-            "key=\"seqRef\"/></sequence></target></clone>"));
+            "key=\"seqRef\"/></sequence></target></clone>"), new Properties());
         assertTrue(clone.mediate(testCtx));
         while(helperMediator.getMediatedContext(1) == null) {
             Thread.sleep(100);

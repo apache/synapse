@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * This class is based on J2SE Service Provider model
@@ -100,12 +101,12 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
                 }
             }
         }
-        // now iterate through the available pluggable mediator factories
+        // now iterate through the available plugable mediator factories
         registerExtensions();
         initialized = true;
     }
     /**
-     * Register pluggable mediator factories from the classpath
+     * Register plugable mediator factories from the classpath
      * <p/>
      * This looks for JAR files containing a META-INF/services that adheres to the following
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
@@ -133,7 +134,7 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
      * @param element
      * @return Processor
      */
-    public SynapseConfiguration getConfiguration(OMElement element) {
+    public SynapseConfiguration getConfiguration(OMElement element, Properties properties) {
 
         String localName = element.getLocalName();
         QName qName;
@@ -157,7 +158,7 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
 
         try {
             ConfigurationFactory cf = (ConfigurationFactory) cls.newInstance();
-            return cf.getConfiguration(element);
+            return cf.getConfiguration(element, properties);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing configuration factory : " + cls;
@@ -239,12 +240,13 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
      * Allow the mediator factory finder to act as an XMLToObjectMapper for Mediators
      * (i.e. Sequence Mediator) loaded dynamically from a Registry
      *
-     * @param om
-     * @return
+     * @param om configuration from which the object is built
+     * @param properties bag of properties to pass in any information to the factory
+     * @return built object
      */
-    public Object getObjectFromOMNode(OMNode om) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
-            return getConfiguration((OMElement) om);
+            return getConfiguration((OMElement) om, properties);
         } else {
             handleException("Invalid configuration XML : " + om);
         }

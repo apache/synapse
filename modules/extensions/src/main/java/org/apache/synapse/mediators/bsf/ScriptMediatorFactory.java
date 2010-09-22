@@ -30,6 +30,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 
 import java.util.Map;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -63,7 +64,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
     private static final QName INCLUDE_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "include");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ScriptMediator mediator;
         OMAttribute keyAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,

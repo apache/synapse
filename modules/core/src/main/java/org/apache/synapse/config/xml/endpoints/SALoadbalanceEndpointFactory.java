@@ -33,6 +33,7 @@ import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 
 import javax.xml.namespace.QName;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Creates {@link SALoadbalanceEndpoint} from an XML configuration.
@@ -54,7 +55,8 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         // create the endpoint, manager and the algorithms
         SALoadbalanceEndpoint loadbalanceEndpoint = new SALoadbalanceEndpoint();
@@ -110,7 +112,8 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
         if(loadbalanceElement != null) {
 
             // set endpoints
-            List<Endpoint> endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
+            List<Endpoint> endpoints = getEndpoints(loadbalanceElement,
+                    loadbalanceEndpoint, properties);
             loadbalanceEndpoint.setChildren(endpoints);
 
             // set load balance algorithm

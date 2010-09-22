@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.eip.sample.MessageQueue;
 import org.apache.synapse.mediators.eip.sample.SamplingThrottleMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Builds the {@link org.apache.synapse.mediators.eip.sample.SamplingThrottleMediator} instance by looking at the
@@ -55,7 +56,7 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
     private static final QName CLASS_ATTR
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
 
-    public Mediator createSpecificMediator(OMElement omElement) {
+    public Mediator createSpecificMediator(OMElement omElement, Properties properties) {
 
         SamplingThrottleMediator samplingThrottleMediator = new SamplingThrottleMediator();
         processAuditStatus(samplingThrottleMediator, omElement);
@@ -89,7 +90,7 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
 
         OMElement targetElem = omElement.getFirstChildWithName(TARGET_Q);
         if (targetElem != null) {
-            Target target = TargetFactory.createTarget(targetElem);
+            Target target = TargetFactory.createTarget(targetElem, properties);
             samplingThrottleMediator.setTarget(target);
         } else {
             handleException("Sampler requires a target for the sampling mediation");

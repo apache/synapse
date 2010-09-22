@@ -363,9 +363,10 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                                     "Could not get the WSDL to Axis Service Builder");
                         }
 
-                        wsdlToAxisServiceBuilder.setBaseUri(
-                                wsdlURI != null ? wsdlURI.toString() :
-                                        SynapseConfigUtils.getSynapseHome());
+                        wsdlToAxisServiceBuilder.setBaseUri(wsdlURI != null ? wsdlURI.toString() :
+                                SynapseConfigUtils.getSynapseEnvironment(axisCfg)
+                                        .getServerContextInformation()
+                                        .getServerConfigurationInformation().getSynapseHome());
 
                         if (trace()) {
                             trace.info("Setting up custom resolvers");

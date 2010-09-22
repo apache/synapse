@@ -30,6 +30,7 @@ import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *  Handles the <code>Sequence</code> deployment and undeployment tasks
@@ -41,14 +42,16 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
     private static Log log = LogFactory.getLog(SequenceDeployer.class);
     
     @Override
-    public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {
+    public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
+                                        Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("Sequence Deployment from file : " + fileName + " : Started");
         }
 
         try {    
-            Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig);
+            Mediator m = MediatorFactoryFinder.getInstance().getMediator(
+                    artifactConfig, properties);
             if (m instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) m;
                 seq.setFileName((new File(fileName)).getName());
@@ -81,14 +84,15 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
 
     @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                        String existingArtifactName) {
+                                        String existingArtifactName, Properties properties) {
         
         if (log.isDebugEnabled()) {
             log.debug("Sequence Update from file : " + fileName + " : Started");
         }
 
         try {
-            Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig);
+            Mediator m = MediatorFactoryFinder.getInstance().getMediator(
+                    artifactConfig, properties);
             if (m instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) m;
                 if ((SynapseConstants.MAIN_SEQUENCE_KEY.equals(existingArtifactName)

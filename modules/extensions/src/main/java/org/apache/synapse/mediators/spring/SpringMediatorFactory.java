@@ -26,6 +26,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Creates an instance of a Spring mediator that refers to the given Spring
@@ -44,9 +45,10 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
      * by the OMElement declaration
      *
      * @param elem the OMElement that specifies the Spring mediator configuration
+     * @param properties
      * @return the Spring mediator instance created
      */
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SpringMediator sm = new SpringMediator();
         OMAttribute bean = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "bean"));

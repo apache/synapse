@@ -146,11 +146,11 @@ public class ServerConfigurationInformationFactory {
 
         if (synapseHome == null) {
             log.info("synapse.home not set; using web application root as default value");
-            String webinfPath = servletConfig.getServletContext().getRealPath("WEB-INF");
-            if (webinfPath == null || !webinfPath.endsWith("WEB-INF")) {
+            String webInfPath = servletConfig.getServletContext().getRealPath("WEB-INF");
+            if (webInfPath == null || !webInfPath.endsWith("WEB-INF")) {
                 handleFatal("Unable to currentState web application root directory");
             } else {
-                synapseHome = webinfPath.substring(0, webinfPath.length() - 7);
+                synapseHome = webInfPath.substring(0, webInfPath.length() - 7);
                 log.info("Setting synapse.home to : " + synapseHome);
             }
         }

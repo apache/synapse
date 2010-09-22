@@ -22,6 +22,8 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Startup;
 
+import java.util.Properties;
+
 /**
  *
  */
@@ -33,7 +35,7 @@ public class StartupSerializationTest extends AbstractTestCase {
                 "<property name=\"name\" value=\"foo\"/>" +
                 "<trigger interval=\"5\"/></task>";
         OMElement inputOM = createOMElement(inputXml);
-        Startup startup = StartupFinder.getInstance().getStartup(inputOM);
+        Startup startup = StartupFinder.getInstance().getStartup(inputOM, new Properties());
         OMElement resultOM = StartupFinder.getInstance().serializeStartup(null, startup);
         assertTrue(compare(resultOM, inputOM));
     }
@@ -45,7 +47,7 @@ public class StartupSerializationTest extends AbstractTestCase {
                 "<property name=\"name\" value=\"foo\"/>" +
                 "<trigger interval=\"5\"/></task>";
         OMElement inputOM = createOMElement(inputXml);
-        Startup startup = StartupFinder.getInstance().getStartup(inputOM);
+        Startup startup = StartupFinder.getInstance().getStartup(inputOM, new Properties());
         OMElement resultOM = StartupFinder.getInstance().serializeStartup(null, startup);
         assertTrue(compare(resultOM, inputOM));
     }

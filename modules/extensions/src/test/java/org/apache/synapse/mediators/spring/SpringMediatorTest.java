@@ -24,6 +24,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.mediators.TestUtils;
 
+import java.util.Properties;
+
 /**
  * This unit test is a different 'type' of a unit test, such that it tests end-to-end
  * like scenario of using Spring extensions! First it tests that the configuration
@@ -38,7 +40,7 @@ public class SpringMediatorTest extends TestCase {
 
         MessageContext msgCtx = TestUtils.getTestContext("<dummy/>");
         msgCtx.setConfiguration(
-            SynapseConfigurationBuilder.getConfiguration("./../../repository/conf/sample/resources/spring/synapse_spring_unittest.xml"));
+            SynapseConfigurationBuilder.getConfiguration("./../../repository/conf/sample/resources/spring/synapse_spring_unittest.xml", new Properties()));
         msgCtx.getMainSequence().mediate(msgCtx);
 
         assertEquals(TestMediateHandlerImpl.invokeCount, 202);

@@ -26,6 +26,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.SendMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link SendMediator} instances.
@@ -76,7 +77,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
     private static final QName SEND_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "send");
     private static final QName ENDPOINT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SendMediator sm =  new SendMediator();
 
@@ -86,8 +87,8 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
 
         OMElement epElement = elem.getFirstChildWithName(ENDPOINT_Q);
         if (epElement != null) {
-            // create the endpoint and set it in the send medaitor
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true);
+            // create the endpoint and set it in the send mediator
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties);
             if (endpoint != null) {
                 sm.setEndpoint(endpoint);
             }

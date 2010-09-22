@@ -172,7 +172,7 @@ public class SynapseConfigUtils {
                             url.openStream();
                         } catch (IOException e) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Faild to resolve an absolute path of the " +
+                                log.debug("Failed to resolve an absolute path of the " +
                                         " URL using the synapse.home : " + synapseHome);
                             }
                             log.warn("IO Error reading from URL " + url.getPath() + e);

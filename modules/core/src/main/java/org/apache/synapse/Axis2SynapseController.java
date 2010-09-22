@@ -423,6 +423,11 @@ public class Axis2SynapseController implements SynapseController {
                     serverConfigurationInformation.getResolveRoot());
         }
 
+        if (serverConfigurationInformation.getSynapseHome() != null) {
+            properties.put(SynapseConstants.SYNAPSE_HOME,
+                    serverConfigurationInformation.getSynapseHome());
+        }
+
         if (synapseXMLLocation != null) {
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(
                     synapseXMLLocation, properties);

@@ -158,7 +158,7 @@ public class SynapseConfigUtils {
                         log.debug("Can not open a connection to the URL with a path :" +
                                 path);
                     }
-                    String synapseHome = getSynapseHome();
+                    String synapseHome = properties.get(SynapseConstants.SYNAPSE_HOME).toString();
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +

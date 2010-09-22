@@ -27,6 +27,8 @@ import org.apache.synapse.mediators.AbstractMediatorTestCase;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 
+import java.util.Properties;
+
 /**
  * Tests the pojo command mediator instantiation and setting of literal and
  * XPath parameters at runtime.
@@ -36,7 +38,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
     public void testPojoWithoutPropertiesNotCommandImpl() throws Exception {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestMediator' " +
-                        "xmlns='http://synapse.apache.org/ns/2010/04/configuration'/>"));
+                        "xmlns='http://synapse.apache.org/ns/2010/04/configuration'/>"), new Properties());
         POJOCommandTestHelper.reset();
         pcm.mediate(new TestMessageContext());
         assertTrue(POJOCommandTestHelper.getInstance().isExecuted());
@@ -46,7 +48,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestMediator' " +
                         "xmlns='http://synapse.apache.org/ns/2010/04/configuration'><property name=\"testProp\" " +
-                        "expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"ReadMessage\"/></pojoCommand>"));
+                        "expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"ReadMessage\"/></pojoCommand>"), new Properties());
         POJOCommandTestHelper.reset();
         pcm.mediate(new TestMessageContext());
         assertEquals("XPATH FUNC", POJOCommandTestHelper.getInstance().getChangedProperty());
@@ -56,7 +58,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
     public void testPojoWithoutPropertiesCommandImpl() throws Exception {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
-                        "xmlns='http://synapse.apache.org/ns/2010/04/configuration'/>"));
+                        "xmlns='http://synapse.apache.org/ns/2010/04/configuration'/>"), new Properties());
         POJOCommandTestHelper.reset();
         pcm.mediate(new TestMessageContext());
         assertTrue(POJOCommandTestHelper.getInstance().isExecuted());
@@ -66,7 +68,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
                         "xmlns='http://synapse.apache.org/ns/2010/04/configuration'><property name=\"testProp\" " +
-                        "expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"ReadMessage\"/></pojoCommand>"));
+                        "expression=\"fn:concat('XPATH ', 'FUNC')\" action=\"ReadMessage\"/></pojoCommand>"), new Properties());
         POJOCommandTestHelper.reset();
         pcm.mediate(new TestMessageContext());
         assertEquals("XPATH FUNC", POJOCommandTestHelper.getInstance().getChangedProperty());
@@ -77,7 +79,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
                         "xmlns='http://synapse.apache.org/ns/2010/04/configuration'><property name=\"testProp\" " +
-                        "value=\"Test Property\"/></pojoCommand>"));
+                        "value=\"Test Property\"/></pojoCommand>"), new Properties());
         POJOCommandTestHelper.reset();
         pcm.mediate(new TestMessageContext());
         assertEquals("Test Property", POJOCommandTestHelper.getInstance().getChangedProperty());
@@ -88,7 +90,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
                         "xmlns='http://synapse.apache.org/ns/2010/04/configuration'><property name=\"testProp\" " +
-                        "value=\"Test Property\" context-name=\"testPropInMC\"/></pojoCommand>"));
+                        "value=\"Test Property\" context-name=\"testPropInMC\"/></pojoCommand>"), new Properties());
         POJOCommandTestHelper.reset();
         MessageContext ctx = new TestMessageContext();
         pcm.mediate(ctx);
@@ -101,7 +103,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
                         "xmlns='http://synapse.apache.org/ns/2010/04/configuration'><property name=\"testProp\" " +
-                        "value=\"TestProperty\" expression=\"//testNode\"/></pojoCommand>"));
+                        "value=\"TestProperty\" expression=\"//testNode\"/></pojoCommand>"), new Properties());
         POJOCommandTestHelper.reset();
         MessageContext ctx = new TestMessageContext();
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
@@ -117,7 +119,7 @@ public class POJOCommandMediatorTest extends AbstractMediatorTestCase {
         Mediator pcm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
                 "<pojoCommand name='org.apache.synapse.mediators.ext.POJOCommandTestImplementedMediator' " +
                         "xmlns='http://synapse.apache.org/ns/2010/04/configuration'><property name=\"ctxTest\" " +
-                        "context-name=\"testCtxProp\" action=\"ReadAndUpdateContext\"/></pojoCommand>"));
+                        "context-name=\"testCtxProp\" action=\"ReadAndUpdateContext\"/></pojoCommand>"), new Properties());
         POJOCommandTestHelper.reset();
         MessageContext ctx = new TestMessageContext();
         ctx.setProperty("testCtxProp", "test");

@@ -29,6 +29,7 @@ import org.apache.synapse.config.xml.ProxyServiceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  *  Handles the <code>ProxyService</code> deployment and undeployment tasks
@@ -40,14 +41,15 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
     private static Log log = LogFactory.getLog(ProxyServiceDeployer.class);
 
     @Override
-    public String deploySynapseArtifact(OMElement artifactConfig, String fileName) {
+    public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
+                                        Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("ProxyService Deployment from file : " + fileName + " : Started");
         }
 
         try {
-            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig);
+            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig, properties);
             if (proxy != null) {
                 proxy.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {
@@ -85,14 +87,14 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
 
     @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
-                                        String existingArtifactName) {
+                                        String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
             log.debug("ProxyService Update from file : " + fileName + " : Started");
         }
 
         try {
-            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig);
+            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig, properties);
             if (proxy != null) {
                 proxy.setFileName((new File(fileName)).getName());
                 if (log.isDebugEnabled()) {

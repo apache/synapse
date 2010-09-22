@@ -29,6 +29,7 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Creates an instance of a AnnotatedCommand mediator using XML configuration specified
@@ -47,7 +48,7 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
     private static final QName ANNOTATED_COMMAND_Q =
         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "annotatedCommand");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         AnnotatedCommandMediator pojoMediator = new AnnotatedCommandMediator();
 

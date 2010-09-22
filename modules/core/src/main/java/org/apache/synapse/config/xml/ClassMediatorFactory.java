@@ -29,6 +29,7 @@ import org.apache.synapse.mediators.ext.ClassMediator;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Creates an instance of a Class mediator using XML configuration specified
@@ -45,7 +46,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "class");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ClassMediator classMediator = new ClassMediator();
 

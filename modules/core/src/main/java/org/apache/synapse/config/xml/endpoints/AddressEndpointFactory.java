@@ -28,6 +28,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Creates {@link AddressEndpoint} using a XML configuration.
@@ -69,7 +70,8 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
     }
 
     @Override
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         AddressEndpoint addressEndpoint = new AddressEndpoint();
         OMAttribute name = epConfig.getAttribute(

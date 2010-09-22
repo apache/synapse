@@ -28,6 +28,7 @@ import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link HeaderMediator} instances.
@@ -47,7 +48,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
     private static final QName HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "header");
     private static final QName ATT_ACTION = new QName("action");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         HeaderMediator headerMediator = new HeaderMediator();
         OMAttribute name   = elem.getAttribute(ATT_NAME);

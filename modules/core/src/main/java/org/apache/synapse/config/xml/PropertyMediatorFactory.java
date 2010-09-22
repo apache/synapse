@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
@@ -45,7 +46,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_PATTERN = new QName("pattern");
     private static final QName ATT_GROUP = new QName("group");
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         PropertyMediator propMediator = new PropertyMediator();
         OMAttribute name = elem.getAttribute(ATT_NAME);

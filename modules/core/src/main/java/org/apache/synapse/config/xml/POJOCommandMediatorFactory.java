@@ -29,6 +29,7 @@ import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Factory for {@link POJOCommandMediator} instances.
@@ -63,7 +64,7 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
     protected static final String RAUM_ACTION = "ReadAndUpdateMessage";
     protected static final String RAUC_ACTION = "ReadAndUpdateContext";
 
-    public Mediator createSpecificMediator(OMElement elem) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         POJOCommandMediator pojoMediator = new POJOCommandMediator();
 

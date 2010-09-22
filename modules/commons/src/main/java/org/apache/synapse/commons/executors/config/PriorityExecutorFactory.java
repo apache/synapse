@@ -32,15 +32,13 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Properties;
 
 
 public class PriorityExecutorFactory {
     private static Log log = LogFactory.getLog(PriorityExecutorFactory.class);
 
     public static final QName NAME_ATT = new QName(ExecutorConstants.NAME);
-    public static final QName CLASS_ATT = new QName("class");
-    public static final QName ATT_NAME    = new QName(ExecutorConstants.NAME);
-    public static final QName ATT_VALUE   = new QName(ExecutorConstants.VALUE);
     public static final QName SIZE_ATT   = new QName(ExecutorConstants.SIZE);
     public static final QName PRIORITY_ATT   = new QName(ExecutorConstants.PRIORITY);
 
@@ -55,8 +53,11 @@ public class PriorityExecutorFactory {
     public static final QName CORE_ATT = new QName(ExecutorConstants.CORE);
     public static final QName KEEP_ALIVE_ATT = new QName(ExecutorConstants.KEEP_ALIVE);
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static PriorityExecutor createExecutor(String namespace, OMElement e,
-                                                  boolean requireName) throws AxisFault {        
+                                                  boolean requireName,
+                                                  Properties properties) throws AxisFault {
+        
         QName queuesQName = createQname(namespace, ExecutorConstants.QUEUES);
         QName queueQName = createQname(namespace, ExecutorConstants.QUEUE);
         QName threadsQName = createQname(namespace, ExecutorConstants.THREADS);
@@ -97,10 +98,11 @@ public class PriorityExecutorFactory {
             }
 
             // create the queue configuration
-            List<InternalQueue<Runnable>> intQueues = createQueues(queueQName, queuesEle, isFixedSize);
+            List<InternalQueue<Runnable>> intQueues
+                    = createQueues(queueQName, queuesEle, isFixedSize);
 
-            MultiPriorityBlockingQueue queue =
-                    new MultiPriorityBlockingQueue(intQueues, isFixedSize, nqa);
+            MultiPriorityBlockingQueue<Runnable> queue =
+                    new MultiPriorityBlockingQueue<Runnable>(intQueues, isFixedSize, nqa);
 
             executor.setQueue(queue);
         } else {

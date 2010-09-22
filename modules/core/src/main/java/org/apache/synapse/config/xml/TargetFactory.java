@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Factory for {@link Target} instances.
@@ -55,9 +56,10 @@ public class TargetFactory {
      * This static method will be used to build the Target from the specified element
      * 
      * @param elem - OMElement describing the xml configuration of the target
+     * @param properties bag of properties with information 
      * @return Target built by parsing the given element
      */
-    public static Target createTarget(OMElement elem) {
+    public static Target createTarget(OMElement elem, Properties properties) {
 
         if (!TARGET_Q.equals(elem.getQName())) {
             handleException("Element does not match with the target QName");
@@ -91,13 +93,13 @@ public class TargetFactory {
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"));
         if (sequence != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
-            target.setSequence(fac.createAnonymousSequence(sequence));
+            target.setSequence(fac.createAnonymousSequence(sequence, properties));
         }
 
         OMElement endpoint = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
         if (endpoint != null) {
-            target.setEndpoint(EndpointFactory.getEndpointFromElement(endpoint, true));
+            target.setEndpoint(EndpointFactory.getEndpointFromElement(endpoint, true, properties));
         }
 
         return target;

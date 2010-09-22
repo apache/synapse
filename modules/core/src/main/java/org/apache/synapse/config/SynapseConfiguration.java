@@ -250,7 +250,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry);
+                o = registry.getResource(entry, getProperties());
                 if (o != null && o instanceof Mediator) {
                     localRegistry.put(key, entry);
                     return (Mediator) o;
@@ -259,7 +259,8 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         } else {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
-                Object object = entry.getMapper().getObjectFromOMNode((OMNode) value);
+                Object object = entry.getMapper().getObjectFromOMNode(
+                        (OMNode) value, getProperties());
                 if (object instanceof Mediator) {
                     entry.setValue(object);
                     return (Mediator) object;
@@ -411,7 +412,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             if (registry != null) {
                 if (entry.isCached()) {
                     try {
-                        o = registry.getResource(entry);
+                        o = registry.getResource(entry, getProperties());
                     } catch (Exception e) {
                         // Error occured while loading the resource from the registry
                         // Fall back to the cached value - Do not increase the expiry time
@@ -423,7 +424,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
                 } else {
                     // Resource not available in the cache - Must load from the registry
                     // No fall backs possible here!!
-                    o = registry.getResource(entry);
+                    o = registry.getResource(entry, getProperties());
                 }
             } else {
                 if (entry.isCached()) {
@@ -604,7 +605,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry);
+                o = registry.getResource(entry, getProperties());
                 if (o != null && o instanceof Endpoint) {
                     localRegistry.put(key, entry);
                     return (Endpoint) o;
@@ -613,7 +614,8 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         } else {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
-                Object object = entry.getMapper().getObjectFromOMNode((OMNode) value);
+                Object object = entry.getMapper().getObjectFromOMNode(
+                        (OMNode) value, getProperties());
                 if (object instanceof Endpoint) {
                     entry.setValue(object);
                     return (Endpoint) object;

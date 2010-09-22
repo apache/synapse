@@ -29,6 +29,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
 
 import javax.xml.namespace.QName;
+import java.util.Properties;
 
 /**
  * Creates {@link DefaultEndpoint} using a XML configuration.
@@ -68,7 +69,8 @@ public class DefaultEndpointFactory extends EndpointFactory {
         return instance;
     }
 
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties) {
 
         DefaultEndpoint defaultEndpoint = new DefaultEndpoint();
         OMAttribute name = epConfig.getAttribute(

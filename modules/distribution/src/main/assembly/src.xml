@@ -38,7 +38,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>.</directory>
+            <directory>../..</directory>
             <outputDirectory>synapse-${synapse.version}-src</outputDirectory>
             <includes>
                 <include>modules/**/*</include>
@@ -48,6 +48,7 @@
             </includes>
             <excludes>
                 <exclude>**/target</exclude>
+                <exclude>**/logs</exclude>
                 <exclude>**/target/**/*</exclude>
                 <exclude>**/build</exclude>
                 <exclude>**/build/**/*</exclude>
@@ -56,6 +57,7 @@
                 <exclude>**/.project</exclude>
                 <exclude>**/.wtpmodules</exclude>
                 <exclude>**/*.iml</exclude>
+                <exclude>**/*.log</exclude>
                 <exclude>**/.settings</exclude>
                 <exclude>**/.settings/**/*</exclude>
             </excludes>

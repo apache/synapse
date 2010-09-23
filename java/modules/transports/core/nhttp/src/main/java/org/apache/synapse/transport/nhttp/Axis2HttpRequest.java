@@ -363,7 +363,7 @@ public class Axis2HttpRequest {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
-        synchronized(this) {
+        synchronized (this) {
             this.notifyAll();
         }
     }

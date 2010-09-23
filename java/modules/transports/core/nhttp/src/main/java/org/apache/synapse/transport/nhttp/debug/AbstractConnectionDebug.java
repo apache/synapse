@@ -31,7 +31,7 @@ import java.util.List;
  */
 public abstract class AbstractConnectionDebug {
 
-    protected static final DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
+    protected final DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
 
     protected String keyValueSeparator;
     protected String fieldSeparator;

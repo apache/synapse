@@ -552,15 +552,13 @@ public class FIXUtils {
         } else {
             Hashtable<String,String> properties1 = BaseUtils.getEPRProperties(url1);
             Hashtable<String, String> properties2 = BaseUtils.getEPRProperties(url2);
-            Iterator<String> keys = properties1.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = keys.next();
+            for (String key : properties1.keySet()) {
                 if (!properties2.containsKey(key)) {
                     return false;
                 } else if (!properties1.get(key).equals(properties2.get(key))) {
                     return false;
                 }
-            }
+            }                        
         }
         return true;
     }

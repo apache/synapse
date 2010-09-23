@@ -30,6 +30,7 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
@@ -261,7 +262,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      *
      * @param artifactConfig built element representing the artifact to be deployed loaded from the file
      * @param fileName file name from which this artifact is being loaded
-     * @param properties
+     * @param properties Properties associated with the artifact
      * @return String artifact name created by the deployment task
      * 
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#deploy(
@@ -290,7 +291,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      *
      * @param artifactName name of the artifact to be undeployed
      *
-     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploy(String)  
+     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#unDeploy(String)
      */
     public abstract void undeploySynapseArtifact(String artifactName);
 
@@ -397,8 +398,12 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 backupFilePath = filePath + "." + backupIndex + ".back";
             } else {
                 backupIndex = -1;
-                //noinspection ResultOfMethodCallIgnored
-                file.renameTo(new File(backupFilePath));
+                try {
+                    FileUtils.moveFile(file, new File(backupFilePath));
+                } catch (IOException e) {
+                    handleSynapseArtifactDeploymentError("Error while backing up the artifact: " +
+                            file.getName(), e);
+                }
             }
         }
         return backupFilePath;

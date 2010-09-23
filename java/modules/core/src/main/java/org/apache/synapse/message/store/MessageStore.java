@@ -20,6 +20,7 @@
 package org.apache.synapse.message.store;
 
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.SynapseArtifact;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.Map;
  * This is the interface  for the Synapse Message Store
  * Message Store used to store failed Messages.
  */
-public interface MessageStore {
+public interface MessageStore extends SynapseArtifact {
 
     /**
      * store the Message in the Message Store
@@ -154,4 +155,18 @@ public interface MessageStore {
      * @param configuration Current SynapseConfiguration
      */
     public void setConfiguration(SynapseConfiguration configuration);
+
+    /**
+     * Set the name of the file that the Message store is configured
+     *
+     * @param filename
+     */
+    public void setFileName(String filename);
+
+    /**
+     * get the file name that the message store is configured
+     * @return
+     */
+    public String getFileName();
+    
 }

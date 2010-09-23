@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -75,6 +76,7 @@ public class MultiXMLConfigurationBuilder {
     public static final String TASKS_DIR           = "tasks";
     public static final String EVENTS_DIR          = "event-sources";
     public static final String EXECUTORS_DIR       = "priority-executors";
+    public static final String MESSAGE_STORE_DIR   = "message-stores";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 
@@ -121,6 +123,7 @@ public class MultiXMLConfigurationBuilder {
         createTasks(synapseConfig, root, properties);
         createEventSources(synapseConfig, root, properties);
         createExecutors(synapseConfig, root, properties);
+        createMessageStores(synapseConfig, root, properties);
 
         return synapseConfig;
     }
@@ -310,6 +313,30 @@ public class MultiXMLConfigurationBuilder {
                             file.getAbsolutePath(), executor.getName());
                 } catch (FileNotFoundException ignored) {}
            }
+        }
+    }
+
+    private static void createMessageStores(SynapseConfiguration synapseConfig ,
+                                            String rootDirPath, Properties properties)
+            throws XMLStreamException {
+
+        File messageStoresDir = new File(rootDirPath, MESSAGE_STORE_DIR);
+        if (messageStoresDir.exists() ) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading Message Stores from :" + messageStoresDir.getPath());
+            }
+
+            File[] messageStores = messageStoresDir.listFiles(filter);
+            for (File file : messageStores) {
+                try {
+                    OMElement document = parseFile(file);
+                    MessageStore messageStore = SynapseXMLConfigurationFactory.defineMessageStore(
+                            synapseConfig, document, properties);
+                    messageStore.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                            messageStore.getName());
+                } catch (FileNotFoundException ignored ) { }
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-Apache Synapse 1.2 build  (June 2008) - http://ws.apache.org/synapse/
+Apache Synapse 2.0 build  (September 2010) - http://synapse.apache.org/
 ------------------------------------------------------------------------------------------
 
 -------------------

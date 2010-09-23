@@ -43,14 +43,17 @@ public class SynapseAxisServlet extends AxisServlet {
     public void init(ServletConfig config) throws ServletException {
         ServletContext servletContext = config.getServletContext();
 
-        //TODO SUPUN
-        /*this.configContext = (ConfigurationContext) ServerManager.getInstance().
-                getServerContextInformation().getServerContext();*/
-        this.axisConfiguration = this.configContext.getAxisConfiguration();
-        servletContext.setAttribute(this.getClass().getName(), this);
-        this.servletConfig = config;
-        agent = new ListingAgent(configContext);
-        initParams();
+        ServerManager serverManager = (ServerManager) config.getServletContext().
+                getAttribute(SynapseStartUpServlet.SYNAPSE_SERVER_MANAGER);
+        if (serverManager != null) {
+            this.configContext = (ConfigurationContext) serverManager.
+                    getServerContextInformation().getServerContext();
+            this.axisConfiguration = this.configContext.getAxisConfiguration();
+            servletContext.setAttribute(this.getClass().getName(), this);
+            this.servletConfig = config;
+            agent = new ListingAgent(configContext);
+            initParams();
+        }
     }
 
     public void initContextRoot(HttpServletRequest req) {

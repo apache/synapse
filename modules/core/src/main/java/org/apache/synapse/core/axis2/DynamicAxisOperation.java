@@ -59,7 +59,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 		return new DynamicOperationClient(this, sc, options);
 	}
 
-	class DynamicOperationClient extends OperationClient {
+	static class DynamicOperationClient extends OperationClient {
 
 		DynamicOperationClient(OutInAxisOperation axisOp, ServiceContext sc, Options options) {
             super(axisOp, sc, options);

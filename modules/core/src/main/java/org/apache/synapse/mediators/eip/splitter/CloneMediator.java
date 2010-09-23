@@ -161,9 +161,7 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
                 seq.init(se);
             }
             Endpoint endpoint = target.getEndpoint();
-            if (endpoint instanceof ManagedLifecycle) {
-                ((ManagedLifecycle) endpoint).init(se);
-            }
+            endpoint.init(se);
         }
     }
 
@@ -175,9 +173,7 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
                 seq.destroy();
             }
             Endpoint endpoint = target.getEndpoint();
-            if (endpoint instanceof ManagedLifecycle) {
-                ((ManagedLifecycle) endpoint).destroy();
-            }
+            endpoint.destroy();            
         }
     }
 }

@@ -429,15 +429,6 @@ public class SynapseConfigUtils {
                             }
                             return true;
                         }
-
-                        public boolean verify(String hostname, String certHostname) {
-                            if (log.isTraceEnabled()) {
-                                log.trace("HostName verification disabled");
-                                log.trace("Host:   " + hostname);
-                                log.trace("Cert HostName:  " + certHostname);
-                            }
-                            return true;
-                        }
                     });
                 } else {
                     if (log.isDebugEnabled()) {

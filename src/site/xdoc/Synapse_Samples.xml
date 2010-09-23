@@ -5299,14 +5299,15 @@ values by executing XPath expressions. The port numbers are calculated by execut
             &lt;drop/&gt;
         &lt;/filter&gt;
         &lt;send/&gt;
-    &lt;!-- Endpoint named SampleEndpoint--&gt;
-    &lt;endpoint name="SampleEndpoint" onFault="foo"&gt;
-                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"&gt;
+
+        &lt;!-- Endpoint named SampleEndpoint--&gt;
+        &lt;endpoint name="SampleEndpoint" onFault="foo"&gt;
+            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"&gt;
     			&lt;suspendDurationOnFailure&gt;2&lt;/suspendDurationOnFailure&gt;
     		&lt;/address&gt;
-            &lt;/endpoint&gt;
+        &lt;/endpoint&gt;
 
-    &lt;sequence name="bar"&gt;
+        &lt;sequence name="bar"&gt;
             &lt;log level="full"/&gt;
         &lt;/sequence&gt;
     &lt;/definitions&gt;

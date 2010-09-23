@@ -229,7 +229,10 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
         Log log = getLog();
         File tmpServicesDir = new File(new File(tmpDirectory, "META-INF"), "services");
         File buildServicesDir = new File(new File(buildOutputDirectory, "META-INF"), "services");
-        tmpServicesDir.mkdirs();
+        if (!tmpServicesDir.mkdirs()) {
+            throw new MojoExecutionException("Error while creating the directory: " +
+                    tmpServicesDir.getPath());
+        }
         
         log.debug("Initializing class scanner ...");
         ClassScanner scanner = new ClassScanner(buildOutputDirectory);

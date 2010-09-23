@@ -345,6 +345,14 @@
                 </li>
             </ul>
         </li>
+        <li>
+            <a href="#MessageStore">Synapse Message Stores (Dead Letter Channel)</a>
+            <ul>
+                <li>
+                    <a href="#Sample700">Sample 700: Introduction to Synapse Message Store </a>
+                </li>
+            </ul>
+        </li>
 </ul></div>
 <h1>
 <a name="MediationSamples" id="MediationSamples">Message Mediation Samples</a> </h1>
@@ -5265,5 +5273,63 @@ values by executing XPath expressions. The port numbers are calculated by execut
         <p>Invoke the client as follows.</p>
         <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN/
         </pre>
+    <h2>
+    <a name="Message Store" id="MessageStore">Introducing Synapse Message store</a></h2>
+    <h2>
+    <a name="Sample700" id="Sample700">Sample 700: Introduction Message Store</a></h2>
+    <pre xml:space="preserve">&lt;!-- Introduction to the Synapse Message Store --&gt;
+    &lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+           &lt;!--Simple in Memory Message Store with name foo --&gt;
+            &lt;messageStore name="foo" sequence="bar"&gt;
+    		&lt;redelivery&gt;
+    			&lt;!--retry interval 1 sec --&gt;
+    			&lt;interval&gt;1&lt;/interval&gt;
+    			&lt;!--Message will be stored after 2 redeliveries --&gt;
+    			&lt;maximumRedeliveries&gt;2&lt;/maximumRedeliveries&gt;
+    			&lt;exponentialBackoff&gt;true&lt;/exponentialBackoff&gt;
+    			&lt;backoffMutiplier&gt;2&lt;/backoffMutiplier&gt;
+    		&lt;/redelivery&gt;
+     	&lt;/messageStore&gt;
+
+    	&lt;!-- filtering of messages with XPath and regex matches --&gt;
+        &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+            &lt;send&gt;
+            	&lt;endpoint key="SampleEndpoint"/&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/filter&gt;
+        &lt;send/&gt;
+    &lt;!-- Endpoint named SampleEndpoint--&gt;
+    &lt;endpoint name="SampleEndpoint" onFault="foo"&gt;
+                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"&gt;
+    			&lt;suspendDurationOnFailure&gt;2&lt;/suspendDurationOnFailure&gt;
+    		&lt;/address&gt;
+            &lt;/endpoint&gt;
+
+    &lt;sequence name="bar"&gt;
+            &lt;log level="full"/&gt;
+        &lt;/sequence&gt;
+    &lt;/definitions&gt;
+    </pre>
+    <p>
+    <strong>Objective: </strong>Introduction to Synapse Message Stores</p>
+    <p>
+    <strong>Prerequisites</strong>:Start the Synapse configuration numbered 700: i.e. synapse -sample 700 </p>
+    <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done. </p>
+    <p></p>
+    <p>To Execute the Client : </p>
+
+    <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote </pre>
+    <p></p>
+    <p>Since now you have the Axis2 Server Running when you run the client you will get the Stock
+        generation output in Server console and the out put in the client side. Then try shutting down
+        the Axis2 Server and running again. You will see synapse will try 2 times to deliver the message
+        and store in on the MessageStore.It will execute the log sequence before storing the Message
+        in the Message store.</p>
+
+    <p>You can then use the JMX view of Synapse Message Store by using the jconsole and view the stored
+        Message.You can even re start the Axis2Server and manually redeliver the request using the
+        Same JMX view.
+    </p>
     </div>
 </body></document>

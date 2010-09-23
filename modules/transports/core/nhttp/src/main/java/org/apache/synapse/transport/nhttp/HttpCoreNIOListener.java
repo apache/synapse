@@ -218,14 +218,13 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         try {
             FileInputStream fis = new FileInputStream(fileName);
             definitions = new StAXOMBuilder(fis).getDocumentElement();
+            assert definitions != null;
             definitions.build();
         } catch (FileNotFoundException e) {
             handleException("Priority configuration file cannot be found : " + fileName, e);
         } catch (XMLStreamException e) {
             handleException("Error parsing priority configuration xml file " + fileName, e);
         }
-
-        assert definitions != null;
 
         OMElement executorElem = definitions.getFirstChildWithName(
                 new QName(ExecutorConstants.PRIORITY_EXECUTOR));

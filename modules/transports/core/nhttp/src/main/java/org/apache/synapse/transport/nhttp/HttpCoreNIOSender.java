@@ -216,10 +216,13 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /**
      * Return the IOEventDispatch implementation to be used. This is overridden by the
      * SSL sender
-     * @param handler
-     * @param sslContext
-     * @param params
-     * @return
+     * @param handler The NHTTP client handler instance
+     * @param sslContext SSL context used by the sender or null
+     * @param sslIOSessionHandler SSL session handler or null
+     * @param params HTTP parameters
+     * @param trpOut Transport out description
+     * @return an IOEventDispatch instance
+     * @throws AxisFault on error
      */
     protected IOEventDispatch getEventDispatch(NHttpClientHandler handler, SSLContext sslContext,
         SSLIOSessionHandler sslIOSessionHandler, HttpParams params,
@@ -230,9 +233,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
     /**
      * Always return null, as this implementation does not support outgoing SSL
-     * @param transportOut
+     * @param transportOut The transport out description
      * @return null
-     * @throws AxisFault
+     * @throws AxisFault on error
      */
     protected SSLContext getSSLContext(TransportOutDescription transportOut) throws AxisFault {
         return null;
@@ -240,8 +243,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
     /**
      * Create the SSL IO Session handler to be used by this listener
-     * @param transportOut
+     * @param transportOut Transport out description
      * @return always null
+     * @throws AxisFault on error
      */
     protected SSLIOSessionHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
         throws AxisFault {
@@ -404,7 +408,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             ServerConnectionDebug scd = (ServerConnectionDebug)
                 msgContext.getProperty(ServerHandler.SERVER_CONNECTION_DEBUG);
 
-            ClientConnectionDebug ccd = null;
+            ClientConnectionDebug ccd;
             if (scd != null) {
                 ccd = scd.getClientConnectionDebug();
                 if (ccd == null) {
@@ -464,7 +468,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         MessageFormatter messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
-        if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
+        if (noEntityBody == null || !noEntityBody) {
             response.setHeader(
                 HTTP.CONTENT_TYPE,
                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
@@ -518,15 +522,13 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
              * write an empty byte array as body
              */
             if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)
-                || Boolean.TRUE == noEntityBody) {
+                || noEntityBody) {
                 out.write(new byte[0]);
             } else {
                 messageFormatter.writeTo(msgContext, format, out, false);
             }
             out.close();
-            if (lstMetrics != null) {
-                lstMetrics.incrementMessagesSent();
-            }
+            lstMetrics.incrementMessagesSent();
 
         } catch (HttpException e) {
             if (lstMetrics != null) {

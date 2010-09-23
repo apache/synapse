@@ -196,9 +196,7 @@ public class ClientHandler implements NHttpClientHandler {
         try {
             processConnection(conn, (Axis2HttpRequest) attachment);
         } catch (ConnectionClosedException e) {
-            if (metrics != null) {
-                metrics.incrementFaultsSending();
-            }
+            metrics.incrementFaultsSending();
             handleException("I/O Error submitting request : " + e.getMessage(), e, conn);
         }
     }

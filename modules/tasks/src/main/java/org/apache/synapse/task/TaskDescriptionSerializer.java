@@ -59,14 +59,14 @@ public class TaskDescriptionSerializer {
             task.addAttribute("group", group, NULL_OMNS);
         }
 
-        List pinnedServers = taskDescription.getPinnedServers();
+        List<String> pinnedServers = taskDescription.getPinnedServers();
         if (pinnedServers != null && !pinnedServers.isEmpty()) {
-            String pinnedServersStr = "" + pinnedServers.get(0);
+            StringBuffer pinnedServersStr = new StringBuffer(pinnedServers.get(0));
             for (int i = 1; i < pinnedServers.size(); i++) {
-                pinnedServersStr = pinnedServersStr + " " + pinnedServers.get(i);
+                pinnedServersStr.append(" ").append(pinnedServers.get(i));
             }
             task.addAttribute(omFactory.createOMAttribute("pinnedServers",
-                    NULL_OMNS, pinnedServersStr));
+                    NULL_OMNS, pinnedServersStr.toString()));
         }
 
         if (taskDescription.getDescription() != null) {

@@ -65,7 +65,7 @@ public class ConfigurationMigrator {
 
         try {
             doTransform(arguments[0], MIGRATOR_XSLT_PATH, arguments[1]);
-            System.out.println("[INFO] Migration COMPLETED");
+            System.out.println("[INFO] Migration SUCCESSFULLY COMPLETED");
         } catch (TransformerException e) {
             handleException("Migration FAILED\n\t" + e.toString());
         } catch (IOException e) {

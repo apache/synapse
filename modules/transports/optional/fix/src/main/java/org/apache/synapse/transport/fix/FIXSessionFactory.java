@@ -180,11 +180,9 @@ public class FIXSessionFactory {
         }
 
         Hashtable<String,String> properties = BaseUtils.getEPRProperties(fixEPR);
-        Iterator<String> keys = properties.keySet().iterator();
-        while (keys.hasNext()) {
-            String currentKey = keys.next();
-            settings.setString(sessionID, currentKey, properties.get(currentKey));
-        }
+        for (String key : properties.keySet()) {
+            settings.setString(sessionID, key, properties.get(key));
+        }        
 
         String[] socketAddressElements = FIXUtils.getSocketAddressElements(fixEPR);
         settings.setString(sessionID, FIXConstants.CONNECTION_TYPE, FIXConstants.FIX_INITIATOR);

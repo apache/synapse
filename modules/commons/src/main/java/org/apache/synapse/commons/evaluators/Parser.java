@@ -97,14 +97,6 @@ public class Parser {
     }
 
     /**
-     * Set the Conditions
-     * @param conditions <code>array</code> of conditions
-     */
-    public void setConditions(Condition[] conditions) {
-        this.conditions = conditions;
-    }
-
-    /**
      * Build the parser from a given XML
      *
      * @param conditions set of conditions

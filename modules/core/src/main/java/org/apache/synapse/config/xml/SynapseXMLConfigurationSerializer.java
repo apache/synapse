@@ -167,22 +167,18 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
 
     private static void serializeExecutors(OMElement definitions,
                                            Map<String, PriorityExecutor> executors) {
-        for (Object o : executors.keySet()) {
-            if (o instanceof String) {
-                String key = (String) o;
-                PriorityExecutor executor = executors.get(key);
-                PriorityExecutorSerializer.serialize(definitions, executor,
-                        XMLConfigConstants.SYNAPSE_NAMESPACE);
-            }
-        }
+        for (PriorityExecutor exec : executors.values()) {
+            PriorityExecutorSerializer.serialize(definitions, exec,
+                    XMLConfigConstants.SYNAPSE_NAMESPACE);
+        }        
     }
 
     private static void serializeMessageStores(OMElement definitions,
                                                Map<String, MessageStore> messageStores ){
 
-        for (String name : messageStores.keySet()) {
-            MessageStoreSerializer.serializeMessageStore(definitions,messageStores.get(name));
-        }
+        for (MessageStore ms : messageStores.values()) {
+            MessageStoreSerializer.serializeMessageStore(definitions, ms);
+        }        
     }
 
     private static void handleException(String msg) {

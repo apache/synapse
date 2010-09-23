@@ -115,7 +115,7 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         // This is the reference to the DefaultHandler instance
-        MyErrorHandler errorHandler = new MyErrorHandler();
+        ValidateMediatorErrorHandler errorHandler = new ValidateMediatorErrorHandler();
 
         // do not re-initialize schema unless required
         synchronized (validatorLock) {
@@ -221,7 +221,7 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * This class handles validation errors to be used for the error reporting
      */
-    private class MyErrorHandler extends DefaultHandler {
+    private static class ValidateMediatorErrorHandler extends DefaultHandler {
 
         private boolean validationError = false;
         private SAXParseException saxParseException = null;

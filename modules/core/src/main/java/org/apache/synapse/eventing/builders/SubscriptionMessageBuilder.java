@@ -27,9 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.endpoints.AddressEndpoint;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.eventing.SynapseSubscription;
 import org.wso2.eventing.EventingConstants;
 
@@ -114,12 +111,12 @@ public class SubscriptionMessageBuilder {
      * (47)   </s12:Body>
      * (48) </s12:Envelope>
      *
-     * @param mc
-     * @return
+     * @param mc The MessageContext from which to create the SynapseSubscription
+     * @return The SynapseSubscription
      */
     public static SynapseSubscription createSubscription(MessageContext mc) {
         SynapseSubscription subscription = null;
-        OMElement notifyToElem = null;
+        OMElement notifyToElem;
         OMElement elem = mc.getEnvelope().getBody().getFirstChildWithName(SUBSCRIBE_QNAME);
         if (elem != null) {
             OMElement deliveryElem = elem.getFirstChildWithName(DELIVERY_QNAME);
@@ -208,8 +205,8 @@ public class SubscriptionMessageBuilder {
      * (25)   </s12:Body>
      * (26) </s12:Envelope>
      *
-     * @param mc
-     * @return
+     * @param mc The MessageContext from which to create the SynapseSubscription
+     * @return The SynapseSubscription
      */
     public static SynapseSubscription createUnSubscribeMessage(MessageContext mc) {
         SynapseSubscription subscription = new SynapseSubscription();
@@ -250,8 +247,8 @@ public class SubscriptionMessageBuilder {
      * (27)   </s12:Body>
      * (28) </s12:Envelope>
      *
-     * @param mc
-     * @return
+     * @param mc MessageContext from which to create the SynapseSubscription
+     * @return The SynapseSubscription
      */
     public static SynapseSubscription createRenewSubscribeMessage(MessageContext mc) {
         SynapseSubscription subscription = new SynapseSubscription();
@@ -322,8 +319,8 @@ public class SubscriptionMessageBuilder {
      * (25)   </s12:Body>
      * (26) </s12:Envelope>
      *
-     * @param mc
-     * @return
+     * @param mc The MessageContext from which to extract the SynapseSubscription
+     * @return The SynapseSubscription
      */
     public static SynapseSubscription createGetStatusMessage(MessageContext mc) {
         SynapseSubscription subscription = new SynapseSubscription();
@@ -334,22 +331,9 @@ public class SubscriptionMessageBuilder {
         return subscription;
     }
 
-    private static Endpoint getEndpointFromWSAAddress(OMElement address) {
-        AddressEndpoint endpoint = new AddressEndpoint();
-        EndpointDefinition def = new EndpointDefinition();
-        def.setAddress(address.getText().trim());
-        endpoint.setDefinition(def);
-        return endpoint;
-    }
-
     private static void handleException(String message) {
         log.error(message);
         throw new SynapseException(message);
-    }
-
-    private static void handleException(String message, Exception e) {
-        log.error(message, e);
-        throw new SynapseException(message, e);
     }
 
     public static String getErrorSubCode() {
@@ -384,11 +368,12 @@ public class SubscriptionMessageBuilder {
     }
 
     /**
-     * Check is a valid date, this check required due to Java calendar use the Julion date to create
-     * dates, so feb-31 take as a valid date and converts to march-03, ConverterUtil wont validate.
+     * Check is a valid date, this check required due to Java calendar use the Julion
+     * date to create dates, so feb-31 is taken as a valid date and converts to march-03,
+     * ConverterUtil wont validate.
      *
-     * @param original
-     * @param converted
+     * @param original The original date as a string
+     * @param converted The Calendar instance to be validated
      * @return true || false
      */
     private static boolean isValidDate(String original, Calendar converted) {

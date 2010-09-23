@@ -72,8 +72,7 @@ public class SynapseStartUpServlet extends HttpServlet {
 
     public void destroy() {
         try {
-            Object o = (ServerManager) getServletConfig().getServletContext().
-                    getAttribute(SYNAPSE_SERVER_MANAGER);
+            Object o = getServletConfig().getServletContext().getAttribute(SYNAPSE_SERVER_MANAGER);
             if (o != null && o instanceof ServerManager) {
                 ServerManager serverManager = (ServerManager) o;
                 serverManager.stop();

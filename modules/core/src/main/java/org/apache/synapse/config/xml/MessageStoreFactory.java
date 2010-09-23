@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.message.store.InMemoryMessageStore;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.message.store.RedeliveryProcessor;
@@ -65,6 +66,8 @@ public class MessageStoreFactory {
             "backoffMutiplier");
     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             "parameter");
+    private static final QName DESCRIPTION_Q
+            = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
     @SuppressWarnings({"UnusedDeclaration"})
     public static MessageStore createMessageStore(OMElement elem, Properties properties) {
@@ -101,6 +104,11 @@ public class MessageStoreFactory {
             RedeliveryProcessor redeliveryProcessor = populateRedeliveryProcessor(redeliveryElem,
                     messageStore);
             messageStore.setRedeliveryProcessor(redeliveryProcessor);
+        }
+
+        OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
+        if (descriptionElem != null) {
+            messageStore.setDescription(descriptionElem.getText());
         }
 
         messageStore.setParameters(getParameters(elem));

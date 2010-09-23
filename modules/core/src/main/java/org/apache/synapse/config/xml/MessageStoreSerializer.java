@@ -29,6 +29,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.store.MessageStore;
 
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
@@ -116,10 +117,26 @@ public class MessageStoreSerializer {
             }
         }
 
+        if (getSerializedDescription(messageStore) != null) {
+            store.addChild(getSerializedDescription(messageStore));
+        }
+
         if (parent != null) {
             parent.addChild(store);
         }
         return store;
+    }
+
+    private static OMElement getSerializedDescription(MessageStore messageStore) {
+        OMElement descriptionElem = fac.createOMElement(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
+
+        if (messageStore.getDescription() != null) {
+            descriptionElem.setText(messageStore.getDescription());
+            return descriptionElem;
+        } else {
+            return null;
+        }
     }
 
     private static void handleException(String msg) {

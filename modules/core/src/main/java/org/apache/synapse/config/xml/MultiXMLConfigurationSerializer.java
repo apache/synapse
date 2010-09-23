@@ -29,6 +29,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorSerializer;
@@ -98,6 +99,7 @@ public class MultiXMLConfigurationSerializer {
             serializeLocalRegistryValues(synapseConfig.getLocalRegistry().values(),
                     synapseConfig, definitions);
             serializeExecutors(synapseConfig.getPriorityExecutors().values(), definitions);
+            serializeMessageStores(synapseConfig.getMessageStores().values(), definitions);
             serializeSynapseXML(definitions);
 
             markConfigurationForSerialization(synapseConfig);
@@ -148,6 +150,7 @@ public class MultiXMLConfigurationSerializer {
         Collection<Startup> tasks = synapseConfig.getStartups();
         Collection localEntries = synapseConfig.getLocalRegistry().values();
         Collection<PriorityExecutor> executors = synapseConfig.getPriorityExecutors().values();
+        Collection<MessageStore> messageStores = synapseConfig.getMessageStores().values();
 
         for (ProxyService service : proxyServices) {
             if (service.getFileName() == null) {
@@ -197,6 +200,12 @@ public class MultiXMLConfigurationSerializer {
         for (PriorityExecutor executor : executors) {
             PriorityExecutorSerializer.serialize(definitions, executor,
                     SynapseConstants.SYNAPSE_NAMESPACE);
+        }
+
+        for (MessageStore messageStore : messageStores) {
+            if(messageStore.getFileName() == null) {
+                MessageStoreSerializer.serializeMessageStore(definitions,messageStore);
+            }
         }
 
         serializeSynapseXML(definitions);
@@ -368,6 +377,26 @@ public class MultiXMLConfigurationSerializer {
         return eventDirElem;
     }
 
+    public OMElement serializeMessageStore(MessageStore messagestore,
+                                           OMElement parent) throws Exception {
+
+        File messageStoreDir = createDirectory(currentDirectory,
+                MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR);
+        OMElement messageStoreElem = MessageStoreSerializer.serializeMessageStore(null,
+                messagestore);
+
+        String fileName = messagestore.getFileName();
+        if (fileName != null) {
+            File messageStoreFile = new File(messageStoreDir , fileName);
+            writeToFile(messageStoreElem , messageStoreFile);
+
+        } else if (parent != null) {
+            parent.addChild(messageStoreElem);
+        }
+
+        return messageStoreElem;
+    }
+
     private void writeToFile(OMElement content, File file) throws Exception {
         File tempFile = File.createTempFile("syn_mx_", ".xml");
         OutputStream out = new FileOutputStream(tempFile);
@@ -425,6 +454,13 @@ public class MultiXMLConfigurationSerializer {
                                        OMElement parent) throws Exception {
         for (PriorityExecutor source : executors) {
             serializeExecutor(source, parent);
+        }
+    }
+
+    private void serializeMessageStores(Collection<MessageStore> messaegeStores,
+                                         OMElement parent) throws Exception{
+        for (MessageStore messageStore : messaegeStores) {
+            serializeMessageStore(messageStore, parent);
         }
     }
 

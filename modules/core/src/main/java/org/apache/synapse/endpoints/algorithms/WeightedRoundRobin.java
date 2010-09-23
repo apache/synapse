@@ -47,6 +47,7 @@ import java.util.Comparator;
  * and cycle continues.</p>  
  */
 public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycle {
+
     private static final Log log = LogFactory.getLog(WeightedRoundRobin.class);
 
     /** We keep a sorted array of endpoint states, first state will point to the
@@ -209,10 +210,11 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
     }
 
     /**
-     * This is a thread local implementation of the algorith. This way indivudual threads will
-     * do their own weighted round robin without considering the global state of the endpoints
+     * This is a thread local implementation of the algorithm. This way, individual threads will
+     * do their own weighted round robin without considering the global state of the endpoints.
      */
-    private class Algorithm {
+    private static class Algorithm {
+
         /**
          * We keep a sorted array of endpoint states, first state will point to the
          * endpoint with the highest weight
@@ -260,7 +262,7 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
     /**
      * Simple class for holding the states about the endpoints. 
      */
-    private class EndpointState {
+    private static class EndpointState {
         /** Position of the endpoint, represented by this state */
         private int endpointPosition = 0;
 

@@ -468,7 +468,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         MessageFormatter messageFormatter =
                 MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
         Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
-        if (noEntityBody == null || !noEntityBody) {
+        if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
             response.setHeader(
                 HTTP.CONTENT_TYPE,
                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
@@ -522,7 +522,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
              * write an empty byte array as body
              */
             if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)
-                || noEntityBody) {
+                || Boolean.TRUE == noEntityBody) {
                 out.write(new byte[0]);
             } else {
                 messageFormatter.writeTo(msgContext, format, out, false);

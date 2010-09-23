@@ -80,10 +80,10 @@ public class Axis2SynapseController implements SynapseController {
     private boolean initialized;
 
     /** ServerConfiguration Information */
-    private ServerConfigurationInformation serverConfigurationInformation;
+    protected ServerConfigurationInformation serverConfigurationInformation;
 
     /** Runtime information about the server */
-    private ServerContextInformation serverContextInformation;
+    protected ServerContextInformation serverContextInformation;
 
     /** JMX Adapter */
     private JmxAdapter jmxAdapter;

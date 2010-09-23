@@ -230,7 +230,10 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     public void destroy() {
         try {
             sc.cleanup();
-        } catch (AxisFault ignore) {}
+        } catch (AxisFault af) {
+            log.warn("Error while cleaning up the service client instance used by the " +
+                    "Callout mediator", af);
+        }
     }
 
     public String getServiceURL() {

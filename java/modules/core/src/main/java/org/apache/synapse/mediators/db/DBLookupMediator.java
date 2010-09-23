@@ -39,10 +39,11 @@ public class DBLookupMediator extends AbstractDBMediator {
         // execute the prepared statement, and extract the first result row and
         // set as message context properties, any results that have been specified
         Connection con = null;
+        ResultSet rs = null;
         try {
             PreparedStatement ps = getPreparedStatement(stmnt, msgCtx);
             con = ps.getConnection();
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             if (rs.next()) {
                 if (synLog.isTraceOrDebugEnabled()) {
@@ -86,6 +87,11 @@ public class DBLookupMediator extends AbstractDBMediator {
             handleException("Error executing statement : " + stmnt.getRawStatement() +
                 " against DataSource : " + getDSName(), e, msgCtx);
         } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {}
+            }
             if (con != null) {
                 try {
                     con.close();

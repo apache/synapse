@@ -300,11 +300,6 @@ public class ResponseMessageBuilder {
         }
     }
 
-    private void handleException(String message) {
-        log.error(message);
-        throw new SynapseException(message);
-    }
-
     private void handleException(String message, Exception e) {
         log.error(message, e);
         throw new SynapseException(message, e);

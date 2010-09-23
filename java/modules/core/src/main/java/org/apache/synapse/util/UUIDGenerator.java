@@ -90,7 +90,7 @@ public class UUIDGenerator {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
             //System.out.println("Error: " + e);
-            //todo heve to be properly handle
+            //todo have to be properly handled
         }
         md5.update(sb.toString().getBytes());
         byte[] array = md5.digest();

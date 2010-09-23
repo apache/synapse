@@ -62,7 +62,7 @@ public class Statement {
         return resultsMap;
     }
 
-    public class Parameter {
+    public static class Parameter {
         String propertyName = null;
         SynapseXPath xpath = null;
         int type = 0;

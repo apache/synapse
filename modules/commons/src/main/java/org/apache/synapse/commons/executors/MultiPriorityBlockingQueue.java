@@ -399,11 +399,11 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-            String s = "";
+            StringBuffer s = new StringBuffer();
             for (InternalQueue<E> internalQueue : queues) {
-                s += internalQueue.toString();
+                s.append(internalQueue.toString());
             }
-            return s;
+            return s.toString();
         } finally {
             lock.unlock();
         }

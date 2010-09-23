@@ -1,6 +1,7 @@
 package org.apache.synapse.commons.util;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -355,7 +356,7 @@ public class TemporaryData {
             if (log.isDebugEnabled()) {
                 log.debug("Deleting temporary file " + temporaryFile);
             }
-            temporaryFile.delete();
+            FileUtils.deleteQuietly(temporaryFile);
         }
     }
 
@@ -364,7 +365,7 @@ public class TemporaryData {
     protected void finalize() throws Throwable {
         if (temporaryFile != null) {
             log.warn("Cleaning up unreleased temporary file " + temporaryFile);
-            temporaryFile.delete();
+            FileUtils.deleteQuietly(temporaryFile);
         }
     }
 }

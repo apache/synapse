@@ -176,7 +176,7 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
-                                <!--<descriptor>src/main/assembly/src.xml</descriptor>-->
+                                <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
                             <finalName>synapse-${synapse.version}</finalName>
                         </configuration>

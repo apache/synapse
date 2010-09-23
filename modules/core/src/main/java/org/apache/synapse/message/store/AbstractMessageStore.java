@@ -73,6 +73,16 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
      */
     protected Map<String,Object> parameters;
 
+    /**
+     * Message Store description
+     */
+    protected String description;
+
+    /**
+     * Name of the file where this message store is defined
+     */
+    protected String fileName;
+
     public void init(SynapseEnvironment se) {
         this.synapseEnvironment = se;
         this.synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
@@ -158,5 +168,21 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
 
     public void destroy() {
 
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setFileName(String filename) {
+        this.fileName = filename;
+    }
+
+    public String getFileName() {
+        return this.fileName;
     }
 }

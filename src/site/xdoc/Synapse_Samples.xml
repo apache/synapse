@@ -263,7 +263,7 @@
 <li>
 <a href="#Sample364">Sample 364: Executing database Stored Procedures</a></li></ul></li>
 <li>
-<a href="#Throttle">Throtteling messages (Throttle Mediator)</a>
+<a href="#Throttle">Throttling messages (Throttle Mediator)</a>
 <ul>
 <li>
 <a href="#Sample370">Sample 370: Introduction to throttle mediator and concurrency throttling</a></li>
@@ -296,7 +296,7 @@
 <li>
 <a href="#Sample420">Sample 420: Simple cache implemented on Synapse for the actual service</a></li></ul></li>
 <li>
-<a href="#Callout">Synchronize web service invocation with Callout mediator</a>
+<a href="#Callout">Synchronized Web Service invocations with Callout mediator</a>
 <ul>
 <li>
 <a href="#Sample430">Sample 430: Simple Callout Mediator for synchronize web service invocation</a></li>
@@ -530,7 +530,9 @@
             &lt;switch source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; xmlns:m0=&quot;http://services.samples&quot;&gt;
                 &lt;case regex=&quot;IBM&quot;&gt;
                     &lt;send&gt;
-                        &lt;endpoint&gt;&lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;&lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                        &lt;/endpoint&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex=&quot;MSFT&quot;&gt;
@@ -550,11 +552,11 @@
         &lt;/out&gt;
     &lt;/sequence&gt;
 
-&lt;sequence name=&quot;sunSequence&quot; onError=&quot;sunErrorHandler&quot;&gt;
+    &lt;sequence name=&quot;sunSequence&quot; onError=&quot;sunErrorHandler&quot;&gt;
         &lt;send&gt;
             &lt;endpoint key=&quot;sunPort&quot;/&gt;
         &lt;/send&gt;
-&lt;/sequence&gt;
+    &lt;/sequence&gt;
 
 &lt;/definitions&gt; </pre>
 <p>
@@ -1061,11 +1063,10 @@ Content-ID:
 &lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the simple load balancing among a set of endpoints</strong> </p>
-<p>
-<strong>Prerequisites:</strong> </p>
-<p>Start Synapse with sample configuration 52. (i.e. synapse -sample 52) </p>
-<p>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant. </p>
-<p>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server. </p>
+<strong>Prerequisites:</strong>
+<br/>Start Synapse with sample configuration 52. (i.e. synapse -sample 52)
+<br/>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant.
+<br/>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server.
 <p>Example commands to run sample Axis2 servers from the &lt;Synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below: </p>
 <pre xml:space="preserve">./axis2server.sh -http 9001 -https 9005 -name MyServer1
 ./axis2server.sh -http 9002 -https 9006 -name MyServer2
@@ -1122,7 +1123,7 @@ Content-ID:
                     &lt;/failover&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
-&lt;drop/&gt;
+            &lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -1142,10 +1143,9 @@ Content-ID:
 &lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the failover sending</strong> </p>
-<p>
-<strong>Prerequisites:</strong> </p>
-<p>Start Synapse with sample configuration 53 (i.e. synapse -sample 53) </p>
-<p>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52. </p>
+<strong>Prerequisites:</strong>
+<br/>Start Synapse with sample configuration 53 (i.e. synapse -sample 53)
+<br/>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52.
 <p></p>
 <p>Above configuration sends messages with the failover behavior. Initially the server at port 9001 is treated as primary and other two are treated as backups. Messages are always directed only to the primary server. If the primary server has failed, next listed server is selected as the primary. Thus, messages are sent successfully as long as there is at least one active server. To test this, run the loadbalancefailover client to send infinite requests as follows: </p>
 <pre xml:space="preserve">ant loadbalancefailover</pre>
@@ -1173,7 +1173,7 @@ Content-ID:
                     &lt;!-- specify the session as the simple client session provided by Synapse for
                     testing purpose --&gt;
                     
-<strong>&lt;session type=&quot;simpleClientSession&quot;/&gt;</strong>
+                    <strong>&lt;session type=&quot;simpleClientSession&quot;/&gt;</strong>
 
                     &lt;loadbalance&gt;
                         &lt;endpoint&gt;
@@ -1194,7 +1194,7 @@ Content-ID:
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
-&lt;drop/&gt;
+            &lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -1245,7 +1245,7 @@ Content-ID:
                     &lt;!-- specify the session as the simple client session provided by Synapse for
                     testing purpose --&gt;
                     
-<strong>&lt;session type=&quot;simpleClientSession&quot;/&gt;</strong>
+                    <strong>&lt;session type=&quot;simpleClientSession&quot;/&gt;</strong>
 
                     &lt;loadbalance&gt;
                         &lt;endpoint&gt;
@@ -1279,7 +1279,7 @@ Content-ID:
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
-&lt;drop/&gt;
+            &lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -4731,9 +4731,6 @@ values by executing XPath expressions. The port numbers are calculated by execut
    <h2>
       <a name="Sample501" id="Sample501">Sample 501: EventSource with static subscriptions</a>
     </h2>
-    <p>
-      &#xa0;
-    </p>
 <pre xml:space="preserve">&lt;!-- Eventing configuration with static subscriptions--&gt;
 &lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
      &lt;eventSource name=&quot;SampleEventSource&quot;&gt;
@@ -4971,12 +4968,9 @@ values by executing XPath expressions. The port numbers are calculated by execut
          </p>
        </div>
 
-    <h2>
+   <h2>
          <a name="Sample650" id="Sample650">Sample 650: Priority Based Message Mediation</a>
-       </h2>
-       <p>
-         &#xa0;
-       </p>
+   </h2>
    <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
     &lt;priorityExecutor name=&quot;exec&quot;&gt;
         &lt;queues&gt;
@@ -5073,10 +5067,7 @@ values by executing XPath expressions. The port numbers are calculated by execut
 
     <h2>
          <a name="Sample651" id="Sample651">Sample 651: NHTTP Transport Priority Based Dispatching</a>
-       </h2>
-       <p>
-         &#xa0;
-       </p>
+    </h2>
     <p>
         Here is the priority configuration file used by the NHTTP transport to determine the priority based on HTTP level properties.
     </p>
@@ -5279,8 +5270,8 @@ values by executing XPath expressions. The port numbers are calculated by execut
     <a name="Sample700" id="Sample700">Sample 700: Introduction Message Store</a></h2>
     <pre xml:space="preserve">&lt;!-- Introduction to the Synapse Message Store --&gt;
     &lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
-           &lt;!--Simple in Memory Message Store with name foo --&gt;
-            &lt;messageStore name="foo" sequence="bar"&gt;
+        &lt;!--Simple in Memory Message Store with name foo --&gt;
+        &lt;messageStore name="foo" sequence="bar"&gt;
     		&lt;redelivery&gt;
     			&lt;!--retry interval 1 sec --&gt;
     			&lt;interval&gt;1&lt;/interval&gt;
@@ -5292,13 +5283,15 @@ values by executing XPath expressions. The port numbers are calculated by execut
      	&lt;/messageStore&gt;
 
     	&lt;!-- filtering of messages with XPath and regex matches --&gt;
-        &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
-            &lt;send&gt;
-            	&lt;endpoint key="SampleEndpoint"/&gt;
-            &lt;/send&gt;
-            &lt;drop/&gt;
-        &lt;/filter&gt;
-        &lt;send/&gt;
+        &lt;sequence name="main"&gt;
+            &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+                &lt;send&gt;
+                    &lt;endpoint key="SampleEndpoint"/&gt;
+                &lt;/send&gt;
+                &lt;drop/&gt;
+            &lt;/filter&gt;
+            &lt;send/&gt;
+        &lt;/sequence&gt;
 
         &lt;!-- Endpoint named SampleEndpoint--&gt;
         &lt;endpoint name="SampleEndpoint" onFault="foo"&gt;
@@ -5314,14 +5307,12 @@ values by executing XPath expressions. The port numbers are calculated by execut
     </pre>
     <p>
     <strong>Objective: </strong>Introduction to Synapse Message Stores</p>
-    <p>
-    <strong>Prerequisites</strong>:Start the Synapse configuration numbered 700: i.e. synapse -sample 700 </p>
-    <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done. </p>
+    <strong>Prerequisites</strong>:
+    <br/>Start the Synapse configuration numbered 700: i.e. synapse -sample 700
+    <br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done.
     <p></p>
     <p>To Execute the Client : </p>
-
-    <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote </pre>
-    <p></p>
+    <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote</pre>
     <p>Since now you have the Axis2 Server Running when you run the client you will get the Stock
         generation output in Server console and the out put in the client side. Then try shutting down
         the Axis2 Server and running again. You will see synapse will try 2 times to deliver the message

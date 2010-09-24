@@ -64,8 +64,21 @@ public class ConfigurationMigrator {
         System.out.println("\n[INFO] Migration STARTED");
 
         try {
-            doTransform(arguments[0], MIGRATOR_XSLT_PATH, arguments[1]);
-            System.out.println("[INFO] Migration COMPLETED");
+            if (arguments.length == 2) {
+                System.out.println("[INFO] Migrating the synapse 1.x configuration '"
+                        + arguments[0] + "' into a new 2.x configuration at '" + arguments[1] + "'");
+                doTransform(arguments[0], MIGRATOR_XSLT_PATH, arguments[1]);
+            } else if (arguments.length == 3) {
+                System.out.println("[INFO] Migrating the synapse 1.x configuration '"
+                        + arguments[0] + "' into a new 2.x configuration at '"
+                        + arguments[1] + "' using the XSLT '" + arguments[2] + "'");
+                doTransform(arguments[0], arguments[2], arguments[1]);
+            } else {
+                System.out.println("[ERROR] Invalid arguments provided for migration");
+            }
+            System.out.println("[INFO] Migration SUCCESSFULLY COMPLETED");
+            System.out.println("[INFO] Migrated 2.x configuration is available at '"
+                    + arguments[1] + "'");
         } catch (TransformerException e) {
             handleException("Migration FAILED\n\t" + e.toString());
         } catch (IOException e) {

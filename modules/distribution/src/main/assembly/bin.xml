@@ -40,6 +40,7 @@
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
             <includes>
                 <include>synapse.sh</include>
+                <include>synapse-config-migrator.sh</include>
                 <include>ciphertool.sh</include>
                 <include>synapse-daemon.sh</include>
             </includes>
@@ -89,6 +90,13 @@
                 <include>providers.xml</include>
                 <include>identity.jks</include>
                 <include>trust.jks</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/migrator/src/main/resources</directory>
+            <outputDirectory>synapse-${synapse.version}/resources</outputDirectory>
+            <includes>
+                <include>synapse-configuration-migrator.xslt</include>
             </includes>
         </fileSet>
         <fileSet>

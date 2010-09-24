@@ -2181,17 +2181,19 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
         &lt;/transaction&gt;
       </pre>
         <p>The action attribute has the following meanings.</p>
-        <p>1. new - Create a new jta transaction. Generate a fault if a transaction already exist.
-        </p>
-        <p>2. use-existing-or-new - Create a new jta transaction. Do nothing if a transaction exist.
-        </p>
-        <p>3. fault-if-no-tx - Generate a fault if no transaction exist. Do nothing if a transaction
+        <ol>
+        <li>1. new - Create a new jta transaction. Generate a fault if a transaction already exist.
+        </li>
+        <li>2. use-existing-or-new - Create a new jta transaction. Do nothing if a transaction exist.
+        </li>
+        <li>3. fault-if-no-tx - Generate a fault if no transaction exist. Do nothing if a transaction
             exist.
-        </p>
-        <p>4. commit - Commit transaction. Generate a fault if no transaction exist.</p>
-        <p>5. rollback - Rollback transaction. Generate a fault if no transaction exist.</p>
-        <p>6. suspend - Suspend transaction. Generate a fault if no transaction exist.</p>
-        <p>7. resume - Resume transaction. Generate a fault if no transaction exist.</p>
+        </li>
+        <li>4. commit - Commit transaction. Generate a fault if no transaction exist.</li>
+        <li>5. rollback - Rollback transaction. Generate a fault if no transaction exist.</li>
+        <li>6. suspend - Suspend transaction. Generate a fault if no transaction exist.</li>
+        <li>7. resume - Resume transaction. Generate a fault if no transaction exist.</li>
+        </ol>
 
         <p>
             The transaction mediator can use to define a distributed transaction. It has the

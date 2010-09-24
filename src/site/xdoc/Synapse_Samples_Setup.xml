@@ -112,7 +112,7 @@
         Apache Synapse ESB - Samples Setup
       </h1>
     </div>
-    <p/>
+    
     <p>
       Synapse ships with a set of working examples that demonstrate some of the
       basic features and capabilities of Synapse. A set of sample clients and
@@ -129,7 +129,6 @@
       ActiveMQ installation by default (or another JMS provider with relevant
       configuration changes.)
     </p>
-    <p/>
     <p>
       Note*: The samples and the documentation assume that you are running
       Synapse in DEBUG mode. You can switch from the default INFO log messages
@@ -189,11 +188,10 @@
       mediation through Synapse, the requests are passed over to the sample
       services. The sample clients and services are explained below.
     </p>
-    <p/>
+
     <h2>
       Using the Sample Clients
     </h2>
-    <p/>
     <p>
       The sample clients can be executed from the samples/axis2Client directory
       through the provided ant script. Simply executing 'ant' displays the
@@ -203,7 +201,6 @@
     <h3>
       1. Stock Quote Client
     </h3>
-    <p/>
     <p>
       This is a simple SOAP client that can send stock quote requests, and
       receive and display the last sale price for a stock symbol.
@@ -307,7 +304,6 @@
     </p>
 <pre xml:space="preserve">e.g: ant stockquote -Dprxurl=&lt;synapse&gt; [-Daddurl=&lt;addressingEPR&gt;]</pre>
 
-    <p/>
     <p>
       Specifying a policy
     </p>
@@ -317,11 +313,11 @@
       such as timestamps, signatures and encryption. See Apache Axis2 and Apache
       Rampart documentation for more information.
     </p>
-    <p/>
+
     <h3>
       2. Generic JMS Client
     </h3>
-    <p/>
+
     <p>
       The JMS client is able to send plain text, plain binary content or POX
       content by directly publishing a JMS message to the specified destination.
@@ -329,7 +325,7 @@
       The 'jms_type' property can specify 'text', 'binary' or 'pox' to specify
       the type of message payload.
     </p>
-    <p/>
+
     <p>
       The plain text payload for a 'text' message can be specified through the
       'payload' property. For binary messages, the 'payload' property will
@@ -348,11 +344,11 @@ ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy
       Note: The JMS client assumes the existence of a default ActiveMQ (4.1.0 or
       above) installation on the local machine.
     </p>
-    <p/>
+
     <h3>
       3. MTOM / SwA Client
     </h3>
-    <p/>
+
     <p>
       The MTOM / SwA client is able to send a binary image file as a MTOM or SwA
       optimized message, and receive the same file again through the response
@@ -364,11 +360,10 @@ ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy
     </p>
 <pre xml:space="preserve">e.g. ant optimizeclient -Dopt_mode=[mtom | swa]</pre>
 
-    <p/>
     <h2>
       Starting the Sample Services
     </h2>
-    <p/>
+
     <p>
       The sample services ship with a pre-configured Axis2 server and
       demonstrates in-only and in-out SOAP/REST or POX messaging over HTTP/S and
@@ -388,7 +383,7 @@ build-service:
 
 BUILD SUCCESSFUL
 Total time: 3 seconds</pre>
-    <p/>
+
     <p>
       To start the Axis2 server, go to the samples/axis2Server directory and
       execute the axis2server.sh or axis2server.bat script. This starts the
@@ -398,7 +393,7 @@ Total time: 3 seconds</pre>
       machine is supported by default, and can be easily enabled by uncommenting
       the JMS transport from the repository/conf/axis2.xml
     </p>
-    <p/>
+
     <h3>
       Sample services
     </h3>
@@ -433,7 +428,7 @@ Total time: 3 seconds</pre>
       as MTOM and SwA, and returns this image back again as the response, while
       the oneWayUploadUsingMTOM saves the request message to disk.
     </p>
-    <p/>
+
     <h3>
       Starting Sample Synapse Configurations
     </h3>
@@ -448,7 +443,7 @@ Total time: 3 seconds</pre>
     </p>
 <pre xml:space="preserve">synapse.bat -sample &lt;n&gt;
 synapse.sh -sample &lt;n&gt;</pre>
-    <p/>
+
     <h2>
       Setting up the JMS Listener
     </h2>
@@ -513,7 +508,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     <h2 id="setupamqpjms">
       Configure Synapse for AMQP Transport
     </h2>
-    <p/>
+
     <p>
       The samples used in this guide assumes the existence of a local QPid
       (1.0-M2 or higher) installation properly installed and started up. You also
@@ -544,7 +539,6 @@ synapse.sh -sample &lt;n&gt;</pre>
         &lt;transportSender name="jms" class="org.apache.synapse.transport.jms.JMSSender"&gt;
         &lt;/transportReceiver&gt;</pre>
 
-    <p/>
     <p>
         Locate and edit the AMQP connection settings file for the message consumer, this fle is usually named direct.properties.
         <pre>
@@ -587,7 +581,7 @@ synapse.sh -sample &lt;n&gt;</pre>
         &lt;parameter name="mail.smtp.password"&gt;mailpassword&lt;/parameter&gt;
         &lt;parameter name="mail.smtp.from"&gt;synapse.demo.0@gmail.com&lt;/parameter&gt;
     &lt;/transportSender&gt;</pre>
-    <p/>
+
     <h2 id="fixtransport">
       Configuring Synapse for the FIX Transport
     </h2>
@@ -647,7 +641,7 @@ synapse.sh -sample &lt;n&gt;</pre>
     SocketConnectPort=19876
       </pre>
     </p>
-    <p/>
+
     <h3 id="fixsamplesconfig">
       Configuring Sample FIX Applications
     </h3>
@@ -733,7 +727,7 @@ synapse.sh -sample &lt;n&gt;</pre>
      If you wish to use the sample Axis2 client to send TCP messages, you have to uncomment the TCP
      transport sender configuration in the samples/axis2Client/client_repo/conf/axis2.xml file.
     </p>
-    <p/>
+
     <h2 id="udp">
       Setting up the UDP Transport
     </h2>
@@ -750,11 +744,11 @@ synapse.sh -sample &lt;n&gt;</pre>
      If you wish to use the sample Axis2 client to send UDP messages, you have to uncomment the UDP
      transport sender configuration in the samples/axis2Client/client_repo/conf/axis2.xml file.
     </p>
-    <p/>
+
     <h2 id="script">
       Configuring Synapse for Script Mediator Support
     </h2>
-    <p/>
+
     <p>
       The Synapse Script Mediator is a Synapse extension, and thus all
       prerequisites are not bundled by default with the Synapse distribution.
@@ -780,11 +774,11 @@ synapse.sh -sample &lt;n&gt;</pre>
       href="http://repo2.maven.org/maven2/org/jruby/jruby-complete/1.3.0/jruby-complete-1.3.0.jar">
       here</a>.
     </p>
-    <p/>
+
     <h2 id="json">
       Configuring Synapse for JSON Support
     </h2>
-    <p/>
+
     <p>
       <a href="http://json.org">JSON</a> is a lightweight data-interchange format.
       It can be used as an alternative to the XML or SOAP. To enable the JSON support
@@ -812,7 +806,7 @@ synapse.sh -sample &lt;n&gt;</pre>
       If you are planning to run sample 440, you should also add the above two entries
       to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.
     </p>    
-    <p/>
+
     <h2 id="derby">
       Setting up Derby database server
     </h2>
@@ -851,7 +845,7 @@ synapse.sh -sample &lt;n&gt;</pre>
       change the database connection details accordingly. Also you have to copy
       the required database driver jars to the Synapse classpath.
     </p>
-    <p/>
+
     <h2 id="mysql">
       Setting Up MySQL database server
     </h2>
@@ -900,8 +894,7 @@ synapse.sh -sample &lt;n&gt;</pre>
       change the database connection details accordingly. Also you have to copy
       the required database driver jars to the Synapse classpath.
     </p>
-    <p/>
-        <h2>Key Stores Configurations</h2>
+    <h2>Key Stores Configurations</h2>
 
 <div>
 <p>This configuration is to be used in any location that needs key stores. This is currently used

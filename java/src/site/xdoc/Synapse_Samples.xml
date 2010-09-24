@@ -1143,10 +1143,10 @@ Content-ID:
 &lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the failover sending</strong> </p>
+<p>
 <strong>Prerequisites:</strong>
 <br/>Start Synapse with sample configuration 53 (i.e. synapse -sample 53)
-<br/>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52.
-<p></p>
+<br/>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52.</p>
 <p>Above configuration sends messages with the failover behavior. Initially the server at port 9001 is treated as primary and other two are treated as backups. Messages are always directed only to the primary server. If the primary server has failed, next listed server is selected as the primary. Thus, messages are sent successfully as long as there is at least one active server. To test this, run the loadbalancefailover client to send infinite requests as follows: </p>
 <pre xml:space="preserve">ant loadbalancefailover</pre>
 <p>You can see that all requests are processed by MyServer1. Now shutdown MyServer1 and inspect the console output of the client. You will observe that all subsequent requests are processed by MyServer2. </p>
@@ -1215,10 +1215,10 @@ Content-ID:
 <p>
 <strong>Objective: Demonstrate the loadbalancing with session affinity using client initiated sessions</strong> </p>
 <p>
-<strong>Prerequisites:</strong> </p>
-<p>Start Synapse with sample configuration 54 (i.e. synapse -sample 54). </p>
-<p>Deploy the LoadbalanceFailoverService and start three instances of the sample Axis2 server as in sample 52. </p>
-<p></p>
+<strong>Prerequisites:</strong>
+<br/>Start Synapse with sample configuration 54 (i.e. synapse -sample 54).
+<br/>Deploy the LoadbalanceFailoverService and start three instances of the sample Axis2 server as in sample 52. </p>
+
 <p>Above configuration is same as the load balancing configuration in sample 52, except that the session type is specified as &quot;simpleClientSession&quot;. This is a client initiated session, which means that the client generates the session identifier and sends it with each request. In this sample session type, client adds a SOAP header named ClientID containing the identifier of the client. Synapse binds this ID with a server on the first request and sends all successive requests containing that ID to the same server. Now switch to samples/axis2Client directory and run the client using the following command to check this in action. </p>
 <pre xml:space="preserve">ant loadbalancefailover -Dmode=session</pre>
 <p>In the session mode, client continuously sends requests with three different client (session) IDs. One ID is selected among these three IDs for each request randomly. Then client prints the session ID with the responded server for each request. Client output for the first 10 requests are shown below. </p>
@@ -1300,10 +1300,9 @@ Content-ID:
 <p>
 <strong>Objective: Demonstrate the session affinity based load balancing with failover capability</strong> </p>
 <p>
-<strong>Prerequisites:</strong> </p>
-<p>Start Synapse with sample configuration 55 (i.e. synapse -sample 55). </p>
-<p>Deploy the LoadbalanceFailoverService and start four sample Axis2 servers on HTTP ports 9001, 9002, 9003 and 9004 respectively (make sure to specify non-conflicting HTTPS ports). </p>
-<p></p>
+<strong>Prerequisites:</strong>
+<br/>Start Synapse with sample configuration 55 (i.e. synapse -sample 55).
+<br/>Deploy the LoadbalanceFailoverService and start four sample Axis2 servers on HTTP ports 9001, 9002, 9003 and 9004 respectively (make sure to specify non-conflicting HTTPS ports). </p>
 <p>This configuration also uses &quot;simpleClientSession&quot; to bind sessions as in the previous sample. But failover endpoints are specified as the child endpoints of the load balance endpoint. Therefore sessions are bound to the failover endpoints. Session information has to be replicated among the servers listed under each failover endpoint using some clustering mechanism. Therefore, if one endpoint bound to a session failed, successive requets for that session will be directed to the next endpoint in that failover group. Run the client using the following command to observe this behaviour. </p>
 <pre xml:space="preserve">ant loadbalancefailover -Dmode=session</pre>
 <p>You can see a client output as shown below. </p>
@@ -1358,9 +1357,10 @@ Content-ID:
 <p>
 <strong>Objective: Demonstrate the use of WSDL endpoints</strong> </p>
 <p>
-<strong>Prerequisites:</strong> </p>
-<p>Start the Synapse configuration numbered 56 (i.e. synapse -sample 56). </p>
-<p>Deploy the SimpleStockQuoteService and start the sample Axis2 server. </p>
+<strong>Prerequisites:</strong>
+<br/>Start the Synapse configuration numbered 56 (i.e. synapse -sample 56).
+<br/>Deploy the SimpleStockQuoteService and start the sample Axis2 server. </p>
+
 <p>This sample uses a WSDL endpoint inside the send mediator. WSDL endpoints can extract endpoint's address from the given WSDL. As WSDL documents can have many services and many ports inside each service, the service and port of the required endpoint has to be specified. As with address endpoints, QoS parameters for the endpoint can be specified in-line in the configuration. An excerpt taken from the sample_proxy_1.wsdl containing the specified service and port is listed below. </p>
 <pre xml:space="preserve"><![CDATA[<wsdl:service name="SimpleStockQuoteService"> 
     <wsdl:port name="SimpleStockQuoteServiceHttpSoap11Endpoint" binding="ns:SimpleStockQuoteServiceSoap11Binding"> 
@@ -1412,11 +1412,11 @@ Content-ID:
 <p>
 <strong>Objective: Demonstrate the simple dynamic load balancing among a set of nodes</strong> </p>
 <p>
-<strong>Prerequisites:</strong> </p>
-<p>Enable clustering and load balancing in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;cluster&quot; and &quot;loadBalancer&quot; elements. Also provide the IP address of you machine as the values of the &quot;mcastBindAddress&quot; and &quot;localMemberHost&quot; parameters. </p>
-<p>Start Synapse with sample configuration 57. (i.e. synapse -sample 57) </p>
-<p>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant. </p>
-<p>Enable clustering in the &lt;Synapse installation directory&gt;/samples/axis2Server/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;cluster&quot; element. Also provide the IP address of you machine as the values of the &quot;mcastBindAddress&quot; and &quot;localMemberHost&quot; parameters. Make sure that the "applicationDomain" of the membershipHandler is the same as the domain name specified in the axis2.xml files of the Axis2 servers. Then Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server. </p>
+<strong>Prerequisites:</strong>
+<br/>Enable clustering and load balancing in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;cluster&quot; and &quot;loadBalancer&quot; elements. Also provide the IP address of you machine as the values of the &quot;mcastBindAddress&quot; and &quot;localMemberHost&quot; parameters.
+<br/>Start Synapse with sample configuration 57. (i.e. synapse -sample 57)
+<br/>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant.
+<br/>Enable clustering in the &lt;Synapse installation directory&gt;/samples/axis2Server/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;cluster&quot; element. Also provide the IP address of you machine as the values of the &quot;mcastBindAddress&quot; and &quot;localMemberHost&quot; parameters. Make sure that the "applicationDomain" of the membershipHandler is the same as the domain name specified in the axis2.xml files of the Axis2 servers. Then Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server.</p>
 <p>Example commands to run sample Axis2 servers from the &lt;Synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below: </p>
 <pre xml:space="preserve">./axis2server.sh -http 9001 -https 9005 -name MyServer1
 ./axis2server.sh -http 9002 -https 9006 -name MyServer2
@@ -1480,10 +1480,10 @@ Content-ID:
 <p>
 <strong>Objective: Demonstrate the simple static load balancing among a set of nodes</strong> </p>
 <p>
-<strong>Prerequisites:</strong> </p>
-<p>Start Synapse with sample configuration 58. (i.e. synapse -sample 58) </p>
-<p>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant. </p>
-<p>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server. </p>
+<strong>Prerequisites:</strong>
+<br/>Start Synapse with sample configuration 58. (i.e. synapse -sample 58)
+<br/>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant.
+<br/>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server. </p>
 <p>Example commands to run sample Axis2 servers from the &lt;Synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below: </p>
 <pre xml:space="preserve">./axis2server.sh -http 9001 -https 9005 -name MyServer1
 ./axis2server.sh -http 9002 -https 9006 -name MyServer2
@@ -1536,11 +1536,10 @@ Content-ID:
 <strong>Objective: Connecting to endpoints with WS-Security for outgoing messages</strong> </p>
 <p>
 <strong>Prerequisites:</strong>
-<br></br> </p>
-<p>You may also need to download and install the unlimited strength policy files for your JDK before using Apache Rampart (e.g. see http://java.sun.com/javase/downloads/index_jdk5.jsp) </p>
-<p>Start the Synapse configuration numbered 100: i.e. synapse -sample 100
-<br></br> Start the Axis2 server and deploy the SecureStockQuoteService if not already done </p>
-<p></p>
+<br/>You may also need to download and install the unlimited strength policy files for your JDK before using Apache Rampart (e.g. see http://java.sun.com/javase/downloads/index_jdk5.jsp)
+<br/>Start the Synapse configuration numbered 100: i.e. synapse -sample 100
+<br/>Start the Axis2 server and deploy the SecureStockQuoteService if not already done</p>
+
 <p>Use the stock quote client to send a request without WS-Security. Synapse is configured to enable WS-Security as per the policy specified by 'policy_3.xml' for the outgoing messages to the SecureStockQuoteService endpoint hosted on the Axis2 instance. The debug log messages on Synapse shows the encrypted message flowing to the service and the encrypted response being received by Synapse. The wsse:Security header is then removed from the decrypted message and the response is delivered back to the client, as expected. You may execute the client as follows: </p>
 <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
 <p>The message sent by Synapse to the secure service can be seen as follows, when TCPMon is used. </p>
@@ -1588,6 +1587,7 @@ User-Agent: Synapse-HttpComponents-NIO
          &lt;/xenc:EncryptedData&gt;
       &lt;/soapenv:Body&gt;
    &lt;/soapenv:Envelope&gt;0</pre>
+
 <h2>
 <a name="Sample101" id="Sample101">Sample 101: Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
@@ -1614,11 +1614,11 @@ User-Agent: Synapse-HttpComponents-NIO
 &lt;/definitions&gt;</pre>
 <strong>Objective: Demonstrate the message exchange between Synapse and the server using WS-ReliableMessaging (WS-RM)</strong>
 <p>
-<strong>Prerequisites:</strong> </p>
-<p>Deploy the ReliableStockQuoteService in the sample Axis2 server by switching to the samples/axis2Server/src/ReliableStockQuoteService directory and running the command 'ant'. </p>
-<p>Start the sample Axis2 server on port 9000. </p>
-<p>Start Synapse with the sample configuration 101 (i.e. synapse -sample 101). </p>
-<p></p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the ReliableStockQuoteService in the sample Axis2 server by switching to the samples/axis2Server/src/ReliableStockQuoteService directory and running the command 'ant'.
+<br/>Start the sample Axis2 server on port 9000.
+<br/>Start Synapse with the sample configuration 101 (i.e. synapse -sample 101).</p>
+
 <p>In the above configuration, WS-RM is engaged to the endpoint using the &lt;enableRM/&gt; tag. It is possible to engage WS-RM to both Address and WSDL endpoints using this tag. In addition to the RM enabled endpoint, RMSequence mediator is specified before the send mediator. This mediator is used to specify the set of messages to be sent using a single RM sequence. In this sample it is specified as single message per sequence. It also specifies the version of the WS-RM to be used. Refer to the Synapse configuration language documentation for more information about the RMSequence mediator. RM related SOAP headers are removed form the message in the out mediator as WS-RM message exchange takes place only between the Synapse and the server. Now run the sample client using the following command. </p>
 <pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
 <p>You can observe the client output displaying the quote price for IBM as follows: </p>
@@ -1732,6 +1732,7 @@ User-Agent: Synapse-HttpComponents-NIO
 <p>Note that although each of above messages are separate SOAP messages, in most cases they will be exchanged in a single socket connection as HTTP Keep-Alive header is used. </p>
 <h1>
 <a name="ProxyServices" id="ProxyServices">Synapse Proxy service samples</a> </h1>
+
 <h2>
 <a name="Sample150" id="Sample150">Sample 150: Introduction to proxy services</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
@@ -1753,7 +1754,6 @@ User-Agent: Synapse-HttpComponents-NIO
 <strong>Prerequisites:</strong>
 <br></br> Start the Synapse configuration numbered 150: i.e. synapse -sample 150
 <br></br> Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
-<p></p>
 <p>Once Synapse starts, you could go to http://localhost:8280/services/StockQuoteProxy?wsdl and view the WSDL generated for the proxy service defined in the configuration. This WSDL is based on the source WSDL supplied in the proxy service definition, and is updated to reflect the proxy service EPR. </p>
 <p>Execute the stock quote client by requesting for a stock quote on the proxy service as follows: </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy</pre>
@@ -3228,7 +3228,6 @@ end
 <a href="Synapse_Samples_Setup.html#script">Configuring JRuby</a>. </p>
 <p>Start the Synapse configuration numbered 353: i.e. bin/synapse -sample 353
 <br></br> Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
-<p></p>
 <p>This sample is functionally equivalent to sample # 350 (#351 and #8) but instead uses a Ruby script using the JRuby interpreter. The script has two functions, 'transformRequest' and 'transformResponse', and the Synapse configuration specifies which function to be invoked when used. Execute the stock quote client to send a custom stock quote as per example #350 and check the received stock quote response. </p>
 <h2>
 <a name="Sample354" id="Sample354">Sample 354: Using In-lined Ruby scripts for mediation</a></h2>
@@ -3451,12 +3450,11 @@ end
 <div>
 <p>
 <strong>Objective:Introduction to the dbreport mediator</strong> </p>
-<p>
-<strong>Prerequisites:</strong> Setting up Derby database as above. </p>
-<p>Start the Synapse configuration numbered 361: i.e. synapse -sample 361 </p>
-<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p></div>
+<strong>Prerequisites:</strong>
+<br/>Setting up Derby database as above.
+<br/>Start the Synapse configuration numbered 361: i.e. synapse -sample 361
+<br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done</div>
 <p>This sample demonstrates simple database write operations. The dbreport mediator writes (i.e. inserts one row) to a table using the message details. It works the same as the dblookup mediator. In this sample , dbreport mediator is used for updating the stock price of the company using the last quote value which is calculated by evaluating an XPath against the response message. After running this sample, user can check the company table using the Derby client tool. It will show the inserted value by the dbreport mediator. </p>
-<p></p>
 <p>Run the client using, </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</pre>
 <p>and then execute the following query using database client tool against synapsedb. </p>
@@ -3988,7 +3986,6 @@ INFO LogMediator text = Stock price - 183.3635460215262</pre></div>
 <p>
 <strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
 <p>Start Synapse with the sample configuration 372 (i.e. synapse -sample 372). </p>
-<p></p>
 <p>Throttle policy is loaded from the &#x201c;throttle_policy. xml&#x201d; . That policy contains merging policy from sample 370 and 371. To check the functionality, it requires to run a load test. The all enabled request from the concurrency throttling will be controlled by the access rate base throttling according to the policy. </p>
 <p>Run the client as follows </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy</pre>
@@ -4651,9 +4648,6 @@ values by executing XPath expressions. The port numbers are calculated by execut
    <h2>
       <a name="Sample500" id="Sample500">Sample 500: Simple Eventing Sample</a>
     </h2>
-    <p>
-      &#xa0;
-    </p>
 <pre xml:space="preserve">&lt;!-- Simple Eventing configuration --&gt;
 &lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
      &lt;eventSource name=&quot;SampleEventSource&quot;&gt;
@@ -4923,7 +4917,7 @@ values by executing XPath expressions. The port numbers are calculated by execut
              SynapseObserver interface
          </p>
          <p>
-           Open the synapse.properties file in the SYNAPSE_HOME/lib directory using a text editor and uncomment the line which
+           Open the synapse.properties file in the SYNAPSE_HOME/repository/conf directory using a text editor and uncomment the line which
            defines the simple logging Synapse observer.
          </p>
          <pre xml:space="preserve">synapse.observers=samples.userguide.SimpleLoggingObserver</pre>
@@ -5310,7 +5304,6 @@ values by executing XPath expressions. The port numbers are calculated by execut
     <strong>Prerequisites</strong>:
     <br/>Start the Synapse configuration numbered 700: i.e. synapse -sample 700
     <br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done.
-    <p></p>
     <p>To Execute the Client : </p>
     <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote</pre>
     <p>Since now you have the Axis2 Server Running when you run the client you will get the Stock

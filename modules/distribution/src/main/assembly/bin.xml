@@ -40,6 +40,7 @@
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
             <includes>
                 <include>synapse.sh</include>
+                <include>synapse-config-migrator.sh</include>
                 <include>ciphertool.sh</include>
                 <include>synapse-daemon.sh</include>
             </includes>
@@ -92,6 +93,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../../modules/migrator/src/main/resources</directory>
+            <outputDirectory>synapse-${synapse.version}/resources</outputDirectory>
+            <includes>
+                <include>synapse-configuration-migrator.xslt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/bin</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
@@ -122,7 +130,7 @@
             <directory>src/main/bin/native</directory>
             <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>
             <fileMode>755</fileMode>
-        </fileSet>      
+        </fileSet>
         <fileSet>
             <directory>../../src/site/resources/images</directory>
             <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>

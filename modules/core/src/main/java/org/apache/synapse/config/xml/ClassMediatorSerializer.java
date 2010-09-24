@@ -55,7 +55,7 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
         while(itr.hasNext()) {
             String propName = (String) itr.next();
             Object o = mediator.getProperties().get(propName);
-            OMElement prop = fac.createOMElement(PROP_Q);
+            OMElement prop = fac.createOMElement(PROP_Q, clazz);
             prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
 
             if (o instanceof String) {

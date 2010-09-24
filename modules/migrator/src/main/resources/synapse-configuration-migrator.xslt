@@ -34,6 +34,31 @@ version to the 2.x compatible version
         <xsl:call-template name="convertNS"/>
     </xsl:template>
 
+    <xsl:template match="syn:filter | synNew:filter" priority="0">
+        <xsl:element name="{local-name()}" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+            <xsl:copy-of select="@*"/>
+            <xsl:choose>
+                <xsl:when test="local-name(child::*[position()=1])='then' or local-name(child::*[position()=1])='else'">
+                    <xsl:if test="count(child::syn:then)>0 or count(child::synNew:then)>0">
+                        <xsl:element name="then" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+                            <xsl:apply-templates select="child::syn:then/* | child::synNew:then/*"/>
+                        </xsl:element>
+                    </xsl:if>
+                    <xsl:if test="count(child::syn:else)>0 or count(child::synNew:else)>0">
+                        <xsl:element name="else" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+                            <xsl:apply-templates select="child::syn:else/* | child::synNew:else/*"/>
+                        </xsl:element>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:element name="then" namespace="http://synapse.apache.org/ns/2010/04/configuration">
+                        <xsl:apply-templates/>
+                    </xsl:element>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
+    </xsl:template>
+
     <xsl:template match="syn:definitions/syn:sequence | syn:definitions/syn:localEntry | syn:definitions/syn:proxy | syn:definitions/syn:task | syn:definitions/syn:endpoint | syn:definitions/syn:eventSource | syn:definitions/syn:registry" priority="2">
         <xsl:call-template name="convertNS"/>
     </xsl:template>
@@ -68,7 +93,7 @@ version to the 2.x compatible version
                                     </xsl:if>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:call-template name="convertNS"/>
+                                    <xsl:apply-templates select="."/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:if>

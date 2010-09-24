@@ -28,47 +28,63 @@
   
 <section name="Apache Synapse Enterprise Service Bus (ESB)">
   <p>
-       Apache Synapse is designed to be a simple, lightweight and high performance 
-       Enterprise Service Bus (ESB) from Apache. Based on a small asynchronous core, 
-       Apache Synapse has excellent support for XML and Web services - as well as binary and text formats. 
-       The Synapse engine is configured with a simple XML format and comes with a set of ready-to-use transports and mediators. 
-       We recommend you start by reading the QuickStart and then trying out the samples. Synapse is made available under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
-  </p><p>
-      <b>Latest News</b>
-  </p><p>
-      Synapse 1.2 release adds the support for the <a href="http://www.fixprotocol.org/">Financial Information eXchange (FIX)</a> an industry
-    driven messaging standard through <a href="http://www.quickfixj.org/">QuickFixJ</a> as well as <a href="http://hessian.caucho.com/">Hessian binary web service protocol</a>, as well as other functional, stability and performance improvements. For more details please see the <a href="http://svn.apache.org/repos/asf/synapse/tags/1.2/src/main/release/docs/release_notes.txt">1.2 release notes</a>.
+      Apache Synapse is a lightweight and high-performance Enterprise Service Bus (ESB). Powered
+      by a small and asynchronous mediation engine, Apache Synapse provides exceptional support
+      for XML, Web Services and REST. In addition to XML and SOAP, Apache Synapse supports
+      several other content interchange formats, such as plain text, binary, Hessian and JSON. The
+      wide range of transport adapters available for Synapse, enables it to communicate over many
+      application and transport layer protocols. As of now, Apache Synapse has support for protocols
+      like HTTP/S, Mail (POP3, IMAP, SMTP), JMS, TCP, UDP, VFS and FIX.
   </p>
-  <p>For more information, see:
-  <ul>
-  <li><a href="./Synapse_QuickStart.html">Quick Start Guide</a></li>
-  <li><a href="./Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
-  <li><a href="./Synapse_Samples.html">A Quick start with Synapse Samples</a></li>
-  <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
-  <li>The Developer mailing list:  <a href="mailto:dev-subscribe@synapse.apache.org">Subscribe</a></li>
-  <li>The User mailing list:  <a href="mailto:user-subscribe@synapse.apache.org">Subscribe</a></li>
-  <!--li>The Synapse Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li-->
-  </ul>
+  <p>
+      Apache Synapse is designed to be lightweight and fast. The non-blocking HTTP transport,
+      the multi-threaded mediation engine and the streaming XML infoset combine to ensure that
+      Synapse can mediate very high volumes of messages through the service bus with minimum
+      delay and resource usage. Synapse also comes with comprehensive logging capabilities,
+      statistics collection and JMX monitoring support which are crucial in production deployments.
   </p>
-</section>
-
-<section name="Introduction">
-<p>
-    Apache Synapse is an ESB that has been designed to be simple to configure, very fast, and effective at solving many integration and gatewaying problems.
-    Synapse has support for HTTP, SOAP, SMTP, JMS, FTP and file system transports, Financial Information eXchange (FIX) and Hessian protocols for message exchange as well as first class support for standards such as WS-Addressing, 
-    Web Services Security (WSS), Web Services Reliable Messaging (WSRM), efficient binary attachments (MTOM/XOP).
-    Synapse can transform messages using key standards such as XSLT, XPath and XQuery, or simply using Java. Synapse supports a number of useful
-    functions out-of-the-box without programming, but it also can be extended using popular programming languages such as Java, JavaScript, Ruby, Groovy, etc..
-</p>
-<p>
-    Synapse has a completely asynchronous core, and supports non-blocking HTTP and HTTPS using the
-    excellent <a href="http://hc.apache.org/httpcomponents-core/index.html">Apache HttpCore</a> NIO module. In addition, Synapse supports JMS v1.0 and higher, Apache VFS File Systems (FTP, SFTP, File (including zip/jar/tar/gz), Webdav, CIFS), POP3/IMAP/SMTP transports. Apache Synapse can process
-    SOAP 1.1/1.2, pure XML/REST, Text and Binary messages with support for any-to-any conversion and transformation.  
-</p>
+  <p>
+      Synapse uses Apache Axis2 as the underlying Web Services engine. Therefore it has outstanding
+      support for Web Services and related standards such as SOAP and WSDL. Tried and tested
+      Axis2 modules like Apache Rampart and Apache Sandesha2 can be used with Synapse with no
+      configuration overhead. Using such external modules, Apache Synapse supports a range of
+      Web Services standards including WS-Security, WS-Reliable Messaging and WS-Eventing. Synapse
+      also makes use of the Axis2 clustering framework and the deployment framework to provide
+      enteprise grade clustering support and development time hot deployment support.
+  </p>
+  <p>
+      The Synapse mediation engine is configured using a simple, XML-based configuration language.
+      The configuration language and the related functional components are designed with SOA
+      best practices in mind. As a result one could easily store configuration fragments in an
+      external registry and import them to the mediation engine on demand.
+      Synapse ships with a large collection of useful mediators that can be used to develop even the
+      most complex enterprise integration scenarios. If necessary, the mediation engine can be
+      easily extended by developing custom mediators using Java or your favorite scripting
+      language.
+  </p>
+  <p>
+      Apache Synapse is free and open source software distributed under the
+      <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
+  </p>
+  <p>Want to get started? Please refer one of these comprehensive manuals:
+      <ul>
+          <li><a href="./Synapse_QuickStart.html">Quick Start Guide</a></li>
+          <li><a href="./Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
+          <li><a href="./Synapse_Samples.html">Synapse Samples Catalog</a></li>
+          <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
+      </ul>
+  </p>
+  <p>Need some assistance with a problem? Feel free to get in touch with the community over these
+      mailing lists:
+      <ul>
+          <li>The Developer mailing list:  <a href="mailto:dev-subscribe@synapse.apache.org">Subscribe</a></li>
+          <li>The User mailing list:  <a href="mailto:user-subscribe@synapse.apache.org">Subscribe</a></li>
+      </ul>
+  </p>
 </section>
 	
 <section name="Key Features">
-		<p>The latest release of Synapse is <a href="download/1.2/download.cgi">1.2</a>. Its key features are </p>
+		<p>The latest release of Synapse is <a href="download/2.0/download.cgi">2.0</a>. Its key features are </p>
 
 	<ul>
         <li><p>Proxy services - facilitating transport, interface (WSDL/Schema/Policy), message format (SOAP 1.1/1.2, POX/REST, Text, Binary), QoS (WS-Addressing/WS-Security/WS-RM) and optimization switching (MTOM/SwA)</p></li>

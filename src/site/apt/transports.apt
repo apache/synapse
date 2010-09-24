@@ -28,6 +28,16 @@
   
   * A mail transport able to send messages using SMTP and poll messages from a POP3 or IMAP account.
 
+  Apache Synapse is also compatible with the following transport implementations from the Apache
+  Axis2 Transports project:
+
+  * TCP
+
+  * UDP
+
+  These transports are not shipped with Apache Synapse by default and hence they should be
+  downloaded separately from the Axis2 website and installed in the Synapse runtime.
+
 {Contents}
 
 %{toc}

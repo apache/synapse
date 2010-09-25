@@ -1052,7 +1052,7 @@ Content-ID:
                     &lt;/loadbalance&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
-&lt;drop/&gt;
+            &lt;drop/&gt;
         &lt;/in&gt;
 
         &lt;out&gt;
@@ -1072,10 +1072,11 @@ Content-ID:
 &lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the simple load balancing among a set of endpoints</strong> </p>
+<p>
 <strong>Prerequisites:</strong>
 <br/>Start Synapse with sample configuration 52. (i.e. synapse -sample 52)
 <br/>Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant.
-<br/>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server.
+<br/>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server.</p>
 <p>Example commands to run sample Axis2 servers from the &lt;Synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below: </p>
 <pre xml:space="preserve">./axis2server.sh -http 9001 -https 9005 -name MyServer1
 ./axis2server.sh -http 9002 -https 9006 -name MyServer2
@@ -1343,26 +1344,26 @@ Content-ID:
 ...</pre>
 <h2>
 <a name="Sample56" id="Sample56">Sample 56: WSDL endpoint</a></h2>
-<pre xml:space="preserve"><![CDATA[<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuraiton">
+<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;
 
-    <sequence name="main">
-        <in>
-            <send>
-                <!-- get epr from the given wsdl -->
-                <endpoint>
-                    <wsdl uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;!-- get epr from the given wsdl --&gt;
+                &lt;endpoint&gt;
+                    &lt;wsdl uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"
                           service="SimpleStockQuoteService"
-                          port="SimpleStockQuoteServiceHttpSoap11Endpoint"/>
-                </endpoint>
-            </send>
-        </in>
+                          port="SimpleStockQuoteServiceHttpSoap11Endpoint"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
 
-        <out>
-            <send/>
-        </out>
-    </sequence>
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
 
-</definitions>]]></pre>
+&lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Demonstrate the use of WSDL endpoints</strong> </p>
 <p>
@@ -1371,14 +1372,14 @@ Content-ID:
 <br/>Deploy the SimpleStockQuoteService and start the sample Axis2 server. </p>
 
 <p>This sample uses a WSDL endpoint inside the send mediator. WSDL endpoints can extract endpoint's address from the given WSDL. As WSDL documents can have many services and many ports inside each service, the service and port of the required endpoint has to be specified. As with address endpoints, QoS parameters for the endpoint can be specified in-line in the configuration. An excerpt taken from the sample_proxy_1.wsdl containing the specified service and port is listed below. </p>
-<pre xml:space="preserve"><![CDATA[<wsdl:service name="SimpleStockQuoteService"> 
-    <wsdl:port name="SimpleStockQuoteServiceHttpSoap11Endpoint" binding="ns:SimpleStockQuoteServiceSoap11Binding"> 
-        <soap:address location="http://localhost:9000/services/SimpleStockQuoteService.SimpleStockQuoteServiceHttpSoap11Endpoint"/> 
-    </wsdl:port> 
-    <wsdl:port name="SimpleStockQuoteServiceHttpSoap12Endpoint" binding="ns:SimpleStockQuoteServiceSoap12Binding"> 
-        <soap12:address location="http://localhost:9000/services/SimpleStockQuoteService.SimpleStockQuoteServiceHttpSoap12Endpoint"/> 
-    </wsdl:port> 
-</wsdl:service>]]></pre>
+<pre xml:space="preserve">&lt;wsdl:service name="SimpleStockQuoteService"&gt;
+    &lt;wsdl:port name="SimpleStockQuoteServiceHttpSoap11Endpoint" binding="ns:SimpleStockQuoteServiceSoap11Binding"&gt;
+        &lt;soap:address location="http://localhost:9000/services/SimpleStockQuoteService.SimpleStockQuoteServiceHttpSoap11Endpoint"/&gt;
+    &lt;/wsdl:port&gt;
+    &lt;wsdl:port name="SimpleStockQuoteServiceHttpSoap12Endpoint" binding="ns:SimpleStockQuoteServiceSoap12Binding"&gt;
+        &lt;soap12:address location="http://localhost:9000/services/SimpleStockQuoteService.SimpleStockQuoteServiceHttpSoap12Endpoint"/&gt;
+    &lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;</pre>
 <p>Specified service and port refers to the endpoint address &quot;http://localhost:9000/services/SimpleStockQuoteService.SimpleStockQuoteServiceHttpSoap11Endpoint&quot; according to the above WSDL. Now run the client using the following command. </p>
 <pre xml:space="preserve">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</pre>
 <p>Client will print the quote price for IBM received from the server running on port 9000. Observe the Axis2 console and the Synapse console to verify this behavior. </p>

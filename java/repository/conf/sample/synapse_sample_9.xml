@@ -26,6 +26,8 @@
         <parameter name="cachableDuration">15000</parameter>
     </registry>
 
-    <sequence key="sequence/dynamic_seq_1.xml"/>
+    <sequence name="main">
+        <sequence key="sequence/dynamic_seq_1.xml"/>
+    </sequence>
 
 </definitions>

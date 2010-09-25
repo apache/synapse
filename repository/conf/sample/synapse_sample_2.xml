@@ -22,15 +22,15 @@
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <sequence name="main">
-        <switch source="//m0:getQuote/m0:request/m0:symbol">
-            <case xmlns:m0="http://services.samples" regex="IBM">
+        <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples">
+            <case regex="IBM">
                 <!-- the property mediator sets a local property on the *current* message -->
                 <property name="symbol" value="Great stock - IBM"/>
             </case>
-            <case xmlns:m0="http://services.samples" regex="MSFT">
+            <case regex="MSFT">
                 <property name="symbol" value="Are you sure? - MSFT"/>
             </case>
-            <default xmlns:m0="http://services.samples">
+            <default>
                 <!-- it is possible to assign the result of an XPath expression as well -->
                 <property name="symbol" expression="fn:concat('Normal Stock - ', //m0:getQuote/m0:request/m0:symbol)"/>
             </default>

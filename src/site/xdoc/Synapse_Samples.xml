@@ -770,7 +770,9 @@ mediator forwards the response back to the client using the implicit 'To' addres
         &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
     &lt;/registry&gt;
 
-    &lt;sequence key=&quot;sequence/dynamic_seq_1.xml&quot;/&gt;
+    &lt;sequence name="main"&gt;
+        &lt;sequence key=&quot;sequence/dynamic_seq_1.xml&quot;/&gt;
+    &lt;/sequence&gt;
 &lt;/definitions&gt; </pre>
 <p>
 <strong>Objective: Introduction to dynamic sequences with a registry</strong> </p>

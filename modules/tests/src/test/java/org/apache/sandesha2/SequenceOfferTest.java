@@ -31,9 +31,9 @@ import org.apache.sandesha2.client.SandeshaReport;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-public class SquenceOfferTest extends SandeshaTestCase {
+public class SequenceOfferTest extends SandeshaTestCase {
 
-	public SquenceOfferTest () {
+	public SequenceOfferTest () {
 		super ("SquenceOfferTest");
 	}
 	

@@ -21,6 +21,13 @@
 <!-- Custom sequences and endpoints with proxy services -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
+    <localEntry key="proxy_wsdl"
+                src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+
+    <endpoint name="proxy_2_endpoint">
+        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+    </endpoint>
+
     <sequence name="proxy_1">
         <send>
             <endpoint>
@@ -32,13 +39,6 @@
     <sequence name="out">
         <send/>
     </sequence>
-
-    <endpoint name="proxy_2_endpoint">
-        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-    </endpoint>
-
-    <localEntry key="proxy_wsdl"
-                src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
 
     <proxy name="StockQuoteProxy1">
         <publishWSDL key="proxy_wsdl"/>

@@ -54,10 +54,18 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="faultSequence" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="endpoint" type="Endpoint" minOccurs="0" maxOccurs="1"/>
         </xs:all>
         <xs:attribute name="inSequence" type="xs:string" use="optional"/>
         <xs:attribute name="outSequence" type="xs:string" use="optional"/>
+        <xs:attribute name="faultSequence" type="xs:string" use="optional"/>
         <xs:attribute name="endpoint" type="xs:string" use="optional"/>
     </xs:complexType>
 

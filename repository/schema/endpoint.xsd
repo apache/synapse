@@ -99,17 +99,60 @@
             </xs:documentation>
         </xs:annotation>
         <xs:choice>
-            <xs:element name="loadbalance">
-                <xs:complexType>
-                    <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="unbounded"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="failover">
-                <xs:complexType>
-                    <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="unbounded"/>
-                </xs:complexType>
-            </xs:element>
+            <xs:group ref="lbEndpoints"/>
+            <xs:group ref="failoverEndpoints"/>
         </xs:choice>
+    </xs:group>
+
+    <xs:group name="lbEndpoints">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group represents the secondary load balance endpoints
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="session" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="type" use="optional">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="simpleClientSession"/>
+                                <!-- TODO : add other possible values -->
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="loadbalance" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="endpoint" minOccurs="1" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="1"/>
+                                <xs:attribute name="name" type="xs:string" use="optional"/>
+                                <xs:attribute name="key" type="xs:string" use="optional"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="algorithm" type="xs:string" default="org.apache.synapse.endpoints.algorithms.RoundRobin" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:all>
+    </xs:group>
+
+    <xs:group name="failoverEndpoints">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group represents the secondary fail over endpoints
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="failover" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:all>
     </xs:group>
 
     <xs:complexType name="DefaultEndpoint">
@@ -175,6 +218,13 @@
                         <xs:element name="maximumDuration" minOccurs="0" maxOccurs="1" type="xs:long"/>
                     </xs:all>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="suspendDurationOnFailure" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="description">
+                        This is deprecated, please use the suspendOnFailure
+                    </xs:documentation>
+                </xs:annotation>
             </xs:element>
         </xs:all>
         <xs:attributeGroup ref="commonEndpoint"/>

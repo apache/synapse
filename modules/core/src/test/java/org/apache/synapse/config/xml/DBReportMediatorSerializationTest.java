@@ -59,4 +59,17 @@ public class DBReportMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, dbReportMediatorFactory, dbReportMediatorSerializer));
         assertTrue(serialization(inputXml, dbReportMediatorSerializer));
     }
+
+    public void testDBReportMediatorSerializationWithExternalDataSource2() throws Exception {
+        String inputXml = "<dbreport xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                          "<connection><pool>" +
+                          "<dsName>DataServiceName</dsName></pool>" +
+                          "</connection><statement><sql><![CDATA[update company set price=? " +
+                          "where name =?]]></sql><parameter expression=\"//m0:return/m0:last/child::text()\" " +
+                          "xmlns:m0=\"http://services.samples/xsd\" type=\"DOUBLE\"/><parameter " +
+                          "expression=\"//m0:return/m0:symbol/child::text()\" " +
+                          "xmlns:m0=\"http://services.samples/xsd\" type=\"VARCHAR\"/></statement></dbreport>";
+        assertTrue(serialization(inputXml, dbReportMediatorFactory, dbReportMediatorSerializer));
+        assertTrue(serialization(inputXml, dbReportMediatorSerializer));
+    }
 }

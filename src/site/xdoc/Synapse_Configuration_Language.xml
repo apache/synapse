@@ -1739,6 +1739,9 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
        &lt;url/&gt;
        &lt;user/&gt;
        &lt;password/&gt;
+       &lt;property name="name" value="value"/&gt;*
+     |
+       &lt;dsName/&gt;
      |
        &lt;dsName/&gt;
        &lt;icClass/&gt;
@@ -1746,7 +1749,6 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
        &lt;user/&gt;
        &lt;password/&gt;
      )
-       &lt;property name="name" value="value"/&gt;*
      &lt;/pool&gt;
    &lt;/connection&gt;
    &lt;statement&gt;
@@ -1830,6 +1832,9 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
        &lt;url/&gt;
        &lt;user/&gt;
        &lt;password/&gt;
+       &lt;property name="name" value="value"/&gt;* 
+     |
+       &lt;dsName/&gt;
      |
        &lt;dsName/&gt;
        &lt;icClass/&gt;
@@ -1837,7 +1842,6 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
        &lt;user/&gt;
        &lt;password/&gt;
      )
-       &lt;property name="name" value="value"/&gt;*
      &lt;/pool&gt;
    &lt;/connection&gt;
    &lt;statement&gt;

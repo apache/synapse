@@ -46,4 +46,38 @@ public class DBLookupMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, dbLookupFactory, dbLookupSerializer));
         assertTrue(serialization(inputXml, dbLookupSerializer));
     }
+
+    public void testDBLookupMediatorSerializationScenarioTwo() throws Exception {
+
+        String inputXml =
+            "<syn:dblookup xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                    "<syn:connection><syn:pool><syn:dsName>lookupdb</syn:dsName>" +                    
+                    "</syn:pool></syn:connection><syn:statement><syn:sql>" +
+                    "<![CDATA[insert into table values (?, ?, ..)]]></syn:sql>" +
+                    "<syn:parameter value=\"ABC\" type=\"VARCHAR\"/>" +
+                    "<syn:parameter expression=\"4\" type=\"INTEGER\"/>" +
+                    "<syn:result name=\"2\" column=\"int\"/></syn:statement></syn:dblookup>";
+
+        assertTrue(serialization(inputXml, dbLookupFactory, dbLookupSerializer));
+        assertTrue(serialization(inputXml, dbLookupSerializer));
+    }
+
+    public void testDBLookupMediatorSerializationScenarioThree() throws Exception {
+
+        String inputXml =
+            "<syn:dblookup xmlns:syn=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                    "<syn:connection><syn:pool><syn:dsName>lookupdb</syn:dsName>" +
+                    "<syn:icClass>com.sun.jndi.rmi.registry.RegistryContextFactory</syn:icClass>" +
+                    "<syn:url>rmi://localhost:2199</syn:url>" +
+                    "<syn:user>user</syn:user>" +
+                    "<syn:password>password</syn:password>" +
+                    "</syn:pool></syn:connection><syn:statement><syn:sql>" +
+                    "<![CDATA[insert into table values (?, ?, ..)]]></syn:sql>" +
+                    "<syn:parameter value=\"ABC\" type=\"VARCHAR\"/>" +
+                    "<syn:parameter expression=\"4\" type=\"INTEGER\"/>" +
+                    "<syn:result name=\"2\" column=\"int\"/></syn:statement></syn:dblookup>";
+
+        assertTrue(serialization(inputXml, dbLookupFactory, dbLookupSerializer));
+        assertTrue(serialization(inputXml, dbLookupSerializer));
+    }
 }

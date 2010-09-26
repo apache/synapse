@@ -3714,7 +3714,7 @@ INFO LogMediator text = Stock price - 153.47886496064808</pre>
 <strong>Objective: Demonstrate the use of reusable database connection pools</strong></p>
 <p>
 <strong>Prerequisites:</strong>
-<br/>>Setting up DataBase and DataSources according to the
+<br/>Set up the database and Data sources according to the
 <a href="Synapse_Samples_Setup.html">sample setup guide</a>
 <br/>Start the Synapse configuration numbered 363: i.e. synapse -sample 363
 <br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>

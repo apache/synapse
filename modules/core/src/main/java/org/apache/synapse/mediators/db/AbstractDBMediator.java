@@ -142,11 +142,16 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @return a unique name or URL to refer to the DataSource being used
      */
     protected String getDSName() {
-        String name = dataSourceInformation.getUrl();
-        if (name == null) {
-            name = dataSourceInformation.getDatasourceName();
+        if (dataSourceName != null) {
+            return dataSourceName;
+        } else if (dataSourceInformation != null) {
+            String name = dataSourceInformation.getUrl();
+            if (name == null) {
+                name = dataSourceInformation.getDatasourceName();
+            }
+            return name;
         }
-        return name;
+        return null;
     }
     
     public void setDataSourceInformation(DataSourceInformation dataSourceInformation) {
@@ -195,10 +200,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
 
     /**
      * Return a Prepared statement for the given Statement object, which is ready to be executed
-     * @param stmnt
-     * @param msgCtx
-     * @return
-     * @throws SQLException
+     * @param stmnt SQL stataement to be executed
+     * @param msgCtx Current message context
+     * @return a PreparedStatement
+     * @throws SQLException on error
      */
     protected PreparedStatement getPreparedStatement(Statement stmnt,
                                                      MessageContext msgCtx) throws SQLException {
@@ -355,8 +360,8 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
             dataSource = finder.find(dataSourceName);
         }
 
-        if(dataSource == null){
-        // decrypt the password if needed
+        if (dataSource == null) {
+            // decrypt the password if needed
             String password = jndiProperties.getProperty(Context.SECURITY_CREDENTIALS);
             if (password != null && !"".equals(password)) {
                 jndiProperties.put(Context.SECURITY_CREDENTIALS, getActualPassword(password));
@@ -369,12 +374,13 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                         " properties :" + jndiProperties);
             }
         }
+
         MBeanRepository mBeanRepository = DatasourceMBeanRepository.getInstance();
         Object mBean = mBeanRepository.getMBean(dataSourceName);
         if (mBean instanceof DBPoolView) {
             setDbPoolView((DBPoolView) mBean);
         }
-        log.info("Sunccessfully looked up datasource " + dataSourceName + ".");
+        log.info("Successfully looked up datasource " + dataSourceName + ".");
 
         return dataSource;
     }
@@ -390,7 +396,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         
         DataSource dataSource = DataSourceFactory.createDataSource(dataSourceInformation);
         if (dataSource != null) {
-            log.info("Sunccessfully created data source for " + dataSourceInformation.getUrl() + ".");
+            log.info("Successfully created data source for " + dataSourceInformation.getUrl() + ".");
         }
         
         return dataSource;

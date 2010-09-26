@@ -22,26 +22,22 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="../../misc/common.xsd"/>
-
-    <xs:element name="property">
+    <xs:element name="script">
         <xs:annotation>
             <xs:documentation source="description">
-                Property mediator to process properties of the messages
+                Script mediator to process messages using the specified script
             </xs:documentation>
         </xs:annotation>
-        <xs:complexType>
-            <xs:attributeGroup ref="nameValueOrExpression"/>
-            <xs:attribute name="scope" use="optional" default="default">
+        <xs:complexType mixed="true">
+            <xs:attribute name="language" use="required">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:enumeration value="default"/>
-                        <xs:enumeration value="axis2"/>
-                        <xs:enumeration value="transport"/>
-                        <xs:enumeration value="axis2-client"/>
+                        <xs:enumeration value="js"/>
+                        <xs:enumeration value="ruby"/>
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="src" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
 

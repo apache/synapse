@@ -54,13 +54,13 @@
                 </xs:element>
                 <xs:element name="node" minOccurs="0" maxOccurs="1" type="xs:anyType"/>
                 <xs:element name="role" minOccurs="0" maxOccurs="1" type="xs:anyType"/>
-                <xs:element name="detail" type="xs:anyType" minOccurs="0" maxOccurs="1">
+                <xs:element name="detail" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation source="description">
                             The fault Detail
                         </xs:documentation>
                     </xs:annotation>
-                    <xs:complexType>
+                    <xs:complexType mixed="true">
                         <xs:attribute name="expression" type="xs:string" use="optional"/>
                     </xs:complexType>
                 </xs:element>

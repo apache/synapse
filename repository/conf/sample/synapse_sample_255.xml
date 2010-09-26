@@ -22,10 +22,6 @@
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <proxy name="StockQuoteProxy" transports="vfs">
-        <parameter name="transport.vfs.FileURI">vfs:ftp://guest:guest@localhost/test?vfs.passive=true</parameter> <!--CHANGE-->
-        <parameter name="transport.vfs.ContentType">text/xml</parameter>
-        <parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
-        <parameter name="transport.PollInterval">15</parameter>
 
         <target>
             <inSequence>
@@ -44,6 +40,11 @@
             </outSequence>
         </target>
         <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+
+        <parameter name="transport.vfs.FileURI">vfs:ftp://guest:guest@localhost/test?vfs.passive=true</parameter> <!--CHANGE-->
+        <parameter name="transport.vfs.ContentType">text/xml</parameter>
+        <parameter name="transport.vfs.FileNamePattern">.*\.xml</parameter>
+        <parameter name="transport.PollInterval">15</parameter>
     </proxy>
 
 </definitions>

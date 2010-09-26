@@ -2095,15 +2095,27 @@ Connection: Keep-Alive
 <strong>Objective: Introduction to switching transports with proxy services</strong> </p>
 <p>
 <strong>Prerequisites:</strong>
-<br/> Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+<br/> Start the Axis2 server with the SimpleStockQuoteService deployed
 <br/> Download, install and start a JMS server, and configure Synapse to listen on JMS (refer notes below)
-<br/> Start the Synapse configuration numbered 250: i.e. synapse -sample 250
-<br/> For this example we would use ActiveMQ as the JMS provider. Once ActiveMQ is installed and started you should get a message as follows: </p>
-<pre xml:space="preserve">INFO BrokerService - ActiveMQ JMS Message Broker (localhost) started</pre>
-<p>You will now need to configure the Axis2 instance used by Synapse (not the sample Axis2 server) to enable JMS support using the above provider. Refer to the Axis2 documentation on setting up JMS for more details (http://ws.apache.org/axis2/1_1/jms-transport.html). You will also need to copy the ActiveMQ client jar files activeio-core-3.0-beta1.jar, activemq-core-4.0-RC2.jar and geronimo-j2ee-management_1.0_spec-1.0.jar into the lib directory to allow Synapse to connect to the JMS provider. </p>
-<p>For a default ActiveMQ v4.0 installation, you may uncomment the Axis2 transport listener configuration found at repository/conf/axis2.xml as </p>
+<br/> Start the Synapse configuration numbered 250: i.e. synapse -sample 250</p>
+
+<p> For this example we will use <a href="http://activemq.apache.org">Apache ActiveMQ</a> as the JMS provider.
+Simply download the binary distribution, extract it and launch the startup script to start the JMS broker.</p>
+<p>Now you have to enable the JMS transport receiver of Synapse. Start by deploying the ActiveMQ client
+libraries into the Synapse runtime. Simply copy the following jars from the ActiveMQ distribution into
+SYNAPSE_HOME/lib directory:</p>
+<ul>
+    <li>activemq-core.jar</li>
+    <li>geronimo-j2ee_management.jar</li>
+    <li>geronimo-jms.jar</li>
+</ul>
+<p>Now you need to add some entries into the axis2.xml file. For a default ActiveMQ v5.x installation, you may
+uncomment the Axis2 transport listener configuration found at repository/conf/axis2.xml as </p>
 <pre xml:space="preserve">&lt;transportReceiver name=&quot;jms&quot; class=&quot;org.apache.axis2.transport.jms.JMSListener&quot;&gt; ...</pre>
-<p>Once you start the Synapse configuration and request for the WSDL of the proxy service (http://localhost:8280/services/StockQuoteProxy?wsdl) you will notice that its exposed only on the JMS transport. This is because the configuration specified this requirement in the proxy service definition. </p>
+
+<p>Once you start the Synapse configuration and request for the WSDL of the proxy service (http://localhost:8280/services/StockQuoteProxy?wsdl)
+you will notice that its exposed only on the JMS transport. This is because the configuration specified this requirement in the
+proxy service definition. </p>
 <p>Now lets send a stock quote request on JMS, using the dumb stock quote client as follows: </p>
 <pre xml:space="preserve">ant jmsclient -Djms_type=pox -Djms_dest=dynamicQueues/StockQuoteProxy -Djms_payload=MSFT</pre>
 <p>On the Synapse debug log you will notice that the JMS listener received the request message as: </p>
@@ -2143,11 +2155,12 @@ it will first try to read the content type from the 'contentType' message proper
 <strong>Objective: Demonstrate switching from HTTP to JMS</strong> </p>
 <p>
 <strong>Prerequisites:</strong>
-<br/> Download, install and start a JMS server </p>
-<p>Configure sample Axis2 server for JMS (refer notes above)
+<br/> Download, install and start a JMS server
+<br/> Configure sample Axis2 server for JMS (refer notes below)
 <br/> Start the Axis2 server and deploy the SimpleStockQuoteService (see below)
 <br/> Configure the Synase JMS transport (refer notes above - sample 250)
 <br/> Start the Synapse configuration numbered 251: i.e. synapse -sample 251 </p>
+    
 <p>To switch from HTTP to JMS, edit the samples/axis2Server/repository/conf/axis2.xml for the sample Axis2 server and enable JMS (refer notes above), and restart the server. Now you can see that the simple stock quote service is available in both JMS and HTTP in the sample Axis2 server. To see this, point your browser to the WSDL of the service at http://localhost:9000/services/SimpleStockQuoteService?wsdl. JMS URL for the service is mentioned as below: </p>
 <pre xml:space="preserve">jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=
 QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
@@ -2383,16 +2396,20 @@ Transfer-Encoding: chunked
 &lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Using the file system as transport medium using VFS transport listener and sender</strong> </p>
-<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
-<p>Create three new directories in a test directory. e.g. in, out, original in /home/user/test. Open SYNAPSE_HOME/repository/conf/sample/synapse_sample_254.xml and edit the following values. Change transport.vfs.FileURI, transport.vfs.MoveAfterProcess, transport.vfs.MoveAfterFailure parameter values to the above in, original, original directories respectively. Change outSequence endpoint address uri to out directory with the prefix 
-<em>vfs:</em>. Values you have to change are marked with &lt;!--CHANGE--&gt;. </p>
-<p>Start the Synapse configuration numbered 254: i.e. synapse -sample 254 </p>
+
+<p>
+<strong>Prerequisites:</strong>
+<br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done
+<br/>Create three new directories in a test directory. e.g. in, out, original in /home/user/test. Open SYNAPSE_HOME/repository/conf/sample/synapse_sample_254.xml and edit the following values. Change transport.vfs.FileURI, transport.vfs.MoveAfterProcess, transport.vfs.MoveAfterFailure parameter values to the above in, original, original directories respectively. Change outSequence endpoint address uri to out directory with the prefix
+<em>vfs:</em>. Values you have to change are marked with &lt;!--CHANGE--&gt;
+<br/>Start the Synapse configuration numbered 254: i.e. synapse -sample 254 </p>
+
 <p>Copy SYNAPSE_HOME/repository/conf/sample/resources/vfs/test.xml to the directory given in transport.vfs.FileURI above. </p>
 <p>test.xml file content is as follows </p>
 <pre xml:space="preserve">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
     &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
     &lt;soapenv:Body&gt;
-            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples/xsd&quot;&gt;
+            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
                     &lt;m0:request&gt;
                             &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
                     &lt;/m0:request&gt;
@@ -2538,13 +2555,13 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>
 <strong>Prerequisites:</strong>
 <br/> You will need the two sample FIX applications that come with Quickfix/J (Banzai and Executor). Configure the two applications to establish sessions with Synapse. See
-<a href="Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX Applications</a> </p>
-<p>Start Banzai and Executor </p>
-<p>Enable FIX transport in the Synapse axis2.xml. See 
-<a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a> </p>
-<p>Configure Synapse for FIX samples. See 
-<a href="Synapse_Samples_Setup.html#fixsamples">Configuring Synapse for FIX Samples</a> </p>
-<p>Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_257.xml file and make sure that transport.fix.AcceptorConfigURL property points to the fix-synapse.cfg file you created. Also make sure that transport.fix. InitiatorConfigURL property points to the synapse-sender.cfg file you created. Once done you can start the Synapse configuration numbered 257: i.e. synapse -sample 257. Note that Synapse creates new FIX sessions with Banzai and Executor at this point. </p>
+<a href="Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX Applications</a>
+<br/>Start Banzai and Executor
+<br/>Enable FIX transport in the Synapse axis2.xml. See
+<a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a>
+<br/>Configure Synapse for FIX samples. See
+<a href="Synapse_Samples_Setup.html#fixsamples">Configuring Synapse for FIX Samples</a>
+<br/>Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_257.xml file and make sure that transport.fix.AcceptorConfigURL property points to the fix-synapse.cfg file you created. Also make sure that transport.fix. InitiatorConfigURL property points to the synapse-sender.cfg file you created. Once done you can start the Synapse configuration numbered 257: i.e. synapse -sample 257. Note that Synapse creates new FIX sessions with Banzai and Executor at this point. </p>
 <p>Send an order request from Banzai to Synapse. </p>
 <p>Synapse will forward the order request to the session with the Executor. The responses coming from the Executor will be sent back to Banzai. </p>
 <p>To get an idea about the various transport parameters being used in this sample see 
@@ -2552,7 +2569,7 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <h2>
 <a name="Sample258" id="Sample258">Sample 258: Switching from HTTP to FIX </a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
-    &lt;proxy name=&quot;FIXProxy&quot;&gt;
+    &lt;proxy name=&quot;FIXProxy&quot; transport&quot;http&quot;&gt;
 
         &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:/home/synapse_user/fix-config/synapse-sender.cfg&lt;/parameter&gt;
         &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;file&lt;/parameter&gt;
@@ -2579,13 +2596,14 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>
 <strong>Prerequisites:</strong>
 <br/> You will need the Executor sample application that comes with Quickfix/J. Configure Executor to establish a session with Synapse. See
-<a href="Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX Applications</a> </p>
-<p>Start Executor. </p>
-<p>Enable FIX transport sender in the Synapse axis2.xml. See 
-<a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a> </p>
-<p>Configure Synapse for FIX samples. See 
-<a href="Synapse_Samples_Setup.html#fixsamples">Configuring Synapse for FIX Samples</a>. There is no need to create the fix-synapse.cfg file for this sample. Having only the synapse-sender.cfg file is sufficient. </p>
-<p>Go to the SYNAPSE_HOME/repository/conf/sample/synapse_sample_258.xml file and make sure that transport.fix.InitiatorConfigURL property points to the synapse-sender.cfg file you created. Once done you can start the Synapse configuration numbered 258: i.e. synapse -sample 258 </p>
+<a href="Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX Applications</a>
+<br/>Start Executor
+<br/>Enable FIX transport sender in the Synapse axis2.xml. See
+<a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a>
+<br/>Configure Synapse for FIX samples. See
+<a href="Synapse_Samples_Setup.html#fixsamples">Configuring Synapse for FIX Samples</a>. There is no need to create the fix-synapse.cfg file for this sample. Having only the synapse-sender.cfg file is sufficient.
+<br/>Go to the SYNAPSE_HOME/repository/conf/sample/synapse_sample_258.xml file and make sure that transport.fix.InitiatorConfigURL property points to the synapse-sender.cfg file you created. Once done you can start the Synapse configuration numbered 258: i.e. synapse -sample 258 </p>
+
 <p>Invoke the FIX Client as follows. This command sends a FIX message embedded in a SOAP message over HTTP. 
 <pre>ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8280/services/FIXProxy</pre> </p>
 <p>Synapse will forward the order request to the session with the Executor. The first response coming from the Executor will be sent back over HTTP. Executor generally sends two responses for each incoming order request. But since the response has to be forwarded over HTTP only one can be sent back to the client. </p>
@@ -2622,14 +2640,15 @@ mail clients don't allow the user to explicitly set the content type.</p>
 <p>
 <strong>Prerequisites:</strong>
 <br/> You will need the sample FIX blotter that come with Quickfix/J (Banzai). Configure the blotter to establish sessions with Synapse. See
-<a href="Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX Applications</a> </p>
-<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already deployed </p>
-<p>Start Banzai </p>
-<p>Enable FIX transport in the Synapse axis2.xml. See 
-<a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a> </p>
-<p>Configure Synapse for FIX samples. See 
-<a href="Synapse_Samples_Setup.html#fixsamples">Configuring Synapse for FIX Samples</a> </p>
-<p>Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_259.xml file and make sure that transport.fix.AcceptorConfigURL property points to the fix-synapse.cfg file you created. Once done you can start the Synapse configuration numbered 259: i.e. synapse -sample 259. Note that Synapse creates a new FIX session with Banzai at this point. </p>
+<a href="Synapse_Samples_Setup.html#fixsamplesconfig">Configuring Sample FIX Applications</a>
+<br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already deployed
+<br/>Start Banzai
+<br/>Enable FIX transport in the Synapse axis2.xml. See
+<a href="Synapse_Samples_Setup.html#fixtransport">Setting up FIX transport </a>
+<br/>Configure Synapse for FIX samples. See
+<a href="Synapse_Samples_Setup.html#fixsamples">Configuring Synapse for FIX Samples</a>
+<br/>Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_259.xml file and make sure that transport.fix.AcceptorConfigURL property points to the fix-synapse.cfg file you created. Once done you can start the Synapse configuration numbered 259: i.e. synapse -sample 259. Note that Synapse creates a new FIX session with Banzai at this point. </p>
+    
 <p>Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ 100. User has to send a 'Limit' Order because price is a mandatory field for 'placeOrder' operation. </p>
 <p>Synapse will forward the order request to one-way 'placeOrder' operation on the SimpleStockQuoteService. Synapse uses a simple XSLT mediator to transform the incoming FIX to a SOAP message. </p>
 <pre xml:space="preserve">&lt;xsl:stylesheet version=&quot;2.0&quot;

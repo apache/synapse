@@ -30,6 +30,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 
+import javax.xml.namespace.QName;
 import java.io.File;
 import java.net.URL;
 
@@ -98,7 +99,12 @@ public class JSONClient {
                         "</request></getQuote>");
 
         OMElement response = serviceClient.sendReceive(payload);
-        System.out.println("Received response: " + response);
+        if (response.getLocalName().equals("getQuoteResponse")) {
+            OMElement last = response.getFirstElement().getFirstChildWithName(new QName("last"));
+            System.out.println("Standard :: Stock price = $" + last.getText());
+        } else {
+            throw new Exception("Unexpected response : " + response);
+        }
         Thread.sleep(1000);
         if (configContext != null) {
             configContext.terminate();

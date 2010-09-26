@@ -3058,9 +3058,16 @@ it will first try to read the content type from the 'contentType' message proper
 <strong>Objective: Introduce the concept of tasks and how simple trigger works</strong> </p>
 <p>
 <strong>Prerequisites:</strong>
-<br/> Build the SimpleStockQuoteService as mentioned above and start the sample axis2 server before staring Synapse. </p>
-<p>When ever Synapse gets started with this configuration (i.e. ./synapse.sh -sample 300) and initialized, this task will run periodically in 5 second intervals. You could limit the number of times that you want to run this task by adding a count attribute with an integer as the value, if the count is not present as in this sample this task will run forever. </p>
-<p>One can write his own task class implementing the org.apache.synapse.startup.Task interface and implementing the execute method to do the task. For this particular sample we have used the MessageInjector which just injects a message specified into Synapse environment. </p>
+<br/> Build the SimpleStockQuoteService as mentioned above and start the sample Axis2 server
+<br/> Start Synapse using sample 300: ie synapse -sample 300</p>
+<p>When ever Synapse gets started with this configuration, a task will run periodically in 5 second
+    intervals. You could limit the number of times that you want to run this task by adding a count
+    attribute with an integer as the value, if the count is not present as in this sample this task
+    will run until the server is shutdown.</p>
+<p>One can write his/her own task class implementing the org.apache.synapse.startup.Task interface and
+    implementing the execute method to run the necessary logic. For this particular sample we have used the
+    MessageInjector class which just injects a message specified into Synapse environment. </p>
+    
 <h1>
 <a name="AdvancedMediation" id="AdvancedMediation">Advanced mediations with advanced mediators</a> </h1>
 <h2>
@@ -3107,7 +3114,7 @@ it will first try to read the content type from the 'contentType' message proper
   function transformRequest(mc) {
      var symbol = mc.getPayloadXML()..*::Code.toString();
      mc.setPayloadXML(
-        &lt;m:getQuote xmlns:m=&quot;http://services.samples/xsd&quot;&gt;
+        &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
            &lt;m:request&gt;
               &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
            &lt;/m:request&gt;
@@ -3142,7 +3149,7 @@ it will first try to read the content type from the 'contentType' message proper
         &lt;script language=&quot;js&quot;&gt;&lt;![CDATA[
                var symbol = mc.getPayloadXML()..*::Code.toString();
                mc.setPayloadXML(
-                  &lt;m:getQuote xmlns:m=&quot;http://services.samples/xsd&quot;&gt;
+                  &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
                      &lt;m:request&gt;
                         &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
                      &lt;/m:request&gt;

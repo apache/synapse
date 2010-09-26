@@ -27,7 +27,7 @@
             <script language="js">
                 var symbol = mc.getPayloadXML()..*::Code.toString();
                 mc.setPayloadXML(
-                &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
+                &lt;m:getQuote xmlns:m="http://services.samples"&gt;
                 &lt;m:request&gt;
                 &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
                 &lt;/m:request&gt;

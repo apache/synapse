@@ -41,13 +41,13 @@
     </sequence>
 
     <proxy name="StockQuoteProxy1">
-        <publishWSDL key="proxy_wsdl"/>
         <target inSequence="proxy_1" outSequence="out"/>
+        <publishWSDL key="proxy_wsdl"/>
     </proxy>
 
     <proxy name="StockQuoteProxy2">
-        <publishWSDL key="proxy_wsdl"/>
         <target endpoint="proxy_2_endpoint" outSequence="out"/>
+        <publishWSDL key="proxy_wsdl"/>
     </proxy>
 
 </definitions>

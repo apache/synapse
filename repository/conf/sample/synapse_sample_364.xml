@@ -18,7 +18,7 @@
   ~  under the License.
   -->
 
-<!-- Action of dbreport and dblookup mediators together -->
+<!-- Action of dbreport and dblookup mediators together with stored procedures -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <sequence name="main">
@@ -39,9 +39,9 @@
                 <connection>
                     <pool>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost/synapsedb</url>
-                        <user>root</user>
-                        <password>admin</password>
+                        <url>jdbc:mysql://localhost:3306/synapsedb</url>
+                        <user>user</user>
+                        <password>password</password>
                     </pool>
                 </connection>
                 <statement>
@@ -61,9 +61,9 @@
                 <connection>
                     <pool>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost/synapsedb</url>
-                        <user>root</user>
-                        <password>admin</password>
+                        <url>jdbc:mysql://localhost:3306/synapsedb</url>
+                        <user>user</user>
+                        <password>password</password>
                     </pool>
                 </connection>
                 <statement>

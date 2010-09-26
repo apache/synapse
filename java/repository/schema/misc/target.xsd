@@ -56,6 +56,9 @@
             </xs:element>
             <xs:element name="endpoint" type="Endpoint" minOccurs="0" maxOccurs="1"/>
         </xs:all>
+        <xs:attribute name="inSequence" type="xs:string" use="optional"/>
+        <xs:attribute name="outSequence" type="xs:string" use="optional"/>
+        <xs:attribute name="endpoint" type="xs:string" use="optional"/>
     </xs:complexType>
 
 </xs:schema>

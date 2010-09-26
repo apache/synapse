@@ -604,42 +604,38 @@ synapse.sh -sample &lt;n&gt;</pre>
     <p>
       Put the following entries in a file called fix-synapse.cfg
 
-      <pre>
-	[default]
-	FileStorePath=examples/target/data/synapse-acceptor
-	ConnectionType=acceptor
-	StartTime=00:00:00
-	EndTime=00:00:00
-	HeartBtInt=30
-	ValidOrderTypes=1,2,F
-	SenderCompID=SYNAPSE
-	TargetCompID=BANZAI
-	UseDataDictionary=Y
-	DefaultMarketPrice=12.30
+      <pre>[default]
+FileStorePath=examples/target/data/synapse-acceptor
+ConnectionType=acceptor
+StartTime=00:00:00
+EndTime=00:00:00
+HeartBtInt=30
+ValidOrderTypes=1,2,F
+SenderCompID=SYNAPSE
+TargetCompID=BANZAI
+UseDataDictionary=Y
+DefaultMarketPrice=12.30
 
-	[session]
-	BeginString=FIX.4.0
-	SocketAcceptPort=9876		
-      </pre>
+[session]
+BeginString=FIX.4.0
+SocketAcceptPort=9876</pre>
     </p>
     <p>
       Put the following entries in a file called synapse-sender.cfg
-      <pre>
-	[default]
-	FileStorePath=examples/target/data/synapse-initiator
-	SocketConnectHost=localhost
-	StartTime=00:00:00
-	EndTime=00:00:00
-	HeartBtInt=30
-	ReconnectInterval=5
-    SenderCompID=SYNAPSE
-    TargetCompID=EXEC
-    ConnectionType=initiator
+      <pre>[default]
+FileStorePath=examples/target/data/synapse-initiator
+SocketConnectHost=localhost
+StartTime=00:00:00
+EndTime=00:00:00
+HeartBtInt=30
+ReconnectInterval=5
+SenderCompID=SYNAPSE
+TargetCompID=EXEC
+ConnectionType=initiator
 
-    [session]
-    BeginString=FIX.4.0
-    SocketConnectPort=19876
-      </pre>
+[session]
+BeginString=FIX.4.0
+SocketConnectPort=19876</pre>
     </p>
 
     <h3 id="fixsamplesconfig">
@@ -648,44 +644,40 @@ synapse.sh -sample &lt;n&gt;</pre>
     <p>
       Locate and edit the FIX configuration file of Executor to be as follows.
       This file is usually named executor.cfg
-      <pre>
-	[default]
-	FileStorePath=examples/target/data/executor
-	ConnectionType=acceptor
-	StartTime=00:00:00
-	EndTime=00:00:00
-	HeartBtInt=30
-	ValidOrderTypes=1,2,F
-	SenderCompID=EXEC
-	TargetCompID=SYNAPSE
-	UseDataDictionary=Y
-	DefaultMarketPrice=12.30
+      <pre>[default]
+FileStorePath=examples/target/data/executor
+ConnectionType=acceptor
+StartTime=00:00:00
+EndTime=00:00:00
+HeartBtInt=30
+ValidOrderTypes=1,2,F
+SenderCompID=EXEC
+TargetCompID=SYNAPSE
+UseDataDictionary=Y
+DefaultMarketPrice=12.30
 
-	[session]
-	BeginString=FIX.4.0
-	SocketAcceptPort=19876		
-      </pre>
+[session]
+BeginString=FIX.4.0
+SocketAcceptPort=19876</pre>
     </p>
     <p>
       Locate and edit the FIX configuration file of Banzai to be as follows.
       This file is usually named banzai.cfg
-      <pre>
-	[default]
-	FileStorePath=examples/target/data/banzai
-	ConnectionType=initiator
-	SenderCompID=BANZAI
-	TargetCompID=SYNAPSE
-	SocketConnectHost=localhost
-	StartTime=00:00:00
-	EndTime=00:00:00
-	HeartBtInt=30
-	ReconnectInterval=5
+      <pre>[default]
+FileStorePath=examples/target/data/banzai
+ConnectionType=initiator
+SenderCompID=BANZAI
+TargetCompID=SYNAPSE
+SocketConnectHost=localhost
+StartTime=00:00:00
+EndTime=00:00:00
+HeartBtInt=30
+ReconnectInterval=5
 
-	[session]
-	BeginString=FIX.4.0
-	SocketConnectPort=9876
-      </pre>
-    </p>
+[session]
+BeginString=FIX.4.0
+SocketConnectPort=9876</pre>
+   </p>
     <p>
 	The FileStorePath property in the above two files should point
         to two directories in your local file system.

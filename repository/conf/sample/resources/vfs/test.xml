@@ -2,7 +2,7 @@
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing">
 	<soapenv:Body>
 		<getQuote xmlns="http://services.samples">
-			<request xmlns="http://services.samples/xsd">
+			<request>
 				<symbol>IBM</symbol>
 			</request>
 		</getQuote>

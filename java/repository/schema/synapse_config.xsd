@@ -48,16 +48,16 @@
                 configuration
             </xs:documentation>
         </xs:annotation>
-        <xs:all>
-            <xs:element ref="sequence" minOccurs="0"/>
-            <xs:element ref="localEntry" minOccurs="0"/>
-            <xs:element ref="endpoint" minOccurs="0"/>
-            <xs:element ref="proxy" minOccurs="0"/>
-            <xs:element ref="eventSource" minOccurs="0"/>
-            <xs:element ref="task" minOccurs="0"/>
-            <xs:element ref="priorityExecutor" minOccurs="0"/>
+        <xs:sequence>
             <xs:element ref="registry" minOccurs="0" maxOccurs="1"/>
-        </xs:all>
+            <xs:element ref="localEntry" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="priorityExecutor" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="sequence" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="proxy" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="eventSource" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="task" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
     </xs:complexType>
-    
+
 </xs:schema>

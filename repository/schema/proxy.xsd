@@ -40,7 +40,7 @@
                 in the Synapse Configuration
             </xs:documentation>
         </xs:annotation>
-        <xs:all>
+        <xs:sequence>
             <xs:element ref="target" minOccurs="1" maxOccurs="1"/>
             <xs:element name="publishWSDL" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -58,8 +58,24 @@
                     <xs:attribute name="key" type="xs:string" use="optional"/>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="enableAddressing" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="enableSec" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="enableRM" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="policy" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="key" type="xs:string" use="required"/>
+                    <xs:attribute name="type" use="optional">
+                        <xs:simpleType>
+                            <xs:restriction>
+                                <xs:enumeration value="in"/>
+                                <xs:enumeration value="out"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
             <xs:element ref="parameter" minOccurs="0"/>
-        </xs:all>
+        </xs:sequence>
         <xs:attributeGroup ref="monitoringAspect"/>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="transports" type="xs:string" use="optional"/>

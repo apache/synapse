@@ -102,18 +102,18 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
     static final QName ATT_COLUMN = new QName("column");
     static final QName ATT_TYPE = new QName("type");
-    
+
     /**
      * Reads the data source configuration for all mediators based on the <code>AbstractDBMediator</code>
      * and stores the configuration in the mediator for datasource initialization and de-serialization.
-     *  
+     *
      * @param elem the configuration element of the mediator
      * @param mediator the mediator on which the configuration shall be stored
      */
     protected void buildDataSource(OMElement elem, AbstractDBMediator mediator) {
 
         OMElement pool;
-        
+
         try {
             // get the 'pool' element and determine if we need to create a DataSource or
             // lookup using JNDI
@@ -134,34 +134,18 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
     }
 
     private void readLookupConfig(AbstractDBMediator mediator, OMElement pool) {
-        DataSourceInformation dataSourceInformation = new DataSourceInformation();
-        dataSourceInformation.setUrl(getValue(pool, URL_Q));
         String dataSourceName = getValue(pool, DSNAME_Q);
         mediator.setDataSourceName(dataSourceName);
         saveElementConfig(pool, DSNAME_Q, mediator);
-        SecretInformation secretInformation = new SecretInformation();
-        secretInformation.setUser(getValue(pool, USER_Q));
-        secretInformation.setAliasSecret(getValue(pool, PASS_Q));
-        dataSourceInformation.setSecretInformation(secretInformation);
 
-        Iterator poolPropIter = pool.getChildrenWithName(PROP_Q);
-        if(poolPropIter != null){
-            while (poolPropIter.hasNext()){
-                OMElement poolProp = (OMElement) poolPropIter.next();
-                readPoolProperty(mediator, dataSourceInformation, poolProp);
-            }
-        }
-        mediator.setDataSourceInformation(dataSourceInformation);
-        
         if (pool.getFirstChildWithName(ICCLASS_Q) != null) {
-            
             Properties props = new Properties();
             props.put(Context.INITIAL_CONTEXT_FACTORY, getValue(pool, ICCLASS_Q));
             props.put(Context.PROVIDER_URL, getValue(pool, URL_Q));
             props.put(Context.SECURITY_PRINCIPAL, getValue(pool, USER_Q));
             props.put(Context.SECURITY_CREDENTIALS, getValue(pool, PASS_Q));
             mediator.setJndiProperties(props);
-            
+
             // Save element configuration for later de-serialization
             saveElementConfig(pool, ICCLASS_Q, mediator);
             saveElementConfig(pool, URL_Q, mediator);
@@ -172,37 +156,37 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
 
     private void readCustomDataSourceConfig(OMElement pool, AbstractDBMediator mediator) {
 
-            DataSourceInformation dataSourceInformation = new DataSourceInformation();
+        DataSourceInformation dataSourceInformation = new DataSourceInformation();
 
-            dataSourceInformation.setDriver(getValue(pool, DRIVER_Q));
-            dataSourceInformation.setUrl(getValue(pool, URL_Q));
-            
-            SecretInformation secretInformation = new SecretInformation();
-            secretInformation.setUser(getValue(pool, USER_Q));
-            secretInformation.setAliasSecret(getValue(pool, PASS_Q));
-            dataSourceInformation.setSecretInformation(secretInformation);
+        dataSourceInformation.setDriver(getValue(pool, DRIVER_Q));
+        dataSourceInformation.setUrl(getValue(pool, URL_Q));
 
-            // Save element configuration for later de-serialization
-            saveElementConfig(pool, DRIVER_Q, mediator);
-            saveElementConfig(pool, URL_Q, mediator);
-            saveElementConfig(pool, USER_Q, mediator);
-            saveElementConfig(pool, PASS_Q, mediator);
-            
-            Iterator poolPropIter = pool.getChildrenWithName(PROP_Q);
-            while (poolPropIter.hasNext()) {
-                OMElement poolProp = (OMElement) poolPropIter.next();
-                readPoolProperty(mediator, dataSourceInformation, poolProp);
-            }
+        SecretInformation secretInformation = new SecretInformation();
+        secretInformation.setUser(getValue(pool, USER_Q));
+        secretInformation.setAliasSecret(getValue(pool, PASS_Q));
+        dataSourceInformation.setSecretInformation(secretInformation);
 
-            mediator.setDataSourceInformation(dataSourceInformation);
+        // Save element configuration for later de-serialization
+        saveElementConfig(pool, DRIVER_Q, mediator);
+        saveElementConfig(pool, URL_Q, mediator);
+        saveElementConfig(pool, USER_Q, mediator);
+        saveElementConfig(pool, PASS_Q, mediator);
+
+        Iterator poolPropIter = pool.getChildrenWithName(PROP_Q);
+        while (poolPropIter.hasNext()) {
+            OMElement poolProp = (OMElement) poolPropIter.next();
+            readPoolProperty(mediator, dataSourceInformation, poolProp);
+        }
+
+        mediator.setDataSourceInformation(dataSourceInformation);
     }
 
     private void readPoolProperty(AbstractDBMediator mediator, DataSourceInformation dataSourceInformation,
-            OMElement prop) {
+                                  OMElement prop) {
         String name = prop.getAttribute(ATT_NAME).getAttributeValue();
         String value = prop.getAttribute(ATT_VALUE).getAttributeValue();
         mediator.addDataSourceProperty(name, value);
-        
+
         if ("autocommit".equals(name)) {
             if ("true".equals(value)) {
                 dataSourceInformation.setDefaultAutoCommit(true);
@@ -347,7 +331,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         }
         return null;
     }
-    
+
     private void saveElementConfig(OMElement element, QName qname, AbstractDBMediator mediator) {
         mediator.addDataSourceProperty(qname, getValue(element, qname));
     }

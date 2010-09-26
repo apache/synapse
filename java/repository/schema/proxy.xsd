@@ -61,9 +61,10 @@
             <xs:element ref="parameter" minOccurs="0"/>
         </xs:all>
         <xs:attributeGroup ref="monitoringAspect"/>
-        <xs:attribute name="name" use="required"/>
-        <xs:attribute name="transports" use="optional"/>
-        <xs:attribute name="pinnedServers" use="optional"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="transports" type="xs:string" use="optional"/>
+        <xs:attribute name="pinnedServers" type="xs:string" use="optional"/>
+        <xs:attribute name="startOnLoad" type="xs:boolean" use="optional"/>
     </xs:complexType>
 
 </xs:schema>

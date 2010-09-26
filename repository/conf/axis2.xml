@@ -136,6 +136,9 @@
                          class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
         <!--<messageFormatter contentType=""
                          class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
+        <!--<messageFormatter contentType="application/json"
+                         class="org.apache.axis2.json.JSONMessageFormatter"/>-->
+
     </messageFormatters>
 
     <!-- ================================================= -->
@@ -154,6 +157,8 @@
                          class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
         <!--<messageBuilder contentType=""
                          class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
+        <!--<messageBuilder contentType="application/json"
+                         class="org.apache.axis2.json.JSONOMBuilder"/>-->
     </messageBuilders>
 
     <!-- ================================================= -->

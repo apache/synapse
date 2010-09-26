@@ -775,12 +775,12 @@ SocketConnectPort=9876</pre>
 
     <p>
       <a href="http://json.org">JSON</a> is a lightweight data-interchange format.
-      It can be used as an alternative to the XML or SOAP. To enable the JSON support
+      It can be used as an alternative to XML or SOAP. To enable the JSON support
       in Synapse, following two jar files should be deployed into the 'lib' directory
       of Synapse.
     </p>
     <ul>
-        <li><a href="http://repo1.maven.org/maven2/org/apache/axis2/axis2-saaj">axis2-saaj.jar</a></li>
+        <li><a href="http://repo1.maven.org/maven2/org/apache/axis2/axis2-json">axis2-json.jar</a></li>
         <li><a href="http://jettison.codehaus.org/Download">jettison.jar</a></li>
     </ul>
     <p>

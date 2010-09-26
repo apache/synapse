@@ -21,7 +21,7 @@
 <!-- HTTP to FIX Proxy Service -->
 <definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <proxy name="FIXProxy">
+    <proxy name="FIXProxy" transports="http">
         <target>
             <endpoint>
                 <address
@@ -40,7 +40,7 @@
         </target>
 
         <parameter name="transport.fix.InitiatorConfigURL">
-            file:/home/hiranya/Desktop/fix-config/synapse-sender.cfg
+            file:repository/conf/sample/resources/fix/synapse-sender.cfg
         </parameter>
         <parameter name="transport.fix.InitiatorMessageStore">file</parameter>
         <parameter name="transport.fix.SendAllToInSequence">false</parameter>

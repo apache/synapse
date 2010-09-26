@@ -4025,8 +4025,9 @@ INFO LogMediator text = Stock price - 183.3635460215262</pre></div>
 <p>
 <strong>Objective: Use of both concurrency throttling and request rate based throttling </strong> </p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
-<p>Start Synapse with the sample configuration 372 (i.e. synapse -sample 372). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 372 (i.e. synapse -sample 372)</p>
 <p>Throttle policy is loaded from the &#x201c;throttle_policy. xml&#x201d; . That policy contains merging policy from sample 370 and 371. To check the functionality, it requires to run a load test. The all enabled request from the concurrency throttling will be controlled by the access rate base throttling according to the policy. </p>
 <p>Run the client as follows </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy</pre>
@@ -4336,8 +4337,9 @@ Discounted price: 138.77458254967408</pre>
 <p>
 <strong>Objective: Demonstrate the use of XQuery mediator to import external XML documents to the XQuery engine</strong> </p>
 <p>
-<strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
-<p>Start Synapse with the sample configuration 391 (i.e. synapse -sample 391). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 391 (i.e. synapse -sample 391). </p>
 <p>In this sample, data from commission.xml document is used inside XQuery . The stock quote price from the response and commission from the commission.xml document will be added and given as a new price . </p>
 <p>Invoke the client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy</pre>
@@ -4379,8 +4381,9 @@ Discounted price: 138.77458254967408</pre>
 <p>
 <strong>Objective: Demonstrate the use of Iterate mediator to split the messages in to parts and process them asynchronously and then aggregate the responses coming in to Synapse</strong> </p>
 <p>
-<strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
-<p>Start Synapse with the sample configuration 400 (i.e. synapse -sample 400). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 400 (i.e. synapse -sample 400). </p>
 <p>In this sample, the message sent to Synapse is comprised of a number of elements of the same type. When Synapse receives this message it will iterate through those elements and then will send to the specified endpoint. When all the responses appear to Synapse then those messages will be aggregated to form the resultant response and will send back to the client. </p>
 <p>Invoke the client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/SplitAggregateProxy -Ditr=4</pre>
@@ -4409,15 +4412,16 @@ Discounted price: 138.77458254967408</pre>
 <p>
 <strong>Objective: Demonstrate the use of Cache mediator in order to cache the response and use that cached response as the response for an identical xml request</strong> </p>
 <p>
-<strong>Prerequisites:</strong>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
-<p>Start Synapse with the sample configuration 420 (i.e. synapse -sample 420). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 420 (i.e. synapse -sample 420)</p>
 <p>In this sample, the message sent to Synapse is checked for an existing cached response by calculating the hash value of the request. If there is a cache hit in Synapse then this request will not be forwarded to the actual service, rather Synapse responds to the client with the cached response. In case of a cache miss that particular message will be forwarded to the actual service and caches that response in the out path for the use of consecutive requests of the same type. </p>
 <p>To observe this behaviour, invoke the client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
 <p>You could notice that if you send more than one requests within 20 seconds only the first request is forwarded to the actual service, and the rest of the requests will be served by the cache inside Synapse. You could observe this by looking at the printed line of the axis2 server, as well as by observing a constant rate as the response to the client instead of the random rate, which changes by each and every 20 seconds.
 <br/> </p>
 <h2>
-<a name="Callout" id="Callout">Synchronize web service invocation with Callout mediator </a></h2>
+<a name="Callout" id="Callout">Synchronous Web Services Invocations with the Callout Mediator</a></h2>
 <p>The Callout mediator calls the given service URL with the request message which is given by the source attribute, waits for the response and attaches the received response to the destination which is given by the target attribute. Both the source and the target can be a key or an XPath. In the case of the source, this key refers to either a message context property or to a local entry. For the target, this key refers to a message context property only. </p>
 <h2>
 <a name="Sample430" id="Sample430">Sample 430: Simple Callout Mediator for synchronizing web service invocation</a></h2>
@@ -4441,8 +4445,9 @@ Discounted price: 138.77458254967408</pre>
 <p>
 <strong>Objective:</strong> Demonstrate the use of the callout mediator for the synchronized web service invocation </p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
-<p>Start Synapse with the sample configuration 430 (i.e. synapse -sample 430). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 430 (i.e. synapse -sample 430)</p>
 <p>In this sample, the callout mediator does the direct service invocation to the StockQuoteService using the client request, gets the response and sets it as the first child of the SOAP message body. Then using the send mediator, the message is sent back to the client. </p>
 <p>Invoke the client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre></div>
@@ -4500,10 +4505,11 @@ Discounted price: 138.77458254967408</pre>
 <p>
 <strong>Objective:</strong> Demonstrate the ability to switch between JSON and XML/SOAP content interchange formats</p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
-<p>Setup Synapse and the sample Axis2 client for JSON (Refer <a href="Synapse_Samples_Setup.html#json">Synapse Samples Setup Guide</a>
-for details)</p>
-<p>Start Synapse with the sample configuration 440 (i.e. synapse -sample 440). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Setup Synapse and the sample Axis2 client for JSON (Refer <a href="Synapse_Samples_Setup.html#json">Synapse Samples Setup Guide</a>
+for details)
+<br/>Start Synapse with the sample configuration 440 (i.e. synapse -sample 440)</p>
 <p>Invoke the JSON client as follows. </p>
 <pre xml:space="preserve">ant jsonclient -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/services/JSONProxy</pre>
 <p>JSON client will send a stockquote request to Synapse using the JSON content interchange format. Synapse

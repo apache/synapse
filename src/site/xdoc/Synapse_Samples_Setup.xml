@@ -706,8 +706,9 @@ SocketConnectPort=9876</pre>
     </h2>
     <p>
       To enable the TCP transport for samples first you need to download the Axis2 TCP transport
-      jar and copy it to the lib directory of Synapse. Then open up the axis2.xml file and uncomment
-      the TCP transport receiver and sender configurations:
+      jar and copy it to the lib directory of Synapse. This library can be downloaded from the
+      <a href="http://ws.apache.org/commons/transport">WS-Commons Transports</a> website. Then open
+      up the axis2.xml file and uncomment the TCP transport receiver and sender configurations:
     </p>
     <pre xml:space="preserve">
     &lt;transportReceiver name="tcp" class="org.apache.axis2.transport.tcp.TCPServer"&gt;
@@ -725,8 +726,9 @@ SocketConnectPort=9876</pre>
     </h2>
     <p>
       To enable the UDP transport for samples first you need to download the Axis2 UDP transport
-      jar and copy it to the lib directory of Synapse. Then open up the axis2.xml file and uncomment
-      the UDP transport receiver and sender configurations:
+      jar and copy it to the lib directory of Synapse. This library can be downloaded from the
+      <a href="http://ws.apache.org/commons/transport">WS-Commons Transports</a> website. Then
+      open up the axis2.xml file and uncomment the UDP transport receiver and sender configurations:
     </p>
     <pre xml:space="preserve">
     &lt;transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/&gt;

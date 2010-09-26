@@ -74,7 +74,7 @@
                     </xs:attribute>
                 </xs:complexType>
             </xs:element>
-            <xs:element ref="parameter" minOccurs="0"/>
+            <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="monitoringAspect"/>
         <xs:attribute name="name" type="xs:string" use="required"/>

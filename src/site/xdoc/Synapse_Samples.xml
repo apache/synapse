@@ -4543,8 +4543,9 @@ will be converted into a JSON message and sent back to the JSON client.</p>
 <p>
 <strong>Objective:</strong> Demonstrate the basic functions of the URL rewrite mediator</p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
-<p>Start Synapse with the sample configuration 450 (i.e. synapse -sample 450). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 450 (i.e. synapse -sample 450)</p>
 <p>Invoke the Axis2 client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280 -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService</pre>
 <p>Note that the address URL of the client request contains the context 'soap'. But in the Axis2 server all the
@@ -4585,8 +4586,9 @@ Axis2 client will receive a valid response.</p>
 <strong>Objective:</strong> Demonstrate the ability of the URL rewrite mediator to evaluate conditions on messages and
 perform rewrites based on the results.</p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
-<p>Start Synapse with the sample configuration 451 (i.e. synapse -sample 451). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 451 (i.e. synapse -sample 451)</p>
 <p>Invoke the Axis2 client and send some requests to Synapse with different address URL values. If the address
 URL value contains localhost as the hostname and https as the protocol prefix, Synapse will route the message as
 it is. But if the hostname is localhost and the protocol is not https, Synapse will rewrite the URL by setting
@@ -4635,8 +4637,9 @@ framework. Hence URL rewriting can be done based on any of these aspects.</p>
 <strong>Objective:</strong> Demonstrate the ability of the URL rewrite mediator to perform rewrites based
 on multiple rules.</p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000.</p>
-<p>Start Synapse with the sample configuration 452 (i.e. synapse -sample 452). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 452 (i.e. synapse -sample 452)</p>
 <p>Invoke the Axis2 client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280 -Daddurl=http://test.com/SimpleStockQuoteService</pre>
 <p>The provided address URL does not contain a port number and the context. The URL rewrite mediator will replace
@@ -4686,12 +4689,21 @@ values by executing XPath expressions. The port numbers are calculated by execut
 <p>
 <strong>Objective:</strong> Demonstrate How to initialize and use a SpringBean as a mediator  </p>
 <p>
-<strong>Prerequisites:</strong> Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000. </p>
-<p>Start Synapse with the sample configuration 460 (i.e. synapse -sample 460). </p>
+<strong>Prerequisites:</strong>
+<br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+<br/>Start Synapse with the sample configuration 460 (i.e. synapse -sample 460)</p>
 <p>In this sample, the Spring Bean, SpringCustomLogger get initialized using springCustomLogger.xml file and then it log the message Id.</p>
 <p>Invoke the client as follows. </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</pre>
+<p>If you have enabled logging for the samples.mediators package you will see an output similar to the
+following on the console:</p>
+<pre xml:space="preserve">2010-09-26 20:46:57,946 [-] [HttpServerWorker-1]  INFO SpringCustomLogger Starting Spring Meditor
+2010-09-26 20:46:57,946 [-] [HttpServerWorker-1]  INFO SpringCustomLogger Bean in Initialized with User:["Synapse User"]
+2010-09-26 20:46:57,946 [-] [HttpServerWorker-1]  INFO SpringCustomLogger E-MAIL:["usr@synapse.org"]
+2010-09-26 20:46:57,946 [-] [HttpServerWorker-1]  INFO SpringCustomLogger Massage Id:  urn:uuid:383FA8B27D7CC549D91285514217720
+2010-09-26 20:46:57,946 [-] [HttpServerWorker-1]  INFO SpringCustomLogger Logged....</pre>
 </div>
+    
    <h2>
       <a name="Sample500" id="Sample500">Sample 500: Simple Eventing Sample</a>
     </h2>
@@ -5308,7 +5320,7 @@ values by executing XPath expressions. The port numbers are calculated by execut
     <h2>
     <a name="Message Store" id="MessageStore">Introducing Synapse Message store</a></h2>
     <h2>
-    <a name="Sample700" id="Sample700">Sample 700: Introduction Message Store</a></h2>
+    <a name="Sample700" id="Sample700">Sample 700: Introduction to Synapse Message Store</a></h2>
     <pre xml:space="preserve">&lt;!-- Introduction to the Synapse Message Store --&gt;
     &lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
         &lt;!--Simple in Memory Message Store with name foo --&gt;

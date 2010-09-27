@@ -63,13 +63,13 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_CONTPAR = new QName("continueParent");
     private static final QName ATT_PREPLD = new QName("preservePayload");
     private static final QName ATT_ATTACHPATH = new QName("attachPath");
-    private static final QName ATT_ASYNCHRONOUS = new QName("asynchronous");
+    private static final QName ATT_SEQUENCIAL = new QName("sequential");
 
     /**
      * This method will create the IterateMediator by parsing the given xml configuration
      *
      * @param elem OMElement describing the configuration of the IterateMediaotr
-     * @param properties
+     * @param properties properties bag containing synapse configurations
      * @return IterateMediator created from the given configuration
      */
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
@@ -121,7 +121,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
         }
 
         boolean asynchronous = true;
-        OMAttribute asynchronousAttr = elem.getAttribute(ATT_ASYNCHRONOUS);
+        OMAttribute asynchronousAttr = elem.getAttribute(ATT_SEQUENCIAL);
         if (asynchronousAttr != null && asynchronousAttr.getAttributeValue().equals("false")) {
             asynchronous = true;
         }

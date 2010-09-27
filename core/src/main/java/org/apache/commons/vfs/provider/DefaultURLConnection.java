@@ -29,7 +29,7 @@ import java.net.URLConnection;
  * A default URL connection that will work for most file systems.
  *
  * @author <a href="mailto:brian@mmmanager.org">Brian Olsen</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public final class DefaultURLConnection
     extends URLConnection

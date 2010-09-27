@@ -29,7 +29,7 @@ import java.util.Collection;
  * A read-only file system for compressed files.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 480428 $ $Date: 2006-11-29 11:45:24 +0530 (Wed, 29 Nov 2006) $
+ * @version $Revision$ $Date$
  */
 public abstract class CompressedFileFileSystem
     extends AbstractFileSystem

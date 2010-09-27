@@ -32,7 +32,7 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
  * Determines the content information for files accessed via WebDAV.
  *
  * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
- * @version $Revision: 834373 $
+ * @version $Revision$
  */
 public class WebdavFileContentInfoFactory implements FileContentInfoFactory
 {

@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
  * @author Gary D. Gregory
- * @version $Id: AbstractTestSuite.java 833829 2009-11-08 05:16:14Z rgoers $
+ * @version $Id$
  */
 public abstract class AbstractTestSuite
     extends TestSetup

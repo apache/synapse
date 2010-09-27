@@ -32,7 +32,7 @@ import java.net.UnknownHostException;
  * RandomAccess for smb files
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 537714 $ $Date: 2007-05-14 11:21:00 +0530 (Mon, 14 May 2007) $
+ * @version $Revision$ $Date$
  */
 class SmbFileRandomAccessContent extends AbstractRandomAccessContent
 {

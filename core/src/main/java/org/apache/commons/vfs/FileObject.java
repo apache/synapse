@@ -65,7 +65,7 @@ import org.apache.commons.vfs.operations.FileOperations;
  * <p>To find files in another file system, use a {@link FileSystemManager}.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  * @see FileSystemManager
  * @see FileContent
  * @see FileName

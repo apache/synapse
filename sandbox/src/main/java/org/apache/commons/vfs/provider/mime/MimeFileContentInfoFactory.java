@@ -30,7 +30,7 @@ import javax.mail.internet.ContentType;
  * get access to the content info stuff for mime objects
  *
  * @author <a href="mailto:imario@apache.org">imario@apache.org</a>
- * @version $Revision: 496713 $ $Date: 2007-01-16 20:18:22 +0530 (Tue, 16 Jan 2007) $
+ * @version $Revision$ $Date$
  */
 public class MimeFileContentInfoFactory implements FileContentInfoFactory
 {

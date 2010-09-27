@@ -44,7 +44,7 @@ import java.util.jar.Attributes.Name;
  * TODO - Test this with signed Jars and a SecurityManager.
  *
  * @author <a href="mailto:brian@mmmanager.org">Brian Olsen</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  * @see FileSystemManager#createFileSystem
  */
 public class VFSClassLoader extends SecureClassLoader

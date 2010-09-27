@@ -21,7 +21,7 @@ package org.apache.commons.vfs.impl;
  * Same as {@link ProviderConfiguration} but for the default provider.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 480428 $ $Date: 2006-11-29 11:45:24 +0530 (Wed, 29 Nov 2006) $
+ * @version $Revision$ $Date$
  */
 public class DefaultProviderConfiguration extends ProviderConfiguration
 {

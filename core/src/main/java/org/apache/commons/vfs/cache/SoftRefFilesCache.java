@@ -38,7 +38,7 @@ import java.util.Map;
  * will be discarded.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 764356 $ $Date: 2005-09-30 09:02:41 +0200 (Fr, 30 Sep
+ * @version $Revision$ $Date: 2005-09-30 09:02:41 +0200 (Fr, 30 Sep
  *          2005) $
  * @see SoftReference
  */

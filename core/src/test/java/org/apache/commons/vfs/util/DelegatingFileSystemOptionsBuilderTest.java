@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
  * Some tests for the DelegatingFileSystemOptionsBuilder
  * 
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 740653 $ $Date: 2009-02-04 13:36:28 +0530 (Wed, 04 Feb 2009) $
+ * @version $Revision$ $Date$
  */
 public class DelegatingFileSystemOptionsBuilderTest extends TestCase
 {

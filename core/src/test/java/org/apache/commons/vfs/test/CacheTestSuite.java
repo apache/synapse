@@ -22,7 +22,7 @@ package org.apache.commons.vfs.test;
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
  * @author Gary D. Gregory
- * @version $Id: CacheTestSuite.java 480428 2006-11-29 06:15:24Z bayard $
+ * @version $Id$
  */
 public class CacheTestSuite
     extends AbstractTestSuite

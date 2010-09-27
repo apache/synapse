@@ -42,7 +42,7 @@ import java.util.StringTokenizer;
  * </ul>
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 895278 $ $Date: 2010-01-03 01:32:29 +0530 (Sun, 03 Jan 2010) $
+ * @version $Revision$ $Date$
  * @todo Deal with case where dest file maps to a child of one of the source files
  * @todo Deal with case where dest file already exists and is incorrect type (not file, not a folder)
  * @todo Use visitors

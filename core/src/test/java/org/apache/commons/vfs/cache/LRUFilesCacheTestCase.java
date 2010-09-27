@@ -31,7 +31,7 @@ import java.io.File;
  * Tests the NullFilesCache
  * 
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 480428 $ $Date: 2006-11-29 11:45:24 +0530 (Wed, 29 Nov 2006) $
+ * @version $Revision$ $Date$
  */
 public class LRUFilesCacheTestCase
     extends AbstractProviderTestConfig

@@ -32,7 +32,7 @@ import java.util.Set;
  * A wrapper to an FileObject to get a {@link javax.mail.internet.SharedInputStream} 
  *
  * @author <a href="mailto:imario@apache.org">imario@apache.org</a>
- * @version $Revision: 480428 $ $Date: 2006-11-29 11:45:24 +0530 (Wed, 29 Nov 2006) $
+ * @version $Revision$ $Date$
  */
 public class SharedRandomContentInputStream extends BufferedInputStream implements SharedInputStream
 {

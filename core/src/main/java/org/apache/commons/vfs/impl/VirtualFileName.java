@@ -24,7 +24,7 @@ import org.apache.commons.vfs.provider.AbstractFileName;
  * A simple Filename to hold the scheme for to be created virtual filesytsem.
  *
  * @author imario@apache.org
- * @version $Revision: 480428 $ $Date: 2006-11-29 11:45:24 +0530 (Wed, 29 Nov 2006) $
+ * @version $Revision$ $Date$
  */
 public class VirtualFileName extends AbstractFileName
 {

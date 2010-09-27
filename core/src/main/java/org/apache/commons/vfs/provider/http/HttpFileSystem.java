@@ -32,7 +32,7 @@ import java.util.Collection;
  * An HTTP file system.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 833480 $ $Date: 2009-11-06 23:07:05 +0530 (Fri, 06 Nov 2009) $
+ * @version $Revision$ $Date$
  */
 public class HttpFileSystem
     extends AbstractFileSystem

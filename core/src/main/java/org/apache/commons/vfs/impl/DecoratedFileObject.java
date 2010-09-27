@@ -33,7 +33,7 @@ import org.apache.commons.vfs.operations.FileOperations;
  * Base class to build a fileObject decoration.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public class DecoratedFileObject implements FileObject
 {

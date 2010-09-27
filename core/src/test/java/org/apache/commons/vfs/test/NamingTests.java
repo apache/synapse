@@ -25,7 +25,7 @@ import org.apache.commons.vfs.NameScope;
  * Test cases for file naming.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 755295 $ $Date: 2009-03-17 21:41:28 +0530 (Tue, 17 Mar 2009) $
+ * @version $Revision$ $Date$
  * @todo Add tests for all FileName methods
  */
 public class NamingTests

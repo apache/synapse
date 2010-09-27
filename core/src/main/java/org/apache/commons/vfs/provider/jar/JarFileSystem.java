@@ -37,7 +37,7 @@ import java.util.zip.ZipFile;
  * A read-only file system for Jar files.
  *
  * @author <a href="mailto:brian@mmmanager.org">Brian Olsen</a>
- * @version $Revision: 895278 $ $Date: 2010-01-03 01:32:29 +0530 (Sun, 03 Jan 2010) $
+ * @version $Revision$ $Date$
  */
 public class JarFileSystem
     extends ZipFileSystem

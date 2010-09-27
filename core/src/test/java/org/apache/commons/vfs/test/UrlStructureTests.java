@@ -25,7 +25,7 @@ import org.apache.commons.vfs.FileObject;
  * URL Test cases for providers that supply structural info.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 755096 $ $Date: 2009-03-17 08:18:32 +0530 (Tue, 17 Mar 2009) $
+ * @version $Revision$ $Date$
  */
 public class UrlStructureTests
     extends AbstractProviderTestCase

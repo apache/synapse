@@ -34,7 +34,7 @@ import org.apache.commons.vfs.util.UserAuthenticatorUtils;
  * Create a HttpClient instance.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 895278 $ $Date: 2010-01-03 01:32:29 +0530 (Sun, 03 Jan 2010) $
+ * @version $Revision$ $Date$
  */
 public final class HttpClientFactory
 {

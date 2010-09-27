@@ -24,7 +24,7 @@ import java.io.InputStream;
  * An InputStream that provides buffering and end-of-stream monitoring.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804886 $ $Date: 2009-08-17 13:08:49 +0530 (Mon, 17 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public class MonitorInputStream
     extends BufferedInputStream

@@ -43,7 +43,7 @@ import org.w3c.dom.NodeList;
  * if a provider was skipped due to "unresolved externals".
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804273 $ $Date: 2009-08-14 21:26:52 +0530 (Fri, 14 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public class StandardFileSystemManager
     extends DefaultFileSystemManager

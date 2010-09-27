@@ -30,7 +30,7 @@ import java.util.zip.GZIPOutputStream;
  * the gzip file.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 804644 $ $Date: 2009-08-16 13:32:15 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public class GzipFileObject extends CompressedFileFileObject
 {

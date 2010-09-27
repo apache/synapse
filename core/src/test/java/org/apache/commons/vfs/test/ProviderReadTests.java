@@ -30,7 +30,7 @@ import java.util.List;
  * Read-only test cases for file providers.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 773234 $ $Date: 2009-05-09 20:57:59 +0530 (Sat, 09 May 2009) $
+ * @version $Revision$ $Date$
  * @todo Test getLastModified(), getAttribute()
  */
 public class ProviderReadTests

@@ -67,7 +67,7 @@ import org.apache.commons.vfs.operations.FileOperationProvider;
  * </ul>
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public interface FileSystemManager
 {

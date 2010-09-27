@@ -33,7 +33,7 @@ import java.util.Collection;
  * An FTP file system.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 993534 $ $Date: 2010-09-08 02:43:19 +0530 (Wed, 08 Sep 2010) $
+ * @version $Revision$ $Date$
  */
 public class FtpFileSystem extends AbstractFileSystem
 {

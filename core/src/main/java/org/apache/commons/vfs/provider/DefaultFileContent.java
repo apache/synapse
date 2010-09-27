@@ -39,7 +39,7 @@ import java.util.Set;
  * The content of a file.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804273 $ $Date: 2009-08-14 21:26:52 +0530 (Fri, 14 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public final class DefaultFileContent implements FileContent
 {

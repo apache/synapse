@@ -78,7 +78,7 @@ import java.util.Stack;
  * interface.)</i>
  *
  * @author <a href="mailto:xknight@users.sourceforge.net">Christopher Ottley</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public class DefaultFileMonitor implements Runnable, FileMonitor
 {

@@ -27,7 +27,7 @@ import org.apache.commons.httpclient.HttpRecoverableException;
  * Now that webdavlib didnt support adding a MethodRetryHandler only a few operations are restartable yet.
  *
  * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
- * @version $Revision: 764356 $ $Date: 2009-04-13 09:36:01 +0530 (Mon, 13 Apr 2009) $
+ * @version $Revision$ $Date$
  */
 public final class WebdavMethodRetryHandler implements MethodRetryHandler
 {

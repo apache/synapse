@@ -39,7 +39,7 @@ import org.apache.commons.vfs.test.ProviderTestSuite;
  * The suite of tests for a file system.
  *
  * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
- * @version $Id: WebdavProviderTestSuite.java 773234 2009-05-09 15:27:59Z rgoers $
+ * @version $Id$
  */
 public class WebdavProviderTestSuite extends ProviderTestSuite
 {

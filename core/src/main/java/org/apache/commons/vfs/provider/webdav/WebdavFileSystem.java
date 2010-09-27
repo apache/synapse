@@ -32,7 +32,7 @@ import org.apache.commons.vfs.provider.http.HttpFileSystem;
  * A WebDAV file system.
  *
  * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
- * @version $Revision: 773234 $ $Date: 2009-05-09 20:57:59 +0530 (Sat, 09 May 2009) $
+ * @version $Revision$ $Date$
  */
 public class WebdavFileSystem extends HttpFileSystem implements FileSystem
 {

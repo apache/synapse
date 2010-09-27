@@ -30,7 +30,7 @@ import org.apache.commons.vfs.util.FileObjectUtils;
  * Creates the FileContentInfo.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 834373 $ $Date: 2009-11-10 12:51:18 +0530 (Tue, 10 Nov 2009) $
+ * @version $Revision$ $Date$
  */
 public class HttpFileContentInfoFactory implements FileContentInfoFactory
 {

@@ -28,7 +28,7 @@ import java.io.Serializable;
  * The config BUILDER for various sftp configuration options.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 993534 $ $Date: 2010-09-08 02:43:19 +0530 (Wed, 08 Sep 2010) $
+ * @version $Revision$ $Date$
  */
 public final class SftpFileSystemConfigBuilder extends FileSystemConfigBuilder
 {

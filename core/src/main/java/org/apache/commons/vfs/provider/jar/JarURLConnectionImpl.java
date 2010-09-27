@@ -35,7 +35,7 @@ import java.util.jar.Manifest;
  * A default URL connection that will work for most file systems.
  *
  * @author <a href="mailto:brian@mmmanager.org">Brian Olsen</a>
- * @version $Revision: 895278 $ $Date: 2010-01-03 01:32:29 +0530 (Sun, 03 Jan 2010) $
+ * @version $Revision$ $Date$
  */
 public class JarURLConnectionImpl
     extends JarURLConnection

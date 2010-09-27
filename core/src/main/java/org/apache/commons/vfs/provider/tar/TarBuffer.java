@@ -33,7 +33,7 @@ import java.util.Arrays;
  *
  * @author <a href="mailto:time@ice.com">Timothy Gerard Endres</a>
  * @author <a href="mailto:peter@apache.org">Peter Donald</a>
- * @version $Revision: 895278 $ $Date: 2010-01-03 01:32:29 +0530 (Sun, 03 Jan 2010) $
+ * @version $Revision$ $Date$
  */
 class TarBuffer
 {

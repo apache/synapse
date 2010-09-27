@@ -21,7 +21,7 @@ package org.apache.commons.vfs;
  * traversal of a hierarchy.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 764356 $ $Date: 2009-04-13 09:36:01 +0530 (Mon, 13 Apr 2009) $
+ * @version $Revision$ $Date$
  * @todo Rename this interface, as it is used by both FileSelector and FileVisitor.
  */
 public interface FileSelectInfo

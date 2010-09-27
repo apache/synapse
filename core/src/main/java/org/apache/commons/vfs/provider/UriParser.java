@@ -26,7 +26,7 @@ import org.apache.commons.vfs.util.Os;
  * Utilities for dealing with URIs. See RFC 2396 for details.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804644 $ $Date: 2005-10-13 21:11:33 +0200 (Do, 13 Okt
+ * @version $Revision$ $Date: 2005-10-13 21:11:33 +0200 (Do, 13 Okt
  *          2005) $
  */
 public final class UriParser

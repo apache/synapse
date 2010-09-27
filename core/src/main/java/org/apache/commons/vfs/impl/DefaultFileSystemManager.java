@@ -58,7 +58,7 @@ import java.util.Map;
  * A default file system manager implementation.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 804548 $ $Date: 2006-03-30 21:16:24 +0200 (Do, 30 Mrz
+ * @version $Revision$ $Date: 2006-03-30 21:16:24 +0200 (Do, 30 Mrz
  *          2006) $
  */
 public class DefaultFileSystemManager implements FileSystemManager

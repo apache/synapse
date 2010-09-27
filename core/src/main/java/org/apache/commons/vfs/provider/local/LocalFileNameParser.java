@@ -27,7 +27,7 @@ import org.apache.commons.vfs.provider.VfsComponentContext;
  * A name parser.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 895278 $ $Date: 2010-01-03 01:32:29 +0530 (Sun, 03 Jan 2010) $
+ * @version $Revision$ $Date$
  */
 public abstract class LocalFileNameParser extends AbstractFileNameParser
 {

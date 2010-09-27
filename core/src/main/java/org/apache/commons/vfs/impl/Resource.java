@@ -29,7 +29,7 @@ import java.util.jar.Attributes;
  * the classloader.
  *
  * @author <a href="mailto:brian@mmmanager.org">Brian Olsen</a>
- * @version $Revision: 764356 $ $Date: 2009-04-13 09:36:01 +0530 (Mon, 13 Apr 2009) $
+ * @version $Revision$ $Date$
  * @see VFSClassLoader
  */
 class Resource

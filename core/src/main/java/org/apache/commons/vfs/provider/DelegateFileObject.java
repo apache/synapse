@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
  * @author Gary D. Gregory
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  * @todo Extract subclass that overlays the children
  */
 public class DelegateFileObject

@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * test resources.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 805690 $ $Date: 2009-08-19 13:16:37 +0530 (Wed, 19 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public abstract class AbstractVfsTestCase
     extends TestCase

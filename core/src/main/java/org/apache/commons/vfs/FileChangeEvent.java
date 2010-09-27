@@ -20,7 +20,7 @@ package org.apache.commons.vfs;
  * An event fired when a file is changed.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 763740 $ $Date: 2009-04-09 22:52:31 +0530 (Thu, 09 Apr 2009) $
+ * @version $Revision$ $Date$
  */
 public class FileChangeEvent
 {

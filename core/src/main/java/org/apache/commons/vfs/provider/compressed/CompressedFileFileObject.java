@@ -28,7 +28,7 @@ import org.apache.commons.vfs.provider.AbstractFileObject;
  * Such a file do only have one child (the compressed filename with stripped last extension)
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 804644 $ $Date: 2009-08-16 13:32:15 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public abstract class CompressedFileFileObject
     extends AbstractFileObject

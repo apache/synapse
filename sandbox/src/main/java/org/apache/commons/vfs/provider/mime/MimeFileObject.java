@@ -45,7 +45,7 @@ import org.apache.commons.vfs.util.FileObjectUtils;
  * A part of a MIME message.
  *
  * @author <a href="mailto:imario@apache.org">imario@apache.org</a>
- * @version $Revision: 755096 $ $Date: 2009-03-17 08:18:32 +0530 (Tue, 17 Mar 2009) $
+ * @version $Revision$ $Date$
  */
 public class MimeFileObject
 	extends AbstractFileObject

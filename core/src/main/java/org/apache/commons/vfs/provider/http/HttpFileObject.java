@@ -44,7 +44,7 @@ import java.net.HttpURLConnection;
  * A file object backed by commons httpclient.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 833575 $ $Date: 2009-11-07 03:47:06 +0530 (Sat, 07 Nov 2009) $
+ * @version $Revision$ $Date$
  * @todo status codes
  */
 public class HttpFileObject

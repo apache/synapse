@@ -20,7 +20,7 @@ package org.apache.commons.vfs;
  * Create a class which is able to determine the content-info for the given content.
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 public interface FileContentInfoFactory
 {

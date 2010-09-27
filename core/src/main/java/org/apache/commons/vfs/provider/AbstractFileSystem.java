@@ -51,7 +51,7 @@ import java.lang.reflect.InvocationTargetException;
  * A partial {@link org.apache.commons.vfs.FileSystem} implementation.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 833538 $ $Date: 2009-11-07 01:26:25 +0530 (Sat, 07 Nov 2009) $
+ * @version $Revision$ $Date$
  */
 public abstract class AbstractFileSystem
     extends AbstractVfsComponent

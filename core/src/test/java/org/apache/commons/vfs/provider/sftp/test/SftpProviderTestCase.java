@@ -31,7 +31,7 @@ import org.apache.commons.vfs.test.ProviderTestSuite;
  * Test cases for the SFTP provider.
  *
  * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 732328 $ $Date: 2009-01-07 18:58:48 +0530 (Wed, 07 Jan 2009) $
+ * @version $Revision$ $Date$
  */
 public class SftpProviderTestCase
     extends AbstractProviderTestConfig

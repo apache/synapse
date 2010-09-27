@@ -22,7 +22,7 @@ import org.apache.commons.vfs.FileSystemOptions;
  * Used to identify a filesystem
  *
  * @author <a href="mailto:imario@apache.org">Mario Ivankovits</a>
- * @version $Revision: 804548 $ $Date: 2009-08-16 07:42:32 +0530 (Sun, 16 Aug 2009) $
+ * @version $Revision$ $Date$
  */
 class FileSystemKey implements Comparable
 {

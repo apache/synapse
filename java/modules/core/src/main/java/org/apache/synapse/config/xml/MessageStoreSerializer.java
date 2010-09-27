@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.store.MessageStore;
+import org.apache.synapse.message.store.InMemoryMessageStore;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -53,30 +54,30 @@ public class MessageStoreSerializer {
 
     public static OMElement serializeMessageStore(OMElement parent, MessageStore messageStore) {
 
-        OMElement store = fac.createOMElement(XMLConfigConstants.MESSAGE_STORE_ELT);
+        OMElement store = fac.createOMElement("messageStore", synNS);
 
         if (messageStore.getProviderClass() != null) {
-            store.addAttribute(fac.createOMAttribute("class", nullNS,
-                    messageStore.getProviderClass()));
+            if (!messageStore.getProviderClass().equals(InMemoryMessageStore.class.getName())) {
+                store.addAttribute(fac.createOMAttribute("class", nullNS,
+                        messageStore.getProviderClass()));
+            }
         } else {
             handleException("Invalid MessageStore. Provider is required");
         }
 
         if (messageStore.getSequence() != null) {
-            store.addAttribute(fac.createOMAttribute("sequence", nullNS,
-                    messageStore.getSequence()));
+            store.addAttribute(fac.createOMAttribute("sequence", nullNS, messageStore.getSequence()));
         }
 
         if (messageStore.getName() != null) {
-            store.addAttribute(fac.createOMAttribute("name", nullNS,
-                    messageStore.getSequence()));
+            store.addAttribute(fac.createOMAttribute("name", nullNS, messageStore.getName()));
         } else {
             handleException("Message store Name not specified");
         }
 
         //Redelivery processor
         OMElement redilevery = fac.createOMElement("redelivery", synNS);
-        int reDeliveryDelay = messageStore.getRedeliveryProcessor().getRedeliveryDelay()/1000;
+        int reDeliveryDelay = messageStore.getRedeliveryProcessor().getRedeliveryDelay() / 1000;
 
         OMElement delay = fac.createOMElement("interval", synNS);
         delay.setText(String.valueOf(reDeliveryDelay));

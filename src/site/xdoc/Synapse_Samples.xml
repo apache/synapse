@@ -2506,11 +2506,11 @@ Transfer-Encoding: chunked
 <strong>Objective: Using the mail transport with Proxy services</strong> </p>
 <p>
 <strong>Prerequisites:</strong>
-<br/> You will need access to an email account </p>
-<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
-<p>Enable mail transport sender in the Synapse axis2.xml. See 
-<a href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport sender</a> </p>
-<p>Start the Synapse configuration numbered 256: i.e. synapse -sample 256 </p>
+<br/> You will need access to an email account
+<br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done
+<br/>Enable mail transport sender in the Synapse axis2.xml. See
+<a href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport sender</a>
+<br/>Start the Synapse configuration numbered 256: i.e. synapse -sample 256 </p>
 <p>Send an email with the following body and any custom Subject from your mail account. </p>
 <pre xml:space="preserve">&lt;getQuote xmlns=&quot;http://services.samples&quot;&gt;
    &lt;request xmlns=&quot;http://services.samples/xsd&quot;&gt;

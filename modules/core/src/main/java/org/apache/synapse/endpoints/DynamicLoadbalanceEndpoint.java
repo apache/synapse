@@ -27,6 +27,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.core.LoadBalanceMembershipHandler;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -190,6 +191,13 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         //Rewriting the URL
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+        //Removing the REST_URL_POSTFIX - this is a hack.
+        //In this loadbalance endpoint we create an endpoint per request by setting the complete url as the adress.
+        //If a REST message comes Axis2FlexibleMEPClient append the REST_URL_POSTFIX to the adress. Hence endpoint fails
+        //do send the request. e.g.  http://localhost:8080/example/index.html/example/index.html
+        axis2MsgCtx.removeProperty(NhttpConstants.REST_URL_POSTFIX);
+
         String transport = axis2MsgCtx.getTransportIn().getName();
         String address = synCtx.getTo().getAddress();
         EndpointReference to = getEndpointReferenceAfterURLRewrite(currentMember,

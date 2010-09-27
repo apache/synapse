@@ -72,12 +72,34 @@ public abstract class AbstractDispatcher implements Dispatcher {
 
         if (key != null) {
             Map headerMap = getTransportHeaderMap(synCtx);
+
             if (headerMap != null) {
+                Object cookieObj = headerMap.get(key);
 
-                Object cookie = headerMap.get(key);
+                if (cookieObj instanceof String) {
+                    String cookie = (String) cookieObj;
+                    
+                    // extract the first name value pair of the Set-Cookie header, which is considered
+                    // as the session id which will be sent back from the client with the Cookie header
+                    // for example;
+                    //      Set-Cookie: JSESSIONID=760764CB72E96A7221506823748CF2AE; Path=/
+                    // will result in the session id "JSESSIONID=760764CB72E96A7221506823748CF2AE"
+                    String[] sessionIds = cookie.split(";");
 
-                if (cookie instanceof String) {
-                    return (String) cookie;
+                    if (sessionIds == null || sessionIds.length == 0) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Cannot find a session id for the cookie : " + cookie);
+                        }
+                        return null;
+                    }
+
+                    for(String sessionId : sessionIds){
+                        if(sessionId != null && sessionId.indexOf("JSESSIONID") != -1){
+                            return sessionId;
+                        }
+                    }
+
+                    return null;
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Couldn't find the " + key + " header to find the session");

@@ -211,8 +211,7 @@ public class ScriptMediator extends AbstractMediator {
             returnValue = false;
         } catch (NoSuchMethodException e) {
             handleException("The script engine returned a NoSuchMethodException executing the " +
-                    (key == null ? "inlined " : "external ") + language + " script" +
-                    (key != null ? " : " + key : "") +
+                    "external " + language + " script" + " : " + key +
                     (function != null ? " function " + function : ""), e, synCtx);
             returnValue = false;
         }
@@ -231,7 +230,7 @@ public class ScriptMediator extends AbstractMediator {
             throws ScriptException, NoSuchMethodException {
         prepareExternalScript(synCtx);
         ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
-        return invocableScript.invokeFunction(function, new Object[]{scriptMC});
+        return invocableScript.invokeFunction(function, scriptMC);
     }
 
     /**

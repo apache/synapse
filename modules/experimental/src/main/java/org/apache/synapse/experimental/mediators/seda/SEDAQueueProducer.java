@@ -48,7 +48,9 @@ public class SEDAQueueProducer {
         } else if (SEDAQueueProducerPolicy.OFFER.equals(action)) {
             long timeout = queueProducerPolicy.getTimeoutOnInsert();
             if (timeout < 0) {
-                queue.offer(messageContext);
+                if (!queue.offer(messageContext)) {
+                    log.warn("Error while offering the message to the queue");    
+                }
             } else {
                 try {
                     queue.offer(messageContext, timeout, TimeUnit.MILLISECONDS);

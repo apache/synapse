@@ -95,9 +95,10 @@ public class RewriteRule {
 
         if (headers != null && headers instanceof Map) {
             Map headersMap = (Map) headers;
-            for (Object key : headersMap.keySet()) {
-                if (key instanceof String && headersMap.get(key) instanceof String) {
-                    evaluatorHeaders.put((String) key, (String) headersMap.get(key));
+            for (Object entryObj : headersMap.entrySet()) {
+                Map.Entry entry = (Map.Entry) entryObj;
+                if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
+                    evaluatorHeaders.put((String) entry.getKey(), (String) entry.getValue());
                 }
             }
         }

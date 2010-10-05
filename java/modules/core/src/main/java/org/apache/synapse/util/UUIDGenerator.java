@@ -85,12 +85,13 @@ public class UUIDGenerator {
         sb.append(sid);
         sb.append(":");
         sb.append(Long.toString(rand));
-        MessageDigest md5 = null;
+        MessageDigest md5;
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
             //System.out.println("Error: " + e);
             //todo have to be properly handled
+            return null;
         }
         md5.update(sb.toString().getBytes());
         byte[] array = md5.digest();

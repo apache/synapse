@@ -297,7 +297,8 @@ public class SynapseConfigUtils {
         } finally {
             try {
                 inStream.close();
-            } catch (IOException ignore) {
+            } catch (IOException e) {
+                log.warn("Error while closing the input stream to: " + url, e);
             }
         }
     }

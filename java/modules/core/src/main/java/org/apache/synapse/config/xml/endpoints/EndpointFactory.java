@@ -53,7 +53,7 @@ import java.util.*;
  */
 public abstract class EndpointFactory implements XMLToObjectMapper {
 
-    protected static Log log;
+    static Log log;
 
     protected EndpointFactory() {
         log = LogFactory.getLog(this.getClass());

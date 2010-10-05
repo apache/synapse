@@ -67,7 +67,7 @@ public class ProxyServiceSerializer {
         if (transports != null && !transports.isEmpty()) {
             String transportStr = "" + transports.get(0);
             for (int i = 1; i < transports.size(); i++) {
-                transportStr = transportStr + " " + transports.get(i);
+                transportStr = transportStr.concat(" " + transports.get(i));
             }
             proxy.addAttribute(fac.createOMAttribute("transports", nullNS, transportStr));
         }
@@ -81,7 +81,7 @@ public class ProxyServiceSerializer {
         if (pinnedServers != null && !pinnedServers.isEmpty()) {
           String pinnedServersStr = "" + pinnedServers.get(0);
           for (int i = 1; i < pinnedServers.size(); i++) {
-            pinnedServersStr = pinnedServersStr + " " + pinnedServers.get(i);
+            pinnedServersStr = pinnedServersStr.concat(" " + pinnedServers.get(i));
           }
           proxy.addAttribute(fac.createOMAttribute("pinnedServers", nullNS, pinnedServersStr));
         }

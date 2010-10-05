@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.apache.synapse.util;
 
 import java.util.Iterator;
@@ -21,7 +40,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.util.SimpleMap;
 
 public class PayloadHelper {
 	
@@ -46,14 +64,15 @@ public class PayloadHelper {
 	// the payload is set
 	public static int getPayloadType(SOAPEnvelope envelope) {
 		OMElement el = getXMLPayload(envelope);
-		if (el.getQName().equals(BINARYELT))
+		if (el.getQName().equals(BINARYELT)) {
 			return BINARYPAYLOADTYPE;
-		else if (el.getQName().equals(TEXTELT))
+        } else if (el.getQName().equals(TEXTELT)) {
 			return TEXTPAYLOADTYPE;
-		else if (el.getQName().equals(MAPELT))
+        } else if (el.getQName().equals(MAPELT)) {
 			return MAPPAYLOADTYPE;
-		else
+        } else {
 			return XMLPAYLOADTYPE; // default XML
+        }
 	}
 
 	public static int getPayloadType(MessageContext mc) {
@@ -173,7 +192,7 @@ public class PayloadHelper {
 		if (el == null)
 			return null;
 		if (!el.getQName().equals(TEXTELT)) {
-			log.error("Wrong QName" + el.getQName());
+			log.error("Wrong QName " + el.getQName());
 			return null;
 		}
 		OMNode textNode = el.getFirstOMChild();
@@ -269,6 +288,7 @@ public class PayloadHelper {
 		}
 		return el.getXMLStreamReader();
 	}
+    
 	public static XMLStreamReader getStAXPayload(MessageContext mc) {
 		if (mc.getEnvelope() == null) {
 			log.error("null envelope");
@@ -276,23 +296,21 @@ public class PayloadHelper {
 		}
 		return getStAXPayload(mc.getEnvelope());
 	}
+
 	public static void setStAXPayload(SOAPEnvelope envelope, XMLStreamReader streamReader) {
 		StAXOMBuilder builder = new StAXOMBuilder(envelope.getOMFactory(), streamReader);
 		OMElement el = builder.getDocumentElement();
 		setXMLPayload(envelope, el);
 	}
+
 	public static void setStAXPayload(MessageContext mc, XMLStreamReader streamReader) {
 		if (mc.getEnvelope() == null) {
 			try {
-				mc.setEnvelope(OMAbstractFactory.getSOAP12Factory()
-						.createSOAPEnvelope());
+				mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
 			} catch (Exception e) {
 				throw new SynapseException(e);
 			}
 			setStAXPayload(mc.getEnvelope(), streamReader);
 		}
-	
 	}
-	
-	
 }

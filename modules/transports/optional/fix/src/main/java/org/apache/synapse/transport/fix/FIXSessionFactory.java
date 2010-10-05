@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -180,9 +179,9 @@ public class FIXSessionFactory {
         }
 
         Hashtable<String,String> properties = BaseUtils.getEPRProperties(fixEPR);
-        for (String key : properties.keySet()) {
-            settings.setString(sessionID, key, properties.get(key));
-        }        
+        for (Map.Entry<String,String> entry : properties.entrySet()) {
+            settings.setString(sessionID, entry.getKey(), entry.getValue());
+        }
 
         String[] socketAddressElements = FIXUtils.getSocketAddressElements(fixEPR);
         settings.setString(sessionID, FIXConstants.CONNECTION_TYPE, FIXConstants.FIX_INITIATOR);

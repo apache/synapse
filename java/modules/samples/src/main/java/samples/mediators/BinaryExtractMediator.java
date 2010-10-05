@@ -65,7 +65,7 @@ public class BinaryExtractMediator extends AbstractMediator {
             DataHandler dataHandler =(DataHandler) binaryNode.getDataHandler();
             InputStream inputStream = dataHandler.getInputStream();
             byte[] searchByte = new byte[length];
-            inputStream.skip(offset-1);
+            inputStream.skip(offset - 1);
             int readBytes = inputStream.read(searchByte,0,length);
             String outString = new String(searchByte,binaryEncoding);
             msgCtx.setProperty(variableName,outString);

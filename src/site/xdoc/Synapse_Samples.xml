@@ -3064,7 +3064,7 @@ it will first try to read the content type from the 'contentType' message proper
     intervals. You could limit the number of times that you want to run this task by adding a count
     attribute with an integer as the value, if the count is not present as in this sample this task
     will run until the server is shutdown.</p>
-<p>One can write his/her own task class implementing the org.apache.synapse.startup.Task interface and
+<p>One can write his/her own task class implementing the org.apache.synapse.task.Task interface and
     implementing the execute method to run the necessary logic. For this particular sample we have used the
     MessageInjector class which just injects a message specified into Synapse environment. </p>
     

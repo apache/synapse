@@ -260,7 +260,7 @@
     </h3>
     <p>
       A Task is a custom Java class that implements the
-      org.apache.synapse.startup.Task interface that defines a single "public
+      org.apache.synapse.task.Task interface that defines a single "public
       void execute()" method. Such a task can be scheduled and managed via the
       Synapse ESB. The scheduling information for a task can be specified in the
       cron format or a simple format by the user. A task may also be specified
@@ -1017,7 +1017,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       A task is created and scheduled to run at specified time intervals or as
       specified by the cron expression. The Task class specifies the actual task
-      implementation class (which must implement org.apache.synapse.startup.Task
+      implementation class (which must implement org.apache.synapse.task.Task
       interface) to be executed at the specified interval/s, and name specifies
       an identifier for the scheduled task.
     </p>

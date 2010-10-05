@@ -81,6 +81,10 @@
                     <groupId>org.apache.woden</groupId>
                     <artifactId>woden-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
             </exclusions>
             <type>mar</type>
         </dependency>

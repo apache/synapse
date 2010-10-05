@@ -230,7 +230,7 @@ public class ScriptMediator extends AbstractMediator {
             throws ScriptException, NoSuchMethodException {
         prepareExternalScript(synCtx);
         ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
-        return invocableScript.invokeFunction(function, scriptMC);
+        return invocableScript.invokeFunction(function, new Object[]{scriptMC});        
     }
 
     /**

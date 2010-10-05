@@ -22,7 +22,6 @@ package org.apache.synapse.util.xpath;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
@@ -154,8 +153,8 @@ public class SynapseXPath extends AXIOMXPath {
         }
 
         SynapseXPath synXPath = new SynapseXPath(newXPath.toString());
-        for (String prefix : nameSpaces.keySet()) {
-            synXPath.addNamespace(prefix, nameSpaces.get(prefix));
+        for (Map.Entry<String,String> entry : nameSpaces.entrySet()) {
+            synXPath.addNamespace(entry.getKey(), entry.getValue());
         }
         return synXPath;
     }

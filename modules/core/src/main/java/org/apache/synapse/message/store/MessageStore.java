@@ -21,15 +21,16 @@ package org.apache.synapse.message.store;
 
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.SynapseArtifact;
+import org.apache.synapse.Nameable;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * This is the interface  for the Synapse Message Store
- * Message Store used to store failed Messages.
+ * Message Store is used to store failed Messages.
  */
-public interface MessageStore extends SynapseArtifact {
+public interface MessageStore extends SynapseArtifact, Nameable {
 
     /**
      * store the Message in the Message Store
@@ -37,20 +38,6 @@ public interface MessageStore extends SynapseArtifact {
      * @param storableMessage wrapper of the Message context
      */
     public void store(StorableMessage storableMessage);
-
-    /**
-     * get the Message Store name.
-     * Each Message Store must have a unique name.
-     * @return  name
-     */
-    public String getName();
-
-    /**
-     * Set the Message Store Name
-     *
-     * @param name Name of the message store
-     */
-    public void setName(String name);
 
     /**
      * Store the Message in schedule queue to redeliver
@@ -159,13 +146,14 @@ public interface MessageStore extends SynapseArtifact {
     /**
      * Set the name of the file that the Message store is configured
      *
-     * @param filename
+     * @param filename Name of the file where this artifact is defined
      */
     public void setFileName(String filename);
 
     /**
      * get the file name that the message store is configured
-     * @return
+     *
+     * @return Name of the file where this artifact is defined
      */
     public String getFileName();
     

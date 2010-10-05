@@ -42,10 +42,13 @@ public final class ClasspathURLStreamHandler extends URLStreamHandler {
         public void connect() {}
 
         public InputStream getInputStream() throws IOException {
-            if (url != null && url.getHost() != null) {
+            if (url == null) {
+                throw new MalformedURLException("Null or empty classpath URL");
+            } else if (url.getHost() != null) {
                 throw new MalformedURLException("No host available in classpath URLs");
             }
-            InputStream is = ClasspathURLStreamHandler.class.getClassLoader().getResourceAsStream(url.getFile());
+            InputStream is = ClasspathURLStreamHandler.class.getClassLoader().
+                    getResourceAsStream(url.getFile());
             if (is == null) {
                 throw new IOException("Classpath resource not found: " + url);
             }

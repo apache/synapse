@@ -174,13 +174,12 @@ public class RedeliveryProcessor {
 
         public void run() {
             while (start) {
-                synchronized (this) {
+                synchronized (messageStore) {
 
                     int delay = redeliveryDelay;
                     StorableMessage storableMessage;
 
                     storableMessage = messageStore.getFirstSheduledMessage();
-
                     if (storableMessage == null || storableMessage.getEndpoint() == null ||
                             !storableMessage.getEndpoint().readyToSend()) {
                         continue;
@@ -195,38 +194,35 @@ public class RedeliveryProcessor {
                         delay = redeliveryDelay;
 
                     } else {
-                        String numberS = (String) synCtx.getProperty(
+                        String redeliveryCountStr = (String) synCtx.getProperty(
                                 SynapseConstants.MESSAGE_STORE_REDELIVERY_COUNT);
-                        int number = Integer.parseInt(numberS);
+                        int redeliveryCount = Integer.parseInt(redeliveryCountStr);
 
-                        if (number >= maxRedeleveries) {
+                        if (redeliveryCount >= maxRedeleveries) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Maximum number of redelivery attempts has exceeded " +
                                         "for the message: " + synCtx.getMessageID() + " - " +
                                         "Message will be put back to the message store.");
-
                             }
                             messageStore.store(storableMessage);
                             continue;
                         }
 
                         synCtx.setProperty(SynapseConstants.MESSAGE_STORE_REDELIVERY_COUNT, "" +
-                                (number + 1));
-                        if (maxRedeleveries <= (number+1)) {
+                                (redeliveryCount + 1));
+                        if (maxRedeleveries <= (redeliveryCount + 1)) {
                             synCtx.setProperty(SynapseConstants.MESSAGE_STORE_REDELIVERED, "true");
                         }
 
                         if (exponentialBackoff && backOffMultiplier == -1) {
-                            delay = (number + 1) * redeliveryDelay;
-
+                            delay = (redeliveryCount + 1) * redeliveryDelay;
                         } else if (exponentialBackoff) {
-                            delay = (int) Math.pow(backOffMultiplier, number) * redeliveryDelay;
-
+                            delay = (int) Math.pow(backOffMultiplier, redeliveryCount) * redeliveryDelay;
                         }
                     }
 
                     try {
-                        Thread.sleep(delay);
+                        messageStore.wait(delay);
                     } catch (InterruptedException ignored) {
 
                     }

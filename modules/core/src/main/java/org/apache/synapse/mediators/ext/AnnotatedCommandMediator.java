@@ -206,9 +206,9 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
         try {
 
             SynapseXPath axiomXPath = new SynapseXPath(xpath);
-            
-            for (String prefix : namespaces.keySet()) {
-                axiomXPath.addNamespace(prefix, namespaces.get(prefix));
+
+            for (Map.Entry<String, String> entry : namespaces.entrySet()) {
+                axiomXPath.addNamespace(entry.getKey(), entry.getValue());
             }
             
             return axiomXPath;

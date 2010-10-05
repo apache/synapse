@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractEvaluatorSerializer implements EvaluatorSerializer {
 
-    protected static Log log;
+    protected Log log;
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
 

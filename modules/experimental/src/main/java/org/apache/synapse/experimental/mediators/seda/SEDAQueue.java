@@ -72,4 +72,8 @@ public class SEDAQueue {
     public void setInitialized(boolean initialized) {
         this.initialized = initialized;
     }
+
+    public SEDAQueuePolicy getQueuePolicy() {
+        return queuePolicy;
+    }
 }

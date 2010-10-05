@@ -191,6 +191,7 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
             throws ArchiverException, MojoExecutionException {
         
         Log log = getLog();
+        log.debug("Using base directory: " + baseDir);
         archiver.addDirectory(buildOutputDirectory);
         if (includeDependencies) {
             log.debug("Adding dependencies ...");

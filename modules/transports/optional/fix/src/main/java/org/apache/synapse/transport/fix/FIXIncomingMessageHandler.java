@@ -311,6 +311,9 @@ public class FIXIncomingMessageHandler implements Application {
                     msgCtx.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
                     msgCtx.setSoapAction("urn:" + operation.getName().getLocalPart());
                 }
+            } else {
+                log.warn("Service information not available for the FIX message processor");
+                return;
             }
 
             String fixApplication = FIXConstants.FIX_INITIATOR;

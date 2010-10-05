@@ -94,6 +94,10 @@ public abstract class KeyStoreInformation {
         this.location = location;
     }
 
+    public String getProvider() {
+        return provider;
+    }
+
     public void setProvider(String provider) {
         this.provider = provider;
     }

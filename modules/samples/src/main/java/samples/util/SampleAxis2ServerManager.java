@@ -26,7 +26,6 @@ import org.apache.axis2.util.CommandLineOption;
 import org.apache.axis2.util.CommandLineOptionParser;
 import org.apache.axis2.util.OptionsValidator;
 import org.apache.axis2.clustering.ClusterManager;
-//import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -118,24 +117,20 @@ public class SampleAxis2ServerManager {
     }
 
     public void stop() throws Exception {
-        try {
-            if (listenerManager != null) {
-                listenerManager.stop();
-                listenerManager.destroy();
-            }
-            //we need to call this method to clean the team fils we created.
-            if (configctx != null) {
-                configctx.terminate();
-            }
-        } catch (Exception ignored) {
+        if (listenerManager != null) {
+            listenerManager.stop();
+            listenerManager.destroy();
+        }
+        //we need to call this method to clean the team fils we created.
+        if (configctx != null) {
+            configctx.terminate();
         }
     }
 
 
     private void configurePort(ConfigurationContext configCtx) {
 
-        TransportInDescription trsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get("http");
+        TransportInDescription trsIn = configCtx.getAxisConfiguration().getTransportsIn().get("http");
 
         if (trsIn != null) {
             String port = System.getProperty("http_port");
@@ -152,8 +147,8 @@ public class SampleAxis2ServerManager {
             }
         }
 
-        TransportInDescription httpsTrsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get("https");
+        TransportInDescription httpsTrsIn = configCtx.getAxisConfiguration().
+                getTransportsIn().get("https");
 
         if (httpsTrsIn != null) {
             String port = System.getProperty("https_port");

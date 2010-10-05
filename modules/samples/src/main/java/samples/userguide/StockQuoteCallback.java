@@ -19,7 +19,8 @@ public class StockQuoteCallback implements AxisCallback {
     }
 
     public void onFault(org.apache.axis2.context.MessageContext messageContext) {
-        System.out.println("Fault received to the callback : " + messageContext.getEnvelope().getBody().getFault());
+        System.out.println("Fault received to the callback : " + messageContext.getEnvelope().
+                getBody().getFault());
     }
 
     public void onError(Exception e) {

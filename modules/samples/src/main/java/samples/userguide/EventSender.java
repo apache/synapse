@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -59,8 +59,6 @@ public class EventSender {
         ConfigurationContext configContext = null;
 
         String addUrl = getProperty("addurl", "http://localhost:8280/services/EventingProxy");
-        String trpUrl = getProperty("trpurl", null);
-        String prxUrl = getProperty("prxurl", null);
         String repo = getProperty("repository", "client_repo");
         String symbol = getProperty("symbol", "GOOG");
         String price = getProperty("price", "10.10");
@@ -105,15 +103,11 @@ public class EventSender {
                         "</m:placeOrder>");
 
         System.out.println("Sending Event : \n" + payload.toString());
-        try {
-            serviceClient.fireAndForget(payload);
-            System.out.println("Event sent to topic " + topic);
-            Thread.sleep(1000);
-            if (configContext != null) {
-                configContext.terminate();
-            }
-        } catch (Exception ignore) {
+        serviceClient.fireAndForget(payload);
+        System.out.println("Event sent to topic " + topic);
+        Thread.sleep(1000);
+        if (configContext != null) {
+            configContext.terminate();
         }
-
     }
 }

@@ -26,6 +26,8 @@ import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.eventing.EventSourceFactory;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.eventing.SynapseEventSource;
+import org.apache.axis2.deployment.DeploymentException;
+import org.apache.axis2.AxisFault;
 
 import java.io.File;
 import java.util.Properties;
@@ -117,9 +119,11 @@ public class EventSourceDeployer extends AbstractSynapseArtifactDeployer {
                 handleSynapseArtifactDeploymentError("EventSource Update Failed. The artifact " +
                         "described in the file " + fileName + " is not a EventSource");
             }
-        } catch (Exception e) {
+        } catch (DeploymentException e) {
             handleSynapseArtifactDeploymentError(
                     "EventSource Update from the file : " + fileName + " : Failed.", e);
+        } catch (AxisFault e) {
+            handleSynapseArtifactDeploymentError("Error while initializing the event source", e);
         }
 
         return null;

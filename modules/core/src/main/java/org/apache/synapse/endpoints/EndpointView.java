@@ -685,9 +685,8 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Is the endpoint considered to be in the given state?
      * @param state the state to consider
      * @return true if all endpoints in a group are of the given state, or if a leaf endpoint is in the given state
-     * @throws Exception
      */
-    public boolean isEndpointInState(int state) throws Exception {
+    public boolean isEndpointInState(int state) {
         if (endpoint.getChildren() != null) {
             int count = 0, total = 0;
             for (Endpoint e : endpoint.getChildren()) {

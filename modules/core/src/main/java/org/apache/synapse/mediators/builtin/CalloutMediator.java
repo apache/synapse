@@ -140,9 +140,12 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                 synLog.traceOrDebug("Service returned a null response");
             }
 
-        } catch (Exception e) {
+        } catch (AxisFault e) {
             handleException("Error invoking service : " + serviceURL +
                 (action != null ? " with action : " + action : ""), e, synCtx);
+        } catch (JaxenException e) {
+            handleException("Error while evaluating the XPath expression: " + targetXPath,
+                    e, synCtx);
         }
 
         synLog.traceOrDebug("End : Callout mediator");

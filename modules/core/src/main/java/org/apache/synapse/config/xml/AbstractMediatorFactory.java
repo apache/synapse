@@ -43,7 +43,7 @@ import java.util.Properties;
 public abstract class AbstractMediatorFactory implements MediatorFactory {
 
     /** the standard log for mediators, will assign the logger for the actual subclass */
-    protected static Log log;
+    static Log log;
     protected static final QName ATT_NAME    = new QName("name");
     protected static final QName ATT_VALUE   = new QName("value");
     protected static final QName ATT_XPATH   = new QName("xpath");

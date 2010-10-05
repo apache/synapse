@@ -185,7 +185,7 @@ public class LoadbalanceFailoverClient {
 
             i++;
             System.out.println("Request: " + i + " ==> " + response);
-            testString += (":" + i + ">" + response + ":");
+            testString = testString.concat(":" + i + ">" + response + ":");
         }
 
         return testString;
@@ -290,10 +290,10 @@ public class LoadbalanceFailoverClient {
             client.setOptions(options);
 
             int i = 0;
-            int sessionNumber = 0;
+            int sessionNumber;
             String[] cookies = new String[3];
             boolean httpSession = session != null && "http".equals(session);
-            int cookieNumber = 0;
+            int cookieNumber;
             while (i < iterations || infinite) {
 
                 i++;
@@ -399,14 +399,7 @@ public class LoadbalanceFailoverClient {
     }
 
     private SOAPEnvelope buildSoapEnvelope(String clientID, String value) {
-
-        String targetEPR = "http://localhost:9000/soap/Service1";
-        String opration = "sampleOperation";
-
         SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();
-
-        OMNamespace wsaNamespace = soapFactory.
-                createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
 
         SOAPEnvelope envelope = soapFactory.createSOAPEnvelope();
 

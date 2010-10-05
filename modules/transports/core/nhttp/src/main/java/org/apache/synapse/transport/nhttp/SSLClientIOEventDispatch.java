@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import javax.net.ssl.SSLContext;
@@ -26,6 +27,8 @@ import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.nio.NHttpClientIOTarget;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.params.HttpParams;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -37,6 +40,8 @@ import java.util.Map;
  */
 public class SSLClientIOEventDispatch 
     extends org.apache.http.impl.nio.SSLClientIOEventDispatch {
+
+    private static final Log log = LogFactory.getLog(SSLClientIOEventDispatch.class);
 
     private Map<String, SSLContext> contextMap;
 
@@ -55,15 +60,22 @@ public class SSLClientIOEventDispatch
     protected SSLIOSession createSSLIOSession(IOSession ioSession, SSLContext sslContext,
                                               SSLIOSessionHandler sslioSessionHandler) {
 
-        InetSocketAddress address = (InetSocketAddress) ioSession.getRemoteAddress();
-        String host = address.getHostName() + ":" + address.getPort();
         SSLContext customContext = null;
         if (contextMap != null) {
             // See if there's a custom SSL profile configured for this server
+            InetSocketAddress address = (InetSocketAddress) ioSession.getRemoteAddress();
+            String host = address.getHostName() + ":" + address.getPort();
             customContext = contextMap.get(host);
+
+            if (log.isDebugEnabled() && customContext != null) {
+                log.debug("Custom SSL context found for the server: " + host);
+            }
         }
 
         if (customContext == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Using default SSL context for the outbound connection");
+            }
             customContext = sslContext;
         }
         

@@ -476,12 +476,11 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         response.setStatusCode(determineHttpStatusCode(msgContext, response));
 
         // set any transport headers
-        Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        Map<?,?> transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
         if (transportHeaders != null && !transportHeaders.values().isEmpty()) {
-            Iterator iter = transportHeaders.keySet().iterator();
-            while (iter.hasNext()) {
-                Object header = iter.next();
-                Object value = transportHeaders.get(header);
+            for (Map.Entry entry : transportHeaders.entrySet()) {
+                Object header = entry.getKey();
+                Object value = entry.getValue();
                 if (value != null && header instanceof String && value instanceof String) {
                     response.setHeader((String) header, (String) value);
                 }

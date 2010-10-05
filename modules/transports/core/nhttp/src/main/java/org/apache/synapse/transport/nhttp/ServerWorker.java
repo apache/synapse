@@ -312,8 +312,8 @@ public class ServerWorker implements Runnable {
                     Map<String, String> responseHeaders = (Map<String, String>)
                             msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
                     if (responseHeaders != null) {
-                        for (String headerName : responseHeaders.keySet()) {
-                            response.addHeader(headerName, responseHeaders.get(headerName));
+                        for (Map.Entry<String, String> entry : responseHeaders.entrySet()) {
+                            response.addHeader(entry.getKey(), entry.getValue());
                         }
                     }
                 }

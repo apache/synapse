@@ -208,9 +208,10 @@ public class Axis2HttpRequest {
         // set any transport headers
         Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
         if (o != null && o instanceof Map) {
-            Map headers = (Map) o;
-            for (Object header : headers.keySet()) {
-                Object value = headers.get(header);
+            Map<?,?> headers = (Map) o;
+            for (Map.Entry entry : headers.entrySet()) {
+                Object header = entry.getKey();
+                Object value = entry.getValue();
                 if (header instanceof String && value != null && value instanceof String) {
                     if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) header)) {
                         httpRequest.setHeader((String) header, (String) value);

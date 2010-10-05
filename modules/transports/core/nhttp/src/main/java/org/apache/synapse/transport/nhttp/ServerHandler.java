@@ -474,9 +474,7 @@ public class ServerHandler implements NHttpServiceHandler {
         ByteArrayEntity entity = new ByteArrayEntity(msg);
         entity.setContentType("text/plain; charset=US-ASCII");
         response.setEntity(entity);
-        try {
-            commitResponseHideExceptions(conn, response);
-        } catch (Exception ignore) {}        
+        commitResponseHideExceptions(conn, response);
     }
 
     /**

@@ -542,13 +542,11 @@ public class ClientHandler implements NHttpClientHandler {
                 // reset metrics on connection
                 conn.getMetrics().reset();
                 if (context.getAttribute(NhttpConstants.DISCARD_ON_COMPLETE) != null) {
-                    try {
-                        // this is a connection we should not re-use
-                        ConnectionPool.forget(conn);
-                        shutdownConnection(conn);
-                        context.removeAttribute(RESPONSE_SINK_BUFFER);
-                        context.removeAttribute(REQUEST_SOURCE_BUFFER);
-                    } catch (Exception ignore) {}
+                    // this is a connection we should not re-use
+                    ConnectionPool.forget(conn);
+                    shutdownConnection(conn);
+                    context.removeAttribute(RESPONSE_SINK_BUFFER);
+                    context.removeAttribute(REQUEST_SOURCE_BUFFER);                    
                 } else if (!connStrategy.keepAlive(response, context)) {
                     shutdownConnection(conn);
                     context.removeAttribute(RESPONSE_SINK_BUFFER);

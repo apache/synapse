@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -137,7 +137,7 @@ public class ServerWorker implements Runnable {
     private MessageContext createMessageContext(HttpRequest request) {
 
         MessageContext msgContext = new MessageContext();
-        msgContext.setMessageID(UUIDGenerator.getUUID());
+        msgContext.setMessageID(UIDGenerator.generateURNString());
 
         // There is a discrepency in what I thought, Axis2 spawns a new threads to
         // send a message if this is TRUE - and I want it to be the other way

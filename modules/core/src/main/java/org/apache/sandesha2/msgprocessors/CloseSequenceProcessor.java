@@ -95,25 +95,18 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		}
 
 		rmBean.setClosed(true);
-		Iterator<SequenceAcknowledgement> sequenceAckIter = null;
+
+		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmBean);
+		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();		
 		if(rmBean instanceof RMDBean){
 			storageManager.getRMDBeanMgr().update((RMDBean)rmBean);
-			RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, (RMDBean)rmBean, sequenceId, storageManager, true);
-			// adding the ack part(s) to the envelope.
-			sequenceAckIter = ackRMMsgCtx.getSequenceAcknowledgements();
+			//Piggyback an ack for the sequence being closed on the closeSequenceResponse
+			RMMsgCreator.addAckMessage(closeSeqResponseRMMsg, sequenceId, (RMDBean)rmBean, false, true);
 		}
 		else{
 			storageManager.getRMSBeanMgr().update((RMSBean)rmBean);
 		}
 
-		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmBean);
-		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();
-
-		while (sequenceAckIter!=null && sequenceAckIter.hasNext()) {
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
-			closeSeqResponseRMMsg.addSequenceAcknowledgement(sequenceAcknowledgement);
-		}
-		
 		closeSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		closeSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 		closeSequenceResponseMsg.setResponseWritten(true);

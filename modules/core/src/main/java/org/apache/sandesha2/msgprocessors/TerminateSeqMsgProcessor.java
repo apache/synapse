@@ -328,15 +328,8 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		MessageContext outMessage = terminateSeqResponseRMMsg.getMessageContext();
 		
 		if(rmBean instanceof RMDBean){
-			RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, (RMDBean)rmBean, 
-					sequenceId,	storageManager, true);
-			
-			// copy over the ack parts
-			Iterator<SequenceAcknowledgement> iter = ackRMMessage.getSequenceAcknowledgements();
-			while (iter.hasNext()) {
-				SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
-				terminateSeqResponseRMMsg.addSequenceAcknowledgement(seqAck);
-			}
+			//Piggyback an ack for the sequence being terminated on the terminateSequenceResponse
+			RMMsgCreator.addAckMessage(terminateSeqResponseRMMsg, sequenceId, (RMDBean)rmBean, false, true);
 		}		
 		terminateSeqResponseRMMsg.addSOAPEnvelope();
 

@@ -22,6 +22,7 @@ package samples.userguide;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -36,7 +37,6 @@ import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.synapse.util.UUIDGenerator;
 import samples.common.StockQuoteHandler;
 
 import java.io.File;
@@ -217,7 +217,7 @@ public class StockQuoteClient {
                options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, Sandesha2Constants.SPEC_VERSIONS.v1_1);
             }
             options.setProperty(SandeshaClientConstants.LAST_MESSAGE, Constants.VALUE_TRUE);
-            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
+            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UIDGenerator.generateURNString());
         }
 
         if ("soap12".equals(soapVer)) {

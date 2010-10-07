@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -35,8 +36,6 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.PropertyInclude;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.endpoints.AbstractEndpoint;
-import org.apache.synapse.util.UUIDGenerator;
-
 
 import javax.xml.namespace.QName;
 import java.util.*;
@@ -129,7 +128,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
 
         // if the endpoint doesn't have a name we will generate a unique name.
         if (anonymousEndpoint && ep.getName() == null) {
-            String uuid = UUIDGenerator.getUUID();
+            String uuid = UIDGenerator.generateUID();
             uuid = uuid.replace(':', '_');
             ep.setName(ENDPOINT_NAME_PREFIX + uuid);
             if (ep instanceof AbstractEndpoint) {

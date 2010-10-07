@@ -30,6 +30,9 @@ public class NhttpConstants {
     public static final String SC_ACCEPTED = "SC_ACCEPTED";
     public static final String HTTP_SC = "HTTP_SC";
     public static final String FORCE_HTTP_1_0 = "FORCE_HTTP_1.0";
+    public static final String FORCE_HTTP_CONTENT_LENGTH = "FORCE_HTTP_CONTENT_LENGTH";
+    public static final String COPY_CONTENT_LENGTH_FROM_INCOMING =
+            "COPY_CONTENT_LENGTH_FROM_INCOMING";
     public static final String DISABLE_CHUNKING = "DISABLE_CHUNKING";
     public static final String POST_TO_URI = "POST_TO_URI";
     public static final String NO_KEEPALIVE = "NO_KEEPALIVE";

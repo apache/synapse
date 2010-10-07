@@ -114,4 +114,15 @@ public class NhttpConstants {
     public static final String REQ_DEPARTURE_TIME = "REQ_DEPARTURE_TIME";
     public static final String RES_ARRIVAL_TIME = "RES_ARRIVAL_TIME";
     public static final String RES_DEPARTURE_TIME = "RES_DEPARTURE_TIME";
+
+    /**
+     * This is a name of a parameter in transportReceiver. If set it will disable service
+     * dispatching inside the transport for rest messages
+     * */
+    public static final String DISABLE_REST_SERVICE_DISPATCHING = "disableRestServiceDispatching";
+
+    /** Input stream of the message is set to this message context property */
+    public static final String NHTTP_INPUT_STREAM = "nhttp.input.stream";
+    /** Output stram of the message is set to this message context property */
+    public static final String NHTTP_OUTPUT_STREAM = "nhttp.output.stream";
 }

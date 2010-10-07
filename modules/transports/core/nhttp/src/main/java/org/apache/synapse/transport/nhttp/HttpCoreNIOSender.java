@@ -40,6 +40,7 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
@@ -60,6 +61,7 @@ import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
+import org.apache.synapse.commons.util.TemporaryData;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -458,9 +460,11 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     private void sendAsyncResponse(MessageContext msgContext) throws AxisFault {
 
+        int contentLength = extractContentLength(msgContext);
+
         // remove unwanted HTTP headers (if any from the current message)
         removeUnwantedHeaders(msgContext);
-        
+
         ServerWorker worker = (ServerWorker) msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
         HttpResponse response = worker.getResponse();
 
@@ -488,31 +492,24 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
         }
 
-        if (JavaUtils.isTrueExplicitly(worker.getConn().getContext().getAttribute("forceClosing"))) {
-            HttpRequest req = (HttpRequest)
-                    worker.getConn().getContext().getAttribute("http.request");
-            req.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
-        }
+        boolean forceContentLength = msgContext.isPropertyTrue(
+                NhttpConstants.FORCE_HTTP_CONTENT_LENGTH);
+        boolean forceContentLengthCopy = msgContext.isPropertyTrue(
+                NhttpConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
 
-        // pass ClientConnectionDebug to the Server side
-        ServerConnectionDebug scd = (ServerConnectionDebug)
-                worker.getConn().getContext().getAttribute(ServerHandler.SERVER_CONNECTION_DEBUG);
-        ClientConnectionDebug ccd = (ClientConnectionDebug)
-            msgContext.getProperty(ClientHandler.CLIENT_CONNECTION_DEBUG);
-
-        if (scd != null && ccd != null) {
-            scd.setClientConnectionDebug(ccd);
-        } else if (scd == null && ccd != null) {
-            scd = ccd.getServerConnectionDebug();
-            scd.setClientConnectionDebug(ccd);
-        }
-
-        if (scd != null) {
-            scd.recordResponseStartTime();
-        }
+        BasicHttpEntity entity = (BasicHttpEntity) response.getEntity();
 
         MetricsCollector lstMetrics = worker.getServiceHandler().getMetrics();
         try {
+            if (forceContentLength) {
+                entity.setChunked(false);
+                if (forceContentLengthCopy && contentLength > 0) {
+                    entity.setContentLength(contentLength);
+                } else {
+                    setStreamAsTempData(entity, messageFormatter, msgContext, format);
+                }
+            }
+
             worker.getServiceHandler().commitResponse(worker.getConn(), response);
             lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());
             OutputStream out = worker.getOutputStream();
@@ -525,41 +522,49 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 || Boolean.TRUE == noEntityBody) {
                 out.write(new byte[0]);
             } else {
-                messageFormatter.writeTo(msgContext, format, out, false);
+                if (forceContentLength) {
+                    if (forceContentLengthCopy && contentLength > 0) {
+                        messageFormatter.writeTo(msgContext, format, out, false);
+                    } else {
+                        writeMessageFromTempData(out, msgContext);
+                    }
+                } else {
+                    messageFormatter.writeTo(msgContext, format, out, false);
+                }
             }
             out.close();
-            lstMetrics.incrementMessagesSent();
+            if (lstMetrics != null) {
+                lstMetrics.incrementMessagesSent();
+            }
 
         } catch (HttpException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
             handleException("Unexpected HTTP protocol error sending response to : " +
-                worker.getRemoteAddress() + "\n" + scd.dump(), e);
+                worker.getRemoteAddress(), e);
         } catch (ConnectionClosedException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            log.warn("Connection closed by client : "
-                    + worker.getRemoteAddress() + "\n" + scd.dump());
+            log.warn("Connection closed by client : " + worker.getRemoteAddress());
         } catch (IllegalStateException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
-            log.warn("Connection closed by client : "
-                    + worker.getRemoteAddress() + "\n" + scd.dump());
+            log.warn("Connection closed by client : " + worker.getRemoteAddress());
         } catch (IOException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
             handleException("IO Error sending response message to : " +
-                worker.getRemoteAddress() + "\n" + scd.dump(), e);
+                worker.getRemoteAddress(), e);
         } catch (Exception e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();
             }
             handleException("General Error sending response message to : " +
-                worker.getRemoteAddress() + "\n" + scd.dump(), e);
+                worker.getRemoteAddress(), e);
         }
 
         InputStream is = worker.getIs();
@@ -567,6 +572,76 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             try {
                 is.close();
             } catch (IOException ignore) {}
+        }
+    }
+
+    /**
+     * Extract the content length from the incoming message
+     *
+     * @param msgContext current MessageContext
+     * @return the length of the message
+     */
+    private int extractContentLength(MessageContext msgContext) {
+        Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+
+        if (headers == null || headers.isEmpty()) {
+            return -1;
+        }
+
+        for (Object o : headers.keySet()) {
+            String headerName = (String) o;
+            if (HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)) {
+                Object value = headers.get(headerName);
+
+                if (value != null && value instanceof String) {
+                    try {
+                        return Integer.parseInt((String) value);
+                    } catch (NumberFormatException e) {
+                        return -1;
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Write the stream to a temporary storage and calculate the content length
+     * @param entity HTTPEntity
+     * @param messageFormatter message formatter
+     * @param msgContext current message context
+     * @param format message format
+     * @throws IOException if an exception occurred while writing data
+     */
+    private void setStreamAsTempData(BasicHttpEntity entity, MessageFormatter messageFormatter,
+                                     MessageContext msgContext, OMOutputFormat format)
+            throws IOException {
+        TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
+        OutputStream out = serialized.getOutputStream();
+        try {
+            messageFormatter.writeTo(msgContext, format, out, true);
+        } finally {
+            out.close();
+        }
+        msgContext.setProperty(NhttpConstants.SERIALIZED_BYTES, serialized);
+        entity.setContentLength(serialized.getLength());
+    }
+
+    /**
+     * Take the data from temporary storage and write it to the output stream
+     * @param out output stream output stream
+     * @param msgContext messagecontext
+     * @throws IOException if an exception occurred while writing data
+     */
+    private void writeMessageFromTempData(OutputStream out, MessageContext msgContext)
+            throws IOException {
+        TemporaryData serialized =
+                (TemporaryData) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
+        try {
+            serialized.writeTo(out);
+        } finally {
+            serialized.release();
         }
     }
 

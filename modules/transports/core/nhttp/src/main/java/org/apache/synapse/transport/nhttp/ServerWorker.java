@@ -82,6 +82,8 @@ public class ServerWorker implements Runnable {
     private OutputStream os = null;
     /** the metrics collector */
     private MetricsCollector metrics = null;
+    /** Weather we should do rest dispatching or not */
+    private boolean isRestDispatching = true;
     
     private static final String SOAPACTION   = "SOAPAction";
     private static final String LOCATION     = "Location";
@@ -108,13 +110,15 @@ public class ServerWorker implements Runnable {
      * @param is the stream input stream to read the request body
      * @param response the response to be populated if applicable
      * @param os the output stream to write the response body if one is applicable
+     * @param isRestDispatching weather we should dispatch in case of rest
      */
     public ServerWorker(final ConfigurationContext cfgCtx, final NHttpServerConnection conn,
         final boolean isHttps,
         final MetricsCollector metrics,
         final ServerHandler serverHandler,
         final HttpRequest request, final InputStream is,
-        final HttpResponse response, final OutputStream os) {
+        final HttpResponse response, final OutputStream os,
+        final boolean isRestDispatching) {
 
         this.cfgCtx = cfgCtx;
         this.conn = conn;
@@ -126,6 +130,7 @@ public class ServerWorker implements Runnable {
         this.is = is;
         this.os = os;
         this.msgContext = createMessageContext(request);
+        this.isRestDispatching = isRestDispatching;
     }
 
     /**
@@ -193,7 +198,10 @@ public class ServerWorker implements Runnable {
 
         msgContext.setProperty(ServerHandler.SERVER_CONNECTION_DEBUG,
             conn.getContext().getAttribute(ServerHandler.SERVER_CONNECTION_DEBUG));
-        
+
+        msgContext.setProperty(NhttpConstants.NHTTP_INPUT_STREAM, is);
+        msgContext.setProperty(NhttpConstants.NHTTP_OUTPUT_STREAM, os);
+
         return msgContext;
     }
 
@@ -401,7 +409,7 @@ public class ServerWorker implements Runnable {
 
             if (HTTPTransportUtils.isRESTRequest(contentTypeStr)) {
                 RESTUtil.processPOSTRequest(msgContext, is, os,
-                        request.getRequestLine().getUri(), contentType);
+                        request.getRequestLine().getUri(), contentType, isRestDispatching);
             } else {
 
                 Header soapAction  = request.getFirstHeader(SOAPACTION);
@@ -676,7 +684,7 @@ public class ServerWorker implements Runnable {
         try {
             RESTUtil.processGetAndDeleteRequest(
                     msgContext, os, request.getRequestLine().getUri(),
-                    request.getFirstHeader(HTTP.CONTENT_TYPE),method);
+                    request.getFirstHeader(HTTP.CONTENT_TYPE), method, isRestDispatching);
             // do not let the output stream close (as by default below) since
             // we are serving this GET/DELETE request through the Synapse engine
         } catch (AxisFault axisFault) {

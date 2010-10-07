@@ -27,7 +27,13 @@ import java.util.Random;
 /**
  * This is a thread-safe version of the Axiom UUIDGenerator
  * to be used until it is fixed in the next Axiom release
+ *
+ * @deprecated Axiom now contains a better and safer
+ * UUIDGenerator. Hence use one of the specialized methods
+ * in the {@link org.apache.axiom.util.UIDGenerator} class
+ * instead of this.
  */
+@Deprecated
 public class UUIDGenerator {
     /** This class will give UUIDs for axis2. */
 

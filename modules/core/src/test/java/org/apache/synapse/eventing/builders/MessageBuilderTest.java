@@ -22,13 +22,10 @@ package org.apache.synapse.eventing.builders;
 import junit.framework.TestCase;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.eventing.SynapseSubscription;
-import org.apache.synapse.util.UUIDGenerator;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.databinding.utils.ConverterUtil;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.util.UIDGenerator;
 import org.wso2.eventing.EventingConstants;
 
 import javax.xml.namespace.QName;
@@ -195,7 +192,7 @@ public class MessageBuilderTest extends TestCase {
     }
 
     private String addIdentifierHeader(MessageContext msgCtx) {
-        String id = UUIDGenerator.getUUID();
+        String id = UIDGenerator.generateURNString();
         QName qname = new QName(EventingConstants.WSE_EVENTING_NS,
                     EventingConstants.WSE_EN_IDENTIFIER, "wse");
         TestUtils.addSOAPHeaderBlock(msgCtx, qname, id);

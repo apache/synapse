@@ -19,8 +19,7 @@
 
 package org.apache.synapse.eventing;
 
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.util.UUIDGenerator;
+import org.apache.axiom.util.UIDGenerator;
 import org.wso2.eventing.EventingConstants;
 import org.wso2.eventing.Subscription;
 import org.wso2.eventing.SubscriptionData;
@@ -34,7 +33,7 @@ public class SynapseSubscription extends Subscription {
 
 
     public SynapseSubscription() {
-        this.setId(UUIDGenerator.getUUID());
+        this.setId(UIDGenerator.generateURNString());
         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
         SubscriptionData subscriptionData = new SubscriptionData();
         subscriptionData.setProperty(SynapseEventingConstants.STATIC_ENTRY, "false");
@@ -42,7 +41,7 @@ public class SynapseSubscription extends Subscription {
     }
 
     public SynapseSubscription(String deliveryMode) {
-        this.setId(UUIDGenerator.getUUID());
+        this.setId(UIDGenerator.generateURNString());
         this.setDeliveryMode(deliveryMode);
     }
 }

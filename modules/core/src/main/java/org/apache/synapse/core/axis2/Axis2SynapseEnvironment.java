@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.util.blob.OverflowBlob;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -37,7 +38,6 @@ import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
 
 import java.util.concurrent.ExecutorService;
@@ -245,7 +245,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         axis2MC.setServiceContext(svcCtx);
         axis2MC.setOperationContext(opCtx);
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
-        mc.setMessageID(UUIDGenerator.getUUID());
+        mc.setMessageID(UIDGenerator.generateURNString());
         try {
 			mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
 			mc.getEnvelope().addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());

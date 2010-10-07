@@ -6,6 +6,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.*;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -173,7 +174,7 @@ public class MessageHelper {
         
         // do not copy options from the original
         newMC.setConfigurationContext(ori.getConfigurationContext());
-        newMC.setMessageID(UUIDGenerator.getUUID());
+        newMC.setMessageID(UIDGenerator.generateURNString());
         newMC.setTo(ori.getTo());
         newMC.setSoapAction(ori.getSoapAction());
 

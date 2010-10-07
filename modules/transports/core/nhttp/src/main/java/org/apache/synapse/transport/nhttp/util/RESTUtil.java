@@ -22,7 +22,6 @@ package org.apache.synapse.transport.nhttp.util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
@@ -123,15 +122,17 @@ public class RESTUtil {
      * @param requestURI        The URL that the request came to
      * @param contentTypeHeader The contentType header of the request
      * @param httpMethod        The http method of the request
+     * @param dispatching   Weather we should do service dispatching
      * @throws AxisFault - Thrown in case a fault occurs
      */
     public static void processGetAndDeleteRequest(MessageContext msgContext, OutputStream out,
                                                   String requestURI, Header contentTypeHeader,
-                                                  String httpMethod) throws AxisFault {
+                                                  String httpMethod, boolean dispatching)
+            throws AxisFault {
 
         String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
 
-        prepareMessageContext(msgContext, requestURI, httpMethod, out, contentType);
+        prepareMessageContext(msgContext, requestURI, httpMethod, out, contentType, dispatching);
 
         msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
 
@@ -173,15 +174,17 @@ public class RESTUtil {
      * @param os                The output stream of the response
      * @param requestURI        The URL that the request came to
      * @param contentTypeHeader The contentType header of the request
+     * @param dispatching  Weather we should do dispatching
      * @throws AxisFault - Thrown in case a fault occurs
      */
     public static void processPOSTRequest(MessageContext msgContext, InputStream is,
                                           OutputStream os, String requestURI,
-                                          Header contentTypeHeader) throws AxisFault {
+                                          Header contentTypeHeader,
+                                          boolean dispatching) throws AxisFault {
 
         String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
         prepareMessageContext(msgContext, requestURI, HTTPConstants.HTTP_METHOD_POST,
-                os, contentType);
+                os, contentType, dispatching);
         org.apache.axis2.transport.http.util.RESTUtil.processXMLRequest(msgContext, is, os,
                 contentType);
     }
@@ -194,13 +197,15 @@ public class RESTUtil {
      * @param httpMethod  The http method of the request
      * @param out         The output stream of the response
      * @param contentType The content type of the request
+     * @param dispatching weather we should do dispatching
      * @throws AxisFault Thrown in case a fault occurs
      */
     private static void prepareMessageContext(MessageContext msgContext,
                                               String requestURI,
                                               String httpMethod,
                                               OutputStream out,
-                                              String contentType) throws AxisFault {
+                                              String contentType,
+                                              boolean dispatching) throws AxisFault {
 
         msgContext.setTo(new EndpointReference(requestURI));
         msgContext.setProperty(HTTPConstants.HTTP_METHOD, httpMethod);
@@ -217,14 +222,16 @@ public class RESTUtil {
         //  2) request is to be injected into  the main sequence  .i.e. http://localhost:8280
         // This method does not cause any performance issue ...
         // Proper fix should be refractoring axis2 RestUtil in a proper way
-        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
-        AxisService axisService = requestDispatcher.findService(msgContext);
-        if (axisService == null) {
-            String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
-                    "nhttp.default.service", "__SynapseService");                 
-            axisService = msgContext.getConfigurationContext()
-                    .getAxisConfiguration().getService(defaultSvcName);
+        if (dispatching) {
+            RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
+            AxisService axisService = requestDispatcher.findService(msgContext);
+            if (axisService == null) {
+                String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
+                        "nhttp.default.service", "__SynapseService");
+                axisService = msgContext.getConfigurationContext()
+                        .getAxisConfiguration().getService(defaultSvcName);
+            }
+            msgContext.setAxisService(axisService);
         }
-        msgContext.setAxisService(axisService);
     }
 }

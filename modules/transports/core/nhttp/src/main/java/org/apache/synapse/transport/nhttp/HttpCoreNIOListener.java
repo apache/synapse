@@ -116,6 +116,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private PriorityExecutor executor = null;
     /** parser for calculating the priority of incoming messages */
     private Parser parser = null;
+    /** if falses we won't dispatch to axis2 service in case of rest scenarios */
+    private boolean restDispatching = true;
 
     protected IOEventDispatch getEventDispatch(
         NHttpServiceHandler handler, SSLContext sslContext, 
@@ -207,18 +209,30 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         if (param != null && param.getValue() != null) {
             createPriorityConfiguration(param.getValue().toString());
         }
+
+        param = transprtIn.getParameter(NhttpConstants.DISABLE_REST_SERVICE_DISPATCHING);
+        if (param != null && param.getValue() != null) {
+            if (param.getValue().equals("true")) {
+                restDispatching = false;
+            }
+        }
     }
 
     public int getActiveConnectionsSize() {
         return handler.getActiveConnectionsSize();
     }
 
+    /**
+     * Create a priority executor from the given file 
+     *
+     * @param fileName file name of the executor configuration
+     * @throws AxisFault if an error occurs
+     */
     private void createPriorityConfiguration(String fileName) throws AxisFault {
         OMElement definitions = null;
         try {
             FileInputStream fis = new FileInputStream(fileName);
             definitions = new StAXOMBuilder(fis).getDocumentElement();
-            assert definitions != null;
             definitions.build();
         } catch (FileNotFoundException e) {
             handleException("Priority configuration file cannot be found : " + fileName, e);
@@ -226,6 +240,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             handleException("Error parsing priority configuration xml file " + fileName, e);
         }
 
+        assert definitions != null;
         OMElement executorElem = definitions.getFirstChildWithName(
                 new QName(ExecutorConstants.PRIORITY_EXECUTOR));
 
@@ -352,7 +367,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             addToServiceURIMap((AxisService) obj);
         }
         
-        handler = new ServerHandler(cfgCtx, params, sslContext != null, metrics, parser, executor);
+        handler = new ServerHandler(cfgCtx, params, sslContext != null
+                , metrics, parser, executor, restDispatching);
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
                 sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;
@@ -614,7 +630,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         public void removeParameter(Parameter param) throws AxisFault {}
         public void deserializeParameters(OMElement parameterElement) throws AxisFault {}
         public Parameter getParameter(String name) { return null; }
-        public ArrayList getParameters() { return null; }
+        public ArrayList<Parameter> getParameters() { return null; }
         public boolean isParameterLocked(String parameterName) { return false; }
         public void serviceGroupUpdate(AxisEvent event, AxisServiceGroup serviceGroup) {}
     }

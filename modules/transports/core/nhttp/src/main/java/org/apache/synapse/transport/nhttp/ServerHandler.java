@@ -96,10 +96,20 @@ public class ServerHandler implements NHttpServiceHandler {
     /** keeps track of the connection that are alive in the system */
     private volatile List<NHttpServerConnection> activeConnections = null;
 
+    /**
+     * This parset is used by the priority executor to parse a given HTTP message and
+     * determine the priority of the message
+     */
     private Parser parser = null;
 
+    /**
+     * An executor capable of exucuting the Server Worker according the priority assigned
+     * to a particular message
+     */
     private PriorityExecutor executor = null;
 
+    private boolean restDispatching = true;
+    
     private LatencyView latencyView = null;
     private ThreadingView threadingView = null;
 
@@ -110,7 +120,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
         final boolean isHttps, final NhttpMetricsCollector metrics,
-        Parser parser, PriorityExecutor executor) {
+        Parser parser, PriorityExecutor executor, boolean restDispatching) {
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
@@ -123,6 +133,7 @@ public class ServerHandler implements NHttpServiceHandler {
         this.activeConnections = new ArrayList<NHttpServerConnection>();
         this.latencyView = new LatencyView(isHttps);
         this.threadingView = new ThreadingView("HttpServerWorker", true, 50);
+        this.restDispatching = restDispatching;
 
         this.cfg = NHttpConfiguration.getInstance();
         if (executor == null)  {
@@ -190,7 +201,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
             // hand off processing of the request to a thread off the pool
             ServerWorker worker = new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
-                        request, is, response, os);
+                        request, is, response, os, restDispatching);
 
             if (workerPool != null) {
                 workerPool.execute(worker);

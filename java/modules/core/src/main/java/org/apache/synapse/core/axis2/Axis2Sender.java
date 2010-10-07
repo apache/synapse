@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -36,7 +37,6 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.POXUtils;
-import org.apache.synapse.util.UUIDGenerator;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
@@ -130,7 +130,7 @@ public class Axis2Sender {
                  messageContext.setMessageID(smc.getMessageID());
              } else {
                  MessageHelper.removeAddressingHeaders(messageContext);
-                 messageContext.setMessageID(UUIDGenerator.getUUID());
+                 messageContext.setMessageID(UIDGenerator.generateURNString());
              }
 
             // determine weather we need to preserve the processed headers

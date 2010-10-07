@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
@@ -27,7 +28,6 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
@@ -94,7 +94,7 @@ public class RMSequenceMediator extends AbstractMediator {
                 String offeredSeqID = null;
 
                 if (!sequenceMap.containsKey(correlationValue)) {
-                    offeredSeqID = UUIDGenerator.getUUID();
+                    offeredSeqID = UIDGenerator.generateURNString();
                     orgMessageCtx.getOptions().setProperty(
                         SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
                 }
@@ -124,7 +124,7 @@ public class RMSequenceMediator extends AbstractMediator {
     private String retrieveSequenceID(String correlationValue) {
         String sequenceID;
         if (!sequenceMap.containsKey(correlationValue)) {
-            sequenceID = UUIDGenerator.getUUID();
+            sequenceID = UIDGenerator.generateURNString();
             if (log.isDebugEnabled()) {
                 log.debug("setting sequenceID " + sequenceID + " for correlation " + correlationValue);
             }

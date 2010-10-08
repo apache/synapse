@@ -48,11 +48,8 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         // serialize the parameters
         serializeProperties(wsdlEndpoint, endpointElement);
 
-        String name = wsdlEndpoint.getName();
-        boolean anon = wsdlEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
+        serializeCommonAttributes(endpoint,endpointElement);
+        
 
         OMElement wsdlElement = fac.createOMElement("wsdl", SynapseConstants.SYNAPSE_OMNAMESPACE);
         String serviceName = wsdlEndpoint.getServiceName();

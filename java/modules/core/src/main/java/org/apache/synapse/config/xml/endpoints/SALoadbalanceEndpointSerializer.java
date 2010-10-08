@@ -52,11 +52,7 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
         // serialize the parameters
         serializeProperties(loadbalanceEndpoint, endpointElement);
         
-        String name = loadbalanceEndpoint.getName();
-        boolean anon = loadbalanceEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
+        serializeCommonAttributes(endpoint,endpointElement);
 
         Dispatcher dispatcher = loadbalanceEndpoint.getDispatcher();
         if (dispatcher != null) {

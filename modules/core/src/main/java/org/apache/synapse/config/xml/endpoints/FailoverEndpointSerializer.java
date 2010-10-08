@@ -51,11 +51,8 @@ public class FailoverEndpointSerializer extends EndpointSerializer {
                 = fac.createOMElement("failover", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(failoverElement);
 
-        String name = failoverEndpoint.getName();
-        boolean anon = failoverEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
+        serializeCommonAttributes(endpoint,endpointElement);
+
 
         for (Endpoint childEndpoint : failoverEndpoint.getChildren()) {
             failoverElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));

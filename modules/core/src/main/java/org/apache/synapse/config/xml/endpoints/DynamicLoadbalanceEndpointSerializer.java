@@ -62,11 +62,8 @@ public class DynamicLoadbalanceEndpointSerializer extends EndpointSerializer {
         // serialize the parameters
         serializeProperties(dynamicLoadbalanceEndpoint, endpointElement);
 
-        String name = dynamicLoadbalanceEndpoint.getName();
-        boolean anon = dynamicLoadbalanceEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
+        serializeCommonAttributes(endpoint,endpointElement);
+        
 
         Dispatcher dispatcher = dynamicLoadbalanceEndpoint.getDispatcher();
         if (dispatcher != null) {

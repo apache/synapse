@@ -44,12 +44,9 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         DefaultEndpoint defaultEndpoint = (DefaultEndpoint) endpoint;
-        String name = defaultEndpoint.getName();
-        boolean anon = defaultEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
 
+        serializeCommonAttributes(defaultEndpoint,endpointElement);
+        
         EndpointDefinition epAddress = defaultEndpoint.getDefinition();
         OMElement defaultElement = serializeEndpointDefinition(epAddress);
         endpointElement.addChild(defaultElement);

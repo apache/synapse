@@ -123,7 +123,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
         boolean asynchronous = true;
         OMAttribute asynchronousAttr = elem.getAttribute(ATT_SEQUENCIAL);
         if (asynchronousAttr != null && asynchronousAttr.getAttributeValue().equals("false")) {
-            asynchronous = true;
+            asynchronous = false;
         }
 
         OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);

@@ -49,11 +49,7 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
         // serialize the parameters
         serializeProperties(loadbalanceEndpoint, endpointElement);
 
-        String name = loadbalanceEndpoint.getName();
-        boolean anon = loadbalanceEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
+        serializeCommonAttributes(endpoint,endpointElement);
 
         OMElement loadbalanceElement
                 = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);

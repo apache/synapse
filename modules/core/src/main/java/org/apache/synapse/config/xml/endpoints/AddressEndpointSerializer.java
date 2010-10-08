@@ -48,12 +48,8 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
 
         // serialize the properties
         serializeProperties(addressEndpoint, endpointElement);
-
-        String name = addressEndpoint.getName();
-        boolean anon = addressEndpoint.isAnonymous();
-        if (name != null && !anon) {
-            endpointElement.addAttribute("name", name, null);
-        }
+        //serialize attributes
+        serializeCommonAttributes(endpoint,endpointElement);
 
         EndpointDefinition epAddress = addressEndpoint.getDefinition();
         OMElement addressElement = serializeEndpointDefinition(epAddress);

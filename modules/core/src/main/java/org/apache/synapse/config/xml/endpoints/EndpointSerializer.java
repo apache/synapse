@@ -102,7 +102,7 @@ public abstract class EndpointSerializer {
      */
     protected void serializeCommonEndpointProperties(
             EndpointDefinition endpointDefinition, OMElement element) {
-    
+
         if (endpointDefinition.getTraceState() == SynapseConstants.TRACING_ON) {
             element.addAttribute(fac.createOMAttribute(XMLConfigConstants.TRACE_ATTRIB_NAME,
                     null, XMLConfigConstants.TRACE_ENABLE));
@@ -121,7 +121,7 @@ public abstract class EndpointSerializer {
                     XMLConfigConstants.STATISTICS_ATTRIB_NAME, null,
                     XMLConfigConstants.STATISTICS_ENABLE));
         }
-        
+
         if (endpointDefinition.isUseSwa()) {
             element.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
         } else if (endpointDefinition.isUseMTOM()) {
@@ -334,6 +334,23 @@ public abstract class EndpointSerializer {
         throw new SynapseException("Serializer for endpoint " +
                 endpoint.getClass().toString() + " is not defined.");
     }
+
+    protected void serializeCommonAttributes(Endpoint endpoint, OMElement element) {
+
+        String name = endpoint.getName();
+        boolean anon = ((AbstractEndpoint) endpoint).isAnonymous();
+        if (name != null && !anon) {
+            element.addAttribute("name", name, null);
+        }
+
+        //serialize the message stores
+        String messageStore = endpoint.getOnFaultMessageStore();
+        if (messageStore != null) {
+            element.addAttribute(EndpointFactory.ON_FAULT_Q.getLocalPart(),
+                    messageStore, null);
+        }
+    }
+
 
     protected void serializeProperties(PropertyInclude endpoint, OMElement element) {
         Collection<MediatorProperty> properties = endpoint.getProperties();

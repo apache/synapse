@@ -182,7 +182,7 @@ public class EndpointDefinition implements AspectConfigurable {
     /**
      * Request that RM be turned on/off on this endpoint
      *
-     * @param reliableMessagingOn
+     * @param reliableMessagingOn a boolean flag indicating RM is on or not
      */
     public void setReliableMessagingOn(boolean reliableMessagingOn) {
         this.reliableMessagingOn = reliableMessagingOn;
@@ -200,7 +200,7 @@ public class EndpointDefinition implements AspectConfigurable {
     /**
      * Request that WS-A be turned on/off on this endpoint
      *
-     * @param addressingOn
+     * @param addressingOn  a boolean flag indicating addressing is on or not
      */
     public void setAddressingOn(boolean addressingOn) {
         this.addressingOn = addressingOn;
@@ -218,7 +218,7 @@ public class EndpointDefinition implements AspectConfigurable {
     /**
      * Set the addressing namespace version
      *
-     * @param addressingVersion
+     * @param addressingVersion Version of the addressing spec to use
      */
     public void setAddressingVersion(String addressingVersion) {
         this.addressingVersion = addressingVersion;
@@ -236,7 +236,7 @@ public class EndpointDefinition implements AspectConfigurable {
     /**
      * Request that WS-Sec be turned on/off on this endpoint
      *
-     * @param securityOn
+     * @param securityOn  a boolean flag indicating security is on or not
      */
     public void setSecurityOn(boolean securityOn) {
         this.securityOn = securityOn;

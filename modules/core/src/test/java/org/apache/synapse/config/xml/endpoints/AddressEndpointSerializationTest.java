@@ -83,4 +83,20 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
         assertTrue(compare(serializedOut,inputElement));
 
     }
+
+    public void testAddressEndpointScenarioFour() throws Exception {
+         String inputXML =
+                "<endpoint xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" >" +
+                "</address>"+
+                "</endpoint>" ;
+
+        OMElement inputElement = createOMElement(inputXML);
+        AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(
+                inputElement, true, null);
+        assertNotNull(endpoint.getName()); // make sure we generate names for anonymous endpoints
+        OMElement serializedOut = AddressEndpointSerializer.getElementFromEndpoint(endpoint);
+        // the generated name should not show up in the serialization
+        assertTrue(compare(serializedOut,inputElement));
+    }
 }

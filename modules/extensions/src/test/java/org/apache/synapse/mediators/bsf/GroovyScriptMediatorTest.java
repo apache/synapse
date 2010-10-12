@@ -20,13 +20,14 @@
 package org.apache.synapse.mediators.bsf;
 
 import junit.framework.TestCase;
+import org.apache.synapse.mediators.TestUtils;
 
 public class GroovyScriptMediatorTest extends TestCase {
 
     public void testXMLMediator2() throws Exception {
-       /* InlineScriptMediator mediator = new InlineScriptMediator("javascript","xml.groovy", "mc.setPayloadXML(mc.getPayloadXML())");
-        mediator.init();
-        assertTrue(mediator.mediate(TestUtils.getTestContext("<a><b>petra</b></a>")));*/
+       ScriptMediator mediator = new ScriptMediator("groovy", "mc.setPayloadXML(mc.getPayloadXML())");
+       mediator.initInlineScript();
+       assertTrue(mediator.mediate(TestUtils.getTestContext("<a><b>petra</b></a>")));
     }
 
 // TODO: doesn't work yet

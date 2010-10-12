@@ -4730,13 +4730,9 @@ following on the console:</p>
         <strong>Objective:</strong> Demonstrate the use of the Eventing functionality built with Synapse
       </p>
       <p>
-        <strong>Prerequisites:</strong> Deploy the
-        SimpleStockQuoteService in sample Axis2 server and start it on port
-        9000.
-      </p>
-      <p>
-        Start Synapse with the sample configuration 500 (i.e. synapse -sample
-        500).
+        <strong>Prerequisites:</strong>
+        <br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+        <br/>Start Synapse with the sample configuration 500 (i.e. synapse -sample 500)
       </p>
       <p>
         In this sample, the event source creted based on the configuration. Event subscriber subscribes for the events, Event sender publish events and the SimpleStockQuoteService act as the Event Sink.
@@ -4816,13 +4812,9 @@ following on the console:</p>
         <strong>Objective:</strong> Demonstrate static subscription capability of Synapse
       </p>
       <p>
-        <strong>Prerequisites:</strong> Deploy the
-        SimpleStockQuoteService in sample Axis2 server and start it on port
-        9000.
-      </p>
-      <p>
-        Start Synapse with the sample configuration 501 (i.e. synapse -sample
-        501).
+        <strong>Prerequisites:</strong>
+        <br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+        <br/>Start Synapse with the sample configuration 501 (i.e. synapse -sample 501)
       </p>
       <p>
         In this sample, two static subscriptions created by providing the SimpleStockQuoteService as the event sink.
@@ -4873,13 +4865,9 @@ following on the console:</p>
            <strong>Objective:</strong> Demonstrate the mediation capability of events before publishsing to event sink.
          </p>
          <p>
-           <strong>Prerequisites:</strong> Deploy the
-           SimpleStockQuoteService in sample Axis2 server and start it on port
-           9000.
-         </p>
-         <p>
-           Start Synapse with the sample configuration 502 (i.e. synapse -sample
-           502).
+           <strong>Prerequisites:</strong>
+           <br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+           <br/>Start Synapse with the sample configuration 502 (i.e. synapse -sample 502)
          </p>
          <p>
            In this sample, the event (order request) transform to a new order with different namesapce using XSLT mediator.
@@ -4926,12 +4914,9 @@ following on the console:</p>
            <strong>Objective:</strong> Demonstrate the ability to construct the Synapse configuration from a file hierarchy
          </p>
          <p>
-           <strong>Prerequisites:</strong> Deploy the
-           SimpleStockQuoteService in sample Axis2 server and start it on port
-           9000.
-         </p>
-         <p>
-           Start Synapse with the sample configuration 600 (i.e. synapse -sample 600).
+           <strong>Prerequisites:</strong>
+           <br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port 9000
+           <br/>Start Synapse with the sample configuration 600 (i.e. synapse -sample 600)
          </p>
          <p>
             Go to the SYNAPSE_HOME/repository/conf/sample directory and locate the subdirectory named synapse_sample_600.xml
@@ -5063,13 +5048,11 @@ following on the console:</p>
            <strong>Objective:</strong> Demonstrate the priority based mediation capability of synapse.
          </p>
          <p>
-           <strong>Prerequisites:</strong> Deploy the
-           SimpleStockQuoteService in sample Axis2 server and start it on port
+           <strong>Prerequisites:</strong>
+           <br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port
            9000. Priority is applied only when synapse is loaded with enough messages to consume its core number of threads.
              So to observe the priority based mediation, it is required to use a load testing tool like JMeter, SOAP UI or Apache bench.
-         </p>
-         <p>
-           Start Synapse with the sample configuration 650 (i.e. synapse -sample 650).
+           <br/>Start Synapse with the sample configuration 650 (i.e. synapse -sample 650)
          </p>
          <p>
            In this sample, client should send a HTTP header that specifies the priority of the message.This header name is priority.
@@ -5151,17 +5134,13 @@ following on the console:</p>
            <strong>Objective:</strong> Demonstrate the priority based dispatching of NHTTP transport.
          </p>
          <p>
-           <strong>Prerequisites:</strong> Deploy the
-           SimpleStockQuoteService in sample Axis2 server and start it on port
+           <strong>Prerequisites:</strong>
+           <br/>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on port
            9000. Priority is applied only when synapse is loaded with enough messages to consume its core number of threads.
-             So to observe the priority based dispatching, it is required to use a load testing tool like JMeter, SOAP UI or Apache bench.
-         </p>
-         <p>
-             Open axis2.xml in repository/conf directory and uncomment the following parameter to the configuration.
+           So to observe the priority based dispatching, it is required to use a load testing tool like JMeter, SOAP UI or Apache bench.
+           <br/>Open axis2.xml in repository/conf directory and uncomment the following parameter to the configuration.
              <strong>priorityConfigFile</strong>. Set the value to repository/conf/sample/resources/priority/priority-configuration.xml
-         </p>
-         <p>
-           Start Synapse with the sample configuration 150 (i.e. synapse -sample 150).
+           <br/>Start Synapse with the sample configuration 150 (i.e. synapse -sample 150).
          </p>
          <p>
            In this sample, client should send a HTTP header that specifies the priority of the message.This header name is priority.
@@ -5360,9 +5339,10 @@ following on the console:</p>
     </pre>
     <p>
     <strong>Objective: </strong>Introduction to Synapse Message Stores</p>
+    <p>
     <strong>Prerequisites</strong>:
     <br/>Start the Synapse configuration numbered 700: i.e. synapse -sample 700
-    <br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done.
+    <br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done</p>
     <p>To Execute the Client : </p>
     <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/soap/StockQuote</pre>
     <p>Since now you have the Axis2 Server Running when you run the client you will get the Stock

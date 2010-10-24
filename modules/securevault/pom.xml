@@ -150,7 +150,7 @@
         <log4j.version>1.2.14</log4j.version>
         <commons-cli.version>1.0</commons-cli.version>
         <jline.version>0.9.94</jline.version>
-        <commons_io.version>1.4</commons_io.version>
+        <commons_io.version>2.0</commons_io.version>
         <commons-codec.version>1.2</commons-codec.version>
     </properties>
 </project>

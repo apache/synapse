@@ -861,7 +861,7 @@
         <derby.version>10.4.2.0</derby.version>
         <wrapper.version>3.2.3</wrapper.version>
         <saxon.version>8.9</saxon.version>
-        <commons_io.version>1.4</commons_io.version>
+        <commons_io.version>2.0</commons_io.version>
         <commons-cli.version>1.0</commons-cli.version>
         <jline.version>0.9.94</jline.version>
 

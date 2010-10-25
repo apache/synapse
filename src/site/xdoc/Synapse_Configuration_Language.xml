@@ -679,7 +679,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       supported. The failover attribute determines if the next endpoint or static member should be
       selected once the currently selected endpoint or static member has failed, and defaults to
       true. The set of endpoints or static members amongst which the load has to be distributed
-      can be listed under the 'loadBalance' element. These endpoints can belong to any
+      can be listed under the 'loadbalance' element. These endpoints can belong to any
       endpoint type mentioned in this document. For example, failover endpoints
       can be listed inside the load balance endpoint to load balance between
       failover groups etc. The loadbalance element cannot have both endpoint &amp; member child
@@ -701,11 +701,11 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </p>
     <pre xml:space="preserve">
     &lt;session type="http|simpleClientSession"/&gt;?
-    &lt;loadBalance [policy="roundRobin"] [algorithm="impl of org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm"]
+    &lt;loadbalance [policy="roundRobin"] [algorithm="impl of org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm"]
                     [failover="true|false"]&gt;
       &lt;endpoint .../&gt;+
       &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+  
-    &lt;/loadBalance&gt;
+    &lt;/loadbalance&gt;
     </pre>
     <h4>
       <a name="fail-over-endpoint" id="fail-over-endpoint">Failover Endpoint</a>

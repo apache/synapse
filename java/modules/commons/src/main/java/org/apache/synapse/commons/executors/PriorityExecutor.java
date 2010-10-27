@@ -51,6 +51,8 @@ public class PriorityExecutor {
     private MultiPriorityBlockingQueue<Runnable> queue;
     /** this is used by the file based synapse xml configuration */
     private String fileName;
+    /** Weather executor is initializer */
+    private boolean initialzed;
 
     /**
      * Execute a given task with the priority specified. If the task throws an exception,
@@ -60,6 +62,9 @@ public class PriorityExecutor {
      * @param priority priority of the task
      */
     public void execute(final Runnable task, int priority) {
+        if (!initialzed) {
+            throw new IllegalStateException("Executor is not initialized");
+        }
         // create a dummy worker to execute the task
         Worker w = new Worker(task, priority);
 
@@ -84,6 +89,8 @@ public class PriorityExecutor {
                 new NativeThreadFactory(new ThreadGroup("executor-group"),
                         "priority-worker" + (name != null ? "-" + name : "")));
 
+        initialzed = true;
+
         if (log.isDebugEnabled()) {
             log.debug("Started the thread pool executor with threads, " +
                     "core = " + core + " max = " + max +
@@ -95,16 +102,18 @@ public class PriorityExecutor {
      * Destroy the executor. Stop all the threads running. 
      */
     public void destroy() {
-        if (log.isDebugEnabled()) {
-            log.debug("Shutting down priority executor" + (name != null ? ": " + name : ""));
-        }
+        if (initialzed) {
+            if (log.isDebugEnabled()) {
+                log.debug("Shutting down priority executor" + (name != null ? ": " + name : ""));
+            }
 
-        executor.shutdown();
+            executor.shutdown();
 
-        try {
-            executor.awaitTermination(100, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            log.error("Failed to Shut down Executor");        
+            try {
+                executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                log.error("Failed to Shut down Executor");
+            }
         }
     }
 

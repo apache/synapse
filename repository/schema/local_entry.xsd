@@ -30,7 +30,7 @@
         </xs:annotation>
     </xs:element>
 
-    <xs:complexType name="LocalEntry">
+    <xs:complexType name="LocalEntry" mixed="true">
         <!-- TODO : need to add the constraints (might need factory refactoring) -->
         <xs:annotation>
             <xs:documentation source="description">

@@ -22,6 +22,8 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
+    <xs:include schemaLocation="misc/common.xsd"/>
+
     <xs:element name="task" type="Task">
         <xs:annotation>
             <xs:documentation source="description">
@@ -32,8 +34,18 @@
 
     <xs:complexType name="Task">
         <xs:annotation>
-
+            <xs:documentation>Task description configuration element</xs:documentation>
         </xs:annotation>
+        <xs:sequence>
+            <xs:element name="property" type="mediatorProperty" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="trigger" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="interval" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="class" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
     </xs:complexType>
 
 </xs:schema>

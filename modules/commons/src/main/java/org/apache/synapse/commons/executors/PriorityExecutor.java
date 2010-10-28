@@ -114,6 +114,8 @@ public class PriorityExecutor {
             } catch (InterruptedException e) {
                 log.error("Failed to Shut down Executor");
             }
+
+            initialzed = false;
         }
     }
 

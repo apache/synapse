@@ -33,6 +33,7 @@
     <xs:include schemaLocation="filter/filter.xsd"/>
     <xs:include schemaLocation="filter/switch.xsd"/>
     <xs:include schemaLocation="transformation/fault.xsd"/>
+    <xs:include schemaLocation="transformation/xslt.xsd"/>
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
 
@@ -66,6 +67,7 @@
             <xs:element ref="RMSequence"/>
             <xs:element ref="makefault"/>
             <xs:element ref="script"/>
+            <xs:element ref="xslt"/>
         </xs:choice>
     </xs:group>
 

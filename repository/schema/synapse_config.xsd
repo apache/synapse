@@ -48,7 +48,7 @@
                 configuration
             </xs:documentation>
         </xs:annotation>
-        <xs:sequence>
+        <xs:choice maxOccurs="unbounded" minOccurs="1">
             <xs:element ref="registry" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="localEntry" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="priorityExecutor" minOccurs="0" maxOccurs="unbounded"/>
@@ -57,7 +57,7 @@
             <xs:element ref="proxy" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="eventSource" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="task" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
+        </xs:choice>
     </xs:complexType>
 
 </xs:schema>

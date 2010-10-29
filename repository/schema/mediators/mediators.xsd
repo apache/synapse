@@ -32,6 +32,7 @@
     <xs:include schemaLocation="filter/out.xsd"/>
     <xs:include schemaLocation="filter/filter.xsd"/>
     <xs:include schemaLocation="filter/switch.xsd"/>
+    <xs:include schemaLocation="filter/throttle.xsd"/>
     <xs:include schemaLocation="transformation/fault.xsd"/>
     <xs:include schemaLocation="transformation/xslt.xsd"/>
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
@@ -71,6 +72,7 @@
             <xs:element ref="xslt"/>
             <xs:element ref="dblookup"/>
             <xs:element ref="dbreport"/>
+            <xs:element ref="throttle"/>
         </xs:choice>
     </xs:group>
 

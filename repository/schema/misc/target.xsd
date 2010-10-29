@@ -36,6 +36,26 @@
     <xs:complexType name="Target">
         <xs:annotation>
             <xs:documentation>
+                This denotes the target for various mediators
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="sequence" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:group ref="mediatorList" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="endpoint" type="Endpoint" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+        <xs:attribute name="sequence" type="xs:string" use="optional"/>
+        <xs:attribute name="endpoint" type="xs:string" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="ProxyTarget">
+        <xs:annotation>
+            <xs:documentation>
                 This denotes the target for a proxy or for various mediators
             </xs:documentation>
         </xs:annotation>

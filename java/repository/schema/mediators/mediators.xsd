@@ -38,6 +38,7 @@
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
+    <xs:include schemaLocation="extension/class.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -73,6 +74,7 @@
             <xs:element ref="dblookup"/>
             <xs:element ref="dbreport"/>
             <xs:element ref="throttle"/>
+            <xs:element ref="class"/>
         </xs:choice>
     </xs:group>
 

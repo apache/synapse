@@ -40,8 +40,8 @@
                 in the Synapse Configuration
             </xs:documentation>
         </xs:annotation>
-        <xs:sequence>
-            <xs:element ref="target" minOccurs="1" maxOccurs="1"/>
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="target" type="ProxyTarget" minOccurs="1" maxOccurs="1"/>
             <xs:element name="publishWSDL" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation source="description">
@@ -75,7 +75,7 @@
                 </xs:complexType>
             </xs:element>
             <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
+        </xs:choice>
         <xs:attributeGroup ref="monitoringAspect"/>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="transports" type="xs:string" use="optional"/>

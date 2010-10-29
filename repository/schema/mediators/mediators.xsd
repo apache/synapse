@@ -35,6 +35,7 @@
     <xs:include schemaLocation="transformation/fault.xsd"/>
     <xs:include schemaLocation="transformation/xslt.xsd"/>
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
+    <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
 
     <xs:group name="mediatorList">
@@ -68,6 +69,8 @@
             <xs:element ref="makefault"/>
             <xs:element ref="script"/>
             <xs:element ref="xslt"/>
+            <xs:element ref="dblookup"/>
+            <xs:element ref="dbreport"/>
         </xs:choice>
     </xs:group>
 

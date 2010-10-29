@@ -35,7 +35,7 @@
     <xs:include schemaLocation="transformation/fault.xsd"/>
     <xs:include schemaLocation="transformation/xslt.xsd"/>
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
-    <xs:include schemaLocation="advanced/db_lookup.xsd"/>
+    <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
 
     <xs:group name="mediatorList">

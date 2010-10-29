@@ -40,6 +40,7 @@
     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
     <xs:include schemaLocation="extension/class.xsd"/>
+    <xs:include schemaLocation="eip/iterate.xsd"/>
 
     <xs:group name="mediatorList">
         <xs:annotation>
@@ -77,6 +78,7 @@
             <xs:element ref="dbreport"/>
             <xs:element ref="throttle"/>
             <xs:element ref="class"/>
+            <xs:element ref="iterate"/>
         </xs:choice>
     </xs:group>
 

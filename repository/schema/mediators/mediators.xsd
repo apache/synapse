@@ -38,6 +38,7 @@
     <xs:include schemaLocation="transformation/xquery.xsd"/>
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
+    <xs:include schemaLocation="advanced/cache.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
     <xs:include schemaLocation="extension/class.xsd"/>
     <xs:include schemaLocation="eip/iterate.xsd"/>
@@ -81,6 +82,7 @@
             <xs:element ref="class"/>
             <xs:element ref="iterate"/>
             <xs:element ref="aggregate"/>
+            <xs:element ref="cache"/>
         </xs:choice>
     </xs:group>
 

@@ -28,6 +28,7 @@
     <xs:include schemaLocation="core/property.xsd"/>
     <xs:include schemaLocation="core/drop.xsd"/>
     <xs:include schemaLocation="core/validate.xsd"/>
+    <xs:include schemaLocation="core/callout.xsd"/>
     <xs:include schemaLocation="filter/in.xsd"/>
     <xs:include schemaLocation="filter/out.xsd"/>
     <xs:include schemaLocation="filter/filter.xsd"/>
@@ -83,6 +84,7 @@
             <xs:element ref="iterate"/>
             <xs:element ref="aggregate"/>
             <xs:element ref="cache"/>
+            <xs:element ref="callout"/>
         </xs:choice>
     </xs:group>
 

@@ -37,6 +37,7 @@
     <xs:include schemaLocation="transformation/fault.xsd"/>
     <xs:include schemaLocation="transformation/xslt.xsd"/>
     <xs:include schemaLocation="transformation/xquery.xsd"/>
+    <xs:include schemaLocation="transformation/rewrite.xsd"/>
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="advanced/cache.xsd"/>
@@ -85,6 +86,7 @@
             <xs:element ref="aggregate"/>
             <xs:element ref="cache"/>
             <xs:element ref="callout"/>
+            <xs:element ref="rewrite"/>
         </xs:choice>
     </xs:group>
 

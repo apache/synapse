@@ -114,6 +114,11 @@ public class EndpointDefinition implements AspectConfigurable {
     private String charSetEncoding;
 
     /**
+     * Whether endpoint state replication should be disabled or not (only valid in clustered setups)
+     */
+    private boolean replicationDisabled = false;
+
+    /**
      * timeout duration for waiting for a response in ms. if the user has set some timeout action
      * and the timeout duration is not set, default is set to 0. note that if the user has
      * not set any timeout configuration, default timeout action is set to NONE, which won't do
@@ -496,6 +501,14 @@ public class EndpointDefinition implements AspectConfigurable {
 
     public List<Integer> getRetryDisabledErrorCodes() {
         return retryDisabledErrorCodes;
+    }
+
+    public boolean isReplicationDisabled() {
+        return replicationDisabled;
+    }
+
+    public void setReplicationDisabled(boolean replicationDisabled) {
+        this.replicationDisabled = replicationDisabled;
     }
 
     public void addSuspendErrorCode(int code) {

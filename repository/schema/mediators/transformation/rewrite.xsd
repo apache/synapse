@@ -22,7 +22,7 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="../../evaluators/evaluators.xsd"/>
+    <xs:include schemaLocation="../../misc/evaluators.xsd"/>
 
     <xs:element name="rewrite">
         <xs:annotation>

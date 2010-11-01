@@ -281,6 +281,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         AddressEndpoint endpoint = new AddressEndpoint();
         endpoint.setName("DynamicLoadBalanceAddressEndpoint-" + Math.random());
         EndpointDefinition definition = new EndpointDefinition();
+        definition.setReplicationDisabled(true);
         definition.setAddress(to.getAddress());
         endpoint.setDefinition(definition);
         endpoint.init((SynapseEnvironment)

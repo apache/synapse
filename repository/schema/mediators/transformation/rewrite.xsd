@@ -22,6 +22,8 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
+    <xs:include schemaLocation="../../evaluators/evaluators.xsd"/>
+
     <xs:element name="rewrite">
         <xs:annotation>
             <xs:documentation source="description">
@@ -35,7 +37,7 @@
                         <xs:choice maxOccurs="unbounded">
                             <xs:element name="condition" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
-                                    <!-- TODO: evaluator definition -->
+                                    <xs:group ref="evaluatorList"/>
                                 </xs:complexType>
                             </xs:element>
                             <xs:element name="action" minOccurs="1" maxOccurs="1">

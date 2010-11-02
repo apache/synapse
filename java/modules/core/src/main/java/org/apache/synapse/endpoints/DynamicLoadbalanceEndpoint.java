@@ -144,6 +144,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         
         if (sessionInformation != null && currentMember != null) {
             //send message on current session
+            sessionInformation.updateExpiryTime();
             sendToApplicationMember(synCtx, currentMember, false);
         } else {
             // prepare for a new session

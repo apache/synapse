@@ -36,6 +36,7 @@ public class SessionInformation implements Serializable {
     private String rootEndpointName;
     private List<String> path;
     private long expiryTime;
+    private long expireTimeWindow;
     private transient List<Endpoint> endpointList;
     private transient Member member;
 
@@ -45,10 +46,11 @@ public class SessionInformation implements Serializable {
         this.expiryTime = expiryTime;
     }
 
-    public SessionInformation(String id, Member member, long expiryTime) {
+    public SessionInformation(String id, Member member, long expiryTime, long expireTimeWindow) {
         this.id = id;
         this.member = member;
         this.expiryTime = expiryTime;
+        this.expireTimeWindow = expireTimeWindow;
     }
 
     public String getId() {
@@ -73,6 +75,10 @@ public class SessionInformation implements Serializable {
 
     public void setExpiryTime(long expiryTime) {
         this.expiryTime = expiryTime;
+    }
+
+    public void updateExpiryTime(){
+        this.expiryTime = System.currentTimeMillis() + expireTimeWindow;    
     }
 
     public List<Endpoint> getEndpointList() {

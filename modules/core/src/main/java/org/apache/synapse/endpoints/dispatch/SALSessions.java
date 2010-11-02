@@ -623,7 +623,7 @@ public class SALSessions {
         Endpoint rootEndpoint = endpoints.get(0);
 
         SessionInformation information = new SessionInformation(id,
-                currentMember, expiryTime);
+                currentMember, expiryTime, expireTimeWindow);
 
         if (isClustered) {
             information.setRootEndpointName(getEndpointName(rootEndpoint));

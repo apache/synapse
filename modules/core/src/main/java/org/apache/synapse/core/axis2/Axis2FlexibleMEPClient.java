@@ -37,6 +37,7 @@ import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -466,7 +467,7 @@ public class Axis2FlexibleMEPClient {
 
             axisOutMsgCtx.setProperty(
                     org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
-                    restContentType);
+                    TransportUtils.getContentType((String)restContentType, originalInMsgCtx));
         }
     }
 

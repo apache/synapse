@@ -43,6 +43,9 @@ public class XMLConfigConstants {
     public static final String SCOPE_CLIENT = "axis2-client";
     /** The scope name for transport header properties */
     public static final String SCOPE_TRANSPORT = "transport";
+    /** The scope name for registry properties */
+    public static final String SCOPE_REGISTRY = "registry";
+
     /** The set of supported data types */
     public static enum DATA_TYPES {
         STRING, BOOLEAN, INTEGER, LONG, SHORT, FLOAT, DOUBLE, OM

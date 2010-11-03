@@ -122,4 +122,11 @@ public interface Registry {
      * @param entry The registry entry
      */
     public void updateRegistryEntry(RegistryEntry entry);
+
+    /**
+     * Get the resource properties of a given resource
+     *
+     * @param entryKey The registry entry
+     */
+    public Properties getResourceProperties(String entryKey);
 }

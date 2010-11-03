@@ -25,6 +25,8 @@ import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.SynapseException;
 
 import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Represents an Entry contained in the local registry used by Synapse
@@ -53,6 +55,12 @@ public class Entry implements SynapseArtifact {
     private String fileName;
     /** The description of the local entry */
     private String description;
+
+    /**
+     * Registry resource properties
+    */
+    private Properties entryProperties;
+
 
     public Entry() {}
     
@@ -166,13 +174,28 @@ public class Entry implements SynapseArtifact {
         this.description = description;
     }
 
+    public Properties getEntryProperties() {
+        return entryProperties;
+    }
+
+    public void setEntryProperties(Properties entryProperties) {
+        this.entryProperties = entryProperties;
+    }
+
     public boolean isExpired() {
         return getType() == REMOTE_ENTRY && getExpiryTime() > 0
                 && System.currentTimeMillis() > expiryTime;
     }
 
     public boolean isCached() {
-        return value != null;
+        if (value != null) {
+            return true;
+        } else if (entryProperties != null) {
+            if (!entryProperties.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void clearCache() {

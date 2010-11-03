@@ -23,12 +23,14 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
 import org.apache.synapse.config.xml.ProxyServiceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -39,10 +41,28 @@ import java.util.Properties;
 public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
 
     private static Log log = LogFactory.getLog(ProxyServiceDeployer.class);
+    public static String failSafeStr = "";
 
     @Override
     public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
                                         Properties properties) {
+        boolean failSafeProxyEnabled = false;
+        try {
+            failSafeStr = getSynapseConfiguration().getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
+            if (failSafeStr != null) {
+                String[] failSafeComponents = failSafeStr.split(",");
+                if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
+                        || Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES) >= 0) {
+                    failSafeProxyEnabled = true; 
+                }
+            } else {
+                failSafeProxyEnabled = true; // Enabled by default
+            }
+            
+        } catch (DeploymentException ignored) {
+
+        }
+
 
         if (log.isDebugEnabled()) {
             log.debug("ProxyService Deployment from file : " + fileName + " : Started");
@@ -60,7 +80,7 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("Initialized the ProxyService : " + proxy.getName());
                 }
-                
+
                 proxy.buildAxisService(getSynapseConfiguration(),
                         getSynapseConfiguration().getAxisConfiguration());
                 if (log.isDebugEnabled()) {
@@ -78,10 +98,14 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                         "artifact described in the file " + fileName + " is not a ProxyService");
             }
         } catch (Exception e) {
-            handleSynapseArtifactDeploymentError(
-                    "ProxyService Deployment from the file : " + fileName + " : Failed.", e);
+            if (failSafeProxyEnabled) {
+                log.warn("Proxy Service : " + fileName + " : Hot Deployment Failed" + e.getMessage());
+                log.warn("Proxy Service : Fail-Safe mode.");
+            } else {
+                handleSynapseArtifactDeploymentError(
+                        "ProxyService Deployment from the file : " + fileName + " : Failed.", e);
+            }
         }
-
         return null;
     }
 

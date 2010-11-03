@@ -19,6 +19,7 @@
 
 package org.apache.synapse.mediators;
 
+import org.apache.axiom.om.OMText;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.transport.base.BaseConstants;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.Context;
@@ -38,6 +40,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implements the XPath extension function synapse:get-property(scope,prop-name)
@@ -99,7 +102,8 @@ public class GetPropertyFunction implements Function {
                 if (argOne != null) {
                     if (!XMLConfigConstants.SCOPE_AXIS2.equals(argOne) &&
                         !XMLConfigConstants.SCOPE_DEFAULT.equals(argOne) &&
-                        !XMLConfigConstants.SCOPE_TRANSPORT.equals(argOne)) {
+                        !XMLConfigConstants.SCOPE_TRANSPORT.equals(argOne) &&
+                            !XMLConfigConstants.SCOPE_REGISTRY.equals(argOne)) {
                         return evaluate(XMLConfigConstants.SCOPE_DEFAULT, args.get(0),
                             args.get(1), context.getNavigator());
                     } else {
@@ -217,9 +221,9 @@ public class GetPropertyFunction implements Function {
                     return SynapseConstants.TRUE;
                 } else if (synCtx instanceof Axis2MessageContext) {
                     org.apache.axis2.context.MessageContext axis2MessageContext
-                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                            = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
                     if (axis2MessageContext.getProperty(BaseConstants.FAULT_MESSAGE) != null
-                        && SynapseConstants.TRUE.equals(
+                            && SynapseConstants.TRUE.equals(
                             axis2MessageContext.getProperty(BaseConstants.FAULT_MESSAGE))) {
                         return SynapseConstants.TRUE;
                     }
@@ -236,10 +240,10 @@ public class GetPropertyFunction implements Function {
                 else
                     return SynapseConstants.FORMAT_SOAP12;
             } else if (SynapseConstants.PROPERTY_OPERATION_NAME.equals(key) ||
-                       SynapseConstants.PROPERTY_OPERATION_NAMESPACE.equals(key)) {
+                    SynapseConstants.PROPERTY_OPERATION_NAMESPACE.equals(key)) {
                 if (synCtx instanceof Axis2MessageContext) {
                     AxisOperation axisOperation
-                        = ((Axis2MessageContext)synCtx).getAxis2MessageContext().getAxisOperation();
+                            = ((Axis2MessageContext)synCtx).getAxis2MessageContext().getAxisOperation();
                     if (axisOperation != null) {
                         if (SynapseConstants.PROPERTY_OPERATION_NAMESPACE.equals(key)) {
                             return axisOperation.getName().getNamespaceURI();
@@ -257,29 +261,66 @@ public class GetPropertyFunction implements Function {
                 }
             }
         } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
-            && synCtx instanceof Axis2MessageContext) {
+                && synCtx instanceof Axis2MessageContext) {
 
             org.apache.axis2.context.MessageContext axis2MessageContext
-                = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             return axis2MessageContext.getProperty(key);
 
         } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
-            && synCtx instanceof Axis2MessageContext) {
+                && synCtx instanceof Axis2MessageContext) {
 
             org.apache.axis2.context.MessageContext axis2MessageContext
-                = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                    = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             Object headers = axis2MessageContext.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+                    org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
             if (headers != null && headers instanceof Map) {
                 Map headersMap = (Map) headers;
                 return headersMap.get(key);
             }
 
+        } else if (XMLConfigConstants.SCOPE_REGISTRY.equals(scope)) {
+            String[] regParam = key.split("@");
+            String regPath = null;
+            String propName = null;
+            if (regParam.length == 2) {
+                regPath = regParam[0];
+                propName = regParam[1];
+            } else if (regParam.length == 1) {
+                regPath = regParam[0];
+            }
+
+            Entry propEntry = synCtx.getConfiguration().getEntryDefinition(regPath);
+            if (propEntry == null) {
+                propEntry = new Entry();
+                propEntry.setType(Entry.REMOTE_ENTRY);
+                propEntry.setKey(key);
+            }
+
+            if (synCtx.getConfiguration().getRegistry() != null) {
+                synCtx.getConfiguration().getRegistry().getResource(propEntry, new Properties());
+            }
+            synCtx.getConfiguration().getRegistry().getResource(propEntry, new Properties());
+            if (null != propEntry.getEntryProperties()) {
+                if (propName != null) {
+                    Properties reqProperties = propEntry.getEntryProperties();
+                    if (reqProperties != null) {
+                        if (reqProperties.get(propName) != null) {
+                            return reqProperties.get(propName);
+                        }
+                    }
+                } else if (propEntry.getValue()!= null) {
+                    if (propEntry.getValue() instanceof OMText) {
+                        return ((OMText) propEntry.getValue()).getText();
+                    }
+                    return propEntry.getValue().toString();
+                }
+            }
         } else {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Invalid scope : '" + scope + "' has been set for the " +
-                    "synapse:get-property(scope,prop-name) XPath function");
+                        "synapse:get-property(scope,prop-name) XPath function");
             }
         }
         return NULL_STRING;

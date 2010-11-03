@@ -27,6 +27,7 @@ import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -60,6 +61,21 @@ public abstract class AbstractRegistry implements Registry {
         // if we have not cached the referenced object, fetch it and its RegistryEntry
         } else if (!entry.isCached()) {
             omNode = lookup(entry.getKey());
+            entry.setEntryProperties(getResourceProperties(entry.getKey()));
+            if (omNode == null && entry.getEntryProperties() != null &&
+                    !entry.getEntryProperties().isEmpty()) {
+                // Collection
+                re = getRegistryEntry(entry.getKey());
+                if (re != null) {
+                    if (re.getCachableDuration() > 0) {
+                        entry.setExpiryTime(System.currentTimeMillis() + re.getCachableDuration());
+                    } else {
+                        entry.setExpiryTime(-1);
+                    }
+                    entry.setVersion(re.getVersion());
+                }
+            }
+
             if (omNode == null) {
                 return null;
             } else {
@@ -171,5 +187,9 @@ public abstract class AbstractRegistry implements Registry {
 
     public void init(Properties properties) {
         this.properties.putAll(properties);
+    }
+
+    public Properties getResourceProperties(String entryKey) {
+        return null;
     }
 }

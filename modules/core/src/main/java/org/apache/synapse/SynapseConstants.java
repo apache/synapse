@@ -408,4 +408,17 @@ public final class SynapseConstants {
 
     // Does message as attemted all its redelivered
     public static final String MESSAGE_STORE_REDELIVERED = "message.store.redelivery.redelivered";
+
+    // Fail-safe mode properties
+    public static final String FAIL_SAFE_MODE_STATUS = "failsafe.mode.enable";
+    public static final String FAIL_SAFE_MODE_ALL = "all";
+    public static final String FAIL_SAFE_MODE_PROXY_SERVICES = "proxyservices";
+    public static final String FAIL_SAFE_MODE_EP = "endpoints";
+    public static final String FAIL_SAFE_MODE_LOCALENTRIES = "localentries";
+    public static final String FAIL_SAFE_MODE_SEQUENCES = "sequences";
+    public static final String FAIL_SAFE_MODE_EVENT_SOURCE = "eventsources";
+    public static final String FAIL_SAFE_MODE_EXECUTORS = "executors";
+
+    
+
 }

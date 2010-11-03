@@ -41,12 +41,14 @@ import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 
 import javax.xml.namespace.QName;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
+    public static String failSafeStr = "";
 
     public SynapseConfiguration getConfiguration(OMElement definitions, Properties properties) {
 
@@ -56,6 +58,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
         SynapseConfiguration config = SynapseConfigUtils.newConfiguration();               
         config.setDefaultQName(definitions.getQName());
+
+        
+        failSafeStr = properties.getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
 
         Iterator itr = definitions.getChildren();
         while (itr.hasNext()) {
@@ -119,30 +124,84 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem,
                                            Properties properties) {
-        ProxyService proxy = ProxyServiceFactory.createProxy(elem, properties);
-        config.addProxyService(proxy.getName(), proxy);
+        boolean failSafeProxyEnabled = isFaileSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES);
+
+        ProxyService proxy = null;
+
+        try {
+            proxy = ProxyServiceFactory.createProxy(elem, properties);
+            if (proxy != null) {
+                config.addProxyService(proxy.getName(), proxy);
+            }
+        } catch (Exception e) {
+            if (failSafeProxyEnabled) {
+                log.warn("Proxy Service configuration : " +
+                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "name")))
+                        + " cannot be built.");
+                log.warn("Continue in Proxy Service Fail-safe mode.");
+            } else {
+                handleException("Proxy Service configuration : " +
+                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "name")))
+                        + " cannot be built.");
+            }
+        }
+        
         return proxy;
     }
 
-   public static Entry defineEntry(SynapseConfiguration config, OMElement elem,
-                                   Properties properties) {
-        Entry entry = EntryFactory.createEntry(elem, properties);
-        config.addEntry(entry.getKey(), entry);
+    public static Entry defineEntry(SynapseConfiguration config, OMElement elem,
+                                    Properties properties) {
+        boolean failSafeLocalEntriesEnabled = isFaileSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_LOCALENTRIES);
+
+        Entry entry = null;
+
+        try {
+            entry = EntryFactory.createEntry(elem, properties);
+            if (entry != null) {
+                config.addEntry(entry.getKey(), entry);
+            }
+        } catch (Exception e) {
+            if (failSafeLocalEntriesEnabled) {
+                log.warn("Local Entry configuration : " +
+                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) +" cannot be built");
+                log.warn("Continue in Local Entry fail-safe mode.");
+            } else {
+                handleException("Local Entry configuration : " +
+                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) +" cannot be built");
+            }
+        }
         return entry;
     }
 
     public static Mediator defineSequence(SynapseConfiguration config, OMElement ele,
                                           Properties properties) {
 
+        boolean failSafeSequenceEnabled = isFaileSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_SEQUENCES);
+
+        Mediator mediator = null;
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
-            Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
-            config.addSequence(name, mediator);
-            // mandatory sequence is treated as a speciall sequence because it will be fetched for
-            // each and every message and keeps a direct reference to that from the configuration
-            // this also limits the ability of the mandatory sequence to be dynamic
-            if (SynapseConstants.MANDATORY_SEQUENCE_KEY.equals(name)) {
-                config.setMandatorySequence(mediator);
+            try {
+                mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
+                if (mediator != null) {
+                    config.addSequence(name, mediator);
+                    // mandatory sequence is treated as a special sequence because it will be fetched for
+                    // each and every message and keeps a direct reference to that from the configuration
+                    // this also limits the ability of the mandatory sequence to be dynamic
+                    if (SynapseConstants.MANDATORY_SEQUENCE_KEY.equals(name)) {
+                        config.setMandatorySequence(mediator);
+                    }
+                }
+            } catch (Exception e) {
+                if (failSafeSequenceEnabled) {
+                    log.warn("Sequence configuration : " + name +" cannot be built.");
+                    log.warn("Continue in Sequence fail-safe mode.");
+                } else {
+                    handleException("Sequence configuration : " + name +" cannot be built.");
+                }
             }
             return mediator;
         } else {
@@ -153,11 +212,24 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele,
                                           Properties properties) {
+        boolean failSafeEpEnabled = isFaileSafeEnabled(SynapseConstants.FAIL_SAFE_MODE_EP);
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        Endpoint endpoint = null;
         if (name != null) {
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(ele, false, properties);
-            config.addEndpoint(name.trim(), endpoint);
+            try {
+                endpoint = EndpointFactory.getEndpointFromElement(ele, false, properties);
+                if (endpoint != null) {
+                    config.addEndpoint(name.trim(), endpoint);
+                }
+            } catch (Exception e) {
+                if (failSafeEpEnabled) {
+                    log.warn("Endpoint configuration : " + name + " cannot be built.");
+                    log.warn("Continue in Endpoint fail-safe mode.");
+                } else {
+                    handleException("Endpoint configuration " + name + " cannot be built.");
+                }
+            }
             return endpoint;
         } else {
             handleException("Invalid endpoint definition without a name");
@@ -167,22 +239,45 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static SynapseEventSource defineEventSource(SynapseConfiguration config,
                                                        OMElement elem, Properties properties) {
-        SynapseEventSource eventSource = EventSourceFactory.createEventSource(elem, properties);
-        config.addEventSource(eventSource.getName(), eventSource);
+        boolean failSafeEventSourcesEnabled = isFaileSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_EVENT_SOURCE);
+        SynapseEventSource eventSource = null;
+
+        try {
+            eventSource = EventSourceFactory.createEventSource(elem, properties);
+            if (eventSource != null) {
+                config.addEventSource(eventSource.getName(), eventSource);
+            }
+        } catch (Exception e) {
+            if (failSafeEventSourcesEnabled) {
+                log.warn("Event Source configuration cannot be built.");
+                log.warn("Continue in Event Source fail-safe mode.");
+            } else {
+                handleException("Event Source configuration cannot be built.");
+            }
+        }
         return eventSource;
     }
 
     public static PriorityExecutor defineExecutor(SynapseConfiguration config,
                                                        OMElement elem, Properties properties) {
+        boolean failSafeExecutorsEnabled = isFaileSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_EXECUTORS);
+
         PriorityExecutor executor = null;
         try {
             executor = PriorityExecutorFactory.createExecutor(
-                XMLConfigConstants.SYNAPSE_NAMESPACE, elem, true, properties);
+                    XMLConfigConstants.SYNAPSE_NAMESPACE, elem, true, properties);
+            assert executor != null;
+            config.addPriorityExecutor(executor.getName(), executor);
         } catch (AxisFault axisFault) {
-            handleException("Failed to create the priorityExecutor configuration");
+            if (failSafeExecutorsEnabled) {
+                log.warn("Executor configuration cannot be built.");
+                log.warn("Continue in Executor fail-safe mode.");
+            } else {
+                handleException("Failed to create the priority-executor configuration");
+            }            
         }
-        assert executor != null;
-        config.addPriorityExecutor(executor.getName(), executor);
         return executor;
     }
 
@@ -205,6 +300,19 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public Class getSerializerClass() {
         return SynapseXMLConfigurationSerializer.class;
+    }
+
+    private static boolean isFaileSafeEnabled(String componentName) {
+        if (failSafeStr != null) {
+            String[] failSafeComponents = failSafeStr.split(",");
+            if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
+                    || Arrays.<String>asList(failSafeComponents).indexOf(componentName) >= 0) {
+                return true;
+            }
+        } else {
+            return true; // Enabled by default
+        }
+        return false;
     }
 
 }

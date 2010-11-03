@@ -477,6 +477,9 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         if (!policies.isEmpty()) {
 
             for (PolicyInfo pi : policies) {
+                if (getPolicyFromKey(pi.getPolicyKey(), synCfg) == null) {
+                    handleException("Cannot find Policy from the key");
+                }
 
                 if (pi.isServicePolicy()) {
 

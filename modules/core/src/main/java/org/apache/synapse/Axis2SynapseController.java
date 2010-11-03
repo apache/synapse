@@ -633,6 +633,19 @@ public class Axis2SynapseController implements SynapseController {
      */
     private void deployProxyServices() {
 
+        boolean failSafeProxyEnabled = false;
+        String failSafeMode = synapseConfiguration.getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
+
+        if (failSafeMode != null) {
+            String[] failSafeComponents = failSafeMode.split(",");
+            if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
+                    || Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES) >= 0) {
+                failSafeProxyEnabled = true;
+            }
+        } else {
+            failSafeProxyEnabled = true; // Enabled by default
+        }
+
         log.info("Deploying Proxy services...");
         String thisServerName = serverConfigurationInformation.getServerName();
         if (thisServerName == null || "".equals(thisServerName)) {
@@ -655,15 +668,23 @@ public class Axis2SynapseController implements SynapseController {
                 }
             }
 
-            AxisService proxyService = proxy.buildAxisService(synapseConfiguration,
-                    configurationContext.getAxisConfiguration());
-            if (proxyService != null) {
-                log.info("Deployed Proxy service : " + proxy.getName());
-                if (!proxy.isStartOnLoad()) {
-                    proxy.stop(synapseConfiguration);
+            try {
+                AxisService proxyService = proxy.buildAxisService(synapseConfiguration,
+                        configurationContext.getAxisConfiguration());
+                if (proxyService != null) {
+                    log.info("Deployed Proxy service : " + proxy.getName());
+                    if (!proxy.isStartOnLoad()) {
+                        proxy.stop(synapseConfiguration);
+                    }
+                } else {
+                    log.warn("The proxy service " + proxy.getName() + " will NOT be available");
                 }
-            } else {
-                log.warn("The proxy service " + proxy.getName() + " will NOT be available");
+            } catch (SynapseException e) {
+                if (failSafeProxyEnabled) {
+                    log.warn("The proxy service " + proxy.getName() + " cannot be deployed. Continue in Proxy Service fail-safe mode.");
+                } else {
+                    handleException("The proxy service " + proxy.getName() + " : Deployment Error");
+                }
             }
         }
     }

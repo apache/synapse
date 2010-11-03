@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -291,7 +292,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      *
      * @param artifactName name of the artifact to be undeployed
      *
-     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#unDeploy(String)
+     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploy(String)
      */
     public abstract void undeploySynapseArtifact(String artifactName);
 

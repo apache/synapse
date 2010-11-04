@@ -173,9 +173,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     Entry entry = SynapseXMLConfigurationFactory.defineEntry(
                             synapseConfig, document, properties);
-                    entry.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), entry.getKey());
+                    if (entry != null) {
+                        entry.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), entry.getKey());
+                    }
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -195,9 +197,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(
                             synapseConfig, document, properties);
-                    proxy.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), proxy.getName());
+                    if (proxy != null) {
+                        proxy.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), proxy.getName());
+                    }
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -217,9 +221,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     Startup startup = SynapseXMLConfigurationFactory.defineStartup(
                             synapseConfig, document, properties);
-                    startup.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), startup.getName());
+                    if (startup != null) {
+                        startup.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), startup.getName());
+                    }
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -239,7 +245,7 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     Mediator seq = SynapseXMLConfigurationFactory.defineSequence(
                             synapseConfig, document, properties);
-                    if (seq instanceof SequenceMediator) {
+                    if (seq != null && seq instanceof SequenceMediator) {
                         SequenceMediator sequence = (SequenceMediator) seq;
                         sequence.setFileName(file.getName());
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
@@ -264,9 +270,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
                             synapseConfig, document, properties);
-                    endpoint.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), endpoint.getName());
+                    if (endpoint != null) {
+                        endpoint.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), endpoint.getName());
+                    }
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -286,9 +294,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
                             defineEventSource(synapseConfig, document, properties);
-                    eventSource.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), eventSource.getName());
+                    if (eventSource != null) {
+                        eventSource.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), eventSource.getName());
+                    }
                 } catch (FileNotFoundException ignored) {}
            }
         }
@@ -308,9 +318,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     PriorityExecutor executor = SynapseXMLConfigurationFactory.
                             defineExecutor(synapseConfig, document, properties);
-                    executor.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), executor.getName());
+                    if (executor != null) {
+                        executor.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), executor.getName());
+                    }
                 } catch (FileNotFoundException ignored) {}
            }
         }
@@ -332,9 +344,11 @@ public class MultiXMLConfigurationBuilder {
                     OMElement document = parseFile(file);
                     MessageStore messageStore = SynapseXMLConfigurationFactory.defineMessageStore(
                             synapseConfig, document, properties);
-                    messageStore.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                            messageStore.getName());
+                    if (messageStore != null) {
+                        messageStore.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                messageStore.getName());
+                    }
                 } catch (FileNotFoundException ignored ) { }
             }
         }

@@ -54,6 +54,7 @@
                 <xs:element name="onComplete" minOccurs="1" maxOccurs="1">
                     <xs:complexType>
                         <xs:group ref="mediatorList"/>
+                        <xs:attribute name="expression" type="xs:string" use="optional"/>
                     </xs:complexType>
                 </xs:element>
             </xs:choice>

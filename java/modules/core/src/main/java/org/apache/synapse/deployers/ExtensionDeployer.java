@@ -126,6 +126,10 @@ public class ExtensionDeployer extends AbstractDeployer {
             
         } catch (IOException e) {
             handleException("I/O error in reading the mediator jar file", e);
+        } catch (Exception e) {
+            handleException("Error occurred while trying to deploy mediator jar file", e);
+        } catch (Throwable t) {
+            handleException("Error occurred while trying to deploy the mediator jar file", t);
         } finally {
             // restore the class loader back
             if (log.isDebugEnabled()) {
@@ -202,5 +206,12 @@ public class ExtensionDeployer extends AbstractDeployer {
             log.debug(message, e);
         }
         throw new DeploymentException(message, e);
+    }
+
+    private void handleException(String message, Throwable t) throws DeploymentException {
+        if (log.isDebugEnabled()) {
+            log.debug(message, t);
+        }
+        throw new DeploymentException(message, t);
     }
 }

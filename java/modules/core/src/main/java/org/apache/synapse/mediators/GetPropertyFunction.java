@@ -30,6 +30,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.registry.Registry;
 import org.jaxen.Context;
 import org.jaxen.Function;
 import org.jaxen.FunctionCallException;
@@ -297,20 +298,19 @@ public class GetPropertyFunction implements Function {
                 propEntry.setType(Entry.REMOTE_ENTRY);
                 propEntry.setKey(key);
             }
-
-            if (synCtx.getConfiguration().getRegistry() != null) {
-                synCtx.getConfiguration().getRegistry().getResource(propEntry, new Properties());
-            }
-            synCtx.getConfiguration().getRegistry().getResource(propEntry, new Properties());
-            if (null != propEntry.getEntryProperties()) {
+            Registry registry = synCtx.getConfiguration().getRegistry();
+            if (registry != null) {
+                registry.getResource(propEntry, new Properties());
                 if (propName != null) {
                     Properties reqProperties = propEntry.getEntryProperties();
                     if (reqProperties != null) {
                         if (reqProperties.get(propName) != null) {
-                            return reqProperties.get(propName);
+                            if (reqProperties.get(propName) != null) {
+                                return reqProperties.getProperty(propName);
+                            }
                         }
                     }
-                } else if (propEntry.getValue()!= null) {
+                } else if (propEntry.getValue() != null) {
                     if (propEntry.getValue() instanceof OMText) {
                         return ((OMText) propEntry.getValue()).getText();
                     }

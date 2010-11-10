@@ -114,6 +114,7 @@ public abstract class AbstractRegistry implements Registry {
 
             } else {
                 omNode = lookup(entry.getKey());
+                entry.setEntryProperties(getResourceProperties(entry.getKey()));
             }
         }
 

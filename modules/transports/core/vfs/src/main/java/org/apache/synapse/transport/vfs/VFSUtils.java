@@ -157,7 +157,8 @@ public class VFSUtils extends BaseUtils {
                 }
             }
         } catch (FileSystemException fse) {
-            log.debug("Cannot get the lock for the file : " + fo.getName() + " before processing");
+            log.debug("Cannot get the lock for the file : " + maskURLPassword(fo.getName().getURI())
+                    + " before processing");
         }
         return false;
     }

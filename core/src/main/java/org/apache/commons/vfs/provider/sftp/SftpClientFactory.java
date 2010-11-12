@@ -16,16 +16,12 @@
  */
 package org.apache.commons.vfs.provider.sftp;
 
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UserInfo;
-import com.jcraft.jsch.Proxy;
-import com.jcraft.jsch.ProxyHTTP;
-import com.jcraft.jsch.ProxySOCKS5;
+import com.jcraft.jsch.*;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.util.Os;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.util.Properties;
@@ -39,6 +35,8 @@ import java.util.Properties;
 public final class SftpClientFactory
 {
     private static final String SSH_DIR_NAME = ".ssh";
+
+    private static final Log log = LogFactory.getLog(SftpClientFactory.class);
 
     private SftpClientFactory()
     {
@@ -57,6 +55,7 @@ public final class SftpClientFactory
     public static Session createConnection(String hostname, int port, char[] username, char[] password,
                                            FileSystemOptions fileSystemOptions) throws FileSystemException
     {
+        JSch.setLogger(new JSchLogger());
         JSch jsch = new JSch();
 
         File sshDir = null;
@@ -286,5 +285,41 @@ public final class SftpClientFactory
             }
         }
         return new File("");
+    }
+
+    public static class JSchLogger implements Logger {
+        public boolean isEnabled(int level) {
+            switch (level) {
+                case FATAL:
+                    return log.isFatalEnabled();
+                case ERROR:
+                    return log.isErrorEnabled();
+                case WARN:
+                    return log.isWarnEnabled();
+                case INFO:
+                    return log.isInfoEnabled();
+                default:
+                    return log.isDebugEnabled();
+            }
+        }
+
+        public void log(int level, String message) {
+            switch (level) {
+                case FATAL:
+                    log.fatal("[JSCH] " + message);
+                    break;
+                case ERROR:
+                    log.error("[JSCH] " + message);
+                    break;
+                case WARN:
+                    log.warn("[JSCH] " + message);
+                    break;
+                case INFO:
+                    log.info("[JSCH] " + message);
+                    break;
+                default:
+                    log.debug("[JSCH] " + message);
+            }
+        }
     }
 }

@@ -22,36 +22,16 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:include schemaLocation="misc/common.xsd"/>
-
-    <xs:element name="eventSource" type="EventSource">
+    <xs:element name="eventPublisher">
         <xs:annotation>
             <xs:documentation source="description">
-                EventSource description
+                EventPublisher mediator to publish the current message as an event
+                to the given event source
             </xs:documentation>
         </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="eventSourceName" type="xs:string" use="required"/>
+        </xs:complexType>
     </xs:element>
-
-    <xs:complexType name="EventSource">
-        <xs:annotation>
-            <xs:documentation>Event source element type</xs:documentation>
-        </xs:annotation>
-        <xs:choice maxOccurs="unbounded">
-            <xs:element name="subscriptionManager" minOccurs="1" maxOccurs="1">
-                <xs:complexType>
-                    <xs:sequence maxOccurs="unbounded">
-                        <xs:element name="property" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:attribute name="name" type="xs:string" use="required"/>
-                                <xs:attribute name="value" type="xs:string" use="required"/>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute name="class" type="xs:string" use="required"/>
-                </xs:complexType>
-            </xs:element>
-        </xs:choice>
-        <xs:attribute name="name" type="xs:string" use="required"/>
-    </xs:complexType>
 
 </xs:schema>

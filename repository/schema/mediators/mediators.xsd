@@ -43,6 +43,7 @@
     <xs:include schemaLocation="advanced/cache.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
     <xs:include schemaLocation="extension/class.xsd"/>
+    <xs:include schemaLocation="extension/spring.xsd"/>
     <xs:include schemaLocation="eip/iterate.xsd"/>
     <xs:include schemaLocation="eip/aggregate.xsd"/>
 
@@ -87,6 +88,7 @@
             <xs:element ref="cache"/>
             <xs:element ref="callout"/>
             <xs:element ref="rewrite"/>
+            <xs:element ref="spring"/>
         </xs:choice>
     </xs:group>
 

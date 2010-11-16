@@ -30,12 +30,41 @@
         </xs:annotation>
         <xs:choice>
             <xs:element ref="and"/>
+            <xs:element ref="or"/>
+            <xs:element ref="equal"/>
+            <xs:element ref="not"/>
         </xs:choice>
     </xs:group>
 
     <xs:element name="and">
         <xs:complexType>
-            <xs:group ref="evaluatorList"/>
+            <xs:group ref="evaluatorList" maxOccurs="unbounded" minOccurs="2"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="or">
+        <xs:complexType>
+            <xs:group ref="evaluatorList" maxOccurs="unbounded" minOccurs="2"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="equal">
+        <xs:complexType>
+            <xs:attribute name="type" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="url"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="source" use="required" type="xs:string"/>
+            <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="not">
+        <xs:complexType>
+            <xs:group ref="evaluatorList" minOccurs="1" maxOccurs="1"/>
         </xs:complexType>
     </xs:element>
 

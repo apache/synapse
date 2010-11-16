@@ -24,12 +24,14 @@
     <sequence name="main">
         <!-- filtering of messages with XPath and regex matches -->
         <filter source="get-property('To')" regex=".*/StockQuote.*">
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
-                </endpoint>
-            </send>
-            <drop/>
+            <then>
+                <send>
+                    <endpoint>
+                        <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
+                    </endpoint>
+                </send>
+                <drop/>
+            </then>
         </filter>
         <send/>
     </sequence>

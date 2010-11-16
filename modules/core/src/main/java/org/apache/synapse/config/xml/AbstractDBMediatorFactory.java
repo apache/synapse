@@ -273,7 +273,7 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         while (iter.hasNext()) {
 
             OMElement stmntElt = (OMElement) iter.next();
-            Statement statement = new Statement(decodeSQLString(getValue(stmntElt, SQL_Q)));
+            Statement statement = new Statement(getValue(stmntElt, SQL_Q));
 
             Iterator paramIter = stmntElt.getChildrenWithName(PARAM_Q);
             while (paramIter.hasNext()) {
@@ -336,8 +336,5 @@ public abstract class AbstractDBMediatorFactory extends AbstractMediatorFactory 
         mediator.addDataSourceProperty(qname, getValue(element, qname));
     }
 
-    private String decodeSQLString(String sql){
-        return sql.replaceAll("&lt;","<").replaceAll("&gt;", ">");
-    }
 }
 

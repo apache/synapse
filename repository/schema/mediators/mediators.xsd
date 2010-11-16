@@ -41,6 +41,7 @@
     <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="advanced/cache.xsd"/>
+    <xs:include schemaLocation="advanced/event.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
     <xs:include schemaLocation="extension/class.xsd"/>
     <xs:include schemaLocation="extension/spring.xsd"/>
@@ -89,6 +90,7 @@
             <xs:element ref="callout"/>
             <xs:element ref="rewrite"/>
             <xs:element ref="spring"/>
+            <xs:element ref="eventPublisher"/>
         </xs:choice>
     </xs:group>
 

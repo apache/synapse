@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -18,22 +18,20 @@
   ~  under the License.
   -->
 
-<!-- POX to SOAP conversion -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+           targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
+           xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <sequence name="main">
-        <!-- filtering of messages with XPath and regex matches -->
-        <filter source="get-property('To')" regex=".*/StockQuote.*">
-            <then>
-                <send>
-                    <endpoint>
-                        <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
-                    </endpoint>
-                </send>
-                <drop/>
-            </then>
-        </filter>
-        <send/>
-    </sequence>
+    <xs:element name="spring">
+        <xs:annotation>
+            <xs:documentation source="description">
+                Spring mediator to process messages using spring beans
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="bean" use="required" type="xs:string"/>
+            <xs:attribute name="key" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
 
-</definitions>
+</xs:schema>

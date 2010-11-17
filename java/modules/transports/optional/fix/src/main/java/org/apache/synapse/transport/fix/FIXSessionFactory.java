@@ -26,8 +26,10 @@ import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quickfixj.jmx.JmxExporter;
 import quickfix.*;
 
+import javax.management.JMException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -128,6 +130,7 @@ public class FIXSessionFactory {
 
                 acceptorStore.put(service.getName(),acceptor);
                 acceptor.start();
+                initJMX(acceptor, service.getName());
                 return true;
             } catch (ConfigError e) {
                 String msg = "Error in the specified FIX configuration. Unable to initialize a " +
@@ -207,6 +210,7 @@ public class FIXSessionFactory {
             initiatorStore.put(fixEPR, initiator);
             applicationStore.put(fixEPR, messageHandler);
             initiator.start();
+            initJMX(initiator, service.getName());
 
             FIXIncomingMessageHandler fixMessageHandler = (FIXIncomingMessageHandler) messageHandler;
             log.info("Waiting for logon procedure to complete...");
@@ -251,6 +255,7 @@ public class FIXSessionFactory {
                     applicationStore.put(EPR, messageHandler);
                 }
                 initiator.start();
+                initJMX(initiator, service.getName());
                 return true;
 
             } catch (FieldConvertError e) {
@@ -493,6 +498,17 @@ public class FIXSessionFactory {
 
     public void setSenderThreadPool(WorkerPool senderThreadPool) {
         this.senderThreadPool = senderThreadPool;
+    }
+
+    private void initJMX(Connector connector, String service) {
+        try {
+            JmxExporter jmxExporter = new JmxExporter();
+            jmxExporter.setRegistrationBehavior(JmxExporter.REGISTRATION_IGNORE_EXISTING);
+            jmxExporter.export(connector);
+        } catch (JMException e) {
+            log.error("Error while initializing JMX support for the FIX sessions in " +
+                    "service: " + service, e);
+        }
     }
 }
 

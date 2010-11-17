@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
+import org.apache.axis2.util.JavaUtils;
 
 import javax.xml.namespace.QName;
 import java.util.List;
@@ -73,8 +74,13 @@ public class FailoverEndpointFactory extends EndpointFactory {
             }
 
             // set endpoints and return
-            failoverEndpoint.setChildren(getEndpoints(
-                    failoverElement, failoverEndpoint, properties));
+            failoverEndpoint.setChildren(getEndpoints(failoverElement, failoverEndpoint, properties));
+
+            String dynamicFO = failoverElement.getAttributeValue(new QName("dynamic"));
+            if (dynamicFO != null && JavaUtils.isFalseExplicitly(dynamicFO)) {
+                failoverEndpoint.setDynamic(false);
+            }
+            
             // process the parameters
             processProperties(failoverEndpoint, epConfig);
 

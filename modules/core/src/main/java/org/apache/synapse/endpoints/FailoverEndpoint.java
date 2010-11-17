@@ -36,6 +36,9 @@ public class FailoverEndpoint extends AbstractEndpoint {
     /** Endpoint for which is currently used */
     private Endpoint currentEndpoint = null;
 
+    /** The fail-over mode supported by this endpoint. By default we do dynamic fail-over */
+    private boolean dynamic = true;
+
     public void send(MessageContext synCtx) {
 
         if (log.isDebugEnabled()) {
@@ -59,28 +62,20 @@ public class FailoverEndpoint extends AbstractEndpoint {
             return;
         }
         
-        if (currentEndpoint == null) {
-            currentEndpoint = getChildren().get(0);
-        }
+        if (dynamic) {
+            // Dynamic fail-over mode - Switch to a backup endpoint when an error occurs
+            // in the primary endpoint. But switch back to the primary as soon as it becomes
+            // active again.
 
-        if (currentEndpoint.readyToSend()) {
-            if (isARetry && metricsMBean != null) {
-                metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_FO_FAIL_OVER);
-            }
-            synCtx.pushFaultHandler(this);
-            currentEndpoint.send(synCtx);
-
-        } else {
             boolean foundEndpoint = false;
             for (Endpoint endpoint : getChildren()) {
                 if (endpoint.readyToSend()) {
                     foundEndpoint = true;
-                    currentEndpoint = endpoint;
                     if (isARetry && metricsMBean != null) {
                         metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_FO_FAIL_OVER);
                     }
                     synCtx.pushFaultHandler(this);
-                    currentEndpoint.send(synCtx);
+                    endpoint.send(synCtx);
                     break;
                 }
             }
@@ -91,6 +86,46 @@ public class FailoverEndpoint extends AbstractEndpoint {
                         " - no ready child endpoints";
                 log.warn(msg);
                 informFailure(synCtx, SynapseConstants.ENDPOINT_FO_NONE_READY, msg);
+            }
+
+        } else {
+            // Static fail-over mode - Switch to a backup endpoint when an error occurs
+            // in the primary endpoint. Keep sending messages to the backup endpoint until
+            // an error occurs in that endpoint.
+
+            if (currentEndpoint == null) {
+                currentEndpoint = getChildren().get(0);
+            }
+
+            if (currentEndpoint.readyToSend()) {
+                if (isARetry && metricsMBean != null) {
+                    metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_FO_FAIL_OVER);
+                }
+                synCtx.pushFaultHandler(this);
+                currentEndpoint.send(synCtx);
+
+            } else {
+                boolean foundEndpoint = false;
+                for (Endpoint endpoint : getChildren()) {
+                    if (endpoint.readyToSend()) {
+                        foundEndpoint = true;
+                        currentEndpoint = endpoint;
+                        if (isARetry && metricsMBean != null) {
+                            metricsMBean.reportSendingFault(SynapseConstants.ENDPOINT_FO_FAIL_OVER);
+                        }
+                        synCtx.pushFaultHandler(this);
+                        currentEndpoint.send(synCtx);
+                        break;
+                    }
+                }
+
+                if (!foundEndpoint) {
+                    String msg = "Failover endpoint : " +
+                            (getName() != null ? getName() : SynapseConstants.ANONYMOUS_ENDPOINT) +
+                            " - no ready child endpoints";
+                    log.warn(msg);
+                    informFailure(synCtx, SynapseConstants.ENDPOINT_FO_NONE_READY, msg);
+                }
             }
         }
     }
@@ -122,5 +157,13 @@ public class FailoverEndpoint extends AbstractEndpoint {
             }
         }
         return false;
-    }        
+    }
+
+    public boolean isDynamic() {
+        return dynamic;
+    }
+
+    public void setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
+    }
 }

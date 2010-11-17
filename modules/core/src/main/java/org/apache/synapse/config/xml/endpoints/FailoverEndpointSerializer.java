@@ -53,9 +53,12 @@ public class FailoverEndpointSerializer extends EndpointSerializer {
 
         serializeCommonAttributes(endpoint,endpointElement);
 
-
         for (Endpoint childEndpoint : failoverEndpoint.getChildren()) {
             failoverElement.addChild(EndpointSerializer.getElementFromEndpoint(childEndpoint));
+        }
+
+        if (!failoverEndpoint.isDynamic()) {
+            failoverElement.addAttribute("dynamic", "false", null);
         }
 
         return endpointElement;

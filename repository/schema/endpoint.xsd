@@ -126,15 +126,19 @@
             <xs:element name="loadbalance" minOccurs="1" maxOccurs="1">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="endpoint" minOccurs="1" maxOccurs="unbounded">
+                        <xs:element name="endpoint" minOccurs="2" maxOccurs="unbounded">
                             <xs:complexType>
-                                <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="1"/>
+                                <xs:choice>
+                                    <xs:group ref="leafEndpoints" minOccurs="0" maxOccurs="1"/>
+                                    <xs:group ref="failoverEndpoints" minOccurs="0" maxOccurs="1"/>
+                                </xs:choice>
                                 <xs:attribute name="name" type="xs:string" use="optional"/>
                                 <xs:attribute name="key" type="xs:string" use="optional"/>
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
-                    <xs:attribute name="algorithm" type="xs:string" default="org.apache.synapse.endpoints.algorithms.RoundRobin" use="required"/>
+                    <xs:attribute name="algorithm" type="xs:string" default="org.apache.synapse.endpoints.algorithms.RoundRobin" use="optional"/>
+                    <xs:attribute name="failover" type="xs:boolean" default="true" use="optional"/>
                 </xs:complexType>
             </xs:element>
         </xs:all>
@@ -149,7 +153,18 @@
         <xs:all>
             <xs:element name="failover" minOccurs="1" maxOccurs="1">
                 <xs:complexType>
-                    <xs:group ref="leafEndpoints" minOccurs="1" maxOccurs="unbounded"/>
+                    <xs:sequence>
+                        <xs:element name="endpoint" minOccurs="2" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:choice>
+                                    <xs:group ref="leafEndpoints" minOccurs="0" maxOccurs="1"/>
+                                    <xs:group ref="lbEndpoints" minOccurs="0" maxOccurs="1"/>
+                                </xs:choice>
+                                <xs:attribute name="name" type="xs:string" use="optional"/>
+                                <xs:attribute name="key" type="xs:string" use="optional"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:all>

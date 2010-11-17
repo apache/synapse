@@ -54,6 +54,7 @@
         <xs:choice minOccurs="1">
             <xs:group ref="leafEndpoints" minOccurs="0" maxOccurs="1"/>
             <xs:group ref="aggregatedEndpoints" minOccurs="0" maxOccurs="1"/>
+            <xs:group ref="dynamicLB" minOccurs="0" maxOccurs="1"/>
         </xs:choice>
         <xs:attribute name="name" type="xs:string" use="optional"/>
         <xs:attribute name="key" type="xs:string" use="optional"/>
@@ -165,6 +166,37 @@
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:all>
+    </xs:group>
+
+    <xs:group name="dynamicLB">
+        <xs:annotation>
+            <xs:documentation source="description">
+                This group represents the dynamic loadbalance endpoint
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="dynamicLoadbalance" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="membershipHandler" minOccurs="1" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:attribute name="name" type="xs:string" use="required"/>
+                                            <xs:attribute name="value" type="xs:string" use="required"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="class" type="xs:string" use="optional" default="org.apache.synapse.core.axis2.Axis2LoadBalanceMembershipHandler"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="algorithm" type="xs:string" use="optional" default="org.apache.synapse.endpoints.algorithms.RoundRobin"/>
+                    <xs:attribute name="failover" type="xs:boolean" use="optional" default="true"/>
                 </xs:complexType>
             </xs:element>
         </xs:all>

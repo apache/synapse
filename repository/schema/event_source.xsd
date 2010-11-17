@@ -23,6 +23,7 @@
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
     <xs:include schemaLocation="misc/common.xsd"/>
+    <xs:include schemaLocation="endpoint.xsd"/>
 
     <xs:element name="eventSource" type="EventSource">
         <xs:annotation>
@@ -48,6 +49,21 @@
                         </xs:element>
                     </xs:sequence>
                     <xs:attribute name="class" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="subscription" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:choice maxOccurs="unbounded">
+                        <xs:element name="filter" minOccurs="1" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:attribute name="source" type="xs:string" use="required"/>
+                                <xs:attribute name="dialect" type="xs:string" use="required"/>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="endpoint" minOccurs="1" maxOccurs="1" type="Endpoint"/>
+                        <xs:element name="expires" minOccurs="0" maxOccurs="1" type="xs:string"/>
+                    </xs:choice>
+                    <xs:attribute name="id" type="xs:string" use="required"/>
                 </xs:complexType>
             </xs:element>
         </xs:choice>

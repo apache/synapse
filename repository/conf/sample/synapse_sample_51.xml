@@ -24,28 +24,38 @@
     <sequence name="main">
         <in>
             <filter source="get-property('Action')" regex="urn:uploadFileUsingMTOM">
-                <property name="example" value="mtom"/>
-                <send>
-                    <endpoint>
-                        <address uri="http://localhost:9000/services/MTOMSwASampleService" optimize="mtom"/>
-                    </endpoint>
-                </send>
+                <then>
+                    <property name="example" value="mtom"/>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/MTOMSwASampleService"
+                                     optimize="mtom"/>
+                        </endpoint>
+                    </send>
+                </then>
             </filter>
             <filter source="get-property('Action')" regex="urn:uploadFileUsingSwA">
-                <property name="example" value="swa"/>
-                <send>
-                    <endpoint>
-                        <address uri="http://localhost:9000/services/MTOMSwASampleService" optimize="swa"/>
-                    </endpoint>
-                </send>
+                <then>
+                    <property name="example" value="swa"/>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/MTOMSwASampleService"
+                                     optimize="swa"/>
+                        </endpoint>
+                    </send>
+                </then>
             </filter>
         </in>
         <out>
             <filter source="get-property('example')" regex="mtom">
-                <property name="enableMTOM" value="true" scope="axis2"/>
+                <then>
+                    <property name="enableMTOM" value="true" scope="axis2"/>
+                </then>
             </filter>
             <filter source="get-property('example')" regex="swa">
-                <property name="enableSwA" value="true" scope="axis2"/>
+                <then>
+                    <property name="enableSwA" value="true" scope="axis2"/>
+                </then>
             </filter>
             <send/>
         </out>

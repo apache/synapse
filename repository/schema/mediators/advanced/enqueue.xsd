@@ -22,35 +22,18 @@
            targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
            xmlns="http://synapse.apache.org/ns/2010/04/configuration">
 
-    <xs:element name="priorityExecutor" type="PriorityExecutor">
+    <xs:element name="enqueue">
         <xs:annotation>
             <xs:documentation source="description">
-                PriorityExecutor description
+                Enqueue mediator to publish the current message as a priority mediation to
+                the given priority queue
             </xs:documentation>
         </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="priority" type="xs:integer" use="required"/>
+            <xs:attribute name="sequence" type="xs:string" use="required"/>
+            <xs:attribute name="executor" type="xs:string" use="required"/>
+        </xs:complexType>
     </xs:element>
-
-    <xs:complexType name="PriorityExecutor">
-        <xs:annotation>
-            <xs:documentation>
-                Priority executor configuration type
-            </xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element name="queues" minOccurs="1" maxOccurs="1">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="queue" minOccurs="1" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:attribute name="size" type="xs:integer" use="required"/>
-                                <xs:attribute name="priority" type="xs:integer" use="required"/>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="name" type="xs:string" use="required"/>
-    </xs:complexType>
 
 </xs:schema>

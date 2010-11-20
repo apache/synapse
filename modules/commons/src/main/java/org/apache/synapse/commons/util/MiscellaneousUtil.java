@@ -48,8 +48,8 @@ public class MiscellaneousUtil {
         String result = properties.getProperty(name);
         if ((result == null || result.length() == 0) && defaultValue != null) {
             if (log.isDebugEnabled()) {
-                log.debug("The name with ' " + name + " ' cannot be found. " +
-                        "Using default value " + defaultValue);
+                log.debug("The name with '" + name + "' cannot be found. " +
+                        "Using default value : " + defaultValue);
             }
             result = defaultValue;
         }
@@ -79,8 +79,8 @@ public class MiscellaneousUtil {
         String result = properties.getProperty(name);
         if (result == null && defaultValue != null) {
             if (log.isDebugEnabled()) {
-                log.debug("The name with ' " + name + " ' cannot be found. " +
-                        "Using default value " + defaultValue);
+                log.debug("The name with '" + name + "' cannot be found. " +
+                        "Using default value : " + defaultValue);
             }
             return defaultValue;
         }
@@ -98,7 +98,7 @@ public class MiscellaneousUtil {
         } else if (Long.class.equals(type)) {
                 return (T) Long.valueOf(Long.parseLong(result));
         } else {
-            handleException("Unsupported type: " + type);
+            handleException("Unsupported type : " + type);
         }
 
         return null;
@@ -116,25 +116,25 @@ public class MiscellaneousUtil {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
         if (log.isDebugEnabled()) {
-            log.debug("Loading a file ' " + filePath + " ' from classpath");
+            log.debug("Loading a file '" + filePath + "' from classpath");
         }
 
         InputStream in = cl.getResourceAsStream(filePath);
         if (in == null) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to load file  ' " + filePath + " '");
+                log.debug("Unable to load file  '" + filePath + "'");
             }
 
             filePath = "conf" +
                     File.separatorChar + filePath;
             if (log.isDebugEnabled()) {
-                log.debug("Loading a file ' " + filePath + " ' from classpath");
+                log.debug("Loading a file '" + filePath + "' from classpath");
             }
 
             in = cl.getResourceAsStream(filePath);
             if (in == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to load file  ' " + filePath + " '");
+                    log.debug("Unable to load file  '" + filePath + "'");
                 }
             }
         }
@@ -142,7 +142,7 @@ public class MiscellaneousUtil {
             try {
                 properties.load(in);
             } catch (IOException e) {
-                String msg = "Error loading properties from a file at :" + filePath;
+                String msg = "Error loading properties from a file at : " + filePath;
                 log.error(msg, e);
                 throw new SynapseCommonsException(msg, e);
             }
@@ -167,7 +167,7 @@ public class MiscellaneousUtil {
             outputStream.writeObject(data);
             result = binOut.toByteArray();
         } catch (IOException e) {
-            handleException("Error serializing object :" + data);
+            handleException("Error serializing object : " + data);
         } finally {
             if (binOut != null) {
                 try {
@@ -194,7 +194,7 @@ public class MiscellaneousUtil {
                 out.write(buffer, 0, len);
         } catch (IOException e) {
             throw new SynapseCommonsException("Error during converting a input stream " +
-                    "into a byte array ", e, log);
+                    "into a byte array", e, log);
         } finally {
             if (in != null) {
                 try {

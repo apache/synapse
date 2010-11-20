@@ -43,6 +43,7 @@
     <xs:include schemaLocation="advanced/cache.xsd"/>
     <xs:include schemaLocation="advanced/event.xsd"/>
     <xs:include schemaLocation="advanced/enqueue.xsd"/>
+    <xs:include schemaLocation="advanced/transaction.xsd"/>
     <xs:include schemaLocation="extension/script.xsd"/>
     <xs:include schemaLocation="extension/class.xsd"/>
     <xs:include schemaLocation="extension/spring.xsd"/>
@@ -92,6 +93,7 @@
             <xs:element ref="rewrite"/>
             <xs:element ref="spring"/>
             <xs:element ref="eventPublisher"/>
+            <xs:element ref="transaction"/>
             <xs:element ref="enqueue"/>
         </xs:choice>
     </xs:group>

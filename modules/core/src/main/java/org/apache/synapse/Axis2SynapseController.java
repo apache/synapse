@@ -580,12 +580,12 @@ public class Axis2SynapseController implements SynapseController {
                 // create and initialize the listener manager but do not start
                 listenerManager = new ListenerManager();
                 listenerManager.init(configurationContext);
-
-                // do not use the listener manager shutdown hook, because it clashes with the
-                // SynapseServer shutdown hook.
-                listenerManager.setShutdownHookRequired(false);
             }
             
+            // do not use the listener manager shutdown hook, because it clashes with the
+            // SynapseServer shutdown hook.
+            listenerManager.setShutdownHookRequired(false);
+
         } catch (Throwable t) {
             handleFatal("Failed to create a new Axis2 instance...", t);
         }

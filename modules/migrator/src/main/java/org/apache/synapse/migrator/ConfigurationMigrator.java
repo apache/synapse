@@ -57,10 +57,6 @@ public class ConfigurationMigrator {
 
     public static void main(String[] arguments) {
 
-        System.out.println("\n\t#######################################################");
-        System.out.println("\t#      Apache Synapse - Configuration Migration       #");
-        System.out.println("\t#######################################################");
-
         System.out.println("\n[INFO] Migration STARTED");
 
         try {

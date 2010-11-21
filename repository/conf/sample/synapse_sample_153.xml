@@ -24,6 +24,7 @@
     <proxy name="StockQuoteProxy">
         <target>
             <inSequence>
+                <property name="preserveProcessedHeaders" value="true"/>
                 <send>
                     <endpoint>
                         <address uri="http://localhost:9000/services/SecureStockQuoteService"/>

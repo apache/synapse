@@ -1880,6 +1880,7 @@ Connection: Keep-Alive
     &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
         &lt;target&gt;
             &lt;inSequence&gt;
+                &lt;property name="preserveProcessedHeaders" value="true"/&gt;
                 &lt;send&gt;
                     &lt;endpoint&gt;
                         &lt;address uri=&quot;http://localhost:9000/services/SecureStockQuoteService&quot;/&gt;

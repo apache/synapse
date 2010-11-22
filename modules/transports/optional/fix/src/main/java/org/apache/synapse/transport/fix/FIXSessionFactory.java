@@ -128,9 +128,9 @@ public class FIXSessionFactory {
                         logFactory,
                         messageFactory);
 
-                acceptorStore.put(service.getName(),acceptor);
                 acceptor.start();
                 initJMX(acceptor, service.getName());
+                acceptorStore.put(service.getName(),acceptor);
                 return true;
             } catch (ConfigError e) {
                 String msg = "Error in the specified FIX configuration. Unable to initialize a " +
@@ -207,10 +207,10 @@ public class FIXSessionFactory {
                     logFactory,
                     messageFactory);
 
-            initiatorStore.put(fixEPR, initiator);
-            applicationStore.put(fixEPR, messageHandler);
             initiator.start();
             initJMX(initiator, service.getName());
+            initiatorStore.put(fixEPR, initiator);
+            applicationStore.put(fixEPR, messageHandler);
 
             FIXIncomingMessageHandler fixMessageHandler = (FIXIncomingMessageHandler) messageHandler;
             log.info("Waiting for logon procedure to complete...");
@@ -249,13 +249,13 @@ public class FIXSessionFactory {
                     logFactory,
                     messageFactory);
 
+                initiator.start();
+                initJMX(initiator, service.getName());
                 String[] EPRs = FIXUtils.getEPRs(settings);
                 for (String EPR : EPRs) {
                     initiatorStore.put(EPR, initiator);
                     applicationStore.put(EPR, messageHandler);
                 }
-                initiator.start();
-                initJMX(initiator, service.getName());
                 return true;
 
             } catch (FieldConvertError e) {

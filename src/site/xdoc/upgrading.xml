@@ -46,9 +46,9 @@
             to go through the first step for all the intermediate releases. This will make the migration
             easier.</p>
         </section>
-        <section name="Upgrading from 1.2 to 1.3">
+        <section name="Upgrading from 1.2 to 2.0.0">
           <subsection name="Endpoint URLs for proxy services">
-            <p>In release 1.3 the endpoint URLs for proxy services have changed from <tt>/soap</tt>
+            <p>In release 2.0.0 the endpoint URLs for proxy services have changed from <tt>/soap</tt>
             to <tt>/services</tt>. E.g. <tt>http://localhost:8280/services/StockQuote</tt> should be
             used instead of <tt>http://localhost:8280/soap/StockQuote</tt>.</p>
           </subsection>
@@ -64,14 +64,11 @@
 <pre>
 &lt;deployer extension="jar" directory="mediators" class="org.apache.synapse.core.axis2.MediatorDeployer"/>
 </pre>
-            <p>In 1.3 the suggested configuration is:</p>
+            <p>In 2.0.0 the suggested configuration is:</p>
 <pre>
 &lt;deployer extension="xar" directory="extensions" class="org.apache.synapse.deployers.ExtensionDeployer"/>
 </pre>
-            <p>Note that the XAR format is compatible with simple JAR files and that the
-            <code>MediatorDeployer</code> class still exists in 1.3. Therefore the old configuration will
-            still work. However you are strongly advised to replace references to the <code>MediatorDeployer</code>
-            class as it will disappear in later releases.</p>
+
             <p>It is possible to have multiple configuration entries for the extension deployer with different
             settings. For example, if you used the deployer in 1.2 you might want to have the following
             configuration:</p>
@@ -82,10 +79,45 @@
           </subsection>
           <subsection name="JMS transport">
             <p>The way the JMS transport determines the content type of incoming messages has slightly changed
-            between Synapse 1.2 and 1.3. The mechanism is also more flexible. See SYNAPSE-304 and SYNAPSE-424
+            between Synapse 1.2 and 2.0.0. The mechanism is also more flexible. See SYNAPSE-304 and SYNAPSE-424
             for the reasons of this change and refer to the
             <a href="http://ws.apache.org/commons/transport/">WS-Commons Transport project</a> for
             documentation.</p>
+          </subsection>
+          <subsection name="Main Sequence">
+            <p>On Synapse 1.2 you could have mediator configuration on the top level definitions tag
+            and they were treated as the <strong>main</strong> sequence if there is no main sequence
+            defined in the configuration. How ever removing the conflict of having top level
+            mediators and a main sequence leading the synapse to fail to start on 2.0.0 Synapse
+            configuration builder simply ignores the top level mediators. So you need to wrap the
+            top level mediators, if there are any, with the sequence named <strong>main</strong> on
+            the new 2.0.0 version.</p>
+            <p>To further explain this lets have a look at the following valid configuration bit
+            (this is the sample 0 configuration) on the 1.2;
+            <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;!-- log all attributes of messages passing through --&gt;
+    &lt;log level=&quot;full&quot;/&gt;
+
+    &lt;!-- Send the message to implicit destination --&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt;</pre>
+            which needs to be changed to the following configuration on 2.0.0
+            <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;!-- log all attributes of messages passing through --&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+
+        &lt;!-- Send the message to implicit destination --&gt;
+        &lt;send/&gt;
+    &lt;sequence/&gt;
+
+&lt;/definitions&gt;</pre></p>
+          </subsection>
+          <subsection name="Filter Mediator">
+            <p>From 2.0.0 onwards Synapse filter mediator supports the else close as well, and hence
+            the filter matching set of mediators has to be enclosed within a &lt;then&gt; element.</p>
+              <!--todo: sample-->
           </subsection>
         </section>
     </body>

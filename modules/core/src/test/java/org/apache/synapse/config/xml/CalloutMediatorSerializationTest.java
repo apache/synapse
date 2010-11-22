@@ -34,7 +34,7 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCalloutMediatorSerializationScenarioOne() {
-        String inputXml = "<callout xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
                           "action=\"urn:getQuote\"><source xmlns:s11=\"http://schemas.xmlsoap.org/" +
                           "soap/envelope/\" xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" " +
@@ -47,7 +47,7 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCalloutMediatorSerializationScenarioTwo() {
-        String inputXml = "<callout xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
                           "action=\"urn:getQuote\"><configuration axis2xml=\"axis2_custom.xml\" " +
                           "repository=\"path_to_repo\"/><source xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +

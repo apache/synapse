@@ -30,14 +30,14 @@ public class RMSequenceMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testRMSequenceSerializationTestScenarioOne() {
-        String inputXml = "<RMSequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<RMSequence xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "single=\"true\" version=\"1.0\"/>";
         assertTrue(serialization(inputXml, rmSequenceMediatorFactory, rmSequenceMediatorSerializer));
         assertTrue(serialization(inputXml, rmSequenceMediatorSerializer));
     }
 
     public void testRMSequenceSerializationTestScenarioTwo() {
-        String inputXml = "<RMSequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<RMSequence xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "correlation=\"get-property('To')\" last-message=\"get-property('To')\" version=\"1.1\"/>";
         assertTrue(serialization(inputXml, rmSequenceMediatorFactory, rmSequenceMediatorSerializer));
         assertTrue(serialization(inputXml, rmSequenceMediatorSerializer));

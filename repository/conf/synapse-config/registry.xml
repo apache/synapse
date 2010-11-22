@@ -19,7 +19,7 @@
   -->
 
 <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->
-<registry xmlns="http://synapse.apache.org/ns/2010/04/configuration"
+<registry xmlns="http://ws.apache.org/ns/synapse"
           provider="org.apache.synapse.registry.url.SimpleURLRegistry">
     <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
     <parameter name="root">file:repository/conf/sample/resources/</parameter>

@@ -19,7 +19,7 @@
   -->
 
 <!-- A proxy service with a dual channel invocation to the actual server -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="StockQuoteProxy">
         <target>

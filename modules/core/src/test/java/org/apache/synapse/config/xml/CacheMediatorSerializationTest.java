@@ -34,7 +34,7 @@ public class CacheMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCacheMediatorSerializationScenarioOne() {
-        String inputXml = "<cache xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<cache xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "id=\"string\" hashGenerator=\"org.wso2.caching.digest.DOMHASHGenerator\" " +
                           "timeout=\"10\" scope=\"per-host\" collector=\"false\" " +
                           "maxMessageSize=\"10000\"><onCacheHit><send/></onCacheHit><implementation " +
@@ -44,7 +44,7 @@ public class CacheMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCacheMediatorSerializationScenarioTwo() {
-        String inputXml = "<cache xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<cache xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "id=\"string\" hashGenerator=\"org.wso2.caching.digest.DOMHASHGenerator\" " +
                           "timeout=\"10\" scope=\"per-mediator\" collector=\"false\" " +
                           "maxMessageSize=\"10000\"><onCacheHit sequence=\"seq\"></onCacheHit>" +
@@ -54,7 +54,7 @@ public class CacheMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCacheMediatorSerializationResponseCache() {
-        String inputXml = "<cache xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String inputXml = "<cache xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "id=\"string\" scope=\"per-host\" collector=\"true\" />";
         assertTrue(serialization(inputXml, cacheMediatorFactory, cacheMediatorSerializer));
         assertTrue(serialization(inputXml, cacheMediatorSerializer));

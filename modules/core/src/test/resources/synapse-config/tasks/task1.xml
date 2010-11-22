@@ -1,5 +1,5 @@
 <task class="org.apache.synapse.startup.tasks.MessageInjector"
-      name="task1" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+      name="task1" xmlns="http://ws.apache.org/ns/synapse">
     
     <property name="to" value="http://localhost:9000/services/SimpleStockQuoteService"/>
     <property name="soapAction" value="urn:getQuote"/>

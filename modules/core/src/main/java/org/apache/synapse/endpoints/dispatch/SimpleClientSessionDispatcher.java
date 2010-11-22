@@ -25,14 +25,14 @@ import javax.xml.namespace.QName;
 
 /**
  * This dispatcher is implemented to demonstrate a sample client session. It will detect sessions
- * based on the <syn:ClientID xmlns:syn="http://synapse.apache.org/ns/2010/04/configuration"> soap header of the
+ * based on the <syn:ClientID xmlns:syn="http://ws.apache.org/ns/synapse"> soap header of the
  * request message. Therefore, above header has to be included in the request soap messages by the
  * client who wants to initiate and maintain a session.
  */
 public class SimpleClientSessionDispatcher extends AbstractDispatcher {
 
 
-    private static final QName CSID_QNAME = new QName("http://synapse.apache.org/ns/2010/04/configuration",
+    private static final QName CSID_QNAME = new QName("http://ws.apache.org/ns/synapse",
             "ClientID", "syn");
 
     public SessionInformation getSession(MessageContext synCtx) {

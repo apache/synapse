@@ -223,7 +223,7 @@ public class URLRewriteMediatorTest extends TestCase {
 
     public void testFullRewriteScenario1() throws Exception {
         String xml =
-                "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">\n" +
+                "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                 "    <rule>\n" +
                 "        <condition>\n" +
                 "            <and>\n" +

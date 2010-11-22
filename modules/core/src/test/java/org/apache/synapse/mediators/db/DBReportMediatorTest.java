@@ -68,7 +68,7 @@ public class DBReportMediatorTest extends AbstractMediatorTestCase {
 
                 report = (DBReportMediator)
                     new DBReportMediatorFactory().createMediator(createOMElement(
-                        "<dblookup xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">\n" +
+                        "<dblookup xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                             "  <connection>\n" +
                             "    <pool>\n" +
                             "      <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>\n" +

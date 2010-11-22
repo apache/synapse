@@ -1,4 +1,4 @@
-<proxy name="proxy1" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<proxy name="proxy1" xmlns="http://ws.apache.org/ns/synapse">
     <target endpoint="epr1" inSequence="foo">
         <outSequence>
             <send/>

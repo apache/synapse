@@ -1,4 +1,4 @@
-<sequence name="foo" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<sequence name="foo" xmlns="http://ws.apache.org/ns/synapse">
     <filter source="get-property('To')" regex=".*/StockQuote.*">
         <then>
             <log level="full"/>                        

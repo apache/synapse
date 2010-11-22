@@ -1,4 +1,4 @@
-<proxy name="StockQuoteProxy" xmlns="http://synapse.apache.org/ns/2010/04/configuration" transports="http">
+<proxy name="StockQuoteProxy" xmlns="http://ws.apache.org/ns/synapse" transports="http">
     <target>
         <endpoint>
             <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>

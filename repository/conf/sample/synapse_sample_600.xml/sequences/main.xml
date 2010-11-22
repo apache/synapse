@@ -1,4 +1,4 @@
-<sequence name="main" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<sequence name="main" xmlns="http://ws.apache.org/ns/synapse">
     <in>
         <send/>
     </in>

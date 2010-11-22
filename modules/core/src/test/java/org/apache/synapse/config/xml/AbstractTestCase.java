@@ -86,7 +86,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
     }
 
     protected OMElement getParent() {
-        String parentXML = "<synapse xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><definitions></definitions></synapse>";
+        String parentXML = "<synapse xmlns=\"http://ws.apache.org/ns/synapse\"><definitions></definitions></synapse>";
         return createOMElement(parentXML);
     }
 

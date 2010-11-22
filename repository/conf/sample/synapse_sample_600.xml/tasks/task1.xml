@@ -1,4 +1,4 @@
-<task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice" xmlns="http://ws.apache.org/ns/synapse">
       <property name="to" value="http://localhost:9000/services/SimpleStockQuoteService"/>
       <property name="soapAction" value="urn:getQuote"/>
       <property name="message">

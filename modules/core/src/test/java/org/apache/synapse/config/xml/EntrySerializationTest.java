@@ -30,7 +30,7 @@ import java.util.Properties;
 public class EntrySerializationTest extends AbstractTestCase {
 
     public void testEntrySerializationScenarioOne() throws Exception {
-        String inputXml = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"key\" " +
+        String inputXml = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" key=\"key\" " +
             "><description>description</description><foo/></localEntry>";
         OMElement inputOM = createOMElement(inputXml);
         Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement(), new Properties());
@@ -39,7 +39,7 @@ public class EntrySerializationTest extends AbstractTestCase {
     }
 
     public void testEntrySerializationScenarioTwo() throws Exception {
-        String inputXml = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"key\"" +
+        String inputXml = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" key=\"key\"" +
             "><description>description</description></localEntry>";
         OMElement inputOM = createOMElement(inputXml);
         Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement(), new Properties());
@@ -48,7 +48,7 @@ public class EntrySerializationTest extends AbstractTestCase {
     }
     
     public void testEntrySerializationScenarioThree() throws Exception {
-        String inputXml = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" key=\"key\" " +
+        String inputXml = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" key=\"key\" " +
             "/>";
         OMElement inputOM = createOMElement(inputXml);
         Entry entry = EntryFactory.createEntry(inputOM.cloneOMElement(), new Properties());

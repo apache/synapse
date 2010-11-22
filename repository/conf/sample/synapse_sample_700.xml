@@ -19,7 +19,7 @@
   -->
 
 <!--Introduction to Synapse Message store -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
     <!--Simple in Memory Message Store with name foo -->
     <messageStore name="foo" sequence="bar">
         <redelivery>

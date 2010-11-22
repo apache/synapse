@@ -50,7 +50,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
 
     public void testIterationScenarioOne() throws Exception {
         Mediator iterate = fac.createMediator(createOMElement("<iterate " +
-            "expression=\"//original/itr\" xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+            "expression=\"//original/itr\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
             "<target soapAction=\"urn:iterate\" sequence=\"seqRef\"/></iterate>"), new Properties());
         helperMediator.clearMediatedContexts();
         iterate.mediate(testCtx);
@@ -71,7 +71,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
     public void testIterationWithPreservePayload() throws Exception {
         Mediator iterate = fac.createMediator(createOMElement("<iterate " +
             "expression=\"//original/itr\" preservePayload=\"true\" attachPath=\"//original\" " +
-            "xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><target soapAction=\"urn:iterate\" " +
+            "xmlns=\"http://ws.apache.org/ns/synapse\"><target soapAction=\"urn:iterate\" " +
             "sequence=\"seqRef\"/></iterate>"), new Properties());
         iterate.mediate(testCtx);
         while(helperMediator.getMediatedContext(1) == null) {

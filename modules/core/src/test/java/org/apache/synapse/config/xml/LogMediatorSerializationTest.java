@@ -96,20 +96,20 @@ public class LogMediatorSerializationTest extends AbstractTestCase {
     }
 
     private String getXmlOfMediatorScenarioOne(String level) {
-        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" level=\"" +
+        return "<log xmlns=\"http://ws.apache.org/ns/synapse\" level=\"" +
                 level + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }
 
     private String getXmlOfMediatorScenarioTwo(String level, String seperator) {
-        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" level=\"" +
+        return "<log xmlns=\"http://ws.apache.org/ns/synapse\" level=\"" +
                 level + "\" separator=\"" + seperator +
                 "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }
 
     private String getXmlOfMediatorScenarioThree(String category) {
-        return "<log xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" category=\"" +
+        return "<log xmlns=\"http://ws.apache.org/ns/synapse\" category=\"" +
                 category + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }

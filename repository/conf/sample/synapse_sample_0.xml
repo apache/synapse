@@ -19,7 +19,7 @@
   -->
 
 <!-- Introduction to Synapse -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">
         <!-- log all attributes of messages passing through -->

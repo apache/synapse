@@ -2947,7 +2947,7 @@ it will first try to read the content type from the 'contentType' message proper
   <h2>
     <a name="Sample265" id="Sample265">Sample 265: Switching from TCP to HTTP/S</a>
   </h2>
-  <pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+  <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="StockQuoteProxy" transports="tcp"&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -2991,7 +2991,7 @@ it will first try to read the content type from the 'contentType' message proper
   <h2>
     <a name="Sample266" id="Sample266">Sample 266: Switching from UDP to HTTP/S</a>
   </h2>
-  <pre xml:space="preserve">&lt;proxy xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="StockQuoteProxy" transports="udp"&gt;
+  <pre xml:space="preserve">&lt;proxy xmlns="http://ws.apache.org/ns/synapse" name="StockQuoteProxy" transports="udp"&gt;
    &lt;target&gt;
 	&lt;endpoint&gt;
 	   &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
@@ -3505,7 +3505,7 @@ end
 <p/>
 <h2>
 <a name="Sample362" id="Sample362">Sample 362: Action of dbreport and dblookup mediators together</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main" trace="enable"&gt;
         &lt;in&gt;
@@ -3740,7 +3740,7 @@ the database instead of direct SQL statements. Prior to running this sample plea
 instructions given in the 'Setting up MySQL database server' section in the
 <a href="Synapse_Samples_Setup.html#mysql">sample setup guide</a>.</p>
 
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
         &lt;in&gt;
@@ -4459,7 +4459,7 @@ Discounted price: 138.77458254967408</pre>
 <h2>
     <a name="Sample440" id="Sample440">Sample 440: Exposing a SOAP Service Over JSON</a>
 </h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="JSONProxy" transports="http https"&gt;
         &lt;target&gt;
@@ -4529,8 +4529,8 @@ will be converted into a JSON message and sent back to the JSON client.</p>
 <h2>
     <a name="Sample450" id="Sample450">Sample 450: Introduction to the URL Rewrite Mediator</a>
 </h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
-    &lt;sequence xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="main"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence xmlns="http://ws.apache.org/ns/synapse" name="main"&gt;
         &lt;in&gt;
             &lt;rewrite&gt;
                &lt;rule&gt;
@@ -4561,8 +4561,8 @@ Axis2 client will receive a valid response.</p>
 <h2>
     <a name="Sample451" id="Sample451">Sample 451: Conditional URL Rewriting</a>
 </h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
-    &lt;sequence xmlns="http://synapse.apache.org/ns/2010/04/configuration" name="main"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence xmlns="http://ws.apache.org/ns/synapse" name="main"&gt;
         &lt;in&gt;
             &lt;rewrite&gt;
                &lt;rule&gt;
@@ -4606,7 +4606,7 @@ framework. Hence URL rewriting can be done based on any of these aspects.</p>
 <h2>
     <a name="Sample452" id="Sample452">Sample 452: Conditional URL Rewriting with Multiple Rules</a>
 </h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;sequence name="main"&gt;
         &lt;in&gt;
             &lt;property name="http.port" value="9000"/&gt;
@@ -4657,7 +4657,7 @@ values by executing XPath expressions. The port numbers are calculated by execut
 
 <h2>
 <a name="Sample460" id="Sample460">Sample 460: How to initialize and use a Spring Bean as a Mediator</a></h2>
-<pre xml:space="preserve">&lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+<pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;parameter name="root">file:repository/conf/sample/resources/&lt;/parameter&gt;
@@ -5204,7 +5204,7 @@ following on the console:</p>
     <h2>
         <a name="Sample652" id="Sample652">Sample 652: Distributed transaction management</a>
     </h2>
-    <pre xml:space="preserve"> &lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+    <pre xml:space="preserve"> &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
         &lt;sequence name="myFaultHandler"&gt;
             &lt;log level="custom"&gt;
@@ -5306,7 +5306,7 @@ following on the console:</p>
     <h2>
     <a name="Sample700" id="Sample700">Sample 700: Introduction to Synapse Message Store</a></h2>
     <pre xml:space="preserve">&lt;!-- Introduction to the Synapse Message Store --&gt;
-    &lt;definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration"&gt;
+    &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
         &lt;!--Simple in Memory Message Store with name foo --&gt;
         &lt;messageStore name="foo" sequence="bar"&gt;
     		&lt;redelivery&gt;

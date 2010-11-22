@@ -37,7 +37,7 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
 
     public void testMessageStoreSerialization() throws Exception {
         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
-                "http://synapse.apache.org/ns/2010/04/configuration\"" +
+                "http://ws.apache.org/ns/synapse\"" +
                 " name=\"foo\" sequence=\"seq1\" >" +
                 "<syn:redelivery>" +
                 "<syn:interval>1</syn:interval>" +

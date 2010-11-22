@@ -26,7 +26,7 @@ import org.apache.synapse.endpoints.Endpoint;
 public class LoadBalanceEndpointSerializationTest extends AbstractTestCase {
 
     public void testLoadBalanceEndpointScenarioOne()throws Exception {
-        String inputXml = "<endpoint xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+        String inputXml = "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<session type=\"simpleClientSession\"/>" +
                 "<loadbalance algorithm=\"org.apache.synapse.endpoints.algorithms.RoundRobin\">" +
                 "<endpoint>" +

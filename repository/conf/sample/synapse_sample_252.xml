@@ -19,7 +19,7 @@
   -->
 
 <!-- Pure text/binary and POX message support with JMS -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="text_proxy">
         <log level="full"/>

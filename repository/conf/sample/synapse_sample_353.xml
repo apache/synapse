@@ -19,7 +19,7 @@
   -->
 
 <!-- Using Ruby scripts for mediation -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <localEntry key="stockquoteScript"
                 src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>

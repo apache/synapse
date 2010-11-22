@@ -30,7 +30,7 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testSerializationScenario1() {
-        String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><rule>" +
+        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rule>" +
                 "<action fragment=\"protocol\" value=\"https\" type=\"set\"/><action " +
                 "fragment=\"host\" value=\"www.test.com\" type=\"set\"/><action " +
                 "fragment=\"port\" value=\"9090\" type=\"set\"/><action fragment=\"path\" " +
@@ -39,7 +39,7 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testSerializationScenario2() {
-        String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<rule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/><action " +
@@ -50,7 +50,7 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testSerializationScenario3() {
-        String xml = "<rewrite xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><rule>" +
+        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rule>" +
                 "<action fragment=\"full\" value=\"http://localhost:8080/synapse\" type=\"set\"/></rule>" +
                 "<rule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +

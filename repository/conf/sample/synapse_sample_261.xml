@@ -19,7 +19,7 @@
   -->
 
 <!-- Switch between FIX versions 4.0 to 4.1 -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="OrderProcesserProxy41" transports="fix">
         <target>

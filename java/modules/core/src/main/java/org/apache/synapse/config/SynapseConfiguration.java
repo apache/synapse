@@ -1229,6 +1229,15 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     }
 
     /**
+     * Removes a Message store from the configuration
+     *
+     * @param name name of the message store
+     */
+    public MessageStore removeMessageStore(String name) {
+        return messageStores.remove(name);
+    }
+
+    /**
      * Sets the description of the configuration
      *
      * @param description tobe set to the artifact

@@ -56,6 +56,7 @@
                 <item name="Samples Setup" href="Synapse_Samples_Setup.html"/>
                 <item name="Extending Synapse" href="Synapse_Extending.html"/>
                 <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
+                <item name="Upgrading" href="upgrading.html"/>
                 <item name="Deployment" href="deployment.html"/>
                 <item name="Transports" href="transports.html"/>
                 <item name="Javadocs" href="apidocs/index.html"/>

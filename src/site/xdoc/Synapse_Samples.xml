@@ -359,11 +359,15 @@
 <h2>
 <a name="Sample0" id="Sample0">Sample 0: Introduction to Synapse</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;
-    &lt;!-- log all attributes of messages passing through --&gt;
-    &lt;log level=&quot;full&quot;/&gt;
 
-    &lt;!-- Send the messageto implicit destination --&gt;
-    &lt;send/&gt;
+    &lt;sequence name="main"&gt;
+        &lt;!-- log all attributes of messages passing through --&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+
+        &lt;!-- Send the message to implicit destination --&gt;
+        &lt;send/&gt;
+    &lt;sequence/&gt;
+    
 &lt;/definitions&gt;</pre>
 <p>
 <strong>Objective: Introduction to Synapse. Shows how a message could be made to pass through Synapse </strong>

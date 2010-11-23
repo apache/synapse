@@ -32,15 +32,24 @@
       (ESB) available under the Apache Software License v2.0. Apache Synapse graduated from the
       Apache Incubator on the 2nd of January 2007, and was accepted as a sub-project of the Apache
       Web Services project. In December 2007, Apache Synapse became a top level project (TLP) of the
-      Apache Software Foundation
+      Apache Software Foundation.
   </p>
-  <p>Documentation for the 1.2 release:</p>
+  <p>
+      Synapse team is pleased to announce the 2.0.0 release as a milestone after almost 2 and half
+      years from its previous release which is 1.2. This release has many improvements and features.
+  </p>
+  <p>Documentation for the 2.0.0 release:</p>
 
   <ul>
   <li><a href="./Synapse_QuickStart.html">Quick Start Guide</a></li>
   <li><a href="./Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
   <li><a href="./Synapse_Samples.html">A Quick start with Synapse Samples</a></li>
+  <li><a href="./deployment.html">Deployment topologies of Synapse</a></li>
   <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
+  <li><a href="./upgrading.html">Upgrading Synapse version</a></li>
+  <li><a href="./faq.html">Frequently Asked Questions</a></li>
+  <li><a href="./apidocs/index.html">API Documentation</a></li>
+
   <li>The WS Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
   </ul>
 </section>

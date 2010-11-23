@@ -63,6 +63,7 @@
                 <item name="FAQ" href="faq.html"/>
             </item>
             <item name="Previous Versions" href="history.html">
+                <item name="Version 1.2" href="1_2/docs_index.html"/>
                 <item name="Version 1.1.1" href="1_1_1/content.html"/>
                 <item name="Version 1.1" href="1_1/content.html"/>
                 <item name="Version 1.0" href="1_0/content.html"/>

@@ -100,13 +100,10 @@ SYNAPSE_CLASSPATH=$SYNAPSE_HOME/repository/conf:$JAVA_HOME/lib/tools.jar:$SYNAPS
 jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`
 
 if [ "$jdk_15" ]; then
-    echo " Using Bouncy castle JAR for Java 1.5"
     for f in $SYNAPSE_HOME/lib/bcprov-jdk15*.jar
     do
       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH
     done
-else
-    echo " [Warn] Synapse is tested only with Java 5"
 fi
 
 # For Cygwin, switch paths to Windows format before running java

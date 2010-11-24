@@ -21,22 +21,26 @@
   Note that while these transports are developed as part of the Synapse project, they can be used
   with any Axis2 based application.
   
-  The Synapse distribution also comes bundled with the following transports from the WS-Commons
-  Transport project:
+  The Synapse distribution also comes bundled with the following transports from the {{{http://axis.apache.org/axis2/java/transports/index.html}Axis2
+  Transport}} project:
   
-  * A JMS transport supporting any JMS 1.0 or 1.1 provider.
+  * A {{{http://axis.apache.org/axis2/java/transports/jms.html}JMS transport}} supporting any JMS 1.0 or 1.1 provider.
   
-  * A mail transport able to send messages using SMTP and poll messages from a POP3 or IMAP account.
+  * A {{{http://axis.apache.org/axis2/java/transports/mail.html}Mail transport}} able to send messages using SMTP and poll messages from a POP3 or IMAP account.
 
   Apache Synapse is also compatible with the following transport implementations from the Apache
   Axis2 Transports project:
 
-  * TCP
+  * {{{http://axis.apache.org/axis2/java/transports/tcp-transport.html}TCP transport}}
 
-  * UDP
+  * {{{http://axis.apache.org/axis2/java/transports/sms.html}SMS transport}}
+
+  * UDP transport
+
+  * XMPP transport
 
   These transports are not shipped with Apache Synapse by default and hence they should be
-  downloaded separately from the Axis2 website and installed in the Synapse runtime.
+  {{{http://axis.apache.org/axis2/java/transports/download.cgi}downloaded separately}} from the Axis2 transport website and installed in the Synapse runtime.
 
 {Contents}
 

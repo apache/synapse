@@ -119,39 +119,39 @@
             the filter matching set of mediators has to be enclosed within a &lt;then&gt; element.</p>
             <p>If we consider the following sample from the 1.2 version of synapse;
             <pre xml:space="preserve">&lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
+    &lt;send&gt;
+        &lt;endpoint&gt;
+            &lt;address uri=&quot;http://localhost:9000/soap/SimpleStockQuoteService&quot;/&gt;
+        &lt;/endpoint&gt;
+    &lt;/send&gt;
+    &lt;drop/&gt;
+&lt;/filter&gt;</pre>
+            the equivalent configuration for the 2.0.0 release is going to be;
+            <pre xml:space="preserve">&lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
+    &lt;then&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
                 &lt;address uri=&quot;http://localhost:9000/soap/SimpleStockQuoteService&quot;/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
         &lt;drop/&gt;
-    &lt;/filter&gt;</pre>
-            the equivalent configuration for the 2.0.0 release is going to be;
-            <pre xml:space="preserve">&lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
-        &lt;then&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;address uri=&quot;http://localhost:9000/soap/SimpleStockQuoteService&quot;/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-            &lt;drop/&gt;
-        &lt;then/&gt;
-    &lt;/filter&gt;</pre>
+    &lt;then/&gt;
+&lt;/filter&gt;</pre>
             You could also add an else close to this conditional statement as follows on 2.0.0 which
             is not possible on 1.2
             <pre xml:space="preserve">&lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
-        &lt;then&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;address uri=&quot;http://localhost:9000/soap/SimpleStockQuoteService&quot;/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-            &lt;drop/&gt;
-        &lt;then/&gt;
-        &lt;else/&gt;
-            &lt;log/&gt;
-        &lt;else/&gt;
-    &lt;/filter&gt;</pre></p>
+    &lt;then&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/soap/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+        &lt;drop/&gt;
+    &lt;then/&gt;
+    &lt;else/&gt;
+        &lt;log/&gt;
+    &lt;else/&gt;
+&lt;/filter&gt;</pre></p>
           </subsection>
           <subsection name="Migration Tool">
             <p>In general it is recommended to run the configuration through the migration tool

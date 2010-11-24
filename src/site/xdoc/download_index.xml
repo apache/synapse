@@ -28,19 +28,20 @@
 
 <section name="Apache Synapse - Downloads">
 
-    <p>The Apache Synapse team is proud to announce the availability of the 1.2 release on the
-        9th of June 2008. As of December 2007, Apache Synapse has moved on to become a Top Level Project
-        (TLP) of the Apache Software Foundation, moving out from Web Services project.
+    <p>The Apache Synapse team is proud to announce the availability of the 2.0.0 release on the
+        30th of November 2010. As of December 2007, Apache Synapse has moved on to become a Top
+        Level Project (TLP) of the Apache Software Foundation, moving out from Web Services project.
     </p>
 
-    <p>Releases are available for download under the ASL v2.0 License
+    <p>Releases (both binary and the source distributions) are available for download under the
+        ASL v2.0 License
 
     <ul>
         <li><a href="download.html">Releases</a></li>
     </ul>
     </p>
 
-    <p>Source code is available to download under the ASL v2.0 License
+    <p>Live source code is also available to checkout under the ASL v2.0 License
 
     <ul>
         <li><a href="source-repository.html">Source code</a></li>

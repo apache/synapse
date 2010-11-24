@@ -34,7 +34,9 @@
       several other content interchange formats, such as plain text, binary, Hessian and JSON. The
       wide range of transport adapters available for Synapse, enables it to communicate over many
       application and transport layer protocols. As of now, Apache Synapse has support for protocols
-      like HTTP/S, Mail (POP3, IMAP, SMTP), JMS, TCP, UDP, VFS and FIX.
+      like HTTP/S, Mail (POP3, IMAP, SMTP), JMS, TCP, UDP, VFS, SMS, XMPP and FIX. It can work with
+      many message exchange patterns and Eventing related delivery channels with reliability and
+      also supports scheduling tasks.
   </p>
   <p>
       Apache Synapse is designed to be lightweight and fast. The non-blocking HTTP transport,
@@ -50,7 +52,15 @@
       configuration overhead. Using such external modules, Apache Synapse supports a range of
       Web Services standards including WS-Security, WS-Reliable Messaging and WS-Eventing. Synapse
       also makes use of the Axis2 clustering framework and the deployment framework to provide
-      enteprise grade clustering support and development time hot deployment support.
+      enterprise grade clustering support and development time hot deployment support.
+  </p>
+  <p>Synapse could be used as one or more event sources and the Event Driven Architecture can be
+      implemented using Synapse for your SOA requirements. It could also prioritize certain messages
+      depending on the given conditions at the mediation layer as well as from the transport layer
+      as far as the HTTP is concerned. This gives the ability to process a set of messages with high
+      priority than the others and can be used to implement today's organizational business
+      requirements. It could successfully be used as a highly scalable load balancer with application
+      level routing logic embedded into it.
   </p>
   <p>
       The Synapse mediation engine is configured using a simple, XML-based configuration language.
@@ -71,6 +81,7 @@
           <li><a href="./Synapse_QuickStart.html">Quick Start Guide</a></li>
           <li><a href="./Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
           <li><a href="./Synapse_Samples.html">Synapse Samples Catalog</a></li>
+          <li><a href="./deployment.html">Synapse Deployment Guide</a></li>
           <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
       </ul>
   </p>

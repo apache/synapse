@@ -38,6 +38,29 @@
       many message exchange patterns and Eventing related delivery channels with reliability and
       also supports scheduling tasks.
   </p>
+</section>
+<section name="Getting Started">
+  <p>
+      Apache Synapse is free and open source software distributed under the
+      <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
+  </p>
+  <p>Want to get started? Please refer one of these comprehensive manuals:
+      <ul>
+          <li><a href="./Synapse_QuickStart.html">Quick Start Guide</a></li>
+          <li><a href="./Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
+          <li><a href="./Synapse_Samples.html">Synapse Samples Catalog</a></li>
+          <li><a href="./deployment.html">Synapse Deployment Guide</a></li>
+          <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
+      </ul>
+  Need some assistance with a problem? Feel free to get in touch with the community over these
+      mailing lists:
+      <ul>
+          <li>The Developer mailing list:  <a href="mailto:dev-subscribe@synapse.apache.org">Subscribe</a></li>
+          <li>The User mailing list:  <a href="mailto:user-subscribe@synapse.apache.org">Subscribe</a></li>
+      </ul>
+  </p>
+</section>
+<section name="Apache Synapse Runtime Architecture">
   <p>
       Apache Synapse is designed to be lightweight and fast. The non-blocking HTTP transport,
       the multi-threaded mediation engine and the streaming XML infoset combine to ensure that
@@ -45,6 +68,7 @@
       delay and resource usage. Synapse also comes with comprehensive logging capabilities,
       statistics collection and JMX monitoring support which are crucial in production deployments.
   </p>
+  <img src="images/diagram_v2.png" caption="Apache Synapse - Runtime Architecture"/>
   <p>
       Synapse uses Apache Axis2 as the underlying Web Services engine. Therefore it has outstanding
       support for Web Services and related standards such as SOAP and WSDL. Tried and tested
@@ -71,26 +95,6 @@
       most complex enterprise integration scenarios. If necessary, the mediation engine can be
       easily extended by developing custom mediators using Java or your favorite scripting
       language.
-  </p>
-  <p>
-      Apache Synapse is free and open source software distributed under the
-      <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
-  </p>
-  <p>Want to get started? Please refer one of these comprehensive manuals:
-      <ul>
-          <li><a href="./Synapse_QuickStart.html">Quick Start Guide</a></li>
-          <li><a href="./Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
-          <li><a href="./Synapse_Samples.html">Synapse Samples Catalog</a></li>
-          <li><a href="./deployment.html">Synapse Deployment Guide</a></li>
-          <li><a href="./Synapse_Extending.html">Extending Synapse</a></li>
-      </ul>
-  </p>
-  <p>Need some assistance with a problem? Feel free to get in touch with the community over these
-      mailing lists:
-      <ul>
-          <li>The Developer mailing list:  <a href="mailto:dev-subscribe@synapse.apache.org">Subscribe</a></li>
-          <li>The User mailing list:  <a href="mailto:user-subscribe@synapse.apache.org">Subscribe</a></li>
-      </ul>
   </p>
 </section>
 	

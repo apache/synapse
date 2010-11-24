@@ -95,7 +95,7 @@
 </section>
 	
 <section name="Key Features">
-		<p>The latest release of Synapse is <a href="download/2.0/download.cgi">2.0</a>. Its key features are </p>
+		<p>The latest release of Synapse is <a href="download/2.0.0/download.cgi">2.0.0</a>. Its key features are </p>
 
 	<ul>
         <li><p>Proxy services - facilitating transport, interface (WSDL/Schema/Policy), message format (SOAP 1.1/1.2, POX/REST, Text, Binary), QoS (WS-Addressing/WS-Security/WS-RM) and optimization switching (MTOM/SwA)</p></li>

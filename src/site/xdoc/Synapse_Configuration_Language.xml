@@ -124,7 +124,7 @@
     </p>
     <ul>
       <li>
-        The Synapse configuration file - synapse.xml
+        The Synapse configuration hierarchy - synapse-config directory with sequences, endpoints, proxies, etc...
       </li>
       <li>
         The underlying Axis2 engine configuration file - axis2.xml
@@ -146,17 +146,17 @@
       a re-load as configured.
     </p>
     <h2>
-      The Synapse Configuration (synapse.xml)
+      The Synapse Configuration (synapse-config directory)
     </h2>
     <p>
       As the diagram below depicts, the Synapse configuration defines the Proxy
-      services, Endpoints, Sequences and Startup jobs managed by the Synapse
-      ESB. It also defines the interface to the Registry/Repository being used
-      by the engine. Typically the Synapse ESB is deployed between the actual
-      client and a backend service implementation to mediate the message flow in
-      between. Thus the Synapse ESB can accept a message on behalf of the actual
-      service, perform authentication, validation, transformation, logging,
-      routing based on the content etc. and then decide the destination target
+      services, Endpoints, Sequences, Startup jobs, Event sources, Priority
+      executors and Dead letter channels managed by the Synapse ESB. It also defines the
+      interface to the Registry/Repository being used by the engine. Typically the Synapse
+      ESB is deployed between the actual client and a backend service implementation to
+      mediate the message flow in between. Thus the Synapse ESB can accept a message
+      on behalf of the actual service, perform authentication, validation, transformation,
+      logging, routing based on the content etc. and then decide the destination target
       endpoint for the message and direct it to an actual service
       implementation. The Synapse ESB can also detect timeouts, transport
       failures during communication or introduce load balancing, throttling or
@@ -166,12 +166,13 @@
       forwarding the request to the actual service.
     </p>
     <p>
+        <!--TODO: we need to update the image to add priority queues and envent sources-->
       <img alt="Synapse message flow"
       src="images/synapse-flow.png" width="400" height="300"/>
     </p>
     <p/>
     <p>
-      The Synapse ESB can operate in two modes:
+      The Synapse ESB can operate in multiple modes:
     </p>
     <h3>
       <a href="#service_mediation">Service mediation</a> / <a
@@ -204,6 +205,29 @@
       that is not accepted by any proxy service, this message is handled through
       message mediation as well. Message mediation always processes messages
       according to the mediation sequence defined as "main".
+    </p>
+    <h3>
+      <a name="_task_scheduling" id="_task_scheduling">Task Scheduling</a>
+    </h3>
+    <p>
+      In Task scheduling, Synapse can schedule a bit of work to be triggered at the specified
+      trigger mechanism. You could use simple triggers such as a count and an interval meaning
+      that it runs count number of times in the specified intervals, or you could use cron
+      scheduling meaning that you specify a standard cron expression adn the scheduler will
+      trigger your task implementation at the cron trigger. This mode of operation is much
+      important for work that has to be initiated by the ESB, for example to poll a service at
+      a given interval and so forth.
+    </p>
+    <h3>
+      <a name="_eventing" id="_eventing">Eventing</a>
+    </h3>
+    <p>
+      In eventing, or in other wards Event Driven Architecture, synapse can be used as
+      one or more event sources and users or systems can subscribe to those event sources.
+      On the other hand systems can send events to Synapse ESB and it will be possible for
+      synapse to act as an event broker and re-deliver the events it received to the respective
+      subscribers according to the filtering criteria, with or without mediation. This again is
+      a very powerful operational mode as it helps to integrated systems based on an EDA.
     </p>
     <h2>
       Concepts and configuration elements overview
@@ -335,7 +359,6 @@
    &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
    &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
    &lt;<a href="#eventsource">eventsource</a> name="string" ...&gt;...&lt;/eventsource&gt;?
-   <a href="#mediator">mediator</a>*
  &lt;/definitions&gt;</pre>
     <p/>
     <p>
@@ -1071,11 +1094,11 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       A mediator token refers to any of the following tokens:
     </p>
-<pre xml:space="preserve">
+<p>
     <a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#property">property</a>  | <a href="#sequence_ref">sequence</a> | <a href="#validate">validate</a> | <a href="#Callout">Callout</a> | <a href="#makefault">makefault</a> | <a href="#xslt">xslt</a> | <a href="#xquery">xquery</a> | <a href="#rewrite">rewrite</a> | <a href="#header">header</a>  | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#in">in</a> | <a href="#out">out</a>
     | <a href="#dblookup">dblookup</a> | <a href="#dbreport">dbreport</a> | <a href="#throttle">throttle</a> | <a href="#cache">cache</a> | <a href="#clone">clone</a> | <a href="#iterate">iterate</a> | <a href="#aggregate">aggregate</a> | <a href="#class">class</a> | <a href="#pojoCommand">pojoCommand</a> | <a href="#spring">spring</a> | <a href="#script">script</a> | <a href="#RMSequence">RMSequence</a> | <a href="#eventPublisher">eventPublisher</a> | <a href="#transaction">transaction</a>
 
-    </pre>
+    </p>
     <p>
       In addition to the above, Synapse will be able to load custom mediators
       via the J2SE Service Provider model. Mediator extensions must implement
@@ -2179,10 +2202,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
         <h4>
             <a name="transaction" id="transaction">Transaction</a>
         </h4>
-      <pre xml:space="preserve">
-        &lt;transaction
-           action="new|use-existing-or-new|fault-if-no-tx|commit|rollback|suspend|resume"&gt;
-        &lt;/transaction&gt;
+      <pre xml:space="preserve">&lt;transaction action="new|use-existing-or-new|fault-if-no-tx|commit|rollback|suspend|resume"/&gt;
       </pre>
         <p>The action attribute has the following meanings.</p>
         <ol>

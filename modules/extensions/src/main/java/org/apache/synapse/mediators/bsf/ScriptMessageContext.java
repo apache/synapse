@@ -47,6 +47,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mozilla.javascript.xml.XMLObject;
 
 /**
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the
@@ -190,7 +191,19 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     public void setProperty(String key, Object value) {
-        mc.setProperty(key, value);
+        if (value instanceof XMLObject) {
+            OMElement omElement = null;
+            try {
+                omElement = xmlHelper.toOMElement(value);
+            } catch (ScriptException e) {
+                mc.setProperty(key, value);
+            }
+            if (omElement != null) {
+                mc.setProperty(key, omElement);
+            }
+        } else {
+            mc.setProperty(key, value);
+        }
     }
 
     public Set getPropertyKeySet() {

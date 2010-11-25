@@ -19,10 +19,7 @@
 
 package org.apache.synapse.mediators.transform;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMDocument;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
@@ -32,6 +29,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
@@ -379,7 +377,23 @@ public class FaultMediator extends AbstractMediator {
             fault.setDetail(soapFaultDetail);
         } else if (faultDetailExpr != null) {
             SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
-            soapFaultDetail.setText(faultDetailExpr.stringValueOf(synCtx));
+            Object result = null;
+            try {
+                result = faultDetailExpr.evaluate(synCtx);
+            } catch (JaxenException e) {
+                handleException("Evaluation of the XPath expression " + this.toString() +
+                        " resulted in an error", e);
+            }
+            if (result instanceof List) {
+                List list = (List) result;
+                for (Object obj : list) {
+                    if (obj instanceof OMNode) {
+                        soapFaultDetail.addChild((OMNode) obj);
+                    }
+                }
+            } else {
+                soapFaultDetail.setText(faultDetailExpr.stringValueOf(synCtx));
+            }
             fault.setDetail(soapFaultDetail);
         } else if (!faultDetailElements.isEmpty()) {
             SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
@@ -517,5 +531,10 @@ public class FaultMediator extends AbstractMediator {
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    private void handleException(String msg, Throwable e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

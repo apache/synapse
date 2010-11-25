@@ -225,9 +225,11 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                     log.debug("Marking artifact as updating from file : " + fileName);
                 }
                 // if the file exists, which means it has been updated and is a Hot-Update case
-                deploymentStore.addUpdatingArtifact(
-                        fileName, deploymentStore.getArtifactNameForFile(fileName));
-                deploymentStore.removeArtifactWithFileName(fileName);
+                if (!deploymentStore.isRestoredFile(fileName)) {
+                    deploymentStore.addUpdatingArtifact(
+                            fileName, deploymentStore.getArtifactNameForFile(fileName));
+                    deploymentStore.removeArtifactWithFileName(fileName);
+                }
             } else {
                 // if the file doesn't exists then it is an actual undeployment
                 String artifactName = deploymentStore.getArtifactNameForFile(fileName);

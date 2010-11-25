@@ -69,6 +69,7 @@
                 <item name="Version 1.0" href="1_0/content.html"/>
             </item>
             <item name="Project Information" href="project-info.html">
+                <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
                 <item name="Mailing Lists" href="mail-lists.html"/>
                 <item name="Building" href="building.html"/>
                 <item name="Issue Tracking" href="issue-tracking.html"/>

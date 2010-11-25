@@ -41,10 +41,8 @@ import java.util.Map;
  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
  */
 public final class SynapseArtifactDeploymentStore {
-    public static final String SYNAPSE_ARTIFACT_DEPLOYMENT_STORE = "SYNAPSE_ARTIFACT_DEPLOYMENT_STORE"; 
-
     /** Keeps track of the deployed artifacts in the synapse environment */
-    private static Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
+    private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
 
     /** Keeps track of the updating artifacts in the synapse environment in a particular instance */
     private Map<String, String> updatingArtifacts = new HashMap<String, String>();

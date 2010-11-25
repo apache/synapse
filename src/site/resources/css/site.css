@@ -43,6 +43,21 @@ p{
     padding-bottom:1.5px;
     line-height:18px;
 }
+pre{
+    padding: 0px;
+    margin-top: 5px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    text-align: left;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border: 1px dashed #3c78b5;
+    font-size: 11px;
+    font-family: Courier;
+    margin: 10px;
+    line-height: 13px;
+}
 /* page styles */
 .page-padding{
     padding-left:10px;
@@ -232,6 +247,7 @@ p{
     line-height: 13px;
 }
 .consoleOutput {
+    white-space: pre;
     border: 1px dashed #3c78b5;
     font-size: 11px;
     font-family: Courier;

@@ -4,117 +4,19 @@
     <properties>
         <title>Extending...</title>
     </properties>
-    <head>
-        <style type="text/css" xml:space="preserve">
-    .command {
-        border: 1px dashed #3c78b5;
-        text-align: left;
-        background-color: #f0f0f0;
-        padding: 3px;
-        font-size: 11px;
-        font-family: Courier;
-        margin: 10px;
-        line-height: 13px;
-    }
-    .consoleOutput {
-        border: 1px dashed #3c78b5;
-        font-size: 11px;
-        font-family: Courier;
-        margin: 10px;
-        line-height: 13px;
-        background-color: #f0f0f0;
-        border-bottom: 1px dashed #3c78b5;
-        padding: 3px;
-        border-style: solid;
-    }
-    .info {
-        border-style: solid;
-        border-width: 1px;
-        border-color: #090;
-        background-color: #dfd;
-        text-align:left;
-        margin-top: 5px;
-        margin-bottom: 5px;
-    }
-    li {
-        font-family: Verdana, arial, sans-serif;
-        font-size: 11px;
-        line-height: 16px;
-        color: #000000;
-        font-weight: normal;
-    }
-    p {
-        font-family: Verdana, arial, sans-serif;
-        font-size: 11px;
-        line-height: 16px;
-        color: #000000;
-        font-weight: normal;
-    }
-    pre {
-        padding: 0px;
-        margin-top: 5px;
-        margin-left: 15px;
-        margin-bottom: 5px;
-        margin-right: 5px;
-        text-align: left;
-        background-color: #f0f0f0;
-        padding: 3px;
-        border: 1px dashed #3c78b5;
-        font-size: 11px;
-        font-family: Courier;
-        margin: 10px;
-        line-height: 13px;
-    }
-    h1 {
-        font-size: 24px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        color: #003366;
-        border-bottom: 1px solid #3c78b5;
-        padding: 2px;
-        margin: 36px 0px 4px 0px;
-    }
-    h2 {
-        font-size: 18px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        border-bottom: 1px solid #3c78b5;
-        padding: 2px;
-        margin: 27px 0px 4px 0px;
-    }
-    h3 {
-        font-size: 14px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        padding: 2px;
-        margin: 21px 0px 4px 0px;
-    }
-    h4 {
-        font-size: 12px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        padding: 2px;
-        margin: 18px 0px 4px 0px;
-    }</style>
-    </head>
   <body>
-    <div style="margin-top:-40px; float:right; _margin-top:0px;">
-      <img alt="Synapse logo"
-           src="images/synapse-logo-web2.png" width="197"
-           height="82"/>
-    </div>
-    <div>
-      <h1>
-        Apache Synapse ESB - Extending...
-      </h1>
-    </div>
-    <h2>
-      Writing custom Mediator implementations
-    </h2>
+    <section name="Apache Synapse ESB - Extending...">
+        <p>
+            Apache Synapse provides a number of extension points so that users can plug-in
+            custom developed code to extend the functionality of the ESB. While the built-in
+            mediators are sufficient to implement most integration scenarios, sometimes
+            it is very helpful to be able to deploy some custom code into the service bus
+            and make the solution simpler. Most Synapse APIs are in Java and therefore
+            the users looking to extend Synapse are expected to have a decent knowledge and
+            experience in Java programming.
+        </p>
+    </section>
+    <section name="Writing custom Mediator implementations">
     <p>
       The primary interface of the Synapse API is the MessageContext interface
       defined below. This essentially defines the per-message context passed
@@ -365,9 +267,8 @@ public interface <span style="font-weight: bold;">FilterMediator </span>extends 
      */
     public boolean test(MessageContext synCtx);
 }</pre>
-    <h2>
-      Writing custom Configuration implementations for mediators
-    </h2>
+    </section>
+    <section name="Writing custom Configuration implementations for mediators">
     <p>
       You may write your own custom configurator for the Mediator implementation
       you write without relying on the Class mediator or Spring extension for
@@ -455,9 +356,8 @@ public interface MediatorSerializer {
      */
     public String getMediatorClassName();
 }</pre>
-    <h2>
-      Configuring mediators
-    </h2>
+    </section>
+    <section name="Configuring mediators">
     <p>
       Mediators could access the Synapse registry to load resources and
       configure the local behaviour. Refer to the Spring mediator and Script
@@ -482,9 +382,8 @@ public interface MediatorSerializer {
         org.apache.synapse.config.xml.MediatorFactory
         org.apache.synapse.config.xml.MediatorSerializer
     /... the implementation classes as usual...</pre>
-    <h2 id="synObservers">
-        Writing Synapse Observers
-    </h2>
+    </section>
+    <section name="Writing Synapse Observers">
     <p>
        A Synapse observer is developed by either implementing the
        org.apache.synapse.config.SynapseObserver interface or by extending the
@@ -520,5 +419,19 @@ public interface MediatorSerializer {
          Synapse configuration using the synapse.properties file.
      </p>
      <pre xml:space="preserve">synapse.observers=test.LoggingObserverImpl, test.SimpleObserverImpl</pre>
+    </section>
+    <section name="Scheduled Tasks">
+        <p>
+        A scheduled task is a custom developed piece of Java code that is scheduled in the
+        ESB to execute periodically. A scheduled task must implement the org.apache.synapse.task.Task
+        interface. This interface has a single 'execute' method. Once scheduled the execute
+        method is called by Synapse periodically.
+        </p>
+        <p>
+        Synapse also comes with a built-in task implementation known as the MessageInjector.
+        This task can be used to inject messages into the service bus periodically. Refer
+        sample 300 to see how to use the MessageInjector task.
+        </p>
+    </section>
   </body>
 </document>

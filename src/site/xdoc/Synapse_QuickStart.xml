@@ -459,9 +459,7 @@ SOAPAction:
           transport endpoint at: http://localhost:8280/services/StockQuoteProxy. You
           will see the response from the server displayed on the console as follows:
         </p>
-        <div class="consoleOutput">
-          Standard :: Stock price = $165.32687331383468
-        </div>
+        <div class="consoleOutput">Standard :: Stock price = $165.32687331383468</div>
         <p>
           This quick guide illustrates the simple use case of proxy services. Please
           refer to samples #150 and above in the Samples guide, for in depth

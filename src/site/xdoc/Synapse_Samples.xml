@@ -298,10 +298,17 @@
 <li>
 <a href="#Callout">Synchronized Web Service invocations with Callout mediator</a>
 <ul>
+    <li>
+    <a href="#Sample430">Sample 430: Simple Callout Mediator for synchronize web service invocation</a></li>
+</ul>
+</li>
 <li>
-<a href="#Sample430">Sample 430: Simple Callout Mediator for synchronize web service invocation</a></li>
-<li>
-<a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
+<a href="#Sample440">Mediating JSON Messages</a>
+<ul>
+    <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
+</ul></li>
+<li><a href="#Sample450">URL Rewrite Mediator</a>
+<ul>
 <li>
 <a href="#Sample450">Sample 450: Introduction to the URL Rewrite mediator</a></li>
 <li>
@@ -310,7 +317,8 @@
 <a href="#Sample452">Sample 452: Conditional URL rewriting with multiple rules</a></li>
 <li>
 <a href="#Sample460">Sample 460: How to initialize and use a Spring Bean as a Mediator</a></li>
-</ul></li></ul></li>
+</ul>
+</li></ul></li>
         <li>
           <a href="#Task">Introduction to Eventing</a>
           <ul>

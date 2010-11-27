@@ -34,6 +34,7 @@
         </menu>
         <menu name="Documentation">
             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
+            <item name="Samples Catalog" href="userguide/samples.html"/>
         </menu>
         <menu name="Developer Resources">
             <item name="Checkout the Source"/>

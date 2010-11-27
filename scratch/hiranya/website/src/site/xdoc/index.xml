@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - The Lightweight ESB</title>
+    </properties>
+    <body>
+        <section name="Apache Synapse Enterprise Service Bus (ESB)">
+            <p>
+                Apache Synapse is a lightweight and high-performance Enterprise Service Bus (ESB).
+                Powered by a fast and asynchronous mediation engine, Apache Synapse provides
+                exceptional support for XML, Web Services and REST. In addition to XML and SOAP,
+                Apache Synapse supports several other content interchange formats, such as plain
+                text, binary, Hessian and JSON. The wide range of transport adapters available for
+                Synapse, enables it to communicate over many application and transport layer
+                protocols. As of now, Apache Synapse supports HTTP/S, Mail (POP3, IMAP, SMTP),
+                JMS, TCP, UDP, VFS, SMS, XMPP and FIX.
+            </p>
+            <p>
+                Apache Synapse is free and open source software distributed under the
+                <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
+                The latest version of Synaspe is <a href="download/2.0/download.cgi">v2.0</a>.
+                This release comes with a horde of new features, bug fixes, performance and
+                stability improvements.
+            </p>
+        </section>
+        <section name="New in Version 2.0">
+            <ul>
+                <li>New, fine-grained configuration model</li>
+                <li>Hot deployment and hot update support for configuration artifacts</li>
+                <li>Priority based mediation support</li>
+                <li>Comprehensive eventing capabilities with WS-Eventing support</li>
+                <li>Secure vault for encrypting passwords in configuration files</li>
+                <li>File locking support in the VFS transport for concurrent polling</li>
+                <li>URLRewrite medaitor for fast and simple URL rewriting</li>
+                <li>Synapse configuration observer API</li>
+                <li>Multiple identity support in the HTTPS transport</li>
+                <li>Enhanced JMX monitoring support for the NHTTP transport</li>
+                <li>Dead letter channel implementation (experimental)</li>
+                <li>Synapse XAR Maven plugin for generating configuration artifacts</li>
+            </ul>
+        </section>
+        <section name="Key Features">
+            <ul>
+                <li>Proxy services - facilitating transport, interface (WSDL/Schema/Policy), 
+                    message format (SOAP 1.1/1.2, POX/REST, Text, Binary), QoS (WS-Addressing/
+                    WS-Security/WS-RM) and optimization switching (MTOM/SwA)</li>
+                <li>Non-blocking HTTP/S transports for fast HTTP interactions and support for
+                    thousands of concurrent connections</li>
+                <li>VFS transport for file manipulation and interaction with FTP, SFTP, CIFS
+                    and WEBDAV</li>
+                <li>JMS support for binary, plain text, XML and SOAP payloads</li>
+                <li>Mail transport with extensive support for POP3, IMAP and SMTP</li>
+                <li>Support for industry driven <a href="http://www.fixprotocol.org/">Financial
+                    Information eXchange (FIX)</a> protocol</li>
+                <li>Built-in Registry/Repository, facilitating dynamic reloading of the
+                    configuration and associated resources (e.g. XSLTs, XSD, JS, ..)</li>
+                <li>Built-in support for scheduling tasks using the
+                    <a target="_blank" href="http://www.opensymphony.com/quartz">Quartz</a> scheduler</li>
+                <li>Load-balancing (with or without sticky sessions) and fail-over routing</li>
+                <li>Support for many Web Services standards including WS-Addressing, WS-Security
+                    and WS-Reliable Messaging</li>
+                <li>Policy based message throttling and caching (with special support for clustered
+                    environments)</li>
+                <li>Message splitting and aggregation</li>
+                <li>Database lookup and update support with database connection pooling</li>
+                <li>Fine grained statistics collection over sequences, endpoints and proxy services</li>
+                <li>JMX monitoring and management</li>
+                <li>Easily extendable with Java, Spring, or BSF Scripting languages (Javascript,
+                    Ruby, Groovy, etc.)</li>
+            </ul>
+        </section>
+    </body>
+</document>

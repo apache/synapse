@@ -1,0 +1,39 @@
+.consoleOutput {
+    overflow: auto;
+    white-space: pre;
+    border: 1px dashed #3c78b5;
+    font-size: 11px;
+    font-family: Courier;
+    margin: 10px;
+    line-height: 13px;
+    background-color: #f0f0f0;
+    border-bottom: 1px dashed #3c78b5;
+    padding: 3px;
+    border-style: solid;
+}
+
+.xmlConf {
+    overflow: auto;
+    white-space: pre;
+    border: 1px dashed #3c78b5;
+    font-size: 11px;
+    font-family: Courier;
+    margin: 10px;
+    line-height: 13px;
+    background-color: #f0f0f0;
+    border-bottom: 1px dashed #3c78b5;
+    padding: 3px;
+    border-style: solid;
+}
+
+.command {
+    overflow: auto;
+    border: 1px dashed #3c78b5;
+    text-align: left;
+    background-color: #f0f0f0;
+    padding: 3px;
+    font-size: 11px;
+    font-family: Courier;
+    margin: 10px;
+    line-height: 13px;
+}

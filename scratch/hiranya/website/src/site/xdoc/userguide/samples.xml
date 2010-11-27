@@ -41,8 +41,8 @@
                         <li><a href="samples/sample1.html">Sample 1: Simple content based routing (CBR) of messages</a></li>
                         <li><a href="samples/sample2.html">Sample 2: CBR with the Switch-case mediator, using message properties</a></li>
                         <li><a href="samples/sample3.html">Sample 3: Local Registry entry definitions, reusable endpoints and sequences</a></li>
-                        <li><a href="">Sample 4: Introduction to error handling</a></li>
-                        <li><a href="">Sample 5: Creating SOAP fault messages and changing the direction of a message</a></li>
+                        <li><a href="samples/sample4.html">Sample 4: Introduction to error handling</a></li>
+                        <li><a href="samples/sample5.html">Sample 5: Creating SOAP fault messages and changing the direction of a message</a></li>
                         <li><a href="">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></li>
                         <li><a href="">Sample 7: Introduction to local Registry entries and using Schema validation</a></li>
                         <li><a href="">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></li>

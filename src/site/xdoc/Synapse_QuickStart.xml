@@ -256,7 +256,7 @@ Total time: 5 seconds</div>
           level http message sent by the client is as follows, and is sent to port
           8280 to the Synapse instance on localhost.
         </p>
-        <pre xml:space="preserve">POST / HTTP/1.1
+        <div class="consoleOutput">POST / HTTP/1.1
 Content-Type: text/xml; charset=UTF-8
 SOAPAction: "urn:getQuote"
 User-Agent: Axis2
@@ -278,7 +278,7 @@ Transfer-Encoding: chunked
             &lt;/m0:request&gt;
          &lt;/m0:getQuote&gt;
       &lt;/soapenv:Body&gt;
-   &lt;/soapenv:Envelope&gt;0</pre>
+   &lt;/soapenv:Envelope&gt;0</div>
         <p>
           Now take a look at the console running Synapse. You will see that all the
           details of the mediation are logged along with all the SOAP messages

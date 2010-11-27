@@ -63,6 +63,7 @@
         font-family: Courier;
         margin: 10px;
         line-height: 13px;
+        overflow: auto;    
     }
     h1 {
         font-size: 24px;

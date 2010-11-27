@@ -237,6 +237,7 @@ pre{
     margin-left:10px;
 }
 .command {
+    overflow: auto;
     border: 1px dashed #3c78b5;
     text-align: left;
     background-color: #f0f0f0;
@@ -247,6 +248,7 @@ pre{
     line-height: 13px;
 }
 .consoleOutput {
+    overflow: auto;
     white-space: pre;
     border: 1px dashed #3c78b5;
     font-size: 11px;

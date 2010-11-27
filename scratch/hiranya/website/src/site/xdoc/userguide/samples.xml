@@ -34,29 +34,210 @@
                 with running Synapse samples, please go ahead and pick the samples you are
                 interested in.
             </p>
-            <p>
-                <ul>
-                    <li>
-                        <a href="">Message Mediation Samples</a>
-                        <ul>
-                            <li><a href="">Sample 0: Introduction to Synapse</a></li>
-                            <li><a href="">Sample 1: Simple content based routing (CBR) of messages</a></li>
-                            <li><a href="">Sample 2: CBR with the Switch-case mediator, using message properties</a></li>
-                            <li><a href="">Sample 3: Local Registry entry definitions, reusable endpoints and sequences</a></li>
-                            <li><a href="">Sample 4: Introduction to error handling</a></li>
-                            <li><a href="">Sample 5: Creating SOAP fault messages and changing the direction of a message</a></li>
-                            <li><a href="">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></li>
-                            <li><a href="">Sample 7: Introduction to local Registry entries and using Schema validation</a></li>
-                            <li><a href="">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></li>
-                            <li><a href="">Sample 9: Introduction to dynamic sequences with the Registry</a></li>
-                            <li><a href="">Sample 10: Introduction to dynamic endpoints with the Registry</a></li>
-                            <li><a href="">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
-                            <li><a href="">Sample 12: One way messaging / fireAndForget through Synapse</a></li>
-                            <li><a href="">Sample 13: Dual channel invocation through Synapse</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </p>
+            <subsection name="Message Mediation">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 0: Introduction to Synapse</a></li>
+                        <li><a href="">Sample 1: Simple content based routing (CBR) of messages</a></li>
+                        <li><a href="">Sample 2: CBR with the Switch-case mediator, using message properties</a></li>
+                        <li><a href="">Sample 3: Local Registry entry definitions, reusable endpoints and sequences</a></li>
+                        <li><a href="">Sample 4: Introduction to error handling</a></li>
+                        <li><a href="">Sample 5: Creating SOAP fault messages and changing the direction of a message</a></li>
+                        <li><a href="">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></li>
+                        <li><a href="">Sample 7: Introduction to local Registry entries and using Schema validation</a></li>
+                        <li><a href="">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></li>
+                        <li><a href="">Sample 9: Introduction to dynamic sequences with the Registry</a></li>
+                        <li><a href="">Sample 10: Introduction to dynamic endpoints with the Registry</a></li>
+                        <li><a href="">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
+                        <li><a href="">Sample 12: One way messaging / fireAndForget through Synapse</a></li>
+                        <li><a href="">Sample 13: Dual channel invocation through Synapse</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Endpoints">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 50: POX to SOAP conversion</a></li>
+                        <li><a href="">Sample 51: MTOM and SwA optimizations and request/response correlation</a></li>
+                        <li><a href="">Sample 52: Session less load balancing between 3 endpoints</a></li>
+                        <li><a href="">Sample 53: Failover sending among 3 endpoints</a></li>
+                        <li><a href="">Sample 54: Session affinity load balancing between 3 endpoints</a></li>
+                        <li><a href="">Sample 55: Session affinity load balancing between fail over endpoints</a></li>
+                        <li><a href="">Sample 56: WSDL endpoint</a></li>
+                        <li><a href="">Sample 57: Dynamic load balancing between 3 nodes</a></li>
+                        <li><a href="">Sample 58: Static load balancing between 3 nodes</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="QoS Addition/Removal with Message Mediation">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 100: Using WS-Security for outgoing messages</a></li>
+                        <li><a href="">Sample 101: Reliable message exchange between Synapse and the back-end server using WS-Reliable Messaging</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Proxy Services">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 150: Introduction to proxy services</a></li>
+                        <li><a href="">Sample 151: Custom sequences and endpoints with proxy services</a></li>
+                        <li><a href="">Sample 152: Switching transports and message format from SOAP to REST/POX</a></li>
+                        <li><a href="">Sample 153: Routing the messages arrived to a proxy service without processing the security headers</a></li>
+                        <li><a href="">Sample 154: Load Balancing with proxy services</a></li>
+                        <li><a href="">Sample 155: Dual channel invocation on both client side and server side of Synapse with proxy services</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="QoS Addition/Removal with Proxy Services">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 200: Using WS-Security with policy attachments for proxy services</a></li>
+                        <li><a href="">Sample 201: Reliable message exchange between the client and proxy services using WS-ReliableMessaging</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Transports">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 250: Introduction to switching transports - JMS to http/s</a></li>
+                        <li><a href="">Sample 251: Switching from http/s to JMS</a></li>
+                        <li><a href="">Sample 252: Pure text/binary and POX message support with JMS</a></li>
+                        <li><a href="">Sample 253: One way bridging from JMS to http and replying with a 202 Accepted response</a></li>
+                        <li><a href="">Sample 254: Using the file system as transport medium using VFS transport listener and sender</a></li>
+                        <li><a href="">Sample 255: Switching from ftp transport listener to mail transport sender</a></li>
+                        <li><a href="">Sample 256: Proxy services with the mail transport</a></li>
+                        <li><a href="">Sample 257: Proxy services with the FIX transport</a></li>
+                        <li><a href="">Sample 258: Switching from HTTP to FIX </a></li>
+                        <li><a href="">Sample 259: Switching from FIX to HTTP </a></li>
+                        <li><a href="">Sample 260: Switching from FIX to AMQP </a></li>
+                        <li><a href="">Sample 261: Switch between FIX versions </a></li>
+                        <li><a href="">Sample 262: CBR of FIX messages </a></li>
+                        <li><a href="">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
+                        <li><a href="">Sample 264: Transport switching - HTTP/S to JMS two way messages</a></li>
+                        <li><a href="">Sample 265: Switching from TCP to HTTP/S</a></li>
+                        <li><a href="">Sample 266: Switching from UDP to HTTP/S</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Scheduled Tasks">
+                <p>
+                    <ul>
+                        <li><a href="#Sample300">Sample 300: Introduction to tasks with simple trigger</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Advanced Mediators">
+                <h4>Script Mediator (Writing Mediation Logic in Scripting Languages)</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample350">Sample 350: Introduction to the script mediator using js scripts</a></li>
+                        <li><a href="#Sample351">Sample 351: In-line script mediation with JavaScript</a></li>
+                        <li><a href="#Sample352">Sample 352: Accessing Synapse message context API methods using scripting language</a></li>
+                        <li><a href="#Sample353">Sample 353: Using Ruby scripts for mediation</a></li>
+                        <li><a href="#Sample354">Sample 354: Using In-lined Ruby scripts for mediation</a></li>
+                    </ul>
+                </p>
+                <h4>Database Mediators (Interacting with Databases)</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample360">Sample 360: Introduction to dblookup mediator</a></li>
+                        <li><a href="#Sample361">Sample 361: Introduction to dbreport mediator</a></li>
+                        <li><a href="#Sample362">Sample 362: Action of dbreport and dblookup mediators together</a></li>
+                        <li><a href="#Sample363">Sample 363: Reusable database connection pools</a></li>
+                        <li><a href="#Sample364">Sample 364: Executing database Stored Procedures</a></li>
+                    </ul>
+                </p>
+                <h4>Throttle Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample370">Sample 370: Introduction to throttle mediator and concurrency throttling</a></li>
+                        <li><a href="#Sample371">Sample 371: Restricting requests based on policies</a></li>
+                        <li><a href="#Sample372">Sample 372: Use of both concurrency throttling and request rate based throttling </a></li>
+                    </ul>
+                </p>
+                <h4>Class Mediator (Writing Mediation Logic in Java)</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample380">Sample 380: Writing your own custom mediation in Java</a></li>
+                        <li><a href="#Sample381">Sample 381: Implementing CBR for binary messages using the class mediator</a></li>
+                    </ul>
+                </p>
+                <h4>XQuery Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample390">Sample 390: Introduction to the XQuery mediator</a></li>
+                        <li><a href="#Sample391">Sample 391: How to use the data from an external XML document with in XQuery </a></li>
+                    </ul>
+                </p>
+                <h4>Iterate Mediator and Aggregate Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample400">Sample 400: Message splitting and aggregating the responses</a></li>
+                    </ul>
+                </p>
+                <h4>Cache Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample420">Sample 420: Simple cache implemented on Synapse for the actual service</a></li>
+                    </ul>
+                </p>
+                <h4>Callout Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample430">Sample 430: Simple Callout Mediator for synchronize web service invocation</a></li>
+                    </ul>
+                </p>
+                <h4>URL Rewrite Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="#Sample450">Sample 450: Introduction to the URL Rewrite mediator</a></li>
+                        <li><a href="#Sample451">Sample 451: Conditional URL rewriting</a></li>
+                        <li><a href="#Sample452">Sample 452: Conditional URL rewriting with multiple rules</a></li>                        
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Eventing">
+                <p>
+                    <ul>
+                        <li><a href="">Sample 500: Introduction to Eventing</a></li>
+                        <li><a href="">Sample 501: EventSource with static subscriptions</a></li>
+                        <li><a href="">Sample 502: Transform events before publish</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Synapse Configuration Model">
+                <p>
+                    <ul>
+                        <li><a href="#Sample600">Sample 600: File hierarchy based configuration builder</a></li>
+                        <li><a href="#Sample601">Sample 601: Using Synapse Observers</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Priority Based Mediation">
+                <p>
+                    <ul>
+                        <li><a href="#Sample650">Sample 650: Priority based Mediation</a></li>
+                        <li><a href="#Sample651">Sample 651: NHTTP Transport Priority based dispatching</a></li>
+                        <li><a href="#Sample652">Sample 652: Distributed transaction management</a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Message Store and Dead Letter Channel">
+                <p>
+                    <ul>
+                        <li><a href="#Sample700">Sample 700: Introduction to Synapse Message Store </a></li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Mediating JSON Messages">
+                <p>
+                    <ul>
+                        <!-- This sample should be renamed -->
+                        <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
+                    </ul>
+                </p>
+            </subsection>
         </section>
     </body>
 </document>

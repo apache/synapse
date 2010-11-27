@@ -37,8 +37,8 @@
             <subsection name="Message Mediation">
                 <p>
                     <ul>
-                        <li><a href="">Sample 0: Introduction to Synapse</a></li>
-                        <li><a href="">Sample 1: Simple content based routing (CBR) of messages</a></li>
+                        <li><a href="samples/sample0.html">Sample 0: Introduction to Synapse</a></li>
+                        <li><a href="samples/sample1.html">Sample 1: Simple content based routing (CBR) of messages</a></li>
                         <li><a href="">Sample 2: CBR with the Switch-case mediator, using message properties</a></li>
                         <li><a href="">Sample 3: Local Registry entry definitions, reusable endpoints and sequences</a></li>
                         <li><a href="">Sample 4: Introduction to error handling</a></li>

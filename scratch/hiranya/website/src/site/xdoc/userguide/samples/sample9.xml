@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 9</title>
     </properties>
     <body>
-        <section name="Sample 9: ">
+        <section name="Sample 9: Introduction to Dynamic Sequences with the Registry ">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
@@ -38,7 +38,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrating the ability to load sequence definitions dynamically from the
+                    remote registry.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -58,11 +59,50 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
+                <p>
+                    This example demonstrates the dynamic behaviour of Synapse through the use of a
+                    registry. Synapse supports dynamic definitions for sequences and endpoints, and
+                    as seen before, for configuration resources (eg: schema files, XSLT files etc).
+                    In this example we define a Synapse configuration which references a sequence
+                    definition specified as a registry key. The registry key resolves to the actual
+                    content of the sequence which would be loaded dynamically by Synapse at runtime,
+                    and cached appropriately as per its definition in the registry. Once the cache
+                    expires, Synapse would re-check the meta information for the definition and
+                    re-load the sequence definition if necessary and re-cache it again.
+                </p>
+                <p>
+                    Execute the client as follows.
+                </p>
                 <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Go through the mediation debug logs to see how Synapse has dynamically loaded
+                    the sequence configurations from the registry.
+                </p>
+                <div class="consoleOutput">[HttpServerWorker-1] DEBUG  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
+...
+[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
+...
+[HttpServerWorker-1] INFO  LogMediator - message = *** Test Message 1 ***</div>
+                <p>
+                    Now if you execute the client immediately (i.e. within 15 seconds of the last
+                    execution) you will notice that the sequence is not reloaded. If you edit the
+                    sequence definition in repository/conf/sample/resources/sequence/dynamic_seq_1.xml
+                    (i.e. edit the log message to read as '*** Test Message 2 ***') and execute the
+                    client again, you will notice that the new message is not yet visible (i.e. if
+                    you execute this within 15 seconds of loading the resource for the first time).
+                    However, after 15 seconds elapsed since the original caching of the sequence,
+                    you will notice that the new sequence is loaded and executed by Synapse from the
+                    following log messages.
+                </p>
+                <div class="consoleOutput">[HttpServerWorker-1] DEBUG  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
+...
+[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
+...
+[HttpServerWorker-1] INFO  LogMediator - message = *** Test Message 2 ***</div>
+                <p>
+                    The cache timeout could be tuned appropriately by configuring the URL registry
+                    to suit the environment and the needs.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

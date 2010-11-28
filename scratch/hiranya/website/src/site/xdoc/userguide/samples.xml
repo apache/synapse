@@ -43,14 +43,14 @@
                         <li><a href="samples/sample3.html">Sample 3: Local Registry entry definitions, reusable endpoints and sequences</a></li>
                         <li><a href="samples/sample4.html">Sample 4: Introduction to error handling</a></li>
                         <li><a href="samples/sample5.html">Sample 5: Creating SOAP fault messages and changing the direction of a message</a></li>
-                        <li><a href="">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></li>
-                        <li><a href="">Sample 7: Introduction to local Registry entries and using Schema validation</a></li>
-                        <li><a href="">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></li>
-                        <li><a href="">Sample 9: Introduction to dynamic sequences with the Registry</a></li>
-                        <li><a href="">Sample 10: Introduction to dynamic endpoints with the Registry</a></li>
-                        <li><a href="">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
-                        <li><a href="">Sample 12: One way messaging / fireAndForget through Synapse</a></li>
-                        <li><a href="">Sample 13: Dual channel invocation through Synapse</a></li>
+                        <li><a href="samples/sample6.html">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></li>
+                        <li><a href="samples/sample7.html">Sample 7: Introduction to local registry entries and using schema validation</a></li>
+                        <li><a href="samples/sample8.html">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></li>
+                        <li><a href="samples/sample9.html">Sample 9: Introduction to dynamic sequences with the registry</a></li>
+                        <li><a href="samples/sample10.html">Sample 10: Introduction to dynamic endpoints with the registry</a></li>
+                        <li><a href="samples/sample11.html">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
+                        <li><a href="samples/sample12.html">Sample 12: One way messaging / fireAndForget through Synapse</a></li>
+                        <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li>
                     </ul>
                 </p>
             </subsection>

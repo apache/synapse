@@ -20,10 +20,10 @@
 
 <document>
     <properties>
-        <title>Apache Synapse - Sample X</title>
+        <title>Apache Synapse - Sample 390</title>
     </properties>
     <body>
-        <section name="Sample X: ">
+        <section name="Sample 390: ">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
@@ -82,10 +82,10 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Start Synapse using the configuration numbered X (repository/conf/sample/synapse_sample_X.xml)
+                            Start Synapse using the configuration numbered 390 (repository/conf/sample/synapse_sample_390.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample X<br/>
-                                Windows: synapse.bat -sample X
+                                Unix/Linux: sh synapse.sh -sample 390<br/>
+                                Windows: synapse.bat -sample 390
                             </div>
                         </li>
                     </ul>

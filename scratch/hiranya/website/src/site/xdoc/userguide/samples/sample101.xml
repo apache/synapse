@@ -20,10 +20,10 @@
 
 <document>
     <properties>
-        <title>Apache Synapse - Sample X</title>
+        <title>Apache Synapse - Sample 101</title>
     </properties>
     <body>
-        <section name="Sample X: ">
+        <section name="Sample 101: ">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -56,10 +56,10 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Start Synapse using the configuration numbered X (repository/conf/sample/synapse_sample_X.xml)
+                            Start Synapse using the configuration numbered 101 (repository/conf/sample/synapse_sample_101.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample X<br/>
-                                Windows: synapse.bat -sample X
+                                Unix/Linux: sh synapse.sh -sample 101<br/>
+                                Windows: synapse.bat -sample 101
                             </div>
                         </li>
                     </ul>

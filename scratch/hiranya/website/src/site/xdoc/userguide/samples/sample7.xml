@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 7</title>
     </properties>
     <body>
-        <section name="Sample 7: ">
+        <section name="Sample 7: Introduction to Local Registry Entries and Using Schema Validation">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -65,7 +65,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrating the usage of the validate mediator for XML schema validation
+                    and using local registry (local entries) for storing configuration metadata.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -85,11 +86,29 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
+                <p>
+                    This example shows how a static XML fragment could be stored in the the
+                    Synapse local registry. Resources defined in the local registry are static
+                    (i.e. never changes over the lifetime of the configuration) and may be
+                    specified as a source URL, in-line text or in-line xml. In this example the
+                    schema is made available under the key 'validate_schema'.
+                </p>
+                <p>
+                    The validate mediator by default operates on the first child element of the
+                    SOAP body. You may specify an XPath expression using the 'source' attribute
+                    to override this behaviour. The validate mediator in this sample uses the 'validate_schema'
+                    resource to validate the incoming message, and if the message validation fails
+                    it invokes the 'on-fail' sequence of mediators.
+                </p>
+                <p>
+                    If you send a stockquote request using the 'ant stockquote ...' command as follows
+                    you will get a fault back with the message 'Invalid custom quote request' as
+                    the schema validation fails. This is because the schema used in the example
+                    expects a slightly different message than what is created by the stock quote
+                    client. (i.e. expects a 'stocksymbol' element instead of 'symbol' to specify
+                    the stock symbol)
+                </p>
                 <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

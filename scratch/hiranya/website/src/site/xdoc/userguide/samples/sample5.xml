@@ -63,8 +63,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-                    Introducing the makefault mediator for creating custom SOAP faults and demonstrating
-                    the message direction (in/out) change
+                    Demonstrating how makefault mediator can be used to construct custom SOAP
+                    faults and change the direction (in/out) of messages.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">

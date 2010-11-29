@@ -85,9 +85,7 @@ Standard dual channel :: Stock price = $57.16686934968289</div>
                     is gpoing on a different channel listening on the port 8200. Please note that it
                     is required to engage addressing when using the dual channel invocation because
                     it requires the wsa:Reply-To header.
-                </p>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                </p>                
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>

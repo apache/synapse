@@ -23,36 +23,29 @@
         <title>Apache Synapse - Sample 12</title>
     </properties>
     <body>
-        <section name="Sample 12: ">
+        <section name="Sample 12: One-way Messaging / Fire-and-Forget Through Synapse">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;localEntry key="local-enrty-ep-key"
-                src="file:repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml"/&gt;
-
-    &lt;localEntry key="local-enrty-sequence-key"&gt;
-        &lt;sequence name="dynamic_sequence"&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="message" value="*** Test Message 1 ***"/&gt;
-            &lt;/log&gt;
-        &lt;/sequence&gt;
-    &lt;/localEntry&gt;
-
     &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;sequence key="local-enrty-sequence-key"/&gt;
-            &lt;send&gt;
-                &lt;endpoint key="local-enrty-ep-key"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
+        &lt;!-- filtering of messages with XPath and regex matches --&gt;
+        &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+            &lt;then&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+                &lt;drop/&gt;
+            &lt;/then&gt;
+        &lt;/filter&gt;
+        &lt;send/&gt;
     &lt;/sequence&gt;
 
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the ability to perform one-way invocations (out-only) through
+                    Synapse.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -62,21 +55,36 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Start Synapse using the configuration numbered 12 (repository/conf/sample/synapse_sample_12.xml)
+                            This sample makes use of the configuration used in <a href="sample1.html">sample 1</a>.
+                            So start Synapse using the configuration numbered 1 (repository/conf/sample/synapse_sample_1.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 12<br/>
-                                Windows: synapse.bat -sample 12
+                                Unix/Linux: sh synapse.sh -sample 1<br/>
+                                Windows: synapse.bat -sample 1
                             </div>
                         </li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
+                <p>
+                    In this example we will invoke the one-way 'placeOrder' operation on the
+                    SimpleStockQuoteService using the sample client which uses the Axis2
+                    ServiceClient.fireAndForget() API. To send a placeOrder request from the sample
+                    client, execute the following command.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder</div>
 
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+                <p>
+                    Going through the Axis2 server logs, you will notice the following entry, which
+                    confirms that Axis2 accepted the in-only request.
+                </p>
+                <div class="consoleOutput">SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</div>
 
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    If you send your client request through TCPmon, you will notice that the
+                    SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that Synapse
+                    in turns replies to the client with a HTTP 202 acknowledgment.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

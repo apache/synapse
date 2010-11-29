@@ -46,10 +46,10 @@
                         <li><a href="samples/sample6.html">Sample 6: Manipulating SOAP headers, and filtering incoming and outgoing messages</a></li>
                         <li><a href="samples/sample7.html">Sample 7: Introduction to local registry entries and using schema validation</a></li>
                         <li><a href="samples/sample8.html">Sample 8: Introduction to static and dynamic registry resources, and using XSLT transformations</a></li>
-                        <li><a href="samples/sample9.html">Sample 9: Introduction to dynamic sequences with the registry</a></li>
-                        <li><a href="samples/sample10.html">Sample 10: Introduction to dynamic endpoints with the registry</a></li>
+                        <li><a href="samples/sample9.html">Sample 9: Introduction to dynamic sequences with registry</a></li>
+                        <li><a href="samples/sample10.html">Sample 10: Introduction to dynamic endpoints with registry</a></li>
                         <li><a href="samples/sample11.html">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
-                        <li><a href="samples/sample12.html">Sample 12: One way messaging / fireAndForget through Synapse</a></li>
+                        <li><a href="samples/sample12.html">Sample 12: One-way messaging / fire-and-forget through Synapse</a></li>
                         <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li>
                     </ul>
                 </p>

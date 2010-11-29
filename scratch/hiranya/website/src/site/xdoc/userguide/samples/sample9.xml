@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 9</title>
     </properties>
     <body>
-        <section name="Sample 9: Introduction to Dynamic Sequences with the Registry ">
+        <section name="Sample 9: Introduction to Dynamic Sequences with Registry">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;

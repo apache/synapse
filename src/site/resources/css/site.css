@@ -2,7 +2,7 @@
 body{
     padding:0px;
     margin:0px;
-    width:1000px;
+    /*width:1000px;*/
 }
 a{
     color:#557f95;
@@ -65,12 +65,11 @@ pre{
 }
 .composite{
 /* Uncomment these lines to give a fixed width with centered positioning ....*/
-    position:absolute;
-    left:50%;
-    width:980px;
-    margin-left:-490px;
-    border:solid 1px #83b0c0;
-    margin-top:5px;
+    /*position:absolute;*/
+    /*left:50%;*/
+    /*width:980px;*/
+    /*margin: 5px;*/
+    /*border:solid 1px #83b0c0;*/
 }
 
 /* header styles */
@@ -109,11 +108,7 @@ pre{
     right:0px;
     top:0px;
 }
-.xleft{
-    color:#929292;
-    right:200px;
-    position:absolute;
-}
+
 .top-menu a{
     color:#000000;
     text-decoration:none;

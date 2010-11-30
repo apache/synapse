@@ -36,82 +36,15 @@
         margin-top: 5px;
         margin-bottom: 5px;
     }
-    li {
-        font-family: Verdana, arial, sans-serif;
-        font-size: 11px;
-        line-height: 16px;
-        color: #000000;
-        font-weight: normal;
-    }
-    p, td {
-        font-family: Verdana, arial, sans-serif;
-        font-size: 11px;
-        line-height: 16px;
-        color: #000000;
-        font-weight: normal;
-    }
-    pre {
-        padding: 0px;
-        margin-top: 5px;
-        margin-left: 15px;
-        margin-bottom: 5px;
-        margin-right: 5px;
-        text-align: left;
-        background-color: #f0f0f0;
-        padding: 3px;
-        border: 1px dashed #3c78b5;
-        font-size: 11px;
-        font-family: Courier;
-        margin: 10px;
-        line-height: 13px;
-        overflow: auto;    
-    }
-    h1 {
-        font-size: 24px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        color: #003366;
-        border-bottom: 1px solid #3c78b5;
-        padding: 2px;
-        margin: 36px 0px 4px 0px;
-    }
-    h2 {
-        font-size: 18px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        border-bottom: 1px solid #3c78b5;
-        padding: 2px;
-        margin: 27px 0px 4px 0px;
-    }
-    h3 {
-        font-size: 14px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        padding: 2px;
-        margin: 21px 0px 4px 0px;
-    }
-    h4 {
-        font-size: 12px;
-        line-height: normal;
-        font-weight: bold;
-        background-color: #f0f0f0;
-        padding: 2px;
-        margin: 18px 0px 4px 0px;
-    }</style>
+    </style>
     </head>
     <body>
-    <div style="margin-top:-40px; float:right; _margin-top:0px;">
-      <img alt="Synapse logo"
-           src="images/synapse-logo-web2.png" width="197"
-           height="82"/>
-    </div>
+        <div class="section">
+    
     <div>
-      <h1>
+      <h2>
         Apache Synapse ESB - Samples Setup
-      </h1>
+      </h2>
     </div>
     
     <p>
@@ -1154,6 +1087,7 @@ synapse.datasources.reportds.maxWait=10000</pre>
         Output : VbwH1pePwf4XmUtCdIvO0MA/EZPl8YK+E0kGkMpFd7CbWKpR2h1evTv902zoVorbJbHsVDNXfuvUUGmQAptUl4GknAm4bgZsgQ/pbsRbXivRkNzg9JVqw3FzWkR2uN2ZCHSacC4IdUwOjSDOTQ+kH7se
         58kt2xqJSax2a9pdL1w=
     </pre>
+</div>
 </div>
 </div>
 </body>

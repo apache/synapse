@@ -86,8 +86,8 @@
                         </li>
                         <li>
                             Start 3 instances of the Axis2 server on different ports as follows
-                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1
-./axis2server.sh -http 9002 -https 9006 -name MyServer2
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1<br/>
+./axis2server.sh -http 9002 -https 9006 -name MyServer2<br/>
 ./axis2server.sh -http 9003 -https 9007 -name MyServer3</div>
                         </li>
                         <li>

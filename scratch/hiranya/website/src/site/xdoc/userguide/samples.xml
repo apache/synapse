@@ -62,10 +62,10 @@
                         <li><a href="samples/sample52.html">Sample 52: Session less load balancing between 3 endpoints</a></li>
                         <li><a href="samples/sample53.html">Sample 53: Fail-over routing among 3 endpoints</a></li>
                         <li><a href="samples/sample54.html">Sample 54: Session affinity load balancing between 3 endpoints</a></li>
-                        <li><a href="samples/sample55.html">Sample 55: Session affinity load balancing between fail over endpoints</a></li>
-                        <li><a href="">Sample 56: WSDL endpoint</a></li>
-                        <li><a href="">Sample 57: Dynamic load balancing between 3 nodes</a></li>
-                        <li><a href="">Sample 58: Static load balancing between 3 nodes</a></li>
+                        <li><a href="samples/sample55.html">Sample 55: Session affinity load balancing between fail-over endpoints</a></li>
+                        <li><a href="samples/sample56.html">Sample 56: WSDL endpoint</a></li>
+                        <li><a href="samples/sample57.html">Sample 57: Dynamic load balancing between 3 nodes</a></li>
+                        <li><a href="samples/sample58.html">Sample 58: Static load balancing between 3 nodes</a></li>
                     </ul>
                 </p>
             </subsection>

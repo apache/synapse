@@ -60,7 +60,7 @@
                         <li><a href="samples/sample50.html">Sample 50: POX to SOAP conversion</a></li>
                         <li><a href="samples/sample51.html">Sample 51: MTOM and SwA optimizations and request/response correlation</a></li>
                         <li><a href="samples/sample52.html">Sample 52: Session less load balancing between 3 endpoints</a></li>
-                        <li><a href="samples/sample53.html">Sample 53: Failover sending among 3 endpoints</a></li>
+                        <li><a href="samples/sample53.html">Sample 53: Fail-over routing among 3 endpoints</a></li>
                         <li><a href="samples/sample54.html">Sample 54: Session affinity load balancing between 3 endpoints</a></li>
                         <li><a href="samples/sample55.html">Sample 55: Session affinity load balancing between fail over endpoints</a></li>
                         <li><a href="">Sample 56: WSDL endpoint</a></li>

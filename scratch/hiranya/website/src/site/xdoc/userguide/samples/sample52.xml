@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 52</title>
     </properties>
     <body>
-        <section name="Sample 52: ">
+        <section name="Sample 52: Session-less Load Balancing Between 3 Endpoints">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main" onError="errorHandler"&gt;
@@ -72,14 +72,22 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the ability of Synapse to act as a load balancer for a set of
+                    servers hosting stateless services
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Deploy the LoadbalanceFailoverService in the sample Axis2 server (go to
+                            samples/axis2Server/src/LoadbalanceFailoverService and run 'ant')
+                        </li>
+                        <li>
+                            Start 3 instances of the Axis2 server on different ports as follows
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1
+./axis2server.sh -http 9002 -https 9006 -name MyServer2
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</div>
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 52 (repository/conf/sample/synapse_sample_52.xml)
@@ -92,11 +100,49 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Invoke the sample client as follows
+                </p>
+                <div class="command">ant loadbalancefailover -Di=100</div>
+                <p>
+                    This will send 100 requests to the LoadbalanceFailoverService through Synapse.
+                    Synapse will distribute the load among the three endpoints mentioned in the
+                    configuration in round-robin manner. LoadbalanceFailoverService appends the name
+                    of the server to the response, so that client can determine which server has
+                    processed the message. If you examine the console output of the client, you can
+                    see that requests are processed by three servers as follows:
+                </p>
+                <div class="consoleOutput">[java] Request: 1 ==&gt; Response from server: MyServer1
+[java] Request: 2 ==&gt; Response from server: MyServer2
+[java] Request: 3 ==&gt; Response from server: MyServer3
+[java] Request: 4 ==&gt; Response from server: MyServer1
+[java] Request: 5 ==&gt; Response from server: MyServer2
+[java] Request: 6 ==&gt; Response from server: MyServer3
+[java] Request: 7 ==&gt; Response from server: MyServer1
+...</div>
+                <p>
+                    Now run the client without the -Di=100 parameter to send requests indefinitely.
+                    While running the client shutdown the server named MyServer1. Then you can observe
+                    that requests are only distributed among MyServer2 and MyServer3. Console output
+                    before and after shutting down MyServer1 is listed below (MyServer1 was shutdown
+                    after request 63):
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 61 ==&gt; Response from server: MyServer1
+[java] Request: 62 ==&gt; Response from server: MyServer2
+[java] Request: 63 ==&gt; Response from server: MyServer3
+[java] Request: 64 ==&gt; Response from server: MyServer2
+[java] Request: 65 ==&gt; Response from server: MyServer3
+[java] Request: 66 ==&gt; Response from server: MyServer2
+[java] Request: 67 ==&gt; Response from server: MyServer3
+...</div>
+                <p>
+                    Now restart MyServer1. You can observe that requests will be again sent to all 
+                    three servers within 60 seconds. This is because we have specified
+                    &lt;suspendDurationOnFailure&gt; as 60 seconds in the configuration. Therefore,
+                    load balance endpoint will suspend any failed child endpoint only for 60 seconds
+                    after detecting the failure.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

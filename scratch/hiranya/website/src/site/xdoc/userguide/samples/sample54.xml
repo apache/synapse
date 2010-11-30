@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 54</title>
     </properties>
     <body>
-        <section name="Sample 54: ">
+        <section name="Sample 54: Session Affinity Load Balancing Between 3 Endpoints">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main" onError="errorHandler"&gt;
@@ -73,14 +73,22 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Showcase the ability of Synapse to act as a session aware load balancer with
+                    simple client sessions
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Deploy the LoadbalanceFailoverService in the sample Axis2 server (go to
+                            samples/axis2Server/src/LoadbalanceFailoverService and run 'ant')
+                        </li>
+                        <li>
+                            Start 3 instances of the Axis2 server on different ports as follows
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1
+./axis2server.sh -http 9002 -https 9006 -name MyServer2
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</div>
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 54 (repository/conf/sample/synapse_sample_54.xml)
@@ -93,11 +101,40 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Above configuration is same as the load balancing configuration in
+                    <a href="sample52.html">sample 52</a>, except that the session type is specified
+                    as 'simpleClientSession'. This is a client initiated session, which means that
+                    the client generates the session identifier and sends it with each request. In
+                    this sample, client adds a SOAP header named ClientID containing the identifier
+                    of the client. Synapse binds this ID with a server on the first request and sends
+                    all successive requests containing that ID to the same server. Now switch to
+                    samples/axis2Client directory and run the client using the following command to
+                    check this in action.
+                </p>
+                <div class="command">ant loadbalancefailover -Dmode=session</div>
+                <p>
+                    In the session mode, client continuously sends requests with three different
+                    client (session) IDs. One ID is selected among these three IDs for each request
+                    randomly. Then client prints the session ID with the responded server for each
+                    request. Client output for the first 10 requests are shown below.
+                </p>
+                <div class="consoleOutput">[java] Request: 1 Session number: 1 Response from server: MyServer3
+[java] Request: 2 Session number: 2 Response from server: MyServer2
+[java] Request: 3 Session number: 0 Response from server: MyServer1
+[java] Request: 4 Session number: 2 Response from server: MyServer2
+[java] Request: 5 Session number: 1 Response from server: MyServer3
+[java] Request: 6 Session number: 2 Response from server: MyServer2
+[java] Request: 7 Session number: 2 Response from server: MyServer2
+[java] Request: 8 Session number: 1 Response from server: MyServer3
+[java] Request: 9 Session number: 0 Response from server: MyServer1
+[java] Request: 10 Session number: 0 Response from server: MyServer1
+... </div>
+                <p>
+                    You can see that session ID 0 is always directed to the server named MyServer1.
+                    That means session ID 0 is bound to MyServer1. Similarly session 1 and 2 are bound
+                    to MyServer3 and MyServer2 respectively.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

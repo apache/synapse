@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 55</title>
     </properties>
     <body>
-        <section name="Sample 55: ">
+        <section name="Sample 55: Session Affinity Load Balancing Between Fail-over Endpoints">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main" onError="errorHandler"&gt;
@@ -86,14 +86,23 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate session aware load balancing in conjunction with fail-over 
+                    routing.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Deploy the LoadbalanceFailoverService in the sample Axis2 server (go to
+                            samples/axis2Server/src/LoadbalanceFailoverService and run 'ant')
+                        </li>
+                        <li>
+                            Start 4 instances of the Axis2 server on different ports as follows
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1
+./axis2server.sh -http 9002 -https 9006 -name MyServer2
+./axis2server.sh -http 9003 -https 9007 -name MyServer3
+./axis2server.sh -http 9004 -https 9008 -name MyServer4</div>
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 55 (repository/conf/sample/synapse_sample_55.xml)
@@ -106,11 +115,53 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This configuration also uses 'simpleClientSession' to bind session ID values to
+                    servers as in <a href="sample54.html">sample 54</a>. But fail-over endpoints are
+                    specified as the child endpoints of the load balance endpoint. Therefore sessions
+                    are bound to the fail-over endpoints. Session information has to be replicated
+                    among the servers listed under each failover endpoint using some clustering
+                    mechanism. Therefore, if one endpoint bound to a session failed, successive requets
+                    for that session will be directed to the next endpoint in that failover group.
+                    Run the client using the following command to observe this behaviour.
+                </p>
+                <div class="command">ant loadbalancefailover -Dmode=session</div>
+                <p>
+                    You can see a client output as shown below.
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 222 Session number: 0 Response from server: MyServer1
+[java] Request: 223 Session number: 0 Response from server: MyServer1
+[java] Request: 224 Session number: 1 Response from server: MyServer1
+[java] Request: 225 Session number: 2 Response from server: MyServer3
+[java] Request: 226 Session number: 0 Response from server: MyServer1
+[java] Request: 227 Session number: 1 Response from server: MyServer1
+[java] Request: 228 Session number: 2 Response from server: MyServer3
+[java] Request: 229 Session number: 1 Response from server: MyServer1
+[java] Request: 230 Session number: 1 Response from server: MyServer1
+[java] Request: 231 Session number: 2 Response from server: MyServer3
+...</div>
+                <p>
+                    Note that session 0 is always directed to MyServer1 and session 2 is directed to
+                    MyServer3. No requests are directed to MyServer2 and MyServer4 as they are kept
+                    as backups by fail-over endpoints. Now shutdown the server named MyServer1 while
+                    running the sample. You will observe that all successive requests for session 0
+                    is now directed to MyServer2, which is the backup server for MyServer1's group.
+                    This is shown below, where MyServer1 was shutdown after the request 534.
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 529 Session number: 2 Response from server: MyServer3
+[java] Request: 530 Session number: 1 Response from server: MyServer1
+[java] Request: 531 Session number: 0 Response from server: MyServer1
+[java] Request: 532 Session number: 1 Response from server: MyServer1
+[java] Request: 533 Session number: 1 Response from server: MyServer1
+[java] Request: 534 Session number: 1 Response from server: MyServer1
+[java] Request: 535 Session number: 0 Response from server: MyServer2
+[java] Request: 536 Session number: 0 Response from server: MyServer2
+[java] Request: 537 Session number: 0 Response from server: MyServer2
+[java] Request: 538 Session number: 2 Response from server: MyServer3
+[java] Request: 539 Session number: 0 Response from server: MyServer2
+...</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

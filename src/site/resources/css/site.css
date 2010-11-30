@@ -35,6 +35,8 @@ h3{
     font-weight:bold;
 }
 h4{
+    padding:0px;
+    margin:0px;
     font-weight:bold;
     color:#777777;
 }
@@ -57,6 +59,7 @@ pre{
     font-family: Courier;
     margin: 10px;
     line-height: 13px;
+    overflow: auto;
 }
 /* page styles */
 .page-padding{

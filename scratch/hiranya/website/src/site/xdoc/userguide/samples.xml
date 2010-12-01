@@ -72,8 +72,8 @@
             <subsection name="QoS Addition/Removal with Message Mediation">
                 <p>
                     <ul>
-                        <li><a href="">Sample 100: Using WS-Security for outgoing messages</a></li>
-                        <li><a href="">Sample 101: Reliable message exchange between Synapse and the back-end server using WS-Reliable Messaging</a></li>
+                        <li><a href="samples/sample100.html">Sample 100: Using WS-Security for outgoing messages</a></li>
+                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages</a></li>
                     </ul>
                 </p>
             </subsection>

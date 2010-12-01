@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 101</title>
     </properties>
     <body>
-        <section name="Sample 101: ">
+        <section name="Sample 101: Using WS-ReliableMessaging for Outgoing Messages">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -46,14 +46,15 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the ability of Synapse to exchange messages with an endpoint
+                    reliably, using WS-ReliableMessaging
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Deploy the ReliableStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 101 (repository/conf/sample/synapse_sample_101.xml)
@@ -66,11 +67,160 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
+                <p>
+                    In the above configuration, WS-RM is engaged on the endpoint using the
+                    &lt;enableRM/&gt; tag. It is possible to engage WS-RM to both Address and WSDL
+                    endpoints using this tag. In addition to the RM enabled endpoint, RMSequence
+                    mediator is specified before the send mediator. This mediator is used to specify
+                    the set of messages to be sent using a single RM sequence. In this sample it is
+                    specified as single message per sequence. It also specifies the version of the
+                    WS-RM to be used. Refer to the Synapse configuration language documentation for
+                    more information about the RMSequence mediator. RM related SOAP headers are
+                    removed form the message in the out mediator as WS-RM message exchange takes
+                    place only between the Synapse and the server. Now run the sample client using
+                    the following command.
+                </p>
+                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</div>
+                <p>
+                    You can observe the client output displaying the quote price for IBM as follows:
+                </p>
                 <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    There is no difference to be observed between the normal message exchange and
+                    WS-RM enabled message exchange as far as client and server outputs are considered.
+                    But if you look at the wire level messages, you would observe additional WS-RM
+                    messages and WS-RM headers. Synapse, the initiator of the RM sequence, first try
+                    to create a sequence by sending a message with CreateSequence element.
+                </p>
+                <div class="consoleOutput">...
+&lt;soapenv:Body&gt;
+   &lt;wsrm:CreateSequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+      &lt;wsrm:AcksTo&gt;
+         &lt;wsa:Address&gt;http://www.w3.org/2005/08/addressing/anonymous&lt;/wsa:Address&gt;
+      &lt;/wsrm:AcksTo&gt;
+      &lt;wsrm:Offer&gt;
+         &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+      &lt;/wsrm:Offer&gt;
+   &lt;/wsrm:CreateSequence&gt;
+&lt;/soapenv:Body&gt;
+...</div>
+                <p>
+                    Sample Axis2 server responds to CreateSequence request with the following
+                    message:
+                </p>
+                <div class="consoleOutput">...
+&lt;soapenv:Body&gt;
+   &lt;wsrm:CreateSequenceResponse xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+      &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+      &lt;wsrm:Accept&gt;
+         &lt;wsrm:AcksTo&gt;
+            &lt;wsa:Address&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:Address&gt;
+         &lt;/wsrm:AcksTo&gt;
+      &lt;/wsrm:Accept&gt;
+   &lt;/wsrm:CreateSequenceResponse&gt;
+&lt;/soapenv:Body&gt;
+...</div>
+                <p>
+                    Once the sequence is established, Synapse sends the request to the server with
+                    the pre-negotiated sequence ID.
+                </p>
+                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+    &lt;soapenv:Header&gt;
+        &lt;wsa:To&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:To&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:DB9A5257B637DDA38B1179807372560712002-1515891720&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+        &lt;wsrm:Sequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+                       soapenv:mustUnderstand=&quot;1&quot;&gt;
+            &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+            &lt;wsrm:MessageNumber&gt;1&lt;/wsrm:MessageNumber&gt;
+            &lt;wsrm:LastMessage/&gt;
+        &lt;/wsrm:Sequence&gt;
+    &lt;/soapenv:Header&gt;
+    &lt;soapenv:Body&gt;
+        &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+            &lt;m0:request&gt;
+                &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+            &lt;/m0:request&gt;
+        &lt;/m0:getQuote&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    Synapse keeps on sending the above message till the server responds with a valid
+                    response message with 200 OK HTTP header. If the server is not ready with a
+                    response, it will respond with 202 Accepted HTTP header for all requests. Once
+                    the server is ready with a response it will send the response message with
+                    sequence ID as follows.
+                </p>
+                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+    &lt;soapenv:Header&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:879853A6871A66641C1179807373804&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;http://services.samples/ReliableStockQuoteServicePortType/getQuoteResponse
+        &lt;/wsa:Action&gt;
+        &lt;wsa:RelatesTo&gt;urn:uuid:DB9A5257B637DDA38B1179807372560712002-1515891720&lt;/wsa:RelatesTo&gt;
+        &lt;wsrm:Sequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+                       soapenv:mustUnderstand=&quot;1&quot;&gt;
+            &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+            &lt;wsrm:MessageNumber&gt;1&lt;/wsrm:MessageNumber&gt;
+            &lt;wsrm:LastMessage/&gt;
+        &lt;/wsrm:Sequence&gt;
+        &lt;wsrm:SequenceAcknowledgement xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+                                      soapenv:mustUnderstand=&quot;1&quot;&gt;
+            &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+            &lt;wsrm:AcknowledgementRange Lower=&quot;1&quot; Upper=&quot;1&quot;/&gt;
+        &lt;/wsrm:SequenceAcknowledgement&gt;
+    &lt;/soapenv:Header&gt;
+    &lt;soapenv:Body&gt;
+        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples/xsd&quot;&gt;
+...</div>
+                <p>
+                    Now both Synapse and the server are done with the actual message exchange. Then
+                    Synapse sends a request to terminate the sequence as follows:
+                </p>
+                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+    &lt;soapenv:Header&gt;
+        &lt;wsa:To&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:To&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:546F6F33FB7D8BBE351179807379591&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence&lt;/wsa:Action&gt;
+        &lt;wsrm:SequenceAcknowledgement xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+                                      soapenv:mustUnderstand=&quot;1&quot;&gt;
+            &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+            &lt;wsrm:AcknowledgementRange Lower=&quot;1&quot; Upper=&quot;1&quot;/&gt;
+        &lt;/wsrm:SequenceAcknowledgement&gt;
+    &lt;/soapenv:Header&gt;
+    &lt;soapenv:Body&gt;
+        &lt;wsrm:TerminateSequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+            &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+        &lt;/wsrm:TerminateSequence&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    Server responds to the sequence termination message, accepting to terminate the
+                    sequence as follows.
+                </p>
+                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+    &lt;soapenv:Header&gt;
+        &lt;wsa:ReplyTo&gt;
+            &lt;wsa:Address&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:Address&gt;
+        &lt;/wsa:ReplyTo&gt;
+        &lt;wsa:MessageID&gt;urn:uuid:879853A6871A66641C1179807380190&lt;/wsa:MessageID&gt;
+        &lt;wsa:Action&gt;http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence&lt;/wsa:Action&gt;
+    &lt;/soapenv:Header&gt;
+    &lt;soapenv:Body&gt;
+        &lt;wsrm:TerminateSequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+            &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+        &lt;/wsrm:TerminateSequence&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    Note that although each of above messages are separate SOAP messages, in most
+                    cases they will be exchanged in a single socket connection as HTTP Keep-Alive
+                    header is being used.
+                </p>
+
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

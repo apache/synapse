@@ -80,9 +80,9 @@
             <subsection name="Proxy Services">
                 <p>
                     <ul>
-                        <li><a href="">Sample 150: Introduction to proxy services</a></li>
-                        <li><a href="">Sample 151: Custom sequences and endpoints with proxy services</a></li>
-                        <li><a href="">Sample 152: Switching transports and message format from SOAP to REST/POX</a></li>
+                        <li><a href="samples/sample150.html">Sample 150: Introduction to proxy services</a></li>
+                        <li><a href="samples/sample151.html">Sample 151: Custom sequences and endpoints with proxy services</a></li>
+                        <li><a href="samples/sample152.html">Sample 152: Switching transports and message format from SOAP to REST/POX</a></li>
                         <li><a href="">Sample 153: Routing the messages arrived to a proxy service without processing the security headers</a></li>
                         <li><a href="">Sample 154: Load Balancing with proxy services</a></li>
                         <li><a href="">Sample 155: Dual channel invocation on both client side and server side of Synapse with proxy services</a></li>

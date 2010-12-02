@@ -23,7 +23,7 @@
     <parent>
 		<groupId>org.apache.sandesha2</groupId>
 		<artifactId>sandesha2-parent</artifactId>
-        <version>SNAPSHOT</version>
+        <version>1.3-1041287</version>
     </parent>
 	
     <modelVersion>4.0.0</modelVersion>
@@ -70,7 +70,7 @@
     	<dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
-            <version>SNAPSHOT</version>
+            <version>1.3-1041287</version>
         </dependency>
 	
 			<!-- Rampart -->
@@ -95,7 +95,7 @@
     </dependencies>
 	
     <properties>
-	     <rampart.version>SNAPSHOT</rampart.version>
+	     <rampart.version>1.5</rampart.version>
     </properties>     
 	 
 </project>

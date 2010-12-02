@@ -19,7 +19,7 @@
         guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 works
         internally.
     </description>
-    <version>SNAPSHOT</version>
+    <version>1.3-1041287</version>
     <name>Apache Sandesha</name>
     <url>http://ws.apache.org/ws-fx/sandesha/sandesha2</url>
 
@@ -276,10 +276,10 @@
     </modules>
 
     <properties>
-        <sandesha2.version>SNAPSHOT</sandesha2.version>
-        <axis2.version>SNAPSHOT</axis2.version>
-        <axiom.version>1.2.10-SNAPSHOT</axiom.version>
-        <neethi.version>3.0.0-SNAPSHOT</neethi.version>
+        <sandesha2.version>1.3-1041287</sandesha2.version>
+        <axis2.version>1.5.2</axis2.version>
+        <axiom.version>1.2.9</axiom.version>
+        <neethi.version>2.0.4</neethi.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <stax.api.version>1.0.1</stax.api.version>
         <stax.impl.artifactid>wstx-asl</stax.impl.artifactid>

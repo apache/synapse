@@ -29,31 +29,28 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.util.XMLPrettyPrinter;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
+import org.apache.synapse.ServerConfigurationInformation;
+import org.apache.synapse.ServerContextInformation;
+import org.apache.synapse.ServerState;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
+import java.io.*;
 import java.util.Properties;
 
 /**
- * Implements the generic logic for the synapse artifact deployment and provide a deployment framework
- * for the synapse.</p>
+ * Implements the generic logic for the synapse artifact deployment and provide a deployment
+ * framework for the synapse.</p>
  *
- * <p>Any  synapse artifact which requires the hot deployment or hot update features should extend this and
- * just needs to concentrate on the deployment logic. By default setting the file extension and directory dynamically
- * is not supported.
+ * <p>Any  synapse artifact which requires the hot deployment or hot update features should extend
+ * this and just needs to concentrate on the deployment logic. By default setting the file
+ * extension and directory dynamically is not supported.
  *
  * @see org.apache.axis2.deployment.Deployer
  */
@@ -77,14 +74,15 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
     }
 
     /**
-     *  This method is called by the axis2 deployment framework and it performs a synapse artifact specific
-     * yet common across all the artifacts, set of tasks and delegate the actual deployment to the respective
-     * artifact deployers.
+     * This method is called by the axis2 deployment framework and it performs a synapse artifact
+     * specific yet common across all the artifacts, set of tasks and delegate the actual deployment
+     * to the respective artifact deployers.
      *
      * @param deploymentFileData file to be used for the deployment
      * @throws DeploymentException in-case of an error in deploying the file
      * 
-     * @see AbstractSynapseArtifactDeployer#deploySynapseArtifact(org.apache.axiom.om.OMElement, String,java.util.Properties)
+     * @see AbstractSynapseArtifactDeployer#deploySynapseArtifact(org.apache.axiom.om.OMElement,
+     * String,java.util.Properties)
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
@@ -106,13 +104,15 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         SynapseArtifactDeploymentStore deploymentStore =
                 getSynapseConfiguration().getArtifactDeploymentStore();
 
-        // check whether this is triggered by a restore, if it is a restore we do not want to deploy it again
+        // check whether this is triggered by a restore, if it is a restore we do not want to
+        // deploy it again
         if (deploymentStore.isRestoredFile(filename)) {
             if (log.isDebugEnabled()) {
                 log.debug("Restored artifact detected with filename : " + filename);
             }
-            // only one deployment trigger can happen after a restore and hence remove it from restoredFiles
-            // at the first hit, allowing the further deployments/updates to take place as usual
+            // only one deployment trigger can happen after a restore and hence remove it from
+            // restoredFiles at the first hit, allowing the further deployments/updates to take
+            // place as usual
             deploymentStore.removeRestoredFile(filename);
             return;
         }
@@ -179,25 +179,28 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Deployment of the synapse artifact from file : " + filename + " : COMPLETED");
+            log.debug("Deployment of the synapse artifact from file : "
+                    + filename + " : COMPLETED");
         }
     }
 
     /**
-     * This is the method called by the axis2 framework for undeployment of the artifacts. As in the deploy
-     * case this performs some common tasks across all the synapse artifacts and fall back to the artifact
-     * specific logic of undeployment.
+     * This is the method called by the axis2 framework for undeployment of the artifacts. As in
+     * the deploy case this performs some common tasks across all the synapse artifacts and fall
+     * back to the artifact specific logic of undeployment.
      *
      * @param fileName file describing the artifact to be undeployed
      * @throws DeploymentException in case of an error in undeployment
      *
-     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploySynapseArtifact(String) 
+     * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploySynapseArtifact(
+     * String)
      */
     public void undeploy(String fileName) throws DeploymentException {
 
         fileName = FilenameUtils.normalize(fileName);
         if (log.isDebugEnabled()) {
-            log.debug("UnDeployment of the synapse artifact from file : " + fileName + " : STARTED");
+            log.debug("UnDeployment of the synapse artifact from file : "
+                    + fileName + " : STARTED");
         }
 
         SynapseArtifactDeploymentStore deploymentStore =
@@ -209,17 +212,19 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
             if (log.isDebugEnabled()) {
                 log.debug("BackedUp artifact detected with filename : " + fileName);
             }
-            // only one undeployment trigger can happen after a backup and hence remove it from backedUpFiles
-            // at the first hit, allowing the further undeploymentsto take place as usual
+            // only one undeployment trigger can happen after a backup and hence remove it from
+            // backedUpFiles at the first hit, allowing the further undeploymentsto take place
+            // as usual
             deploymentStore.removeBackedUpArtifact(fileName);
             return;
         }
 
         if (deploymentStore.containsFileName(fileName)) {
             File undeployingFile = new File(fileName);
-            // axis2 treats Hot-Update as (Undeployment + deployment), where synapse needs to differentiate
-            // the Hot-Update from the above two, since it needs some validations for a real undeployment.
-            // also this makes sure a zero downtime of the synapse artifacts which are being Hot-deployed
+            // axis2 treats Hot-Update as (Undeployment + deployment), where synapse needs to
+            // differentiate the Hot-Update from the above two, since it needs some validations for
+            // a real undeployment. Also this makes sure a zero downtime of the synapse artifacts
+            // which are being Hot-deployed
             if (undeployingFile.exists()) {
                 if (log.isDebugEnabled()) {
                     log.debug("Marking artifact as updating from file : " + fileName);
@@ -260,10 +265,11 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
     public void setExtension(String extension) {}
 
     /**
-     * All synapse artifact deployers MUST implement this method and it handles artifact specific deployment
-     * tasks of those artifacts.
+     * All synapse artifact deployers MUST implement this method and it handles artifact specific
+     * deployment tasks of those artifacts.
      *
-     * @param artifactConfig built element representing the artifact to be deployed loaded from the file
+     * @param artifactConfig built element representing the artifact to be deployed loaded
+     * from the file
      * @param fileName file name from which this artifact is being loaded
      * @param properties Properties associated with the artifact
      * @return String artifact name created by the deployment task
@@ -275,13 +281,15 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                                                  Properties properties);
 
     /**
-     * All synapse artifact deployers MUST implement this method and it handles artifact specific update
-     * tasks of those artifacts.
+     * All synapse artifact deployers MUST implement this method and it handles artifact specific
+     * update tasks of those artifacts.
      *
-     * @param artifactConfig built element representing the artifact to be deployed loaded from the file
+     * @param artifactConfig built element representing the artifact to be deployed loaded
+     * from the file
      * @param fileName file name from which this artifact is being loaded
-     * @param existingArtifactName name of the artifact that was being deployed using the updated file
-     * @param properties bag of properties with the additional infroamtion
+     * @param existingArtifactName name of the artifact that was being deployed using
+     * the updated file
+     * @param properties bag of properties with the additional information
      * @return String artifact name created by the update task
      */
     public abstract String updateSynapseArtifact(OMElement artifactConfig, String fileName,
@@ -289,8 +297,8 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                                                  Properties properties);
 
     /**
-     * All synapse artifact deployers MUST implement this method and it handles artifact specific undeployment
-     * tasks of those artifacts.
+     * All synapse artifact deployers MUST implement this method and it handles artifact specific
+     * undeployment tasks of those artifacts.
      *
      * @param artifactName name of the artifact to be undeployed
      *
@@ -299,8 +307,8 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
     public abstract void undeploySynapseArtifact(String artifactName);
 
     /**
-     * All synapse artifact deployers MUST implement this method and it handles artifact specific restore
-     * tasks of those artifacts upon a failure of an update or undeployment.
+     * All synapse artifact deployers MUST implement this method and it handles artifact specific
+     * restore tasks of those artifacts upon a failure of an update or undeployment.
      *
      * @param artifactName name of the artifact to be restored
      */
@@ -371,7 +379,8 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         throw new SynapseArtifactDeploymentException(msg, e);
     }
 
-    private void handleDeploymentError(String msg, Exception e, String fileName) throws DeploymentException {
+    private void handleDeploymentError(String msg, Exception e, String fileName)
+            throws DeploymentException {
         fileName = FilenameUtils.normalize(fileName);
         log.error(msg, e);
         SynapseArtifactDeploymentStore deploymentStore =

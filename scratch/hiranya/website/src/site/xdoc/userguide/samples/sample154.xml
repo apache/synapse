@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 154</title>
     </properties>
     <body>
-        <section name="Sample 154: ">
+        <section name="Sample 154: Load Balancing with Proxy Services">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="LBProxy" transports="http" startOnLoad="true"&gt;
@@ -74,14 +74,21 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate how to use a proxy service as a load balancer
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Deploy the LoadbalanceFailoverService in the sample Axis2 server (go to
+                            samples/axis2Server/src/LoadbalanceFailoverService and run 'ant')
+                        </li>
+                        <li>
+                            Start 3 instances of the Axis2 server on different ports as follows
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1<br/>
+./axis2server.sh -http 9002 -https 9006 -name MyServer2<br/>
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</div>
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 154 (repository/conf/sample/synapse_sample_154.xml)
@@ -94,11 +101,33 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This sample is similar to <a href="sample54.html">sample 54</a>. The only
+                    notable difference is the use of a proxy service.
+                </p>
+                <p>
+                    Execute the client as follows.
+                </p>
+                <div class="command">ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8280/services/LBProxy</div>
+                <p>
+                    You will get an output similar to the following.
+                </p>
+                <div class="consoleOutput">[java] Request: 1 Session number: 1 Response from server: MyServer3
+[java] Request: 2 Session number: 2 Response from server: MyServer2
+[java] Request: 3 Session number: 0 Response from server: MyServer1
+[java] Request: 4 Session number: 2 Response from server: MyServer2
+[java] Request: 5 Session number: 1 Response from server: MyServer3
+[java] Request: 6 Session number: 2 Response from server: MyServer2
+[java] Request: 7 Session number: 2 Response from server: MyServer2
+[java] Request: 8 Session number: 1 Response from server: MyServer3
+[java] Request: 9 Session number: 0 Response from server: MyServer1
+[java] Request: 10 Session number: 0 Response from server: MyServer1
+... </div>
+                <p>
+                    You can see that session ID 0 is always directed to the server named MyServer1.
+                    That means session ID 0 is bound to MyServer1. Similarly session 1 and 2 are bound
+                    to MyServer3 and MyServer2 respectively.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

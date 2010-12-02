@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 155</title>
     </properties>
     <body>
-        <section name="Sample 155: ">
+        <section name="Sample 155: Dual Channel Invocation on Client Side and Server Side">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy"&gt;
@@ -43,7 +43,9 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    <a href="sample13.html">Sample 13</a> show cased how to perform dual channel
+                    invocations on the client side. This sample demonstrates how to perform dual
+                    channel invocations on both client side and server side, using proxy services.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -63,11 +65,31 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This sample will show the action of the dual channel invocation between client
+                    and Synapse as well as between Synapse and the Axis2 server. Note that if you
+                    want to enable dual channel invocation you need to set the separateListener
+                    attribute to true on the enableAddressing element of the endpoint.
+                </p>
+                <p>
+                    Execute the stock quote client in the dual channel mode as follows:
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy -Dmode=dualquote</div>
+                <p>
+                    In the above example, the request received is forwarded to the sample service
+                    hosted on Axis2 and the endpoint specifies to enable addressing and do the
+                    invocation in dual channel mode. If you observe the message flow using TCPmon,
+                    you will see that on the channel you send the request to Synapse, the response has 
+                    been written as HTTP 202 Accepted, where as the real response from Synapse
+                    comes over a different channel which cannot be obsesrved unless you use tcpdump
+                    to dump all the TCP level messages.
+                </p>
+                <p>
+                    At the same time you can observe the behaviour of the invocation between Synapse
+                    and the actual Axis2 service, where you can see a 202 Accepted message being
+                    delivered to Synapse as the response to the request. The actual response will be
+                    delivered to Synapse over a different channel.
+                </p>                
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

@@ -92,8 +92,8 @@
             <subsection name="QoS Addition/Removal with Proxy Services">
                 <p>
                     <ul>
-                        <li><a href="">Sample 200: Using WS-Security with policy attachments for proxy services</a></li>
-                        <li><a href="">Sample 201: Reliable message exchange between the client and proxy services using WS-ReliableMessaging</a></li>
+                        <li><a href="samples/sample200.html">Sample 200: Engaging WS-Security on proxy services</a></li>
+                        <li><a href="samples/sample201.html">Sample 201: Reliable communication between the client and proxy services using WS-ReliableMessaging</a></li>
                     </ul>
                 </p>
             </subsection>

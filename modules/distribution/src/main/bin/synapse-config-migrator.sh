@@ -19,7 +19,7 @@
 
 # -----------------------------------------------------------------------------
 #
-# Environment Variable Prequisites
+# Environment Variable Prerequisites
 #
 #   SYNAPSE_HOME   Home of Synapse installation. If not set will use the parent directory
 #
@@ -29,7 +29,7 @@
 
 # if JAVA_HOME is not set we're not happy
 if [ -z "$JAVA_HOME" ]; then
-  echo "You must set the JAVA_HOME variable before running Synapse."
+  echo "You must set the JAVA_HOME variable before running Synapse Configuration Migrator."
   exit 1
 fi
 
@@ -107,14 +107,21 @@ fi
 # endorsed dir
 SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 
+MIGRATING_CONFIG=$SYNAPSE_HOME/repository/conf/synapse.xml
+if $1; then
+  MIGRATING_CONFIG=$1
+fi
+
 
 # ----- Execute The Requested Command -----------------------------------------
 
 cd $SYNAPSE_HOME
-echo "Starting Synapse/Java ..."
-echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
-echo "Using JAVA_HOME:       $JAVA_HOME"
-echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
+echo "Starting Synapse Configuration Migration ..."
+echo "Using SYNAPSE_HOME :    $SYNAPSE_HOME"
+echo "Using JAVA_HOME :       $JAVA_HOME"
+echo "Migrating configuration :     $MIGRATING_CONFIG"
+
+mv $MIGRATING_CONFIG $MIGRATING_CONFIG.back
 
 $JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
     $TEMP_PROPS \
@@ -123,6 +130,6 @@ $JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
     -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse \
     -classpath $SYNAPSE_CLASSPATH \
     org.apache.synapse.migrator.ConfigurationMigrator \
-        $1 \
+        $MIGRATING_CONFIG.back \
         $SYNAPSE_HOME/repository/conf/migrated-synapse.xml \
         $SYNAPSE_HOME/resources/synapse-configuration-migrator.xslt \

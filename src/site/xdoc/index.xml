@@ -79,6 +79,18 @@
         <li>Easily extendable with Java, Spring, or BSF Scripting languages (Javascript, Ruby, Groovy, etc.)</li>
     </ul>
 </section>
+<section name="Known Issues">
+    <p>Except for the issues listed in the Apache Synapse <a href="issue-tracking.html">issue tracker</a> there are following minor issues associated with this release of the Synapse</p>
+    <ul>
+        <li>Sandesha2 build shipped with the Synapse distribution has not been tested extensively
+            and is a custom build, built by the synapse community. Although all the shipped reliable
+            messaging samples are working with this shipped sandesha2 build, it is recommended that
+            you download a compatible Sandesha2 build from the Sandesha2 site if you plan to put any
+            reliable messaging scenario into production.</li>
+        <li>Message store implementation and DLC has not been tested extensively, so use it with
+            care after testing in production if you are planning to use it in production</li>
+    </ul>
+</section>
 <section name="Apache Synapse Runtime Architecture">
   <p>
       Apache Synapse is designed to be lightweight and fast. The non-blocking HTTP transport,

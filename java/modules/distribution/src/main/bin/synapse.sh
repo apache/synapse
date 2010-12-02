@@ -19,7 +19,7 @@
 
 # -----------------------------------------------------------------------------
 #
-# Environment Variable Prequisites
+# Environment Variable Prerequisites
 #
 #   SYNAPSE_HOME   Home of Synapse installation. If not set will use the parent directory
 #

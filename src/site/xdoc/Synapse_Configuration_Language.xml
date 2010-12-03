@@ -82,12 +82,14 @@
       As the diagram below depicts, the Synapse configuration defines the Proxy
       services, Endpoints, Sequences, Startup jobs, Event sources, Priority
       executors and Dead letter channels managed by the Synapse ESB. It also defines the
-      interface to the Registry/Repository being used by the engine. Typically the Synapse
-      ESB is deployed between the actual client and a backend service implementation to
-      mediate the message flow in between. Thus the Synapse ESB can accept a message
-      on behalf of the actual service, perform authentication, validation, transformation,
-      logging, routing based on the content etc. and then decide the destination target
-      endpoint for the message and direct it to an actual service
+      interface to the Registry/Repository being used by the engine. Synapse Configuration is
+      now available with a XML Schema which defines the
+      <a href="./ns/2010/04/configuration/synapse_config.xsd">configuration language</a> using a set
+      of XSD's. Typically the Synapse ESB is deployed between the actual client and a back-end
+      service implementation to mediate the message flow in between. Thus the Synapse ESB can 
+      accept a message on behalf of the actual service, perform authentication, validation,
+      transformation, logging, routing based on the content etc. and then decide the destination
+      target endpoint for the message and direct it to an actual service
       implementation. The Synapse ESB can also detect timeouts, transport
       failures during communication or introduce load balancing, throttling or
       caching where necessary. For fault scenarios such as authentication

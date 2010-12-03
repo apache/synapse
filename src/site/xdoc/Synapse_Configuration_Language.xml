@@ -314,6 +314,7 @@
       configuration parameters as may be required for the configuration of the
       connection to the registry.
     </p>
+    <p>Registry schema can be found at <a href="./ns/2010/04/configuration/registry.xsd">here</a></p>
 <pre xml:space="preserve"> &lt;registry provider="string"/&gt;
    &lt;parameter name="string"&gt;text | xml&lt;/parameter&gt;*
  &lt;/registry&gt;</pre>
@@ -353,6 +354,7 @@
       The &lt;localEntry&gt; element is used to declare registry entries that
       are local to the Synapse instance, as shown below
     </p>
+    <p>Local entry schema can be found at <a href="./ns/2010/04/configuration/local_entry.xsd">here</a></p>
 <pre xml:space="preserve">  &lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;</pre>
     <p>
       These entries are top level entries which are globally visible within the
@@ -401,6 +403,7 @@
       mediation step. A tracing enabled sequence propagates this setting to
       invoked sub-sequences.
     </p>
+    <p>Sequence schema can be found at <a href="./ns/2010/04/configuration/sequence.xsd">here</a></p>
 <pre xml:space="preserve"> &lt;sequence name="string" [onError="string"] [key="string"] [trace="enable"]&gt;
    mediator*
  &lt;/sequence&gt;</pre>
@@ -422,6 +425,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       An endpoint may be specified as an address endpoint, WSDL based endpoint,
       a load balancing endpoint or a fail-over endpoint as follows:
     </p>
+    <p>Endpoint schema can be found at <a href="./ns/2010/04/configuration/endpoint.xsd">here</a></p>
 <pre xml:space="preserve">&lt;endpoint [name="string"] [key="string"]&gt;
   <a href="#address-endpoint">address-endpoint</a> | <a href="#default-endpoint">default-endpoint</a> | <a href="#wsdl-endpoint">wsdl-endpoint</a> | <a href="#load-balanced-endpoint">load-balanced-endpoint</a> | <a href="#fail-over-endpoint">fail-over-endpoint</a>
 &lt;/endpoint&gt; </pre>
@@ -715,6 +719,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       A &lt;proxy&gt; element is used to define a Synapse Proxy service.
     </p>
+    <p>Proxy service schema can be found at <a href="./ns/2010/04/configuration/proxy.xsd">here</a></p>
 <pre xml:space="preserve"> &lt;proxy name="string" [transports="(http |https |jms |.. )+|all"] [pinnedServers="(serverName )+"] [serviceGroup="string"]&gt;
    &lt;description&gt;...&lt;/description&gt;?
    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
@@ -962,6 +967,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       A &lt;task&gt; element is used to define a Synapse Startup Task.
     </p>
+    <p>Task schema can be found at <a href="./ns/2010/04/configuration/task.xsd">here</a></p>
 <pre xml:space="preserve"> &lt;task class="mypackage.MyTask" name="string" [pinnedServers="(serverName)+"]&gt;
    &lt;property name="stringProp" value="String"/&gt;
    &lt;property name="xmlProp"&gt;
@@ -1003,6 +1009,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       A &lt;eventSource&gt; element is used to define a Synapse event source.
     </p>
+    <p>Event source schema can be found at <a href="./ns/2010/04/configuration/event_source.xsd">here</a></p>
 <pre xml:space="preserve">&lt;eventSource name="string"&gt;
 	&lt;subscriptionManager class="mypackage.MyClass"&gt;
 		   &lt;parameter name="string"/&gt;
@@ -1039,6 +1046,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       mediator allows Apache BSF scripts such as Javascript, Ruby, Groovy etc to
       be used for mediation.
     </p>
+    <p>All mediator schema can be found at <a href="./ns/2010/04/configuration/mediators/">here</a></p>
     <h3>
       Core Mediators
     </h3>

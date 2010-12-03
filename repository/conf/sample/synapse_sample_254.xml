@@ -19,7 +19,9 @@
   -->
 
 <!-- Using the  file system as transport medium using VFS transport listener and sender -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">
 
     <proxy name="StockQuoteProxy" transports="vfs">
         <parameter name="transport.vfs.FileURI">file:///home/user/test/in</parameter> <!--CHANGE-->

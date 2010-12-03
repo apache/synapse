@@ -17,9 +17,11 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-        
+
 <!-- An empty flat synapse configuration shipped with the Apache Synapse -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">
 
     <!-- You can add any flat sequences, endpoints, etc.. to this synapse.xml file if you do
     not want to keep the artifacts in several files -->

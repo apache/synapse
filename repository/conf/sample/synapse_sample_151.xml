@@ -19,7 +19,9 @@
   -->
 
 <!-- Custom sequences and endpoints with proxy services -->
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">
 
     <localEntry key="proxy_wsdl"
                 src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>

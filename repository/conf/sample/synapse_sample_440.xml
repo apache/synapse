@@ -18,7 +18,9 @@
   ~  under the License.
   -->
 
-<definitions xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">
 
     <proxy name="JSONProxy" transports="http https">
         <target>
@@ -42,7 +44,8 @@
     <localEntry key="in_transform">
         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                         xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-                        xmlns:m0="http://services.samples" version="2.0" exclude-result-prefixes="m0 fn">
+                        xmlns:m0="http://services.samples" version="2.0"
+                        exclude-result-prefixes="m0 fn">
             <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
             <xsl:template match="*">
                 <xsl:element name="{local-name()}" namespace="http://services.samples">

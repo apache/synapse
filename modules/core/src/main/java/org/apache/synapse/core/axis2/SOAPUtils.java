@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
@@ -191,6 +192,18 @@ public class SOAPUtils {
                         newSOAPFault.setReason(newSOAPFaultReason);
                     }
 
+                    SOAPFaultDetail detail = soapFault.getDetail();
+                    if(detail != null) {
+                        SOAPFaultDetail newSOAPFaultDetail
+                                = soap12Factory.createSOAPFaultDetail(newSOAPFault);
+                        Iterator<OMElement> iter = detail.getAllDetailEntries();
+                        while (iter.hasNext()) {
+                          OMElement detailEntry = iter.next();
+                          newSOAPFaultDetail.addDetailEntry(detailEntry);
+                        }
+                         newSOAPFault.setDetail(newSOAPFaultDetail);
+                    }
+
                 } else {
                     newEnvelope.getBody().addChild(omNode);
 
@@ -321,6 +334,19 @@ public class SOAPUtils {
                         newSOAPFaultReason.setText(soapFaultText.getText());
                     }
                 }
+
+                SOAPFaultDetail detail = soapFault.getDetail();
+                if(detail != null) {
+                    SOAPFaultDetail newSOAPFaultDetail
+                            = soap11Factory.createSOAPFaultDetail(newSOAPFault);
+                    Iterator<OMElement> iter = detail.getAllDetailEntries();
+                    while (iter.hasNext()) {
+                        OMElement detailEntry = iter.next();
+                        newSOAPFaultDetail.addDetailEntry(detailEntry);
+                    }
+                    newSOAPFault.setDetail(newSOAPFaultDetail);
+                }
+
             } else {
                 Iterator itr = clonedOldEnv.getBody().getChildren();
                 while (itr.hasNext()) {

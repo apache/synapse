@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
@@ -90,8 +91,8 @@ public class SOAPUtils {
         if(log.isDebugEnabled()) {
             log.debug("convert SOAP11 to SOAP12");
         }
-        
-        SOAPEnvelope clonedOldEnv = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope()); 
+
+        SOAPEnvelope clonedOldEnv = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope());
 
         SOAPFactory soap12Factory = OMAbstractFactory.getSOAP12Factory();
         SOAPEnvelope newEnvelope  = soap12Factory.getDefaultEnvelope();
@@ -156,7 +157,7 @@ public class SOAPUtils {
                 OMNode omNode = (OMNode) itrBodyChildren.next();
 
                 if (omNode != null && omNode instanceof SOAPFault) {
-                    
+
                     SOAPFault soapFault = (SOAPFault) omNode;
                     SOAPFault newSOAPFault = soap12Factory.createSOAPFault();
                     newEnvelope.getBody().addChild(newSOAPFault);
@@ -189,6 +190,18 @@ public class SOAPUtils {
                             newSOAPFaultText.setText(reasonText);
                         }
                         newSOAPFault.setReason(newSOAPFaultReason);
+                    }
+
+                    SOAPFaultDetail detail = soapFault.getDetail();
+                    if(detail != null) {
+                        SOAPFaultDetail newSOAPFaultDetail
+                                = soap12Factory.createSOAPFaultDetail(newSOAPFault);
+                        Iterator<OMElement> iter = detail.getAllDetailEntries();
+                        while (iter.hasNext()) {
+                          OMElement detailEntry = iter.next();
+                          newSOAPFaultDetail.addDetailEntry(detailEntry);
+                        }
+                         newSOAPFault.setDetail(newSOAPFaultDetail);
                     }
 
                 } else {
@@ -225,12 +238,12 @@ public class SOAPUtils {
      */
     public static void convertSOAP12toSOAP11(
         org.apache.axis2.context.MessageContext axisOutMsgCtx) throws AxisFault {
-        
+
         if (log.isDebugEnabled()) {
             log.debug("convert SOAP12 to SOAP11");
         }
 
-        SOAPEnvelope clonedOldEnv = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope()); 
+        SOAPEnvelope clonedOldEnv = MessageHelper.cloneSOAPEnvelope(axisOutMsgCtx.getEnvelope());
 
         SOAPFactory soap11Factory = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope newEnvelope  = soap11Factory.getDefaultEnvelope();
@@ -321,6 +334,19 @@ public class SOAPUtils {
                         newSOAPFaultReason.setText(soapFaultText.getText());
                     }
                 }
+
+                SOAPFaultDetail detail = soapFault.getDetail();
+                if(detail != null) {
+                    SOAPFaultDetail newSOAPFaultDetail
+                            = soap11Factory.createSOAPFaultDetail(newSOAPFault);
+                    Iterator<OMElement> iter = detail.getAllDetailEntries();
+                    while (iter.hasNext()) {
+                        OMElement detailEntry = iter.next();
+                        newSOAPFaultDetail.addDetailEntry(detailEntry);
+                    }
+                    newSOAPFault.setDetail(newSOAPFaultDetail);
+                }
+
             } else {
                 Iterator itr = clonedOldEnv.getBody().getChildren();
                 while (itr.hasNext()) {

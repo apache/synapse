@@ -302,4 +302,6 @@ pre{
     margin:0;
     padding-top:3px;
     padding-bottom:3px;
+    border: medium none;
+    background-color: #BBBBBB;
 }

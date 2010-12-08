@@ -15,10 +15,10 @@
       <table class="bodyTable">
         <tbody>
           <tr class="b">
-            <th scope="col">
+            <th scope="col" width="20%">
               <pre class="download-header-pre">  Distribution Name  </pre>
             </th>
-            <th scope="col">
+            <th scope="col" width="50%">
               <pre class="download-header-pre">                                             Description</pre>
             </th>
             <th scope="col">
@@ -35,7 +35,7 @@
               samples as well.
             </td>
             <td>
-              <pre class="download-pre"><a
+              <p class="download-pre"><a
               href="[preferred]/ws/synapse/1.1/synapse-1.1-bin.tar.gz"
               title="[preferred]/ws/synapse/1.1/Apache-Synapse-1.1-bin.zip"><strong>tar.gz </strong></a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.tar.gz.md5"
@@ -43,8 +43,8 @@
               title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.md5">MD5</a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.tar.gz.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.zip">PGP</a></pre>
-              <pre class="download-pre"><a
+              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.zip">PGP</a></p>
+              <p class="download-pre"><a
               href="[preferred]/ws/synapse/1.1/synapse-1.1-bin.zip"
               title="[preferred]/ws/synapse/1.1/synapse-1.1-bin.zip"><strong>zip </strong></a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.md5"
@@ -52,7 +52,7 @@
               title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.md5">MD5</a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.zip">PGP</a></pre>
+              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-bin.zip.zip">PGP</a></p>
             </td>
           </tr>
           <tr class="b">
@@ -65,7 +65,7 @@
               clean install' followed by 'mvn assembly:assembly -Drelease'
             </td>
             <td>
-              <pre class="download-pre"><a
+              <p class="download-pre"><a
               href="[preferred]/ws/synapse/1.1/synapse-1.1-src.tar.gz"
               title="[preferred]/ws/synapse/1.1/synapse-1.1-src.zip"><strong>tar.gz </strong></a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.tar.gz.md5"
@@ -74,8 +74,8 @@
               name="MD5" id="MD5">MD5</a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.tar.gz.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.asc">PGP</a></pre>
-              <pre class="download-pre"><a
+              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.asc">PGP</a></p>
+              <p class="download-pre"><a
               href="[preferred]/ws/synapse/1.1/synapse-1.1-src.zip"
               title="[preferred]/ws/synapse/1.1/synapse-1.1-src.zip"><strong>zip </strong></a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.md5"
@@ -83,7 +83,7 @@
               title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.md5">MD5</a><a
               href="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.asc"
               class="externalLink"
-              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.asc">PGP</a></pre>
+              title="http://www.apache.org/dist/ws/synapse/1.1/synapse-1.1-src.zip.asc">PGP</a></p>
             </td>
           </tr>
         </tbody>

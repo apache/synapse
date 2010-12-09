@@ -141,6 +141,12 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-fix-transport</artifactId>
             <version>${pom.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>quickfixj</groupId>
+                    <artifactId>quickfixj-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

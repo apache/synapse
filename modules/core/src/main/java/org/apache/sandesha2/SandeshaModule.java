@@ -95,7 +95,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		
 		if (propertyBean==null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotLoadModulePolicies);
-			log.error (message);
+			log.warn (message);
 			propertyBean = new SandeshaPolicyBean ();
 		} else {
 			if (log.isDebugEnabled()) {

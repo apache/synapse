@@ -26,6 +26,7 @@ version to the 2.x compatible version
                 xmlns:syn="http://ws.apache.org/ns/synapse"
                 xmlns:spring="http://ws.apache.org/ns/synapse/spring"
                 xmlns:synNew="http://ws.apache.org/ns/synapse"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 exclude-result-prefixes="syn">
 
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
@@ -65,6 +66,7 @@ version to the 2.x compatible version
 
     <xsl:template match="syn:definitions | synNew:definitions" priority="1">
         <xsl:element name="definitions" namespace="http://ws.apache.org/ns/synapse">
+            <xsl:attribute name="xsi:schemaLocation">http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd</xsl:attribute>
             <xsl:text>
 
 </xsl:text>

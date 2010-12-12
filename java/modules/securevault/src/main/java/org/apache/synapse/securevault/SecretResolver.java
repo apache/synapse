@@ -107,8 +107,6 @@ public class SecretResolver {
 
         String plainText = secretCallback.getSecret();
 
-        log.info("Secret : " + encryptedPassword + " PlainText : " + plainText);
-
         return plainText;
     }
 

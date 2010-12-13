@@ -30,6 +30,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
@@ -199,7 +200,11 @@ public class SynapseXPathVariableContext implements VariableContext {
                 }
             }
         }
-
+        //try resolving using available custom extensions
+        Object obj = XpathExtensionUtil.resolveVariableContext(synCtx,namespaceURI,prefix,localName);
+        if(obj!=null) {
+            return obj;
+        }
         return parent.getVariableValue(namespaceURI, prefix, localName);
     }
 }

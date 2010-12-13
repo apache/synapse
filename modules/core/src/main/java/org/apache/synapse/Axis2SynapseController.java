@@ -50,6 +50,9 @@ import org.apache.synapse.core.axis2.*;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.task.*;
 import org.apache.synapse.securevault.secret.handler.SharedSecretCallbackHandlerCache;
+import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;
+import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
+import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
 
 import java.util.*;
 
@@ -154,7 +157,7 @@ public class Axis2SynapseController implements SynapseController {
             configurationContext.getAxisConfiguration().addParameter(serverContextParameter);
             configurationContext.getAxisConfiguration().addParameter(serverConfigParameter);
         } catch (AxisFault ignored) {
-            log.fatal("Error adding the parameter to the Axis Configuration");            
+            log.fatal("Error adding the parameter to the Axis Configuration");
         }
 
         // we retrieve these properties to initialize the task scheduler in the envrionment
@@ -169,13 +172,42 @@ public class Axis2SynapseController implements SynapseController {
         if (taskScheduler != null && (taskScheduler instanceof TaskScheduler)) {
             this.taskScheduler = (TaskScheduler) taskScheduler;
         }
-        
+
         addDefaultBuildersAndFormatters(configurationContext.getAxisConfiguration());
         deployMediatorExtensions();
         initDataSourceHelper(serverContextInformation);
         initSharedSecretCallbackHandlerCache(serverContextInformation);
         initialized = true;
     }
+
+
+    /**
+     * This method initializes Xpath Extensions available through synapse.properties file
+     * Xpath Extensions can be defined in Variable Context Extensions + Function Context Extensions
+     * synapse.xpath.var.extensions --> Variable Extensions
+     * synapse.xpath.func.extensions --> Function Extensions
+     */
+    private void initXpathExtensions() {
+        Axis2SynapseEnvironment axis2SynapseEnvironment = (Axis2SynapseEnvironment) synapseEnvironment;
+
+        /*Initalize Function Context extensions for xpath
+         */
+        List<SynapseXpathFunctionContextProvider> functionExtensions =
+                XpathExtensionUtil.getRegisteredFunctionExtensions();
+        for (SynapseXpathFunctionContextProvider functionExtension : functionExtensions) {
+            axis2SynapseEnvironment.setXpathFunctionExtensions(functionExtension);
+        }
+
+        /*Initalize Variable Context extensions for xpath
+         */
+        List<SynapseXpathVariableResolver> variableExtensions =
+                XpathExtensionUtil.getRegisteredVariableExtensions();
+        for (SynapseXpathVariableResolver variableExtension : variableExtensions) {
+            axis2SynapseEnvironment.setXpathVariableExtensions(variableExtension);
+        }
+
+    }
+
 
     /**
      * {@inheritDoc}
@@ -248,7 +280,7 @@ public class Axis2SynapseController implements SynapseController {
             /* if JMX Adapter has been configured and started, output usage information rather
                at the end of the startup process to make it more obvious */
             if (jmxAdapter != null && jmxAdapter.isRunning()) {
-                log.info("Management using JMX available via: " 
+                log.info("Management using JMX available via: "
                         + jmxAdapter.getJmxInformation().getJmxUrl());
             }
         }
@@ -270,10 +302,10 @@ public class Axis2SynapseController implements SynapseController {
         if (synapseTaskManager.isInitialized()) {
             synapseTaskManager.pauseAll();
         }
-        
+
         log.info("Entered maintenence mode");
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -378,7 +410,7 @@ public class Axis2SynapseController implements SynapseController {
         synapseEnvironment = new Axis2SynapseEnvironment(
                 configurationContext, synapseConfiguration, serverContextInformation);
         MessageContextCreatorForAxis2.setSynEnv(synapseEnvironment);
-        
+
         Parameter synapseEnvironmentParameter = new Parameter(
                 SynapseConstants.SYNAPSE_ENV, synapseEnvironment);
         try {
@@ -392,6 +424,10 @@ public class Axis2SynapseController implements SynapseController {
         synapseEnvironment.getTaskManager().init(taskDescriptionRepository, taskScheduler);
         synapseConfiguration.init(synapseEnvironment);
         synapseEnvironment.setInitialized(true);
+
+        //we initialize xpath extensions here since synapse environment is available
+        initXpathExtensions();
+
         return synapseEnvironment;
     }
 
@@ -456,7 +492,7 @@ public class Axis2SynapseController implements SynapseController {
             handleFatal("Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
                     "' to the Axis2 configuration : " + e.getMessage(), e);
         }
-        
+
         addServerIPAndHostEnrties();
 
         return synapseConfiguration;
@@ -476,17 +512,17 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * Waits until it is safe to stop or the the specified end time has been reached. A delay
      * of <code>waitIntervalMillis</code> milliseconds is used between each subsequent check.
-     * If the state "safeToStop" is reached before the specified <code>endTime</code>, 
+     * If the state "safeToStop" is reached before the specified <code>endTime</code>,
      * the return value is true.
-     * 
+     *
      * @param waitIntervalMillis the pause time (delay) in milliseconds between subsequent checks
      * @param endTime            the time until which the checks need to finish successfully
-     * 
+     *
      * @return true, if a safe state is reached before the specified <code>endTime</code>,
      *         otherwise false (forceful stop required)
      */
     public boolean waitUntilSafeToStop(long waitIntervalMillis, long endTime) {
-        
+
         boolean safeToStop = false;
         boolean forcefulStop = false;
         Axis2TransportHelper transportHelper = new Axis2TransportHelper(configurationContext);
@@ -510,7 +546,7 @@ public class Axis2SynapseController implements SynapseController {
                         + " active connections to be closed..");
             }
             int pendingTransportThreads = pendingListenerThreads + pendingSenderThreads;
-            
+
             int pendingCallbacks = serverContextInformation.getCallbackCount();
             if (pendingCallbacks > 0) {
                 log.info("Waiting for: " + pendingCallbacks + " callbacks/replies..");
@@ -548,7 +584,7 @@ public class Axis2SynapseController implements SynapseController {
                 }
             }
         }
-        
+
         return !forcefulStop;
     }
 
@@ -581,7 +617,7 @@ public class Axis2SynapseController implements SynapseController {
                 listenerManager = new ListenerManager();
                 listenerManager.init(configurationContext);
             }
-            
+
             // do not use the listener manager shutdown hook, because it clashes with the
             // SynapseServer shutdown hook.
             listenerManager.setShutdownHookRequired(false);
@@ -616,7 +652,7 @@ public class Axis2SynapseController implements SynapseController {
         synapseServiceGroup.addService(synapseService);
         axisCfg.addServiceGroup(synapseServiceGroup);
     }
-    
+
     /**
      * Removes the Synapse Service from the Axis2 configuration.
      *
@@ -690,13 +726,13 @@ public class Axis2SynapseController implements SynapseController {
     }
     /**
      * Removes all Synapse proxy services from the Axis2 configuration.
-     * 
+     *
      * @throws AxisFault if an error occurs undeploying proxy services
      */
     private void undeployProxyServices() throws AxisFault {
-        
+
         log.info("Undeploying Proxy services...");
-        
+
         for (ProxyService proxy : synapseConfiguration.getProxyServices()) {
             configurationContext.getAxisConfiguration().removeService(
                     proxy.getName());
@@ -719,7 +755,7 @@ public class Axis2SynapseController implements SynapseController {
 
     /**
      * Deploys all event sources.
-     * 
+     *
      * @throws AxisFault if an error occurs deploying the event sources.
      */
     private void deployEventSources() throws AxisFault {
@@ -728,10 +764,10 @@ public class Axis2SynapseController implements SynapseController {
             eventSource.buildService(configurationContext.getAxisConfiguration());
         }
     }
-    
+
     /**
      * Undeploys all event sources.
-     * 
+     *
      * @throws AxisFault if an error occurs undeploying the event sources.
      */
     private void undeployEventSources() throws AxisFault {
@@ -774,7 +810,7 @@ public class Axis2SynapseController implements SynapseController {
         if (handler instanceof SecretCallbackHandler) {
             cache.setSecretCallbackHandler((SecretCallbackHandler) handler);
         }
-    }    
+    }
 
     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
         if (axisConf.getMessageBuilder("text/plain") == null) {

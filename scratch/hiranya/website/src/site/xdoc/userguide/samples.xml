@@ -100,8 +100,8 @@
             <subsection name="Transports">
                 <p>
                     <ul>
-                        <li><a href="">Sample 250: Introduction to switching transports - JMS to http/s</a></li>
-                        <li><a href="">Sample 251: Switching from http/s to JMS</a></li>
+                        <li><a href="samples/sample250.html">Sample 250: Introduction to transport switching - JMS to HTTP/S</a></li>
+                        <li><a href="samples/sample251.html">Sample 251: Switching from http/s to JMS</a></li>
                         <li><a href="">Sample 252: Pure text/binary and POX message support with JMS</a></li>
                         <li><a href="">Sample 253: One way bridging from JMS to http and replying with a 202 Accepted response</a></li>
                         <li><a href="">Sample 254: Using the file system as transport medium using VFS transport listener and sender</a></li>

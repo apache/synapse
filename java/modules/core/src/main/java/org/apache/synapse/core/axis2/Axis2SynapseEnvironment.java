@@ -39,7 +39,12 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
+import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;
+import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
 
+import javax.xml.namespace.QName;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -59,6 +64,14 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private StatisticsCollector statisticsCollector = new StatisticsCollector();
 
     private ServerContextInformation contextInformation;
+
+    /** Map containing Xpath Function Context Extensions */
+    Map<QName, SynapseXpathFunctionContextProvider> xpathFunctionExtensions =
+            new HashMap<QName, SynapseXpathFunctionContextProvider>();
+
+    /** Map containing Xpath Variable Context Extensions */
+    Map<QName, SynapseXpathVariableResolver> xpathVariableExtensions =
+            new HashMap<QName, SynapseXpathVariableResolver>();
 
     public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
 
@@ -372,6 +385,37 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public ConfigurationContext getAxis2ConfigurationContext() {
         return this.configContext;
     }
+
+    /**
+     * Returns all declared xpath Function Extensions
+     * @return Hash Map Contatining Function Extensions with supported QName keys
+     */
+    public Map<QName, SynapseXpathFunctionContextProvider> getXpathFunctionExtensions() {
+        return xpathFunctionExtensions;
+    }
+
+    /**
+     * Returns all declared xpath Variable Extensions
+     * @return Hash Map Contatining Variable Extensions with supported QName keys
+     */
+    public Map<QName, SynapseXpathVariableResolver> getXpathVariableExtensions() {
+        return xpathVariableExtensions;
+    }
+
+    public void setXpathFunctionExtensions(SynapseXpathFunctionContextProvider functionExt){
+         if(functionExt!=null) {
+             xpathFunctionExtensions.put(functionExt.getResolvingQName(), functionExt);
+         }
+    }
+
+
+    public void setXpathVariableExtensions(SynapseXpathVariableResolver variableExt){
+         if(variableExt!=null) {
+             xpathVariableExtensions.put(variableExt.getResolvingQName(), variableExt);
+         }
+    }
+
+
 
     private void handleException(String message, Throwable e) {
         log.error(message, e);

@@ -27,7 +27,11 @@ import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;
+import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
 
+import javax.xml.namespace.QName;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -142,4 +146,19 @@ public interface SynapseEnvironment {
      * @return {@link org.apache.synapse.ServerContextInformation} of this synapse environment
      */
     public ServerContextInformation getServerContextInformation();
+
+    /**
+     * Get all Xpath Extension objects for Function contexts
+     * @return Map containing xpath extension objects
+     */
+    public Map<QName, SynapseXpathFunctionContextProvider> getXpathFunctionExtensions();
+
+
+    /**
+     * Get all Xpath Extension objects for Variable contexts
+     * @return Map containing xpath extension objects
+     */
+    public Map<QName, SynapseXpathVariableResolver> getXpathVariableExtensions();
+
+
 }

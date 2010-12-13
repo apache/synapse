@@ -21,6 +21,7 @@ package org.apache.synapse.util.xpath;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.GetPropertyFunction;
+import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
 import org.jaxen.Function;
 import org.jaxen.FunctionContext;
 import org.jaxen.UnresolvableException;
@@ -82,7 +83,12 @@ public class SynapseXPathFunctionContext implements FunctionContext {
             // create a base64Encode function and set it to the XPath
             return new Base64EncodeFunction();
         }
-
+        //We check if custom Xpath extensions are available
+        Function extensionFunction = XpathExtensionUtil.getFunctionContext(synCtx,namespaceURI,prefix,
+                                                                           localName);
+        if(extensionFunction!=null) {
+            return extensionFunction;
+        }
         // if not the get-property function then try to get it from the parent context
         return parent.getFunction(namespaceURI, prefix, localName);
     }

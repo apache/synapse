@@ -29,43 +29,51 @@ version to the 2.x compatible version
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 exclude-result-prefixes="syn">
 
-    <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+    <xsl:output method="xml" indent="yes" encoding="UTF-8" version="1.0"/>
 
-    <xsl:template match="syn:* | spring:*" priority="0">
+    <xsl:template match="syn:*" priority="0">
+        <xsl:call-template name="copyElement"/>
+    </xsl:template>
+
+    <xsl:template match="spring:*" priority="0">
         <xsl:call-template name="convertNS"/>
     </xsl:template>
 
     <xsl:template match="syn:filter | synNew:filter" priority="0">
-        <xsl:element name="{local-name()}" namespace="http://ws.apache.org/ns/synapse">
+        <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:choose>
                 <xsl:when test="local-name(child::*[position()=1])='then' or local-name(child::*[position()=1])='else'">
                     <xsl:if test="count(child::syn:then)>0 or count(child::synNew:then)>0">
                         <xsl:element name="then" namespace="http://ws.apache.org/ns/synapse">
+                            <xsl:copy-of select="namespace::*"/>
                             <xsl:apply-templates select="child::syn:then/* | child::synNew:then/*"/>
                         </xsl:element>
                     </xsl:if>
                     <xsl:if test="count(child::syn:else)>0 or count(child::synNew:else)>0">
                         <xsl:element name="else" namespace="http://ws.apache.org/ns/synapse">
+                            <xsl:copy-of select="namespace::*"/>
                             <xsl:apply-templates select="child::syn:else/* | child::synNew:else/*"/>
                         </xsl:element>
                     </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:element name="then" namespace="http://ws.apache.org/ns/synapse">
+                        <xsl:copy-of select="namespace::*"/>
                         <xsl:apply-templates/>
                     </xsl:element>
                 </xsl:otherwise>
             </xsl:choose>
-        </xsl:element>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template match="syn:definitions/syn:sequence | syn:definitions/syn:localEntry | syn:definitions/syn:proxy | syn:definitions/syn:task | syn:definitions/syn:endpoint | syn:definitions/syn:eventSource | syn:definitions/syn:registry" priority="2">
-        <xsl:call-template name="convertNS"/>
+        <xsl:call-template name="copyElement"/>
     </xsl:template>
 
     <xsl:template match="syn:definitions | synNew:definitions" priority="1">
-        <xsl:element name="definitions" namespace="http://ws.apache.org/ns/synapse">
+        <!--<xsl:element name="definitions" namespace="http://ws.apache.org/ns/synapse">-->
+        <xsl:copy>
             <xsl:attribute name="xsi:schemaLocation">http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd</xsl:attribute>
             <xsl:text>
 
@@ -105,7 +113,8 @@ version to the 2.x compatible version
 
 </xsl:text>
             </xsl:if>
-        </xsl:element>
+        </xsl:copy>
+        <!--</xsl:element>-->
     </xsl:template>
 
     <xsl:template match="/ | @* | node() | text() | processing-instruction()">
@@ -123,6 +132,18 @@ version to the 2.x compatible version
                 <xsl:copy/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="copyElement">
+        <!--<xsl:element name="{local-name()}" namespace="http://ws.apache.org/ns/synapse">-->
+            <!--<xsl:copy-of select="@*"/>-->
+            <!--<xsl:apply-templates/>-->
+        <!--</xsl:element>-->
+
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:apply-templates/>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template name="convertNS">

@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 255</title>
     </properties>
     <body>
-        <section name="Sample 255: ">
+        <section name="Sample 255: Switching from File Transport (FTP) to the Mail Transport">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy" transports="vfs"&gt;
@@ -55,14 +55,41 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    In <a href="sample254.html">sample 254</a> we looked at how the VFS transport
+                    can be used to read files from the local file system. VFS transport can also be
+                    used to read files from FTP, SFTP and CIFS sites. This sample illustrates how to
+                    read from a remote FTP site and send the content to a remote client as an e-mail.                    
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
+                       <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
+
+                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+
+                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div> <li>
+                            This sample requires access to a FTP site and an e-mail account.
+                        </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Enable the VFS transport listener for Synapse (refer VFS setup guide for
+                            more details).
+                        </li>
+                        <li>
+                            Enable the mail transport sender for Synapse (refer Mail transport setup
+                            guide for more details).
+                        </li>
+                        <li>
+                            Create a new test directory in the FTP site.
+                        </li>
+                        <li>
+                            Open the repository/conf/sample/synapse_sample_255.xml and edit the
+                            transport.vfs.FileURI parameter to point to the test directory in the FTP
+                            server. Also change the endpoint in the out sequence to point to your
+                            e-mail account.
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 255 (repository/conf/sample/synapse_sample_255.xml)
@@ -75,11 +102,27 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Copy the test.xml file in the repository/conf/sample/resources/vfs directory to
+                    the directory given in transport.vfs.FileURI above (i.e the test directory in
+                    FTP server). This file contains a simple stock quote request in XML/SOAP format.
+                </p>
+                <div class="consoleOutput">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+    &lt;soapenv:Body&gt;
+            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+                    &lt;m0:request&gt;
+                            &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+                    &lt;/m0:request&gt;
+            &lt;/m0:getQuote&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    VFS transport will pick up the file from the FTP site and send the content to
+                    the stock quote service in Axis2 over HTTP. Response from Axis2 will be sent to
+                    the mail endpoint as an e-mail. It should show up in the configured e-mail account
+                    after a few seconds.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

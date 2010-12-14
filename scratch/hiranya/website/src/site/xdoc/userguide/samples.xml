@@ -104,8 +104,8 @@
                         <li><a href="samples/sample251.html">Sample 251: Switching from http/s to JMS</a></li>
                         <li><a href="samples/sample252.html">Sample 252: Pure text, binary and POX message support with JMS</a></li>
                         <li><a href="samples/sample253.html">Sample 253: One way bridging from JMS to http and replying with a 202 Accepted response</a></li>
-                        <li><a href="">Sample 254: Using the file system as transport medium using VFS transport listener and sender</a></li>
-                        <li><a href="">Sample 255: Switching from ftp transport listener to mail transport sender</a></li>
+                        <li><a href="samples/sample254.html">Sample 254: Using file system as the transport medium (reading/writing files)</a></li>
+                        <li><a href="samples/sample255.html">Sample 255: Switching from file transport (ftp) to the mail transport</a></li>
                         <li><a href="">Sample 256: Proxy services with the mail transport</a></li>
                         <li><a href="">Sample 257: Proxy services with the FIX transport</a></li>
                         <li><a href="">Sample 258: Switching from HTTP to FIX </a></li>

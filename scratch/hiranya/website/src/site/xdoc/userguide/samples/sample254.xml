@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 254</title>
     </properties>
     <body>
-        <section name="Sample 254: ">
+        <section name="Sample 254: Using File System as the Transport Medium (Reading/Writing Files)">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy" transports="vfs"&gt;
@@ -59,7 +59,10 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Synapse can access the local file system using its VFS (Virtual File System)
+                    transport receiver and sender. This way Synapse can read files in the local file
+                    system as well as write to the local file system. This sample show cases the
+                    Synapse VFS transport in action.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -67,6 +70,25 @@
                     <ul>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Create 3 new directories (folders) named 'in', 'out' and 'original' in a
+                            suitable location in the local file system (eg: /home/user/test). 
+                        </li>
+                        <li>
+                            Open the repository/conf/sample/synapse_sample_254.xml file in a text
+                            editor and. Then change the transport.vfs.FileURI, transport.vfs.MoveAfterProcess,
+                            transport.vfs.MoveAfterFailure parameter values to the above in, original
+                            and original directories respectively. Note that both 2nd and 3rd parameters
+                            are pointed to the 'original' directory.
+                        </li>
+                        <li>
+                            Change the endpoint in the out-sequence to point to the 'out' directory.
+                            The prefix 'vfs' in the endpoint URL must not be removed or changed.
+                        </li>
+                        <li>
+                            Enable the VFS transport receiver and sender for Synapse (refer VFS
+                            setup guide for more information)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 254 (repository/conf/sample/synapse_sample_254.xml)
@@ -79,11 +101,26 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Copy the test.xml file in the repository/conf/sample/resources/vfs directory to
+                    the directory given in transport.vfs.FileURI above (i.e the 'in' directory). This
+                    file contains a simple stock quote request in XML/SOAP format.
+                </p>
+                <div class="consoleOutput">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+    &lt;soapenv:Body&gt;
+            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+                    &lt;m0:request&gt;
+                            &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+                    &lt;/m0:request&gt;
+            &lt;/m0:getQuote&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    VFS transport listener will pick the file from 'in' directory and send it to the
+                    Axis2 service over HTTP. The request XML file will be backed up in the 'original'
+                    directory. The response from the Axis2 server will be saved to the 'out' directory.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

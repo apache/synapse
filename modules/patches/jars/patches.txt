@@ -1,0 +1,4 @@
+This directory contains all the patches for Synapse. Synapse can be patched by putting a new or
+patched version of any jar file which is there on the distribution lib directory without
+removing/replacing the existing jars, so that you can easily revert the patching by removing the
+patched jar files on this directory.

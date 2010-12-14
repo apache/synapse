@@ -29,6 +29,7 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>*.jar</include>
+                <include>patches.txt</include>
             </includes>
         </fileSet>
     </fileSets>

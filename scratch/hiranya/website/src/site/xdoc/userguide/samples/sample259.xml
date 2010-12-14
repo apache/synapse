@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 259</title>
     </properties>
     <body>
-        <section name="Sample 259: ">
+        <section name="Sample 259: Switch from FIX to HTTP">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;localEntry key="xslt-key-req"
@@ -52,14 +52,25 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    In <a href="sample258.html">sample 258</a> we looked at how to forward HTTP
+                    requests over a FIX session. This sample demonstrates how to send a FIX message
+                    to an HTTP endpoint.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
+                            You need a <a href="http://www.quickfixj.org">Quickfix/J</a> installation
+                            to try out FIX samples. Please download and extract a Quickfix/J distribution
+                            into your local machine.
+                        </li>
+                        <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Enable the FIX transport receiver for Synapse (refer FIX transport setup
+                            guide for details)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 259 (repository/conf/sample/synapse_sample_259.xml)
@@ -68,15 +79,32 @@
                                 Windows: synapse.bat -sample 259
                             </div>
                         </li>
+                        <li>
+                            Configure Banzai sample FIX application (shipped with Quickfix/J) to send
+                            messages to Synapse and start it (refer FIX setup guide for more details).
+                            If Banzai was properly configured, it should establish a FIX session with
+                            Synapse upon startup. You should see some session logon messages on Synapse
+                            console and Banzai console.
+                        </li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This sample expects a Limit order from Banzai to be received by Synapse and
+                    transformed into a place order request in SOAP format. To try it out send a
+                    'Limit' order request from Banzai to Synapse. Synapse will convert it into a
+                    place order request and send to the Axis2 server over HTTP. The stock quote
+                    service in Axis2 will print the following log when it receives the in-only
+                    place order request.
+                </p>
+                <div class="consoleOutput">Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</div>
+                <p>
+                    Note that the request sent from Banzai must be of type 'Limit'. Otherwise the
+                    XSLT transformation will not work as expected and Axis2 will receive an invalid
+                    request. Also since the place order requests are one-way messages, Banzai is not
+                    supposed to receive any response in this case.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 261</title>
     </properties>
     <body>
-        <section name="Sample 261: ">
+        <section name="Sample 261: Switch Between Different FIX Versions">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="OrderProcesserProxy41" transports="fix"&gt;
@@ -53,14 +53,32 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the ability of Synapse to switch between FIX versions (eg: FIX 4.0
+                    to FIX 4.1)
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            You need a <a href="http://www.quickfixj.org">Quickfix/J</a> installation
+                            to try out FIX samples. Please download and extract a Quickfix/J distribution
+                            into your local machine.
+                        </li>
+                        <li>
+                            Enable the FIX transport listener and sender for Synapse (refer FIX setup
+                            guide for details).
+                        </li>
+                        <li>
+                            Configure the Executor sample FIX application (shipped with Quickfix/J)
+                            to receive messages from Synapse and start it (refer FIX setup guide for
+                            more details). In previous samples we only had a FIX 4.0 session configured
+                            for Executor. For this sample we should configure a FIX 4.1 session for
+                            Executor. Therefore before starting it add the following entries to the
+                            configuration file of Executor.
+                            <div class="consoleOutput">[session]
+BeginString=FIX.4.1
+SocketAcceptPort=19877</div>
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 261 (repository/conf/sample/synapse_sample_261.xml)
@@ -68,16 +86,35 @@
                                 Unix/Linux: sh synapse.sh -sample 261<br/>
                                 Windows: synapse.bat -sample 261
                             </div>
+                            If Executor is properly configured, Synapse should establish a FIX 4.1 session
+                            with the Executor upon startup. You should see some log entries confirming
+                            the session logon event on Synapse console as well as Executor console.
+                        </li>
+                        <li>
+                            Configure Banzai sample FIX application (shipped with Quickfix/J) to send
+                            messages to Synapse and start it (refer FIX setup guide for more details).
+                            You should also add the following entry to the Banzai configuration file
+                            before starting it (replace $SYNAPSE_HOME with the actual path to Synapse
+                            home).
+                            <div class="consoleOutput">DataDictionary=$SYNAPSE_HOME/repository/conf/sample/resources/fix/FIX40-synapse.xml</div>
+                            If Banzai was properly configured, it should establish a FIX 4.0 session with
+                            Synapse upon startup. You should see some session logon messages on Synapse
+                            console and Banzai console.
                         </li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Send some FIX messages from Banzai to Synapse. Synapse will forward all requests
+                    to Executor and get them processes. Responses from Executor will be routed back
+                    to Banzai.
+                </p>
+                <p>
+                    Note that the session between Banzai and Synapse is a FIX 4.0 session whereas
+                    the session between Synapse and Execurot is a FIX 4.1 session. Synapse receives
+                    FIX 4.0 messages and simply forwards them to the FIX 4.1 endpoint.
+                </p>                
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

@@ -109,9 +109,9 @@
                         <li><a href="samples/sample256.html">Sample 256: Proxy services with the mail transport</a></li>
                         <li><a href="samples/sample257.html">Sample 257: Proxy services with the FIX transport</a></li>
                         <li><a href="samples/sample258.html">Sample 258: Switching from HTTP to FIX </a></li>
-                        <li><a href="">Sample 259: Switching from FIX to HTTP </a></li>
+                        <li><a href="samples/sample259.html">Sample 259: Switching from FIX to HTTP </a></li>
                         <li><a href="">Sample 260: Switching from FIX to AMQP </a></li>
-                        <li><a href="">Sample 261: Switch between FIX versions </a></li>
+                        <li><a href="samples/sample261.html">Sample 261: Switch between different FIX versions </a></li>
                         <li><a href="">Sample 262: CBR of FIX messages </a></li>
                         <li><a href="">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
                         <li><a href="">Sample 264: Transport switching - HTTP/S to JMS two way messages</a></li>

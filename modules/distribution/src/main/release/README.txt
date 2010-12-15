@@ -1,4 +1,4 @@
-Apache Synapse 2.0 build  (September 2010) - http://synapse.apache.org/
+Apache Synapse 2.0.0 build  (December 2010) - http://synapse.apache.org/
 ------------------------------------------------------------------------------------------
 
 -------------------
@@ -10,10 +10,15 @@ structure.
 
 	synapse
 		/bin
-			synapse.sh
+		    /native
+		        <wrapper configurations for the supported operating systems>
+		    ciphertool.bat
+		    ciphertool.sh
+			install-synapse-service.bat
+			synapse-config-migrator.sh
 			synapse-daemon.sh
 			synapse.bat
-			install-synapse-service.bat
+			synapse.sh
 			uninstall-synapse-service.bat
 		/docs
 			<documentation>
@@ -29,7 +34,18 @@ structure.
 			providers.xml
 		/repository
 			/conf
-				synapse.xml
+				synapse-config
+				    /endpoints
+                    /event-sources
+                    /local-entries
+                    /priority-executors
+                    /proxy-services
+                    /sequences
+                        main.xml
+                        fault.xml
+                    /tasks
+                    registry.xml
+                    synapse.xml
 				axis2.xml
 				wrapper.conf
 			    /sample

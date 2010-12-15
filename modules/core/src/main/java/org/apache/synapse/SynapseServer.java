@@ -75,8 +75,11 @@ public class SynapseServer {
             new CountDownLatch(1).await();
 
         } catch (SynapseException e) {
-            log.error("Error starting Apache Synapse, trying a clean shutdown...", e);
+            log.fatal("Error starting Apache Synapse, trying a clean shutdown...", e);
             serverManager.shutdown();
+            log.info("Clean shutdown due to the startups error complete");
+            log.info("Halting JVM");
+            System.exit(1);
         }
     }
 

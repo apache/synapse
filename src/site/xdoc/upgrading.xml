@@ -47,6 +47,37 @@
             easier.</p>
         </section>
         <section name="Upgrading from 1.2 to 2.0.0">
+          <subsection name="Configuration file vs multi XML configuration">
+            <p>In 1.2 you have been using a single synapse.xml file which resides on the repository/conf directory of
+            the distribution, where as on 2.0.0 we have structured this into a configuration repository with
+            multiple directories to have different artifact types and each and every artifact configuration
+            to reside on a different files inside the desired repository directory. This repository directory on the 2.0.0
+            release resides in the repository/conf directory too, and named as synapse-config.
+            The repository directory structure inside the synapse-config directory looks like follows;</p>
+<pre>synapse-config
+    /endpoints
+    /event-sources
+    /local-entries
+    /priority-executors
+    /proxy-services
+    /sequences
+        main.xml
+        fault.xml
+    /tasks
+    registry.xml
+    synapse.xml
+</pre>
+            <p>As you can see in the above sketch of the repository though it is a repository based
+            configuration, it also supports the old style single flat synapse.xml file in which case
+            it has to reside inside the root of the repository.</p>
+            <p>So the easiest way to migrate the configuration is to move your
+            already existing synapse.xml file in repository/conf directory in 1.2 version into the
+            repository/conf/synapse-config directory of the 2.0.0 version. <em>Note: When doing this
+            migration you should also delete the main.xml and fault.xml files which are there on the
+            sequences directory of the repository, otherwise there will be 2 main and fault
+            sequences one coming from the sequences directory and the other coming from your just
+            copied synapse.xml file</em></p>
+          </subsection>
           <subsection name="Endpoint URLs for proxy services">
             <p>In release 2.0.0 the endpoint URLs for proxy services have changed from <tt>/soap</tt>
             to <tt>/services</tt>. E.g. <tt>http://localhost:8280/services/StockQuote</tt> should be

@@ -107,7 +107,7 @@ fi
 # endorsed dir
 SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 
-MIGRATING_CONFIG=$SYNAPSE_HOME/repository/conf/synapse.xml
+MIGRATING_CONFIG=""
 if [ ! $1 == '' ]; then
   if [ "$1" = "-h" ]; then
     echo "Usage: synapse-config-migrator.sh"
@@ -117,12 +117,11 @@ if [ ! $1 == '' ]; then
     MIGRATING_CONFIG=$1
   fi
 else
-  echo ""
-  echo "[WARNING] Location of the configuration to be migrated has not been provided."
-  echo "[WARNING] Assuming the file to be migrated as :"
-  echo "    $MIGRATING_CONFIG"
+  echo "[FATAL] Location of the configuration to be migrated has not been provided."
   echo ""
   echo "Use -h option for help"
+  echo ""
+  exit 1
 fi
 
 

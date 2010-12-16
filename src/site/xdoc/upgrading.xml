@@ -193,6 +193,55 @@
             compatible configuration with the .new suffix. For example;
             <pre>sh bin/synapse-config-migrator.sh synapse-1.2/repository/conf/synapse.xml</pre></p>
           </subsection>
+          <subsection name="Custom Extensions and API changes">
+            <p>Even though there is a migration tool it just takes care of your configuration and not
+            custom extensions that you have done for example like CustomMediators or Tasks and so forth.
+            There are some API changes that affect your custom extensions unfortunately. This section
+            tries to list all the public API changes which affects the backward compatibility of the
+            custom extensions that you have been running with the 1.2 version of Synapse</p>
+            <table>
+                <tr>
+                    <th>Class</th>
+                    <th>Method</th>
+                    <th>Change Description</th>
+                </tr>
+                <tr>
+                    <td><a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html">AbstractMediatorFactory</a></td>
+                    <td>createMediator(OMElement)</td>
+                    <td>
+                        This was the method that you have been overwriting on the 1.2 version to
+                        implement a new custom mediator factory to build the mediator by looking at
+                        the XML configuration. On the 2.0.0 version you should be extending the
+                        <a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html#createSpecificMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">createSpecificMediator(OMElement, Properties)</a>. Note that in the process of
+                        changing the method to be extended, the method <a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html#createMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">createMediator</a> method has been
+                        changed to be final. From a users point of view of this interface he/she
+                        should be using the createMediator method which is what Synapse does
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html">AbstractMediatorSerializer</a></td>
+                    <td>serializeMediator(Mediator)</td>
+                    <td>
+                        This was the method that you have been overwriting on the 1.2 version to
+                        implement a new custom mediator serializer to serialize to the XML Configuration
+                        by walking through the mediator properties. On the 2.0.0 version you should be extending the
+                        <a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html#serializeSpecificMediator(org.apache.synapse.Mediator)">serializeSpecificMediator(Mediator)</a>. Note that in the process of
+                        changing the method to be extended, the method <a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html#serializeMediator(org.apache.axiom.om.OMElement,%20org.apache.synapse.Mediator)">serializeMediator</a> method has been
+                        changed to be final. From a users point of view of this interface he/she
+                        should be using the serializeMediator method which is what Synapse does</td>
+                </tr>
+            </table>
+            <p>Further to that if you have been using <a href="apidocs/org/apache/synapse/ServerManager.html">ServerManager</a> class you may have noticed that the
+            class is no more a singleton and doesn't have the static getInstance method. Also note that
+            the common utilities like data sources JMX and RMI registration stuff have been moved to a new
+            module with org.apache.synapse.commons package name.</p>
+            <p>On the configuration building front all entities are given a properties map to construct
+            its instance and that has been used to pass in any additional information required like
+            RESOLVE_ROOT, or SYNAPSE_HOME startup parameters. For example if you look at the <a href="apidocs/org/apache/synapse/config/xml/MediatorFactoryFinder.html">MediatorFactoryFinder</a>
+            class the <a href="apidocs/org/apache/synapse/config/xml/MediatorFactoryFinder.html#getMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">getMediator</a> method is expecting a properties map apart from the OMElement argument.
+            It is safe to pass in a empty properties map if you are using these methods for any testing purposes or
+            even in cases where you do not resolve dependencies</p>
+          </subsection>
         </section>
     </body>
 </document>

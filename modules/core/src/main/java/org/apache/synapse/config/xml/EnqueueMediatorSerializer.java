@@ -26,7 +26,7 @@ import org.apache.synapse.mediators.builtin.EnqueueMediator;
 
 public class EnqueueMediatorSerializer extends AbstractMediatorSerializer{
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
         assert m instanceof EnqueueMediator :
                 "Unsupported mediator passed in for serialization : " + m.getType();
 

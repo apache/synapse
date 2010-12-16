@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof ValidateMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

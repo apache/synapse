@@ -32,7 +32,7 @@ import org.apache.synapse.mediators.base.SynapseMediator;
  */
 public class SynapseMediatorSerializer extends AbstractListMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SynapseMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

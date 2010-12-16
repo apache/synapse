@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof XQueryMediator)) {
             handleException("Invalid Mediator has passed to serializer");

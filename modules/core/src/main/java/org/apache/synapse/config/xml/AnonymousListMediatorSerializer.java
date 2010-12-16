@@ -33,7 +33,7 @@ public class AnonymousListMediatorSerializer extends AbstractListMediatorSeriali
      * @param m
      * @return OMElement
      */
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
         throw new UnsupportedOperationException("Anonymous list mediator has nothing specific");
     }
 

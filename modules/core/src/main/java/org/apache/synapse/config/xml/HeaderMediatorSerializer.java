@@ -32,7 +32,7 @@ import javax.xml.namespace.QName;
  */
 public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof HeaderMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

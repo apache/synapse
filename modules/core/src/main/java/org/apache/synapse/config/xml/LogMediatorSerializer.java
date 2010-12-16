@@ -32,7 +32,7 @@ import org.apache.synapse.mediators.builtin.LogMediator;
  */
 public class LogMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof LogMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

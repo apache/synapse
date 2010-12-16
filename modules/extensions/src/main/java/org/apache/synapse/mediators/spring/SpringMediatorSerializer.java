@@ -34,7 +34,7 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer {
     private static final OMNamespace sprNS =
             fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "spring");
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SpringMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

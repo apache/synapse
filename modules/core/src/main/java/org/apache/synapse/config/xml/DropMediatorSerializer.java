@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.builtin.DropMediator;
  */
 public class DropMediatorSerializer extends AbstractMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DropMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

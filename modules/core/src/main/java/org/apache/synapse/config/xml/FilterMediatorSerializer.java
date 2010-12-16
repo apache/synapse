@@ -46,7 +46,7 @@ import org.apache.synapse.mediators.filters.FilterMediator;
  */
 public class FilterMediatorSerializer extends AbstractListMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof FilterMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

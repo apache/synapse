@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.db.DBReportMediator;
  */
 public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
 
-    public OMElement serializeSpecificMediator(Mediator m) {
+    protected OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DBReportMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());

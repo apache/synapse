@@ -83,6 +83,7 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * java.util.Properties)} by the sub classes
      *
      * @param elem configuration element of the mediator to be built
+     * @param properties any additional information passed as key value pairs for creating mediator
      * @return built mediator using the above element
      */
     public final Mediator createMediator(OMElement elem, Properties properties) {

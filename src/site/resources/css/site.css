@@ -93,7 +93,8 @@ pre{
 }
 #breadcrumbs{
     position:absolute;
-    top:70px;
+    width:100%;
+    top:85px;
     background-color:transparent;
     border-bottom:none;
     border-top:none;

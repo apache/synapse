@@ -48,7 +48,7 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
      * @param properties
      * @return the Spring mediator instance created
      */
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SpringMediator sm = new SpringMediator();
         OMAttribute bean = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "bean"));

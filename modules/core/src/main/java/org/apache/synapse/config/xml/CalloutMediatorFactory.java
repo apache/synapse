@@ -54,7 +54,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
     private static final QName Q_TARGET
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CalloutMediator callout = new CalloutMediator();
 

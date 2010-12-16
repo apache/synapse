@@ -63,10 +63,10 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      * 
      * @param elem - OMElement describing the element which will be parsed
      *  to build the CloneMediator
-     * @param properties
+     * @param properties additional information for creating the mediator
      * @return Mediator of the type CloneMediator built from the config element
      */
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CloneMediator mediator = new CloneMediator();
         processAuditStatus(mediator, elem);

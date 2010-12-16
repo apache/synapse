@@ -40,7 +40,7 @@ public class DetachMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public DetachMediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected DetachMediator createSpecificMediator(OMElement elem, Properties properties) {
         DetachMediator mediator = new DetachMediator();
 
         OMAttribute attSource = elem.getAttribute(ATT_SOURCE);

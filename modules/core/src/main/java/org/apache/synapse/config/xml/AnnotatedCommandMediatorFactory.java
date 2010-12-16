@@ -48,7 +48,7 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
     private static final QName ANNOTATED_COMMAND_Q =
         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "annotatedCommand");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         AnnotatedCommandMediator pojoMediator = new AnnotatedCommandMediator();
 

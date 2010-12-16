@@ -62,7 +62,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
     private static final long DEFAULT_TIMEOUT = 5000L;
     private static final int DEFAULT_DISK_CACHE_SIZE = 200;
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         if (!CACHE_Q.equals(elem.getQName())) {
             handleException("Unable to create the cache mediator. " +

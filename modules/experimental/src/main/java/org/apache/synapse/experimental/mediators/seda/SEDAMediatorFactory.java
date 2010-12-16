@@ -34,7 +34,7 @@ public class SEDAMediatorFactory extends AbstractMediatorFactory {
     private static final QName SEDA_Q =
             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "seda");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         final SEDAMediator mediator = new SEDAMediator();
         String mediatorKey = elem.getAttributeValue(ATT_KEY);

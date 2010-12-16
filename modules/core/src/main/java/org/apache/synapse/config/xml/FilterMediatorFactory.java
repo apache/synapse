@@ -60,7 +60,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
     private static final QName THEN_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "then");
     private static final QName ELSE_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "else");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
         
         FilterMediator filter = new FilterMediator();
 

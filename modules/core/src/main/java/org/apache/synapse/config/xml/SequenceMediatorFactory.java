@@ -69,7 +69,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return seqMediator;
     }
     
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SequenceMediator seqMediator = new SequenceMediator();
 

@@ -62,7 +62,7 @@ public class DBReportMediatorFactory extends AbstractDBMediatorFactory {
             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dbreport");
     private static final QName DBREPORT_USE_TX = new QName("useTransaction");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
         DBReportMediator mediator = new DBReportMediator();
 
         OMAttribute useTx = elem.getAttribute(DBREPORT_USE_TX);

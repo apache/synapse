@@ -40,7 +40,7 @@ public class ReplaceMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public ReplaceMediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected ReplaceMediator createSpecificMediator(OMElement elem, Properties properties) {
         ReplaceMediator mediator = new ReplaceMediator();
 
         OMAttribute attTarget = elem.getAttribute(ATT_TARGET);

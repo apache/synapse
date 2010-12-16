@@ -56,7 +56,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
     public static final QName ATT_TYPE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "type");
 
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         XQueryMediator xQueryMediator = new XQueryMediator();
         OMAttribute xqueryKey = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,

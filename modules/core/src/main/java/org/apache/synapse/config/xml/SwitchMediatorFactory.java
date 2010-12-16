@@ -56,7 +56,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
     private static final QName DEFAULT_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "default");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SwitchMediator switchMediator = new SwitchMediator();
         OMAttribute source = elem.getAttribute(ATT_SOURCE);

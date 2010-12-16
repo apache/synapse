@@ -64,7 +64,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
     private static final QName INCLUDE_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "include");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ScriptMediator mediator;
         OMAttribute keyAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,

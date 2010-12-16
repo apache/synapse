@@ -46,7 +46,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "class");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ClassMediator classMediator = new ClassMediator();
 

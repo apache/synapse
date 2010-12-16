@@ -77,7 +77,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
     private static final QName SEND_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "send");
     private static final QName ENDPOINT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SendMediator sm =  new SendMediator();
 

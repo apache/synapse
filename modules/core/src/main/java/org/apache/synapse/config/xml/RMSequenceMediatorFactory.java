@@ -46,7 +46,7 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_VERSION = new QName("version");
     private static final QName ATT_SINGLE = new QName("single");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         RMSequenceMediator sequenceMediator = new RMSequenceMediator();
         OMAttribute correlation = elem.getAttribute(ATT_CORR);

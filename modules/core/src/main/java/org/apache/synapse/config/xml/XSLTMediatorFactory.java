@@ -53,7 +53,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         XSLTMediator transformMediator = new XSLTMediator();
 

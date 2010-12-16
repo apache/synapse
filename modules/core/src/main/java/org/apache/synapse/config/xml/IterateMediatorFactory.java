@@ -72,7 +72,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
      * @param properties properties bag containing synapse configurations
      * @return IterateMediator created from the given configuration
      */
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         IterateMediator mediator = new IterateMediator();
         processAuditStatus(mediator, elem);

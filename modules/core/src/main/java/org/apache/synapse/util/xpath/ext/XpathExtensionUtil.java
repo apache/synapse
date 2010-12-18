@@ -99,7 +99,7 @@ public class XpathExtensionUtil {
     }
 
     /**
-     * Returns a Fucntion Context extension registered for given QName/namespaceURI+prefix+localName
+     * Returns a Function Context extension registered for given QName/namespaceURI+prefix+localName
      * combination
      *
      * @param ctxt         Synapse Message Context
@@ -133,13 +133,14 @@ public class XpathExtensionUtil {
      * @param localName    binding localname string in xpath expression
      * @return Object variable resolved by corresponding extension
      */
-    public static Object resolveVariableContext(MessageContext ctxt, String namespaceURI, String prefix,
-                                                String localName) {
+    public static Object resolveVariableContext(MessageContext ctxt, String namespaceURI,
+                                                String prefix, String localName) {
         SynapseEnvironment environment = ctxt.getEnvironment();
         if (environment != null) {
             Map<QName, SynapseXpathVariableResolver> extensions =
                     environment.getXpathVariableExtensions();
-            SynapseXpathVariableResolver variableResolver = getMatchingExtensionProvider(extensions, namespaceURI, prefix, localName);
+            SynapseXpathVariableResolver variableResolver =
+                    getMatchingExtensionProvider(extensions, namespaceURI, prefix, localName);
             if (variableResolver != null) {
                 return resolveXpathVariable(variableResolver, ctxt);
             }
@@ -159,7 +160,8 @@ public class XpathExtensionUtil {
      * @return matching Extension provider. returns null if no extension is found for the given
      *         combination
      */
-    private static <T> T getMatchingExtensionProvider(Map<QName, T> extensionMap, String namespaceURI,
+    private static <T> T getMatchingExtensionProvider(Map<QName, T> extensionMap,
+                                                      String namespaceURI,
                                                       String prefix, String localName) {
         QName subject;
         if (localName != null && prefix != null) {
@@ -208,8 +210,9 @@ public class XpathExtensionUtil {
      * @param ctxt            Synapse Message Context
      * @return Xpath Function instance . returns null if error occurs
      */
-    private static Function initAndReturnXpathFunction(SynapseXpathFunctionContextProvider funcExtProvider,
-                                                       MessageContext ctxt) {
+    private static Function initAndReturnXpathFunction(
+            SynapseXpathFunctionContextProvider funcExtProvider,
+            MessageContext ctxt) {
         try {
             return funcExtProvider.getInitializedExtFunction(ctxt);
         } catch (Exception e) {

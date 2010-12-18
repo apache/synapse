@@ -84,9 +84,9 @@ public class SynapseXPathFunctionContext implements FunctionContext {
             return new Base64EncodeFunction();
         }
         //We check if custom Xpath extensions are available
-        Function extensionFunction = XpathExtensionUtil.getFunctionContext(synCtx,namespaceURI,prefix,
-                                                                           localName);
-        if(extensionFunction!=null) {
+        Function extensionFunction = XpathExtensionUtil.getFunctionContext(
+                synCtx,namespaceURI,prefix, localName);
+        if (extensionFunction != null) {
             return extensionFunction;
         }
         // if not the get-property function then try to get it from the parent context

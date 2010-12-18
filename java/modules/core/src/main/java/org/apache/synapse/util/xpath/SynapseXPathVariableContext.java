@@ -201,8 +201,9 @@ public class SynapseXPathVariableContext implements VariableContext {
             }
         }
         //try resolving using available custom extensions
-        Object obj = XpathExtensionUtil.resolveVariableContext(synCtx,namespaceURI,prefix,localName);
-        if(obj!=null) {
+        Object obj = XpathExtensionUtil.resolveVariableContext(
+                synCtx,namespaceURI,prefix,localName);
+        if (obj != null) {
             return obj;
         }
         return parent.getVariableValue(namespaceURI, prefix, localName);

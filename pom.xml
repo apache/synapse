@@ -755,6 +755,7 @@
                 <enabled>false</enabled>
             </releases>
             <snapshots>
+                <checksumPolicy>ignore</checksumPolicy>
                 <updatePolicy>interval:10080</updatePolicy> <!-- i.e. refresh weekly -->
             </snapshots>
         </repository>
@@ -763,6 +764,7 @@
             <name>WSO2 Maven 2 Repository</name>
             <url>http://dist.wso2.org/maven2/</url>
             <releases>
+                <checksumPolicy>ignore</checksumPolicy>
                 <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
@@ -778,6 +780,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
                 <updatePolicy>interval:10080</updatePolicy>
             </snapshots>
         </repository>

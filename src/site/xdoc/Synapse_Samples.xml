@@ -5712,6 +5712,13 @@ following on the console:</p>
         &lt;/redelivery>
     &lt;/messageStore>
 
+    &lt;!-- Endpoint named SampleEndpoint-->
+    &lt;endpoint name="SampleEndpoint" onFault="foo">
+        &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService">
+            &lt;suspendDurationOnFailure>2&lt;/suspendDurationOnFailure>
+        &lt;/address>
+    &lt;/endpoint>
+
     &lt;sequence name="main">
         &lt;!-- filtering of messages with XPath and regex matches -->
         &lt;filter source="get-property('To')" regex=".*/StockQuote.*">
@@ -5721,16 +5728,10 @@ following on the console:</p>
             &lt;drop/>
         &lt;/filter>
         &lt;send/>
-        &lt;!-- Endpoint named SampleEndpoint-->
-        &lt;endpoint name="SampleEndpoint" onFault="foo">
-            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService">
-                &lt;suspendDurationOnFailure>2&lt;/suspendDurationOnFailure>
-            &lt;/address>
-        &lt;/endpoint>
+    &lt;/sequence>
 
-        &lt;sequence name="bar">
-            &lt;log level="full"/>
-        &lt;/sequence>
+    &lt;sequence name="bar">
+        &lt;log level="full"/>
     &lt;/sequence>
 
 &lt;/definitions></pre>

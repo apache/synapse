@@ -35,6 +35,13 @@
         </redelivery>
     </messageStore>
 
+    <!-- Endpoint named SampleEndpoint-->
+    <endpoint name="SampleEndpoint" onFault="foo">
+        <address uri="http://localhost:9000/services/SimpleStockQuoteService">
+            <suspendDurationOnFailure>2</suspendDurationOnFailure>
+        </address>
+    </endpoint>
+
     <sequence name="main">
         <!-- filtering of messages with XPath and regex matches -->
         <filter source="get-property('To')" regex=".*/StockQuote.*">
@@ -44,16 +51,10 @@
             <drop/>
         </filter>
         <send/>
-        <!-- Endpoint named SampleEndpoint-->
-        <endpoint name="SampleEndpoint" onFault="foo">
-            <address uri="http://localhost:9000/services/SimpleStockQuoteService">
-                <suspendDurationOnFailure>2</suspendDurationOnFailure>
-            </address>
-        </endpoint>
+    </sequence>
 
-        <sequence name="bar">
-            <log level="full"/>
-        </sequence>
+    <sequence name="bar">
+        <log level="full"/>
     </sequence>
 
 </definitions>

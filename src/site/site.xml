@@ -70,7 +70,6 @@
                 <item name="Version 1.0" href="1_0/content.html"/>
             </item>
             <item name="Project Information" href="project-info.html">
-                <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
                 <item name="Mailing Lists" href="mail-lists.html"/>
                 <item name="Building" href="building.html"/>
                 <item name="Issue Tracking" href="issue-tracking.html"/>
@@ -79,6 +78,10 @@
                 <item name="Project Team" href="team-list.html"/>
                 <item name="Project Summary" href="project-summary.html"/>
             </item>
+            <item name="License" href="http://www.apache.org/licenses/"/>
+            <item name="Sponsorship" href="http://www.apache.org/foundation/sponsorship.html"/>
+            <item name="Thanks" href="http://www.apache.org/foundation/thanks.html"/>
+            <item name="Security" href="http://www.apache.org/security/"/>
         </menu>
 
     </body>

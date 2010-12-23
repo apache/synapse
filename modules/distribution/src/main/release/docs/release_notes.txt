@@ -1,10 +1,10 @@
-Apache Synapse Enterprise Service Bus (ESB) - 1.2 Release Notes - June 2008
+Apache Synapse Enterprise Service Bus (ESB) - 2.0.0 Release Notes - December 2010
 
 1. Overview
     The Apache Synapse ESB is a robust, lightweight and highly scalable and distributed
-    Enterprise Service Bus (ESB). It supports SOAP Web services as well as Legacy services over
-    transports such as JMS, Apache VFS File systems, Mail etc, and SOAP, REST/POX, plain text
-    and binary message payloads. (Please see http://synapse.apache.org for more details)
+    open source Enterprise Service Bus (ESB). It supports SOAP Web services as well as Legacy
+    services over transports such as JMS, Apache VFS File systems, Mail etc, and SOAP, REST/POX,
+    plain text and binary message payloads. (Please see http://synapse.apache.org for more details)
 
     Apache Synapse graduated from the Apache Incubator on the 2nd of January 2007, and the first
     Synapse 1.0 was released on the 11th of June 2007. On the 20th of December 2007, Synapse was
@@ -15,7 +15,7 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.2 Release Notes - June 2008
     Apache Synapse requires a J2SE runtime of version 1.5.x or later. Running the samples also
     requires Apache Ant 1.7.x or later. Although Synapse would run with a JDK > 1.5.x, the Script
     mediator may not properly function on these JDKs. Building Synapse from source requires
-    JDK 1.5.x, and Apache Maven 2.0.6 or later
+    JDK 1.5.x or later, and Apache Maven 2.1.0 or later
 
 3. Quick start
     Please see the docs/Synapse_Quickstart.html guide
@@ -65,6 +65,19 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.2 Release Notes - June 2008
         synapse-user mailing list by sending email to user-subscribe@synapse.apache.org
 
 10. New features
+    The 2.0.0 release
+        * New, fine-grained configuration model
+        * Hot deployment and hot update support for configuration artifacts
+        * Priority based mediation support
+        * Comprehensive eventing capabilities with WS-Eventing support
+        * Secure vault for encrypting passwords in configuration files
+        * File locking support in the VFS transport for concurrent polling
+        * URLRewrite medaitor for fast and simple URL rewriting
+        * Synapse configuration observer API
+        * Multiple identity support in the HTTPS transport
+        * Enhanced JMX monitoring support for the NHTTP transport
+        * Dead letter channel implementation (experimental)
+        * Synapse XAR Maven plugin for generating configuration artifacts
     The 1.2 release
         * Support for Hessian binary messages
         * FIX (Financial Information eXchange) protocol transport

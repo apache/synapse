@@ -141,8 +141,8 @@
                 <h4>Database Mediators (Interacting with Databases)</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample360">Sample 360: Introduction to dblookup mediator</a></li>
-                        <li><a href="#Sample361">Sample 361: Introduction to dbreport mediator</a></li>
+                        <li><a href="samples/sample360.html">Sample 360: Introduction to dblookup mediator</a></li>
+                        <li><a href="samples/sample361.html">Sample 361: Introduction to dbreport mediator</a></li>
                         <li><a href="#Sample362">Sample 362: Action of dbreport and dblookup mediators together</a></li>
                         <li><a href="#Sample363">Sample 363: Reusable database connection pools</a></li>
                         <li><a href="#Sample364">Sample 364: Executing database Stored Procedures</a></li>

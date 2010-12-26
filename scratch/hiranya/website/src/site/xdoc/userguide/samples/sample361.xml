@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 361</title>
     </properties>
     <body>
-        <section name="Sample 361: ">
+        <section name="Sample 361: Introduction to DBReport Mediator">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -65,12 +65,17 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    <a href="sample360.html">Sample 360</a> shows how to perform database lookups
+                    in Synapse. This sample illustrates how to write to a given database from
+                    Synapse using the dbreport mediator.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
+                        <li>
+                            Setup a Derby database as described in the database setup guide
+                        </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
@@ -85,11 +90,30 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This sample demonstrates how to perform simple database write operations in
+                    Synapse. The dbreport mediator writes (i.e. inserts one row) to a table using the
+                    details available in messages. It works the same way as the dblookup mediator.
+                    In this sample, dbreport mediator is used for updating the stock price of the
+                    company using the last quote value which is calculated by evaluating an XPath
+                    against the response message. After running this sample, user can check the
+                    company table using the Derby client tool. It will show the value inserted by the 
+                    dbreport mediator.
+                </p>
+                <p>
+                    To try this out run the sample client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</div>
+                <p>
+                    Now execute the following SQL query against the Derby database using the Derby
+                    client tool.
+                </p>
+                <div class="command">select price from company where name='IBM';</div>
+                <p>
+                    This operation will return the stock quote value returned earlier by Axis2. You
+                    can compare the output of the sample Axis2 client with the output of the Derby
+                    client tool for confirmation.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

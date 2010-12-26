@@ -83,19 +83,19 @@
             <subsection name="Executing the Client">
                 <p>
                     The above configuration adds a scheduled task to the Synapse runtime. The task
-                    is configured to run every 5 minutes (note the interval attribute on the trigger
+                    is configured to run every 5 seconds (note the 'interval' attribute on the 'trigger'
                     element).
                 </p>
                 <p>
                     One can write his/her own tasks implementing the org.apache.synapse.task.Task
-                    interface and implementing the execute method to run the necessary logic. For
+                    interface and programming the 'execute' method to run the necessary logic. For
                     this particular sample we have used the MessageInjector class which just injects
                     a message into Synapse environment. In the configuration we have set the message
                     payload to be the stock quote request payload.
                 </p>
                 <p>
                     In this sample, injected messages will be sent to the sample Axis2 server which
-                    will send back a response to Synapse. So every 5 minutes you will notice that Axis2
+                    will send back a response to Synapse. So every 5 seconds you will notice that Axis2
                     is generating a quote and Synapse is receiving the stock quote response.
                 </p>
             </subsection>

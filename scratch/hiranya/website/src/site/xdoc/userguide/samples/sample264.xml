@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 264</title>
     </properties>
     <body>
-        <section name="Sample 264: ">
+        <section name="Sample 264: Request-Response Invocations with the JMS Transport">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy" transports="http"&gt;
@@ -47,14 +47,26 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    In <a href="sample251.html">sample 251</a> we saw how to perform transport switching
+                    between HTTP and JMS using a one-way invocation. Here we will do HTTP to JMS switching
+                    with a two-way, request-response invocation.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Setup and start a JMS broker (Apache ActiveMQ can be used as the
+                            JMS broker for this scenario. Refer JMS setup guide for information on
+                            how to run ActiveMQ.)
+                        </li>
+                        <li>
+                            Enable the JMS transport receiver of the sample Axis2 server (Refer JMS
+                            setup guide for details)
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2 (Since
+                            the JMS receiver is enabled, Axis2 will start polling on a JMS queue)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 264 (repository/conf/sample/synapse_sample_264.xml)
@@ -67,11 +79,18 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Send a stock quote request to Synapse over HTTP using the following command.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy -Dsymbol=MSFT</div>
+                <p>
+                    The proxy service will send the message to the JMS queue named SimpleStockQuoteService
+                    and wait for a response to arrive. In fact the JMS sender in Synapse will create a temporary
+                    queue to start polling on that queue for the response. The address of this queue will
+                    be sent on the request as a JMS header. Axis2 server will consumer the request from the
+                    queue and place a response on the temporary queue created by Synapse. At this point
+                    Synapse will pick up the response and forward it back to the Axis2 client over HTTP.
+                </p>                
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

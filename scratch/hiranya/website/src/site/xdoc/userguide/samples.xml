@@ -112,11 +112,11 @@
                         <li><a href="samples/sample259.html">Sample 259: Switching from FIX to HTTP </a></li>
                         <li><a href="">Sample 260: Switching from FIX to AMQP </a></li>
                         <li><a href="samples/sample261.html">Sample 261: Switch between different FIX versions </a></li>
-                        <li><a href="">Sample 262: CBR of FIX messages </a></li>
+                        <li><a href="samples/sample262.html">Sample 262: Content Based Routing of FIX messages </a></li>
                         <li><a href="">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
-                        <li><a href="">Sample 264: Transport switching - HTTP/S to JMS two way messages</a></li>
-                        <li><a href="">Sample 265: Switching from TCP to HTTP/S</a></li>
-                        <li><a href="">Sample 266: Switching from UDP to HTTP/S</a></li>
+                        <li><a href="samples/sample264.html">Sample 264: Request-response invocations with the JMS transport</a></li>
+                        <li><a href="samples/sample265.html">Sample 265: Switching from TCP to HTTP/S</a></li>
+                        <li><a href="samples/sample266.html">Sample 266: Switching from UDP to HTTP/S</a></li>
                     </ul>
                 </p>
             </subsection>

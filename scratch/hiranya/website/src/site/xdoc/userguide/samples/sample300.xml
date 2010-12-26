@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 300</title>
     </properties>
     <body>
-        <section name="Sample 300: ">
+        <section name="Sample 300: Introduction to Synapse Tasks">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;task class="org.apache.synapse.startup.tasks.MessageInjector" name="CheckPrice"&gt;
@@ -61,7 +61,7 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate how to schedule tasks in the Synapse runtime for periodic execution
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -81,11 +81,23 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    The above configuration adds a scheduled task to the Synapse runtime. The task
+                    is configured to run every 5 minutes (note the interval attribute on the trigger
+                    element).
+                </p>
+                <p>
+                    One can write his/her own tasks implementing the org.apache.synapse.task.Task
+                    interface and implementing the execute method to run the necessary logic. For
+                    this particular sample we have used the MessageInjector class which just injects
+                    a message into Synapse environment. In the configuration we have set the message
+                    payload to be the stock quote request payload.
+                </p>
+                <p>
+                    In this sample, injected messages will be sent to the sample Axis2 server which
+                    will send back a response to Synapse. So every 5 minutes you will notice that Axis2
+                    is generating a quote and Synapse is receiving the stock quote response.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

@@ -131,11 +131,11 @@
                 <h4>Script Mediator (Writing Mediation Logic in Scripting Languages)</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample350">Sample 350: Introduction to the script mediator using js scripts</a></li>
-                        <li><a href="#Sample351">Sample 351: In-line script mediation with JavaScript</a></li>
-                        <li><a href="#Sample352">Sample 352: Accessing Synapse message context API methods using scripting language</a></li>
-                        <li><a href="#Sample353">Sample 353: Using Ruby scripts for mediation</a></li>
-                        <li><a href="#Sample354">Sample 354: Using In-lined Ruby scripts for mediation</a></li>
+                        <li><a href="samples/sample350.html">Sample 350: Introduction to the script mediator using js scripts</a></li>
+                        <li><a href="samples/sample351.html">Sample 351: Inline scripts with the script mediator</a></li>
+                        <li><a href="samples/sample352.html">Sample 352: Accessing Synapse MessageContext API through scripts</a></li>
+                        <li><a href="samples/sample353.html">Sample 353: Using Ruby scripts for mediation</a></li>
+                        <li><a href="samples/sample354.html">Sample 354: Using In-lined Ruby scripts for mediation</a></li>
                     </ul>
                 </p>
                 <h4>Database Mediators (Interacting with Databases)</h4>

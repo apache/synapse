@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 350</title>
     </properties>
     <body>
-        <section name="Sample 350: ">
+        <section name="Sample 350: Introduction to the Script Mediator using JavaScript">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
@@ -55,9 +55,34 @@
     &lt;/sequence&gt;
 
 &lt;/definitions&gt;</div>
+            <p>
+                The JavaScript resource file referenced by the configuration looks like this.
+            </p>
+            <div class="xmlConf">&lt;x&gt;&lt;![CDATA[
+  function transformRequest(mc) {
+     var symbol = mc.getPayloadXML()..*::Code.toString();
+     mc.setPayloadXML(
+        &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
+           &lt;m:request&gt;
+              &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+           &lt;/m:request&gt;
+        &lt;/m:getQuote&gt;);
+  }
+
+  function transformResponse(mc) {
+     var symbol = mc.getPayloadXML()..*::symbol.toString();
+     var price = mc.getPayloadXML()..*::last.toString();
+     mc.setPayloadXML(
+        &lt;m:CheckPriceResponse xmlns:m=&quot;http://www.apache-synapse.org/test&quot;&gt;
+           &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
+           &lt;m:Price&gt;{price}&lt;/m:Price&gt;
+        &lt;/m:CheckPriceResponse&gt;);
+  }
+]]&gt;&lt;/x&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Showcase the ability to configure the Synapse runtime using common scripting
+                    languages such as JavaScript
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -77,11 +102,21 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This sample is similar to <a href="sample8.html">sample 8</a> but instead of using
+                    XSLT, the transformation is done using JavaScript and E4X. Note that the script
+                    source is loaded from a resource in the file system which must be wrapped in
+                    CDATA tags within an XML element. The script used in this example has two functions, 
+                    'transformRequest' and 'transformResponse'. The Synapse configuration uses the
+                    'function' attribute to specify which function should be invoked. Use the stock
+                    quote client to send a custom quote request as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</div>
+                <p>
+                    Synapse uses the script mediator and the specified JavaScript function to convert
+                    the custom request to a standard quote request. Subsequently the response received
+                    is transformed and sent back to the client.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

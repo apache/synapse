@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 352</title>
     </properties>
     <body>
-        <section name="Sample 352: ">
+        <section name="Sample 352: Accessing the Synapse MessageContext API Through Scripts">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -34,9 +34,9 @@
                 mc.setProperty("RESPONSE", "true");
                 mc.setPayloadXML(
                 &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
-                &lt;ns:return&gt;
-                &lt;ns:last&gt;99.9&lt;/ns:last&gt;
-                &lt;/ns:return&gt;
+                    &lt;ns:return&gt;
+                        &lt;ns:last&gt;99.9&lt;/ns:last&gt;
+                    &lt;/ns:return&gt;
                 &lt;/ns:getQuoteResponse&gt;);
             &lt;/script&gt;
         &lt;/in&gt;
@@ -46,15 +46,13 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate how to access various methods on the Synapse MessageContext API
+                    using the script mediator
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
-                        <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
-                        </li>
                         <li>
                             Start Synapse using the configuration numbered 352 (repository/conf/sample/synapse_sample_352.xml)
                             <div class="command">
@@ -66,11 +64,18 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
+                <p>
+                    This example shows how an inline JavaScript can access the Synapse message context
+                    API to set its 'To' EPR and to set a custom property to mark it as a response. Execute
+                    the stock quote client, and you will receive the response '99.9' as the last sale
+                    price as per the above script. 
+                </p>
                 <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Note that the symbol 'mc' is bound to the Synapse MessageContext object by the
+                    script mediator. Then the user can invoke various methods on the message context
+                    using common JavaScript syntax such as mc.getProperty('name') and mc.setTo('epr').
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

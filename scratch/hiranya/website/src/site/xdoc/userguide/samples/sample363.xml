@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 363</title>
     </properties>
     <body>
-        <section name="Sample 363: ">
+        <section name="Sample 363: Reusable Database Connection Pools">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="myFaultHandler"&gt;
@@ -154,12 +154,17 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate how to setup reusable connection pools for the dblookup and dbreport
+                    mediators
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
+                        <li>
+                            Setup a Derby database and the Synapse data sources as described in the
+                            database setup guide
+                        </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
@@ -174,11 +179,25 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This sample employs two instances of the dblookup mediator and a single instance
+                    of the dbreport mediator. The two dblookup mediators are sharing the same database
+                    connection pool named 'lookupdb'. The dbreport mediator makes use of a different
+                    connection pool named 'dbreport'. Synapse uses Apache DBCP to create and manage
+                    the corresponding data sources and connection pools.
+                </p>
+                <p>
+                    Run this sample by invoking the client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</div>
+                <p>
+                    Synapse will log the following output as it reads from and writes to the database.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Looking up from the Database ** ...
+INFO LogMediator text = Company ID - c1 ...
+INFO LogMediator text = ** Reporting to the Database ** ...
+INFO LogMediator text = ** Looking up from the Database ** ...
+INFO LogMediator text = Stock price - 183.3635460215262</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

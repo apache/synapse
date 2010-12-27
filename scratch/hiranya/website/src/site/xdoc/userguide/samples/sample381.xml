@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 381</title>
     </properties>
     <body>
-        <section name="Sample 381: ">
+        <section name="Sample 381: Class Mediator for CBR of Binary Messages">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="JMSBinaryProxy" transports="jms"&gt;
@@ -68,14 +68,20 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate an advanced content based routing (CBR) scenario using a custom mediator
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
-                    <ul>
+                    <ul>                
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                            Setup and start a JMS broker (Apache ActiveMQ can be used as the
+                            JMS broker for this scenario. Refer JMS setup guide for information on
+                            how to run ActiveMQ.)
+                        </li>
+                        <li>
+                            Enable the JMS transport receiver and sender of Synapse (Refer JMS setup
+                            guide for more details)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 381 (repository/conf/sample/synapse_sample_381.xml)
@@ -88,11 +94,39 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    In this configuration, a proxy service has been defined to accept incoming JMS 
+                    messages. JMS messages contain binary payloads. User configures the offset, length,
+                    and binary encoding of the text literal that Synapse should use for CBR. Configuration
+                    simply routes the messages based on this text to different endpoints.
+                </p>
+                <p>
+                    A JMS producer and two instances of a consumer used to demonstrate the CBR functionality.
+                </p>
+                <p>
+                    Now run the first consumer using the following command.
+                </p>
+                <div class="command">ant mddconsumer -Djms_topic=mdd.MSFT</div>
+                <p>
+                    Now run the second consumer using the following command.
+                </p>
+                <div class="command">ant mddconsumer -Djms_topic=mdd.GOOG</div>
+                <p>
+                    Now run the market data producer to genenrate market data for symbol 'MSFT' using
+                    the following command.
+                </p>
+                <div class="command">ant mddproducer -Dsymbol=MSFT</div>
+                <p>
+                    Now run the market data producer to genenrate market data for symbol 'GOOG' using
+                    the following command.
+                </p>
+                <div class="command">ant mddproducer -Dsymbol=GOOG</div>
+                <p>
+                    You will see the below output in the client console(s) based on the symbol.
+                </p>
+                <div class="consoleOutput">mddconsumer:
+     [java]  Market data recived for symbol : topic://mdd.MSFT
+     [java]  Market data recived for symbol : topic://mdd.MSFT</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

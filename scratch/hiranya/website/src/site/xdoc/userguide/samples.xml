@@ -159,8 +159,8 @@
                 <h4>Class Mediator (Writing Mediation Logic in Java)</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample380">Sample 380: Writing your own custom mediation in Java</a></li>
-                        <li><a href="#Sample381">Sample 381: Implementing CBR for binary messages using the class mediator</a></li>
+                        <li><a href="samples/sample380.html">Sample 380: Writing custom mediation logic in Java</a></li>
+                        <li><a href="samples/sample381.html">Sample 381: Class mediator for CBR of binary messages</a></li>
                     </ul>
                 </p>
                 <h4>XQuery Mediator</h4>

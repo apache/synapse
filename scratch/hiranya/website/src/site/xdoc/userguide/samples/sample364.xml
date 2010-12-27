@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 364</title>
     </properties>
     <body>
-        <section name="Sample 364: ">
+        <section name="Sample 364: Executing Database Stored Procedures">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -90,12 +90,15 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate how to invoke a database stored procedure from Synapse
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
+                        <li>
+                            Setup a MySQL database as described in the database setup guide
+                        </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
@@ -110,11 +113,24 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This scenario is very similar to <a href="sample363.html">sample 363</a>, but makes
+                    use of stored procedures to lookup and update the database instead of simple
+                    SQL queries. Note that we are still using the dblookup and dbreport mediators
+                    to access the database but the statements are simply calling a stored procedure in
+                    MySQL (the syntax to call a stored procedue is database engine specific).
+                </p>
+                <p>
+                    To try this sample out, invoke the sample client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</div>
+                <p>
+                    Synapse will invoke the two stored procedures as the response is mediated back
+                    to the client. You will see the following output on the Synapse console.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Looking up from the Database ** ...
+INFO LogMediator text = Company ID - c1 ...
+INFO LogMediator text = Stock price - 183.3635460215262</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 371</title>
     </properties>
     <body>
-        <section name="Sample 371: ">
+        <section name="Sample 371: Restricting Requests Based on Policies">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -117,7 +117,7 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate how to throttle incoming requests based on complex policies
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -137,11 +137,38 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Above configuration specifies a throttle mediator inside the in mediator.
+                    Therefore, all request messages directed to the main sequence will be subjected
+                    to throttling. Throttle mediator has policy, onAccept and onReject tags at the
+                    top level. Policy tag specifies the throttling policy against which all messages
+                    will be evaluated. It contains some IP address ranges and the maximum number of
+                    messages to be allowed for those ranges within a time period given in 'UnitTime'
+                    tag. 'ProhibitTimePeriod' tag specifies the time period to prohibit further
+                    requests after the received request count exceeds the specified time. Now run the
+                    client 5 times repetitively using the following command to see how throttling works.
+                </p>
+                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</div>
+                <p>
+                    For the first four requests you will get the quote prices for IBM as follows.
+                </p>
+                <div class="consoleOutput">[java] Standard :: Stock price = $177.20143371883802</div>
+                <p>
+                    Fifth request will not be sent to the Axis2 server and the client will receive
+                    the following fault.
+                </p>
+                <div class="consoleOutput">[java] org.apache.axis2.AxisFault: **Access Denied**</div>
+                <p>
+                    Maximum number of requests within 800000 milliseconds is specified as 4 for any
+                    server (including localhost) other than the explicitly specified ones. Therefore,
+                    our fifth request is denied by the throttle mediator. You can verify this by looking
+                    at the Synapse console.
+                </p>
+                <div class="consoleOutput">[HttpServerWorker-1] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-2] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-3] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied**</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

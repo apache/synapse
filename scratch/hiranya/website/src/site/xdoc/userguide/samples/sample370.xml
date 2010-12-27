@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 370</title>
     </properties>
     <body>
-        <section name="Sample 370: ">
+        <section name="Sample 370: Introduction to Throttle Mediator and Concurrency Throttling">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -71,7 +71,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Showcase the ability of Synapse to throttle incoming requests based on the
+                    concurrency level
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -91,11 +92,23 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    Above configuration specifies a throttle mediator inside the in mediator.
+                    Therefore, all request messages directed to the main sequence will be subjected
+                    to throttling. Throttle mediator has 'policy', 'onAccept' and 'onReject' tags at
+                    top level. The 'policy' tag specifies the throttling policy for throttling messages.
+                    This sample policy only contains a component called 'MaximumConcurrentAccess'.
+                    This indicates the maximum number of concurrent requests that can pass through
+                    Synapse on a single unit of time. To test concurrency throttling, it is required
+                    to send concurrent requests to Synapse. With this configuration if Synapse receives
+                    20 requests concurrently from clients, then approximately half of those will succeed
+                    while the others being throttled. The client command to try this is as follows.
+                </p>
+                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</div>
+                <p>
+                    It's not that easy to try this sample out using the sample Axis2 client. For
+                    better results, consider using a load testing tool like Apache Bench or Java Bench.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

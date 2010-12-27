@@ -145,15 +145,15 @@
                         <li><a href="samples/sample361.html">Sample 361: Introduction to dbreport mediator</a></li>
                         <li><a href="samples/sample362.html">Sample 362: Perform database lookups and updates in the same mediation sequence</a></li>
                         <li><a href="samples/sample363.html">Sample 363: Reusable database connection pools</a></li>
-                        <li><a href="#Sample364">Sample 364: Executing database Stored Procedures</a></li>
+                        <li><a href="samples/sample364.html">Sample 364: Executing database Stored Procedures</a></li>
                     </ul>
                 </p>
                 <h4>Throttle Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample370">Sample 370: Introduction to throttle mediator and concurrency throttling</a></li>
-                        <li><a href="#Sample371">Sample 371: Restricting requests based on policies</a></li>
-                        <li><a href="#Sample372">Sample 372: Use of both concurrency throttling and request rate based throttling </a></li>
+                        <li><a href="samples/sample370.html">Sample 370: Introduction to throttle mediator and concurrency throttling</a></li>
+                        <li><a href="samples/sample371.html">Sample 371: Restricting requests based on policies</a></li>
+                        <li><a href="samples/sample372.html">Sample 372: Use of both concurrency throttling and request rate based throttling </a></li>
                     </ul>
                 </p>
                 <h4>Class Mediator (Writing Mediation Logic in Java)</h4>

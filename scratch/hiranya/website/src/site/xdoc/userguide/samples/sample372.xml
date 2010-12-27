@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 372</title>
     </properties>
     <body>
-        <section name="Sample 372: ">
+        <section name="Sample 372: Use of Concurrency Throttling and Request Rate Based Throttling">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
@@ -74,7 +74,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Showcase how to use the concurrency throttling in conjunction with request rate
+                    throttling
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -94,11 +95,23 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    This is a combination of <a href="sample370.html">sample 370</a> and
+                    <a href="sample371.html">sample 371</a>. In this case the throttle policy is loaded
+                    from the 'throttle_policy.xml' file which is fetched from the registry. To verify
+                    the functionality, it requires running a load test. The all enabled request from
+                    the concurrency throttling will be controlled by the access rate base throttling
+                    according to the policy.
+                </p>
+                <p>
+                    Run the client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy</div>
+                <p>
+                    You will get same results as in <a href="sample371.html">sample 371</a>. If you
+                    run the load test, results will be different due to the effect of concurrency
+                    throttling.
+                </p>                
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

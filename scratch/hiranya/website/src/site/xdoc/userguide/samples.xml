@@ -166,26 +166,26 @@
                 <h4>XQuery Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample390">Sample 390: Introduction to the XQuery mediator</a></li>
-                        <li><a href="#Sample391">Sample 391: Using external XML documents in the XQuery mediator</a></li>
+                        <li><a href="samples/sample390.html">Sample 390: Introduction to the XQuery mediator</a></li>
+                        <li><a href="samples/sample391.html">Sample 391: Using external XML documents in the XQuery mediator</a></li>
                     </ul>
                 </p>
                 <h4>Iterate Mediator and Aggregate Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample400">Sample 400: Message splitting and aggregation</a></li>
+                        <li><a href="samples/sample400.html">Sample 400: Message splitting and aggregation</a></li>
                     </ul>
                 </p>
                 <h4>Cache Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample420">Sample 420: Simple response caching scenario</a></li>
+                        <li><a href="samples/sample420.html">Sample 420: Simple response caching scenario</a></li>
                     </ul>
                 </p>
                 <h4>Callout Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample430">Sample 430: Simple Callout Mediator for synchronize web service invocation</a></li>
+                        <li><a href="samples/sample430.html">Sample 430: Callout mediator for synchronous web service invocations</a></li>
                     </ul>
                 </p>
                 <h4>URL Rewrite Mediator</h4>

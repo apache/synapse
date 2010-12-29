@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 430</title>
     </properties>
     <body>
-        <section name="Sample 430: ">
+        <section name="Sample 430: Callout Mediator for Synchronous Web Service Invocations">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -45,7 +45,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the usage of the callout mediator for making synchronous (blocking)
+                    Web service calls during mediation
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -65,11 +66,17 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
+                <p>
+                    In this sample, the callout mediator does the direct service invocation to the
+                    StockQuoteService using the client request, gets the response and sets it as the
+                    first child of the SOAP message body. Then using the send mediator, the message
+                    is sent back to the client. As a result there is no need to define any endpoints
+                    in this configuration.
+                </p>
+                <p>
+                    Invoke the client as follows.
+                </p>
                 <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

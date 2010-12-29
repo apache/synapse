@@ -167,19 +167,19 @@
                 <p>
                     <ul>
                         <li><a href="#Sample390">Sample 390: Introduction to the XQuery mediator</a></li>
-                        <li><a href="#Sample391">Sample 391: How to use the data from an external XML document with in XQuery </a></li>
+                        <li><a href="#Sample391">Sample 391: Using external XML documents in the XQuery mediator</a></li>
                     </ul>
                 </p>
                 <h4>Iterate Mediator and Aggregate Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample400">Sample 400: Message splitting and aggregating the responses</a></li>
+                        <li><a href="#Sample400">Sample 400: Message splitting and aggregation</a></li>
                     </ul>
                 </p>
                 <h4>Cache Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample420">Sample 420: Simple cache implemented on Synapse for the actual service</a></li>
+                        <li><a href="#Sample420">Sample 420: Simple response caching scenario</a></li>
                     </ul>
                 </p>
                 <h4>Callout Mediator</h4>

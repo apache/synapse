@@ -176,6 +176,12 @@
                         <li><a href="samples/sample400.html">Sample 400: Message splitting and aggregation</a></li>
                     </ul>
                 </p>
+                <h4>Transaction Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="samples/sample410.html">Sample 410: Distributed transactions management with the transaction mediator</a></li>
+                    </ul>
+                </p>
                 <h4>Cache Mediator</h4>
                 <p>
                     <ul>
@@ -225,7 +231,6 @@
                     <ul>
                         <li><a href="samples/sample650.html">Sample 650: Introduction to priority based mediation</a></li>
                         <li><a href="samples/sample651.html">Sample 651: Priority based dispatching at transport level</a></li>
-                        <li><a href="samples/sample652.html">Sample 652: Distributed transactions management</a></li>
                     </ul>
                 </p>
             </subsection>

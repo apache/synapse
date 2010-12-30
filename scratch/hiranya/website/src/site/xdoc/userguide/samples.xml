@@ -191,9 +191,15 @@
                 <h4>URL Rewrite Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="#Sample450">Sample 450: Introduction to the URL Rewrite mediator</a></li>
-                        <li><a href="#Sample451">Sample 451: Conditional URL rewriting</a></li>
-                        <li><a href="#Sample452">Sample 452: Conditional URL rewriting with multiple rules</a></li>                        
+                        <li><a href="samples/sample450.html">Sample 450: Introduction to the URL Rewrite mediator</a></li>
+                        <li><a href="samples/sample451.html">Sample 451: Conditional URL rewriting</a></li>
+                        <li><a href="samples/sample452.html">Sample 452: Conditional URL rewriting with multiple rules</a></li>                        
+                    </ul>
+                </p>
+                <h4>Spring Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="samples/sample460.html">Sample 460: Introduction to the Spring mediator</a></li>
                     </ul>
                 </p>
             </subsection>

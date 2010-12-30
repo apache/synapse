@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 451</title>
     </properties>
     <body>
-        <section name="Sample 451: ">
+        <section name="Sample 451: Conditional URL Rewriting">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -52,7 +52,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the ability of the URL rewrite mediator to evaluate conditions on
+                    messages and perform rewrites based on the results                                        
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -72,11 +73,25 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
+                <p>
+                    Invoke the Axis2 client and send some requests to Synapse with different address
+                    URL values. If the address URL value contains 'localhost' as the hostname and 'https'
+                    as the protocol prefix, Synapse will route the message as it is. But if the
+                    hostname is 'localhost' and the protocol is not https, Synapse will rewrite the
+                    URL by setting 'https' as the protocol. The port number will also be set to the
+                    HTTPS port of the Axis2 server.
+                </p>
+                <p>
+                    If you invoke the client as follows, Synapse will rewrite the 'To' header and
+                    forward the message to Axis2 over HTTPS.
+                </p>
                 <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    The condition evaluation feature is provided by the Synapse evaluator framework.
+                    Currently one can evaluate expressions on URL values, query parameters, transport
+                    headers, properties and SOAP envelope content using this framework. Hence URL
+                    rewriting can be done based on any of these aspects.
+                </p>                
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

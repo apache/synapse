@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 452</title>
     </properties>
     <body>
-        <section name="Sample 452: ">
+        <section name="Sample 452: Conditional URL Rewriting with Multiple Rules">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
@@ -59,7 +59,8 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+                    Demonstrate the ability of the URL rewrite mediator to perform rewrites based
+                    on multiple rules
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -79,11 +80,25 @@
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    One may specify multiple rewrite rules for a URL rewrite mediator instance. In
+                    that case Synapse will execute all the rules on each message, in the order they
+                    appear. This particular sample lists 3 rewrite rules. To try it out, invoke the
+                    client as follows.
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280 -Daddurl=http://test.com/SimpleStockQuoteService</div>
+                <p>
+                    The provided address URL does not contain a port number and the context. The URL
+                    rewrite mediator will replace the hostname (test.com) with 'localhost' and add the
+                    context '/services' to the path. Then it will add the appropriate port number to
+                    the URL by looking at the protocol prefix. Ultimately the service request will be
+                    routed the sample Axis2 server and the client will receive a valid response.
+                </p>
+                <p>
+                    Another important aspect shown by this sample is the ability of the URL rewirte
+                    mediator to obtain the necessary values by executing XPath expressions. The port
+                    numbers are calculated by executing an XPath on the messages.
+                </p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

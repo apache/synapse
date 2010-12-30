@@ -206,33 +206,33 @@
             <subsection name="Eventing">
                 <p>
                     <ul>
-                        <li><a href="">Sample 500: Introduction to Eventing</a></li>
-                        <li><a href="">Sample 501: Event source with static subscriptions</a></li>
-                        <li><a href="">Sample 502: Transforming events before publish</a></li>
+                        <li><a href="samples/sample500.html">Sample 500: Introduction to Eventing</a></li>
+                        <li><a href="samples/sample501.html">Sample 501: Event source with static subscriptions</a></li>
+                        <li><a href="samples/sample502.html">Sample 502: Transforming events before publish</a></li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Synapse Configuration Model">
                 <p>
                     <ul>
-                        <li><a href="#Sample600">Sample 600: File hierarchy based configuration builder</a></li>
-                        <li><a href="#Sample601">Sample 601: Using Synapse Observers</a></li>
+                        <li><a href="samples/sample600.html">Sample 600: File hierarchy based configuration builder</a></li>
+                        <li><a href="samples/sample601.html">Sample 601: Using Synapse Observers</a></li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Priority Based Mediation">
                 <p>
                     <ul>
-                        <li><a href="#Sample650">Sample 650: Introduction to priority based mediation</a></li>
-                        <li><a href="#Sample651">Sample 651: Priority based dispatching at transport level</a></li>
-                        <li><a href="#Sample652">Sample 652: Distributed transactions management</a></li>
+                        <li><a href="samples/sample650.html">Sample 650: Introduction to priority based mediation</a></li>
+                        <li><a href="samples/sample651.html">Sample 651: Priority based dispatching at transport level</a></li>
+                        <li><a href="samples/sample652.html">Sample 652: Distributed transactions management</a></li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Message Store and Dead Letter Channel">
                 <p>
                     <ul>
-                        <li><a href="#Sample700">Sample 700: Introduction to Synapse message store </a></li>
+                        <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse message store </a></li>
                     </ul>
                 </p>
             </subsection>

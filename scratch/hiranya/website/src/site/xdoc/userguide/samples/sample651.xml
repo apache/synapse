@@ -20,52 +20,41 @@
 
 <document>
     <properties>
-        <title>Apache Synapse - Sample 650</title>
+        <title>Apache Synapse - Sample 651</title>
     </properties>
     <body>
-        <section name="Sample 650: Introduction to Priority Based Mediation">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;priorityExecutor name="exec"&gt;
-        &lt;queues&gt;
-            &lt;queue size="100" priority="1"/&gt;
-            &lt;queue size="100" priority="10"/&gt;
+        <section name="Sample 651: Priority Based Dispatching at Transport Level">
+            <p>
+                For this sample we will be using the same Synapse configuration used in
+                <a href="sample150.html">sample 150</a>. In addition we will be using the following
+                priority configuration for the Synapse NHTTP transport.
+            </p>
+            <div class="xmlConf">&lt;priorityConfiguration&gt;
+    &lt;priorityExecutor&gt;
+        &lt;!-- two priorities specified with priority 10 and 1. Both priority messages has a queue depth of 100 --&gt;
+        &lt;queues isFixedCapacity=&quot;true&quot; nextQueue=&quot;org.apache.synapse.commons.executors.PRRNextQueueAlgorithm&quot;&gt;
+            &lt;queue size=&quot;100&quot; priority=&quot;10&quot;/&gt;
+            &lt;queue size=&quot;100&quot; priority=&quot;1&quot;/&gt;
         &lt;/queues&gt;
+        &lt;!-- these are the default values, values are put here to show their availability --&gt;
+        &lt;threads core=&quot;20&quot; max=&quot;100&quot; keep-alive=&quot;5&quot;/&gt;
     &lt;/priorityExecutor&gt;
 
-    &lt;proxy name="StockQuoteProxy"&gt;
-        &lt;target&gt;
-            &lt;inSequence&gt;
-                &lt;filter source="$trp:priority" regex="1"&gt;
-                    &lt;then&gt;
-                        &lt;enqueue priority="1" sequence="priority_sequence" executor="exec"/&gt;
-                    &lt;/then&gt;
-                    &lt;else&gt;
-                        &lt;enqueue priority="10" sequence="priority_sequence" executor="exec"/&gt;
-                    &lt;/else&gt;
-                &lt;/filter&gt;
-            &lt;/inSequence&gt;
-            &lt;outSequence&gt;
-                &lt;send/&gt;
-            &lt;/outSequence&gt;
-        &lt;/target&gt;
-        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-    &lt;/proxy&gt;
-
-    &lt;sequence name="priority_sequence"&gt;
-        &lt;log level="full"/&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/sequence&gt;
-
-&lt;/definitions&gt;</div>
+    &lt;!-- if a message comes that we cannot determine priority, we set a default priority of 1 --&gt;
+    &lt;conditions defaultPriority=&quot;1&quot;&gt;
+        &lt;condition priority=&quot;10&quot;&gt;
+            &lt;!-- check for the header named priority --&gt;
+            &lt;equal type=&quot;header&quot; source=&quot;priority&quot; value=&quot;5&quot;/&gt;
+        &lt;/condition&gt;
+        &lt;condition priority=&quot;1&quot;&gt;
+            &lt;equal type=&quot;header&quot; source=&quot;priority&quot; value=&quot;1&quot;/&gt;
+        &lt;/condition&gt;
+    &lt;/conditions&gt;
+&lt;/priorityConfiguration&gt;</div>
             <subsection name="Objective">
                 <p>
-                    Demonstrate the usage of priority executors in Synapse to assign priority levels
-                    to requests and mediate them based on the assigned priority
+                    Demonstrate priority based dispatching capabilities of the Synapse NHTTP
+                    transport
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -75,10 +64,16 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Start Synapse using the configuration numbered 650 (repository/conf/sample/synapse_sample_650.xml)
+                            Open axis2.xml file in repository/conf directory and uncomment the
+                            following parameter in the NHTTP transport receiver configuration.
+                            <br/><strong>priorityConfigFile</strong>
+                            <br/>Set the value to repository/conf/sample/resources/priority/priority-configuration.xml
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 150 (repository/conf/sample/synapse_sample_150.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 650<br/>
-                                Windows: synapse.bat -sample 650
+                                Unix/Linux: sh synapse.sh -sample 150<br/>
+                                Windows: synapse.bat -sample 150
                             </div>
                         </li>
                     </ul>
@@ -140,8 +135,13 @@
         &lt;/m0:getQuote&gt;
      &lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    In this sample, priority based mediation takes place at the transport level
+                    itself (before the message is even received by the mediation engine). High
+                    priority messages will reach the service bus first.
+                </p>
             </subsection>
         </section>
-        <p><a href="../samples.html">Back to Catalog</a></p>        
+        <p><a href="../samples.html">Back to Catalog</a></p>
     </body>
 </document>

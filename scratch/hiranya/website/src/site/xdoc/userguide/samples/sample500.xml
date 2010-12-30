@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 500</title>
     </properties>
     <body>
-        <section name="Sample 500: Simple Eventing Sample">
+        <section name="Sample 500: Introduction to Eventing">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;eventSource name="SampleEventSource"&gt;

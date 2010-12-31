@@ -307,7 +307,38 @@ Total time: 3 seconds</div>
                     To run the stock quote client in a particular mode pass the name of the mode
                     as a system property as follows.
                 </p>
-                <div class="command">ant stockquote -Dmode=placeorder</div>                
+                <div class="command">ant stockquote -Dmode=placeorder</div>
+                <p>
+                    Behavior of the sample Axis2 client can be further customized by using the addurl,
+                    trpurl and prxurl parameters. These parameters enable the following modes of
+                    operation.
+                </p>
+                <h5>Smart Client Mode</h5>
+                <p>
+                    The 'addurl' property sets the WS-Addressing EPR, and the 'trpurl' sets a
+                    transport URL for a message. Thus by specifying both of these properties,
+                    the client can operate in the 'smart client' mode, where the addressing EPR can
+                    specify the ultimate receiver, while the transport URL set to Synapse will ensure
+                    that any necessary mediation takes place before the message is delivered to the
+                    ultimate receiver.
+                </p>
+                <div class="command">ant stockquote -Daddurl=&lt;addressingEPR&gt; -Dtrpurl=&lt;synapse&gt;</div>
+                <h5>Gateway/Dumb Client Mode</h5>
+                <p>
+                    By specifying only a transport URL, the client operates in the 'dumb client'
+                    mode, where it sends the message to Synapse and depends on the rules configured
+                    in Synapse for proper mediation and routing of the message to the ultimate
+                    destination.
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=&lt;synapse&gt;</div>
+                <h5>Proxy Client Mode</h5>
+                <p>
+                    In this mode, the client uses the 'prxurl' as a HTTP proxy to send the request.
+                    Thus by setting the 'prxurl' to Synapse, the client can ensure that the message
+                    will reach Synapse for mediation. The client can optionally set a WS-Addressing
+                    EPR if required.
+                </p>
+                <div class="command">ant stockquote -Dprxurl=&lt;synapse&gt; [-Daddurl=&lt;addressingEPR&gt;]</div>
             </subsection>
             <subsection name="Generic JMS Client">
                 <p>

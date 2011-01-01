@@ -75,7 +75,7 @@
                             more details). In previous samples we only had a FIX 4.0 session configured
                             for Executor. For this sample we should configure a FIX 4.1 session for
                             Executor. Therefore before starting it add the following entries to the
-                            configuration file of Executor.
+                            configuration file of Executor (executor.cfg).
                             <div class="consoleOutput">[session]
 BeginString=FIX.4.1
 SocketAcceptPort=19877</div>

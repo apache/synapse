@@ -115,12 +115,12 @@
                         </li>
                         <li>
                             Setup and start a JMS broker (Apache ActiveMQ can be used as the
-                            JMS broker for this scenario. Refer JMS setup guide for information on
-                            how to run ActiveMQ.)
+                            JMS broker for this scenario. Refer <a href="setup/jms.html#pre">JMS setup guide</a>
+                            for information on how to run ActiveMQ.)
                         </li>
                         <li>
-                            Enable the JMS transport receiver of Synapse (Refer JMS setup guide for
-                            more details)
+                            Enable the JMS transport receiver of Synapse (Refer
+                            <a href="setup/jms.html#listener">JMS setup guide</a> for more details)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 252 (repository/conf/sample/synapse_sample_252.xml)

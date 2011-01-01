@@ -67,7 +67,7 @@
                         </li>
                         <li>
                             Enable the JMS transport receiver of Synapse (Refer
-                            <a href="setup/jms.html#synapse">JMS setup guide</a> for more details)
+                            <a href="setup/jms.html#listener">JMS setup guide</a> for more details)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 250 (repository/conf/sample/synapse_sample_250.xml)

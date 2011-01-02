@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Database Setup Guide</title>
+    </properties>
+    <body>
+        <section name="Contents">
+            <ul>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#derby">Setting Up Apache Derby</a></li>
+                <li><a href="#mysql">Setting Up MySQL</a></li>
+                <li><a href="#other">Using Other Database Engines</a></li>
+            </ul>
+        </section>
+        <section name="Introduction" id="intro">
+            <p>
+                Apache Synapse has the ability to lookup and update relational databases through
+                JDBC. Any database engine that provides JDBC drivers can be integrated with
+                Synapse using the dblookup and dbreport mediators. Synapse ships with a collection
+                of samples which demonstrates various aspects of dblookup, dbreport mediators and
+                database integration. This article describes how to setup the databases and
+                sample tables required to try these examples out.
+            </p>
+            <p>
+                Most samples assume Apache Derby is used as the database engine. And therefore this
+                article also focuses mainly on setting up Apache Derby. Byt in reality
+                any database engine can be used to run these samples. The database schema and SQL
+                queries described here will work with any database engine. However in such cases
+                some minor changes should be made to the Synapse configuration files.
+            </p>
+            <p>
+                Some samples involve invoking database stored procedures from Synapse. For these
+                samples MySQL database engine is assumed. Therefore this article provides some
+                basic information on setting up MySQL for the example scenarios.
+            </p>
+        </section>
+        <section name="Setting Up Apache Derby" id="derby">
+            <p>
+                To start with, download the latest binary distribution of <a href="http://db.apache.org/derby/">Apache Derby</a>.
+                Extract the downloaded archive to a suitable location in the local disk and switch
+                to the 'bin' directory of the installation. Start the Derby network server by
+                executing the 'startNetworkServer' startup script. An output similar to the following
+                will be displayed as the database engine starts up.
+            </p>
+            <div class="consoleOutput">Sun Jan 02 10:53:28 IST 2011 : Security manager installed using the Basic server security policy.
+Sun Jan 02 10:53:30 IST 2011 : Apache Derby Network Server - 10.7.1.1 - (1040133) started and ready to accept connections on port 1527</div>
+            <p>
+                Now launch the Derby client tool by executing the 'ij' script. This will give a command
+                prompt where you can execute various command and SQL queries. Execute the following
+                connect statement to create a fresh database named 'synapsedb' and obtain a connection
+                to it.
+            </p>
+            <div class="command">CONNECT 'jdbc:derby://localhost:1527/synapsedb;user=synapse;password=synapse;create=true';</div>
+            <p>
+                Now execute the following SQL query to create a new table.
+            </p>
+            <div class="command">CREATE table company(name varchar(10), id varchar(10), price double);</div>
+            <p>
+                Insert some sample data to the table by executing following statements.
+            </p>
+            <div class="command">INSERT into company values ('IBM','c1',0.0);
+INSERT into company values ('SUN','c2',0.0);
+INSERT into company values ('MSFT','c3',0.0);</div>
+            <p>
+                Now we have finished setting up the Derby server for the samples. As the final step
+                we should copy the Derby JDBC drivers to Synapse 'lib' directory. Locate the following
+                jar files in Derby installation and copy them into Synapse.
+            </p>
+            <ul>
+                <li>derby.jar</li>
+                <li>derbyclient.jar</li>
+                <li>derbynet.jar</li>
+            </ul>
+        </section>
+        <section name="Setting Up MySQL" id="mysql">
+            <p>
+                This section assumes that you already have a MySQL server instance up and running.
+                For details on installing MySQL, please refer the relevant
+                <a href="http://dev.mysql.com/doc/refman/5.1/en/installing.html">MySQL documentation</a>.
+            </p>
+            <p>
+                Create a new database named 'synapsedb' in MySQL. Then execute the SQL queries
+                given in the previous section to create a table named 'company' and insert some
+                sample data into it. Then execute the following two commands in MySQL client to
+                create two stored procedures.
+            </p>
+            <div class="command">CREATE PROCEDURE getCompany(compName VARCHAR(10)) SELECT name, id, price FROM company WHERE name = compName;
+        CREATE PROCEDURE updateCompany(compPrice DOUBLE,compName VARCHAR(10)) UPDATE company SET price = compPrice WHERE name = compName;</div>
+            <p>
+                Then you should download the <a href="http://www.mysql.com/products/connector/">MySQL JDBC driver</a>
+                and deploy it into the 'lib' directory of Synapse.
+            </p>
+        </section>
+        <section name="Using Other Database Engines" id="other">
+            <p>
+                You can run the given samples using any RDBMS engine you prefer. In that case please
+                make sure you do the following.
+            </p>
+            <ul>
+                <li>Deploy the JDBC drivers for your database engine into Synapse</li>
+                <li>
+                    Update the sample configuration files and change the driver class name and JDBC
+                    connection string correctly
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

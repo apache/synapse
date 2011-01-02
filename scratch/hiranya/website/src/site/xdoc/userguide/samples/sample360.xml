@@ -124,7 +124,7 @@
                 <p>
                     <ul>
                         <li>
-                            Setup a Derby database as described in the database setup guide
+                            Setup a Derby database as described in the <a href="setup/db.html">database setup guide</a>
                         </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2

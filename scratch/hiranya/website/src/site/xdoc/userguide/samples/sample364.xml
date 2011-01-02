@@ -97,7 +97,7 @@
                 <p>
                     <ul>
                         <li>
-                            Setup a MySQL database as described in the database setup guide
+                            Setup a MySQL database as described in the <a href="setup/db.html#mysql">database setup guide</a>
                         </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2

@@ -163,7 +163,7 @@
                     <ul>
                         <li>
                             Setup a Derby database and the Synapse data sources as described in the
-                            database setup guide
+                            <a href="setup/db.html">database setup guide</a>
                         </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2

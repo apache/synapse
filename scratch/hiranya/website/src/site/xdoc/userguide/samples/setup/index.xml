@@ -380,10 +380,8 @@ ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy
             <ul>
                 <li><a href="jms.html">JMS Setup Guide</a></li>
                 <li><a href="fix.html">FIX Setup Guide</a></li>
-                <li><a href="tcp.html">TCP Setup Guide</a></li>
-                <li><a href="udp.html">UDP Setup Guide</a></li>
+                <li><a href="tcp_udp.html">TCP/UDP Setup Guide</a></li>
                 <li><a href="db.html">Database Setup Guide</a></li>
-                <li><a href="ds.html">Datasource Setup Guide</a></li>
             </ul>
         </section>
     </body>

@@ -39,7 +39,7 @@
                 Synapse using the dblookup and dbreport mediators. Synapse ships with a collection
                 of samples which demonstrates various aspects of dblookup, dbreport mediators and
                 database integration. This article describes how to setup the databases, sample
-                tables and JNDI data sources required to try these examples out.
+                tables and reusable data sources required to try these examples out.
             </p>
             <p>
                 Most samples assume Apache Derby is used as the database engine. And therefore this

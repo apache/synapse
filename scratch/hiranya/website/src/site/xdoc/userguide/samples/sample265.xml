@@ -52,8 +52,8 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Enable the TCP transport receiver for Synapse (refer TCP transport setup
-                            guide).
+                            Enable the TCP transport receiver for Synapse (refer
+                            <a href="setup/tcp_udp.html#tcp">TCP transport setup guide</a>).
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 265 (repository/conf/sample/synapse_sample_265.xml)
@@ -63,8 +63,9 @@
                             </div>
                         </li>
                         <li>
-                            Enable the TCP transport sender for the sample Axis2 client (refer TCP transport
-                            setup guide for details).
+                            Enable the TCP transport sender for the sample Axis2 client (refer
+                            <a href="setup/tcp_udp.html#tcp">TCP transport setup guide</a> for
+                            details).
                         </li>
                     </ul>
                 </p>

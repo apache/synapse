@@ -69,12 +69,12 @@
                         </li>
                         <li>
                             Configure the Executor sample FIX application (shipped with Quickfix/J)
-                            to receive messages from Synapse and start it (refer FIX setup guide for
-                            more details).
+                            to receive messages from Synapse and start it (refer
+                            <a href="setup/fix.html#exec">FIX setup guide</a> for more details).
                         </li>
                         <li>
-                            Enable the FIX transport listener and sender for Synapse (refer FIX setup
-                            guide for details).
+                            Enable the FIX transport listener and sender for Synapse (refer
+                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details).
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 257 (repository/conf/sample/synapse_sample_257.xml)
@@ -88,10 +88,10 @@
                         </li>
                         <li>
                             Configure Banzai sample FIX application (shipped with Quickfix/J) to send
-                            messages to Synapse and start it (refer FIX setup guide for more details).
-                            If Banzai was properly configured, it should establish a FIX session with
-                            Synapse upon startup. You should see some session logon messages on Synapse
-                            console and Banzai console.
+                            messages to Synapse and start it (refer <a href="setup/fix.html#banzai">FIX setup guide</a>
+                            for more details). If Banzai was properly configured, it should establish
+                            a FIX session with Synapse upon startup. You should see some session
+                            logon messages on Synapse console and Banzai console.
                         </li>
                     </ul>
                 </p>

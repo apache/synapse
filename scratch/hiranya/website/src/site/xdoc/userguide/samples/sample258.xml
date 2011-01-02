@@ -69,12 +69,12 @@
                         </li>
                         <li>
                             Configure the Executor sample FIX application (shipped with Quickfix/J)
-                            to receive messages from Synapse and start it (refer FIX setup guide for
-                            more details).
+                            to receive messages from Synapse and start it (refer
+                            <a href="setup/fix.html#exec">FIX setup guide</a> for more details).
                         </li>
                         <li>
-                            Enable the FIX transport sender for Synapse (refer FIX setup guide for
-                            details).
+                            Enable the FIX transport sender for Synapse (refer
+                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details).
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 258 (repository/conf/sample/synapse_sample_258.xml)

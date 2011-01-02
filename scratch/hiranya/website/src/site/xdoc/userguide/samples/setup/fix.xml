@@ -32,8 +32,8 @@
                 <li>
                     <a href="#samples">Setting Up the Sample FIX Applications</a>
                     <ul>
-                        <li><a href="exec">Configuring the Executor</a></li>
-                        <li><a href="banzai">Configuring Banzai</a></li>
+                        <li><a href="#exec">Configuring the Executor</a></li>
+                        <li><a href="#banzai">Configuring Banzai</a></li>
                     </ul>
                 </li>
                 
@@ -175,7 +175,7 @@ SocketAcceptPort=19876</div>
                     has been set to 9876. You can launch the Executor using the above configuration
                     as follows.
                 </p>
-                <div class="command">Unix/Linux: sh executor.sh &lt;path to executor.cfg&gt;
+                <div class="command">Unix/Linux: sh executor.sh &lt;path to executor.cfg&gt;<br/>
 Windows: executor.bat &lt;path to executor.cfg&gt;</div>
                 <p>
                     For some samples you will have to make some minor modifications to this
@@ -209,7 +209,7 @@ SocketConnectPort=9876</div>
                     with this configuration, save the above in a file named 'banzai.cfg' and
                     launch the sample application as follows.
                 </p>
-                <div class="command">Unix/Linux: sh banzai.sh &lt;path to banzai.cfg&gt;
+                <div class="command">Unix/Linux: sh banzai.sh &lt;path to banzai.cfg&gt;<br/>
 Windows: banzai.bat &lt;path to banzai.cfg&gt;</div>
             </subsection>
         </section>

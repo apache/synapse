@@ -66,13 +66,13 @@
                             into your local machine.
                         </li>
                         <li>
-                            Enable the FIX transport listener and sender for Synapse (refer FIX setup
-                            guide for details).
+                            Enable the FIX transport listener and sender for Synapse (refer
+                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details).
                         </li>
                         <li>
                             Configure the Executor sample FIX application (shipped with Quickfix/J)
-                            to receive messages from Synapse and start it (refer FIX setup guide for
-                            more details). In previous samples we only had a FIX 4.0 session configured
+                            to receive messages from Synapse and start it (refer <a href="setup/fix.html#exec">FIX setup guide</a>
+                            for more details). In previous samples we only had a FIX 4.0 session configured
                             for Executor. For this sample we should configure a FIX 4.1 session for
                             Executor. Therefore before starting it add the following entries to the
                             configuration file of Executor (executor.cfg).
@@ -92,10 +92,10 @@ SocketAcceptPort=19877</div>
                         </li>
                         <li>
                             Configure Banzai sample FIX application (shipped with Quickfix/J) to send
-                            messages to Synapse and start it (refer FIX setup guide for more details).
-                            You should also add the following entry to the Banzai configuration file
-                            before starting it (replace $SYNAPSE_HOME with the actual path to Synapse
-                            home).
+                            messages to Synapse and start it (refer <a href="setup/fix.html#banzai">FIX setup guide</a>
+                            for more details). You should also add the following entry to the Banzai
+                            configuration file before starting it (replace $SYNAPSE_HOME with the
+                            actual path to Synapse home).
                             <div class="consoleOutput">DataDictionary=$SYNAPSE_HOME/repository/conf/sample/resources/fix/FIX40-synapse.xml</div>
                             If Banzai was properly configured, it should establish a FIX 4.0 session with
                             Synapse upon startup. You should see some session logon messages on Synapse

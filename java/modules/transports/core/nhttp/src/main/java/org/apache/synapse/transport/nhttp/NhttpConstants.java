@@ -128,4 +128,8 @@ public class NhttpConstants {
     public static final String NHTTP_INPUT_STREAM = "nhttp.input.stream";
     /** Output stram of the message is set to this message context property */
     public static final String NHTTP_OUTPUT_STREAM = "nhttp.output.stream";
+
+    /** This constant is used to plugin a custom WSDL processor for Get requests*/
+    public static final String HTTP_GET_PROCESSOR = "httpGetProcessor";
+
 }

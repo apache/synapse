@@ -102,6 +102,9 @@ public class ServerHandler implements NHttpServiceHandler {
      */
     private Parser parser = null;
 
+    /** WSDL processor for Get requests*/
+    private HttpGetRequestProcessor httpGetRequestProcessor = null;
+
     /**
      * An executor capable of exucuting the Server Worker according the priority assigned
      * to a particular message
@@ -120,7 +123,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
         final boolean isHttps, final NhttpMetricsCollector metrics,
-        Parser parser, PriorityExecutor executor, boolean restDispatching) {
+        Parser parser, PriorityExecutor executor, boolean restDispatching,
+        HttpGetRequestProcessor httpGetRequestProcessor) {
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
@@ -147,6 +151,8 @@ public class ServerHandler implements NHttpServiceHandler {
             this.executor = executor;
             this.parser = parser;
         }
+
+        this.httpGetRequestProcessor = httpGetRequestProcessor;
     }
 
     /**
@@ -201,7 +207,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
             // hand off processing of the request to a thread off the pool
             ServerWorker worker = new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
-                        request, is, response, os, restDispatching);
+                        request, is, response, os, restDispatching, httpGetRequestProcessor);
 
             if (workerPool != null) {
                 workerPool.execute(worker);

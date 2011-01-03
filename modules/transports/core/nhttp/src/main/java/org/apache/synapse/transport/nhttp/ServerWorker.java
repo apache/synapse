@@ -21,21 +21,15 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.base.MetricsCollector;
-import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.MessageContextBuilder;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
@@ -43,16 +37,14 @@ import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
-import org.apache.ws.commons.schema.XmlSchema;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Processes an incoming request through Axis2. An instance of this class would be created to
@@ -84,6 +76,8 @@ public class ServerWorker implements Runnable {
     private MetricsCollector metrics = null;
     /** Weather we should do rest dispatching or not */
     private boolean isRestDispatching = true;
+    /** WSDL processor for Get requests */
+    private HttpGetRequestProcessor httpGetRequestProcessor = null;
     
     private static final String SOAPACTION   = "SOAPAction";
     private static final String LOCATION     = "Location";
@@ -118,7 +112,8 @@ public class ServerWorker implements Runnable {
         final ServerHandler serverHandler,
         final HttpRequest request, final InputStream is,
         final HttpResponse response, final OutputStream os,
-        final boolean isRestDispatching) {
+        final boolean isRestDispatching,
+        final HttpGetRequestProcessor httpGetRequestProcessor) {
 
         this.cfgCtx = cfgCtx;
         this.conn = conn;
@@ -131,6 +126,7 @@ public class ServerWorker implements Runnable {
         this.os = os;
         this.msgContext = createMessageContext(request);
         this.isRestDispatching = isRestDispatching;
+        this.httpGetRequestProcessor = httpGetRequestProcessor;
     }
 
     /**
@@ -261,8 +257,9 @@ public class ServerWorker implements Runnable {
         }
         msgContext.setProperty(NhttpConstants.SERVICE_PREFIX, servicePrefix);
 
-        if ("GET".equals(method)) {
-            processGet();
+        if ("GET".equals(method)) {           
+            httpGetRequestProcessor.process(request, response,
+                    msgContext, conn, os, isRestDispatching);
         } else if ("POST".equals(method)) {
             processEntityEnclosingMethod();
         } else if ("PUT".equals(method)) {
@@ -451,229 +448,6 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    /**
-     *
-     */
-    private void processGet() {
-
-        String uri = request.getRequestLine().getUri();
-
-        String servicePath = cfgCtx.getServiceContextPath();
-        if (!servicePath.startsWith("/")) {
-            servicePath = "/" + servicePath;
-        }
-
-        String serviceName = null;
-        if (uri.startsWith(servicePath)) {
-            serviceName = uri.substring(servicePath.length());
-            if (serviceName.startsWith("/")) {
-                serviceName = serviceName.substring(1);
-            }
-            if (serviceName.indexOf("?") != -1) {
-                serviceName = serviceName.substring(0, serviceName.indexOf("?"));
-            }
-        }
-
-        if (serviceName != null) {
-            int opnStart = serviceName.indexOf("/");
-            if (opnStart != -1) {
-                serviceName = serviceName.substring(0, opnStart);
-            }
-        }
-
-        Map<String, String> parameters = new HashMap<String, String>();
-        int pos = uri.indexOf("?");
-        if (pos != -1) {
-            msgContext.setTo(new EndpointReference(uri.substring(0, pos)));
-            StringTokenizer st = new StringTokenizer(uri.substring(pos+1), "&");
-            while (st.hasMoreTokens()) {
-                String param = st.nextToken();
-                pos = param.indexOf("=");
-                if (pos != -1) {
-                    parameters.put(param.substring(0, pos), param.substring(pos+1));
-                } else {
-                    parameters.put(param, null);
-                }
-            }
-        } else {
-            msgContext.setTo(new EndpointReference(uri));
-        }
-
-        if (uri.equals("/favicon.ico")) {
-            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-            response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
-            serverHandler.commitResponseHideExceptions(conn,  response);
-
-//        } else if (!uri.startsWith(servicePath)) {
-//            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-//            response.addHeader(LOCATION, servicePath + "/");
-//            serverHandler.commitResponseHideExceptions(conn, response);
-
-        } else if (serviceName != null && parameters.containsKey("wsdl")) {
-            AxisService service = cfgCtx.getAxisConfiguration().
-                getServices().get(serviceName);
-            if (service != null) {
-                try {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    String parameterValue = parameters.get("wsdl");
-                    if (parameterValue == null) {
-                        service.printWSDL(baos, getIpAddress());
-                    } else {
-                        // here the parameter value should be the wsdl file name
-                        service.printUserWSDL(baos, parameterValue);
-                    }
-                    response.addHeader(CONTENT_TYPE, TEXT_XML);
-                    serverHandler.commitResponseHideExceptions(conn, response);
-                    os.write(baos.toByteArray());
-
-                } catch (Exception e) {
-                    handleBrowserException(
-                        "Error generating ?wsdl output for service : " + serviceName, e);
-                    return;
-                }
-            } else {
-                processGetAndDelete("GET");
-                return;
-            }
-
-        } else if (serviceName != null && parameters.containsKey("wsdl2")) {
-            AxisService service = cfgCtx.getAxisConfiguration().
-                getServices().get(serviceName);
-            if (service != null) {
-                String parameterValue = (String) service.getParameterValue("serviceType");
-                if ("proxy".equals(parameterValue) && !isWSDLProvidedForProxyService(service)) {
-                    handleBrowserException("No WSDL was provided for the Service " + serviceName +
-                            ". A WSDL cannot be generated.", null);
-                    return;
-                }
-                try {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    service.printWSDL2(baos, getIpAddress());
-                    response.addHeader(CONTENT_TYPE, TEXT_XML);
-                    serverHandler.commitResponseHideExceptions(conn, response);
-                    os.write(baos.toByteArray());
-
-                } catch (Exception e) {
-                    handleBrowserException(
-                        "Error generating ?wsdl2 output for service : " + serviceName, e);
-                    return;
-                }
-            } else {
-                processGetAndDelete("GET");
-                return;
-            }
-
-        } else if (serviceName != null && parameters.containsKey("xsd")) {
-            if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
-                AxisService service = cfgCtx.getAxisConfiguration()
-                    .getServices().get(serviceName);
-                if (service != null) {
-                    try {
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        service.printSchema(baos);
-                        response.addHeader(CONTENT_TYPE, TEXT_XML);
-                        serverHandler.commitResponseHideExceptions(conn, response);
-                        os.write(baos.toByteArray());
-
-                    } catch (Exception e) {
-                        handleBrowserException(
-                            "Error generating ?xsd output for service : " + serviceName, e);
-                        return;
-                    }
-                }
-
-            } else {
-                //cater for named xsds - check for the xsd name
-                String schemaName = parameters.get("xsd");
-                AxisService service = cfgCtx.getAxisConfiguration()
-                    .getServices().get(serviceName);
-
-                if (service != null) {
-                    //run the population logic just to be sure
-                    service.populateSchemaMappings();
-                    //write out the correct schema
-                    Map schemaTable = service.getSchemaMappingTable();
-                    XmlSchema schema = (XmlSchema)schemaTable.get(schemaName);
-                    if (schema == null) {
-                        int dotIndex = schemaName.indexOf('.');
-                        if (dotIndex > 0) {
-                            String schemaKey = schemaName.substring(0,dotIndex);
-                            schema = (XmlSchema) schemaTable.get(schemaKey);
-                        }
-                    }
-                    //schema found - write it to the stream
-                    if (schema != null) {
-                        try {
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            schema.write(baos);
-                            response.addHeader(CONTENT_TYPE, TEXT_XML);
-                            serverHandler.commitResponseHideExceptions(conn, response);
-                            os.write(baos.toByteArray());
-                        } catch (Exception e) {
-                            handleBrowserException(
-                                "Error generating named ?xsd output for service : " + serviceName, e);
-                            return;
-                        }
-
-                    } else {
-                        // no schema available by that name  - send 404
-                        response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-                    }
-                }
-            }
-
-        }
-        else if (serviceName != null && parameters.containsKey("info")) {
-            AxisService service = cfgCtx.getAxisConfiguration().
-                    getServices().get(serviceName);
-            if (service != null) {
-                String parameterValue = (String) service.getParameterValue("serviceType");
-                if ("proxy".equals(parameterValue) && !isWSDLProvidedForProxyService(service)) {
-                    handleBrowserException("No WSDL was provided for the Service " + serviceName +
-                            ". A WSDL cannot be generated.", null);
-                    return;
-                }
-                try {
-                    byte[] bytes =
-                        HTTPTransportReceiver.printServiceHTML(serviceName, cfgCtx).getBytes();
-                    response.addHeader(CONTENT_TYPE, TEXT_HTML);
-                    serverHandler.commitResponseHideExceptions(conn, response);
-                    os.write(bytes);
-
-                } catch (IOException e) {
-                    handleBrowserException(
-                        "Error generating service details page for : " + serviceName, e);
-                    return;
-                }
-            } else {
-                handleBrowserException("Invalid service : " + serviceName, null);
-                return;
-            }
-        } else if (uri.startsWith(servicePath) &&
-                (serviceName == null || serviceName.length() == 0)) {
-
-            try {
-                byte[] bytes = getServicesHTML(
-                        servicePath.endsWith("/") ? "" : servicePath + "/").getBytes();
-                response.addHeader(CONTENT_TYPE, TEXT_HTML);
-                serverHandler.commitResponseHideExceptions(conn, response);
-                os.write(bytes);
-
-            } catch (IOException e) {
-                handleBrowserException("Error generating services list", e);
-            }
-
-        } else {
-            processGetAndDelete("GET");
-            return;
-        }
-
-        // make sure that the output stream is flushed and closed properly
-        try {
-            os.flush();
-            os.close();
-        } catch (IOException ignore) {}
-    }
 
     /**
      * Calls the RESTUtil to process GET and DELETE Request
@@ -692,32 +466,6 @@ public class ServerWorker implements Runnable {
                     request.getRequestLine().getUri(), axisFault);
         }
 
-    }
-
-    private void handleBrowserException(String msg, Exception e) {
-
-        if (e == null) {
-            log.error(msg);
-        } else {
-            log.error(msg, e);
-        }
-
-        if (!response.containsHeader(HTTP.TRANSFER_ENCODING)) {
-            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            response.setReasonPhrase(msg);
-            response.addHeader(CONTENT_TYPE, TEXT_HTML);
-            serverHandler.commitResponseHideExceptions(conn, response);
-            try {
-                os.write(msg.getBytes());
-                os.close();
-            } catch (IOException ignore) {}
-        }
-        
-        if (conn != null) {
-            try {
-                conn.shutdown();
-            } catch (IOException ignore) {}
-        }
     }
 
     private void handleException(String msg, Exception e) {
@@ -757,15 +505,6 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private boolean isWSDLProvidedForProxyService(AxisService service) {
-        boolean isWSDLProvided = false;
-        if (service.getParameterValue(WSDLConstants.WSDL_4_J_DEFINITION) != null ||
-                service.getParameterValue(WSDLConstants.WSDL_20_DESCRIPTION) != null) {
-            isWSDLProvided = true;
-        }
-        return isWSDLProvided;
-    }
-
     public HttpResponse getResponse() {
         return response;
     }
@@ -790,103 +529,4 @@ public class ServerWorker implements Runnable {
         return remoteAddress;
     }
 
-    /**
-     * Whatever this method returns as the IP is ignored by the actual http/s listener when
-     * its getServiceEPR is invoked. This was originally copied from axis2
-     *
-     * @return Returns String.
-     * @throws java.net.SocketException if the socket can not be accessed
-     */
-    private static String getIpAddress() throws SocketException {
-        Enumeration e = NetworkInterface.getNetworkInterfaces();
-        String address = "127.0.0.1";
-
-        while (e.hasMoreElements()) {
-            NetworkInterface netface = (NetworkInterface) e.nextElement();
-            Enumeration addresses = netface.getInetAddresses();
-
-            while (addresses.hasMoreElements()) {
-                InetAddress ip = (InetAddress) addresses.nextElement();
-                if (!ip.isLoopbackAddress() && isIP(ip.getHostAddress())) {
-                    return ip.getHostAddress();
-                }
-            }
-        }
-        return address;
-    }
-
-    private static boolean isIP(String hostAddress) {
-        return hostAddress.split("[.]").length == 4;
-    }
-
-    /**
-     * Returns the HTML text for the list of services deployed.
-     * This can be delegated to another Class as well
-     * where it will handle more options of GET messages.
-     *
-     * @param prefix to be used for the Service names
-     * @return the HTML to be displayed as a String
-     */
-    public String getServicesHTML(String prefix) {
-
-        Map services = cfgCtx.getAxisConfiguration().getServices();
-        Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
-        boolean servicesFound = false;
-
-        StringBuffer resultBuf = new StringBuffer();
-        resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
-
-        if ((services != null) && !services.isEmpty()) {
-
-            servicesFound = true;
-            resultBuf.append("<h2>" + "Deployed services" + "</h2>");
-
-            for (Object service : services.values()) {
-
-                AxisService axisService = (AxisService) service;
-                Parameter parameter = axisService.getParameter(
-                        NhttpConstants.HIDDEN_SERVICE_PARAM_NAME);
-                if (axisService.getName().startsWith("__") ||
-                        (parameter != null && JavaUtils.isTrueExplicitly(parameter.getValue()))) {
-                    continue;    // skip private services
-                }
-
-                Iterator iterator = axisService.getOperations();
-                resultBuf.append("<h3><a href=\"").append(prefix).append(axisService.getName()).append(
-                        "?wsdl\">").append(axisService.getName()).append("</a></h3>");
-
-                if (iterator.hasNext()) {
-                    resultBuf.append("Available operations <ul>");
-
-                    for (; iterator.hasNext();) {
-                        AxisOperation axisOperation = (AxisOperation) iterator.next();
-                        resultBuf.append("<li>").append(
-                                axisOperation.getName().getLocalPart()).append("</li>");
-                    }
-                    resultBuf.append("</ul>");
-                } else {
-                    resultBuf.append("No operations specified for this service");
-                }
-            }
-        }
-
-        if ((erroneousServices != null) && !erroneousServices.isEmpty()) {
-            servicesFound = true;
-            resultBuf.append("<hr><h2><font color=\"blue\">Faulty Services</font></h2>");
-            Enumeration faultyservices = erroneousServices.keys();
-
-            while (faultyservices.hasMoreElements()) {
-                String faultyserviceName = (String) faultyservices.nextElement();
-                resultBuf.append("<h3><font color=\"blue\">").append(
-                        faultyserviceName).append("</font></h3>");
-            }
-        }
-
-        if (!servicesFound) {
-            resultBuf.append("<h2>There are no services deployed</h2>");
-        }
-
-        resultBuf.append("</body></html>");
-        return resultBuf.toString();
-    }
 }

@@ -118,6 +118,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private Parser parser = null;
     /** if falses we won't dispatch to axis2 service in case of rest scenarios */
     private boolean restDispatching = true;
+    /** WSDL processor for Get requests*/
+    private HttpGetRequestProcessor httpGetRequestProcessor = null;
 
     protected IOEventDispatch getEventDispatch(
         NHttpServiceHandler handler, SSLContext sslContext, 
@@ -216,6 +218,36 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
                 restDispatching = false;
             }
         }
+
+        // create http Get processor
+        param = transprtIn.getParameter(NhttpConstants.HTTP_GET_PROCESSOR);
+        if (param != null && param.getValue() != null) {
+            httpGetRequestProcessor = createHttpGetProcessor(param.getValue().toString());
+        } else {
+            httpGetRequestProcessor = new DefaultHttpGetProcessor();
+        }
+    }
+
+    private HttpGetRequestProcessor createHttpGetProcessor(String str) throws AxisFault {
+        Object obj = null;
+        try {
+            obj = Class.forName(str).newInstance();
+        } catch (ClassNotFoundException e) {
+            handleException("Error creating WSDL processor", e);
+        } catch (InstantiationException e) {
+            handleException("Error creating WSDL processor", e);
+        } catch (IllegalAccessException e) {
+            handleException("Error creating WSDL processor", e);
+        }
+
+        if (obj instanceof HttpGetRequestProcessor) {
+            return (HttpGetRequestProcessor) obj;
+        } else {
+            handleException("Error creating WSDL processor. The HttpProcessor should be of type " +
+                    "org.apache.synapse.transport.nhttp.HttpGetRequestProcessor");
+        }
+
+        return null;
     }
 
     public int getActiveConnectionsSize() {
@@ -368,7 +400,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         }
         
         handler = new ServerHandler(cfgCtx, params, sslContext != null
-                , metrics, parser, executor, restDispatching);
+                , metrics, parser, executor, restDispatching, httpGetRequestProcessor);
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
                 sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;

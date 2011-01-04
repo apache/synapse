@@ -50,14 +50,21 @@
             <subscribe>dev-subscribe@synapse.apache.org</subscribe>
             <unsubscribe>dev-unsubscribe@synapse.apache.org</unsubscribe>
             <post>dev@synapse.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/ws-synapse-dev/</archive>
+            <archive>http://mail-archives.apache.org/mod_mbox/synapse-dev/</archive>
         </mailingList>
         <mailingList>
             <name>Apache Synapse User List</name>
             <subscribe>user-subscribe@synapse.apache.org</subscribe>
             <unsubscribe>user-unsubscribe@synapse.apache.org</unsubscribe>
             <post>user@synapse.apache.org</post>
-            <archive>http://mail-archives.apache.org/mod_mbox/ws-synapse-user/</archive>
+            <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>
+        </mailingList>
+	<mailingList>
+            <name>Apache Synapse Commits List</name>
+            <subscribe>commits-subscribe@synapse.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>
+            <post>commits@synapse.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/synapse-commits/</archive>
         </mailingList>
     </mailingLists>
 

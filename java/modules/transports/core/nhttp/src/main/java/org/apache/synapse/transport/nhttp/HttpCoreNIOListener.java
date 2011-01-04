@@ -223,6 +223,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         param = transprtIn.getParameter(NhttpConstants.HTTP_GET_PROCESSOR);
         if (param != null && param.getValue() != null) {
             httpGetRequestProcessor = createHttpGetProcessor(param.getValue().toString());
+            if (httpGetRequestProcessor == null) {
+                handleException("Cannot create HttpGetRequestProcessor");
+            }
         } else {
             httpGetRequestProcessor = new DefaultHttpGetProcessor();
         }
@@ -404,7 +407,9 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
                 sslContext, sslIOSessionHandler, params);
         state = BaseConstants.STARTED;
-        
+
+        httpGetRequestProcessor.init(cfgCtx,handler);
+
         ListenerEndpoint endpoint;
         try {
             if (bindAddress == null) {

@@ -89,7 +89,7 @@ public class EventSender {
         serviceClient.engageModule("addressing");
         options.setTo(new EndpointReference(addUrl));
         options.setAction(action);
-        options.setProperty(MessageContext.TRANSPORT_NON_BLOCKING,
+        options.setProperty(MessageContext.CLIENT_API_NON_BLOCKING,
                 Boolean.FALSE); // set for fire and foget
         serviceClient.setOptions(options);
         serviceClient.addHeader(topicOm);

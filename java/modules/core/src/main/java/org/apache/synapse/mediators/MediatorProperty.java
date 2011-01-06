@@ -20,10 +20,14 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A mediator property is a name-value or name-expression pair which could be supplied
@@ -38,12 +42,61 @@ public class MediatorProperty {
     public static final QName ATT_NAME_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
     public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
     public static final QName ATT_EXPR_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
+    public static final QName ATT_SCOPE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "scope");
 
     private String name;
     private String value;
     private SynapseXPath expression;
 
+    private String scope;
+
     public MediatorProperty() {}
+
+    public void evaluate(MessageContext synCtx) {
+        String result;
+        if (value != null) {
+            result = value;
+        } else if (expression != null) {
+            result = expression.stringValueOf(synCtx);
+        } else {
+            throw new SynapseException("A value or expression must be specified");
+        }
+
+        if (scope == null || XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
+            synCtx.setProperty(name, result);
+        } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)) {
+            //Setting property into the  Axis2 Message Context
+            Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                    axis2smc.getAxis2MessageContext();
+            axis2MessageCtx.setProperty(name, result);
+        } else if (XMLConfigConstants.SCOPE_CLIENT.equals(scope)) {
+            //Setting property into the  Axis2 Message Context client options
+            Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                    axis2smc.getAxis2MessageContext();
+            axis2MessageCtx.getOptions().setProperty(name, result);
+        } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)) {
+            //Setting Transport Headers
+            Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                    axis2smc.getAxis2MessageContext();
+            Object headers = axis2MessageCtx.getProperty(
+                    org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+            if (headers != null && headers instanceof Map) {
+                Map headersMap = (Map) headers;
+                headersMap.put(name, result);
+            }
+            if (headers == null) {
+                Map headersMap = new HashMap();
+                headersMap.put(name, result);
+                axis2MessageCtx.setProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+                        headersMap);
+            }
+        }
+    }
 
     public String getName() {
         return name;
@@ -51,6 +104,14 @@ public class MediatorProperty {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     public String getValue() {

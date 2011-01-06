@@ -28,12 +28,10 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.algorithms.AlgorithmContext;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
+import org.apache.synapse.mediators.MediatorProperty;
 
 import java.net.*;
-import java.util.List;
-import java.util.TimerTask;
-import java.util.Timer;
-import java.util.ArrayList;
+import java.util.*;
 import java.io.IOException;
 
 /**
@@ -106,6 +104,9 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
         if (activeMembers == null) {
             endpoint = getNextChild(synCtx);
         }
+
+        // evaluate the endpoint properties
+        evaluateProperties(synCtx);
 
         if (endpoint != null) {
             // if this is not a retry

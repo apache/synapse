@@ -1,4 +1,4 @@
-Apache Synapse Enterprise Service Bus (ESB) - 2.0.0 Release Notes - December 2010
+Apache Synapse Enterprise Service Bus (ESB) - 2.0.0 Release Notes - January 2011
 
 1. Overview
     The Apache Synapse ESB is a robust, lightweight and highly scalable and distributed

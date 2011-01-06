@@ -1,4 +1,4 @@
-Apache Synapse 2.0.0 build  (December 2010) - http://synapse.apache.org/
+Apache Synapse 2.0.0 build  (January 2011) - http://synapse.apache.org/
 ------------------------------------------------------------------------------------------
 
 -------------------

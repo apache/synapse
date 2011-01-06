@@ -21,6 +21,10 @@ package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.mediators.MediatorProperty;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * FailoverEndpoint can have multiple child endpoints. It will always try to send messages to
@@ -61,6 +65,9 @@ public class FailoverEndpoint extends AbstractEndpoint {
                     "FailoverLoadbalance endpoint : " + getName() + " - no child endpoints");
             return;
         }
+
+        // evaluate the endpoint properties
+        evaluateProperties(synCtx);
         
         if (dynamic) {
             // Dynamic fail-over mode - Switch to a backup endpoint when an error occurs

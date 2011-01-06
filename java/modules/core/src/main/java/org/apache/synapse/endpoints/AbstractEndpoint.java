@@ -79,7 +79,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     protected String fileName;
 
     /** Map for storing configuration parameters */
-    private Map<String, MediatorProperty> properties = new HashMap<String, MediatorProperty>();
+    protected Map<String, MediatorProperty> properties = new HashMap<String, MediatorProperty>();
 
     protected boolean anonymous = false;
 
@@ -237,6 +237,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         // set message level metrics collector
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
             BaseConstants.METRICS_COLLECTOR, metricsMBean);
+
+        evaluateProperties(synCtx);
+
 
         // if the envelope preserving set build the envelope
         MediatorProperty preserveEnv = getProperty(SynapseConstants.PRESERVE_ENVELOPE);
@@ -611,5 +614,18 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     public void setOnFaultMessageStore(String onFaultMessageStore) {
         this.onFaultMessageStore = onFaultMessageStore;
+    }
+
+    /**
+     * Evaluates the endpoint properties based on the current message context and set
+     * the properties to the message context appropriately
+     * @param synCtx the current message context
+     */
+    protected void evaluateProperties(MessageContext synCtx) {
+        // evaluate the properties
+        Set<Map.Entry<String, MediatorProperty>> propertySet = properties.entrySet();
+        for (Map.Entry<String, MediatorProperty> e : propertySet) {
+            e.getValue().evaluate(synCtx);
+        }
     }
 }

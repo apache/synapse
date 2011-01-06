@@ -27,9 +27,12 @@ import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.endpoints.dispatch.SessionInformation;
+import org.apache.synapse.mediators.MediatorProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * SALoadbalanceEndpoint supports session affinity based load balancing. Each of this endpoint
@@ -99,6 +102,9 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
         List<Endpoint> endpoints = (List<Endpoint>) synCtx.getProperty(
                 SynapseConstants.PROP_SAL_ENDPOINT_CURRENT_ENDPOINT_LIST);
 
+        // evaluate the properties
+        evaluateProperties(synCtx);
+        
         if (sessionInformation == null && endpoints == null) {
 
             sessionInformation = dispatcher.getSession(synCtx);

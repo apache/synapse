@@ -79,7 +79,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     protected String fileName;
 
     /** Map for storing configuration parameters */
-    protected Map<String, MediatorProperty> properties = new HashMap<String, MediatorProperty>();
+    private Map<String, MediatorProperty> properties = new HashMap<String, MediatorProperty>();
 
     protected boolean anonymous = false;
 

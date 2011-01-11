@@ -105,7 +105,7 @@
           [ftp]</option>[end][end][if-any backup][for backup]
         <option value="[backup]">
           [backup] (backup)
-        </option></select>
+        </option>[end][end]</select>
         <input type="submit" value="Change"/>
       </form>
       <p>

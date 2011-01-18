@@ -57,6 +57,7 @@ public class MediatorPropertyFactory {
             OMAttribute attName  = propEle.getAttribute(MediatorProperty.ATT_NAME_Q);
             OMAttribute attValue = propEle.getAttribute(MediatorProperty.ATT_VALUE_Q);
             OMAttribute attExpr  = propEle.getAttribute(MediatorProperty.ATT_EXPR_Q);
+            OMAttribute attScope = propEle.getAttribute(MediatorProperty.ATT_SCOPE_Q);
 
             MediatorProperty prop = new MediatorProperty();
 
@@ -111,6 +112,23 @@ public class MediatorPropertyFactory {
                     "be specified for a mediator property";
                 log.error(msg);
                 throw new SynapseException(msg);
+            }
+
+            if (attScope != null) {
+                String valueStr = attScope.getAttributeValue();
+                if (!XMLConfigConstants.SCOPE_AXIS2.equals(valueStr) &&
+                        !XMLConfigConstants.SCOPE_TRANSPORT.equals(valueStr) &&
+                        !XMLConfigConstants.SCOPE_DEFAULT.equals(valueStr) &&
+                        !XMLConfigConstants.SCOPE_CLIENT.equals(valueStr)) {
+                    String msg = "Only '" + XMLConfigConstants.SCOPE_AXIS2 + "' or '" +
+                            XMLConfigConstants.SCOPE_TRANSPORT + "' or '" +
+                            XMLConfigConstants.SCOPE_CLIENT +
+                            "' values are allowed for attribute scope for a property" +
+                            ", Unsupported scope " + valueStr;
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
+                prop.setScope(valueStr);
             }
 
             propertyList.add(prop);

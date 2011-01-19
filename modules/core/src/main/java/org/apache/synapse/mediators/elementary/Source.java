@@ -62,7 +62,6 @@ import java.util.List;
  */
 
 public class Source {
-
     private SynapseXPath xpath = null;
 
     private String property = null;
@@ -71,10 +70,9 @@ public class Source {
 
     private boolean clone = true;
 
-    private OMElement inlineElement = null;
+    private OMNode inlineOMNode = null;
 
     private String inlineKey = null;
-
 
     public ArrayList<OMNode> evaluate(MessageContext synCtx, SynapseLog synLog)
             throws JaxenException {
@@ -179,17 +177,20 @@ public class Source {
                 synLog.error("Invalid source property type.");
             }
         } else if (sourceType == EnrichMediator.INLINE) {
-            if (inlineElement != null) {
-                if (inlineElement.getQName().getLocalPart().equals("Envelope")) {
-                    SOAPEnvelope soapEnvelope = getSOAPEnvFromOM(inlineElement);
+            if (inlineOMNode instanceof OMElement) {
+                OMElement inlineOMElement = (OMElement) inlineOMNode;
+                if (inlineOMElement.getQName().getLocalPart().equals("Envelope")) {
+                    SOAPEnvelope soapEnvelope = getSOAPEnvFromOM(inlineOMElement);
                     if (soapEnvelope != null) {
                         sourceNodeList.add(soapEnvelope);
                     } else {
                         synLog.error("Inline Source is not a valid SOAPEnvelope.");
                     }
                 } else {
-                    sourceNodeList.add(inlineElement.cloneOMElement());
+                    sourceNodeList.add(inlineOMElement.cloneOMElement());
                 }
+            } else if (inlineOMNode instanceof OMText) {
+                sourceNodeList.add(inlineOMNode);
             } else if (inlineKey != null) {
                 Object inlineObj = synCtx.getEntry(inlineKey);
                 if (inlineObj instanceof OMElement) {
@@ -203,7 +204,14 @@ public class Source {
                     } else {
                         sourceNodeList.add((OMElement) inlineObj);
                     }
+                } else if (inlineObj instanceof String) {
+                    sourceNodeList.add(
+                            OMAbstractFactory.getOMFactory().createOMText(inlineObj.toString()));
+                } else {
+                    synLog.error("Specified Resource as Source is not valid.");
                 }
+            } else {
+                synLog.error("Inline Source Content is not valid.");
             }
         }
         return sourceNodeList;
@@ -211,13 +219,15 @@ public class Source {
 
     private SOAPEnvelope getSOAPEnvFromOM(OMElement inlineElement) {
         SOAPFactory soapFactory;
-        if (inlineElement.getQName().getNamespaceURI().equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
+        if (inlineElement.getQName().getNamespaceURI().equals(
+                SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
             soapFactory = OMAbstractFactory.getSOAP12Factory();
         } else {
             soapFactory = OMAbstractFactory.getSOAP11Factory();
         }
 
-        StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(inlineElement.getXMLStreamReader(), soapFactory, inlineElement.getQName().getNamespaceURI());
+        StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(inlineElement.getXMLStreamReader(),
+                soapFactory, inlineElement.getQName().getNamespaceURI());
         return builder.getSOAPEnvelope();
     }
 
@@ -253,12 +263,12 @@ public class Source {
         this.clone = clone;
     }
 
-    public void setInlineElement(OMElement inlineElement) {
-        this.inlineElement = inlineElement;
+    public void setInlineOMNode(OMNode inlineOMNode) {
+        this.inlineOMNode = inlineOMNode;
     }
 
-    public OMElement getInlineElement() {
-        return inlineElement;
+    public OMNode getInlineOMNode() {
+        return inlineOMNode;
     }
 
     public String getInlineKey() {

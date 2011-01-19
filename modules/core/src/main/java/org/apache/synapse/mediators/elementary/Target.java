@@ -123,7 +123,7 @@ public class Target {
                 }
             }
         } else if (targetType == EnrichMediator.ENVELOPE) {
-            OMNode node = sourceNodeList.get(0); /*TODO*/
+            OMNode node = sourceNodeList.get(0);
             if (node instanceof SOAPEnvelope) {
                 try {
                     synContext.setEnvelope((SOAPEnvelope) node);
@@ -148,6 +148,8 @@ public class Target {
                 if (elem instanceof OMElement) {
                     e.insertSiblingAfter(elem);
                     isInserted = true;
+                } else if (elem instanceof OMText) {
+                    e.setText(((OMText) elem).getText());
                 } else {
                     synLog.error("Invalid Source object to be inserted.");
                 }

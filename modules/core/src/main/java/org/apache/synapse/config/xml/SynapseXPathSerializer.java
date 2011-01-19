@@ -52,6 +52,26 @@ public class SynapseXPathSerializer {
         return elem;
     }
 
+    public static OMElement serializeXPath(SynapseXPath xpath, String expression,
+                                           OMElement elem, String attribName) {
+
+        OMNamespace nullNS = elem.getOMFactory()
+            .createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+
+        if (xpath != null && expression != null) {
+
+            elem.addAttribute(elem.getOMFactory().createOMAttribute(
+                attribName, nullNS, expression));
+
+            serializeNamespaces(elem, xpath);
+
+        } else {
+            handleException("Couldn't find the xpath in the SynapseXPath");
+        }
+
+        return elem;
+    }
+
     private static void serializeNamespaces(OMElement elem, SynapseXPath xpath) {
 
         for (Object o : xpath.getNamespaces().keySet()) {

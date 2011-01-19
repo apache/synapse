@@ -35,7 +35,6 @@ import java.util.Map;
  * against the current message into literal String values.
  */
 public class MediatorProperty {
-
     // TODO: these constants are related to a specific configuration language
     //       and should be moved to a class in the related package
     public static final QName PROPERTY_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
@@ -52,6 +51,10 @@ public class MediatorProperty {
 
     public MediatorProperty() {}
 
+    /**
+     *
+     * @param synCtx
+     */
     public void evaluate(MessageContext synCtx) {
         String result;
         if (value != null) {

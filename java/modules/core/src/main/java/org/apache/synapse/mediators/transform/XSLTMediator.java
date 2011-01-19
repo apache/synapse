@@ -30,15 +30,9 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.Key;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
-import org.apache.synapse.util.jaxp.DOOMSourceBuilderFactory;
-import org.apache.synapse.util.jaxp.ResultBuilder;
-import org.apache.synapse.util.jaxp.ResultBuilderFactory;
-import org.apache.synapse.util.jaxp.SourceBuilder;
-import org.apache.synapse.util.jaxp.SourceBuilderFactory;
-import org.apache.synapse.util.jaxp.StreamResultBuilderFactory;
-import org.apache.synapse.util.jaxp.StreamSourceBuilderFactory;
+import org.apache.synapse.util.jaxp.*;
 import org.apache.synapse.util.resolver.CustomJAXPURIResolver;
 import org.apache.synapse.util.resolver.ResourceMap;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
@@ -46,9 +40,7 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.transform.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * The XSLT mediator performs an XSLT transformation requested, using
@@ -115,9 +107,10 @@ public class XSLTMediator extends AbstractMediator {
         "http://synapse.apache.org/ns/2010/04/configuration/transform/attribute/rbf";
     
     /**
-     * The resource key/name which refers to the XSLT to be used for the transformation
+     * The resource key which refers to the XSLT to be used for the transformation
+     * supports both static and dynamic(xpath) keys
      */
-    private String xsltKey = null;
+    private Key xsltKey = null;
 
     /**
      * The (optional) XPath expression which yields the source element for a transformation
@@ -151,11 +144,11 @@ public class XSLTMediator extends AbstractMediator {
     private ResourceMap resourceMap;
 
     /**
+     * Cache multiple templates
+     * Unique string used as a key for each template
      * The Template instance used to create a Transformer object. This is  thread-safe
-     *
-     * @see javax.xml.transform.Templates
      */
-    private Templates cachedTemplates = null;
+    private Map<String, Templates> cachedTemplatesMap = new Hashtable<String, Templates>();
 
     /**
      * The TransformerFactory instance which use to create Templates. This is not thread-safe.
@@ -219,6 +212,12 @@ public class XSLTMediator extends AbstractMediator {
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
+        // Derive actual key from message context
+        String generatedXsltKey = xsltKey.evaluateKey(synCtx);
+
+        // get templates from generatedXsltKey
+        Templates cachedTemplates = null;
+
         if (synLog.isTraceTraceEnabled()) {
             synLog.traceTrace("Transformation source : " + sourceNode.toString());
         }
@@ -229,14 +228,25 @@ public class XSLTMediator extends AbstractMediator {
             synchronized (transformerLock) {
                 // only first thread should create the template
                 if (isCreationOrRecreationRequired(synCtx)) {
-                    createTemplate(synCtx, synLog);
+                    cachedTemplates = createTemplate(synCtx, synLog);
                 }
+            }
+        }
+        else{
+            //If already cached template then load it from cachedTemplatesMap
+            synchronized (transformerLock){
+                cachedTemplates = cachedTemplatesMap.get(generatedXsltKey);
             }
         }
 
         try {
             // perform transformation
-            Transformer transformer = cachedTemplates.newTransformer();
+            Transformer transformer = null;
+            try {
+                transformer = cachedTemplates.newTransformer();
+            } catch (NullPointerException ex) {
+                handleException("Unable to create Transformer using cached template", ex, synCtx);
+            }
             if (!properties.isEmpty()) {
                 // set the parameters which will pass to the Transformation
                 applyProperties(transformer, synCtx, synLog);
@@ -337,38 +347,56 @@ public class XSLTMediator extends AbstractMediator {
      * Create a XSLT template object and assign it to the cachedTemplates variable
      * @param synCtx current message
      * @param synLog logger to use
+     * @return cached template
      */
-    private void createTemplate(MessageContext synCtx, SynapseLog synLog) {
+    private Templates createTemplate(MessageContext synCtx, SynapseLog synLog) {
+        // Assign created template
+        Templates cachedTemplates = null;
+
         // Set an error listener (SYNAPSE-307).
         transFact.setErrorListener(new ErrorListenerImpl(synLog, "stylesheet parsing"));
         // Allow xsl:import and xsl:include resolution
         transFact.setURIResolver(new CustomJAXPURIResolver(resourceMap,
                 synCtx.getConfiguration()));
+        // Derive actual key from message context
+        String generatedXsltKey = xsltKey.evaluateKey(synCtx);
+
         try {
             cachedTemplates = transFact.newTemplates(
-                    SynapseConfigUtils.getStreamSource(synCtx.getEntry(xsltKey)));
+                    SynapseConfigUtils.getStreamSource(synCtx.getEntry(generatedXsltKey)));
             if (cachedTemplates == null) {
+                // if cached template creation failed
                 handleException("Error compiling the XSLT with key : " + xsltKey, synCtx);
+            } else {
+                // if cached template is created then put it in to cachedTemplatesMap
+                cachedTemplatesMap.put(generatedXsltKey, cachedTemplates);
             }
         } catch (Exception e) {
             handleException("Error creating XSLT transformer using : " + xsltKey, e, synCtx);
         }
+        return cachedTemplates;
     }
 
     /**
      * Utility method to determine weather it is needed to create a XSLT template
+     *
      * @param synCtx current message
      * @return true if it is needed to create a new XSLT template
      */
     private boolean isCreationOrRecreationRequired(MessageContext synCtx) {
 
-        // if there are no cachedTemplates we need to create a one
-        if (cachedTemplates == null) {
+        // Derive actual key from message context
+        String generatedXsltKey = xsltKey.evaluateKey(synCtx);
+
+        // if there are no cachedTemplates inside cachedTemplatesMap or
+        // if the template related to this generated key is not cached
+        // then it need to be cached
+        if (cachedTemplatesMap.isEmpty() || !cachedTemplatesMap.containsKey(generatedXsltKey)) {
             // this is a creation case
             return true;
         } else {
             // build transformer - if necessary
-            Entry dp = synCtx.getConfiguration().getEntryDefinition(xsltKey);
+            Entry dp = synCtx.getConfiguration().getEntryDefinition(generatedXsltKey);
             // if the xsltKey refers to a dynamic resource, and if it has been expired
             // it is a recreation case
             return dp != null && dp.isDynamic() && (!dp.isCached() || dp.isExpired());
@@ -383,11 +411,11 @@ public class XSLTMediator extends AbstractMediator {
         this.source.setXPath(source);
     }
 
-    public String getXsltKey() {
+    public Key getXsltKey() {
         return xsltKey;
     }
 
-    public void setXsltKey(String xsltKey) {
+    public void setXsltKey(Key xsltKey) {
         this.xsltKey = xsltKey;
     }
 

@@ -63,9 +63,8 @@ public class Target {
 
     public static final String ACTION_ADD_CHILD = "child";
 
-    public static final String ACTION_ADD_SIBLING = "sibiling";
+    public static final String ACTION_ADD_SIBLING = "sibling";
 
-    //private boolean replace = true;
     private String action = ACTION_REPLACE;
 
     public void insert(MessageContext synContext,

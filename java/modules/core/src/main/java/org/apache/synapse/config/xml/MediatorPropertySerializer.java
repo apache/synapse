@@ -4,7 +4,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;

@@ -21,12 +21,11 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-
-import java.util.List;
+import org.apache.synapse.mediators.transform.XSLTMediator;
 
 import javax.xml.namespace.QName;
+import java.util.List;
 
 /**
  * Serializer for {@link XSLTMediator} instances.
@@ -48,8 +47,9 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         OMElement xslt = fac.createOMElement("xslt", synNS);
 
         if (mediator.getXsltKey() != null) {
-            xslt.addAttribute(fac.createOMAttribute(
-                "key", nullNS, mediator.getXsltKey()));
+            //xslt.addAttribute(fac.createOMAttribute("key", nullNS, mediator.getXsltKey()));
+            KeySerializer keySerializer =  new KeySerializer();
+            keySerializer.serializeKey(mediator.getXsltKey(), xslt);
         } else {
             handleException("Invalid XSLT mediator. XSLT registry key is required");
         }

@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
@@ -110,13 +111,16 @@ public class EnrichMediatorFactory extends AbstractMediatorFactory {
                 handleException("xpath attribute is required for CUSTOM type");
             }
         } else if (source.getSourceType() == EnrichMediator.INLINE) {
-            OMElement ele = null;
+            OMElement inlineElem = null;
             if (sourceEle.getFirstElement() != null) {
-                ele = sourceEle.getFirstElement().cloneOMElement();
+                inlineElem = sourceEle.getFirstElement().cloneOMElement();
             }
 
-            if (ele != null) {
-                source.setInlineElement(ele);
+            if (inlineElem != null) {
+                source.setInlineOMNode(inlineElem);
+            } else if (sourceEle.getText() != null
+                    && (!sourceEle.getText().equals(""))) {
+                source.setInlineOMNode(OMAbstractFactory.getOMFactory().createOMText(sourceEle.getText()));
             } else if (sourceEle.getAttributeValue(ATT_KEY) != null) {
                 source.setInlineKey(sourceEle.getAttributeValue(ATT_KEY));
             } else {
@@ -126,7 +130,7 @@ public class EnrichMediatorFactory extends AbstractMediatorFactory {
     }
 
     private void populateTarget(Target target, OMElement sourceEle) {
-        // type attribue
+        // type attribute
         OMAttribute typeAttr = sourceEle.getAttribute(ATT_TYPE);
         if (typeAttr != null && typeAttr.getAttributeValue() != null) {
             int type = convertTypeToInit(typeAttr.getAttributeValue());

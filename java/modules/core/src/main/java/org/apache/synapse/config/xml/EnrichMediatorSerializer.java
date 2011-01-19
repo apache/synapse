@@ -19,6 +19,7 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
 import org.apache.synapse.Mediator;
 
 
@@ -65,8 +66,11 @@ public class EnrichMediatorSerializer extends AbstractMediatorSerializer {
         } else if (source.getSourceType() == EnrichMediator.CUSTOM) {
             SynapseXPathSerializer.serializeXPath(source.getXpath(), sourceEle, "xpath");
         } else if (source.getSourceType() == EnrichMediator.INLINE) {
-            if (source.getInlineElement() != null) {
-                sourceEle.addChild(source.getInlineElement().cloneOMElement());
+            if (source.getInlineOMNode() instanceof OMElement) {
+                sourceEle.addChild(((OMElement) source.getInlineOMNode()).cloneOMElement());
+            } else if (source.getInlineOMNode() instanceof OMText) {
+                /*Text as inline content*/
+                sourceEle.setText(((OMText) source.getInlineOMNode()).getText());
             } else if (source.getInlineKey() != null) {
                 sourceEle.addAttribute("key", source.getInlineKey(), null);
             }

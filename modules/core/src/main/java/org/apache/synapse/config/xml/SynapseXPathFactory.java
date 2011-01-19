@@ -55,6 +55,19 @@ public class SynapseXPathFactory {
         return xpath;
     }
 
+    public static SynapseXPath getSynapseXPath(OMElement elem, String expression)
+        throws JaxenException {
+
+        if (expression == null) {
+            handleException("XPath expression cannot be null");
+        }
+
+        SynapseXPath xpath = new SynapseXPath(expression);
+        OMElementUtils.addNameSpaces(xpath, elem, log);
+
+        return xpath;
+    }
+
     private static void handleException(String message) {
         log.error(message);
         throw new SynapseException(message);

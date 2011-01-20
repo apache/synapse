@@ -19,36 +19,26 @@
 
 package org.apache.synapse.mediators.transform;
 
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerFactory;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMContainer;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.TestMessageContextBuilder;
-import org.apache.synapse.util.jaxp.AXIOMResultBuilderFactory;
-import org.apache.synapse.util.jaxp.AXIOMSourceBuilderFactory;
-import org.apache.synapse.util.jaxp.DOOMResultBuilderFactory;
-import org.apache.synapse.util.jaxp.DOOMSourceBuilderFactory;
-import org.apache.synapse.util.jaxp.StreamResultBuilderFactory;
-import org.apache.synapse.util.jaxp.StreamSourceBuilderFactory;
+import org.apache.synapse.mediators.Key;
+import org.apache.synapse.util.jaxp.*;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.apache.axis2.transport.base.BaseConstants;
+
+import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerFactory;
 
 public class XSLTMediatorTest extends TestCase {
     private static final Class[] sourceBuilderFactories = {
         DOOMSourceBuilderFactory.class,
         StreamSourceBuilderFactory.class,
         AXIOMSourceBuilderFactory.class };
-    
+
     private static final Class[] resultBuilderFactories = {
         DOOMResultBuilderFactory.class,
         StreamResultBuilderFactory.class,
@@ -64,6 +54,21 @@ public class XSLTMediatorTest extends TestCase {
         SOURCE +
         "</m:someOtherElement>";
 
+    private static final String SOURCE_DYNAMIC_KEY1 =
+        "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
+        "<m0:DynamicXsltKey1>DynamicXsltKey1</m0:DynamicXsltKey1>\n" +
+        "</m0:CheckPriceRequest>\n" ;
+
+    private static final String SOURCE_DYNAMIC_KEY2 =
+        "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
+        "<m0:DynamicXsltKey2>DynamicXsltKey2</m0:DynamicXsltKey2>\n" +
+        "</m0:CheckPriceRequest>\n" ;
+
+    private static final String SOURCE_STATIC_KEY =
+        "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
+        "<m0:StaticXsltKey>StaticXsltKey</m0:StaticXsltKey>\n" +
+        "</m0:CheckPriceRequest>\n" ;
+
     // Create the test cases for the various transformer factories, source builders and
     // result builders dynamically:
     public static TestSuite suite() {
@@ -72,10 +77,10 @@ public class XSLTMediatorTest extends TestCase {
         addGenericTests(suite, "Saxon", net.sf.saxon.TransformerFactoryImpl.class);
         return suite;
     }
-    
+
     private static void addGenericTests(TestSuite suite, final String processorName,
             final Class<? extends TransformerFactory> transformerFactoryClass) {
-        
+
         for (final Class sbf : sourceBuilderFactories) {
             for (final Class rbf : resultBuilderFactories) {
                 String testName = "test" + processorName + shortName(sbf) + shortName(rbf);
@@ -94,7 +99,7 @@ public class XSLTMediatorTest extends TestCase {
             }
         }
     }
-    
+
     private static String shortName(Class clazz) {
         String name = clazz.getName();
         name = name.substring(name.lastIndexOf('.')+1);
@@ -107,13 +112,13 @@ public class XSLTMediatorTest extends TestCase {
     /**
      * Check that the provided element is the result of the XSL transformation of
      * SOURCE by the stylesheet transform_unittest.xslt.
-     * 
+     *
      * @param node result of the XSLT to be matched
      */
     private void assertQuoteElement(OMNode node) {
         assertTrue(node instanceof OMElement);
         OMElement element = (OMElement)node;
-        
+
         assertTrue("GetQuote".equals(element.getLocalName()));
         assertTrue("http://www.webserviceX.NET/".equals(element.getNamespace().getNamespaceURI()));
 
@@ -124,7 +129,7 @@ public class XSLTMediatorTest extends TestCase {
 
         assertTrue("String".equals(symbolElem.getText()));
     }
-    
+
     public void testTransformXSLTCustomSource() throws Exception {
 
         // create a new XSLT mediator
@@ -136,7 +141,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setSource(xpath);
 
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
+        setXsltTransformationURL(transformMediator, "xslt-key");
 
         MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
                 "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
@@ -157,7 +162,7 @@ public class XSLTMediatorTest extends TestCase {
         XSLTMediator transformMediator = new XSLTMediator();
 
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
+        setXsltTransformationURL(transformMediator, "xslt-key");
 
         MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
                 "../../repository/conf/sample/resources/transform/transform_unittest.xslt")
@@ -173,7 +178,7 @@ public class XSLTMediatorTest extends TestCase {
         // create a new switch mediator
         XSLTMediator transformMediator = new XSLTMediator();
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
+        setXsltTransformationURL(transformMediator, "xslt-key");
 
         for (int i=0; i<2; i++) {
 
@@ -195,8 +200,7 @@ public class XSLTMediatorTest extends TestCase {
         // create a new switch mediator
         XSLTMediator transformMediator = new XSLTMediator();
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
-
+        setXsltTransformationURL(transformMediator, "xslt-key");
         for (int i=0; i<2; i++) {
 
             // invoke transformation, with static enveope
@@ -216,7 +220,7 @@ public class XSLTMediatorTest extends TestCase {
         // create a new switch mediator
          XSLTMediator transformMediator = new XSLTMediator();
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
+        setXsltTransformationURL(transformMediator, "xslt-key");
 
          // invoke transformation, with static enveope
          MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
@@ -228,7 +232,7 @@ public class XSLTMediatorTest extends TestCase {
          // validate result
          OMContainer body = synCtx.getEnvelope().getBody();
          assertTrue(body.getFirstOMChild().getNextOMSibling() instanceof OMElement);
-         assertTrue( ((OMElement)body.getFirstOMChild().getNextOMSibling()).getText().length() > 0);
+         assertTrue(((OMElement) body.getFirstOMChild().getNextOMSibling()).getText().length() > 0);
     }
 
 
@@ -237,7 +241,7 @@ public class XSLTMediatorTest extends TestCase {
         // create a new switch mediator
         XSLTMediator transformMediator = new XSLTMediator();
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
+        setXsltTransformationURL(transformMediator, "xslt-key");
 
         for (int i=0; i<5; i++) {
             // invoke transformation, with static enveope
@@ -262,7 +266,7 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setSource(xpath);
 
         // set XSLT transformation URL
-        transformMediator.setXsltKey("xslt-key");
+        setXsltTransformationURL(transformMediator, "xslt-key");
 
         // invoke transformation, with static enveope
         MessageContext synCtx = new TestMessageContextBuilder().addFileEntry("xslt-key",
@@ -287,15 +291,15 @@ public class XSLTMediatorTest extends TestCase {
 
     public void testTextEncoding() throws Exception {
         XSLTMediator transformMediator = new XSLTMediator();
-        transformMediator.setXsltKey("xslt-key");
-        
+        setXsltTransformationURL(transformMediator, "xslt-key");
+
         MessageContext mc = new TestMessageContextBuilder().addFileEntry("xslt-key",
                 "../../repository/conf/sample/resources/transform/encoding_test.xslt")
                 .setEnvelopeFromFile("../../repository/conf/sample/resources/transform" +
                         "/encoding_test.xml").build();
-        
+
         transformMediator.mediate(mc);
-        
+
         OMElement resultElement = mc.getEnvelope().getBody().getFirstElement();
         assertEquals(BaseConstants.DEFAULT_TEXT_WRAPPER, resultElement.getQName());
         assertEquals("\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre",
@@ -305,13 +309,12 @@ public class XSLTMediatorTest extends TestCase {
     // Test for SYNAPSE-307
     public void testInvalidStylesheet() throws Exception {
         XSLTMediator transformMediator = new XSLTMediator();
-        transformMediator.setXsltKey("xslt-key");
-        
+        setXsltTransformationURL(transformMediator, "xslt-key");
         MessageContext mc = new TestMessageContextBuilder()
             .addEntry("xslt-key", getClass().getResource("invalid.xslt"))
             .setBodyFromString("<root/>")
             .build();
-        
+
         try {
             transformMediator.mediate(mc);
             fail("Expected a SynapseException to be thrown");
@@ -319,7 +322,7 @@ public class XSLTMediatorTest extends TestCase {
             // this is what is expected
         }
     }
-    
+
     /**
      * Test that the XSLT mediator is able to handle CDATA sections in the
      * source AXIOM tree.
@@ -330,47 +333,127 @@ public class XSLTMediatorTest extends TestCase {
      */
     public void testWithCDATA() throws Exception {
         XSLTMediator transformMediator = new XSLTMediator();
-        transformMediator.setXsltKey("xslt-key");
-        
+        setXsltTransformationURL(transformMediator, "xslt-key");
+
         MessageContext mc = new TestMessageContextBuilder()
             .addEntry("xslt-key", getClass().getResource("cdata.xslt"))
             .build();
-        
+
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement in = factory.createOMElement(new QName(null, "in"));
         factory.createOMText(in, "test", OMNode.CDATA_SECTION_NODE);
         mc.getEnvelope().getBody().addChild(in);
-        
+
         transformMediator.mediate(mc);
-        
+
         OMElement out = mc.getEnvelope().getBody().getFirstElement();
         assertEquals("out", out.getLocalName());
         assertEquals("test", out.getText());
     }
 
-    protected static void test(Class sbf, Class rbf) throws Exception {
-        
+    /**
+     * Test that the XSLT mediator is able to handle dynamic keys
+     * Xpath expression can be used to generate real key dynamically
+     * Multiple xslt files can be loaded
+     *
+     * @throws Exception Exception in case of an error in tests
+     */
+    public void testWithStaticDynamicKeys() throws Exception {
+        for (int i = 0; i < 3; i++) {
+            testMultipleKeys(i);
+        }
+    }
+
+    /**
+     * Test with multiple keys including static and dynamic keys
+     *
+     * @param num number from 0 to 2
+     * @throws Exception Exception in case of an error in tests
+     */
+    private void testMultipleKeys(int num) throws Exception {
+
+        String xsltKeyValue = null;
+
+        String path;
+        SynapseXPath xpath;
+        Key xsltKey;
         XSLTMediator transformMediator = new XSLTMediator();
-        transformMediator.setXsltKey("xslt-key");
-        
+
+        //default source, xsltFile, and state of key (dynamic or static)
+        String source = "";
+        String xsltFile = "";
+        boolean isDynamicKey = true;
+
+        // based on source, different XSLTFiles can be used
+        if (num == 0) {
+            source = SOURCE_STATIC_KEY;
+            xsltFile = "static_key.xslt";
+            xsltKeyValue = "StaticXsltKey";
+            isDynamicKey = false;
+
+        } else if (num == 1) {
+            source = SOURCE_DYNAMIC_KEY1;
+            xsltFile = "dynamic_key_1.xslt";
+            xsltKeyValue = "DynamicXsltKey1";
+            isDynamicKey = true;
+        } else if (num == 2) {
+            source = SOURCE_DYNAMIC_KEY2;
+            xsltFile = "dynamic_key_2.xslt";
+            xsltKeyValue = "DynamicXsltKey2";
+            isDynamicKey = true;
+        }
+
+        if (isDynamicKey) {
+            path = "//m0:CheckPriceRequest/m0:" + xsltKeyValue;
+            xpath = new SynapseXPath(path);
+            xpath.addNamespace("m0", "http://services.samples/xsd");
+
+            // Create key from dynamic key (xpath)
+            xsltKey = new Key(xpath);
+            // set XSLT transformation URL (Xpath)
+            transformMediator.setXsltKey(xsltKey);
+        } else {
+            //static key
+            path = xsltKeyValue;
+            // set XSLT transformation URL (static)
+            setXsltTransformationURL(transformMediator, path);
+        }
+        // Mediate twice for synCtx
+        MessageContext synCtx = new TestMessageContextBuilder().addEntry(
+                xsltKeyValue, getClass().getResource(xsltFile)).setBodyFromString(
+                source).addTextAroundBody().build();
+        transformMediator.mediate(synCtx);
+
+        synCtx = new TestMessageContextBuilder().addEntry(
+                xsltKeyValue, getClass().getResource(xsltFile)).setBodyFromString(
+                source).addTextAroundBody().build();
+        transformMediator.mediate(synCtx);
+    }
+
+    protected static void test(Class sbf, Class rbf) throws Exception {
+
+        XSLTMediator transformMediator = new XSLTMediator();
+        Key xsltKey = new Key("xslt-key");
+        transformMediator.setXsltKey(xsltKey);
+
         MessageContext mc = new TestMessageContextBuilder()
             .addEntry("xslt-key", XSLTMediator.class.getResource("identity.xslt"))
             .build();
-        
+
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement orgRoot = factory.createOMElement(new QName("root"));
         OMElement orgElement = factory.createOMElement(new QName("urn:mynamespace", "element1"));
         orgElement.setText("test");
         OMAttribute orgAttribute = orgElement.addAttribute("att", "testValue", null);
         orgRoot.addChild(orgElement);
-        
+
         mc.getEnvelope().getBody().addChild(orgRoot);
-        
+
         transformMediator.addAttribute(XSLTMediator.SOURCE_BUILDER_FACTORY, sbf.getName());
         transformMediator.addAttribute(XSLTMediator.RESULT_BUILDER_FACTORY, rbf.getName());
-        
+
         transformMediator.mediate(mc);
-        
+
         OMElement root = mc.getEnvelope().getBody().getFirstElement();
         assertEquals(orgRoot.getQName(), root.getQName());
         OMElement element = (OMElement)root.getFirstOMChild();
@@ -378,5 +461,16 @@ public class XSLTMediatorTest extends TestCase {
         assertEquals(orgElement.getText(), element.getText());
         assertEquals(orgAttribute, orgElement.getAttribute(orgAttribute.getQName()));
         assertNull(element.getNextOMSibling());
+    }
+
+    /**
+     * Set XSLT transformation URL
+     *
+     * @param transformMediator Mediator which need to set key
+     * @param xsltKeyValue String key value (static key) to set as a key
+     */
+    private void setXsltTransformationURL(XSLTMediator transformMediator, String xsltKeyValue) {
+        Key xsltKey = new Key(xsltKeyValue);
+        transformMediator.setXsltKey(xsltKey);
     }
 }

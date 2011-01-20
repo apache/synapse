@@ -386,6 +386,13 @@ public class Axis2FlexibleMEPClient {
             mepClient.setCallback(callback);
         }
 
+        // this is a temporary fix for converting messages from HTTP 1.1 chunking to HTTP 1.0.
+        // Without this HTTP transport can block & become unresponsive because we are streaming
+        // HTTP 1.1 messages and HTTP 1.0 require the whole message to caculate the content length
+        if (originalInMsgCtx.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
+            synapseOutMessageContext.getEnvelope().toString();
+        }
+
         // with the nio transport, this causes the listener not to write a 202
         // Accepted response, as this implies that Synapse does not yet know if
         // a 202 or 200 response would be written back.

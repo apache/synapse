@@ -61,7 +61,7 @@
                 All the functional components of the Synapse configuration are configured through
                 XML files. The Synapse configuration language governs the XML syntax used to define
                 and configure different types of components. This configuration language is now
-                available as a XML schema.
+                available as a <a href="http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">XML schema</a>.
             </p>
             <p>
                 Typically the Synapse ESB is deployed between an actual client and a back-end service
@@ -275,7 +275,17 @@
                 'definitions' element. A configuration defined in the synapse.xml file looks like
                 this at the high level.
             </p>
-            <div class="xmlConf"></div>
+            <div class="xmlConf">&lt;definitions&gt;
+   &lt;<a href="#registry">registry</a> provider="string"&gt;...&lt;/registry&gt;?
+   &lt;<a href="#localEntry">localEntry</a> key="string"&gt;...&lt;/localEntry&gt;?
+   &lt;<a href="#sequence">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
+   &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
+   &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
+   &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
+   &lt;<a href="#eventsource">eventSource</a> name="string" ...&gt;...&lt;/eventSource&gt;?
+   &lt;<a href="#executor">executor</a> name="string" ...&gt;...&lt;/executor&gt;?
+   &lt;<a href="#store">messageStore</a> name="string" ...&gt;...&lt;/messageStore&gt;?
+ &lt;/definitions&gt;</div>
             <p>
                 The registry adapter definition is defined under the &lt;registry&gt; element. Similarly
                 &lt;endpoint&gt;, &lt;sequence&gt;, &lt;proxy&gt;, &lt;localEntry&gt;, &lt;eventSource
@@ -289,6 +299,42 @@
                 directory. However the XML syntax used to configure these artifacts are always the same.
                 Next few sections of this document explains the XML syntax for defining various
                 types of components in the Synapse configuration.
+            </p>
+        </section>
+        <section name="Registry" id="registry">
+            <p>
+                The &lt;registry&gt; element is used to define the remote registry used by the
+                Synapse runtime. The registry provider specifies an implementation class for the
+                registry being used, and optionally a number of configuration parameters as may be
+                required by the particular registry implementation. An outline configuration is given
+                below.
+            </p>
+            <div class="xmlConf">&lt;registry provider="string"/&gt;
+    &lt;parameter name="string"&gt;text | xml&lt;/parameter&gt;*
+&lt;/registry&gt;</div>
+            <p>
+                Registry entries loaded from a remote registry may be cached as governed by the
+                registry, and reloaded after the cache periods expires if a newer version is found.
+                Hence it is possible to define configuration elements such as (dynamic) sequences and
+                endpoints, as well as resources such as XSLT's, scripts or XSDs in the registry, and
+                update the configuration as these are allowed to dynamically change over time.
+            </p>
+            <p>
+                Synapse ships with a built-in URL based registry implementation called the
+                'SimpleURLRegistry' and this can be configured as follows:
+            </p>
+            <div class="xmlConf">&lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+  &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
+  &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+&lt;/registry&gt;</div>
+            <p>
+                The 'root' parameter specifies the root URL of the registry for loaded resources. The
+                SimpleURLRegistry keys are path fragments, that when combined with the root prefix
+                would form the full URL for the referenced resource. The 'cachableDuration' parameter
+                specifies the number of milliseconds for which resources loaded from the registry
+                should be cached. More advanced registry implementations allows different cachable
+                durations to be specified for different resources, or mark some resources as never
+                expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)
             </p>
         </section>
     </body>

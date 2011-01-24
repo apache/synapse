@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Configuration Language Guide</title>
+    </properties>
+    <body>
+        <section name="Contents">
+            
+        </section>
+        <section name="Introduction">
+            <p>
+                Apache Synapse reads its configuration from a set of XML files.  This allows the
+                configuration to be easily hand edited, backed up from the file system, or even
+                included in a version control system for easier management and control (e.g. moving
+                a configuration from development, through QA, staging and into production). All these
+                XML configuration files are housed under the repository/conf/synapse-config directory.
+            </p>
+            <p>
+                Synapse also has the ability to load certain configuration elements from an external
+                registry. When using a registry to hold pieces of the configuration, certain items
+                such as endpoint definitions, sequences and local entries can be updated dynamically
+                while the Synapse ESB is executing.
+            </p>
+            <p>
+                This article describes the hierarchy or XML files from which Synapse loads its
+                configuration. It describes the high level structure of the file set and the XML
+                syntax used to configure various elements in the Synapse configuration.
+            </p>
+        </section>
+        <section name="The Synapse Configuration">
+            <p>
+                A typical Synapse configuration is comprised of sequences, endpoints, proxy services
+                and local entries. In certain advanced scenarios, Synapse configuration may also
+                contain scheduled tasks, event sources, messages stores and priority executors.
+                Synapse configuration may also include a registry adapter through which Synapse can
+                import various resources to the mediation engine at runtime. Following diagram
+                illustrates different components of the Synapse configuration and how they interact
+                with each other.
+            </p>
+            <!-- Image goes here -->
+            <p>
+                All the functional components of the Synapse configuration are configured through
+                XML files. The Synapse configuration language governs the XML syntax used to define
+                and configure different types of components. This configuration language is now
+                available as a XML schema.
+            </p>
+            <p>
+                Typically the Synapse ESB is deployed between an actual client and a back-end service
+                implementation to mediate the message flow. Therefore the Synapse ESB can accept a
+                message on behalf of the actual service, perform authentication, validation, transformation,
+                logging, routing and then decide the destination endpoint for the message and direct
+                it to an actual service. The Synapse ESB can also detect timeouts and transport failures
+                during communication or introduce load balancing, throttling or caching where necessary.
+                For fault scenarios such as authentication failures or schema validation failures, the
+                Synapse ESB can be configured to return a custom message or a fault to the requesting
+                client without forwarding the request to the actual service. All these scenarios
+                and usecases can be put into action by selecting the right set of functional components
+                and combining them appropriately in the Synapse configuration.
+            </p>
+            <p>
+                Depending on how functional components are used in the Synapse configuration, Synapse
+                can execute in one or more of the following operational modes.
+            </p>
+            <subsection name="Service Mediation (Proxy Services)">
+                <p>
+                    In service mediation, the Synapse ESB exposes a service endpoint on the ESB, which
+                    accepts messages from clients. Typically these services acts as proxies for existing
+                    (external) services, and the role of Synapse would be to 'mediate' these messages
+                    before they are delivered to the actual service. In this mode, Synapse could expose
+                    a service already available in one transport, over a different transport; or expose
+                    a service that uses one schema or WSDL as a service that uses a different schema or
+                    WSDL. A Proxy service could define the transports over which the service is exposed,
+                    and point to the mediation sequences that should be used to process request and
+                    response messages. A proxy service maybe a SOAP or a REST/POX service over HTTP/S or
+                    SOAP, POX, plain text or binary/legacy service for other transports such as JMS
+                    and VFS file systems.
+                </p>
+            </subsection>
+            <subsection name="Message Mediation">
+                <p>
+                    In message mediation, Synapse acts as a transparent proxy for clients. This way,
+                    Synapse could be configured to filter all the messages on a network for logging,
+                    access control etc, and could 'mediate' messages without the explicit knowledge
+                    of the original client. If Synapse receives a message that is not accepted by any
+                    proxy service, that message is handled through message mediation. Message mediation
+                    always processes messages according to the mediation sequence defined as 'main'.
+                </p>
+            </subsection>
+            <subsection name="Task Scheduling">
+                <p>
+                    In task scheduling, Synapse can execute a predefined task based on a user
+                    specified schedule. This way a task can be configured to run exactly once or
+                    multiple times with fixed intervals. The schedule can be defined by specifying
+                    the number of times the task should be executed and the interval between
+                    executions. Alternatively one may use the Unix Cron syntax to define task
+                    schedules. This mode of operation can be used to periodically invoke a given
+                    service, poll databases and execute other periodic maintenance activities.
+                </p>
+            </subsection>
+            <subsection name="Eventing">
+                <p>
+                    
+                </p>
+            </subsection>
+        </section>
+    </body>
+</document>

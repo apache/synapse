@@ -19,7 +19,7 @@
   -->
 
 <!-- Introduction to dynamic sequences with the Registry -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <parameter name="root">file:./repository/conf/sample/resources/</parameter>

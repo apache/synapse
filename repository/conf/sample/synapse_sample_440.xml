@@ -18,7 +18,7 @@
   ~  under the License.
   -->
 
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="JSONProxy" transports="http https">
         <target>

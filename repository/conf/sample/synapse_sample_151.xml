@@ -19,7 +19,7 @@
   -->
 
 <!-- Custom sequences and endpoints with proxy services -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <localEntry key="proxy_wsdl"
                 src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>

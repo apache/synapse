@@ -19,8 +19,8 @@
   -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-           targetNamespace="http://synapse.apache.org/ns/2010/04/configuration"
-           xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+           targetNamespace="http://ws.apache.org/ns/synapse"
+           xmlns="http://ws.apache.org/ns/synapse">
 
     <xs:include schemaLocation="misc/common.xsd"/>
     <xs:include schemaLocation="endpoint.xsd"/>

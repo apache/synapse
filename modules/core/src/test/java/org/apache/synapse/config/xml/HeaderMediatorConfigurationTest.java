@@ -31,7 +31,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
 
     public void testNamespaceUnqualifiedScenarioOne() {
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"MyHeader\" value=\"MyValue\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
@@ -42,7 +42,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         }
 
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"MyHeader\" action=\"remove\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
@@ -55,7 +55,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
 
     public void testNamespaceUnqualifiedScenarioTwo() {
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"m:MyHeader\" value=\"MyValue\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"m:MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
@@ -66,7 +66,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         }
 
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"m:MyHeader\" action=\"remove\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"m:MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
@@ -88,7 +88,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
 
     private void predefinedHeaderTest(String header) {
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"" + header + "\" value=\"MyValue\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"" + header + "\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
@@ -96,7 +96,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         }
 
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"" + header + "\" action=\"remove\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"" + header + "\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
@@ -106,7 +106,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
 
     public void testNamespaceQualifiedScenario() {
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" value=\"MyValue\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {
@@ -114,7 +114,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         }
 
         try {
-            String inputXml = "<header xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" action=\"remove\"/>";
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
         } catch (XMLStreamException e) {

@@ -42,7 +42,7 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
 
     public void testClonningScenarioOne() throws Exception {
         Mediator clone = fac.createMediator(createOMElement("<clone " +
-            "xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><target soapAction=\"urn:clone\" " +
+            "xmlns=\"http://ws.apache.org/ns/synapse\"><target soapAction=\"urn:clone\" " +
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"), new Properties());
         clone.mediate(testCtx);
@@ -62,7 +62,7 @@ public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
 
     public void testClonningWithContinueParent() throws Exception {
         Mediator clone = fac.createMediator(createOMElement("<clone continueParent=\"true\" " +
-            "xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\"><target soapAction=\"urn:clone\" " +
+            "xmlns=\"http://ws.apache.org/ns/synapse\"><target soapAction=\"urn:clone\" " +
             "sequence=\"seqRef\"/><target to=\"http://test\"><sequence><sequence " +
             "key=\"seqRef\"/></sequence></target></clone>"), new Properties());
         assertTrue(clone.mediate(testCtx));

@@ -19,7 +19,7 @@
   -->
 
 <!-- Introduction to error handling -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- the default fault handling sequence used by Synapse - named 'fault' -->
     <sequence name="fault">

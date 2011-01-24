@@ -118,7 +118,61 @@
             </subsection>
             <subsection name="Eventing">
                 <p>
-                    
+                    In eventing mode, Synapse can be used as an event source and users or systems can
+                    subscribe to receive events from Synapse. Synapse can also act as an event broker
+                    which receives events from other systems and delivers them to the appropriate
+                    subscribers with or without mediation. The set of subsribers will be selected
+                    by applying a predefined filter criteria. This mode enables Synapse to integrate
+                    applications and systems based on the Event Driven Architecture (EDA).
+                </p>
+            </subsection>
+        </section>
+        <section name="Functional Components Overview">
+            <p>
+                We have already skimmed through some of the functional components available in
+                Synapse configuration. This section provides detailed information about each of
+                functional component types.
+            </p>
+            <subsection name="Mediators and Sequences">
+                <p>
+                    The Synapse ESB defines a 'mediator' as a component which performs a predefined
+                    action on a message during the message flow. Thus a mediator gets full access to
+                    a message at the point where it is defined to gain control, and could inspect the
+                    message, modify it or take an external action depending on some attributes or
+                    values of the current message. Writing a custom mediator in Java is easy
+                    and the supplementary documentation provides more details on this. The 'Class' and
+                    'POJO (command)' mediators allow one to plugin a Java class into the Synapse
+                    engine with minimal effort. In addition, the Script mediator allows one to provide
+                    an Apache BSF script (e.g. Javascript, Ruby, Groovy etc) for mediation.
+                </p>
+                <p>
+                    A mediation sequence, commonly called a 'sequence' is a list of mediators. A
+                    sequence may be named for re-use, or defined in-line or anonymously within a
+                    configuration. Sequences may be defined within the Synapse configuration or within
+                    the Registry.
+                </p>
+                <p>
+                    A Synapse configuration contains two special sequences named 'main' and 'fault'.
+                    These too may be defined in the Synapse configuration, or externally in the
+                    Registry. If either is not found, a suitable default configuration is generated at
+                    runtime by the ESB. The default 'main' sequence will simply send a message without
+                    any mediation, while the default 'fault' sequence would log the message and error
+                    details and stop further processing. The 'fault' sequence executes whenever Synapse
+                    itself encounters an error while processing a message, or when a fault handler has
+                    not been defined to handle exceptions. A sequence can assign another named sequence
+                    as its 'fault' handler sequence, and handover control to the fault handler if an
+                    error is encountered during the execution of the initial sequence.
+                </p>
+            </subsection>
+            <subsection name="Endpoints">
+                <p>
+                    An Endpoint definition within Synapse defines an external service endpoint and
+                    any attributes or semantics that should be followed when communicating with that
+                    endpoint. An endpoint definition can be named for re-use, or defined in-line or
+                    anonymously within a configuration. Typically an endpoint would be based on a
+                    service address or a WSDL. Additionally the Synapse ESB supports Failover and
+                    Load-balance endpoints - which are defined over a group of endpoints. Endpoints
+                    may be defined within the local Synapse configuration or within the Registry.
                 </p>
             </subsection>
         </section>

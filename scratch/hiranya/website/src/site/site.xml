@@ -36,6 +36,7 @@
             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
             <item name="Samples Catalog" href="userguide/samples.html"/>
+            <item name="Configuration Language" href="userguide/config.html"/>
         </menu>
         <menu name="Developer Resources">
             <item name="Checkout the Source"/>

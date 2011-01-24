@@ -35,22 +35,22 @@ import java.util.HashMap;
 public class DynamicResourceTest extends TestCase {
 
     private static final String DYNAMIC_ENDPOINT_1 =
-            "<endpoint xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">\n" +
+            "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
             "    <address uri=\"http://test.url\"/>\n" +
             "</endpoint>";
 
     private static final String DYNAMIC_ENDPOINT_2 =
-            "<endpoint xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">\n" +
+            "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
             "    <address uri=\"http://test2.url\"/>\n" +
             "</endpoint>";
 
     private static final String DYNAMIC_SEQUENCE_1 =
-            "<sequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"seq1\">\n" +
+            "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"seq1\">\n" +
             "    <property name=\"foo\" value=\"bar\" />" +
             "</sequence>";
 
     private static final String DYNAMIC_SEQUENCE_2 =
-            "<sequence xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" name=\"seq1\">\n" +
+            "<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"seq1\">\n" +
             "    <property name=\"foo\" value=\"baz\" />" +
             "</sequence>";
 

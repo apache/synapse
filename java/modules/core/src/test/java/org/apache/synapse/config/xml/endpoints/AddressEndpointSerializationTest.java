@@ -26,7 +26,7 @@ import org.apache.synapse.endpoints.AddressEndpoint;
 public class AddressEndpointSerializationTest extends AbstractTestCase {
 
     public void testAddressEndpointScenarioOne() throws Exception {
-        String inputXML = "<endpoint  xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+        String inputXML = "<endpoint  xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" />" +
                 "</endpoint>" ;
 
@@ -42,7 +42,7 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
     public void testAddressEndpointScenarioTwo() throws Exception {
         String inputXML =
                 "<endpoint name=\"testEndpoint\" onFault=\"foo\" xmlns=" +
-                        "\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                        "\"http://ws.apache.org/ns/synapse\">" +
                 "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" >" +
                 "</address>"+
                 "</endpoint>" ;
@@ -56,7 +56,7 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
     }
 
     public void testAddressEndpointScenarioThree() throws Exception {
-        String inputXML = "<endpoint  xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+        String inputXML = "<endpoint  xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" >" +
                 "<markForSuspension>" +
                 "<errorCodes>101507,101508</errorCodes>" +
@@ -86,7 +86,7 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
 
     public void testAddressEndpointScenarioFour() throws Exception {
          String inputXML =
-                "<endpoint xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" >" +
                 "</address>"+
                 "</endpoint>" ;

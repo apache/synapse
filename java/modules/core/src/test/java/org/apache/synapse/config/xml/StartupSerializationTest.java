@@ -31,7 +31,7 @@ public class StartupSerializationTest extends AbstractTestCase {
 
     public void testStartupSerializationSenarioOne() throws Exception {
         String inputXml = "<task class=\"org.apache.synapse.util.TestTask\" group=\"org\" " +
-                "name=\"TestTask\" xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                "name=\"TestTask\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<property name=\"name\" value=\"foo\"/>" +
                 "<trigger interval=\"5\"/></task>";
         OMElement inputOM = createOMElement(inputXml);
@@ -42,7 +42,7 @@ public class StartupSerializationTest extends AbstractTestCase {
 
     public void testStartupSerializationSenarioTwo() throws Exception {
         String inputXml = "<task class=\"org.apache.synapse.util.TestTask\" group=\"org\" " +
-                "name=\"TestTask\" xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\">" +
+                "name=\"TestTask\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<description>Test description</description>" +
                 "<property name=\"name\" value=\"foo\"/>" +
                 "<trigger interval=\"5\"/></task>";

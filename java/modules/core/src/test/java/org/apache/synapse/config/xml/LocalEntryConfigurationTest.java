@@ -36,9 +36,9 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
     public void testSimpleTextEntry() {
         String text = "Apache Synapse - 2.0";
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\">" + text + "</localEntry>";
-        String serializedSrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String serializedSrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
 
         try {
@@ -65,7 +65,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
         System.out.println("Testing text entry with markup characters; Coalesced " +
                 "parsing: " + coalesced);
         String text = "mc.setPayloadXML(<xml>data</xml>);";
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
 
         try {
@@ -94,7 +94,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         String actualText = "mc.setPayloadXML(<xml><![CDATA[data]]></xml>);";
         String escapedText = "mc.setPayloadXML(<xml><![CDATA[data]]]]><![CDATA[></xml>);";
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\"><![CDATA[" + escapedText + "]]></localEntry>";
 
         try {
@@ -123,9 +123,9 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
                 "available under the Apache Software License 2.0. For more information please visit " +
                 "http://synapse.apache.org.";
 
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\">" + text + "</localEntry>";
-        String serializedSrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String serializedSrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
 
         try {
@@ -163,7 +163,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
                 "available under the Apache Software License 2.0. For more information please visit " +
                 "http://synapse.apache.org.";
 
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\"><![CDATA[" + text + "]]></localEntry>";
 
         try {
@@ -187,7 +187,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
     public void testSimpleXMLEntry() {
         String xml = "<m:project xmlns:m=\"http://testing.synapse.apache.org\"><m:id>001</m:id>" +
                 "<m:name>Synapse</m:name></m:project>";
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\">" + xml + "</localEntry>";
 
         try {
@@ -218,7 +218,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
 
         String xml = "<m:project xmlns:m=\"http://testing.synapse.apache.org\">" +
                 "<![CDATA[<xml>data</xml>]]></m:project>";
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\">" + xml + "</localEntry>";
 
         try {
@@ -323,7 +323,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
                 "    </wsdl:service>\n" +
                 "</wsdl:definitions>";
         
-        String entrySrc = "<localEntry xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" " +
+        String entrySrc = "<localEntry xmlns=\"http://ws.apache.org/ns/synapse\" " +
                 "key=\"" + key + "\">" + xml + "</localEntry>";
 
         try {

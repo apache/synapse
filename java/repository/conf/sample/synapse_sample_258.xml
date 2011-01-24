@@ -19,7 +19,7 @@
   -->
 
 <!-- HTTP to FIX Proxy Service -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="FIXProxy" transports="http">
         <target>

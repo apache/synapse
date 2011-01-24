@@ -19,7 +19,7 @@
   -->
 
 <!-- Switching transports and message format from SOAP to REST/POX -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <proxy name="StockQuoteProxy" transports="https">
         <target>

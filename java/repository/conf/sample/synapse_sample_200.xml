@@ -19,7 +19,7 @@
   -->
 
 <!-- Using WS-Security with policy attachments for proxy services -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 

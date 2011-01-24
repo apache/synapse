@@ -35,7 +35,7 @@ public class DropMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testDropMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<drop xmlns=\"http://synapse.apache.org/ns/2010/04/configuration\" />";
+        String inputXml = "<drop xmlns=\"http://ws.apache.org/ns/synapse\" />";
         assertTrue(serialization(inputXml, dropMediatorFactory, dropMediatorSerializer));
         assertTrue(serialization(inputXml, dropMediatorSerializer));
     }

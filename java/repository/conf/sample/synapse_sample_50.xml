@@ -19,7 +19,7 @@
   -->
 
 <!-- POX to SOAP conversion -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">
         <!-- filtering of messages with XPath and regex matches -->

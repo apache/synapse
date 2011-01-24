@@ -337,5 +337,61 @@
                 expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)
             </p>
         </section>
+        <section name="Local Registry (Local Entries)" id="localEntry">
+            <p>
+                The &lt;localEntry&gt; element is used to declare registry entries that are local to
+                the Synapse instance, as shown below.
+            </p>
+            <div class="xmlConf">&lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;</div>
+            <p>
+                These entries are top level entries which are globally visible within the entire
+                system. Values of these entries can be retrieved via the extension XPath function
+                'synapse:get-property(prop-name)' and the keys of these entries could be specified
+                wherever a registry key is expected within the configuration.
+            </p>
+            <p>
+                An entry can contain static text or static XML specified inline. A local entry may
+                also load its content from a URL (using the 'src' attribute). A local entry shadows
+                any entry with the same name from a remote registry.
+            </p>
+            <div class="xmlConf">&lt;localEntry key="version"&gt;0.1&lt;/localEntry&gt;
+
+&lt;localEntry key="validate_schema"&gt;
+    &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+     ...
+    &lt;/xs:schema&gt;
+&lt;/localEntry&gt;
+
+&lt;localEntry key="xslt-key-req" src="file:repository/conf/sample/resources/transform/transform.xslt"/&gt;</div>
+        </section>
+        <section name="Sequences" id="sequence">
+            <p>
+                A &lt;sequence&gt; element is used to define a sequence of mediators that can be
+                invoked later by name. The sequences named 'main' and 'fault' has special significance
+                in a Synapse configuration. The 'main' sequence handles any message that is accepted
+                for message mediation, and the 'fault' sequence is invoked if Synapse encounters a fault,
+                and a custom fault handler is not specified for the sequence via its 'onError' attribute.
+            </p>
+            <p>
+                A dynamic sequence may be defined by specifying a key reference to a registry entry.
+                As the remote registry entry changes, the sequence will dynamically be updated according
+                to the specified cache duration and expiration. If tracing is enabled on a sequence,
+                all messages being processed through the sequence would write tracing information
+                through  each mediation step to the trace.log file configured via the log4j.properties
+                configuration. Setting the trace log level to TRACE would additionally dump the message
+                and detailed trace information at each mediation step. A tracing enabled sequence
+                propagates this setting to invoked sub-sequences.
+            </p>
+            <div class="xmlConf">&lt;sequence name="main" onError="errorHandler"&gt;
+  .. &lt;!-- a 'main' sequence that invokes the sequence named 'errorHandler' on a fault --&gt; ..
+&lt;/sequence&gt;</div>
+            <div class="xmlConf">&lt;sequence key="sequence/dynamic_seq_1.xml"/&gt;
+where "sequence/dynamic_seq_1.xml" refers to the following sequence definition from the registry:
+
+&lt;sequence name="dynamic_sequence" xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;
+  ..
+&lt;/sequence&gt;</div>
+            
+        </section>
     </body>
 </document>

@@ -175,6 +175,121 @@
                     may be defined within the local Synapse configuration or within the Registry.
                 </p>
             </subsection>
+            <subsection name="Tasks">
+                <p>
+                    A task is a custom Java class that implements the org.apache.synapse.task.Task
+                    interface which contains a single "public void execute()" method. Such a task can
+                    be scheduled and managed via the Synapse ESB. The scheduling information for a
+                    task can be specified in the cron format or a simple format by the user. A task
+                    may also be specified as a one-time task where required, and can be used to trigger
+                    a callout or inject a message into the Synapse ESB.
+                </p>
+            </subsection>
+            <subsection name="Remote Registry and Local Registry (Local Entries)">
+                <p>
+                    Synapse configuration can refer to an external registry/repository for resources
+                    used such as WSDL, schemas, scripts, XSLT and XQuery transformations etc. One or
+                    more remote registries may be hidden or merged behind a local registry interface
+                    defined in the Synapse configuration. Resources from an external registry are
+                    looked up using 'keys' - which are known to the external registry. The Synapse
+                    ESB ships with a simple URL based registry implementation that uses the file system
+                    for storage of resources, and URL's or fragments as 'keys'.
+                </p>
+                <p>
+                    A registry may define a duration for which a resource served may be cached by the
+                    Synapse runtime. If such a duration is specified, the Synapse ESB is capable of
+                    refreshing the resource after cache expiry to support dynamic re-loading of resource
+                    at runtime. Optionally, a configuration could define certain 'keys' to map to locally
+                    defined entities. These entities may refer to a source URL or file, or may be defined
+                    as in-line XML or text within the configuration itself. If a registry contains a
+                    resource whose 'key' matches the key of a locally defined entry, the local entry
+                    shadows the resource available in the registry. Thus it is possible to override
+                    registry resources locally from within a configuration. To integrate Synapse with
+                    a custom/new registry, one needs to implement the org.apache.synapse.registry.Registry
+                    interface to suit the actual registry being used.
+                </p>
+            </subsection>
+            <subsection name="Event Sources">
+
+            </subsection>
+            <subsection name="Priority Executors">
+
+            </subsection>
+            <subsection name="Message Stores">
+                
+            </subsection>
+        </section>
+        <section name="Synapse Configuration Files">
+            <p>
+                All the XML files pertaining to Synapse configuration are available in the
+                repository/conf/synapse-config directory of the Synapse installation. This file
+                heirarchy consists of two files named synapse.xml and registry.xml. In addition to
+                that, following subdirectories can be found in the synapse-config directory.
+            </p>
+            <ul>
+                <li>endpoints</li>
+                <li>events</li>
+                <li>local-entries</li>
+                <li>proxy-services</li>
+                <li>sequences</li>
+                <li>tasks</li>
+            </ul>
+            <p>
+                Each of these subdirectories can contain zero or more configuration items. For
+                an example the 'endpoints' directory may contain zero or more endpoint definitions
+                and the 'sequences' directory may contain zero or more sequence definitions. The
+                registry adapter is defined in the top level registry.xml file. The synapse.xml file
+                is there mainly for backward compatibility reasons. It can be used to define any
+                type of configuration items. One may define few endpoints in the 'endpoints' directory
+                and a few endpoints in the synapse.xml file. However it is recommended to stick to
+                a single, consistent way of defining configuration elements.
+            </p>
+            <p>
+                The following tree diagram shows the high-level view of the resulting file
+                heirarchy.
+            </p>
+            <div class="consoleOutput">synapse-config
+            |-- endpoints
+            |   `-- foo.xml
+            |-- events
+            |   `-- event1.xml
+            |-- local-entries
+            |   `-- bar.xml
+            |-- proxy-services
+            |   |-- proxy1.xml
+            |   |-- proxy2.xml
+            |   `-- proxy3.xml
+            |-- registry.xml
+            |-- sequences
+            |   |-- custom-logger.xml
+            |   |-- fault.xml
+            |   `-- main.xml
+            |-- synapse.xml
+            `-- tasks
+                `-- task1.xml</div>
+        </section>
+        <section name="Contents of the synapse.xml File">
+            <p>
+                As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.
+                All these different configuration items should be wrapped in a top level
+                'definitions' element. A configuration defined in the synapse.xml file looks like
+                this at the high level.
+            </p>
+            <div class="xmlConf"></div>
+            <p>
+                The registry adapter definition is defined under the &lt;registry&gt; element. Similarly
+                &lt;endpoint&gt;, &lt;sequence&gt;, &lt;proxy&gt;, &lt;localEntry&gt;, &lt;eventSource
+                and &lt;executor&gt; elements are used to define other functional components.
+            </p>
+            <p>
+                As pointed out earlier, the synapse.xml file is there in the synapse-config directory
+                for backwards compatibility reasons. Any artifact defined in this file can be
+                defined separately in its own XML file. The registry can be defined in the registry.xml
+                and other artifacts can be defined in the corresponding subdirectories of the synapse-config
+                directory. However the XML syntax used to configure these artifacts are always the same.
+                Next few sections of this document explains the XML syntax for defining various
+                types of components in the Synapse configuration.
+            </p>
         </section>
     </body>
 </document>

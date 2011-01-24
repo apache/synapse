@@ -19,7 +19,7 @@
   -->
 
 <!-- Simple callout  mediator -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">
         <callout serviceURL="http://localhost:9000/services/SimpleStockQuoteService"

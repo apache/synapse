@@ -1,4 +1,4 @@
-<sequence name="fault" xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<sequence name="fault" xmlns="http://ws.apache.org/ns/synapse">
     <log level="full"/>
     <send/>
 </sequence>

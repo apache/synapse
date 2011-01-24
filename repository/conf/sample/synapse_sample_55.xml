@@ -21,7 +21,7 @@
 <!-- Session affinity load balancing between fail over endpoints.
         (If endpoint servers maintain session specific data,
         such data have to replicated among the failover endpoints) -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main" onError="errorHandler">
         <in>

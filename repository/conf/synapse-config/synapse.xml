@@ -19,7 +19,7 @@
   -->
         
 <!-- An empty flat synapse configuration shipped with the Apache Synapse -->
-<definitions xmlns="http://synapse.apache.org/ns/2010/04/configuration">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- You can add any flat sequences, endpoints, etc.. to this synapse.xml file if you do
     not want to keep the artifacts in several files -->

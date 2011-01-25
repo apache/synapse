@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
@@ -68,6 +69,8 @@ import java.util.Properties;
  */
 public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
+    public static final String SKIP_WSDL_PARSING = "skip.wsdl.parsing";
+
     private static WSDLEndpointFactory instance = new WSDLEndpointFactory();
 
     private WSDLEndpointFactory() {
@@ -106,35 +109,40 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
             wsdlEndpoint.setServiceName(serviceName);
             wsdlEndpoint.setPortName(portName);
 
+            String noParsing = properties.getProperty(SKIP_WSDL_PARSING);
+
             if (wsdlURI != null) {
-
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
-                try {
-                    OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI)
-                            .toString(), properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
-                            properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
-                    if (wsdlOM != null && wsdlOM instanceof OMElement) {
-                        OMElement omElement = (OMElement) wsdlOM;
-                        OMNamespace ns = omElement.getNamespace();
-                        if (ns != null) {
-                            String nsUri = omElement.getNamespace().getNamespaceURI();
-                            if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
+                if (noParsing == null || !JavaUtils.isTrueExplicitly(noParsing)) {
+                    try {
+                        OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI)
+                                .toString(), properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
+                                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
+                        if (wsdlOM != null && wsdlOM instanceof OMElement) {
+                            OMElement omElement = (OMElement) wsdlOM;
+                            OMNamespace ns = omElement.getNamespace();
+                            if (ns != null) {
+                                String nsUri = omElement.getNamespace().getNamespaceURI();
+                                if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
 
-                                endpoint = new WSDL11EndpointBuilder().
-                                        createEndpointDefinitionFromWSDL(
-                                                wsdlURI.trim(), omElement, serviceName, portName);
+                                    endpoint = new WSDL11EndpointBuilder().
+                                            createEndpointDefinitionFromWSDL(
+                                                    wsdlURI.trim(), omElement, serviceName, portName);
 
-                            } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
-                                //endpoint = new WSDL20EndpointBuilder().
-                                // createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
+                                } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
+                                    //endpoint = new WSDL20EndpointBuilder().
+                                    // createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
 
-                                handleException("WSDL 2.0 Endpoints are currently not supported");
+                                    handleException("WSDL 2.0 Endpoints are currently not supported");
+                                }
                             }
                         }
+                    } catch (Exception e) {
+                        handleException("Couldn't create endpoint from the given WSDL URI : "
+                                + e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    handleException("Couldn't create endpoint from the given WSDL URI : "
-                            + e.getMessage(), e);
+                } else {
+                    endpoint = new EndpointDefinition();
                 }
             }
 
@@ -144,17 +152,20 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
             if (endpoint == null && definitionElement != null) {
                 wsdlEndpoint.setWsdlDoc(definitionElement);
 
-                String resolveRoot = properties.get(SynapseConstants.RESOLVE_ROOT).toString();
-//                String resolveRoot = SynapseConfigUtils.getResolveRoot();
-                String baseUri = "file:./";
-                if (resolveRoot != null) {
-                    baseUri = resolveRoot.trim();
+                if (noParsing == null || !JavaUtils.isTrueExplicitly(noParsing)) {
+                    String resolveRoot = properties.get(SynapseConstants.RESOLVE_ROOT).toString();
+                    String baseUri = "file:./";
+                    if (resolveRoot != null) {
+                        baseUri = resolveRoot.trim();
+                    }
+                    if (!baseUri.endsWith(File.separator)) {
+                        baseUri = baseUri + File.separator;
+                    }
+                    endpoint = new WSDL11EndpointBuilder().createEndpointDefinitionFromWSDL(
+                            baseUri, definitionElement, serviceName, portName);
+                } else {
+                    endpoint = new EndpointDefinition();
                 }
-                if (!baseUri.endsWith(File.separator)) {
-                    baseUri = baseUri + File.separator;
-                }
-                endpoint = new WSDL11EndpointBuilder().createEndpointDefinitionFromWSDL(
-                        baseUri, definitionElement, serviceName, portName);
             }
 
             // check if a wsdl 2.0 document is supplied inline
@@ -168,7 +179,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                 // for now, QOS information has to be provided explicitly.
                 extractCommonEndpointProperties(endpoint, wsdlElement);
                 extractSpecificEndpointProperties(endpoint, wsdlElement);
-                wsdlEndpoint.setDefinition(endpoint);                   
+                wsdlEndpoint.setDefinition(endpoint);
                 processAuditStatus(endpoint, wsdlEndpoint.getName(), wsdlElement);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");

@@ -242,10 +242,20 @@ public class FIXUtils {
                 Iterator groupElements = bodyNode.getChildElements();
                 while (groupElements.hasNext()){
                     OMElement groupNode = (OMElement) groupElements.next();
-                    OMElement delimNode = groupNode.getFirstElement();
-                    int delimKey = Integer.parseInt(delimNode.getAttributeValue(
-                            new QName(FIXConstants.FIX_FIELD_ID)));
-                    group = new Group(groupsKey, delimKey);
+                    Iterator groupFields = groupNode.getChildrenWithName(new QName(FIXConstants.FIX_FIELD));
+                    List<Integer> idList = new ArrayList<Integer>();
+                    while (groupFields.hasNext()) {
+                        OMElement fieldNode = (OMElement) groupFields.next();
+                        idList.add(Integer.parseInt(fieldNode.getAttributeValue(
+                                new QName(FIXConstants.FIX_FIELD_ID))));
+                    }
+
+                    int[] order = new int[idList.size()];
+                    for (int i = 0; i < order.length; i++) {
+                        order[i] = idList.get(i);
+                    }
+
+                    group = new Group(groupsKey, order[0], order);
                     generateFIXBody(groupNode, group, msgCtx, withNs, nsURI, nsPrefix);
                     message.addGroup(group);
                 }

@@ -254,6 +254,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
                 if (o != null && o instanceof Mediator) {
                     localRegistry.put(key, entry);
                     return (Mediator) o;
+                } else if (o instanceof OMNode) {
+                    Mediator m = (Mediator) MediatorFactoryFinder.getInstance().
+                            getObjectFromOMNode((OMNode) o, properties);
+                    if (m != null) {
+                        entry.setValue(m);
+                        return m;
+                    }
                 }
             }
         } else {
@@ -612,6 +619,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
                 if (o != null && o instanceof Endpoint) {
                     localRegistry.put(key, entry);
                     return (Endpoint) o;
+                } else if (o instanceof OMNode){
+                    Endpoint e = (Endpoint) XMLToEndpointMapper.getInstance().
+                            getObjectFromOMNode((OMNode) o, properties);
+                    if (e != null) {
+                        entry.setValue(e);
+                        return e;
+                    }
                 }
             }
         } else {

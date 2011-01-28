@@ -138,7 +138,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             if (failSafeProxyEnabled) {
                 log.warn("Proxy Service configuration : " +
                         elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "name")))
-                        + " cannot be built.");
+                        + " cannot be built.", e);
                 log.warn("Continue in Proxy Service Fail-safe mode.");
             } else {
                 handleException("Proxy Service configuration : " +
@@ -165,7 +165,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         } catch (Exception e) {
             if (failSafeLocalEntriesEnabled) {
                 log.warn("Local Entry configuration : " +
-                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) +" cannot be built");
+                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) +" cannot be built", e);
                 log.warn("Continue in Local Entry fail-safe mode.");
             } else {
                 handleException("Local Entry configuration : " +
@@ -197,7 +197,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 }
             } catch (Exception e) {
                 if (failSafeSequenceEnabled) {
-                    log.warn("Sequence configuration : " + name +" cannot be built.");
+                    log.warn("Sequence configuration : " + name +" cannot be built.", e);
                     log.warn("Continue in Sequence fail-safe mode.");
                 } else {
                     handleException("Sequence configuration : " + name +" cannot be built.");
@@ -224,7 +224,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 }
             } catch (Exception e) {
                 if (failSafeEpEnabled) {
-                    log.warn("Endpoint configuration : " + name + " cannot be built.");
+                    log.warn("Endpoint configuration : " + name + " cannot be built.", e);
                     log.warn("Continue in Endpoint fail-safe mode.");
                 } else {
                     handleException("Endpoint configuration " + name + " cannot be built.");
@@ -250,7 +250,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
         } catch (Exception e) {
             if (failSafeEventSourcesEnabled) {
-                log.warn("Event Source configuration cannot be built.");
+                log.warn("Event Source configuration cannot be built.", e);
                 log.warn("Continue in Event Source fail-safe mode.");
             } else {
                 handleException("Event Source configuration cannot be built.");

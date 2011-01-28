@@ -115,6 +115,26 @@ public abstract class AbstractRegistry implements Registry {
             } else {
                 omNode = lookup(entry.getKey());
                 entry.setEntryProperties(getResourceProperties(entry.getKey()));
+
+                if (omNode == null && entry.getEntryProperties() != null &&
+                        !entry.getEntryProperties().isEmpty()) {
+                    // Collection
+                    re = getRegistryEntry(entry.getKey());
+                    if (re != null) {
+                        if (re.getCachableDuration() > 0) {
+                            entry.setExpiryTime(System.currentTimeMillis() +
+                                    re.getCachableDuration());
+                        } else {
+                            entry.setExpiryTime(-1);
+                        }
+                        entry.setVersion(re.getVersion());
+                    }
+                }
+
+                if (omNode == null) {
+                    return null;
+                }
+
             }
         }
 

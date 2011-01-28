@@ -124,7 +124,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem,
                                            Properties properties) {
-        boolean failSafeProxyEnabled = isFaileSafeEnabled(
+        boolean failSafeProxyEnabled = isFailSafeEnabled(
                 SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES);
 
         ProxyService proxy = null;
@@ -152,7 +152,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static Entry defineEntry(SynapseConfiguration config, OMElement elem,
                                     Properties properties) {
-        boolean failSafeLocalEntriesEnabled = isFaileSafeEnabled(
+        boolean failSafeLocalEntriesEnabled = isFailSafeEnabled(
                 SynapseConstants.FAIL_SAFE_MODE_LOCALENTRIES);
 
         Entry entry = null;
@@ -178,7 +178,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     public static Mediator defineSequence(SynapseConfiguration config, OMElement ele,
                                           Properties properties) {
 
-        boolean failSafeSequenceEnabled = isFaileSafeEnabled(
+        boolean failSafeSequenceEnabled = isFailSafeEnabled(
                 SynapseConstants.FAIL_SAFE_MODE_SEQUENCES);
 
         Mediator mediator = null;
@@ -212,7 +212,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele,
                                           Properties properties) {
-        boolean failSafeEpEnabled = isFaileSafeEnabled(SynapseConstants.FAIL_SAFE_MODE_EP);
+        boolean failSafeEpEnabled = isFailSafeEnabled(SynapseConstants.FAIL_SAFE_MODE_EP);
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         Endpoint endpoint = null;
@@ -239,7 +239,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static SynapseEventSource defineEventSource(SynapseConfiguration config,
                                                        OMElement elem, Properties properties) {
-        boolean failSafeEventSourcesEnabled = isFaileSafeEnabled(
+        boolean failSafeEventSourcesEnabled = isFailSafeEnabled(
                 SynapseConstants.FAIL_SAFE_MODE_EVENT_SOURCE);
         SynapseEventSource eventSource = null;
 
@@ -261,7 +261,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static PriorityExecutor defineExecutor(SynapseConfiguration config,
                                                        OMElement elem, Properties properties) {
-        boolean failSafeExecutorsEnabled = isFaileSafeEnabled(
+        boolean failSafeExecutorsEnabled = isFailSafeEnabled(
                 SynapseConstants.FAIL_SAFE_MODE_EXECUTORS);
 
         PriorityExecutor executor = null;
@@ -302,7 +302,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return SynapseXMLConfigurationSerializer.class;
     }
 
-    private static boolean isFaileSafeEnabled(String componentName) {
+    private static boolean isFailSafeEnabled(String componentName) {
         if (failSafeStr != null) {
             String[] failSafeComponents = failSafeStr.split(",");
             if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0

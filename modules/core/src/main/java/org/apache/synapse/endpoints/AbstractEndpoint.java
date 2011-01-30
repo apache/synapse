@@ -196,13 +196,25 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     }
 
     public boolean readyToSend() {
-        return !initialized || context == null || context.readyToSend();
+        if (!initialized) {
+            //can't send to a non-initialized endpoint. This is a program fault
+            throw new IllegalStateException("not initialized, " +
+                    "endpoint must be in initialized state");
+        }
+
+        return context != null && context.readyToSend();
     }
 
     public void send(MessageContext synCtx) {
 
         boolean traceOn = isTraceOn(synCtx);
         boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (!initialized) {
+            //can't send to a non-initialized endpoint. This is a program fault
+            throw new IllegalStateException("not initialized, " +
+                    "endpoint must be in initialized state");
+        }
 
         prepareForEndpointStatistics(synCtx);
 

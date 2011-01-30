@@ -19,11 +19,42 @@
 
 package org.apache.synapse.endpoints;
 
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+
 /**
  * This class represents an endpoint with the EPR as the 'To' header of the message. It is
  * responsible for sending the message to this EPR, performing retries etc on failure and
  * using any QOS etc as specified
  */
 public class DefaultEndpoint extends AbstractEndpoint {
-    // do nothing :)!
+    public void onFault(MessageContext synCtx) {
+
+        // is this really a fault or a timeout/connection close etc?
+        if (isTimeout(synCtx)) {
+            getContext().onTimeout();
+        } else if (isSuspendFault(synCtx)) {
+            getContext().onFault();
+        }
+
+        // this should be an ignored error if we get here
+        setErrorOnMessage(synCtx, null, null);
+        super.onFault(synCtx);
+    }
+
+    public void onSuccess() {
+        if (getContext() != null) {
+            getContext().onSuccess();
+        }
+    }
+
+    public void send(MessageContext synCtx) {
+        if (getParentEndpoint() == null && !readyToSend()) {
+            // if the this leaf endpoint is too a root endpoint and is in inactive
+            informFailure(synCtx, SynapseConstants.ENDPOINT_ADDRESS_NONE_READY,
+                    "Currently , Default endpoint : " + getContext());
+        } else {
+            super.send(synCtx);
+        }
+    }
 }

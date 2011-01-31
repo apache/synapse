@@ -101,7 +101,7 @@ public class Axis2FlexibleMEPClient {
         if (log.isDebugEnabled()) {
             String to;
             if (endpoint != null && endpoint.getAddress() != null) {
-                to = endpoint.getAddress();
+                to = endpoint.getAddress(synapseOutMessageContext);
             } else {
                 to = synapseOutMessageContext.getTo().toString();
             }
@@ -221,13 +221,16 @@ public class Axis2FlexibleMEPClient {
             if (endpoint.getAddress() != null) {
                 if (isRest && restSuffix != null && !"".equals(restSuffix)) {
                     axisOutMsgCtx.setTo(
-                            new EndpointReference(endpoint.getAddress() + restSuffix));
+                            new EndpointReference(
+                                    endpoint.getAddress(synapseOutMessageContext) + restSuffix));
 
                 } else {
-                    axisOutMsgCtx.setTo(new EndpointReference(endpoint.getAddress()));
+                    axisOutMsgCtx.setTo(
+                            new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
                 }
 
-                axisOutMsgCtx.setProperty(NhttpConstants.ENDPOINT_PREFIX, endpoint.getAddress());
+                axisOutMsgCtx.setProperty(NhttpConstants.ENDPOINT_PREFIX,
+                        endpoint.getAddress(synapseOutMessageContext));
             } else {
                 // Supporting RESTful invocation
                 if (isRest && restSuffix != null && !"".equals(restSuffix)) {
@@ -413,9 +416,11 @@ public class Axis2FlexibleMEPClient {
             if ( (rm11 != null) && rm11.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){
                 ServiceClient serviceClient = new ServiceClient(
                         axisOutMsgCtx.getConfigurationContext(), axisOutMsgCtx.getAxisService());
-                serviceClient.setTargetEPR(new EndpointReference(endpoint.getAddress()));
+                serviceClient.setTargetEPR(
+                        new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
                 serviceClient.setOptions(clientOptions);
-                serviceClient.getOptions().setTo(new EndpointReference(endpoint.getAddress()));
+                serviceClient.getOptions().setTo(
+                        new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
                 SandeshaClient.terminateSequence(serviceClient);
             }
         }

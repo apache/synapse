@@ -316,12 +316,16 @@ public class ServerHandler implements NHttpServiceHandler {
 
                 Boolean reqRead = (Boolean) conn.getContext().getAttribute(
                         NhttpConstants.REQUEST_READ);
+                Boolean forceConnectionClose = (Boolean) conn.getContext().getAttribute(
+                        NhttpConstants.FORCE_CONNECTION_CLOSE);
                 if (reqRead != null && !reqRead) {
                     try {
                         // this is a connection we should not re-use
                         conn.close();
                     } catch (Exception ignore) {}
                 } else if (!connStrategy.keepAlive(response, context)) {
+                    conn.close();
+                } else if (forceConnectionClose != null && forceConnectionClose) {
                     conn.close();
                 } else {
                     conn.requestInput();

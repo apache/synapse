@@ -475,33 +475,41 @@ public class ServerWorker implements Runnable {
         } else {
             log.error(msg, e);
         }
-
+        Exception newException = e;
         if (e == null) {
-            e = new Exception(msg);
+            newException = new Exception(msg);
         }
 
         try {
             MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(
-                    msgContext, e);
+                    msgContext, newException);
             AxisEngine.sendFault(faultContext);
 
         } catch (Exception ex) {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             response.addHeader(CONTENT_TYPE, TEXT_XML);
+            conn.getContext().setAttribute(NhttpConstants.FORCE_CONNECTION_CLOSE, true);
             serverHandler.commitResponseHideExceptions(conn, response);
 
             try {
-                os.write(msg.getBytes());
-                if (ex != null) {
-                    os.write(ex.getMessage().getBytes());
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException ignore) {}
                 }
-            } catch (IOException ignore) {}
 
-            if (conn != null) {
-                try {
-                    conn.shutdown();
-                } catch (IOException ignore) {}
-            }
+                String body = "<html><body><h1>" + "Failed to process the request" +
+                         "</h1><p>"+ msg + "</p>";
+                if (e != null) {
+                    body = body + "<p>"+ e.getMessage() + "</p></body></html>";
+                }
+                if (ex != null) {
+                    body = body + "<p>"+ ex.getMessage() + "</p></body></html>";
+                }
+                os.write(body.getBytes());
+                os.flush();
+                os.close();
+            } catch (IOException ignore) {}
         }
     }
 

@@ -132,4 +132,5 @@ public class NhttpConstants {
     /** This constant is used to plugin a custom WSDL processor for Get requests*/
     public static final String HTTP_GET_PROCESSOR = "httpGetProcessor";
 
+    public static final String FORCE_CONNECTION_CLOSE = "FORCE_CONNECTION_CLOSE";
 }

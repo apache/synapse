@@ -172,6 +172,19 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
             if (serviceName.indexOf("?") != -1) {
                 serviceName = serviceName.substring(0, serviceName.indexOf("?"));
             }
+        } else {
+            // this may be a custom URI
+            String incomingURI = request.getRequestLine().getUri();
+
+            Map serviceURIMap = (Map) cfgCtx.getProperty(NhttpConstants.EPR_TO_SERVICE_NAME_MAP);
+            if (serviceURIMap != null) {
+                Set keySet = serviceURIMap.keySet();
+                for (Object key : keySet) {
+                    if (incomingURI.toLowerCase().contains(((String) key).toLowerCase())) {
+                        return (String) serviceURIMap.get(key);
+                    }
+                }
+            }
         }
 
         if (serviceName != null) {

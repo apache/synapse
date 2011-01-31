@@ -19,12 +19,15 @@
 
 package org.apache.synapse.endpoints;
 
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.AspectConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -164,6 +167,47 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     public String getAddress() {
         return address;
+    }
+
+
+    /**
+     * This should return the absolute EPR address referenced by the named endpoint. This may be
+     * possibly computed if the ${} properties specified in the URL.
+     *
+     * @param messageContext the current message context against the address is computed
+     * @return an absolute address to be used to reference the named endpoint
+     */
+    public String getAddress(MessageContext messageContext) {
+        if (address == null) {
+            return null;
+        }
+
+        boolean matches = false;
+        int s = 0;
+        Pattern pattern = Pattern.compile("\\$\\{.*?\\}");
+
+        StringBuffer computedAddress = new StringBuffer();
+
+        Matcher matcher = pattern.matcher(address);
+        while (matcher.find()) {
+
+
+            Object property = messageContext.getProperty(
+                    address.substring(matcher.start() + 2, matcher.end() - 1));
+            if (property != null) {
+                computedAddress.append(address.substring(s, matcher.start()));
+                computedAddress.append(property.toString());
+                s = matcher.end();
+                matches = true;
+            }
+        }
+
+        if (!matches) {
+            return address;
+        } else {
+            computedAddress.append(address.substring(s, address.length()));
+            return computedAddress.toString();
+        }
     }
 
     /**

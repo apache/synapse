@@ -204,6 +204,8 @@ public class Source {
                     } else {
                         sourceNodeList.add((OMElement) inlineObj);
                     }
+                } else if (inlineObj instanceof OMText) {
+                    sourceNodeList.add((OMText)inlineObj);
                 } else if (inlineObj instanceof String) {
                     sourceNodeList.add(
                             OMAbstractFactory.getOMFactory().createOMText(inlineObj.toString()));

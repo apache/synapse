@@ -29,6 +29,8 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.AXIOMUtils;
+import org.apache.synapse.util.jaxp.SchemaResourceResolver;
+import org.apache.synapse.util.resolver.ResourceMap;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.xml.sax.SAXException;
@@ -59,6 +61,11 @@ public class ValidateMediator extends AbstractListMediator {
      * A list of property keys, referring to the schemas to be used for the validation
      */
     private List<String> schemaKeys = new ArrayList<String>();
+
+    /**
+     * A list of property keys, referring to the external schema resources to be used for the validation
+     */
+    private ResourceMap resourceMap;
 
     /**
      * An XPath expression to be evaluated against the message to find the element to be validated.
@@ -129,15 +136,21 @@ public class ValidateMediator extends AbstractListMediator {
                 }
 
                 try {
+                    factory.setResourceResolver(
+                            new SchemaResourceResolver(synCtx.getConfiguration(), resourceMap));
                     cachedSchema = factory.newSchema(sources);
                 } catch (SAXException e) {
                     handleException("Error creating a new schema objects for " +
-                        "schemas : " + schemaKeys.toString(), e, synCtx);
+                            "schemas : " + schemaKeys.toString(), e, synCtx);
+                } catch (RuntimeException e) {
+                    handleException("Error creating a new schema objects for " +
+                            "schemas : " + schemaKeys.toString(), e, synCtx);
                 }
 
                 if (errorHandler.isValidationError()) {
                     //reset the errorhandler state
                     errorHandler.setValidationError(false);
+                    cachedSchema = null;
                     handleException("Error creating a new schema objects for schemas : "
                             + schemaKeys.toString(), errorHandler.getSaxParseException(), synCtx);
                 }
@@ -246,7 +259,7 @@ public class ValidateMediator extends AbstractListMediator {
         public SAXParseException getSaxParseException() {
             return saxParseException;
         }
-        
+
         /**
          * To set explicitly validation error condition
          * @param validationError  is occur validation error?
@@ -313,6 +326,14 @@ public class ValidateMediator extends AbstractListMediator {
     }
 
     /**
+     * Set the External Schema ResourceMap that will required for schema validation
+     * @param resourceMap  the ResourceMap which contains external schema resources
+     */
+    public void setResourceMap(ResourceMap resourceMap) {
+        this.resourceMap = resourceMap;
+    }
+
+    /**
      * Get the source XPath which yields the source element for validation
      * @return the XPath which yields the source element for validation
      */
@@ -335,4 +356,13 @@ public class ValidateMediator extends AbstractListMediator {
     public List<MediatorProperty> getFeatures() {
         return explicityFeatures;
     }
+
+    /**
+     *ResourceMap for the external schema resources to be used for the validation
+     * @return the ResourceMap with external schema resources
+     */
+    public ResourceMap getResourceMap() {
+        return resourceMap;
+    }
+
 }

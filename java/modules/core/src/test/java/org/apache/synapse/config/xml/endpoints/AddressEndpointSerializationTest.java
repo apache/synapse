@@ -41,7 +41,7 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
 
     public void testAddressEndpointScenarioTwo() throws Exception {
         String inputXML =
-                "<endpoint name=\"testEndpoint\" onFault=\"foo\" xmlns=" +
+                "<endpoint name=\"testEndpoint\" onError=\"foo\" xmlns=" +
                         "\"http://ws.apache.org/ns/synapse\">" +
                 "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" >" +
                 "</address>"+

@@ -36,7 +36,8 @@ import java.util.*;
  * <pre>
  * &lt;validate [source="xpath"]>
  *   &lt;schema key="string">+
- *   &lt;feature name="<validation-feature-name>" value="true|false"/>
+ *   &lt;resource location="&lt;external-schema>" key="string">+
+ *   &lt;feature name="&lt;validation-feature-name>" value="true|false"/>
  *   &lt;on-fail>
  *     mediator+
  *   &lt;/on-fail>
@@ -88,6 +89,9 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                 handleException("Invalid XPath expression specified for attribute 'source'", e);
             }
         }
+
+        //process external schema resources
+        validateMediator.setResourceMap(ResourceMapFactory.createResourceMap(elem));
 
         // process on-fail
         OMElement onFail = null;

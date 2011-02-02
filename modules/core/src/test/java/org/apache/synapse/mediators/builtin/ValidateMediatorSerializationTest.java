@@ -28,12 +28,11 @@ public class ValidateMediatorSerializationTest extends AbstractTestCase {
     private ValidateMediatorFactory validateMediatorFactory = null;
     private ValidateMediatorSerializer validateMediatorSerializer = null;
 
-    public ValidateMediatorSerializationTest() {
-        validateMediatorFactory = new ValidateMediatorFactory();
-        validateMediatorSerializer = new ValidateMediatorSerializer();
-    }
 
     public void testValidateMediatorSerialization() throws Exception {
+
+        validateMediatorFactory = new ValidateMediatorFactory();
+        validateMediatorSerializer = new ValidateMediatorSerializer();
 
         String validateConfiguration = "<syn:validate xmlns:syn=\"http://ws.apache.org/ns/synapse\" source=\"//regRequest\">" +
                 "<syn:schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
@@ -43,6 +42,22 @@ public class ValidateMediatorSerializationTest extends AbstractTestCase {
                 "</syn:on-fail>" +
                 "</syn:validate>";
 
+        assertTrue(serialization(validateConfiguration, validateMediatorFactory, validateMediatorSerializer));
+    }
+
+    public void testValidateMediatorSerializationWithExternalResources() throws Exception {
+
+        validateMediatorFactory = new ValidateMediatorFactory();
+        validateMediatorSerializer = new ValidateMediatorSerializer();
+
+        String validateConfiguration = "<validate xmlns=\"http://ws.apache.org/ns/synapse\" " +
+                "source=\"//regRequest\">" +
+                "<schema key=\"file:synapse_repository/conf/sample/validate.xsd\" />" +
+                "<resource location=\"resource2.xsd\" key=\"resource2_xsd\" />" +
+                "<resource location=\"resource1.xsd\" key=\"resource1_xsd\" />" +
+                "<feature name=\"http://javax.xml.XMLConstants/feature/secure-processing\" value=\"true\" />" +
+                "<on-fail><drop /></on-fail>" +
+                "</validate>";
         assertTrue(serialization(validateConfiguration, validateMediatorFactory, validateMediatorSerializer));
     }
 

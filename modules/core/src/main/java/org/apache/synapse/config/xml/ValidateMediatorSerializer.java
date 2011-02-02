@@ -52,6 +52,8 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
             schema.addAttribute(fac.createOMAttribute("key", nullNS, key));
         }
 
+        ResourceMapSerializer.serializeResourceMap(validate, mediator.getResourceMap());
+
         List<MediatorProperty> features = mediator.getFeatures();
         if (!features.isEmpty()) {
             for (MediatorProperty mp : features) {

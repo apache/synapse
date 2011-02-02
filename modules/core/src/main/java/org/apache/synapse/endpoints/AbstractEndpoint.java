@@ -335,29 +335,13 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     protected boolean isRetryDisabled(MessageContext synCtx) {
         Integer errorCode = (Integer) synCtx.getProperty(SynapseConstants.ERROR_CODE);
         if (errorCode != null) {
-            if (definition.getRetryDisabledErrorCodes().isEmpty()) {
-                // if timeout codes are not defined, assume only HTTP timeout and connection close
-                boolean isTimeout = SynapseConstants.NHTTP_CONNECTION_TIMEOUT == errorCode;
-                boolean isClosed = SynapseConstants.NHTTP_CONNECTION_CLOSED == errorCode;
-
-                if (isTimeout || isClosed) {
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Encountered a HTTP connection " + (isClosed ? "close" :
-                                "timeout") + " error : " + errorCode + ", for which retries are " +
-                                "disabled by default");
-                    }
-                    return true;
+            if (definition.getRetryDisabledErrorCodes().contains(errorCode)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Encountered a retry disabled error : " + errorCode
+                            + ", defined retry disabled error codes are : "
+                            + definition.getRetryDisabledErrorCodes());
                 }
-            } else {
-                if (definition.getRetryDisabledErrorCodes().contains(errorCode)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Encountered a retry disabled error : " + errorCode
-                                + ", defined retry disabled error codes are : "
-                                + definition.getRetryDisabledErrorCodes());
-                    }
-                    return true;
-                }
+                return true;
             }
         }
 

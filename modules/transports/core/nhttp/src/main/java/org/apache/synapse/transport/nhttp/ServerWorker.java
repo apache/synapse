@@ -239,10 +239,10 @@ public class ServerWorker implements Runnable {
             int pos = uri.indexOf("://");
             if (pos != -1) {
                 uri = uri.substring(pos + 3);
-                pos = uri.indexOf("/");
-                if (pos != -1) {
-                    uri = uri.substring(pos + 1);
-                }
+            }
+            pos = uri.indexOf("/");
+            if (pos != -1) {
+                uri = uri.substring(pos + 1);
             }
         }
         msgContext.setProperty(NhttpConstants.REST_URL_POSTFIX, uri);

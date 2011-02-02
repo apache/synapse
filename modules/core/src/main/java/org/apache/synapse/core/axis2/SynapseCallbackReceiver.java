@@ -107,6 +107,26 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
         String messageID = null;
 
+        /**
+         * In an Out-only scenario if the client receives a HTTP 202 accepted we need to
+         * remove the call back/s registered for that request.
+         * This if will check weather this is a message sent in a that scenario and remove the callback
+         */
+        if (messageCtx.getProperty(NhttpConstants.HTTP_202_RECEIVED) != null && "true".equals(
+                messageCtx.getProperty(NhttpConstants.HTTP_202_RECEIVED))) {
+            if (callbackStore.containsKey(messageCtx.getMessageID())) {
+                callbackStore.remove(messageCtx.getMessageID());
+                if (log.isDebugEnabled()) {
+                    log.debug("CallBack registered with Message id : " + messageCtx.getMessageID() +
+                            " removed from the " +
+                            "callback store since we got an accepted Notification");
+                }
+            }
+
+            return;
+        }
+
+
         if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
             // never take a chance with a NPE at this stage.. so check at each level :-)
             Options options = messageCtx.getOptions();

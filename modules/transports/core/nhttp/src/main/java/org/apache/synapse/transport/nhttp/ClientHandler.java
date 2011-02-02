@@ -713,9 +713,13 @@ public class ClientHandler implements NHttpClientHandler {
                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
                         if (responseMsgCtx == null ||
-                                outMsgCtx.getOptions().isUseSeparateListener()) {
-                            // This means that we received a 202 accepted for an out-only ,
-                            // for which we do not need a dummy message anyway
+                                outMsgCtx.getOptions().isUseSeparateListener() ||
+                                outMsgCtx.getOperationContext().isComplete()) {
+                            // Since we need to notify the SynapseCallback receiver to remove the
+                            // call backs registered  we set a custom property
+                            outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
+                            mr.receive(outMsgCtx);
+
                             return;
                         }
                         responseMsgCtx.setServerSide(true);

@@ -129,6 +129,12 @@ public class NhttpConstants {
     /** Output stram of the message is set to this message context property */
     public static final String NHTTP_OUTPUT_STREAM = "nhttp.output.stream";
 
+    /**
+     * A message context property indicating "TRUE", This will set on success scenarios
+     */
+    public static final String HTTP_202_RECEIVED = "HTTP_202_RECEIVED";
+
+
     /** This constant is used to plugin a custom WSDL processor for Get requests*/
     public static final String HTTP_GET_PROCESSOR = "httpGetProcessor";
 

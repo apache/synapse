@@ -344,7 +344,7 @@ public abstract class EndpointSerializer {
         }
 
         //serialize the message stores
-        String messageStore = endpoint.getOnFaultMessageStore();
+        String messageStore = endpoint.getErrorHandler();
         if (messageStore != null) {
             element.addAttribute(EndpointFactory.ON_FAULT_Q.getLocalPart(),
                     messageStore, null);

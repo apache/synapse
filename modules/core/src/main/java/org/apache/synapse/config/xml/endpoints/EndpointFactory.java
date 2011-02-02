@@ -60,7 +60,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
 
     private static final String ENDPOINT_NAME_PREFIX = "endpoint_";
 
-    public static final QName ON_FAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "onFault");
+    public static final QName ON_FAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "onError");
 
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
@@ -138,7 +138,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
 
         OMAttribute onFaultAtt = epConfig.getAttribute(ON_FAULT_Q);
         if (onFaultAtt != null) {
-            ep.setOnFaultMessageStore(onFaultAtt.getAttributeValue());
+            ep.setErrorHandler(onFaultAtt.getAttributeValue());
         }
         return ep;
     }

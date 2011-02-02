@@ -27,6 +27,7 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.message.store.StorableMessage;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.aspects.ComponentType;
@@ -84,7 +85,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     protected boolean anonymous = false;
 
     /** The Message store name associated with the endpoint*/
-    protected String onFaultMessageStore = null;
+    protected String errorHandler = null;
 
     protected AbstractEndpoint() {
         log = LogFactory.getLog(this.getClass());
@@ -236,10 +237,20 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
             }
         }
 
-        if (onFaultMessageStore != null &&
-                synCtx.getConfiguration().getMessageStore(onFaultMessageStore) != null) {
-            //building the SOAP XML
-            synCtx.getEnvelope().build();
+        // push the errorHandler sequence into the current message as the fault handler
+        if (errorHandler != null) {
+            Mediator errorHandlerMediator = synCtx.getSequence(errorHandler);
+            if (errorHandlerMediator != null) {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Setting the onError handler : " +
+                            errorHandler + " for the endpoint : " + endpointName);
+                }
+                synCtx.pushFaultHandler(
+                        new MediatorFaultHandler(errorHandlerMediator));
+            } else {
+                log.warn("onError handler : " + errorHandler + " for sequence : " +
+                        endpointName + " cannot be found");
+            }
         }
 
         // register this as the immediate fault handler for this message.
@@ -397,17 +408,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * @param synCtx the message at hand
      */
     public void onFault(MessageContext synCtx) {
-        if (onFaultMessageStore != null &&
-                synCtx.getConfiguration().getMessageStore(onFaultMessageStore) != null) {
-            StorableMessage storableMessage = new StorableMessage(this, synCtx);
-            synCtx.getConfiguration().getMessageStore(onFaultMessageStore).schedule(storableMessage);
-            if (log.isDebugEnabled()) {
-                log.debug("Message with ID: " + synCtx.getMessageID() + " directed to the " +
-                        "message store" );
-            }
-        } else {
-            invokeNextFaultHandler(synCtx);
-        }
+        invokeNextFaultHandler(synCtx);
     }
 
     /**
@@ -620,12 +621,12 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         }
     }
 
-    public String getOnFaultMessageStore() {
-        return onFaultMessageStore;
+    public String getErrorHandler() {
+        return errorHandler;
     }
 
-    public void setOnFaultMessageStore(String onFaultMessageStore) {
-        this.onFaultMessageStore = onFaultMessageStore;
+    public void setErrorHandler(String errorHandler) {
+        this.errorHandler = errorHandler;
     }
 
     /**

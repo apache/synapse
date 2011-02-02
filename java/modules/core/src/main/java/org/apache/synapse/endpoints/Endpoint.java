@@ -116,12 +116,12 @@ public interface Endpoint extends ManagedLifecycle, SynapseArtifact, Nameable {
      * Get the MessageStore name associated with the Endpoint
      * @return String message store name
      */
-    public String getOnFaultMessageStore();
+    public String getErrorHandler();
 
     /**
      * Set the Message Store name associated with the Endpoint
      * @param onFaultMessageStore, name of the message store
      */
-    public void setOnFaultMessageStore(String onFaultMessageStore);
+    public void setErrorHandler(String onFaultMessageStore);
 
 }

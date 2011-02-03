@@ -305,9 +305,7 @@ public class GetPropertyFunction implements Function {
                     Properties reqProperties = propEntry.getEntryProperties();
                     if (reqProperties != null) {
                         if (reqProperties.get(propName) != null) {
-                            if (reqProperties.get(propName) != null) {
-                                return reqProperties.getProperty(propName);
-                            }
+                            return reqProperties.getProperty(propName);
                         }
                     }
                 } else if (propEntry.getValue() != null) {

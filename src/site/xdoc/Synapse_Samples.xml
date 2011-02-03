@@ -139,7 +139,11 @@
 <li>
 <a href="#Sample12">Sample 12: One way messaging / fireAndForget through Synapse</a></li>
 <li>
-<a href="#Sample13">Sample 13: Dual channel invocation through Synapse</a></li></ul></li>
+<a href="#Sample13">Sample 13: Dual channel invocation through Synapse</a></li>
+<li>
+<a href="#Sample13">Sample 15: Message Enrichment through Synapse</a></li>
+</ul></li>
+
 <li>
 <a href="#Endpoints">Advanced mediations with endpoints</a>
 <ul>
@@ -862,6 +866,7 @@ mediator forwards the response back to the client using the implicit 'To' addres
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder</pre>
 <pre xml:space="preserve">SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
 <p>If you send your client request through TCPmon, you will notice that the SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that Synapse in turns replies to the client with a HTTP 202 acknowledgment </p>
+
 <h2>
 <a name="Sample13" id="Sample13">Sample 13: Dual channel invocation through Synapse</a></h2>
 <p>
@@ -876,6 +881,82 @@ mediator forwards the response back to the client using the implicit 'To' addres
 Standard dual channel :: Stock price = $57.16686934968289</pre>
 <p>If you send your client request through TCPmon, you will notice that Synapse replies to the client with a HTTP 202 acknowledgment when you send the request and the communication between Synapse and the server happens on a single channel and then you get the response back from Synapse to the clients callback in a different channel (which cannot be observed through TCPmon) </p>
 <p>Also you could see the wsa:Reply-To header being something like http://localhost:8200/axis2/services/anonService2 which implies that the reply is being on a different channel listening on the port 8200. Please note that it is required to engage addressing when using the dual channel invocation because it requires the wsa:Reply-To header. </p>
+
+<h2>
+<a name="Sample10" id="Sample15">Sample 15: Message Enrichment through Synapse</a></h2>
+<pre xml:space="preserve">
+    &lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuration&quot;&gt;
+    &lt;sequence name=&quot;main&quot;&gt;
+        &lt;in&gt;
+            &lt;enrich&gt;
+                &lt;source type=&quot;custom&quot;
+                        xpath=&quot;//m0:getQuote/m0:request/m0:symbol/text()&quot;
+                        xmlns:m0=&quot;http://services.samples&quot;/&gt;
+                &lt;target type=&quot;property&quot; property=&quot;ORIGINAL_REQ&quot;/&gt;
+            &lt;/enrich&gt;
+            &lt;enrich&gt;
+                &lt;source type=&quot;body&quot;/&gt;
+                &lt;target type=&quot;property&quot; property=&quot;REQUEST_PAYLOAD&quot;/&gt;
+            &lt;/enrich&gt;
+
+            &lt;enrich&gt;
+                &lt;source type=&quot;inline&quot; key=&quot;init_req&quot;/&gt;
+                &lt;target xmlns:m0=&quot;http://services.samples&quot;
+                        xpath=&quot;//m0:getQuote/m0:request/m0:symbol/text()&quot;/&gt;
+            &lt;/enrich&gt;
+
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;header xmlns:urn=&quot;http://synapse.apache.org&quot; name=&quot;urn:lastTradeTimestamp&quot; value=&quot;foo&quot;/&gt;
+            &lt;enrich&gt;
+                &lt;source type=&quot;custom&quot;
+                        xpath=&quot;//ns:getQuoteResponse/ns:return/ax21:lastTradeTimestamp&quot;
+                        xmlns:ns=&quot;http://services.samples&quot;
+                        xmlns:ax21=&quot;http://services.samples/xsd&quot;/&gt;
+                &lt;target xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;
+                        xmlns:urn=&quot;http://synapse.apache.org&quot;
+                        xpath=&quot;/soapenv:Envelope/soapenv:Header/urn:lastTradeTimestamp&quot;/&gt;
+            &lt;/enrich&gt;
+             &lt;log level=&quot;full&quot;/&gt;
+            &lt;log&gt;
+                &lt;property name=&quot;Original Request Symbol&quot; expression=&quot;get-property(&#39;ORIGINAL_REQ&#39;)&quot;/&gt;
+                &lt;property name=&quot;Request Payload&quot; expression=&quot;get-property(&#39;REQUEST_PAYLOAD&#39;)&quot;/&gt;
+            &lt;/log&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+
+    &lt;/sequence&gt;
+    &lt;localEntry key=&quot;init_req&quot;&gt;MSFT&lt;/localEntry&gt;
+    &lt;localEntry key=&quot;price_req&quot;&gt;
+        &lt;m0:symbol xmlns:m0=&quot;http://services.samples&quot;&gt;MSFT&lt;/m0:symbol&gt;
+    &lt;/localEntry&gt;
+
+&lt;/definitions&gt;
+</pre>
+<p>
+<strong>Objective: Introduction to Message Copying and Content Enriching with Enrich Mediator</strong> </p>
+<p>
+<strong>Prerequisites:</strong>
+<br/> Start the Synapse configuration numbered 15: i.e. synapse -sample 15
+<br/> Start the Axis2 server and deploy the SimpleStockQuoteService if not already done
+</p>
+<pre xml:space="preserve">./axis2server.sh</pre>
+<p>This sample demonstrate the various capabilities of Enrich Mediator. Inside the in-sequence we store/copy different
+    parts of the message to properties and just before sending the message to the StockQuoteService, we modify the
+    request value based on the local entry value-init_req. Then in the out-sequence, the enrich mediator is used
+    to enrich a soap header based on the 'lastTradeTimestamp' value of the response.
+</p>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/services/StockQuote</pre>
+<p>You can try with different local entries as the source with the correct target xpath values. </p>
+
+
+
 <h1>
 <a name="Endpoints" id="Endpoints">Advanced mediations with endpoints</a> </h1>
 <h2>
@@ -914,6 +995,9 @@ Transfer-Encoding: chunked
       &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
    &lt;/m0:request&gt;
 &lt;/m0:getQuote&gt;0</pre>
+
+
+
 <h2>
 <a name="Sample51" id="Sample51">Sample 51: MTOM and SwA optimizations and request/response correlation</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuraiton&quot;&gt;

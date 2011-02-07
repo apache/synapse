@@ -21,6 +21,8 @@ package org.apache.synapse.deployers;
 
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -78,48 +80,48 @@ public class PriorityExecutorDeployer extends AbstractSynapseArtifactDeployer {
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
                                         String existingArtifactName, Properties properties) {
         if (log.isDebugEnabled()) {
-            log.debug("PriorityExecutor Update from file : " + fileName + " : Started");
+            log.debug("PriorityExecutor update from file : " + fileName + " has started");
         }
 
         try {
             PriorityExecutor e = PriorityExecutorFactory.createExecutor(
                     SynapseConstants.SYNAPSE_NAMESPACE, artifactConfig, true, properties);
-            if (e != null) {
-                e.setFileName((new File(fileName)).getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("PriorityExecutor with key '" + e.getName()
-                            + "' has been built from the file " + fileName);
-                }
-                PriorityExecutor existingExecutor =
-                        getSynapseConfiguration().removeExecutor(existingArtifactName);
-                if (!existingArtifactName.equals(e.getName())) {
-                    log.info("PriorityExecutor named " + existingArtifactName +
-                            " has been Undeployed");
-                }
-
-                if (existingExecutor != null) {
-                    existingExecutor.destroy();
-                }
-
-                getSynapseConfiguration().addPriorityExecutor(e.getName(), e);
-                if (log.isDebugEnabled()) {
-                    log.debug("PriorityExecutor " + (existingArtifactName.equals(e.getName()) ?
-                            "update" : "deployment") + " from file : " + fileName + " : Completed");
-                }
-                log.info("PriorityExecutor named '" + e.getName()
-                        + "' has been " + (existingArtifactName.equals(e.getName()) ?
-                            "updated" : "deployed") + " from file : " + fileName);
-
-                e.init();
-
-                return e.getName();
-            } else {
-                handleSynapseArtifactDeploymentError("PriorityExecutor Update Failed. The artifact " +
-                        "described in the file " + fileName + " is not a LocalEntry");
+            if (e == null) {
+                handleSynapseArtifactDeploymentError("PriorityExecutor update failed. The artifact " +
+                        "defined in the file: " + fileName + " is not a valid executor.");
+                return null;
             }
-        } catch (Exception e) {
-            handleSynapseArtifactDeploymentError(
-                    "PriorityExecutor Update from the file : " + fileName + " : Failed.", e);
+            e.setFileName(new File(fileName).getName());
+
+            if (log.isDebugEnabled()) {
+                log.debug("Executor: " + e.getName() + " has been built from the file: " + fileName);
+            }
+
+            e.init();
+            PriorityExecutor existingExecutor = getSynapseConfiguration().getPriorityExecutors().
+                    get(existingArtifactName);
+            if (existingArtifactName.equals(e.getName())) {
+                getSynapseConfiguration().updatePriorityExecutor(existingArtifactName, e);
+            } else {
+                // The user has changed the name of the executor
+                // We should add the updated executor as a new executor and remove the old one
+                getSynapseConfiguration().addPriorityExecutor(e.getName(), e);
+                getSynapseConfiguration().removeExecutor(existingArtifactName);
+                log.info("Executor: " + existingArtifactName + " has been undeployed");
+            }
+
+            sleep(2000);
+            existingExecutor.destroy();
+
+            log.info("PriorityExecutor: " + e.getName() + " has been updated from the file: " + fileName);
+            return e.getName();
+
+        } catch (DeploymentException e) {
+            handleSynapseArtifactDeploymentError("Error while updating the executor from the " +
+                    "file: " + fileName);
+        } catch (AxisFault e) {
+            handleSynapseArtifactDeploymentError("Error while creating the executor from the " +
+                    "configuration in file: " + fileName);
         }
 
         return null;

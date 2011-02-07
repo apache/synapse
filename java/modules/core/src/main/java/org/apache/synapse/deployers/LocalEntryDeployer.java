@@ -20,6 +20,7 @@
 package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.Entry;
@@ -79,37 +80,38 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
                                         String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
-            log.debug("LocalEntry Update from file : " + fileName + " : Started");
+            log.debug("LocalEntry update from file : " + fileName + " has started");
         }
 
         try {
             Entry e = EntryFactory.createEntry(artifactConfig, properties);
-            if (e != null) {
-                e.setFileName((new File(fileName)).getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("LocalEntry with key '" + e.getKey()
-                            + "' has been built from the file " + fileName);
-                }
-                getSynapseConfiguration().removeEntry(existingArtifactName);
-                if (!existingArtifactName.equals(e.getKey())) {
-                    log.info("LocalEntry named " + existingArtifactName + " has been Undeployed");
-                }
-                getSynapseConfiguration().addEntry(e.getKey(), e);
-                if (log.isDebugEnabled()) {
-                    log.debug("LocalEntry " + (existingArtifactName.equals(e.getKey()) ?
-                            "update" : "deployment") + " from file : " + fileName + " : Completed");
-                }
-                log.info("LocalEntry named '" + e.getKey()
-                        + "' has been " + (existingArtifactName.equals(e.getKey()) ?
-                            "updated" : "deployed") + " from file : " + fileName);
-                return e.getKey();
-            } else {
-                handleSynapseArtifactDeploymentError("LocalEntry Update Failed. The artifact " +
-                        "described in the file " + fileName + " is not a LocalEntry");
+            if (e == null) {
+                handleSynapseArtifactDeploymentError("Local entry update failed. The artifact " +
+                        "defined in the file: " + fileName + " is not a valid local entry.");
+                return null;
             }
-        } catch (Exception e) {
-            handleSynapseArtifactDeploymentError(
-                    "LocalEntry Update from the file : " + fileName + " : Failed.", e);
+            e.setFileName(new File(fileName).getName());
+
+            if (log.isDebugEnabled()) {
+                log.debug("Local entry: " + e.getKey() + " has been built from the file: " + fileName);
+            }
+
+            if (existingArtifactName.equals(e.getKey())) {
+                getSynapseConfiguration().updateEntry(existingArtifactName, e);
+            } else {
+                // The user has changed the name of the entry
+                // We should add the updated entry as a new entry and remove the old one
+                getSynapseConfiguration().addEntry(e.getKey(), e);
+                getSynapseConfiguration().removeEntry(existingArtifactName);
+                log.info("Local entry: " + existingArtifactName + " has been undeployed");
+            }
+
+            log.info("Endpoint: " + e.getKey() + " has been updated from the file: " + fileName);
+            return e.getKey();
+
+        } catch (DeploymentException e) {
+            handleSynapseArtifactDeploymentError("Error while updating the local entry from the " +
+                    "file: " + fileName);
         }
 
         return null;

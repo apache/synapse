@@ -20,6 +20,7 @@
 package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -87,52 +88,50 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
                                         String existingArtifactName, Properties properties) {
         
         if (log.isDebugEnabled()) {
-            log.debug("Sequence Update from file : " + fileName + " : Started");
+            log.debug("Sequence update from file : " + fileName + " has started");
         }
 
         try {
-            Mediator m = MediatorFactoryFinder.getInstance().getMediator(
-                    artifactConfig, properties);
-            if (m instanceof SequenceMediator) {
-                SequenceMediator seq = (SequenceMediator) m;
-                if ((SynapseConstants.MAIN_SEQUENCE_KEY.equals(existingArtifactName)
-                        || SynapseConstants.FAULT_SEQUENCE_KEY.equals(existingArtifactName))
-                        && !existingArtifactName.equals(seq.getName())) {
-                    handleSynapseArtifactDeploymentError(
-                            existingArtifactName + " sequence cannot be renamed");
-                }
-                seq.setFileName((new File(fileName)).getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("Sequence named '" + seq.getName()
-                            + "' has been built from the file " + fileName);
-                }
-                seq.init(getSynapseEnvironment());
-                if (log.isDebugEnabled()) {
-                    log.debug("Initialized the sequence : " + seq.getName());
-                }
-                SequenceMediator existingSeq =
-                        getSynapseConfiguration().getDefinedSequences().get(existingArtifactName);
-                getSynapseConfiguration().removeSequence(existingArtifactName);
-                if (!existingArtifactName.equals(seq.getName())) {
-                    log.info("Sequence named '" + existingArtifactName + "' has been Undeployed");
-                }
-                getSynapseConfiguration().addSequence(seq.getName(), seq);
-                existingSeq.destroy();
-                if (log.isDebugEnabled()) {
-                    log.debug("Sequence " + (existingArtifactName.equals(seq.getName()) ?
-                            "update" : "deployment") + " from file : " + fileName + " : Completed");
-                }
-                log.info("Sequence named '" + seq.getName()
-                        + "' has been " + (existingArtifactName.equals(seq.getName()) ?
-                            "update" : "deployed") + " from file : " + fileName);
-                return seq.getName();
-            } else {
-                handleSynapseArtifactDeploymentError("Sequence Update Failed. " +
-                        "The artifact described in the file " + fileName + " is not a Sequence");
+            Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig, properties);
+            if (m == null || !(m instanceof  SequenceMediator)) {
+                handleSynapseArtifactDeploymentError("Sequence update failed. The artifact " +
+                        "defined in the file: " + fileName + " is not a valid sequence.");
+                return null;
             }
-        } catch (Exception e) {
-            handleSynapseArtifactDeploymentError(
-                    "Sequence Update from the file : " + fileName + " : Failed.", e);
+
+            SequenceMediator seq = (SequenceMediator) m;
+            seq.setFileName(new File(fileName).getName());
+
+            if ((SynapseConstants.MAIN_SEQUENCE_KEY.equals(existingArtifactName) ||
+                    SynapseConstants.FAULT_SEQUENCE_KEY.equals(existingArtifactName)) &&
+                    !existingArtifactName.equals(seq.getName())) {
+                handleSynapseArtifactDeploymentError(existingArtifactName + " sequence cannot be renamed");
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Sequence: " + seq.getName() + " has been built from the file: " + fileName);
+            }
+
+            seq.init(getSynapseEnvironment());
+            SequenceMediator existingSeq = getSynapseConfiguration().getDefinedSequences().
+                    get(existingArtifactName);
+            if (existingArtifactName.equals(seq.getName())) {
+                getSynapseConfiguration().updateSequence(existingArtifactName, seq);
+            } else {
+                getSynapseConfiguration().addSequence(seq.getName(), seq);
+                getSynapseConfiguration().removeSequence(existingArtifactName);
+                log.info("Sequence: " + existingArtifactName + " has been undeployed");
+            }
+
+            log.info("Sequence: " + seq.getName() + " has been updated from the file: " + fileName);
+
+            sleep(2000); // Give some time for worker threads to release the old sequence
+            existingSeq.destroy();
+            return seq.getName();
+
+        } catch (DeploymentException e) {
+            handleSynapseArtifactDeploymentError("Error while updating the sequence from the " +
+                    "file: " + fileName);
         }
 
         return null;

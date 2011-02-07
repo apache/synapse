@@ -20,6 +20,7 @@
 package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
@@ -83,44 +84,43 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
                                         String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Endpoint Update from file : " + fileName + " : Started");
+            log.debug("Endpoint update from file : " + fileName + " has started");
         }
 
         try {
             Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties);
-            if (ep != null) {
-                ep.setFileName((new File(fileName)).getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("Endpoint named '" + ep.getName()
-                            + "' has been built from the file " + fileName);
-                }
-                ep.init(getSynapseEnvironment());
-                if (log.isDebugEnabled()) {
-                    log.debug("Initialized the endpoint : " + ep.getName());
-                }
-                Endpoint existingEp
-                        = getSynapseConfiguration().getDefinedEndpoints().get(existingArtifactName);
-                getSynapseConfiguration().removeEndpoint(existingArtifactName);
-                if (!existingArtifactName.equals(ep.getName())) {
-                    log.info("Endpoint named " + existingArtifactName + " has been Undeployed");
-                }
-                getSynapseConfiguration().addEndpoint(ep.getName(), ep);
-                existingEp.destroy();
-                if (log.isDebugEnabled()) {
-                    log.debug("Endpoint " + (existingArtifactName.equals(ep.getName()) ?
-                            "update" : "deployment") + " from file : " + fileName + " : Completed");
-                }
-                log.info("Endpoint named '" + ep.getName()
-                        + "' has been " + (existingArtifactName.equals(ep.getName()) ?
-                            "update" : "deployed") + " from file : " + fileName);
-                return ep.getName();
-            } else {
-                handleSynapseArtifactDeploymentError("Endpoint Update Failed. The artifact " +
-                        "described in the file " + fileName + " is not an Endpoint");
+            if (ep == null) {
+                handleSynapseArtifactDeploymentError("Endpoint update failed. The artifact " +
+                        "defined in the file: " + fileName + " is not a valid endpoint.");
+                return null;
             }
-        } catch (Exception e) {
-            handleSynapseArtifactDeploymentError(
-                    "Endpoint Update from the file : " + fileName + " : Failed.", e);
+            ep.setFileName(new File(fileName).getName());
+
+            if (log.isDebugEnabled()) {
+                log.debug("Endpoint: " + ep.getName() + " has been built from the file: " + fileName);
+            }
+
+            ep.init(getSynapseEnvironment());
+            Endpoint existingEp = getSynapseConfiguration().getDefinedEndpoints().get(existingArtifactName);
+            if (existingArtifactName.equals(ep.getName())) {
+                getSynapseConfiguration().updateEndpoint(existingArtifactName, ep);
+            } else {
+                // The user has changed the name of the endpoint
+                // We should add the updated endpoint as a new endpoint and remove the old one
+                getSynapseConfiguration().addEndpoint(ep.getName(), ep);
+                getSynapseConfiguration().removeEndpoint(existingArtifactName);
+                log.info("Endpoint: " + existingArtifactName + " has been undeployed");
+            }
+
+            log.info("Endpoint: " + ep.getName() + " has been updated from the file: " + fileName);
+
+            sleep(2000);
+            existingEp.destroy();
+            return ep.getName();
+
+        } catch (DeploymentException e) {
+            handleSynapseArtifactDeploymentError("Error while updating the endpoint from the " +
+                    "file: " + fileName);
         }
 
         return null;

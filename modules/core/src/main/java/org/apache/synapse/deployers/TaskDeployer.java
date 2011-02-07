@@ -20,6 +20,7 @@
 package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Startup;
@@ -76,39 +77,34 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
                                         String existingArtifactName, Properties properties) {
 
         if (log.isDebugEnabled()) {
-            log.debug("StartupTask Update from file : " + fileName + " : Started");
+            log.debug("StartupTask update from file : " + fileName + " has started");
         }
 
         try {
             Startup st = StartupFinder.getInstance().getStartup(artifactConfig, properties);
-                st.setFileName((new File(fileName)).getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("StartupTask named '" + st.getName()
-                            + "' has been built from the file " + fileName);
-                }
-                st.init(getSynapseEnvironment());
-                if (log.isDebugEnabled()) {
-                    log.debug("Initialized the StartupTask : " + st.getName());
-                }
-                Startup existingSt =
-                        getSynapseConfiguration().getStartup(existingArtifactName);
-                getSynapseConfiguration().removeStartup(existingArtifactName);
-                if (!existingArtifactName.equals(st.getName())) {
-                    log.info("StartupTask named '" + existingArtifactName + "' has been Undeployed");
-                }
+            st.setFileName((new File(fileName)).getName());
+
+            if (log.isDebugEnabled()) {
+                log.debug("StartupTask: " + st.getName() + " has been built from the file: " + fileName);
+            }
+            st.init(getSynapseEnvironment());
+
+            Startup existingSt = getSynapseConfiguration().getStartup(existingArtifactName);
+            if (existingArtifactName.equals(st.getName())) {
+                getSynapseConfiguration().updateStartup(st);
+            } else {
                 getSynapseConfiguration().addStartup(st);
-                existingSt.destroy();
-                if (log.isDebugEnabled()) {
-                    log.debug("StartupTask " + (existingArtifactName.equals(st.getName()) ?
-                            "update" : "deployment") + " from file : " + fileName + " : Completed");
-                }
-                log.info("StartupTask named '" + st.getName()
-                        + "' has been " + (existingArtifactName.equals(st.getName()) ?
-                            "update" : "deployed") + " from file : " + fileName);
-                return st.getName();
-        } catch (Exception e) {
-            handleSynapseArtifactDeploymentError(
-                    "StartupTask Update from the file : " + fileName + " : Failed.", e);
+                getSynapseConfiguration().removeStartup(existingArtifactName);
+                log.info("StartupTask: " + existingArtifactName + " has been undeployed");
+            }
+
+            existingSt.destroy();
+            log.info("StartupTask: " + st.getName() + " has been updated from the file: " + fileName);
+            return st.getName();
+
+        } catch (DeploymentException e) {
+            handleSynapseArtifactDeploymentError("Error while updating the startup task from the " +
+                    "file: " + fileName);
         }
 
         return null;

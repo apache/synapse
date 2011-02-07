@@ -42,6 +42,7 @@ import org.apache.axiom.om.OMNode;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The SynapseConfiguration holds the global configuration for a Synapse
@@ -77,19 +78,19 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * Holds Proxy services defined through Synapse
      */
-    private final Map<String, ProxyService> proxyServices = new HashMap<String, ProxyService>();
+    private final Map<String, ProxyService> proxyServices = new ConcurrentHashMap<String, ProxyService>();
 
     /**
      * This holds a Map of ManagedLifecycle objects
      */
-    private final Map<String, Startup> startups = new HashMap<String, Startup>();
+    private final Map<String, Startup> startups = new ConcurrentHashMap<String, Startup>();
 
     /**
      * The local registry is a simple HashMap and provides the ability to
      * override definitions of a remote registry for entries defined locally
      * with the same key
      */
-    private final Map<String, Object> localRegistry = new HashMap<String, Object>();
+    private final Map<String, Object> localRegistry = new ConcurrentHashMap<String, Object>();
 
     /** Holds the synapse properties */
     private Properties properties = new Properties();
@@ -112,7 +113,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * Holds Event Sources defined through Synapse
      */
-    private Map<String, SynapseEventSource> eventSources = new HashMap<String, SynapseEventSource>();
+    private Map<String, SynapseEventSource> eventSources = new ConcurrentHashMap<String, SynapseEventSource>();
 
     /**
      * The list of registered configuration observers
@@ -122,12 +123,12 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * Executors for executing sequences with priorities
      */
-    private Map<String, PriorityExecutor> executors = new HashMap<String, PriorityExecutor>();
+    private Map<String, PriorityExecutor> executors = new ConcurrentHashMap<String, PriorityExecutor>();
 
     /**
      * Messages stores for the synapse configuration.
      */
-    private Map<String, MessageStore> messageStores =new HashMap<String, MessageStore>();
+    private Map<String, MessageStore> messageStores =new ConcurrentHashMap<String, MessageStore>();
 
     /**
      * Description/documentation of the configuration
@@ -152,6 +153,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         assertAlreadyExists(key, SEQUENCE);
         localRegistry.put(key, mediator);
 
+        for (SynapseObserver o : observers) {
+            o.sequenceAdded(mediator);
+        }
+    }
+
+    public synchronized void updateSequence(String key, Mediator mediator) {
+        localRegistry.put(key, mediator);
         for (SynapseObserver o : observers) {
             o.sequenceAdded(mediator);
         }
@@ -357,6 +365,30 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
     }
 
+    public synchronized void updateEntry(String key, Entry entry) {
+        if (entry.getType() == Entry.URL_SRC && entry.getValue() == null) {
+            try {
+                SynapseEnvironment synEnv = SynapseConfigUtils.getSynapseEnvironment(
+                        axisConfiguration);
+                entry.setValue(SynapseConfigUtils.getOMElementFromURL(entry.getSrc()
+                        .toString(), synEnv != null ? synEnv.getServerContextInformation()
+                        .getServerConfigurationInformation().getSynapseHome() : ""));
+                localRegistry.put(key, entry);
+                for (SynapseObserver o : observers) {
+                    o.entryAdded(entry);
+                }
+            } catch (IOException e) {
+                handleException("Can not read from source URL : "
+                        + entry.getSrc());
+            }
+        } else {
+            localRegistry.put(key, entry);
+            for (SynapseObserver o : observers) {
+                o.entryAdded(entry);
+            }
+        }
+    }
+
     /**
      * Gives the set of remote entries that are cached in localRegistry as mapping of entry key
      * to the Entry definition
@@ -538,6 +570,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      */
     public synchronized void addEndpoint(String key, Endpoint endpoint) {
         assertAlreadyExists(key, ENDPOINT);
+        localRegistry.put(key, endpoint);
+        for (SynapseObserver o : observers) {
+            o.endpointAdded(endpoint);
+        }
+    }
+
+    public synchronized void updateEndpoint(String key, Endpoint endpoint) {
         localRegistry.put(key, endpoint);
         for (SynapseObserver o : observers) {
             o.endpointAdded(endpoint);
@@ -861,6 +900,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
     }
 
+    public synchronized void updateStartup(Startup startup) {
+        startups.put(startup.getName(), startup);
+        for (SynapseObserver o : observers) {
+            o.startupAdded(startup);
+        }
+    }
+
     /**
      * Removes the startup specified by the name. If no startup exists by the specified name a
      * runtime exception is thrown.
@@ -1180,6 +1226,17 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * @param executor executor
      */
     public synchronized void addPriorityExecutor(String name, PriorityExecutor executor) {
+        if (!executors.containsKey(name)) {
+            executors.put(name, executor);
+            for (SynapseObserver o : observers) {
+                o.priorityExecutorAdded(executor);
+            }
+        } else {
+            handleException("Duplicate priority executor by the name: " + name);
+        }
+    }
+
+    public synchronized void updatePriorityExecutor(String name, PriorityExecutor executor) {
         executors.put(name, executor);
         for (SynapseObserver o : observers) {
             o.priorityExecutorAdded(executor);
@@ -1246,6 +1303,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Removes a Message store from the configuration
      *
      * @param name name of the message store
+     * @return The message store with the specified name
      */
     public MessageStore removeMessageStore(String name) {
         return messageStores.remove(name);

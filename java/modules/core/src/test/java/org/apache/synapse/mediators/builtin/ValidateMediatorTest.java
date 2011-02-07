@@ -23,15 +23,17 @@ import junit.framework.TestCase;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
-import org.apache.synapse.config.xml.ValidateMediatorFactory;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.xml.ValidateMediatorFactory;
+import org.apache.synapse.mediators.Key;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class ValidateMediatorTest extends TestCase {
@@ -120,6 +122,11 @@ public class ValidateMediatorTest extends TestCase {
             "   </on-fail>" +
             "</validate>";
 
+    private static final String DYNAMIC_KEY_ENVELOPE =
+        "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
+        "<m0:DynamicXsdKey>DynamicXsdKey</m0:DynamicXsdKey>\n" +
+        "</m0:CheckPriceRequest>\n" ;
+
     private SynapseXPath createXPath(String expression) throws JaxenException {
         SynapseXPath xpath = new SynapseXPath(expression);
         xpath.addNamespace("m0", "http://services.samples/xsd");
@@ -153,7 +160,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Collections.singletonList("xsd-key"));
+        validate.setSchemaKeys(createKeyListFromStaticKey("xsd-key"));
         validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -169,7 +176,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Arrays.asList("xsd-key-1", "xsd-key-2"));
+        validate.setSchemaKeys(createKeyListFromMoreKeys("xsd-key-1", "xsd-key-2"));
         validate.setSource(createXPath("//m1:Outer"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -186,7 +193,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Arrays.asList("xsd-key-1", "xsd-key-2"));
+        validate.setSchemaKeys(createKeyListFromMoreKeys("xsd-key-1", "xsd-key-2"));
         validate.setSource(createXPath("//m1:Outer"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -203,7 +210,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSchemaKeys(createKeyListFromStaticKey("xsd-key-1"));
         validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -219,7 +226,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSchemaKeys(createKeyListFromStaticKey("xsd-key-1"));
         validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -235,7 +242,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSchemaKeys(createKeyListFromStaticKey("xsd-key-1"));
         validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -273,7 +280,7 @@ public class ValidateMediatorTest extends TestCase {
 
     private void makeValidInvocation(ValidateMediator validate) throws Exception {
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaKeys(Collections.singletonList("xsd-key-1"));
+        validate.setSchemaKeys(createKeyListFromStaticKey("xsd-key-1"));
         validate.setSource(createXPath("//m0:CheckPriceRequest"));
 
         MessageContext synCtx = new TestMessageContextBuilder()
@@ -282,6 +289,115 @@ public class ValidateMediatorTest extends TestCase {
 
         // test validate mediator, with static enveope
         test(validate, synCtx, false);
+    }
+
+    /**
+     * Test that the Validator mediator is able to handle static and dynamic keys
+     * Xpath expression can be used to generate real key dynamically
+     *
+     * @throws Exception Exception in case of an error in tests
+     */
+    public void testWithStaticDynamicKeys() throws Exception {
+        for (int i = 0; i < 2; i++) {
+            testMultipleKeys(i);
+        }
+    }
+
+    /**
+     * Test with multiple keys including static and dynamic keys
+     *
+     * @param num number from 0 to 1
+     * @throws Exception Exception in case of an error in tests
+     */
+    private void testMultipleKeys(int num) throws Exception {
+
+        String xsdKeyValue = null;
+
+        String path;
+
+        SynapseXPath xpath;
+
+        // create a validate mediator
+        ValidateMediator validate = new ValidateMediator();
+
+        //default source, xsdFile, and state of key (dynamic or static)
+        String source = "";
+        String xsdFile = "";
+        boolean isDynamicKey = true;
+
+        // based on source, different xsdFiles can be used
+        if (num == 0) {
+            source = VALID_ENVELOPE;
+            xsdKeyValue = "xsd-key";
+            isDynamicKey = false;
+            xsdFile = "validate";
+
+        } else if (num == 1) {
+            source = DYNAMIC_KEY_ENVELOPE;
+            // xsdFile = "dynamic_key1.xsd";
+            xsdKeyValue = "DynamicXsdKey";
+            isDynamicKey = true;
+            xsdFile = "validate3";
+        }
+
+        if (isDynamicKey) {
+            // set the schema url using dynamic key (Xpath)
+            path = "//m0:CheckPriceRequest/m0:" + xsdKeyValue;
+            xpath = new SynapseXPath(path);
+            xpath.addNamespace("m0", "http://services.samples/xsd");
+            validate.setSchemaKeys(createKeyListFromDynamicKey(xpath));
+        } else {
+            // set the schema url using static key
+            validate.setSchemaKeys(createKeyListFromStaticKey(xsdKeyValue));
+        }
+
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addFileEntry(xsdKeyValue, "./../../repository/conf/sample/resources/validate/" + xsdFile + ".xsd")
+                .setBodyFromString(source).build();
+
+        test(validate, synCtx, false);
+    }
+
+    /**
+     * Create a Key list which consists with one static element
+     *
+     * @param keyName String key value (static key) to create Key object
+     * @return immutable Key list with one Key element
+     */
+    private List<Key> createKeyListFromStaticKey(String keyName) {
+        // create static key using given string key name
+        Key xsdKey = new Key(keyName);
+        return Collections.singletonList(xsdKey);
+    }
+
+    /**
+     * Create a Key list which consists with one dynamic element
+     *
+     * @param xpath String key value (static key) to create Key object
+     * @return immutable Key list with one Key element
+     */
+    private List<Key> createKeyListFromDynamicKey(SynapseXPath xpath) {
+        // create static key using given string key name
+        Key xsdKey = new Key(xpath);
+        return Collections.singletonList(xsdKey);
+    }
+
+
+    /**
+     * Create a Key list with given set of static keys
+     *
+     * @param keyNames Set of static keys to create list
+     * @return Key list
+     */
+    private List<Key> createKeyListFromMoreKeys(String... keyNames) {
+        List<Key> keyList = new ArrayList<Key>();
+        for (String keyName : keyNames) {
+            // create static key using given string key name
+            Key xsdKey = new Key(keyName);
+            keyList.add(xsdKey);
+
+        }
+        return keyList;
     }
 
 

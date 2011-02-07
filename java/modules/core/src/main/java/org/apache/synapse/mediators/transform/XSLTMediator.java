@@ -228,7 +228,7 @@ public class XSLTMediator extends AbstractMediator {
             synchronized (transformerLock) {
                 // only first thread should create the template
                 if (isCreationOrRecreationRequired(synCtx)) {
-                    cachedTemplates = createTemplate(synCtx, synLog);
+                    cachedTemplates = createTemplate(synCtx, synLog, generatedXsltKey);
                 }
             }
         }
@@ -347,9 +347,10 @@ public class XSLTMediator extends AbstractMediator {
      * Create a XSLT template object and assign it to the cachedTemplates variable
      * @param synCtx current message
      * @param synLog logger to use
+     * @param generatedXsltKey evaluated xslt key(real key value) for dynamic or static key 
      * @return cached template
      */
-    private Templates createTemplate(MessageContext synCtx, SynapseLog synLog) {
+    private Templates createTemplate(MessageContext synCtx, SynapseLog synLog, String generatedXsltKey) {
         // Assign created template
         Templates cachedTemplates = null;
 
@@ -358,8 +359,6 @@ public class XSLTMediator extends AbstractMediator {
         // Allow xsl:import and xsl:include resolution
         transFact.setURIResolver(new CustomJAXPURIResolver(resourceMap,
                 synCtx.getConfiguration()));
-        // Derive actual key from message context
-        String generatedXsltKey = xsltKey.evaluateKey(synCtx);
 
         try {
             cachedTemplates = transFact.newTemplates(

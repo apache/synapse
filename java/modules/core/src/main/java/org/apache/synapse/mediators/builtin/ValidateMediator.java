@@ -27,6 +27,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.mediators.Key;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.jaxp.SchemaResourceResolver;
@@ -59,8 +60,9 @@ public class ValidateMediator extends AbstractListMediator {
 
     /**
      * A list of property keys, referring to the schemas to be used for the validation
+     * key can be static or dynamic(xpath) key
      */
-    private List<String> schemaKeys = new ArrayList<String>();
+    private List<Key> schemaKeys = new ArrayList<Key>();
 
     /**
      * A list of property keys, referring to the external schema resources to be used for the validation
@@ -112,7 +114,9 @@ public class ValidateMediator extends AbstractListMediator {
         // flag to check if we need to initialize/re-initialize the schema
         boolean reCreate = false;
         // if any of the schemas are not loaded, or have expired, load or re-load them
-        for (String propKey : schemaKeys) {
+        for (Key schemaKey : schemaKeys) {
+            // Derive actual key from message context
+            String propKey = schemaKey.evaluateKey(synCtx);
             Entry dp = synCtx.getConfiguration().getEntryDefinition(propKey);
             if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
@@ -131,7 +135,9 @@ public class ValidateMediator extends AbstractListMediator {
                 factory.setErrorHandler(errorHandler);
                 StreamSource[] sources = new StreamSource[schemaKeys.size()];
                 int i = 0;
-                for (String propName : schemaKeys) {
+                for (Key schemaKey : schemaKeys) {
+                    // Derive actual key from message context
+                    String propName = schemaKey.evaluateKey(synCtx);
                     sources[i++] = SynapseConfigUtils.getStreamSource(synCtx.getEntry(propName));
                 }
 
@@ -313,7 +319,7 @@ public class ValidateMediator extends AbstractListMediator {
      *
      * @param schemaKeys list of local property names
      */
-    public void setSchemaKeys(List<String> schemaKeys) {
+    public void setSchemaKeys(List<Key> schemaKeys) {
         this.schemaKeys = schemaKeys;
     }
 
@@ -345,7 +351,7 @@ public class ValidateMediator extends AbstractListMediator {
      * The keys for the schema resources used for validation
      * @return schema registry keys
      */
-    public List<String> getSchemaKeys() {
+    public List<Key> getSchemaKeys() {
         return schemaKeys;
     }
 

@@ -205,6 +205,9 @@ public class ServerHandler implements NHttpServiceHandler {
             }
             response.setEntity(entity);
 
+            if (metrics != null) {
+                metrics.incrementMessagesReceived();
+            }
             // hand off processing of the request to a thread off the pool
             ServerWorker worker = new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
                         request, is, response, os, restDispatching, httpGetRequestProcessor);
@@ -253,10 +256,6 @@ public class ServerHandler implements NHttpServiceHandler {
                 
                 ((ServerConnectionDebug) conn.getContext().getAttribute(
                         SERVER_CONNECTION_DEBUG)).recordRequestCompletionTime();
-
-                if (metrics != null) {
-                    metrics.incrementMessagesReceived();
-                }
                 // remove the request we have fully read, to detect harmless keepalive timeouts from
                 // real timeouts while reading requests
                 context.setAttribute(NhttpConstants.REQUEST_READ, Boolean.TRUE);

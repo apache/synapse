@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
@@ -116,6 +117,12 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
 
             sleep(2000);
             existingEp.destroy();
+            if (existingArtifactName.equals(ep.getName())) {
+                // If the endpoint name was same as the old one, above method call (destroy)
+                // will unregister the endpoint MBean - So we should register it again.
+                MBeanRegistrar.getInstance().registerMBean(
+                        ep.getMetricsMBean(), "Endpoint", ep.getName());
+            }
             return ep.getName();
 
         } catch (DeploymentException e) {

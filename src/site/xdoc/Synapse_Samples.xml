@@ -142,6 +142,8 @@
 <a href="#Sample13">Sample 13: Dual channel invocation through Synapse</a></li>
 <li>
 <a href="#Sample13">Sample 15: Message Enrichment through Synapse</a></li>
+<li>
+<a href="#Sample16">Sample 16: Introduction to dynamic and static registry keys</a></li>
 </ul></li>
 
 <li>
@@ -955,7 +957,44 @@ Standard dual channel :: Stock price = $57.16686934968289</pre>
 <pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/services/StockQuote</pre>
 <p>You can try with different local entries as the source with the correct target xpath values. </p>
 
-
+<h2>
+<a name="Sample16" id="Sample16">Sample 16: Introduction to dynamic and static registry keys</a></h2>
+<pre xml:space="preserve">&lt;definitions xmlns=&quot;http://synapse.apache.org/ns/2010/04/configuration&quot;&gt;
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name=&quot;root&quot;&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+    &lt;sequence name=&quot;main&quot;&gt;
+        &lt;in&gt;
+            &lt;!-- define the request processing XSLT resource as a property value --&gt;
+            &lt;property name=&quot;symbol&quot; value=&quot;transform/transform.xslt&quot; xmlns:m0=&quot;http://services.samples&quot;/&gt;
+            &lt;!-- { } denotes that this key is a 'dynamic' one and it is not a 'static' key --&gt;
+            &lt;!-- use Xpath expression "get-property()" to evaluate real key from property --&gt;
+            &lt;xslt key=&quot;{get-property('symbol')}&quot; /&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+            &lt;!-- the key is looked up in the remote registry using a 'static' key --&gt;
+            &lt;xslt key=&quot;transform/transform_back.xslt&quot;/&gt;
+        &lt;/out&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+    
+<p>
+<strong>Objective: Introduction to dynamic and static registry keys</strong> </p>
+<p>
+<strong>Prerequisites:</strong>
+<br/> Start the Synapse configuration numbered 16: i.e. synapse -sample 16
+<br/> Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
+<p>This Sample demonstrates the use of dynamic keys with mediators. XSLT mediator is used as an example for that and deference between static and dynamic usage of keys are shown with that. </p>
+<p>The first registry resource &quot;transform/transform.xslt&quot; is set as a property value. Inside the XSLT mediator the local property value is lookup using the Xpath expression &quot;get-property()&quot;. Likewise any Xpath expression can be enclosed inside &quot;{ }&quot; to denote that it is a dynamic key. Then the mediator will evaluate the real value for that expression. </p>
+<p>The second XSLT resource &quot;transform/transform_back.xslt&quot; is used simply as a static key as usual. It is not included inside &quot;{ }&quot; and because of the mediator directly use the static value as the key. </p>
+<p>Execute the custom quote client as 'ant stockquote -Dmode=customquote …' and analys the output which is similar to the Sample 8. </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
 
 <h1>
 <a name="Endpoints" id="Endpoints">Advanced mediations with endpoints</a> </h1>

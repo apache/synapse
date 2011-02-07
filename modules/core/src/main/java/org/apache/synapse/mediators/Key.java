@@ -34,7 +34,7 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 public class Key {
     private static final Log log = LogFactory.getLog(Key.class);
     /**
-     * The static key value or generated key value for dynamic key
+     * The static key value 
      */
     private String keyValue = null;
     /**
@@ -90,9 +90,8 @@ public class Key {
             //if static kry: return static key
             return keyValue;
         } else if (expression != null) {
-            //if dynamic key: set key value and return key value
-            keyValue = expression.stringValueOf(synCtx);
-            return keyValue;
+            //if dynamic key return evaluated value
+            return expression.stringValueOf(synCtx);
         } else {
             handleException("Can not evaluate the key: " +
                             "key should be static or dynamic key");

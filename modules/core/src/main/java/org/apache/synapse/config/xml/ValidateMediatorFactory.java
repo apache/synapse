@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.Key;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.jaxen.JaxenException;
 import org.xml.sax.SAXException;
@@ -55,7 +56,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         ValidateMediator validateMediator = new ValidateMediator();
 
         // process schema element definitions and create DynamicProperties
-        List<String> schemaKeys = new ArrayList<String>();
+        List<Key> schemaKeys = new ArrayList<Key>();
         Iterator schemas = elem.getChildrenWithName(SCHEMA_Q);
 
         while (schemas.hasNext()) {
@@ -64,7 +65,11 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                 OMElement omElem = (OMElement) o;
                 OMAttribute keyAtt = omElem.getAttribute(ATT_KEY);
                 if (keyAtt != null) {
-                    schemaKeys.add(keyAtt.getAttributeValue());
+                    // KeyFactory for creating dynamic or static Key
+                    KeyFactory keyFac = new KeyFactory();
+                    // create dynamic or static key based on OMElement
+                    Key generatedKey = keyFac.createKey(omElem);
+                    schemaKeys.add(generatedKey);
                 } else {
                     handleException("A 'schema' definition must contain a local property 'key'");
                 }

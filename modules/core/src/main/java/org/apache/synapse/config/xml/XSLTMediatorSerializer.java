@@ -47,7 +47,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         OMElement xslt = fac.createOMElement("xslt", synNS);
 
         if (mediator.getXsltKey() != null) {
-            //xslt.addAttribute(fac.createOMAttribute("key", nullNS, mediator.getXsltKey()));
+            // Serialize Key using KeySerializer
             KeySerializer keySerializer =  new KeySerializer();
             keySerializer.serializeKey(mediator.getXsltKey(), xslt);
         } else {

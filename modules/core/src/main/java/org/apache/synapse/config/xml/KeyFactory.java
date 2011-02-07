@@ -48,10 +48,11 @@ public class KeyFactory {
     public Key createKey(OMElement elem) {
 
         Key key = null;
-        OMAttribute attXslt = elem.getAttribute(ATT_KEY);
 
-        if (attXslt != null) {
-            String attributeValue = attXslt.getAttributeValue();
+        OMAttribute attKey = elem.getAttribute(ATT_KEY);
+
+        if (attKey != null) {
+            String attributeValue = attKey.getAttributeValue();
             if (isDynamicKey(attributeValue)) {
                 /** dynamic key */
                 SynapseXPath synXpath = createSynXpath(elem, attributeValue);

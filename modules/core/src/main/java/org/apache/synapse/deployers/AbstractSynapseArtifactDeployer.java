@@ -369,6 +369,14 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         out.close();
     }
 
+    protected void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ignored) {
+
+        }
+    }
+
     protected void handleSynapseArtifactDeploymentError(String msg) {
         deployerLog.error(msg);
         throw new SynapseArtifactDeploymentException(msg);

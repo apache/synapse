@@ -24,6 +24,7 @@ import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.mediators.Key;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 
 import java.util.Stack;
@@ -42,7 +43,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
     /** The name of the this sequence */
     private String name = null;
     /** The local registry key which is used to pick a sequence definition*/
-    private String key = null;
+    private Key key = null;
     /** The name of the error handler which is used to handle error during the mediation */
     private String errorHandler = null;
     /** is this definition dynamic */
@@ -155,8 +156,9 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
             }
 
         } else {
-
-            Mediator m = synCtx.getSequence(key);
+            String sequenceKey = key.evaluateKey(synCtx);
+            //Mediator m = synCtx.getSequence(key);
+            Mediator m = synCtx.getSequence(sequenceKey);
             if (m == null) {
                 handleException("Sequence named " + key + " cannot be found", synCtx);
 
@@ -217,7 +219,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * To get the key which is used to pick the sequence definition from the local registry
      * @return  return the key which is used to pick the sequence definition from the local registry
      */
-    public String getKey() {
+    public Key getKey() {
         return key;
     }
 
@@ -225,7 +227,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * To set the local registry key in order to pick the sequence definition
      * @param key the local registry key
      */
-    public void setKey(String key) {
+    public void setKey(Key key) {
         this.key = key;
     }
 

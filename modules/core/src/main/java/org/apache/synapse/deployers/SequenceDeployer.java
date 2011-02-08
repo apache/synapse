@@ -125,7 +125,7 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
 
             log.info("Sequence: " + seq.getName() + " has been updated from the file: " + fileName);
 
-            sleep(2000); // Give some time for worker threads to release the old sequence
+            waitForCompletion(); // Give some time for worker threads to release the old sequence
             existingSeq.destroy();
             return seq.getName();
 

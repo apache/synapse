@@ -70,8 +70,10 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
         } else {
            
             if (mediator.getKey() != null) {
-                sequence.addAttribute(fac.createOMAttribute(
-                        "key", nullNS, mediator.getKey()));
+                // Serialize Key using KeySerializer
+                KeySerializer keySerializer = new KeySerializer();
+                keySerializer.serializeKey(mediator.getKey(), sequence);
+                
             } else if (mediator.getName() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
                         "name", nullNS, mediator.getName()));

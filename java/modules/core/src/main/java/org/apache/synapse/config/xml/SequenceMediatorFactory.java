@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.Key;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import javax.xml.namespace.QName;
@@ -86,7 +87,12 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         } else {
             n = elem.getAttribute(ATT_KEY);
             if (n != null) {
-                seqMediator.setKey(n.getAttributeValue());
+                // KeyFactory for creating dynamic or static Key
+                KeyFactory keyFac = new KeyFactory();
+                // create dynamic or static key based on OMElement
+                Key generatedKey = keyFac.createKey(elem);
+                // setKey
+                seqMediator.setKey(generatedKey);
                 if (e != null) {
                     String msg = "A sequence mediator with a reference to another " +
                         "sequence can not have 'ErrorHandler'";

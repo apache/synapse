@@ -115,7 +115,7 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
 
             log.info("Endpoint: " + ep.getName() + " has been updated from the file: " + fileName);
 
-            sleep(2000);
+            waitForCompletion();
             existingEp.destroy();
             if (existingArtifactName.equals(ep.getName())) {
                 // If the endpoint name was same as the old one, above method call (destroy)

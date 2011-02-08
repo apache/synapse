@@ -110,7 +110,7 @@ public class PriorityExecutorDeployer extends AbstractSynapseArtifactDeployer {
                 log.info("Executor: " + existingArtifactName + " has been undeployed");
             }
 
-            sleep(2000);
+            waitForCompletion();
             existingExecutor.destroy();
 
             log.info("PriorityExecutor: " + e.getName() + " has been updated from the file: " + fileName);

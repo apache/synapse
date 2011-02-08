@@ -369,9 +369,15 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         out.close();
     }
 
-    protected void sleep(long millis) {
+    protected void waitForCompletion() {
+        long timeout = 2000L;
+        Parameter param = cfgCtx.getAxisConfiguration().getParameter("hotupdate.timeout");
+        if (param != null && param.getValue() != null) {
+            timeout = Long.parseLong(param.getValue().toString());
+        }
+
         try {
-            Thread.sleep(millis);
+            Thread.sleep(timeout);
         } catch (InterruptedException ignored) {
 
         }

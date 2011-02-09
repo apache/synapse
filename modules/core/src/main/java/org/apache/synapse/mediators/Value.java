@@ -26,13 +26,19 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
 /**
- * Represents a Key
+ * Represents a Value
  * Handling both static and dynamic(Xpath) keys.
  * User can give Xpath expression as a key and derive
  * real key based on message context
  */
-public class Key {
-    private static final Log log = LogFactory.getLog(Key.class);
+public class Value {
+    private static final Log log = LogFactory.getLog(Value.class);
+
+    /**
+     * Name of the value attribute
+     */
+    private String name = null;
+
     /**
      * The static key value 
      */
@@ -47,7 +53,7 @@ public class Key {
      *
      * @param staticKey static key
      */
-    public Key(String staticKey) {
+    public Value(String staticKey) {
         this.keyValue = staticKey;
     }
 
@@ -56,7 +62,7 @@ public class Key {
      *
      * @param expression SynapseXpath for dynamic key
      */
-    public Key(SynapseXPath expression) {
+    public Value(SynapseXPath expression) {
         this.expression = expression;
     }
 
@@ -98,6 +104,15 @@ public class Key {
             return null;
         }
 
+    }
+
+    /**
+     * Get the name of the value attribute
+     *
+     * @return name of the value attribute
+     */
+    public String getName() {
+        return name;
     }
 
     /**

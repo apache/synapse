@@ -26,7 +26,7 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.TestMessageContextBuilder;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.jaxp.*;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
@@ -376,7 +376,7 @@ public class XSLTMediatorTest extends TestCase {
 
         String path;
         SynapseXPath xpath;
-        Key xsltKey;
+        Value xsltKey;
         XSLTMediator transformMediator = new XSLTMediator();
 
         //default source, xsltFile, and state of key (dynamic or static)
@@ -409,7 +409,7 @@ public class XSLTMediatorTest extends TestCase {
             xpath.addNamespace("m0", "http://services.samples/xsd");
 
             // Create key from dynamic key (xpath)
-            xsltKey = new Key(xpath);
+            xsltKey = new Value(xpath);
             // set XSLT transformation URL (Xpath)
             transformMediator.setXsltKey(xsltKey);
         } else {
@@ -433,7 +433,7 @@ public class XSLTMediatorTest extends TestCase {
     protected static void test(Class sbf, Class rbf) throws Exception {
 
         XSLTMediator transformMediator = new XSLTMediator();
-        Key xsltKey = new Key("xslt-key");
+        Value xsltKey = new Value("xslt-key");
         transformMediator.setXsltKey(xsltKey);
 
         MessageContext mc = new TestMessageContextBuilder()
@@ -470,7 +470,7 @@ public class XSLTMediatorTest extends TestCase {
      * @param xsltKeyValue String key value (static key) to set as a key
      */
     private void setXsltTransformationURL(XSLTMediator transformMediator, String xsltKeyValue) {
-        Key xsltKey = new Key(xsltKeyValue);
+        Value xsltKey = new Value(xsltKeyValue);
         transformMediator.setXsltKey(xsltKey);
     }
 }

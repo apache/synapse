@@ -25,7 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.ValidateMediatorFactory;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -359,41 +359,41 @@ public class ValidateMediatorTest extends TestCase {
     }
 
     /**
-     * Create a Key list which consists with one static element
+     * Create a Value list which consists with one static element
      *
-     * @param keyName String key value (static key) to create Key object
-     * @return immutable Key list with one Key element
+     * @param keyName String key value (static key) to create Value object
+     * @return immutable Value list with one Value element
      */
-    private List<Key> createKeyListFromStaticKey(String keyName) {
+    private List<Value> createKeyListFromStaticKey(String keyName) {
         // create static key using given string key name
-        Key xsdKey = new Key(keyName);
+        Value xsdKey = new Value(keyName);
         return Collections.singletonList(xsdKey);
     }
 
     /**
-     * Create a Key list which consists with one dynamic element
+     * Create a Value list which consists with one dynamic element
      *
-     * @param xpath String key value (static key) to create Key object
-     * @return immutable Key list with one Key element
+     * @param xpath String key value (static key) to create Value object
+     * @return immutable Value list with one Value element
      */
-    private List<Key> createKeyListFromDynamicKey(SynapseXPath xpath) {
+    private List<Value> createKeyListFromDynamicKey(SynapseXPath xpath) {
         // create static key using given string key name
-        Key xsdKey = new Key(xpath);
+        Value xsdKey = new Value(xpath);
         return Collections.singletonList(xsdKey);
     }
 
 
     /**
-     * Create a Key list with given set of static keys
+     * Create a Value list with given set of static keys
      *
      * @param keyNames Set of static keys to create list
      * @return Key list
      */
-    private List<Key> createKeyListFromMoreKeys(String... keyNames) {
-        List<Key> keyList = new ArrayList<Key>();
+    private List<Value> createKeyListFromMoreKeys(String... keyNames) {
+        List<Value> keyList = new ArrayList<Value>();
         for (String keyName : keyNames) {
             // create static key using given string key name
-            Key xsdKey = new Key(keyName);
+            Value xsdKey = new Value(keyName);
             keyList.add(xsdKey);
 
         }

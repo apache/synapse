@@ -24,7 +24,7 @@ import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 
 import java.util.Stack;
@@ -43,7 +43,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
     /** The name of the this sequence */
     private String name = null;
     /** The local registry key which is used to pick a sequence definition*/
-    private Key key = null;
+    private Value key = null;
     /** The name of the error handler which is used to handle error during the mediation */
     private String errorHandler = null;
     /** is this definition dynamic */
@@ -219,7 +219,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * To get the key which is used to pick the sequence definition from the local registry
      * @return  return the key which is used to pick the sequence definition from the local registry
      */
-    public Key getKey() {
+    public Value getKey() {
         return key;
     }
 
@@ -227,7 +227,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * To set the local registry key in order to pick the sequence definition
      * @param key the local registry key
      */
-    public void setKey(Key key) {
+    public void setKey(Value key) {
         this.key = key;
     }
 

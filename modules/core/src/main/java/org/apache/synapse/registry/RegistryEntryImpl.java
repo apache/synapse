@@ -116,7 +116,7 @@ public class RegistryEntryImpl implements RegistryEntry {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("RegistryEntry {")
-                .append(" Key : ").append(key)
+                .append(" Value : ").append(key)
                 .append(" Name : ").append(name)
                 .append(" Version : ").append(version)
                 .append(" Type : ").append(type)

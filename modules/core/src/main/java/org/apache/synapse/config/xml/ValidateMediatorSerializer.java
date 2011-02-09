@@ -21,7 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 
@@ -48,11 +48,11 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
             SynapseXPathSerializer.serializeXPath(mediator.getSource(), validate, "source");
         }
 
-        for (Key key : mediator.getSchemaKeys()) {
+        for (Value key : mediator.getSchemaKeys()) {
             OMElement schema = fac.createOMElement("schema", synNS, validate);
-            // Serialize Key using KeySerializer
-            KeySerializer keySerializer =  new KeySerializer();
-            keySerializer.serializeKey(key, schema);
+            // Serialize Value using ValueSerializer
+            ValueSerializer keySerializer =  new ValueSerializer();
+            keySerializer.serializeValue(key, schema);
         }
 
         ResourceMapSerializer.serializeResourceMap(validate, mediator.getResourceMap());

@@ -30,7 +30,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.jaxp.*;
 import org.apache.synapse.util.resolver.CustomJAXPURIResolver;
@@ -110,7 +110,7 @@ public class XSLTMediator extends AbstractMediator {
      * The resource key which refers to the XSLT to be used for the transformation
      * supports both static and dynamic(xpath) keys
      */
-    private Key xsltKey = null;
+    private Value xsltKey = null;
 
     /**
      * The (optional) XPath expression which yields the source element for a transformation
@@ -410,11 +410,11 @@ public class XSLTMediator extends AbstractMediator {
         this.source.setXPath(source);
     }
 
-    public Key getXsltKey() {
+    public Value getXsltKey() {
         return xsltKey;
     }
 
-    public void setXsltKey(Key xsltKey) {
+    public void setXsltKey(Value xsltKey) {
         this.xsltKey = xsltKey;
     }
 

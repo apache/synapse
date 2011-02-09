@@ -47,9 +47,9 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         OMElement xslt = fac.createOMElement("xslt", synNS);
 
         if (mediator.getXsltKey() != null) {
-            // Serialize Key using KeySerializer
-            KeySerializer keySerializer =  new KeySerializer();
-            keySerializer.serializeKey(mediator.getXsltKey(), xslt);
+            // Serialize Value using ValueSerializer
+            ValueSerializer keySerializer =  new ValueSerializer();
+            keySerializer.serializeValue(mediator.getXsltKey(), xslt);
         } else {
             handleException("Invalid XSLT mediator. XSLT registry key is required");
         }

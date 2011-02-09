@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -63,12 +63,12 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         OMAttribute attTarget = elem.getAttribute(ATT_TARGET);
 
         if (attXslt != null) {
-            // KeyFactory for creating dynamic or static Key
-            KeyFactory keyFac = new KeyFactory();
+            // ValueFactory for creating dynamic or static Value
+            ValueFactory keyFac = new ValueFactory();
             // create dynamic or static key based on OMElement
-            Key generatedKey = keyFac.createKey(elem);
+            Value generatedKey = keyFac.createValue(elem);
 
-            // set generated key as the Key
+            // set generated key as the Value
             transformMediator.setXsltKey(generatedKey);
         } else {
             handleException("The 'key' attribute is required for the XSLT mediator");

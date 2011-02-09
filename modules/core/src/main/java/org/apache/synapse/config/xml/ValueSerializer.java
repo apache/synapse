@@ -23,24 +23,24 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 
 /**
- * Serializer for {@link org.apache.synapse.mediators.Key} instances.
+ * Serializer for {@link org.apache.synapse.mediators.Value} instances.
  */
-public class KeySerializer {
+public class ValueSerializer {
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace nullNS
             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**
-     * Serialize the Key object to an OMElement representing the entry
+     * Serialize the Value object to an OMElement representing the entry
      *
-     * @param key  Key to serialize
+     * @param key  Value to serialize
      * @param elem OMElement
      * @return OMElement
      */
-    public OMElement serializeKey(Key key, OMElement elem) {
+    public OMElement serializeValue(Value key, OMElement elem) {
         if (key != null) {
             if (key.getExpression() == null) {
                 //static key

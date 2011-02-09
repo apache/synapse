@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 import java.util.Properties;
 
 /**
- * Creates an {@link IndirectEndpoint} using a XML configuration. Key can be a name of an endpoint defined
+ * Creates an {@link IndirectEndpoint} using a XML configuration. Value can be a name of an endpoint defined
  * in the same Synapse configuration or a registry key pointing to an endpoint configuration in the
  * registry (e.g. &lt;endpoint key="registry/endpoint1.xml"/&gt;).
  *

@@ -68,7 +68,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                     // ValueFactory for creating dynamic or static Value
                     ValueFactory keyFac = new ValueFactory();
                     // create dynamic or static key based on OMElement
-                    Value generatedKey = keyFac.createValue(omElem);
+                    Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, omElem);
                     schemaKeys.add(generatedKey);
                 } else {
                     handleException("A 'schema' definition must contain a local property 'key'");

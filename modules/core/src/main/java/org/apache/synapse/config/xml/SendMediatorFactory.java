@@ -19,10 +19,12 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.builtin.SendMediator;
 
 import javax.xml.namespace.QName;
@@ -76,6 +78,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
 
     private static final QName SEND_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "send");
     private static final QName ENDPOINT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
+    private static final QName RECEIVING_SEQUENCE = new QName(XMLConfigConstants.RECEIVE);
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
@@ -92,6 +95,14 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
             if (endpoint != null) {
                 sm.setEndpoint(endpoint);
             }
+        }
+
+        String receivingSequence = elem.getAttributeValue(RECEIVING_SEQUENCE);
+        if (receivingSequence != null) {
+            ValueFactory valueFactory = new ValueFactory();
+            Value value = valueFactory.createValue(XMLConfigConstants.RECEIVE, elem);
+
+            sm.setReceivingSequence(value);
         }
 
         return sm;

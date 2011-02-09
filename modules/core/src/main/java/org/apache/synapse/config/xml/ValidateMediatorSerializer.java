@@ -52,7 +52,7 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
             OMElement schema = fac.createOMElement("schema", synNS, validate);
             // Serialize Value using ValueSerializer
             ValueSerializer keySerializer =  new ValueSerializer();
-            keySerializer.serializeValue(key, schema);
+            keySerializer.serializeValue(key, XMLConfigConstants.KEY, schema);
         }
 
         ResourceMapSerializer.serializeResourceMap(validate, mediator.getResourceMap());

@@ -40,15 +40,15 @@ public class ValueSerializer {
      * @param elem OMElement
      * @return OMElement
      */
-    public OMElement serializeValue(Value key, OMElement elem) {
+    public OMElement serializeValue(Value key, String name, OMElement elem) {
         if (key != null) {
             if (key.getExpression() == null) {
                 //static key
-                elem.addAttribute(fac.createOMAttribute("key", nullNS, key.getKeyValue()));
+                elem.addAttribute(fac.createOMAttribute(name, nullNS, key.getKeyValue()));
             } else {
                 //dynamic key
                 SynapseXPathSerializer.serializeXPath(key.getExpression(), "{" +
-                        key.getExpression().toString() + "}", elem, "key");
+                        key.getExpression().toString() + "}", elem, name);
             }
         }
         return elem;

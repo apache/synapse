@@ -103,6 +103,7 @@ public final class SynapseConstants {
 	public static final String SANDESHA_POLICY = "sandeshaPolicy";
     /** ServerManager MBean category and id */
     public static final String SERVER_MANAGER_MBEAN = "ServerManager";
+    public static final String RECEIVING_SEQUENCE = "RECEIVING_SEQUENCE";
 
     /** Parameter names in the axis2.xml that can be used to configure the synapse */
     public static final class Axis2Param {

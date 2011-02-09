@@ -29,6 +29,7 @@ import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -45,6 +46,7 @@ import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
 import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -144,12 +146,40 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             }
         }
 
+        String receivingSequence = (String) synCtx.getProperty(SynapseConstants.RECEIVING_SEQUENCE);
+        // remove the receivingSequence property
+        Set keySet = synCtx.getPropertyKeySet();
+        if (keySet != null) {
+            keySet.remove(SynapseConstants.RECEIVING_SEQUENCE);
+        }
+
         // if this is not a response to a proxy service
         String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
         if (proxyName == null || "".equals(proxyName)) {
             if (log.isDebugEnabled()) {
                 log.debug("Using Main Sequence for injected message");
             }
+
+            if (receivingSequence != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Using Sequence with name: " + receivingSequence
+                            + " for injected message");
+                }
+                Mediator seqMediator = synCtx.getSequence(receivingSequence);
+                if (seqMediator != null) {
+                    seqMediator.mediate(synCtx);
+                } else {
+                    log.warn("Cannot find a Sequence with name: " + receivingSequence
+                            + " for injecting the response message");
+                    return false;
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Using a Sequence for injected message");
+                }
+                return synCtx.getMainSequence().mediate(synCtx);
+            }
+
             return synCtx.getMainSequence().mediate(synCtx);
         }
 
@@ -176,7 +206,20 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             }
 
             Mediator outSequence = getProxyOutSequence(synCtx, proxyService);
-            if (outSequence != null) {
+            if (receivingSequence != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Using Sequence with name: " + receivingSequence
+                            + " for injected message");
+                }
+                Mediator seqMediator = synCtx.getSequence(receivingSequence);
+                if (seqMediator != null) {
+                    seqMediator.mediate(synCtx);
+                } else {
+                    log.warn("Cannot find a Sequence with name: " + receivingSequence
+                            + " for injecting the message");
+                    return false;
+                }
+            } else if (outSequence != null) {
                 outSequence.mediate(synCtx);
             } else {
                 if (log.isDebugEnabled()) {

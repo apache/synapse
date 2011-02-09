@@ -493,7 +493,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
     /**
      * To set the policy key - The key for which lookup from the registry
      *
-     * @param policyKey Key for picking policy from the registry
+     * @param policyKey Value for picking policy from the registry
      */
     public void setPolicyKey(String policyKey) {
         this.policyKey = policyKey;

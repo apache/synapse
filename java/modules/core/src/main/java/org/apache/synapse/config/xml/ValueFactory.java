@@ -24,18 +24,18 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.Key;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 
 /**
- * Factory for {@link org.apache.synapse.mediators.Key} instances.
+ * Factory for {@link org.apache.synapse.mediators.Value} instances.
  */
-public class KeyFactory {
+public class ValueFactory {
 
-    private static final Log log = LogFactory.getLog(KeyFactory.class);
+    private static final Log log = LogFactory.getLog(ValueFactory.class);
 
     private static final QName ATT_KEY = new QName("key");
 
@@ -45,9 +45,9 @@ public class KeyFactory {
      * @param elem OMElement
      * @return Key
      */
-    public Key createKey(OMElement elem) {
+    public Value createValue(OMElement elem) {
 
-        Key key = null;
+        Value key = null;
 
         OMAttribute attKey = elem.getAttribute(ATT_KEY);
 
@@ -56,10 +56,10 @@ public class KeyFactory {
             if (isDynamicKey(attributeValue)) {
                 /** dynamic key */
                 SynapseXPath synXpath = createSynXpath(elem, attributeValue);
-                key = new Key(synXpath);
+                key = new Value(synXpath);
             } else {
                 /** static key */
-                key = new Key(attributeValue);
+                key = new Value(attributeValue);
             }
         } else {
             handleException("The 'key' attribute is required for the XSLT mediator");

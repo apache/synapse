@@ -156,7 +156,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
             }
 
         } else {
-            String sequenceKey = key.evaluateKey(synCtx);
+            String sequenceKey = key.evaluateValue(synCtx);
             //Mediator m = synCtx.getSequence(key);
             Mediator m = synCtx.getSequence(sequenceKey);
             if (m == null) {

@@ -91,7 +91,7 @@ public class Value {
      * @param synCtx message context
      * @return string value of evaluated key
      */
-    public String evaluateKey(MessageContext synCtx) {
+    public String evaluateValue(MessageContext synCtx) {
         if (keyValue != null) {
             //if static kry: return static key
             return keyValue;

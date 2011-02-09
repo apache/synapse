@@ -116,7 +116,7 @@ public class ValidateMediator extends AbstractListMediator {
         // if any of the schemas are not loaded, or have expired, load or re-load them
         for (Value schemaKey : schemaKeys) {
             // Derive actual key from message context
-            String propKey = schemaKey.evaluateKey(synCtx);
+            String propKey = schemaKey.evaluateValue(synCtx);
             Entry dp = synCtx.getConfiguration().getEntryDefinition(propKey);
             if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
@@ -137,7 +137,7 @@ public class ValidateMediator extends AbstractListMediator {
                 int i = 0;
                 for (Value schemaKey : schemaKeys) {
                     // Derive actual key from message context
-                    String propName = schemaKey.evaluateKey(synCtx);
+                    String propName = schemaKey.evaluateValue(synCtx);
                     sources[i++] = SynapseConfigUtils.getStreamSource(synCtx.getEntry(propName));
                 }
 

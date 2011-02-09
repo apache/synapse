@@ -45,11 +45,11 @@ public class ValueFactory {
      * @param elem OMElement
      * @return Key
      */
-    public Value createValue(OMElement elem) {
+    public Value createValue(String name, OMElement elem) {
 
         Value key = null;
 
-        OMAttribute attKey = elem.getAttribute(ATT_KEY);
+        OMAttribute attKey = elem.getAttribute(new QName(name));
 
         if (attKey != null) {
             String attributeValue = attKey.getAttributeValue();

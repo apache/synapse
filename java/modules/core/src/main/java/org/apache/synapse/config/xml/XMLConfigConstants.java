@@ -45,6 +45,8 @@ public class XMLConfigConstants {
     public static final String SCOPE_TRANSPORT = "transport";
     /** The scope name for registry properties */
     public static final String SCOPE_REGISTRY = "registry";
+    public static final String KEY = "key";
+    public static final String RECEIVE = "receive";
 
     /** The set of supported data types */
     public static enum DATA_TYPES {

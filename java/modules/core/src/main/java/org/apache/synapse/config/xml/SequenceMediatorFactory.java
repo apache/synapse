@@ -90,7 +90,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 // ValueFactory for creating dynamic or static Value
                 ValueFactory keyFac = new ValueFactory();
                 // create dynamic or static key based on OMElement
-                Value generatedKey = keyFac.createValue(elem);
+                Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);
                 // setKey
                 seqMediator.setKey(generatedKey);
                 if (e != null) {

@@ -72,7 +72,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
             if (mediator.getKey() != null) {
                 // Serialize Value using ValueSerializer
                 ValueSerializer keySerializer = new ValueSerializer();
-                keySerializer.serializeValue(mediator.getKey(), sequence);
+                keySerializer.serializeValue(mediator.getKey(), XMLConfigConstants.KEY, sequence);
                 
             } else if (mediator.getName() != null) {
                 sequence.addAttribute(fac.createOMAttribute(

@@ -49,7 +49,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         if (mediator.getXsltKey() != null) {
             // Serialize Value using ValueSerializer
             ValueSerializer keySerializer =  new ValueSerializer();
-            keySerializer.serializeValue(mediator.getXsltKey(), xslt);
+            keySerializer.serializeValue(mediator.getXsltKey(), XMLConfigConstants.KEY, xslt);
         } else {
             handleException("Invalid XSLT mediator. XSLT registry key is required");
         }

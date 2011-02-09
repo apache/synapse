@@ -66,12 +66,13 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
             // ValueFactory for creating dynamic or static Value
             ValueFactory keyFac = new ValueFactory();
             // create dynamic or static key based on OMElement
-            Value generatedKey = keyFac.createValue(elem);
+            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);
 
             // set generated key as the Value
             transformMediator.setXsltKey(generatedKey);
         } else {
-            handleException("The 'key' attribute is required for the XSLT mediator");
+            handleException("The '" + XMLConfigConstants.KEY + "' " +
+                    "attribute is required for the XSLT mediator");
         }
 
         if (attSource != null) {

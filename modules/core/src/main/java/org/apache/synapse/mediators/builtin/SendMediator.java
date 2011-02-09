@@ -20,11 +20,13 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.Value;
 
 /**
  * SendMediator sends a message using specified semantics. If it contains an endpoint it will
@@ -35,6 +37,8 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class SendMediator extends AbstractMediator implements ManagedLifecycle {
 
     private Endpoint endpoint = null;
+
+    private Value receivingSequence = null;
 
     /**
      * This will call the send method on the messages with implicit message parameters
@@ -50,6 +54,14 @@ public class SendMediator extends AbstractMediator implements ManagedLifecycle {
         synLog.traceOrDebug("Start : Send mediator");
         if (synLog.isTraceTraceEnabled()) {
             synLog.traceTrace("Message : " + synCtx.getEnvelope());
+        }
+
+        if (receivingSequence != null) {
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Receiving sequence is set to: " + receivingSequence);
+            }
+            synCtx.setProperty(SynapseConstants.RECEIVING_SEQUENCE,
+                    receivingSequence.evaluateValue(synCtx));
         }
 
         // if no endpoints are defined, send where implicitly stated
@@ -86,6 +98,14 @@ public class SendMediator extends AbstractMediator implements ManagedLifecycle {
 
     public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public Value getReceivingSequence() {
+        return receivingSequence;
+    }
+
+    public void setReceivingSequence(Value receivingSequence) {
+        this.receivingSequence = receivingSequence;
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {

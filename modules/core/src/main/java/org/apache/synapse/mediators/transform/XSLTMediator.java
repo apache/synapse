@@ -213,7 +213,7 @@ public class XSLTMediator extends AbstractMediator {
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
 
         // Derive actual key from message context
-        String generatedXsltKey = xsltKey.evaluateKey(synCtx);
+        String generatedXsltKey = xsltKey.evaluateValue(synCtx);
 
         // get templates from generatedXsltKey
         Templates cachedTemplates = null;
@@ -385,7 +385,7 @@ public class XSLTMediator extends AbstractMediator {
     private boolean isCreationOrRecreationRequired(MessageContext synCtx) {
 
         // Derive actual key from message context
-        String generatedXsltKey = xsltKey.evaluateKey(synCtx);
+        String generatedXsltKey = xsltKey.evaluateValue(synCtx);
 
         // if there are no cachedTemplates inside cachedTemplatesMap or
         // if the template related to this generated key is not cached

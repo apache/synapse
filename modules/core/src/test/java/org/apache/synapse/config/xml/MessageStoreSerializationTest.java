@@ -39,12 +39,6 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
                 "http://ws.apache.org/ns/synapse\"" +
                 " name=\"foo\" sequence=\"seq1\" >" +
-                "<syn:redelivery>" +
-                "<syn:interval>1</syn:interval>" +
-                "<syn:maximumRedeliveries>5</syn:maximumRedeliveries>" +
-                "<syn:exponentialBackoff>true</syn:exponentialBackoff>" +
-                "<syn:backoffMutiplier>2</syn:backoffMutiplier>" +
-                "</syn:redelivery>" +
                 "</syn:messageStore>";
 
         OMElement messageStoreElement = createOMElement(messageStoreConfiguration);

@@ -79,7 +79,8 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
         ConditionalRouterMediatorFactory.class,
         SamplingThrottleMediatorFactory.class,
         URLRewriteMediatorFactory.class,
-        EnrichMediatorFactory.class    
+        EnrichMediatorFactory.class,
+        MessageStoreMediatorFactory.class
     };
 
     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();

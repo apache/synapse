@@ -21,22 +21,21 @@ package org.apache.synapse.endpoints;
 
 import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.message.store.StorableMessage;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.AspectConfiguration;
+import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.mediators.MediatorFaultHandler;
+import org.apache.synapse.mediators.MediatorProperty;
 
 import java.util.*;
 

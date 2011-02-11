@@ -24,15 +24,16 @@ import java.util.List;
 public interface MessageStoreViewMBean {
 
     /**
-     * try resending all messages stored in the message store via associated endpoints.
-     */
-    public void resendAll();
-
-    /**
      * Delete all the Messages in Message store
      */
     public void deleteAll();
 
+
+    /**
+     * Delete given number of Messages from the MessageStore
+     * @param maxCount
+     */
+    public void delete(int maxCount);
 
     /**
      * Get the Message IDs of all stored Messages in the Message store
@@ -41,14 +42,6 @@ public interface MessageStoreViewMBean {
      */
     public List<String> getMessageIds();
 
-    /**
-     * Resend the Message with the given id
-     * return false if fail to re try deliver the message
-     *
-     * @param messageID ID of the message to be resent
-     * @return true if the resend operation was successful and false otherwise
-     */
-    public boolean  resend(String messageID);
 
     /**
      * Delete the Message with Given id
@@ -58,7 +51,7 @@ public interface MessageStoreViewMBean {
     public void delete(String messageID);
 
     /**
-     * Get the SOAP envelope of the given Messaage with given ID
+     * Get the SOAP envelope of the given Message with given ID
      *
      * @param messageID ID of the message to be returned
      * @return the SOAP envelope content as a string

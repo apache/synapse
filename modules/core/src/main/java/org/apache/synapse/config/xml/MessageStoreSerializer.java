@@ -27,20 +27,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.message.store.InMemoryMessageStore;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Serialize an instance of the given Message Store, and sets properties on it.
  * <p/>
  * &lt;messageStore name="string" class="classname" [sequence = "string" ] &gt;
- * &lt;redelivery&gt;
- * &lt;interval&gt;delay in seconds &lt;/interval&gt;
- * &lt;maximumRedeliveries&gt;maximum_number_of_redeliveries_to attempt  &lt;/maximumRedeliveries&gt;
- * &lt;/redelivery&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
  * &lt;/messageStore&gt;
  */
 public class MessageStoreSerializer {
@@ -75,36 +76,6 @@ public class MessageStoreSerializer {
             handleException("Message store Name not specified");
         }
 
-        //Redelivery processor
-        OMElement redilevery = fac.createOMElement("redelivery", synNS);
-        int reDeliveryDelay = messageStore.getRedeliveryProcessor().getRedeliveryDelay() / 1000;
-
-        OMElement delay = fac.createOMElement("interval", synNS);
-        delay.setText(String.valueOf(reDeliveryDelay));
-
-        redilevery.addChild(delay);
-
-        int maxRedeliveries = messageStore.getRedeliveryProcessor().getMaxRedeleveries();
-        OMElement maxRedeliveryElm = fac.createOMElement("maximumRedeliveries", synNS);
-        maxRedeliveryElm.setText(String.valueOf(maxRedeliveries));
-
-        redilevery.addChild(maxRedeliveryElm);
-
-        if (messageStore.getRedeliveryProcessor().isExponentialBackoffEnable()) {
-             OMElement expBOElm = fac.createOMElement("exponentialBackoff", synNS);
-             expBOElm.setText("true");
-             redilevery.addChild(expBOElm);
-
-             OMElement multiplierElm = fac.createOMElement("backoffMutiplier", synNS);
-             int multiplier = messageStore.getRedeliveryProcessor().getBackOffMultiplier();
-             if (multiplier > 0) {
-                 multiplierElm.setText(String.valueOf(multiplier));
-                 redilevery.addChild(multiplierElm);
-             }
-        }
-
-        store.addChild(redilevery);
-
         if (messageStore.getParameters() != null) {
             Iterator iter = messageStore.getParameters().keySet().iterator();
             while (iter.hasNext()) {
@@ -118,6 +89,9 @@ public class MessageStoreSerializer {
             }
         }
 
+        if(messageStore.getMessageProcessor() != null) {
+            populateProcessorElem(store,fac,messageStore);
+        }
         if (getSerializedDescription(messageStore) != null) {
             store.addChild(getSerializedDescription(messageStore));
         }
@@ -138,6 +112,23 @@ public class MessageStoreSerializer {
         } else {
             return null;
         }
+    }
+
+    private static void populateProcessorElem(OMElement storeElem ,OMFactory factory,
+                                              MessageStore messageStore) {
+        MessageProcessor processor = messageStore.getMessageProcessor();
+        OMElement processorElem = factory.createOMElement("processor" , synNS);
+        Map<String ,Object> parameters = processor.getParameters();
+
+        Iterator<Map.Entry<String ,Object>> it = parameters.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String,Object> entry = it.next();
+            OMElement paramElem = factory.createOMElement("parameter", synNS);
+            paramElem.addAttribute(fac.createOMAttribute("name", nullNS, entry.getKey()));
+            paramElem.setText((String)entry.getValue());
+            processorElem.addChild(paramElem);
+        }
+        storeElem.addChild(processorElem);
     }
 
     private static void handleException(String msg) {

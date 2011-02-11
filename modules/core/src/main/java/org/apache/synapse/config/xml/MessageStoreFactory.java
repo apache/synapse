@@ -25,12 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.InMemoryMessageStore;
 import org.apache.synapse.message.store.MessageStore;
-import org.apache.synapse.message.store.RedeliveryProcessor;
 import org.apache.axis2.util.JavaUtils;
 
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,11 +41,14 @@ import java.util.Properties;
 /**
  * Create an instance of the given Message Store, and sets properties on it.
  * <p/>
- * &lt;messageStore name="string" class="classname" [sequence = "string" ] &gt;
- * &lt;redelivery&gt;
- * &lt;interval&gt;delay in seconds &lt;/interval&gt;
- * &lt;maximumRedeliveries&gt;maximum_number_of_redeliveries_to attempt  &lt;/maximumRedeliveries&gt;
- * &lt;/redelivery&gt;
+ * &lt;messageStore name="string" class="classname" [sequence = "string" ]&gt;
+ * &lt;<processor class="classname">&gt;
+ * &lt;</processor>&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * .
+ * .
  * &lt;/messageStore&gt;
  */
 public class MessageStoreFactory {
@@ -55,19 +59,12 @@ public class MessageStoreFactory {
     public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
     public static final QName SEQUENCE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
 
-    private static final QName REDELIVERY_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "redelivery");
-    private static final QName DELAY_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "interval");
-    private static final QName MAX_REDELIVERIES = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "maximumRedeliveries");
-    private static final QName ENABLE_EXPONENTIAL_BACKOFF = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "exponentialBackoff");
-    private static final QName BACKOFF_MULTIPLIER = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "backoffMutiplier");
+    public static final QName PROCESSOR_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "processor");
     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             "parameter");
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
+
 
     @SuppressWarnings({"UnusedDeclaration"})
     public static MessageStore createMessageStore(OMElement elem, Properties properties) {
@@ -86,7 +83,9 @@ public class MessageStoreFactory {
             messageStore = new InMemoryMessageStore();
         }
 
+
         OMAttribute nameAtt = elem.getAttribute(NAME_Q);
+
         if (nameAtt != null) {
             messageStore.setName(nameAtt.getAttributeValue());
         } else {
@@ -94,16 +93,8 @@ public class MessageStoreFactory {
         }
 
         OMAttribute sequenceAtt = elem.getAttribute(SEQUENCE_Q);
-        if(sequenceAtt != null) {
+        if (sequenceAtt != null) {
             messageStore.setSequence(sequenceAtt.getAttributeValue());
-        }
-
-        OMElement redeliveryElem = elem.getFirstChildWithName(REDELIVERY_Q);
-
-        if (redeliveryElem != null) {
-            RedeliveryProcessor redeliveryProcessor = populateRedeliveryProcessor(redeliveryElem,
-                    messageStore);
-            messageStore.setRedeliveryProcessor(redeliveryProcessor);
         }
 
         OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
@@ -112,44 +103,25 @@ public class MessageStoreFactory {
         }
 
         messageStore.setParameters(getParameters(elem));
+
+        OMElement processorElm = elem.getFirstChildWithName(PROCESSOR_Q);
+        MessageProcessor processor = null;
+        if (processorElm != null) {
+            processor = populateMessageProcessor(processorElm);
+        } else {
+            log.warn("Creating a Message Store without ");
+        }
+
+        if(processor != null) {
+            messageStore.setMessageProcessor(processor);
+        } else {
+            log.warn("Message Store Created with out a Message processor. ");
+        }
         return messageStore;
     }
 
-    private static RedeliveryProcessor populateRedeliveryProcessor(OMElement element,
-                                                                   MessageStore messageStore) {
 
-        RedeliveryProcessor redeliveryProcessor = new RedeliveryProcessor(messageStore);
-
-        OMElement intervalElm = element.getFirstChildWithName(DELAY_Q);
-        if (intervalElm != null) {
-            int delay = 1000 * Integer.parseInt(intervalElm.getText());
-            redeliveryProcessor.setRedeliveryDelay(delay);
-        }
-
-        OMElement maxRedeliveryElm = element.getFirstChildWithName(MAX_REDELIVERIES);
-
-        if (maxRedeliveryElm != null) {
-            int maxRedeliveries = Integer.parseInt(maxRedeliveryElm.getText());
-            redeliveryProcessor.setMaxRedeleveries(maxRedeliveries);
-        }
-
-        OMElement expBOElm = element.getFirstChildWithName(ENABLE_EXPONENTIAL_BACKOFF);
-
-        if (expBOElm != null) {
-            if (JavaUtils.isTrueExplicitly(expBOElm.getText())) {
-                redeliveryProcessor.setExponentialBackoff(true);
-                OMElement multiplierElm = element.getFirstChildWithName(BACKOFF_MULTIPLIER);
-                if (multiplierElm != null) {
-                    int mulp = Integer.parseInt(multiplierElm.getText());
-                    redeliveryProcessor.setBackOffMultiplier(mulp);
-                }
-            }
-        }
-
-        return redeliveryProcessor;
-    }
-
-    private static Map<String,Object> getParameters(OMElement elem) {
+    private static Map<String, Object> getParameters(OMElement elem) {
         Iterator params = elem.getChildrenWithName(PARAMETER_Q);
         Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -168,7 +140,54 @@ public class MessageStoreFactory {
                 }
             }
         }
-        return parameters ;
+        return parameters;
+    }
+
+    /**
+     * Populate the Message Processor
+     *
+     * @return
+     */
+    private static MessageProcessor populateMessageProcessor(OMElement element) {
+        OMAttribute classAtt = element.getAttribute(CLASS_Q);
+        MessageProcessor processor = null;
+        if (classAtt != null) {
+            String className = classAtt.getAttributeValue();
+            try {
+                Class cls = Class.forName(className);
+                if (cls != null) {
+                    processor = (MessageProcessor) cls.newInstance();
+                    Iterator params = element.getChildrenWithName(PARAMETER_Q);
+                    Map<String, Object> parameters = new HashMap<String, Object>();
+
+                    while (params.hasNext()) {
+                        Object o = params.next();
+                        if (o instanceof OMElement) {
+                            OMElement prop = (OMElement) o;
+                            OMAttribute paramName = prop.getAttribute(NAME_Q);
+                            String paramValue = prop.getText();
+                            if (paramName != null) {
+                                if (paramValue != null) {
+                                    parameters.put(paramName.getAttributeValue(), paramValue);
+                                }
+                            } else {
+                                handleException("Invalid Message Processor parameter - Parameter must have a name ");
+                            }
+                        }
+                    }
+                    processor.setParameters(parameters);
+                } else {
+                    throw new SynapseException("Can't find Class " + className);
+                }
+            } catch (Exception e) {
+                log.error("Error while Creating MessageProcessor " + e.getMessage());
+                throw new SynapseException(e);
+            }
+        } else {
+            log.warn("Creating Message Store with out a Message processor processor");
+        }
+
+        return processor;
     }
 
     private static void handleException(String msg) {

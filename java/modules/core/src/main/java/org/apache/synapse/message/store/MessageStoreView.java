@@ -21,6 +21,7 @@ package org.apache.synapse.message.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,19 +39,6 @@ public class MessageStoreView implements MessageStoreViewMBean{
         this.messageStore = messageStore;
     }
 
-    public void resendAll() {
-        List<StorableMessage> list = messageStore.getAllMessages();
-
-        for(int i = 0; i < list.size(); i++) {
-            StorableMessage m = list.get(i);
-            // wait till the endpoint is ready
-            while(!m.getEndpoint().readyToSend());
-            //resend
-            m.getEndpoint().send(m.getMessageContext());
-        }
-
-        log.info("All Messages in Message Store " +messageStoreName+ " were resent");
-    }
 
     public void deleteAll() {
         messageStore.unstoreAll();
@@ -60,36 +48,17 @@ public class MessageStoreView implements MessageStoreViewMBean{
     public List<String> getMessageIds() {
 
         List<String> returnList = new ArrayList<String>();
-        List<StorableMessage> list = messageStore.getAllMessages();
+        List<MessageContext> list = messageStore.getAllMessages();
 
-        for(StorableMessage m : list) {
-            returnList.add(m.getMessageContext().getMessageID());
+        for(MessageContext m : list) {
+            returnList.add(m.getMessageID());
         }
         return returnList;
     }
 
-    public boolean resend(String messageID) {
-
-        StorableMessage m = messageStore.getMessage(messageID);
-
-        if (m != null) {
-            if (m.getEndpoint().readyToSend()) {
-                m.getEndpoint().send(m.getMessageContext());
-                log.info("Message with ID " + messageID + " resent via the Endpoint" +
-                        m.getEndpoint().getName());
-                return true;
-            } else {
-                log.info("Message with ID " + messageID +" unable resent via the Endpoint" +
-                        m.getEndpoint().getName());
-            }
-        }
-
-        return false;
-    }
-
     public void delete(String messageID) {
         if(messageID != null) {
-            StorableMessage m =messageStore.unstore(messageID);
+            MessageContext m =messageStore.unstore(messageID);
             if (m != null){
                 log.info("Message with ID :" + messageID + " removed from the MessageStore");
             }
@@ -98,10 +67,10 @@ public class MessageStoreView implements MessageStoreViewMBean{
 
     public String getEnvelope(String messageID) {
         if (messageID != null) {
-            StorableMessage m = messageStore.getMessage(messageID);
+            MessageContext m = messageStore.getMessage(messageID);
 
             if (m != null) {
-                return m.getMessageContext().getEnvelope().toString();
+                return m.getEnvelope().toString();
             }
         }
         return null;
@@ -109,5 +78,9 @@ public class MessageStoreView implements MessageStoreViewMBean{
 
     public int getSize() {
         return messageStore.getSize();
+    }
+
+    public void delete(int maxCount) {
+        messageStore.unstore(0,maxCount-1);
     }
 }

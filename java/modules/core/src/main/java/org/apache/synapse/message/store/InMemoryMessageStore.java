@@ -21,6 +21,7 @@ package org.apache.synapse.message.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 
 import java.util.*;
 
@@ -32,51 +33,103 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     private static final Log log = LogFactory.getLog(InMemoryMessageStore.class);
 
     /** The map that keeps the stored messages */
-    private Map<String, StorableMessage> messageList = new HashMap<String, StorableMessage>();
+    private Map<String, MessageContext> messageList = new HashMap<String, MessageContext>();
 
-    public void store(StorableMessage storableMessage) {
-        if (storableMessage != null) {
-            mediateSequence(storableMessage.getMessageContext());
-            messageList.put(storableMessage.getMessageContext().getMessageID(), storableMessage);
+    public void store(MessageContext messageContext) {
+        if (messageContext != null) {
+            mediateSequence(messageContext);
+            messageList.put(messageContext.getMessageID(), messageContext);
+
+            /**
+             * If the associated processor is not started we start it. When storing the message
+             */
+            if(!processor.isStarted()) {
+                processor.start();
+            }
             if (log.isDebugEnabled()) {
-                log.debug("Message " + storableMessage.getMessageContext().getMessageID() +
+                log.debug("Message " + messageContext.getMessageID() +
                         " has been stored");
             }
         }
     }
 
-    public StorableMessage unstore(String messageID) {
+    public MessageContext unstore(String messageID) {
         if (messageID != null) {
             return messageList.remove(messageID);
         }
         return null;
     }
 
-    public List<StorableMessage> unstoreAll() {
-        List<StorableMessage> returnList = new ArrayList<StorableMessage>();
+    public List<MessageContext> unstoreAll() {
+        List<MessageContext> returnList = new ArrayList<MessageContext>();
         for (String k : messageList.keySet()) {
             returnList.add(messageList.remove(k));
         }
         return returnList;
     }
 
-    public List<StorableMessage> getAllMessages() {
-        List<StorableMessage> returnlist = new ArrayList<StorableMessage>();
-
+    public List<MessageContext> unstore(int maxNumberOfMessages) {
+        List<MessageContext> returnList = new ArrayList<MessageContext>();
         Iterator<String> it = messageList.keySet().iterator();
-        while (it.hasNext()) {
-            returnlist.add(messageList.get(it.next()));
+        while (it.hasNext() && maxNumberOfMessages > 0) {
+            returnList.add(messageList.get(it.next()));
+            maxNumberOfMessages--;
         }
 
+        return returnList;
+    }
+
+    public List<MessageContext> unstore(int from, int to) {
+        List<MessageContext> returnlist = new ArrayList<MessageContext>();
+        if (from <= to && (from <= messageList.size() && to <= messageList.size())) {
+
+            String[] keys = messageList.keySet().toArray(new String[0]);
+
+            for (int i = from; i <= to; i++) {
+                returnlist.add(messageList.remove(keys[i]));
+            }
+        }
         return returnlist;
     }
 
-    public StorableMessage getMessage(String messageId) {
+    public List<MessageContext> getMessages(int from, int to) {
+         List<MessageContext> returnlist = new ArrayList<MessageContext>();
+        if (from <= to && (from <= messageList.size() && to <= messageList.size())) {
+            String[] keys = messageList.keySet().toArray(new String[0]);
+
+            for (int i = from; i <= to; i++) {
+                returnlist.add(messageList.get(keys[i]));
+            }
+        }
+        return returnlist;
+    }
+
+    public List<MessageContext> getAllMessages() {
+        List<MessageContext> returnList = new ArrayList<MessageContext>();
+        for (Map.Entry<String ,MessageContext> entry :messageList.entrySet()) {
+            returnList.add(entry.getValue());
+        }
+        return returnList;
+    }
+
+    public MessageContext getMessage(String messageId) {
         if (messageId != null) {
             return messageList.get(messageId);
         }
 
         return null;
+    }
+
+    public List<MessageContext> getMessages(int maxNumberOfMessages) {
+        List<MessageContext> returnList = new ArrayList<MessageContext>();
+
+        Iterator<String> it = messageList.keySet().iterator();
+        while (it.hasNext() && maxNumberOfMessages > 0) {
+            returnList.add(messageList.get(it.next()));
+            maxNumberOfMessages--;
+        }
+
+        return returnList;
     }
 
     public int getSize() {

@@ -22,13 +22,11 @@ package org.apache.synapse.message.store;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.message.processors.MessageProcessor;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Map;
 
 public abstract class AbstractMessageStore implements MessageStore, ManagedLifecycle {
@@ -37,16 +35,6 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
      * message store name
      */
     protected String name;
-
-    /**
-     * associated redelivery processor
-     */
-    protected RedeliveryProcessor redeliveryProcessor;
-
-    /**
-     * queue that holds the sheduled messages
-     */
-    protected Queue<StorableMessage> scheduledMessageQueue = new LinkedList<StorableMessage>();
 
     /**
      * name of the sequence to be executed before storing the message
@@ -59,17 +47,17 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
     protected MessageStoreView messageStoreMBean;
 
     /**
-     * synapse configuration reffrence
+     * synapse configuration reference
      */
     protected SynapseConfiguration synapseConfiguration;
 
     /**
-     * synapse environment reffrence
+     * synapse environment reference
      */
     protected SynapseEnvironment synapseEnvironment;
 
     /**
-     * Message store properties
+     * Message store parameters
      */
     protected Map<String,Object> parameters;
 
@@ -82,6 +70,11 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
      * Name of the file where this message store is defined
      */
     protected String fileName;
+
+    /**
+     * Message processor instance associated with the MessageStore
+     */
+    protected MessageProcessor processor;
 
     public void init(SynapseEnvironment se) {
         this.synapseEnvironment = se;
@@ -96,46 +89,26 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
         this.name = name;
         messageStoreMBean = new MessageStoreView(name, this);
         MBeanRegistrar.getInstance().registerMBean(messageStoreMBean,
-                "DeadLetterChannel", this.name);
+                "MessageStore", this.name);
     }
 
-    public void setRedeliveryProcessor(RedeliveryProcessor redeliveryProcessor) {
-        this.redeliveryProcessor = redeliveryProcessor;
-    }
-
-    public RedeliveryProcessor getRedeliveryProcessor() {
-        return redeliveryProcessor;
-    }
-
-
-    public void schedule(StorableMessage storableMessage) {
-        if (storableMessage != null) {
-            scheduledMessageQueue.add(storableMessage);
-        }
-
-        if (scheduledMessageQueue.size() > 0 && redeliveryProcessor != null &&
-                !redeliveryProcessor.isStarted()) {
-            redeliveryProcessor.start();
-        }
-    }
-
-    public StorableMessage dequeueScheduledQueue() {
-        return scheduledMessageQueue.poll();
-    }
-
-    public StorableMessage getFirstSheduledMessage() {
-        return scheduledMessageQueue.peek();
-    }
 
     protected void mediateSequence(MessageContext synCtx) {
 
-        if (sequence != null && synCtx != null && "true".equalsIgnoreCase(
-                (String) synCtx.getProperty(SynapseConstants.MESSAGE_STORE_REDELIVERED))) {
+        if (sequence != null && synCtx != null) {
             Mediator seq = synCtx.getSequence(sequence);
             if (seq != null) {
                 seq.mediate(synCtx);
             }
         }
+    }
+
+    public void setMessageProcessor(MessageProcessor messageProcessor) {
+        this.processor = messageProcessor;
+    }
+
+    public MessageProcessor getMessageProcessor() {
+        return processor;
     }
 
     public int getSize() {

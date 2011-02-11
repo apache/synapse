@@ -19,9 +19,11 @@
 
 package org.apache.synapse.message.store;
 
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.Nameable;
+import org.apache.synapse.message.processors.MessageProcessor;
 
 import java.util.List;
 import java.util.Map;
@@ -33,71 +35,56 @@ import java.util.Map;
 public interface MessageStore extends SynapseArtifact, Nameable {
 
     /**
-     * store the Message in the Message Store
-     * Underlying message store implementation must handle the efficient way of storing the Message
-     * @param storableMessage wrapper of the Message context
+     * Store the Message in the Message Store
+     * @param messageContext  MessageContext to be saved
      */
-    public void store(StorableMessage storableMessage);
+    public void store(MessageContext messageContext);
 
     /**
-     * Store the Message in schedule queue to redeliver
-     *
-     * @param storableMessage A StorableMessage instance
+     * Delete and return the MessageContext with given Message id
+     * @param messageID  message id of the Message
+     * @return  MessageContext instance
      */
-    public void schedule(StorableMessage storableMessage);
-
-
-    public StorableMessage dequeueScheduledQueue();
-
-    /**
-     * return the Message That is on top of the queue
-     *
-     * @return A StorableMessage instance or null
-     */
-    public StorableMessage getFirstSheduledMessage();
-
-    /**
-     * Unstore the Message with Given Message Id from the MessageStore
-     * @param messageID a message ID string
-     * @return unstored Message
-     */
-    public StorableMessage unstore(String messageID);
+    public MessageContext unstore(String messageID);
 
     /**
      * Delete all the Messages in the Message Store
      * @return  List of all messages in store
      */
-    public List<StorableMessage> unstoreAll();
+    public List<MessageContext> unstoreAll();
+
+
+    /**
+     * Unstore Messages from index 'from' to index 'to'
+     * Message ordering will be depend on the implementation
+     * @param from start index
+     * @param to  stop index
+     * @return   list of messages that are belong to given range
+     */
+    public List<MessageContext> unstore(int from , int to);
 
     /**
      * Get the All messages in the Message store without removing them from the queue
      * @return List of all Messages
      */
-    public List<StorableMessage> getAllMessages();
+    public List<MessageContext> getAllMessages();
 
     /**
      * Get the Message with the given ID from the Message store without removing it
      * @param messageId A message ID string
      * @return Message with given ID
      */
-    public StorableMessage getMessage(String messageId);
+    public MessageContext getMessage(String messageId);
+
 
     /**
-     * Set the redelivery processor instance associated with the Message Store
-     * redelivery processor have the responsibility of redelivery message according
-     * to a policy defined
-     *
-     * @param redeliveryProcessor The redelivery processor to be registered
+     * Get Messages from index 'from' to index 'to'
+     * Message ordering will be depend on the implementation
+     * @param from start index
+     * @param to  stop index
+     * @return   list of messages that are belong to given range
      */
-    public void setRedeliveryProcessor(RedeliveryProcessor redeliveryProcessor);
-
-    /**
-    * Return the redelivery processor instance associated with the message store
-     *
-     * @return A RedlieveryProcessor or null
-     */
-    public RedeliveryProcessor getRedeliveryProcessor();
-
+    public List<MessageContext> getMessages(int from , int to);
     /**
      * set the implementation specific parameters
      * @param parameters A map of parameters or null
@@ -156,5 +143,17 @@ public interface MessageStore extends SynapseArtifact, Nameable {
      * @return Name of the file where this artifact is defined
      */
     public String getFileName();
-    
+
+
+    /**
+     * Set the Message Processor Associated with the Message Store
+     * @param messageProcessor message processor instance associated with message store
+     */
+    public void setMessageProcessor(MessageProcessor messageProcessor);
+
+    /**
+     * Get the Message Processor associated with the MessageStore
+     * @return   message processor instance associated with the message store
+     */
+    public MessageProcessor getMessageProcessor();
 }

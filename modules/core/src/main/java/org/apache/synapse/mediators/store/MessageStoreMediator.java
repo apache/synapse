@@ -19,6 +19,7 @@ package org.apache.synapse.mediators.store;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.message.store.MessageStore;
 
@@ -54,6 +55,13 @@ public class MessageStoreMediator extends AbstractMediator{
                     }
                 }
                 messageStore.store(synCtx);
+
+                // with the nio transport, this causes the listener not to write a 202
+                // Accepted response, as this implies that Synapse does not yet know if
+                // a 202 or 200 response would be written back.
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().getOperationContext().setProperty(
+                        org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
+
                 return true;
             }
         }

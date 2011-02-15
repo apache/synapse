@@ -128,7 +128,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * Messages stores for the synapse configuration.
      */
-    private Map<String, MessageStore> messageStores =new ConcurrentHashMap<String, MessageStore>();
+    private Map<String, MessageStore> messageStores = new ConcurrentHashMap<String, MessageStore>();
 
     /**
      * Description/documentation of the configuration

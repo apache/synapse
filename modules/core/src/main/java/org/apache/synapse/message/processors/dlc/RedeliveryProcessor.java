@@ -21,6 +21,7 @@ package org.apache.synapse.message.processors.dlc;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
@@ -40,12 +41,6 @@ public class RedeliveryProcessor implements MessageProcessor {
      * Associated MessageStore
      */
     private MessageStore messageStore;
-
-
-    private Mediator onProcessMediator;
-
-
-    private Mediator onSubmitMediator;
 
     private Map<String, Object> parameters;
 
@@ -110,26 +105,6 @@ public class RedeliveryProcessor implements MessageProcessor {
         }
     }
 
-    public MessageStore getMessageStore() {
-        return this.messageStore;
-    }
-
-    public void setOnProcessSequence(Mediator mediator) {
-        this.onProcessMediator = mediator;
-    }
-
-    public Mediator getOnProcessSequence() {
-        return this.onProcessMediator;
-    }
-
-    public void setOnSubmitSequence(Mediator mediator) {
-        this.onSubmitMediator = mediator;
-    }
-
-    public Mediator getOnSubmitSequence() {
-        return this.onSubmitMediator;
-    }
-
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
         if (parameters.containsKey(REDELIVERY_DELAY)) {
@@ -155,17 +130,22 @@ public class RedeliveryProcessor implements MessageProcessor {
         return parameters;
     }
 
+    public void init(SynapseEnvironment se) {
+
+    }
+
+    public void destroy() {
+
+    }
+
 
     private class Worker implements Runnable {
 
         public void run() {
             while (started) {
-
-
                 try {
                     synchronized (this) {
                         int delay = redeliveryDelay;
-
                         MessageContext messageContext;
                         messageContext = messageStore.getMessages(0, 0).get(0);
 
@@ -197,13 +177,10 @@ public class RedeliveryProcessor implements MessageProcessor {
 
                         messageContext.setProperty(NO_OF_REDELIVERIES, "" + (number + 1));
 
-
                         if (exponentialBackoff && backOffMultiplier == -1) {
                             delay = (number + 1) * redeliveryDelay;
-
                         } else if (exponentialBackoff) {
                             delay = (int) Math.pow(backOffMultiplier, number) * redeliveryDelay;
-
                         }
 
 
@@ -228,13 +205,10 @@ public class RedeliveryProcessor implements MessageProcessor {
                         if (log.isDebugEnabled()) {
                             log.debug("sent \n" + messageContext.getEnvelope());
                         }
-
-
                     }
                 } catch (Throwable e) {
-                    log.warn("Error while Running Redelivery process " +e.getMessage());
+                    log.warn("Error while Running Redelivery process " + e.getMessage());
                 }
-
             }
 
         }

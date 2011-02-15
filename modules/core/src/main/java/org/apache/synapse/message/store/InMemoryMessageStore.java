@@ -40,12 +40,6 @@ public class InMemoryMessageStore extends AbstractMessageStore {
             mediateSequence(messageContext);
             messageList.put(messageContext.getMessageID(), messageContext);
 
-            /**
-             * If the associated processor is not started we start it. When storing the message
-             */
-            if(!processor.isStarted()) {
-                processor.start();
-            }
             if (log.isDebugEnabled()) {
                 log.debug("Message " + messageContext.getMessageID() +
                         " has been stored");

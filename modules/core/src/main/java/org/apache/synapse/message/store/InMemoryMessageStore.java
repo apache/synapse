@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * InMemory Message store will store Failed Messages in the local memory
@@ -35,98 +37,149 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     /** The map that keeps the stored messages */
     private Map<String, MessageContext> messageList = new HashMap<String, MessageContext>();
 
-    public void store(MessageContext messageContext) {
-        if (messageContext != null) {
-            mediateSequence(messageContext);
-            messageList.put(messageContext.getMessageID(), messageContext);
+    private Lock lock = new ReentrantLock();
 
-            if (log.isDebugEnabled()) {
-                log.debug("Message " + messageContext.getMessageID() +
-                        " has been stored");
+    public void store(MessageContext messageContext) {
+        lock.lock();
+        try {
+            if (messageContext != null) {
+                mediateSequence(messageContext);
+                messageList.put(messageContext.getMessageID(), messageContext);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Message " + messageContext.getMessageID() +
+                            " has been stored");
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
     public MessageContext unstore(String messageID) {
-        if (messageID != null) {
-            return messageList.remove(messageID);
+        lock.lock();
+        try {
+            if (messageID != null) {
+                return messageList.remove(messageID);
+            }
+        } finally {
+            lock.unlock();
         }
         return null;
     }
 
     public List<MessageContext> unstoreAll() {
-        List<MessageContext> returnList = new ArrayList<MessageContext>();
-        for (String k : messageList.keySet()) {
-            returnList.add(messageList.remove(k));
+        lock.lock();
+        try {
+            List<MessageContext> returnList = new ArrayList<MessageContext>();
+            for (String k : messageList.keySet()) {
+                returnList.add(messageList.remove(k));
+            }
+            return returnList;
+        } finally {
+            lock.unlock();
         }
-        return returnList;
     }
 
     public List<MessageContext> unstore(int maxNumberOfMessages) {
-        List<MessageContext> returnList = new ArrayList<MessageContext>();
-        Iterator<String> it = messageList.keySet().iterator();
-        while (it.hasNext() && maxNumberOfMessages > 0) {
-            returnList.add(messageList.get(it.next()));
-            maxNumberOfMessages--;
-        }
+        lock.lock();
+        try {
+            List<MessageContext> returnList = new ArrayList<MessageContext>();
+            Iterator<String> it = messageList.keySet().iterator();
+            while (it.hasNext() && maxNumberOfMessages > 0) {
+                returnList.add(messageList.get(it.next()));
+                maxNumberOfMessages--;
+            }
 
-        return returnList;
+            return returnList;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public List<MessageContext> unstore(int from, int to) {
-        List<MessageContext> returnlist = new ArrayList<MessageContext>();
-        if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
+        lock.lock();
+        try {
+            List<MessageContext> returnlist = new ArrayList<MessageContext>();
+            if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
 
-            String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
+                String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
 
-            for (int i = from; i <= to; i++) {
-                returnlist.add(messageList.remove(keys[i]));
+                for (int i = from; i <= to; i++) {
+                    returnlist.add(messageList.remove(keys[i]));
+                }
             }
+            return returnlist;
+        } finally {
+            lock.unlock();
         }
-        return returnlist;
     }
 
     public List<MessageContext> getMessages(int from, int to) {
-        List<MessageContext> returnList = new ArrayList<MessageContext>();
-        if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
-            String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
+        lock.lock();
+        try {
+            List<MessageContext> returnList = new ArrayList<MessageContext>();
+            if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
+                String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
 
-            for (int i = from; i <= to; i++) {
-                returnList.add(messageList.get(keys[i]));
+                for (int i = from; i <= to; i++) {
+                    returnList.add(messageList.get(keys[i]));
+                }
             }
+            return returnList;
+        } finally {
+            lock.unlock();
         }
-        return returnList;
     }
 
     public List<MessageContext> getAllMessages() {
-        List<MessageContext> returnList = new ArrayList<MessageContext>();
-        for (Map.Entry<String ,MessageContext> entry :messageList.entrySet()) {
-            returnList.add(entry.getValue());
+        lock.lock();
+        try {
+            List<MessageContext> returnList = new ArrayList<MessageContext>();
+            for (Map.Entry<String, MessageContext> entry : messageList.entrySet()) {
+                returnList.add(entry.getValue());
+            }
+            return returnList;
+        } finally {
+            lock.unlock();
         }
-        return returnList;
     }
 
     public MessageContext getMessage(String messageId) {
-        if (messageId != null) {
-            return messageList.get(messageId);
+        lock.lock();
+        try {
+            if (messageId != null) {
+                return messageList.get(messageId);
+            }
+        } finally {
+            lock.unlock();
         }
-
         return null;
     }
 
     public List<MessageContext> getMessages(int maxNumberOfMessages) {
-        List<MessageContext> returnList = new ArrayList<MessageContext>();
+        lock.lock();
+        try {
+            List<MessageContext> returnList = new ArrayList<MessageContext>();
 
-        Iterator<String> it = messageList.keySet().iterator();
-        while (it.hasNext() && maxNumberOfMessages > 0) {
-            returnList.add(messageList.get(it.next()));
-            maxNumberOfMessages--;
+            Iterator<String> it = messageList.keySet().iterator();
+            while (it.hasNext() && maxNumberOfMessages > 0) {
+                returnList.add(messageList.get(it.next()));
+                maxNumberOfMessages--;
+            }
+
+            return returnList;
+        } finally {
+            lock.unlock();
         }
-
-        return returnList;
     }
 
     public int getSize() {
-        return messageList.size();
+        lock.lock();
+        try {
+            return messageList.size();
+        } finally {
+            lock.unlock();
+        }
     }
 }

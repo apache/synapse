@@ -30,7 +30,7 @@ public class SynapseThreadPool extends ThreadPoolExecutor {
     public static final int SYNAPSE_CORE_THREADS  = 20;
     public static final int SYNAPSE_MAX_THREADS   = 100;
     public static final int SYNAPSE_KEEP_ALIVE    = 5;
-    public static final int SYNAPSE_THREAD_QLEN   = 10;
+    public static final int SYNAPSE_THREAD_QLEN   = -1;
     public static final String SYNAPSE_THREAD_GROUP     = "synapse-thread-group";
     public static final String SYNAPSE_THREAD_ID_PREFIX = "SynapseWorker";
 
@@ -81,7 +81,7 @@ public class SynapseThreadPool extends ThreadPoolExecutor {
     public SynapseThreadPool(int corePoolSize, int maxPoolSize, long keepAliveTime, int qlen,
         String threadGroup, String threadIdPrefix) {
         super(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(qlen),
+            qlen > 0 ? new LinkedBlockingQueue<Runnable>(qlen) : new LinkedBlockingDeque<Runnable>(),
             new SynapseThreadFactory(new ThreadGroup(threadGroup), threadIdPrefix));
     }
 }

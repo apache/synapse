@@ -108,6 +108,8 @@ public class MessageStoreFactory {
         MessageProcessor processor = null;
         if (processorElm != null) {
             processor = populateMessageProcessor(processorElm);
+
+            processor.setMessageStore(messageStore);
         } else {
             log.warn("Creating a Message Store without ");
         }

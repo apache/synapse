@@ -79,6 +79,9 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
     public void init(SynapseEnvironment se) {
         this.synapseEnvironment = se;
         this.synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
+        if (processor instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) processor).init(se);
+        }
     }
 
     public String getName() {

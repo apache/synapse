@@ -21,9 +21,6 @@ package org.apache.synapse.message.processors.sampler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.message.processors.MessageProcessor;
@@ -35,42 +32,54 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-public class SamplingProcessor implements MessageProcessor, ManagedLifecycle{
-    public static final String EXECUTOR = "Executor";
-    public static final String MESSAGE_STORE = "MESSAGE_STORE";
+public class SamplingProcessor implements MessageProcessor {
     private Log log = LogFactory.getLog(SamplingProcessor.class);
 
-    private final String QUARTZ_CONF = "quartz.conf";
-
+    public static final String EXECUTOR = "Executor";
+    public static final String MESSAGE_STORE = "MESSAGE_STORE";
+    public static final String QUARTZ_CONF = "quartz.conf";
     public static final String INTERVAL = "interval";
-
     public static final String CRON_EXPRESSION = "cronExpression";
-
     public static final String CONCURRENCY = "concurrency";
-
     public static final String SEQUENCE = "sequence";
 
+    private enum State {
+        INITIALIZED,
+        START,
+        STOP,
+        DESTROY
+    }
+
+    private Map<String, Object> parameters = null;
+
+    /** The quartz configuration file if specified as a parameter */
+    private String quartzConfig = null;
+
+    /** A cron expression to run the sampler */
     private String cronExpression = null;
 
+    /** The interval at which this sampler runs */
     private long interval = 1;
 
-    private String quartzConf = null;
-
+    /** The scheduler, run the the sampler */
     private Scheduler scheduler = null;
 
-    private boolean initialized = false;
+    /** Weather sampler is initialized or not */
+    private State state = State.DESTROY;
 
+    /** The message store */
     private MessageStore messageStore = null;
 
-    private Mediator onProcessSequence = null;
-
-    private Mediator onSubmitSequence = null;
-
+    /** Concurrency at the sampler runs, if the concurrency is 2, 2 threads will
+     * be used to dispatch 2 messages, when sampler runs */
     private int concurrency = 1;
 
+    /** An executor */
     private ExecutorService executor = null;
 
+    /** A sequence to run when the sampler is executed */
     private String sequence = null;
+
     /**
      * Creates a Quartz Scheduler and schedule the message processing logic.
      */
@@ -102,34 +111,8 @@ public class SamplingProcessor implements MessageProcessor, ManagedLifecycle{
 
         jobDetail.setJobDataMap(jobDataMap);
 
-        StdSchedulerFactory sf = new StdSchedulerFactory();
         try {
-            if (quartzConf != null && !"".equals(quartzConf)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Initiating a Scheduler with configuration : " + quartzConf);
-                }
-
-                sf.initialize(quartzConf);
-            }
-        } catch (SchedulerException e) {
-            throw new SynapseException("Error initiating scheduler factory "
-                    + sf + "with configuration loaded from " + quartzConf, e);
-        }
-
-
-        try {
-            scheduler = sf.getScheduler();
-        } catch (SchedulerException e) {
-            throw new SynapseException("Error getting a  scheduler instance form scheduler" +
-                    " factory " + sf, e);
-        }
-
-        try {
-            scheduler.start();
-
             scheduler.scheduleJob(jobDetail, trigger);
-
-            initialized = true;
         } catch (SchedulerException e) {
             throw new SynapseException("Error scheduling job : " + jobDetail
                     + " with trigger " + trigger);
@@ -137,15 +120,16 @@ public class SamplingProcessor implements MessageProcessor, ManagedLifecycle{
     }
 
     public void stop() {
-        if (initialized) {
+        if (state == State.START) {
             try {
                 if (scheduler != null && scheduler.isStarted()) {
                     if (log.isDebugEnabled()) {
                         log.debug("ShuttingDown Sampling Scheduler : " + scheduler.getMetaData());
                     }
-                    scheduler.shutdown();
+                    scheduler.standby();
                 }
-                initialized = false;
+
+                state = State.STOP;
             } catch (SchedulerException e) {
                 throw new SynapseException("Error ShuttingDown Sampling scheduler ", e);
             }
@@ -156,27 +140,9 @@ public class SamplingProcessor implements MessageProcessor, ManagedLifecycle{
         this.messageStore = messageStore;
     }
 
-    public MessageStore getMessageStore() {
-        return messageStore;
-    }
-
-    public void setOnProcessSequence(Mediator mediator) {
-        this.onProcessSequence = mediator;
-    }
-
-    public Mediator getOnProcessSequence() {
-        return onProcessSequence;
-    }
-
-    public void setOnSubmitSequence(Mediator mediator) {
-        this.onSubmitSequence = mediator;
-    }
-
-    public Mediator getOnSubmitSequence() {
-        return onSubmitSequence;
-    }
-
     public void setParameters(Map<String, Object> parameters) {
+        this.parameters = parameters;
+
         Object o = parameters.get(CRON_EXPRESSION);
         if (o != null) {
             cronExpression = o.toString();
@@ -194,7 +160,7 @@ public class SamplingProcessor implements MessageProcessor, ManagedLifecycle{
 
         o = parameters.get(QUARTZ_CONF);
         if (o != null) {
-            quartzConf = o.toString();
+            quartzConfig = o.toString();
         }
 
         o = parameters.get(SEQUENCE);
@@ -204,18 +170,47 @@ public class SamplingProcessor implements MessageProcessor, ManagedLifecycle{
     }
 
     public Map<String, Object> getParameters() {
-        return null;
+        return parameters;
     }
 
     public boolean isStarted() {
-        return initialized;
+        return state == State.START;
     }
 
     public void init(SynapseEnvironment se) {
         executor = se.getExecutorService();
+
+        StdSchedulerFactory sf = new StdSchedulerFactory();
+        try {
+            if (quartzConfig != null && !"".equals(quartzConfig)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Initiating a Scheduler with configuration : " + quartzConfig);
+                }
+
+                sf.initialize(quartzConfig);
+            }
+        } catch (SchedulerException e) {
+            throw new SynapseException("Error initiating scheduler factory "
+                    + sf + "with configuration loaded from " + quartzConfig, e);
+        }
+
+        try {
+            scheduler = sf.getScheduler();
+        } catch (SchedulerException e) {
+            throw new SynapseException("Error getting a  scheduler instance form scheduler" +
+                    " factory " + sf, e);
+        }
+
+        try {
+            scheduler.start();
+
+            state = State.INITIALIZED;
+        } catch (SchedulerException e) {
+            throw new SynapseException("Error starting the scheduler", e);
+        }
     }
 
     public void destroy() {
-
+        state = State.DESTROY;
     }
 }

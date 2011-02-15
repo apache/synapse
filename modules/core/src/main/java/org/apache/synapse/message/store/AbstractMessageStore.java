@@ -19,7 +19,6 @@
 
 package org.apache.synapse.message.store;
 
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
@@ -29,7 +28,7 @@ import org.apache.synapse.message.processors.MessageProcessor;
 
 import java.util.Map;
 
-public abstract class AbstractMessageStore implements MessageStore, ManagedLifecycle {
+public abstract class AbstractMessageStore implements MessageStore {
 
     /**
      * message store name
@@ -79,9 +78,10 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
     public void init(SynapseEnvironment se) {
         this.synapseEnvironment = se;
         this.synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
-        if (processor instanceof ManagedLifecycle) {
-            ((ManagedLifecycle) processor).init(se);
-        }
+
+        processor.init(se);
+
+        processor.start();
     }
 
     public String getName() {
@@ -143,7 +143,9 @@ public abstract class AbstractMessageStore implements MessageStore, ManagedLifec
     }
 
     public void destroy() {
+        processor.stop();
 
+        processor.destroy();
     }
 
     public void setDescription(String description) {

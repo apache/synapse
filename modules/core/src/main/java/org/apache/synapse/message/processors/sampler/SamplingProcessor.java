@@ -31,10 +31,13 @@ import org.quartz.impl.StdSchedulerFactory;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SamplingProcessor implements MessageProcessor {
     private Log log = LogFactory.getLog(SamplingProcessor.class);
 
+    public static final String LOCK = "lock";
     public static final String EXECUTOR = "Executor";
     public static final String MESSAGE_STORE = "MESSAGE_STORE";
     public static final String QUARTZ_CONF = "quartz.conf";
@@ -80,6 +83,8 @@ public class SamplingProcessor implements MessageProcessor {
     /** A sequence to run when the sampler is executed */
     private String sequence = null;
 
+    private Lock lock = new ReentrantLock();
+
     /**
      * Creates a Quartz Scheduler and schedule the message processing logic.
      */
@@ -108,6 +113,7 @@ public class SamplingProcessor implements MessageProcessor {
         jobDataMap.put(EXECUTOR, executor);
         jobDataMap.put(MESSAGE_STORE, messageStore);
         jobDataMap.put(SEQUENCE, sequence);
+        jobDataMap.put(LOCK, lock);
 
         jobDetail.setJobDataMap(jobDataMap);
 

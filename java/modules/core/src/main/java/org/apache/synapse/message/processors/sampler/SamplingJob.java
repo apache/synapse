@@ -31,6 +31,7 @@ import org.quartz.JobExecutionException;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.locks.Lock;
 
 public class SamplingJob implements Job {
     private static Log log = LogFactory.getLog(SamplingJob.class);
@@ -42,6 +43,7 @@ public class SamplingJob implements Job {
         final MessageStore messageStore = (MessageStore) jdm.get(SamplingProcessor.MESSAGE_STORE);
         final ExecutorService executor = (ExecutorService) jdm.get(SamplingProcessor.EXECUTOR);
         final String sequence = (String) jdm.get(SamplingProcessor.SEQUENCE);
+        final Lock lock = (Lock) jdm.get(SamplingProcessor.LOCK);
 
         int conc = 1;
         if (concurrency instanceof Integer) {
@@ -49,24 +51,27 @@ public class SamplingJob implements Job {
         }
 
         for (int i = 0; i < conc; i++) {
-            List<MessageContext> list = messageStore.getMessages(0, 0);
+            //lock.lock();
+            synchronized (messageStore){
+                List<MessageContext> list = messageStore.getMessages(0, 0);
 
-            if (list != null && list.size() == 1) {
-                final MessageContext messageContext = list.get(0);
-                if (messageContext != null) {
-                    messageStore.unstore(0, 0);
-                    executor.submit(new Runnable() {
-                        public void run() {
-                            try {
-                                Mediator processingSequence = messageContext.getSequence(sequence);
-                                if (processingSequence != null) {
-                                    processingSequence.mediate(messageContext);
+                if (list != null && list.size() == 1) {
+                    final MessageContext messageContext = list.get(0);
+                    if (messageContext != null) {
+                        messageStore.unstore(0, 0);
+                        executor.submit(new Runnable() {
+                            public void run() {
+                                try {
+                                    Mediator processingSequence = messageContext.getSequence(sequence);
+                                    if (processingSequence != null) {
+                                        processingSequence.mediate(messageContext);
+                                    }
+                                } catch (Throwable t) {
+                                    log.error("Error occurred while executing the message", t);
                                 }
-                            } catch (Throwable t) {
-                                log.error("Error occurred while executing the message", t);
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }

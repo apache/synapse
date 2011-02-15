@@ -17,6 +17,7 @@
 */
 package org.apache.synapse.message.processors;
 
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.message.store.MessageStore;
@@ -30,7 +31,7 @@ import java.util.Map;
  *Message processing logic and process will depend on the
  *concrete implementation of the MessageStore
  */
-public interface MessageProcessor {
+public interface MessageProcessor extends ManagedLifecycle {
 
     /**
      * Start Message Processor
@@ -47,42 +48,6 @@ public interface MessageProcessor {
      * @param messageStore the underlying MessageStore instance
      */
     public void setMessageStore(MessageStore messageStore);
-
-    /**
-     * Get the Message store that backs the Message processor
-     * @return   the underlying MessageStore instance
-     */
-    public MessageStore getMessageStore();
-
-    /**
-     * Set the Mediator/Sequence to be invoked just before processing a Message
-     * This Mediator or sequence will be invoked just before processing the Message
-     * @param mediator   Mediator/sequence instance that will invoked just before
-     * processing a Message
-     */
-    public void setOnProcessSequence(Mediator mediator);
-
-
-    /**
-     * Get the On process Mediator or sequence
-     * @return Mediator/sequence instance that will invoked just before processing a Message
-     */
-    public Mediator getOnProcessSequence();
-
-    /**
-     * This sequence/Mediator will be invoked when a Message is submitted to the MessageProcessor
-     * @param mediator Mediator/sequence instance that will invoked when a Message
-     * is submitted to the Processor
-     */
-    public void setOnSubmitSequence(Mediator mediator);
-
-    /**
-     * Get the OnSubmit Sequence which get invoked when a Message is submitted to
-     * the MessageProcessor
-     * @return mediator Mediator/sequence instance that will invoked when a Message
-     * is submitted to the Processor
-     */
-    public Mediator getOnSubmitSequence();
 
     /**
      * Set the Message processor parameters that will be used by the specific implementation

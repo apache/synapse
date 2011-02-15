@@ -19,6 +19,7 @@
 
 package org.apache.synapse.message.store;
 
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.SynapseArtifact;
@@ -32,7 +33,7 @@ import java.util.Map;
  * This is the interface  for the Synapse Message Store
  * Message Store is used to store failed Messages.
  */
-public interface MessageStore extends SynapseArtifact, Nameable {
+public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycle {
 
     /**
      * Store the Message in the Message Store

@@ -81,9 +81,9 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
     public List<MessageContext> unstore(int from, int to) {
         List<MessageContext> returnlist = new ArrayList<MessageContext>();
-        if (from <= to && (from <= messageList.size() && to <= messageList.size())) {
+        if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
 
-            String[] keys = messageList.keySet().toArray(new String[0]);
+            String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
 
             for (int i = from; i <= to; i++) {
                 returnlist.add(messageList.remove(keys[i]));
@@ -93,15 +93,15 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     }
 
     public List<MessageContext> getMessages(int from, int to) {
-         List<MessageContext> returnlist = new ArrayList<MessageContext>();
-        if (from <= to && (from <= messageList.size() && to <= messageList.size())) {
-            String[] keys = messageList.keySet().toArray(new String[0]);
+        List<MessageContext> returnList = new ArrayList<MessageContext>();
+        if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
+            String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
 
             for (int i = from; i <= to; i++) {
-                returnlist.add(messageList.get(keys[i]));
+                returnList.add(messageList.get(keys[i]));
             }
         }
-        return returnlist;
+        return returnList;
     }
 
     public List<MessageContext> getAllMessages() {

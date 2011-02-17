@@ -81,7 +81,7 @@ public class SynapseThreadPool extends ThreadPoolExecutor {
     public SynapseThreadPool(int corePoolSize, int maxPoolSize, long keepAliveTime, int qlen,
         String threadGroup, String threadIdPrefix) {
         super(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS,
-            qlen > 0 ? new LinkedBlockingQueue<Runnable>(qlen) : new LinkedBlockingDeque<Runnable>(),
+            qlen > 0 ? new LinkedBlockingQueue<Runnable>(qlen) : new LinkedBlockingQueue<Runnable>(),
             new SynapseThreadFactory(new ThreadGroup(threadGroup), threadIdPrefix));
     }
 }

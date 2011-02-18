@@ -23,12 +23,13 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.message.store.AbstractMessageStore;
 import org.apache.synapse.message.store.MessageStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeadLetterChannelView implements DeadLetterChannelViewMBean{
+public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
 
     private MessageStore messageStore;
 
@@ -41,29 +42,37 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean{
     }
 
     public void resendAll() {
-        int size = messageStore.getSize();
-        for(int i = 0; i < size ; i++) {
-            MessageContext messageContext = messageStore.unstore(0,0).get(0);
-            if(messageContext != null) {
-                redeliver(messageContext);
-            }
+        if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
+            int size = messageStore.getSize();
+            for (int i = 0; i < size; i++) {
+                MessageContext messageContext = messageStore.unstore(0, 0).get(0);
+                if (messageContext != null) {
+                    redeliver(messageContext);
+                }
 
+            }
+        } else {
+            throw new SynapseException("Error Message store being used re try later");
         }
     }
 
     public void deleteAll() {
-        int size = messageStore.getSize();
-        for(int i = 0; i < size ; i++) {
-            messageStore.unstore(0,0);
+        if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
+            int size = messageStore.getSize();
+            for (int i = 0; i < size; i++) {
+                messageStore.unstore(0, 0);
+            }
+        } else {
+            throw new SynapseException("Error Message store being used re try later");
         }
     }
 
     public List<String> getMessageIds() {
-       int size = messageStore.getSize();
-       List<String> list = new ArrayList<String>();
-        for(int i = 0; i < size ; i++) {
-            MessageContext messageContext = messageStore.getMessages(0,0).get(0);
-            if(messageContext != null) {
+        int size = messageStore.getSize();
+        List<String> list = new ArrayList<String>();
+        for (int i = 0; i < size; i++) {
+            MessageContext messageContext = messageStore.getMessages(0, 0).get(0);
+            if (messageContext != null) {
                 list.add(messageContext.getMessageID());
             }
         }
@@ -71,20 +80,26 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean{
     }
 
     public void resend(String messageID) {
-       MessageContext messageContext = messageStore.getMessage(messageID);
-       if(messageContext != null) {
-            redeliver(messageContext);
-       }
+        if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
+            MessageContext messageContext = messageStore.unstore(messageID);
+            if (messageContext != null) {
+                redeliver(messageContext);
+            }
+        } else {
+            throw new SynapseException("Error Message store being used re try later");
+        }
     }
 
     public void delete(String messageID) {
-        messageStore.unstore(messageID);
+        if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
+            messageStore.unstore(messageID);
+        }
     }
 
     public String getEnvelope(String messageID) {
         MessageContext messageContext = messageStore.getMessage(messageID);
-        if(messageContext != null) {
-            return  messageContext.getEnvelope().toString();
+        if (messageContext != null) {
+            return messageContext.getEnvelope().toString();
         }
 
         return null;

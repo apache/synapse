@@ -56,8 +56,17 @@ public class RedeliveryJob implements Job {
         lock = ((AbstractMessageStore) messageStore).getLock();
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(
                 MessageProcessorConsents.PARAMETERS);
-        maxNumberOfRedelivers = Integer.parseInt((String) parameters.get(DLCConstents.
-                MAX_REDELIVERY_COUNT));
+        Object o = parameters.get(DLCConstents.MAX_REDELIVERY_COUNT);
+        if(o == null) {
+            maxNumberOfRedelivers = 0;
+        } else {
+            maxNumberOfRedelivers = Integer.parseInt((String)o);
+        }
+
+        /** We are not going to access message Store if max number of redelivery is less than 0*/
+        if(maxNumberOfRedelivers <= 0) {
+            return;
+        }
 
         /**
          * We will keep the message store lock till the redelivery over
@@ -130,13 +139,17 @@ public class RedeliveryJob implements Job {
    static boolean handleEndpointReplay(Endpoint endpoint, MessageContext messageContext) {
         setFaultHandler(messageContext);
         if (endpoint != null && messageContext != null) {
+            if (endpoint.readyToSend()) {
+                endpoint.send(messageContext);
+                return true;
+            } else {
+                return false;
+            }
+
+        } else {
             return false;
-        } else if (endpoint.readyToSend()) {
-            endpoint.send(messageContext);
-            return true;
         }
 
-        return false;
     }
 
     /**
@@ -146,8 +159,11 @@ public class RedeliveryJob implements Job {
      * @return  true of success
      */
     static boolean handleSequenceReplay(Mediator mediator, MessageContext messageContext) {
-        setFaultHandler(messageContext);
-        mediator.mediate(messageContext);
+        if (mediator != null && messageContext != null) {
+            setFaultHandler(messageContext);
+            mediator.mediate(messageContext);
+            return true;
+        }
         return true;
     }
 
@@ -174,10 +190,12 @@ public class RedeliveryJob implements Job {
         String replayFaultHandler = (String)messageContext.getProperty(
                 DLCConstents.REPLAY_FAULT_HANDLER);
         if(replayFaultHandler != null) {
-            if(messageContext.getEndpoint(replayFaultHandler) != null ) {
+            if(messageContext.getConfiguration().getDefinedEndpoints().
+                    containsKey(replayFaultHandler)) {
                 Endpoint ep = messageContext.getEndpoint(replayFaultHandler);
                 messageContext.pushFaultHandler((FaultHandler)ep);
-            } else if (messageContext.getSequence(replayFaultHandler) != null) {
+            } else if (messageContext.getConfiguration().getDefinedSequences().
+                    containsKey(replayFaultHandler)) {
                 Mediator mediator = messageContext.getSequence(replayFaultHandler);
                 MediatorFaultHandler faultHandler = new MediatorFaultHandler(mediator);
                 messageContext.pushFaultHandler(faultHandler);

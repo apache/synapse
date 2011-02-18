@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -35,7 +36,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     private static final Log log = LogFactory.getLog(InMemoryMessageStore.class);
 
     /** The map that keeps the stored messages */
-    private Map<String, MessageContext> messageList = new HashMap<String, MessageContext>();
+    private Map<String, MessageContext> messageList = new ConcurrentHashMap<String, MessageContext>();
 
     private Lock lock = new ReentrantLock();
 
@@ -49,6 +50,14 @@ public class InMemoryMessageStore extends AbstractMessageStore {
                 if (log.isDebugEnabled()) {
                     log.debug("Message " + messageContext.getMessageID() +
                             " has been stored");
+                }
+
+                if(processor != null && !processor.isStarted()) {
+
+                    if(log.isDebugEnabled()) {
+                        log.debug("Starting Message processor " + processor.getClass().getName());
+                    }
+                    processor.start();
                 }
             }
         } finally {
@@ -101,9 +110,11 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         lock.lock();
         try {
             List<MessageContext> returnlist = new ArrayList<MessageContext>();
-            if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
+            if (from <= to && (from <= messageList.size() && to <= messageList.size()) &&
+                    messageList.size() > 0) {
 
-                String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
+                String[] keys = messageList.keySet().toArray(
+                        new String[messageList.keySet().size()]);
 
                 for (int i = from; i <= to; i++) {
                     returnlist.add(messageList.remove(keys[i]));
@@ -119,8 +130,10 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         lock.lock();
         try {
             List<MessageContext> returnList = new ArrayList<MessageContext>();
-            if (from <= to && (from <= messageList.size() && to <= messageList.size()) && messageList.size() > 0) {
-                String[] keys = messageList.keySet().toArray(new String[messageList.keySet().size()]);
+            if (from <= to && (from <= messageList.size() && to <= messageList.size()) &&
+                    messageList.size() > 0) {
+                String[] keys = messageList.keySet().toArray(
+                        new String[messageList.keySet().size()]);
 
                 for (int i = from; i <= to; i++) {
                     returnList.add(messageList.get(keys[i]));
@@ -157,22 +170,6 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         return null;
     }
 
-    public List<MessageContext> getMessages(int maxNumberOfMessages) {
-        lock.lock();
-        try {
-            List<MessageContext> returnList = new ArrayList<MessageContext>();
-
-            Iterator<String> it = messageList.keySet().iterator();
-            while (it.hasNext() && maxNumberOfMessages > 0) {
-                returnList.add(messageList.get(it.next()));
-                maxNumberOfMessages--;
-            }
-
-            return returnList;
-        } finally {
-            lock.unlock();
-        }
-    }
 
     public int getSize() {
         lock.lock();

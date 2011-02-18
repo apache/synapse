@@ -21,6 +21,7 @@ package org.apache.synapse.message.processors.dlc;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseArtifact;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.message.store.MessageStore;
 
@@ -31,9 +32,12 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean{
 
     private MessageStore messageStore;
 
+    private RedeliveryProcessor redeliveryProcessor;
+
 
     public DeadLetterChannelView(MessageStore messageStore) {
         this.messageStore = messageStore;
+        this.redeliveryProcessor = (RedeliveryProcessor) messageStore.getMessageProcessor();
     }
 
     public void resendAll() {
@@ -58,7 +62,7 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean{
        int size = messageStore.getSize();
        List<String> list = new ArrayList<String>();
         for(int i = 0; i < size ; i++) {
-            MessageContext messageContext = messageStore.unstore(0,0).get(0);
+            MessageContext messageContext = messageStore.getMessages(0,0).get(0);
             if(messageContext != null) {
                 list.add(messageContext.getMessageID());
             }
@@ -91,14 +95,14 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean{
     }
 
     private void redeliver(MessageContext messageContext) {
-        SynapseArtifact artifact = RedeliveryProcessor.getReplayTarget(messageContext);
+        SynapseArtifact artifact = RedeliveryJob.getReplayTarget(messageContext);
         if (artifact instanceof Endpoint) {
-            if (!RedeliveryProcessor.handleEndpointReplay((Endpoint) artifact,
+            if (!RedeliveryJob.handleEndpointReplay((Endpoint) artifact,
                     messageContext)) {
                 messageStore.store(messageContext);
             }
         } else if (artifact instanceof Mediator) {
-            if (!RedeliveryProcessor.handleSequenceReplay((Mediator) artifact,
+            if (!RedeliveryJob.handleSequenceReplay((Mediator) artifact,
                     messageContext)) {
                 messageStore.store(messageContext);
             }

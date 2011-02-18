@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.message.processors.MessageProcessorConsents;
 import org.apache.synapse.message.store.MessageStore;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -30,6 +31,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
 
@@ -39,11 +41,13 @@ public class SamplingJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
 
+        final MessageStore messageStore = (MessageStore) jdm.get(
+                                            MessageProcessorConsents.MESSAGE_STORE);
+
+        Map<String ,Object> parameters = (Map<String, Object>) jdm.get(
+                MessageProcessorConsents.PARAMETERS);
         final Object concurrency = jdm.get(SamplingProcessor.CONCURRENCY);
-        final MessageStore messageStore = (MessageStore) jdm.get(SamplingProcessor.MESSAGE_STORE);
-        final ExecutorService executor = (ExecutorService) jdm.get(SamplingProcessor.EXECUTOR);
-        final String sequence = (String) jdm.get(SamplingProcessor.SEQUENCE);
-        final Lock lock = (Lock) jdm.get(SamplingProcessor.LOCK);
+        final String sequence = (String) parameters.get(SamplingProcessor.SEQUENCE);
 
         int conc = 1;
         if (concurrency instanceof Integer) {
@@ -59,6 +63,8 @@ public class SamplingJob implements Job {
                     final MessageContext messageContext = list.get(0);
                     if (messageContext != null) {
                         messageStore.unstore(0, 0);
+                        final ExecutorService executor = messageContext.getEnvironment().
+                                                            getExecutorService();
                         executor.submit(new Runnable() {
                             public void run() {
                                 try {

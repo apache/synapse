@@ -83,7 +83,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     protected boolean anonymous = false;
 
-    /** The Message store name associated with the endpoint*/
+    /** The Sequence name associated with the endpoint*/
     protected String errorHandler = null;
 
     protected AbstractEndpoint() {
@@ -247,7 +247,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                 synCtx.pushFaultHandler(
                         new MediatorFaultHandler(errorHandlerMediator));
             } else {
-                log.warn("onError handler : " + errorHandler + " for sequence : " +
+                log.warn("onError handler sequence : " + errorHandler + " for : " +
                         endpointName + " cannot be found");
             }
         }

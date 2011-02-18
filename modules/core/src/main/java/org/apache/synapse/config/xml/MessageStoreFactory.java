@@ -111,14 +111,17 @@ public class MessageStoreFactory {
 
             processor.setMessageStore(messageStore);
         } else {
-            log.warn("Creating a Message Store without ");
+            log.warn("Creating a Message Store without a Message processor ");
         }
 
         if(processor != null) {
             messageStore.setMessageProcessor(processor);
+            processor.setMessageStore(messageStore);
         } else {
             log.warn("Message Store Created with out a Message processor. ");
         }
+
+        log.info("Successfully created Message Store" + nameAtt.getAttributeValue());
         return messageStore;
     }
 

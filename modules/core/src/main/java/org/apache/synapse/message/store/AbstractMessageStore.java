@@ -27,6 +27,8 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.message.processors.MessageProcessor;
 
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractMessageStore implements MessageStore {
 
@@ -69,6 +71,10 @@ public abstract class AbstractMessageStore implements MessageStore {
      * Name of the file where this message store is defined
      */
     protected String fileName;
+
+
+    protected Lock lock = new ReentrantLock();
+
 
     /**
      * Message processor instance associated with the MessageStore
@@ -162,5 +168,9 @@ public abstract class AbstractMessageStore implements MessageStore {
 
     public String getFileName() {
         return this.fileName;
+    }
+
+    public Lock getLock() {
+        return lock;
     }
 }

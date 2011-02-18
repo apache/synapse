@@ -46,8 +46,8 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
     /** Message Store associated with Message processor */
     protected MessageStore messageStore;
 
-    /** The interval at which this processor runs */
-    protected long interval = 1;
+    /** The interval at which this processor runs , default value is 1000ms*/
+    protected long interval = 1000;
 
 
 
@@ -119,7 +119,11 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
     }
 
     public void setMessageStore(MessageStore messageStore) {
-        this.messageStore = messageStore;
+        if (messageStore != null) {
+            this.messageStore = messageStore;
+        } else {
+            throw new SynapseException("Error Can't set Message store to null");
+        }
     }
 
     public void setParameters(Map<String, Object> parameters) {

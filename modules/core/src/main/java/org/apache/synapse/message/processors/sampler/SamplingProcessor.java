@@ -22,9 +22,10 @@ package org.apache.synapse.message.processors.sampler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.message.processors.AbstractMessageProcessor;
+import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.quartz.JobDetail;
 
-public class SamplingProcessor extends AbstractMessageProcessor{
+public class SamplingProcessor extends ScheduledMessageProcessor{
     private Log log = LogFactory.getLog(SamplingProcessor.class);
 
     public static final String CONCURRENCY = "concurrency";
@@ -33,7 +34,7 @@ public class SamplingProcessor extends AbstractMessageProcessor{
     @Override
     protected JobDetail getJobDetail() {
         JobDetail jobDetail = new JobDetail();
-        jobDetail.setName(messageStore.getName() + "-job");
+        jobDetail.setName(messageStore + "-job");
         jobDetail.setJobClass(SamplingJob.class);
         return jobDetail;
     }

@@ -33,19 +33,18 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
 
     private MessageStore messageStore;
 
-    private RedeliveryProcessor redeliveryProcessor;
 
 
     public DeadLetterChannelView(MessageStore messageStore) {
         this.messageStore = messageStore;
-        this.redeliveryProcessor = (RedeliveryProcessor) messageStore.getMessageProcessor();
+
     }
 
     public void resendAll() {
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            int size = messageStore.getSize();
+            int size = messageStore.size();
             for (int i = 0; i < size; i++) {
-                MessageContext messageContext = messageStore.unstore(0, 0).get(0);
+                MessageContext messageContext = messageStore.poll();
                 if (messageContext != null) {
                     redeliver(messageContext);
                 }
@@ -58,9 +57,9 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
 
     public void deleteAll() {
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            int size = messageStore.getSize();
+            int size = messageStore.size();
             for (int i = 0; i < size; i++) {
-                messageStore.unstore(0, 0);
+                messageStore.poll();
             }
         } else {
             throw new SynapseException("Error Message store being used re try later");
@@ -68,10 +67,10 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
     }
 
     public List<String> getMessageIds() {
-        int size = messageStore.getSize();
+        int size = messageStore.size();
         List<String> list = new ArrayList<String>();
         for (int i = 0; i < size; i++) {
-            MessageContext messageContext = messageStore.getMessages(0, 0).get(0);
+            MessageContext messageContext = messageStore.peek();
             if (messageContext != null) {
                 list.add(messageContext.getMessageID());
             }
@@ -81,7 +80,7 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
 
     public void resend(String messageID) {
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            MessageContext messageContext = messageStore.unstore(messageID);
+            MessageContext messageContext = messageStore.remove(messageID);
             if (messageContext != null) {
                 redeliver(messageContext);
             }
@@ -92,12 +91,12 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
 
     public void delete(String messageID) {
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            messageStore.unstore(messageID);
+            messageStore.remove(messageID);
         }
     }
 
     public String getEnvelope(String messageID) {
-        MessageContext messageContext = messageStore.getMessage(messageID);
+        MessageContext messageContext = messageStore.get(messageID);
         if (messageContext != null) {
             return messageContext.getEnvelope().toString();
         }
@@ -106,7 +105,7 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
     }
 
     public int getSize() {
-        return messageStore.getSize();
+        return messageStore.size();
     }
 
     private void redeliver(MessageContext messageContext) {
@@ -114,15 +113,15 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
         if (artifact instanceof Endpoint) {
             if (!RedeliveryJob.handleEndpointReplay((Endpoint) artifact,
                     messageContext)) {
-                messageStore.store(messageContext);
+                messageStore.offer(messageContext);
             }
         } else if (artifact instanceof Mediator) {
             if (!RedeliveryJob.handleSequenceReplay((Mediator) artifact,
                     messageContext)) {
-                messageStore.store(messageContext);
+                messageStore.offer(messageContext);
             }
         } else {
-            messageStore.store(messageContext);
+            messageStore.offer(messageContext);
         }
     }
 }

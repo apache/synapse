@@ -18,7 +18,9 @@
  */
 package org.apache.synapse.message.processors.dlc;
 
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.message.processors.AbstractMessageProcessor;
+import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.quartz.JobDetail;
 
@@ -26,23 +28,23 @@ import org.quartz.JobDetail;
  * Redelivery processor is the Message processor which implements the Dead letter channel EIP
  * It will Time to time Redeliver the Messages to a given target.
  */
-public class RedeliveryProcessor extends AbstractMessageProcessor{
+public class ScheduledRedeliveryProcessor extends ScheduledMessageProcessor{
 
     /**Dead Letter channel JMX API*/
     private DeadLetterChannelView dlcView;
 
     @Override
-    public void setMessageStore(MessageStore messageStore) {
-        super.setMessageStore(messageStore);
-        dlcView = new DeadLetterChannelView(messageStore);
+    public void init(SynapseEnvironment se) {
+        super.init(se);
+        dlcView = new DeadLetterChannelView(configuration.getMessageStore(messageStore));
         org.apache.synapse.commons.jmx.MBeanRegistrar.getInstance().registerMBean(dlcView,
-                "Dead Letter Channel", messageStore.getName());
+                "Dead Letter Channel", messageStore);
     }
 
     @Override
     protected JobDetail getJobDetail() {
         JobDetail jobDetail = new JobDetail();
-        jobDetail.setName(messageStore.getName() + "- redelivery job");
+        jobDetail.setName(messageStore + "- redelivery job");
         jobDetail.setJobClass(RedeliveryJob.class);
         return jobDetail;
     }

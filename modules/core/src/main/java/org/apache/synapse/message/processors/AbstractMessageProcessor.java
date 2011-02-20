@@ -22,12 +22,10 @@ package org.apache.synapse.message.processors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.message.store.MessageStore;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -40,16 +38,14 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
     protected Log log = LogFactory.getLog(this.getClass());
 
-    /** The scheduler, run the the processor */
-    protected Scheduler scheduler = null;
-
     /** Message Store associated with Message processor */
-    protected MessageStore messageStore;
+    protected String  messageStore;
 
-    /** The interval at which this processor runs , default value is 1000ms*/
-    protected long interval = 1000;
+    protected String description;
 
+    protected String name;
 
+    protected SynapseConfiguration configuration;
 
     protected enum State {
         INITIALIZED,
@@ -61,64 +57,17 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
     /**message store parameters */
     protected Map<String, Object> parameters = null;
 
-    /** The quartz configuration file if specified as a parameter */
-    protected String quartzConfig = null;
-
-    /** A cron expression to run the sampler */
-    protected String cronExpression = null;
 
     /** Keep the state of the message processor */
     private State state  = State.DESTROY;
 
 
-    public void start() {
-        Trigger trigger;
-        if (cronExpression == null || "".equals(cronExpression)) {
-            trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY, interval);
-        } else {
-            CronTrigger cronTrigger = new CronTrigger();
-            try {
-                cronTrigger.setCronExpression(cronExpression);
-                trigger = cronTrigger;
-            } catch (ParseException e) {
-                throw new SynapseException("Error setting cron expression : " +
-                        e.getMessage() + cronExpression, e);
-            }
-        }
-        trigger.setName(messageStore.getName() + "-trigger");
-
-        JobDetail jobDetail = getJobDetail();
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE, messageStore);
-        jobDataMap.put(MessageProcessorConsents.PARAMETERS,parameters);
-        jobDetail.setJobDataMap(jobDataMap);
-
-        try {
-            scheduler.scheduleJob(jobDetail, trigger);
-        } catch (SchedulerException e) {
-            throw new SynapseException("Error scheduling job : " + jobDetail
-                    + " with trigger " + trigger);
-        }
+    public void init(SynapseEnvironment se) {
+        configuration = se.getSynapseConfiguration();
     }
 
-    public void stop() {
-        if (state == State.START) {
-            try {
-                if (scheduler != null && scheduler.isStarted()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("ShuttingDown Message Processor Scheduler : " + scheduler.getMetaData());
-                    }
-                    scheduler.standby();
-                }
 
-                state = State.STOP;
-            } catch (SchedulerException e) {
-                throw new SynapseException("Error ShuttingDown Message processor scheduler ", e);
-            }
-        }
-    }
-
-    public void setMessageStore(MessageStore messageStore) {
+    public void setMessageStoreName(String  messageStore) {
         if (messageStore != null) {
             this.messageStore = messageStore;
         } else {
@@ -126,26 +75,12 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
         }
     }
 
+    public String getMessageStoreName() {
+        return messageStore;
+    }
+
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
-        if(parameters != null && !parameters.isEmpty()) {
-            Object o = parameters.get(MessageProcessorConsents.CRON_EXPRESSION);
-        if (o != null) {
-            cronExpression = o.toString();
-        }
-
-        o = parameters.get(MessageProcessorConsents.INTERVAL);
-        if (o != null) {
-            interval = Integer.parseInt(o.toString());
-        }
-
-
-        o = parameters.get(MessageProcessorConsents.QUARTZ_CONF);
-        if (o != null) {
-            quartzConfig = o.toString();
-        }
-
-        }
     }
 
     public Map<String, Object> getParameters() {
@@ -156,40 +91,20 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
         return state == State.START;
     }
 
-    public void init(SynapseEnvironment se) {
-        StdSchedulerFactory sf = new StdSchedulerFactory();
-        try {
-            if (quartzConfig != null && !"".equals(quartzConfig)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Initiating a Scheduler with configuration : " + quartzConfig);
-                }
-
-                sf.initialize(quartzConfig);
-            }
-        } catch (SchedulerException e) {
-            throw new SynapseException("Error initiating scheduler factory "
-                    + sf + "with configuration loaded from " + quartzConfig, e);
-        }
-
-        try {
-            scheduler = sf.getScheduler();
-        } catch (SchedulerException e) {
-            throw new SynapseException("Error getting a  scheduler instance form scheduler" +
-                    " factory " + sf, e);
-        }
-
-        try {
-            scheduler.start();
-
-            state = State.INITIALIZED;
-        } catch (SchedulerException e) {
-            throw new SynapseException("Error starting the scheduler", e);
-        }
+    public String getName() {
+        return name;
     }
 
-    protected abstract JobDetail getJobDetail();
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void destroy() {
-        state = State.DESTROY;
+
+    public void setDescription(String description) {
+        this.description=description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

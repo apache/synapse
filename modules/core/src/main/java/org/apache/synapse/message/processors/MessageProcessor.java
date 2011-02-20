@@ -17,9 +17,7 @@
 */
 package org.apache.synapse.message.processors;
 
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
+import org.apache.synapse.*;
 import org.apache.synapse.message.store.MessageStore;
 
 import java.util.HashMap;
@@ -31,7 +29,7 @@ import java.util.Map;
  *Message processing logic and process will depend on the
  *concrete implementation of the MessageStore
  */
-public interface MessageProcessor extends ManagedLifecycle {
+public interface MessageProcessor extends ManagedLifecycle , Nameable , SynapseArtifact{
 
     /**
      * Start Message Processor
@@ -44,10 +42,16 @@ public interface MessageProcessor extends ManagedLifecycle {
     public void stop();
 
     /**
-     * Set the Message Store that backs the Message processor
-     * @param messageStore the underlying MessageStore instance
+     * Set the Message Store name that backs the Message processor
+     * @param messageStore name the underlying MessageStore instance
      */
-    public void setMessageStore(MessageStore messageStore);
+    public void setMessageStoreName(String  messageStore);
+
+    /**
+     * Get message store name associated with the Message processor
+     * @return  message store name associated with message processor
+     */
+    public String getMessageStoreName();
 
     /**
      * Set the Message processor parameters that will be used by the specific implementation

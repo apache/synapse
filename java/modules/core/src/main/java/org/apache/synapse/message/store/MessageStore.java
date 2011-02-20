@@ -127,20 +127,6 @@ public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycl
 
 
     /**
-     * set a Mediator sequence  name
-     * This sequence will be executed if the redelivery attempts fail and Message is going to add to the Message store
-     * @param sequence a Sequence name
-     */
-    public void setSequence(String sequence);
-
-    /**
-    * Get Mediator sequence name
-     * @return Name of the sequence
-     */
-    public String getSequence();
-
-
-    /**
      * Set the name of the file that the Message store is configured
      *
      * @param filename Name of the file where this artifact is defined

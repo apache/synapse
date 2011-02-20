@@ -64,10 +64,6 @@ public class MessageStoreSerializer {
             handleException("Invalid MessageStore. Provider is required");
         }
 
-        if (messageStore.getSequence() != null) {
-            store.addAttribute(fac.createOMAttribute("sequence", nullNS, messageStore.getSequence()));
-        }
-
         if (messageStore.getName() != null) {
             store.addAttribute(fac.createOMAttribute("name", nullNS, messageStore.getName()));
         } else {

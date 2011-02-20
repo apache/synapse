@@ -95,15 +95,6 @@ public abstract class AbstractMessageStore implements MessageStore {
         return -1;
     }
 
-    public void setSequence(String sequence) {
-        this.sequence = sequence;
-    }
-
-    public String getSequence() {
-        return sequence;
-    }
-
-
 
     public Map<String, Object> getParameters() {
         return parameters;

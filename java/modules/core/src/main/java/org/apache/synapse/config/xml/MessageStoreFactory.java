@@ -89,10 +89,6 @@ public class MessageStoreFactory {
             handleException("Message Store name not specified");
         }
 
-        OMAttribute sequenceAtt = elem.getAttribute(SEQUENCE_Q);
-        if (sequenceAtt != null) {
-            messageStore.setSequence(sequenceAtt.getAttributeValue());
-        }
 
         OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
         if (descriptionElem != null) {

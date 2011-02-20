@@ -16,97 +16,94 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.processors.MessageProcessor;
-import org.apache.synapse.message.store.InMemoryMessageStore;
-import org.apache.synapse.message.store.MessageStore;
-import org.apache.axis2.util.JavaUtils;
 
-
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
+
 
 /**
- * Create an instance of the given Message Store, and sets properties on it.
+ * Create an instance of the given Message processor, and sets properties on it.
  * <p/>
- * &lt;messageStore name="string" class="classname" [sequence = "string" ]&gt;
+ * &lt;messageProcessor name="string" class="classname" messageStore = "string" &gt;
  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
  * .
  * .
- * &lt;/messageStore&gt;
+ * &lt;/messageProcessor&gt;
  */
-public class MessageStoreFactory {
-
-    private static final Log log = LogFactory.getLog(MessageStoreFactory.class);
-
+public class MessageProcessorFactory {
+    private static final Log log = LogFactory.getLog(MessageProcessorFactory.class);
     public static final QName CLASS_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
     public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
-    public static final QName SEQUENCE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
-
     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             "parameter");
+    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE ,
+            "messageStore");
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static MessageStore createMessageStore(OMElement elem, Properties properties) {
+    /**
+     * Creates a Message processor instance from given xml configuration element
+     * @param elem OMElement of that contain the Message processor configuration
+     * @return  created message processor instance
+     */
+    public static MessageProcessor createMessageProcessor(OMElement elem) {
+        MessageProcessor processor = null;
+        OMAttribute clssAtt = elem.getAttribute(CLASS_Q);
 
-        OMAttribute clss = elem.getAttribute(CLASS_Q);
-        MessageStore messageStore;
-        if (clss != null) {
+        if(clssAtt != null) {
             try {
-                Class cls = Class.forName(clss.getAttributeValue());
-                messageStore = (MessageStore) cls.newInstance();
+                Class cls = Class.forName(clssAtt.getAttributeValue());
+                processor = (MessageProcessor) cls.newInstance();
             } catch (Exception e) {
-                handleException("Error while instantiating the message store", e);
-                return null;
+                handleException("Error while creating Message processor " + e.getMessage());
             }
         } else {
-            messageStore = new InMemoryMessageStore();
+            /**We throw Exception since there is not default processor*/
+            handleException("Can't create Message processor without a provider class");
         }
-
 
         OMAttribute nameAtt = elem.getAttribute(NAME_Q);
-
         if (nameAtt != null) {
-            messageStore.setName(nameAtt.getAttributeValue());
+            assert processor != null;
+            processor.setName(nameAtt.getAttributeValue());
         } else {
-            handleException("Message Store name not specified");
+            handleException("Can't create Message processor without a name ");
         }
 
-        OMAttribute sequenceAtt = elem.getAttribute(SEQUENCE_Q);
-        if (sequenceAtt != null) {
-            messageStore.setSequence(sequenceAtt.getAttributeValue());
+        OMAttribute storeAtt = elem.getAttribute(MESSAGE_STORE_Q);
+
+        if(storeAtt != null) {
+            assert processor != null;
+            processor.setMessageStoreName(storeAtt.getAttributeValue());
+        } else {
+            handleException("Can't create message processor with out a message processor");
         }
 
         OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);
         if (descriptionElem != null) {
-            messageStore.setDescription(descriptionElem.getText());
+            assert processor != null;
+            processor.setDescription(descriptionElem.getText());
         }
 
-        messageStore.setParameters(getParameters(elem));
+        assert processor != null;
+        processor.setParameters(getParameters(elem));
 
-
-
-        log.info("Successfully created Message Store" + nameAtt.getAttributeValue());
-        return messageStore;
+        return processor;
     }
-
 
     private static Map<String, Object> getParameters(OMElement elem) {
         Iterator params = elem.getChildrenWithName(PARAMETER_Q);
@@ -133,10 +130,5 @@ public class MessageStoreFactory {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 }

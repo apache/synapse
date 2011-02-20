@@ -69,6 +69,8 @@ public class XMLConfigConstants {
     public static final QName PROXY_ELT       = new QName(SYNAPSE_NAMESPACE, "proxy");
     public static final QName EVENT_SOURCE_ELT = new QName(SYNAPSE_NAMESPACE, "eventSource");
     public static final QName MESSAGE_STORE_ELT = new QName(SYNAPSE_NAMESPACE, "messageStore");
+    public static final QName MESSAGE_PROCESSOR_ELT = new QName(SYNAPSE_NAMESPACE ,
+                                                                                "messageProcessor");
     public static final String NULL_NAMESPACE = "";
     public static final Object QUARTZ_QNAME   =
         new QName("http://www.opensymphony.com/quartz/JobSchedulingData", "quartz");

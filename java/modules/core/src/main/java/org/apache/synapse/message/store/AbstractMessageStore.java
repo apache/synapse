@@ -19,12 +19,9 @@
 
 package org.apache.synapse.message.store;
 
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.message.processors.MessageProcessor;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -76,18 +73,10 @@ public abstract class AbstractMessageStore implements MessageStore {
     protected Lock lock = new ReentrantLock();
 
 
-    /**
-     * Message processor instance associated with the MessageStore
-     */
-    protected MessageProcessor processor;
 
     public void init(SynapseEnvironment se) {
         this.synapseEnvironment = se;
         this.synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
-
-        processor.init(se);
-
-        processor.start();
     }
 
     public String getName() {
@@ -102,25 +91,7 @@ public abstract class AbstractMessageStore implements MessageStore {
     }
 
 
-    protected void mediateSequence(MessageContext synCtx) {
-
-        if (sequence != null && synCtx != null) {
-            Mediator seq = synCtx.getSequence(sequence);
-            if (seq != null) {
-                seq.mediate(synCtx);
-            }
-        }
-    }
-
-    public void setMessageProcessor(MessageProcessor messageProcessor) {
-        this.processor = messageProcessor;
-    }
-
-    public MessageProcessor getMessageProcessor() {
-        return processor;
-    }
-
-    public int getSize() {
+    public int size() {
         return -1;
     }
 
@@ -132,9 +103,7 @@ public abstract class AbstractMessageStore implements MessageStore {
         return sequence;
     }
 
-    public void setConfiguration(SynapseConfiguration configuration) {
-        this.synapseConfiguration = configuration;
-    }
+
 
     public Map<String, Object> getParameters() {
         return parameters;
@@ -144,14 +113,8 @@ public abstract class AbstractMessageStore implements MessageStore {
         this.parameters = parameters;
     }
 
-    public String getProviderClass() {
-        return this.getClass().getName();
-    }
 
     public void destroy() {
-        processor.stop();
-
-        processor.destroy();
     }
 
     public void setDescription(String description) {

@@ -28,64 +28,91 @@ import org.apache.synapse.message.processors.MessageProcessor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * This is the interface  for the Synapse Message Store
- * Message Store is used to store failed Messages.
+ * Message Store is used to store Messages.
  */
 public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycle {
 
+
+
     /**
-     * Store the Message in the Message Store
+     * Inserts the Message into this store if it is possible to do so immediately
+     * without violating capacity restrictions.
      * @param messageContext  MessageContext to be saved
      */
-    public void store(MessageContext messageContext);
+    public boolean offer(MessageContext messageContext);
+
+    /**
+     * Retrieves and removes the first Message in this store.
+     * Message ordering will depend on the underlying implementation
+     * @return first message context in the store
+     */
+    public MessageContext poll();
+
+    /**
+     * Retrieves but not removes the first Message in this store.
+     * Message ordering will depend on the underlying implementation
+     *
+     * @return first message context in the store
+     */
+    public MessageContext peek();
+
+
+    /**
+     * Retrieves and removes the first Message in this store.
+     * Message ordering will depend on the underlying implementation
+     *
+     * @return first message context in the store
+     * @throws NoSuchElementException if store is empty
+     */
+    public MessageContext remove() throws NoSuchElementException;
+
+    /**
+     * Delete all the Messages in the Message Store
+     *
+     */
+    public void clear();
+
 
     /**
      * Delete and return the MessageContext with given Message id
      * @param messageID  message id of the Message
      * @return  MessageContext instance
      */
-    public MessageContext unstore(String messageID);
-
-    /**
-     * Delete all the Messages in the Message Store
-     * @return  List of all messages in store
-     */
-    public List<MessageContext> unstoreAll();
+    public MessageContext remove(String messageID);
 
 
     /**
-     * Unstore Messages from index 'from' to index 'to'
-     * Message ordering will be depend on the implementation
-     * @param from start index
-     * @param to  stop index
-     * @return   list of messages that are belong to given range
+     *  Returns the number of Messages  in this store.
+     * @return the number of Messages in this Store
      */
-    public List<MessageContext> unstore(int from , int to);
+    public int size();
+
+    /**
+     * Return the Message in given index position
+     * (this may depend on the implementation)
+     * @param index position of the message
+     * @return Message in given index position
+     */
+    public MessageContext get(int index);
 
     /**
      * Get the All messages in the Message store without removing them from the queue
      * @return List of all Messages
      */
-    public List<MessageContext> getAllMessages();
+    public List<MessageContext> getAll();
 
     /**
      * Get the Message with the given ID from the Message store without removing it
      * @param messageId A message ID string
      * @return Message with given ID
      */
-    public MessageContext getMessage(String messageId);
+    public MessageContext get(String messageId);
 
 
-    /**
-     * Get Messages from index 'from' to index 'to'
-     * Message ordering will be depend on the implementation
-     * @param from start index
-     * @param to  stop index
-     * @return   list of messages that are belong to given range
-     */
-    public List<MessageContext> getMessages(int from , int to);
     /**
      * set the implementation specific parameters
      * @param parameters A map of parameters or null
@@ -98,11 +125,6 @@ public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycl
      */
     public Map<String,Object> getParameters();
 
-    /**
-     * return the number of Messages stored in the Message store
-     * @return the number of messages in the store
-     */
-    public int getSize();
 
     /**
      * set a Mediator sequence  name
@@ -112,24 +134,11 @@ public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycl
     public void setSequence(String sequence);
 
     /**
-     * get the implementation class name of the message
-     *
-     * @return Name of the implementation class
-     */
-    public String getProviderClass ();
-
-    /**
     * Get Mediator sequence name
      * @return Name of the sequence
      */
     public String getSequence();
 
-    /**
-     * Add the Synapse configuration reference for the Message Store
-     *
-     * @param configuration Current SynapseConfiguration
-     */
-    public void setConfiguration(SynapseConfiguration configuration);
 
     /**
      * Set the name of the file that the Message store is configured
@@ -147,14 +156,6 @@ public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycl
 
 
     /**
-     * Set the Message Processor Associated with the Message Store
-     * @param messageProcessor message processor instance associated with message store
+     * Todo Add observer api
      */
-    public void setMessageProcessor(MessageProcessor messageProcessor);
-
-    /**
-     * Get the Message Processor associated with the MessageStore
-     * @return   message processor instance associated with the message store
-     */
-    public MessageProcessor getMessageProcessor();
 }

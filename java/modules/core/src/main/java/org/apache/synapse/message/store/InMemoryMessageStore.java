@@ -40,32 +40,64 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
     private Lock lock = new ReentrantLock();
 
-    public void store(MessageContext messageContext) {
+    public boolean offer(MessageContext messageContext) {
         lock.lock();
         try {
             if (messageContext != null) {
-                mediateSequence(messageContext);
                 messageList.put(messageContext.getMessageID(), messageContext);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Message " + messageContext.getMessageID() +
-                            " has been stored");
-                }
-
-                if(processor != null && !processor.isStarted()) {
-
-                    if(log.isDebugEnabled()) {
-                        log.debug("Starting Message processor " + processor.getClass().getName());
-                    }
-                    processor.start();
+                    log.debug("Message with id " + messageContext.getMessageID() +
+                            " stored");
                 }
             }
         } finally {
             lock.unlock();
         }
+
+        return true;
     }
 
-    public MessageContext unstore(String messageID) {
+    public MessageContext poll() {
+        lock.lock();
+        MessageContext context;
+        try {
+            context = peek();
+            if(context !=null) {
+                messageList.remove(context.getMessageID());
+            }
+        } finally {
+            lock.unlock();
+        }
+        return context;
+    }
+
+    public MessageContext peek() {
+        if (messageList.size() > 0) {
+            return (MessageContext) messageList.values().toArray()[0];
+        }
+
+        return null;
+    }
+
+    public MessageContext remove() throws NoSuchElementException {
+        MessageContext context = poll();
+        if(context == null) {
+            throw  new NoSuchElementException();
+        }
+
+        return context;
+
+    }
+
+    public MessageContext get(int index) {
+        if(index >=0 && index < messageList.size()) {
+            return (MessageContext) messageList.values().toArray()[index];
+        }
+        return null;
+    }
+
+    public MessageContext remove(String messageID) {
         lock.lock();
         try {
             if (messageID != null) {
@@ -77,75 +109,19 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         return null;
     }
 
-    public List<MessageContext> unstoreAll() {
+    public void clear() {
         lock.lock();
         try {
-            List<MessageContext> returnList = new ArrayList<MessageContext>();
+
             for (String k : messageList.keySet()) {
-                returnList.add(messageList.remove(k));
+                messageList.remove(k);
             }
-            return returnList;
         } finally {
             lock.unlock();
         }
     }
 
-    public List<MessageContext> unstore(int maxNumberOfMessages) {
-        lock.lock();
-        try {
-            List<MessageContext> returnList = new ArrayList<MessageContext>();
-            Iterator<String> it = messageList.keySet().iterator();
-            while (it.hasNext() && maxNumberOfMessages > 0) {
-                returnList.add(messageList.get(it.next()));
-                maxNumberOfMessages--;
-            }
-
-            return returnList;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public List<MessageContext> unstore(int from, int to) {
-        lock.lock();
-        try {
-            List<MessageContext> returnlist = new ArrayList<MessageContext>();
-            if (from <= to && (from <= messageList.size() && to <= messageList.size()) &&
-                    messageList.size() > 0) {
-
-                String[] keys = messageList.keySet().toArray(
-                        new String[messageList.keySet().size()]);
-
-                for (int i = from; i <= to; i++) {
-                    returnlist.add(messageList.remove(keys[i]));
-                }
-            }
-            return returnlist;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public List<MessageContext> getMessages(int from, int to) {
-        lock.lock();
-        try {
-            List<MessageContext> returnList = new ArrayList<MessageContext>();
-            if (from <= to && (from <= messageList.size() && to <= messageList.size()) &&
-                    messageList.size() > 0) {
-                String[] keys = messageList.keySet().toArray(
-                        new String[messageList.keySet().size()]);
-
-                for (int i = from; i <= to; i++) {
-                    returnList.add(messageList.get(keys[i]));
-                }
-            }
-            return returnList;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public List<MessageContext> getAllMessages() {
+    public List<MessageContext> getAll() {
         lock.lock();
         try {
             List<MessageContext> returnList = new ArrayList<MessageContext>();
@@ -158,7 +134,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         }
     }
 
-    public MessageContext getMessage(String messageId) {
+    public MessageContext get(String messageId) {
         lock.lock();
         try {
             if (messageId != null) {
@@ -171,12 +147,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     }
 
 
-    public int getSize() {
-        lock.lock();
-        try {
-            return messageList.size();
-        } finally {
-            lock.unlock();
-        }
+    public int size() {
+        return messageList.size();
     }
 }

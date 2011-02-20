@@ -30,12 +30,6 @@ public interface MessageStoreViewMBean {
 
 
     /**
-     * Delete given number of Messages from the MessageStore
-     * @param maxCount
-     */
-    public void delete(int maxCount);
-
-    /**
      * Get the Message IDs of all stored Messages in the Message store
      *
      * @return a list of message ID values

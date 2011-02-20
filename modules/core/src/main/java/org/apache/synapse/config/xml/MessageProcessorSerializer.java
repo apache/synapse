@@ -16,7 +16,6 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -27,91 +26,98 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.message.store.InMemoryMessageStore;
-import org.apache.synapse.message.store.MessageStore;
+import org.apache.synapse.message.processors.MessageProcessor;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 
-/**
- * Serialize an instance of the given Message Store, and sets properties on it.
- * <p/>
- * &lt;messageStore name="string" class="classname" [sequence = "string" ] &gt;
- * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
- * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
- * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
- * &lt;/messageStore&gt;
- */
-public class MessageStoreSerializer {
 
-    private static final Log log = LogFactory.getLog(MessageStoreSerializer.class);
+/**
+ * Create an instance of the given Message processor, and sets properties on it.
+ * <p/>
+ * &lt;messageProcessor name="string" class="classname" messageStore = "string" &gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * .
+ * .
+ * &lt;/messageProcessor&gt;
+ */
+public class MessageProcessorSerializer {
+
+    private static final Log log = LogFactory.getLog(MessageProcessorSerializer.class);
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS = SynapseConstants.SYNAPSE_OMNAMESPACE;
     protected static final OMNamespace nullNS = fac.createOMNamespace(
             XMLConfigConstants.NULL_NAMESPACE, "");
 
-    public static OMElement serializeMessageStore(OMElement parent, MessageStore messageStore) {
 
-        OMElement store = fac.createOMElement("messageStore", synNS);
-
-        if (messageStore != null) {
-            if (!messageStore.getClass().getName().equals(InMemoryMessageStore.class.getName())) {
-                store.addAttribute(fac.createOMAttribute("class", nullNS,
-                        messageStore.getClass().getName()));
-            }
+    /**
+     * Serialize a give Message processor instance to XML configuration
+     * @param parent parent configuration
+     * @param processor message processor instance
+     * @return  created XML configuration
+     */
+    public static OMElement serializeMessageProcessor(OMElement parent, MessageProcessor processor) {
+        OMElement processorElem = fac.createOMElement("messageProcessor", synNS);
+        if (processor != null) {
+            processorElem.addAttribute(fac.createOMAttribute("class", nullNS,
+                    processor.getClass().getName()));
         } else {
-            handleException("Invalid MessageStore. Provider is required");
+            handleException("Invalid processor. Provider is required");
         }
 
-        if (messageStore.getSequence() != null) {
-            store.addAttribute(fac.createOMAttribute("sequence", nullNS, messageStore.getSequence()));
-        }
-
-        if (messageStore.getName() != null) {
-            store.addAttribute(fac.createOMAttribute("name", nullNS, messageStore.getName()));
+        if (processor.getName() != null) {
+            processorElem.addAttribute(fac.createOMAttribute("name", nullNS, processor.getName()));
         } else {
             handleException("Message store Name not specified");
         }
 
-        if (messageStore.getParameters() != null) {
-            Iterator iter = messageStore.getParameters().keySet().iterator();
-            while (iter.hasNext()) {
-                String name = (String) iter.next();
-                String value = (String) messageStore.getParameters().get(name);
+        if(processor.getMessageStoreName() != null) {
+            processorElem.addAttribute(fac.createOMAttribute(
+                    "messageStore",nullNS,processor.getMessageStoreName()));
+        }
+
+        if (processor.getParameters() != null) {
+            Iterator iterator = processor.getParameters().keySet().iterator();
+            while (iterator.hasNext()) {
+                String name = (String) iterator.next();
+                String value = (String) processor.getParameters().get(name);
                 OMElement property = fac.createOMElement("parameter", synNS);
                 property.addAttribute(fac.createOMAttribute(
                         "name", nullNS, name));
                 property.setText(value.trim());
-                store.addChild(property);
+                processorElem.addChild(property);
             }
         }
 
 
-        if (getSerializedDescription(messageStore) != null) {
-            store.addChild(getSerializedDescription(messageStore));
+        if (getSerializedDescription(processor) != null) {
+            processorElem.addChild(getSerializedDescription(processor));
         }
 
         if (parent != null) {
-            parent.addChild(store);
+            parent.addChild(processorElem);
         }
-        return store;
-    }
-
-    private static OMElement getSerializedDescription(MessageStore messageStore) {
-        OMElement descriptionElem = fac.createOMElement(
-                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
-
-        if (messageStore.getDescription() != null) {
-            descriptionElem.setText(messageStore.getDescription());
-            return descriptionElem;
-        } else {
-            return null;
-        }
+        return processorElem;
     }
 
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }
+
+    private static OMElement getSerializedDescription(MessageProcessor processor) {
+        OMElement descriptionElem = fac.createOMElement(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
+
+        if (processor.getDescription() != null) {
+            descriptionElem.setText(processor.getDescription());
+            return descriptionElem;
+        } else {
+            return null;
+        }
+    }
+
 }

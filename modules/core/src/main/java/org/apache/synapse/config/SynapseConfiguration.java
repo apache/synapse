@@ -24,6 +24,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
@@ -129,6 +130,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Messages stores for the synapse configuration.
      */
     private Map<String, MessageStore> messageStores = new ConcurrentHashMap<String, MessageStore>();
+
+    /**
+     * Message processors in the synapse configuration
+     */
+    private Map<String , MessageProcessor> messageProcessors = new ConcurrentHashMap<String ,MessageProcessor>();
 
     /**
      * Description/documentation of the configuration
@@ -1139,7 +1145,12 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         //initialize message stores
         for(MessageStore messageStore : messageStores.values()) {
-            ((ManagedLifecycle) messageStore).init(se);
+            messageStore.init(se);
+        }
+
+        // initialize message processors
+        for(MessageProcessor messageProcessor : messageProcessors.values()) {
+            messageProcessor.init(se);
         }
     }
 
@@ -1287,7 +1298,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         if (!messageStores.containsKey(name)){
             messageStores.put(name,messageStore);
         } else {
-            handleException("Duplicate message store by the name: " + name);
+            handleException("Duplicate message store : " + name);
         }
     }
 
@@ -1307,6 +1318,36 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      */
     public MessageStore removeMessageStore(String name) {
         return messageStores.remove(name);
+    }
+
+    /**
+     * Add message processor to the synapse configuration with given name
+     * @param name of the Message processor
+     * @param processor instance
+     */
+    public void addMessageProcessor(String name , MessageProcessor processor) {
+        if(!(messageProcessors.containsKey(processor))) {
+            messageProcessors.put(name , processor);
+        } else {
+            handleException("Duplicate Message Processor " + name);
+        }
+    }
+
+    /**
+     * Get all Message processors in the Synapse configuration
+     * @return Return Map that contains all the message processors
+     */
+    public Map<String, MessageProcessor> getMessageProcessors() {
+        return messageProcessors;
+    }
+
+    /**
+     * remove the message processor from the synapse configuration
+     * @param name  of the message
+     * @return  Removed Message processor instance
+     */
+    public MessageProcessor removeMessageProcessor(String name) {
+        return messageProcessors.remove(name);
     }
 
     /**

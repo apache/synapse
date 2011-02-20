@@ -26,6 +26,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
@@ -90,7 +91,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineExecutor(config, elt, properties);
                 } else if(XMLConfigConstants.MESSAGE_STORE_ELT.equals(elt.getQName())) {
                     defineMessageStore(config, elt, properties);
-                } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
+                } else if (XMLConfigConstants.MESSAGE_PROCESSOR_ELT.equals(elt.getQName())){
+                    defineMessageProcessor(config,elt,properties);
+                }else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt, properties);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
                     config.setDescription(elt.getText());
@@ -286,6 +289,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         MessageStore messageStore = MessageStoreFactory.createMessageStore(elem, properties);
         config.addMessageStore(messageStore.getName(), messageStore);
         return messageStore;
+    }
+
+    public static MessageProcessor defineMessageProcessor(SynapseConfiguration config,
+                                                          OMElement elem, Properties properties) {
+        MessageProcessor processor  = MessageProcessorFactory.createMessageProcessor(elem);
+        config.addMessageProcessor(processor.getName() , processor);
+        return processor;
     }
 
     private static void handleException(String msg) {

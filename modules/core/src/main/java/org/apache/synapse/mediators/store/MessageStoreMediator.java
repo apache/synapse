@@ -54,7 +54,7 @@ public class MessageStoreMediator extends AbstractMediator{
                         sequence.mediate(synCtx);
                     }
                 }
-                messageStore.store(synCtx);
+                messageStore.offer(synCtx);
 
                 // with the nio transport, this causes the listener not to write a 202
                 // Accepted response, as this implies that Synapse does not yet know if

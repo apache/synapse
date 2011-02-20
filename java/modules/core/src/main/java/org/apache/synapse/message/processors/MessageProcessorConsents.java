@@ -21,9 +21,10 @@ package org.apache.synapse.message.processors;
 public final class MessageProcessorConsents {
 
     public static final String MESSAGE_STORE = "MESSAGE_STORE";
+    public static final String PARAMETERS = "parameters";
+
     public static final String QUARTZ_CONF = "quartz.conf";
     public static final String INTERVAL = "interval";
     public static final String CRON_EXPRESSION = "cronExpression";
-    public static final String PARAMETERS = "parameters";
 
 }

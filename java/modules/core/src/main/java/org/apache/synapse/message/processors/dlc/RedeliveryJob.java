@@ -69,14 +69,14 @@ public class RedeliveryJob implements Job {
         }
 
         /**
-         * We will keep the message store lock till the redelivery over
+         * We will keep the message store lock till the redelivery is over
          */
         if (lock.tryLock()) {
 
             try {
-                int size = messageStore.getSize();
+                int size = messageStore.size();
                 for (int i = 0; i < size; i++) {
-                    MessageContext messageContext = messageStore.unstore(0, 0).get(0);
+                    MessageContext messageContext = messageStore.poll();
                     if (messageContext != null) {
                         SynapseArtifact artifact = getReplayTarget(messageContext);
 
@@ -96,7 +96,7 @@ public class RedeliveryJob implements Job {
                                         "will be put back to the Message Store");
 
                             }
-                            messageStore.store(messageContext);
+                            messageStore.offer(messageContext);
                             continue;
                         }
 
@@ -105,14 +105,14 @@ public class RedeliveryJob implements Job {
 
                         if (artifact instanceof Endpoint) {
                             if (!handleEndpointReplay((Endpoint) artifact, messageContext)) {
-                                messageStore.store(messageContext);
+                                messageStore.offer(messageContext);
                             }
                         } else if (artifact instanceof Mediator) {
                             if (!handleSequenceReplay((Mediator) artifact, messageContext)) {
-                                messageStore.store(messageContext);
+                                messageStore.offer(messageContext);
                             }
                         } else {
-                            messageStore.store(messageContext);
+                            messageStore.offer(messageContext);
                         }
 
                         if (log.isDebugEnabled()) {

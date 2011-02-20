@@ -42,9 +42,9 @@ public class SamplingJob implements Job {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
 
         final MessageStore messageStore = (MessageStore) jdm.get(
-                                            MessageProcessorConsents.MESSAGE_STORE);
+                MessageProcessorConsents.MESSAGE_STORE);
 
-        Map<String ,Object> parameters = (Map<String, Object>) jdm.get(
+        Map<String, Object> parameters = (Map<String, Object>) jdm.get(
                 MessageProcessorConsents.PARAMETERS);
         final Object concurrency = jdm.get(SamplingProcessor.CONCURRENCY);
         final String sequence = (String) parameters.get(SamplingProcessor.SEQUENCE);
@@ -56,30 +56,28 @@ public class SamplingJob implements Job {
 
         for (int i = 0; i < conc; i++) {
             //lock.lock();
-            synchronized (messageStore){
-                List<MessageContext> list = messageStore.getMessages(0, 0);
+            synchronized (messageStore) {
+                final MessageContext messageContext = messageStore.peek();
 
-                if (list != null && list.size() == 1) {
-                    final MessageContext messageContext = list.get(0);
-                    if (messageContext != null) {
-                        messageStore.unstore(0, 0);
-                        final ExecutorService executor = messageContext.getEnvironment().
-                                                            getExecutorService();
-                        executor.submit(new Runnable() {
-                            public void run() {
-                                try {
-                                    Mediator processingSequence = messageContext.getSequence(sequence);
-                                    if (processingSequence != null) {
-                                        processingSequence.mediate(messageContext);
-                                    }
-                                } catch (Throwable t) {
-                                    log.error("Error occurred while executing the message", t);
+                if (messageContext != null) {
+                    messageStore.poll();
+                    final ExecutorService executor = messageContext.getEnvironment().
+                            getExecutorService();
+                    executor.submit(new Runnable() {
+                        public void run() {
+                            try {
+                                Mediator processingSequence = messageContext.getSequence(sequence);
+                                if (processingSequence != null) {
+                                    processingSequence.mediate(messageContext);
                                 }
+                            } catch (Throwable t) {
+                                log.error("Error occurred while executing the message", t);
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             }
         }
     }
+
 }

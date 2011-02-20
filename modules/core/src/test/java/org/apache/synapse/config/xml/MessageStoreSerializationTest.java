@@ -38,7 +38,7 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
     public void testMessageStoreSerialization() throws Exception {
         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
                 "http://ws.apache.org/ns/synapse\"" +
-                " name=\"foo\" sequence=\"seq1\" >" +
+                " name=\"foo\" >" +
                 "</syn:messageStore>";
 
         OMElement messageStoreElement = createOMElement(messageStoreConfiguration);

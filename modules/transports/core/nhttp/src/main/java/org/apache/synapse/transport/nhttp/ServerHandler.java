@@ -121,15 +121,15 @@ public class ServerHandler implements NHttpServiceHandler {
     public static final String CONNECTION_CREATION_TIME = "synapse.connectionCreationTime";
     public static final String SERVER_CONNECTION_DEBUG = "synapse.server-connection-debug";
 
-    public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
-        final boolean isHttps, final NhttpMetricsCollector metrics,
-        Parser parser, PriorityExecutor executor, boolean restDispatching,
-        HttpGetRequestProcessor httpGetRequestProcessor) {
+    private ListenerContext listenerContext = null;
+
+    public ServerHandler(ListenerContext listenerContext) {
         super();
-        this.cfgCtx = cfgCtx;
-        this.params = params;
-        this.isHttps = isHttps;
-        this.metrics = metrics;
+        this.listenerContext = listenerContext;
+        this.cfgCtx = listenerContext.getCfgCtx();
+        this.params = listenerContext.getParams();
+        this.isHttps = listenerContext.isSsl();
+        this.metrics = listenerContext.getMetrics();
         this.responseFactory = new DefaultHttpResponseFactory();
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
@@ -137,10 +137,10 @@ public class ServerHandler implements NHttpServiceHandler {
         this.activeConnections = new ArrayList<NHttpServerConnection>();
         this.latencyView = new LatencyView(isHttps);
         this.threadingView = new ThreadingView("HttpServerWorker", true, 50);
-        this.restDispatching = restDispatching;
+        this.restDispatching = listenerContext.isRestDispatching();
 
         this.cfg = NHttpConfiguration.getInstance();
-        if (executor == null)  {
+        if (listenerContext.getExecutor() == null)  {
             this.workerPool = WorkerPoolFactory.getWorkerPool(
                 cfg.getServerCoreThreads(),
                 cfg.getServerMaxThreads(),
@@ -148,11 +148,11 @@ public class ServerHandler implements NHttpServiceHandler {
                 cfg.getServerQueueLen(),
                 "Server Worker thread group", "HttpServerWorker");
         } else {
-            this.executor = executor;
-            this.parser = parser;
+            this.executor = listenerContext.getExecutor();
+            this.parser = listenerContext.getParser();
         }
 
-        this.httpGetRequestProcessor = httpGetRequestProcessor;
+        this.httpGetRequestProcessor = listenerContext.getHttpGetRequestProcessor();
     }
 
     /**
@@ -209,8 +209,8 @@ public class ServerHandler implements NHttpServiceHandler {
                 metrics.incrementMessagesReceived();
             }
             // hand off processing of the request to a thread off the pool
-            ServerWorker worker = new ServerWorker(cfgCtx, conn, isHttps, metrics, this,
-                        request, is, response, os, restDispatching, httpGetRequestProcessor);
+            ServerWorker worker = new ServerWorker(listenerContext, conn, this,
+                    request, is, response, os);
 
             if (workerPool != null) {
                 workerPool.execute(worker);

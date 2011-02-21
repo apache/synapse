@@ -62,9 +62,8 @@ public class ConditionalRouterMediator extends AbstractMediator {
                 }
             }
         }
-        String restParams = (String) axis2MessageCtx.getProperty("REST_URL_POSTFIX");
 
-        String url = synCtx.getTo().getAddress() + (restParams != null ? restParams : ""); 
+        String url = synCtx.getTo().getAddress();
         EvaluatorContext context = new EvaluatorContext(url, evaluatorHeaders);
         context.setProperties(((Axis2MessageContext) synCtx).getProperties());
         context.setMessageContext(((Axis2MessageContext) synCtx).getAxis2MessageContext());

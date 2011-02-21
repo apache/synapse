@@ -95,38 +95,33 @@ public class ServerWorker implements Runnable {
      * its output. This however does not force the processor to write a response back as the
      * traditional servlet service() method, but creates the background required to write the
      * response, if one would be created.
-     * @param cfgCtx the Axis2 configuration context
+     *
+     * @param listenerContext the listener configuration
      * @param conn the underlying http connection
-     * @param isHttps whether https or not
-     * @param metrics metrics for the transport
      * @param serverHandler the handler of the server side messages
      * @param request the http request received (might still be in the process of being streamed)
      * @param is the stream input stream to read the request body
      * @param response the response to be populated if applicable
      * @param os the output stream to write the response body if one is applicable
-     * @param isRestDispatching weather we should dispatch in case of rest
      */
-    public ServerWorker(final ConfigurationContext cfgCtx, final NHttpServerConnection conn,
-        final boolean isHttps,
-        final MetricsCollector metrics,
+    public ServerWorker(ListenerContext listenerContext,
+                        final NHttpServerConnection conn,
         final ServerHandler serverHandler,
         final HttpRequest request, final InputStream is,
-        final HttpResponse response, final OutputStream os,
-        final boolean isRestDispatching,
-        final HttpGetRequestProcessor httpGetRequestProcessor) {
+        final HttpResponse response, final OutputStream os) {
 
-        this.cfgCtx = cfgCtx;
+        this.cfgCtx = listenerContext.getCfgCtx();
         this.conn = conn;
-        this.isHttps = isHttps;
-        this.metrics = metrics;
+        this.isHttps = listenerContext.isSsl();
+        this.metrics = listenerContext.getMetrics();
         this.serverHandler = serverHandler;
         this.request = request;
         this.response = response;
         this.is = is;
         this.os = os;
         this.msgContext = createMessageContext(request);
-        this.isRestDispatching = isRestDispatching;
-        this.httpGetRequestProcessor = httpGetRequestProcessor;
+        this.isRestDispatching = listenerContext.isRestDispatching();
+        this.httpGetRequestProcessor = listenerContext.getHttpGetRequestProcessor();
     }
 
     /**

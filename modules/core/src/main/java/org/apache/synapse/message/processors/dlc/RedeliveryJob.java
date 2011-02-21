@@ -112,6 +112,9 @@ public class RedeliveryJob implements Job {
                                 messageStore.offer(messageContext);
                             }
                         } else {
+                            log.warn("Replay mediator or endpoint not specified. You may need to set" +
+                                    " property " + DLCConstents.REPLAY_ENDPOINT +" or " +
+                                        DLCConstents.REPLAY_SEQUENCE);
                             messageStore.offer(messageContext);
                         }
 
@@ -140,6 +143,9 @@ public class RedeliveryJob implements Job {
         setFaultHandler(messageContext);
         if (endpoint != null && messageContext != null) {
             if (endpoint.readyToSend()) {
+                if(log.isDebugEnabled()) {
+                    log.debug("Re sending Message via Endpoint " + endpoint.getName());
+                }
                 endpoint.send(messageContext);
                 return true;
             } else {
@@ -161,6 +167,10 @@ public class RedeliveryJob implements Job {
     static boolean handleSequenceReplay(Mediator mediator, MessageContext messageContext) {
         if (mediator != null && messageContext != null) {
             setFaultHandler(messageContext);
+            if(log.isDebugEnabled()) {
+                log.debug("Re sending message via Mediator " +
+                        messageContext.getProperty(DLCConstents.REPLAY_SEQUENCE));
+            }
             mediator.mediate(messageContext);
             return true;
         }
@@ -201,7 +211,8 @@ public class RedeliveryJob implements Job {
                 messageContext.pushFaultHandler(faultHandler);
             } else {
                 log.warn("Error handler " + replayFaultHandler + " Not defined in the synapse " +
-                        "configuration");
+                        "configuration. You may need to set the property " +
+                        DLCConstents.REPLAY_FAULT_HANDLER);
             }
         }else {
             log.warn("No fault handler defined for the replaying Message with id " +

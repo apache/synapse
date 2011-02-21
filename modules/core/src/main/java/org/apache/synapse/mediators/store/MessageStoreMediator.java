@@ -54,6 +54,10 @@ public class MessageStoreMediator extends AbstractMediator{
                         sequence.mediate(synCtx);
                     }
                 }
+
+                if(log.isDebugEnabled()) {
+                    log.debug("Message Store mediator storing the message : \n " + synCtx.getEnvelope());
+                }
                 messageStore.offer(synCtx);
 
                 // with the nio transport, this causes the listener not to write a 202

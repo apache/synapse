@@ -18,6 +18,8 @@
  */
 package org.apache.synapse.message.processors.dlc;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseArtifact;
@@ -33,35 +35,52 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
 
     private MessageStore messageStore;
 
+    private static Log log = LogFactory.getLog(DeadLetterChannelView.class);
 
 
     public DeadLetterChannelView(MessageStore messageStore) {
-        this.messageStore = messageStore;
+        if (messageStore != null) {
+            this.messageStore = messageStore;
+        } else {
+            throw new SynapseException("Error , Can not create Dead Letter Channel view with null " +
+                    "message store");
+        }
 
     }
 
     public void resendAll() {
+        log.info("Manually Resending All messages in the Message Store " + messageStore.getName());
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            int size = messageStore.size();
-            for (int i = 0; i < size; i++) {
-                MessageContext messageContext = messageStore.poll();
-                if (messageContext != null) {
-                    redeliver(messageContext);
+            try {
+                int size = messageStore.size();
+                for (int i = 0; i < size; i++) {
+                    MessageContext messageContext = messageStore.poll();
+                    if (messageContext != null) {
+                        redeliver(messageContext);
+                    }
                 }
-
+            } finally {
+                ((AbstractMessageStore) messageStore).getLock().unlock();
             }
         } else {
+            log.info("Message store being used Can't perform resendAll operation");
             throw new SynapseException("Error Message store being used re try later");
         }
     }
 
     public void deleteAll() {
+        log.info("Manually deleting all messages in Message store");
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            int size = messageStore.size();
-            for (int i = 0; i < size; i++) {
-                messageStore.poll();
+            try {
+                int size = messageStore.size();
+                for (int i = 0; i < size; i++) {
+                    messageStore.poll();
+                }
+            } finally {
+                ((AbstractMessageStore) messageStore).getLock().unlock();
             }
         } else {
+            log.info("Message store being used Can't perform deleteAll operation");
             throw new SynapseException("Error Message store being used re try later");
         }
     }
@@ -79,20 +98,38 @@ public class DeadLetterChannelView implements DeadLetterChannelViewMBean {
     }
 
     public void resend(String messageID) {
+        log.info(" Manually re-sending the Message with id " + messageID);
         if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            MessageContext messageContext = messageStore.remove(messageID);
-            if (messageContext != null) {
-                redeliver(messageContext);
+            try {
+                MessageContext messageContext = messageStore.remove(messageID);
+                if (messageContext != null) {
+                    redeliver(messageContext);
+                }
+            } finally {
+                ((AbstractMessageStore) messageStore).getLock().unlock();
             }
         } else {
+            log.info("Message store being used Can't perform resend operation for" +
+                        " message with id " +messageID);
             throw new SynapseException("Error Message store being used re try later");
         }
     }
 
     public void delete(String messageID) {
-        if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
-            messageStore.remove(messageID);
-        }
+        log.info(" Manually deleting the Message with id " + messageID);
+
+            if (((AbstractMessageStore) messageStore).getLock().tryLock()) {
+                try {
+                    messageStore.remove(messageID);
+                } finally {
+                    ((AbstractMessageStore) messageStore).getLock().unlock();
+                }
+            } else {
+                log.info("Message store being used Can't perform delete operation for" +
+                        " message with id " +messageID);
+                throw new SynapseException("Error Message store being used re try later");
+            }
+
     }
 
     public String getEnvelope(String messageID) {

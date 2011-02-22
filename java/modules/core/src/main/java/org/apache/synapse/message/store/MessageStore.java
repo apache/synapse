@@ -142,6 +142,16 @@ public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycl
 
 
     /**
-     * Todo Add observer api
+     * Register a MessageStore observer instance with the MessageStore
+     * to receive events.
+     * @param observer instance to be registered
      */
+    public void registerObserver(MessageStoreObserver observer);
+
+    /**
+     * Un register an Message store instance from the message store
+     * to stop receiving events
+     * @param observer  instance to be unregistered
+     */
+    public void unregisterObserver(MessageStoreObserver observer);
 }

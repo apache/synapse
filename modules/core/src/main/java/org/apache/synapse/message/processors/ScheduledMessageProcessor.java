@@ -21,6 +21,7 @@ package org.apache.synapse.message.processors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -50,11 +51,6 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         STOP,
         DESTROY
     }
-
-    /**
-     * message store parameters
-     */
-    protected Map<String, Object> parameters = null;
 
     /**
      * The quartz configuration file if specified as a parameter
@@ -90,7 +86,8 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
         JobDetail jobDetail = getJobDetail();
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE, messageStore);
+        jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE,
+                configuration.getMessageStore(messageStore));
         jobDataMap.put(MessageProcessorConsents.PARAMETERS, parameters);
         jobDetail.setJobDataMap(jobDataMap);
 
@@ -169,6 +166,8 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
             scheduler.start();
 
             state = State.INITIALIZED;
+
+            this.start();
         } catch (SchedulerException e) {
             throw new SynapseException("Error starting the scheduler", e);
         }

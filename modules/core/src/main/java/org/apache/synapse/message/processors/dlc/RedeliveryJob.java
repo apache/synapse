@@ -24,6 +24,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseArtifact;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.message.processors.MessageProcessorConsents;
@@ -51,7 +52,6 @@ public class RedeliveryJob implements Job {
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
-
         messageStore = (MessageStore) jdm.get(MessageProcessorConsents.MESSAGE_STORE);
         lock = ((AbstractMessageStore) messageStore).getLock();
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(

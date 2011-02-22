@@ -45,7 +45,8 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         try {
             if (messageContext != null) {
                 messageList.put(messageContext.getMessageID(), messageContext);
-
+                /** Notify observers */
+                notifyMessageAddition(messageContext.getMessageID());
                 if (log.isDebugEnabled()) {
                     log.debug("Message with id " + messageContext.getMessageID() +
                             " stored");
@@ -65,6 +66,8 @@ public class InMemoryMessageStore extends AbstractMessageStore {
             context = peek();
             if(context !=null) {
                 messageList.remove(context.getMessageID());
+                /** Notify observers */
+                notifyMessageRemoval(context.getMessageID());
             }
         } finally {
             lock.unlock();
@@ -101,7 +104,11 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         lock.lock();
         try {
             if (messageID != null) {
-                return messageList.remove(messageID);
+               if(messageList.remove(messageID) != null) {
+                   /** Notify observers */
+                    notifyMessageRemoval(messageID);
+               }
+
             }
         } finally {
             lock.unlock();
@@ -115,6 +122,8 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
             for (String k : messageList.keySet()) {
                 messageList.remove(k);
+                /** Notify observers */
+                notifyMessageRemoval(k);
             }
         } finally {
             lock.unlock();

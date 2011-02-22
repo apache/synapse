@@ -23,6 +23,8 @@ import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -69,6 +71,11 @@ public abstract class AbstractMessageStore implements MessageStore {
      */
     protected String fileName;
 
+    /**
+     * List that holds the MessageStore observers registered with the Message Store
+     */
+    protected List<MessageStoreObserver> messageStoreObservers =
+            new ArrayList<MessageStoreObserver>();
 
     protected Lock lock = new ReentrantLock();
 
@@ -91,6 +98,37 @@ public abstract class AbstractMessageStore implements MessageStore {
     }
 
 
+    public void registerObserver(MessageStoreObserver observer) {
+        if(observer != null && !messageStoreObservers.contains(observer)) {
+            messageStoreObservers.add(observer);
+        }
+    }
+
+    public void unregisterObserver(MessageStoreObserver observer) {
+        if(observer != null && messageStoreObservers.contains(observer)) {
+            messageStoreObservers.remove(observer);
+        }
+    }
+
+    /**
+     * Notify Message Addition to the observers
+     * @param messageId of the Message added.
+     */
+    protected void notifyMessageAddition(String messageId) {
+        for(MessageStoreObserver o : messageStoreObservers) {
+            o.messageAdded(messageId);
+        }
+    }
+
+    /**
+     * Notify Message removal to the observers
+     * @param messageId of the Message added
+     */
+    protected void notifyMessageRemoval(String messageId) {
+        for(MessageStoreObserver o : messageStoreObservers) {
+            o.messageRemoved(messageId);
+        }
+    }
     public int size() {
         return -1;
     }

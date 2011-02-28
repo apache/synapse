@@ -156,10 +156,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         // if this is not a response to a proxy service
         String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
         if (proxyName == null || "".equals(proxyName)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Using Main Sequence for injected message");
-            }
-
             if (receivingSequence != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Using Sequence with name: " + receivingSequence
@@ -167,7 +163,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 }
                 Mediator seqMediator = synCtx.getSequence(receivingSequence);
                 if (seqMediator != null) {
-                    seqMediator.mediate(synCtx);
+                    return seqMediator.mediate(synCtx);
                 } else {
                     log.warn("Cannot find a Sequence with name: " + receivingSequence
                             + " for injecting the response message");
@@ -175,12 +171,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Using a Sequence for injected message");
+                    log.debug("Using Main Sequence for injected message");
                 }
                 return synCtx.getMainSequence().mediate(synCtx);
             }
 
-            return synCtx.getMainSequence().mediate(synCtx);
         }
 
         ProxyService proxyService = synCtx.getConfiguration().getProxyService(proxyName);

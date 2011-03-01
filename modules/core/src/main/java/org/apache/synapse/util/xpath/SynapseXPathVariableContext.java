@@ -197,6 +197,16 @@ public class SynapseXPathVariableContext implements VariableContext {
                         }
                     }
                     return "";
+                } else {
+                    Object o = synCtx.getProperty(prefix);
+                    if (o instanceof Map) {
+                        Map properties = (Map) o;
+
+                        Object valueObject = ((Map) o).get(localName);
+                        if (valueObject != null) {
+                            return valueObject.toString();
+                        }
+                    }
                 }
             }
         }

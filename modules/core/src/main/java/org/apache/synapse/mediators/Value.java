@@ -124,6 +124,15 @@ public class Value {
         log.error(msg);
         throw new SynapseException(msg);
     }
+
+    @Override
+    public String toString() {
+        return "Value {" +
+                "name ='" + name + '\'' +
+                (keyValue != null ? ", keyValue ='" + keyValue + '\'' : "") +
+                (expression != null ? ", expression =" + expression : "") +
+                '}';
+    }
 }
 
 

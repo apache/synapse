@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.Value;
 
 import javax.activation.DataHandler;
 import javax.script.*;
@@ -63,8 +64,9 @@ public class ScriptMediator extends AbstractMediator {
 
     /**
      * The registry entry key for a script loaded from the registry
+     * Handle both static and dynamic(Xpath) Keys
      */
-    private String key;
+    private Value key;
     /**
      * The language of the script code
      */
@@ -72,7 +74,7 @@ public class ScriptMediator extends AbstractMediator {
     /**
      * The map of included scripts; key = registry entry key, value = script source
      */
-    private final Map<String, Object> includes;
+    private final Map<Value, Object> includes;
     /**
      * The optional name of the function to be invoked, defaults to mediate
      */
@@ -117,7 +119,7 @@ public class ScriptMediator extends AbstractMediator {
     public ScriptMediator(String language, String scriptSourceCode) {
         this.language = language;
         this.scriptSourceCode = scriptSourceCode;
-        this.includes = new TreeMap<String, Object>();
+        this.includes = new TreeMap<Value, Object>();
         initInlineScript();
     }
 
@@ -129,8 +131,8 @@ public class ScriptMediator extends AbstractMediator {
      * @param key            the registry entry key to load the script
      * @param function       the function to be invoked
      */
-    public ScriptMediator(String language, Map<String, Object> includeKeysMap,
-                          String key, String function) {
+    public ScriptMediator(String language, Map<Value, Object> includeKeysMap,
+                          Value key, String function) {
         this.language = language;
         this.key = key;
         this.includes = includeKeysMap;
@@ -298,12 +300,14 @@ public class ScriptMediator extends AbstractMediator {
         // to access the registry entry during mediator initialization then for non-dynamic entries
         // this could be done just the once during mediator initialization.
 
-        Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
+        // Derive actual key from xpath expression or get static key
+        String generatedScriptKey = key.evaluateValue(synCtx);
+        Entry entry = synCtx.getConfiguration().getEntryDefinition(generatedScriptKey);
         boolean needsReload = (entry != null) && entry.isDynamic() &&
                 (!entry.isCached() || entry.isExpired());
         synchronized (resourceLock) {
             if (scriptSourceCode == null || needsReload) {
-                Object o = synCtx.getEntry(key);
+                Object o = synCtx.getEntry(generatedScriptKey);
                 if (o instanceof OMElement) {
                     scriptSourceCode = ((OMElement) (o)).getText();
                     scriptEngine.eval(scriptSourceCode);
@@ -340,15 +344,19 @@ public class ScriptMediator extends AbstractMediator {
         }
 
         // load <include /> scripts; reload each script if needed
-        for (String includeKey : includes.keySet()) {
+        for (Value includeKey : includes.keySet()) {
+
             String includeSourceCode = (String) includes.get(includeKey);
-            Entry includeEntry = synCtx.getConfiguration().getEntryDefinition(includeKey);
+
+            String generatedKey = includeKey.evaluateValue(synCtx);
+
+            Entry includeEntry = synCtx.getConfiguration().getEntryDefinition(generatedKey);
             boolean includeEntryNeedsReload = (includeEntry != null) && includeEntry.isDynamic()
                     && (!includeEntry.isCached() || includeEntry.isExpired());
             synchronized (resourceLock) {
                 if (includeSourceCode == null || includeEntryNeedsReload) {
                     log.debug("Re-/Loading the include script with key " + includeKey);
-                    Object o = synCtx.getEntry(includeKey);
+                    Object o = synCtx.getEntry(generatedKey);
                     if (o instanceof OMElement) {
                         includeSourceCode = ((OMElement) (o)).getText();
                         scriptEngine.eval(includeSourceCode);
@@ -408,7 +416,7 @@ public class ScriptMediator extends AbstractMediator {
         return language;
     }
 
-    public String getKey() {
+    public Value getKey() {
         return key;
     }
 
@@ -425,7 +433,7 @@ public class ScriptMediator extends AbstractMediator {
         throw new SynapseException(msg);
     }
 
-    public Map<String, Object> getIncludeMap() {
+    public Map<Value, Object> getIncludeMap() {
         return includes;
     }
 

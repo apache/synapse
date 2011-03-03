@@ -278,7 +278,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
 
         synLog.traceOrDebug("End : Aggregate mediator");
 
-        return false;
+        return true;
     }
 
     /**

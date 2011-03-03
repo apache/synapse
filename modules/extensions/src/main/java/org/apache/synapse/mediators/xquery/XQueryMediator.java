@@ -29,25 +29,25 @@ import org.apache.axiom.om.util.ElementHelper;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.util.xpath.SourceXPathSupport;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.mediators.Value;
+import org.apache.synapse.util.xpath.SourceXPathSupport;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
+import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import javax.activation.DataHandler;
-import java.io.StringReader;
-import java.io.InputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.*;
 
 
 /**
@@ -67,8 +67,8 @@ public class XQueryMediator extends AbstractMediator {
     /* Properties that must set to the XQDataSource  */
     private final List<MediatorProperty> dataSourceProperties = new ArrayList<MediatorProperty>();
 
-    /* The key for lookup the xquery */
-    private String queryKey;
+    /* The key for lookup the xquery (Supports both static and dynamic keys)*/
+    private Value queryKey;
 
     /* The source of the xquery */
     private String querySource;
@@ -92,7 +92,7 @@ public class XQueryMediator extends AbstractMediator {
     private XQConnection cachedConnection = null;
 
     /* An expression that use for multiple  executions.Expression will recreate if query has changed */
-    private XQPreparedExpression cachedPreparedExpression = null;
+    private Map<String, XQPreparedExpression> cachedPreparedExpressionMap = new Hashtable<String, XQPreparedExpression>();
 
     public XQueryMediator() {
     }
@@ -143,10 +143,24 @@ public class XQueryMediator extends AbstractMediator {
         boolean reLoad = false;
         boolean needBind = false;
         XQResultSequence resultSequence;
+        String generatedQueryKey = null;
+        boolean isQueryKeyGenerated = false;
 
-        if (queryKey != null && !"".equals(queryKey)) {
+        if (queryKey != null) {
+            // Derive actual key from xpath or get static key
+            generatedQueryKey = queryKey.evaluateValue(synCtx);
+        }
 
-            Entry dp = synCtx.getConfiguration().getEntryDefinition(queryKey);
+        if (generatedQueryKey != null) {
+            isQueryKeyGenerated = true;
+        }
+
+        // get expression from generatedQueryKey
+        XQPreparedExpression cachedPreparedExpression = null;
+
+        if (generatedQueryKey != null && !"".equals(generatedQueryKey)) {
+
+            Entry dp = synCtx.getConfiguration().getEntryDefinition(generatedQueryKey);
             // if the queryKey refers to a dynamic resource
             if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
@@ -182,6 +196,11 @@ public class XQueryMediator extends AbstractMediator {
                     cachedConnection = cachedXQDataSource.getConnection();
                 }
 
+                //If already cached expression then load it from cachedPreparedExpressionMap
+                if (isQueryKeyGenerated) {
+                    cachedPreparedExpression = cachedPreparedExpressionMap.get(generatedQueryKey);
+                }
+
                 // prepare the expression to execute query
                 if (reLoad || cachedPreparedExpression == null
                         || (cachedPreparedExpression != null
@@ -199,13 +218,19 @@ public class XQueryMediator extends AbstractMediator {
                             //create an XQPreparedExpression using the query source
                             cachedPreparedExpression =
                                     cachedConnection.prepareExpression(querySource);
+
+                            // if cachedPreparedExpression is created then put it in to cachedPreparedExpressionMap
+                            if (isQueryKeyGenerated) {
+                                cachedPreparedExpressionMap.put(generatedQueryKey, cachedPreparedExpression);
+                            }
+
                             // need binding because the expression just has recreated
                             needBind = true;
                         }
 
                     } else {
 
-                        Object o = synCtx.getEntry(queryKey);
+                        Object o = synCtx.getEntry(generatedQueryKey);
                         if (o == null) {
                             if (synLog.isTraceOrDebugEnabled()) {
                                 synLog.traceOrDebug("Couldn't find the xquery source with a key "
@@ -263,6 +288,12 @@ public class XQueryMediator extends AbstractMediator {
                             cachedPreparedExpression =
                                     cachedConnection.prepareExpression(inputStream);
                         }
+
+                        // if cachedPreparedExpression is created then put it in to cachedPreparedExpressionMap
+                        if (isQueryKeyGenerated) {
+                            cachedPreparedExpressionMap.put(generatedQueryKey, cachedPreparedExpression);
+                        }
+
                         // need binding because the expression just has recreated
                         needBind = true;
                     }
@@ -601,11 +632,11 @@ public class XQueryMediator extends AbstractMediator {
         throw new SynapseException(msg);
     }
 
-    public String getQueryKey() {
+    public Value getQueryKey() {
         return queryKey;
     }
 
-    public void setQueryKey(String queryKey) {
+    public void setQueryKey(Value queryKey) {
         this.queryKey = queryKey;
     }
 

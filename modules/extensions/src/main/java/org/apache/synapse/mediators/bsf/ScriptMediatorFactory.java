@@ -19,17 +19,18 @@
 
 package org.apache.synapse.mediators.bsf;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.mediators.Value;
+import org.apache.synapse.config.xml.ValueFactory;
 
-import java.util.Map;
+import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
@@ -84,12 +85,18 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
                     "attribute for a script mediator");
         }
 
-        Map<String, Object> includeKeysMap = getIncludeKeysMap(elem);
+        Map<Value, Object> includeKeysMap = getIncludeKeysMap(elem);
 
         if (keyAtt != null) {
+
+            // ValueFactory for creating dynamic or static Key
+            ValueFactory keyFac = new ValueFactory();
+            // create dynamic or static key based on OMElement
+            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);
+
             String functionName = (functionAtt == null ? null : functionAtt.getAttributeValue());
             mediator = new ScriptMediator(langAtt.getAttributeValue(),
-                    includeKeysMap, keyAtt.getAttributeValue(), functionName);
+                    includeKeysMap, generatedKey, functionName);
         } else {
             mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText());
         }
@@ -98,27 +105,30 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
         return mediator;
     }
 
-    private Map<String, Object> getIncludeKeysMap(OMElement elem) {
+    private Map<Value, Object> getIncludeKeysMap(OMElement elem) {
         // get <include /> scripts
         // map key = registry entry key, value = script source
         // at this time map values are null, later loaded
         // from void ScriptMediator.prepareExternalScript(MessageContext synCtx)
 
         // TreeMap used to keep given scripts order if needed
-        Map<String, Object> includeKeysMap = new TreeMap<String, Object>();
+        Map<Value, Object> includeKeysMap = new TreeMap<Value, Object>();
         Iterator itr = elem.getChildrenWithName(INCLUDE_Q);
         while (itr.hasNext()) {
             OMElement includeElem = (OMElement) itr.next();
             OMAttribute key = includeElem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                     "key"));
+            // ValueFactory for creating dynamic or static Value
+            ValueFactory keyFac = new ValueFactory();
+            // create dynamic or static key based on OMElement
+            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);
 
             if (key == null) {
                 throw new SynapseException("Cannot use 'include' element without 'key'" +
                         " attribute for a script mediator");
             }
 
-            String keyText = key.getAttributeValue();
-            includeKeysMap.put(keyText, null);
+            includeKeysMap.put(generatedKey, null);
         }
 
         return includeKeysMap;

@@ -27,6 +27,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.config.xml.*;
 import org.jaxen.JaxenException;
+import org.apache.synapse.mediators.Value;
+import org.apache.synapse.config.xml.ValueFactory;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -64,9 +66,14 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
         OMAttribute attrTarget = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                 "target"));
         if (xqueryKey != null) {
-            String queryKey = xqueryKey.getAttributeValue();
-            if (queryKey != null) {
-                xQueryMediator.setQueryKey(queryKey.trim());
+            // KeyFactory for creating dynamic or static Key
+            ValueFactory keyFac = new ValueFactory();
+            // create dynamic or static key based on OMElement
+            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);
+
+            if (generatedKey != null) {
+                // set generated key as the Key
+                xQueryMediator.setQueryKey(generatedKey);
             } else {
                 handleException("The 'key' attribute is required for the XQuery mediator");
             }

@@ -65,6 +65,9 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_ATTACHPATH = new QName("attachPath");
     private static final QName ATT_SEQUENCIAL = new QName("sequential");
 
+    private static final QName ID_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "id");
+
     /**
      * This method will create the IterateMediator by parsing the given xml configuration
      *
@@ -76,6 +79,11 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
 
         IterateMediator mediator = new IterateMediator();
         processAuditStatus(mediator, elem);
+
+        OMAttribute id = elem.getAttribute(ID_Q);
+        if (id != null) {
+            mediator.setId(id.getAttributeValue());
+        }
 
         OMAttribute continueParent = elem.getAttribute(ATT_CONTPAR);
         if (continueParent != null) {

@@ -70,11 +70,19 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "max");
     private static final QName SEQUENCE_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
+    private static final QName ID_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "id");
+
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         AggregateMediator mediator = new AggregateMediator();
         processAuditStatus(mediator, elem);
+
+        OMAttribute id = elem.getAttribute(ID_Q);
+        if (id != null) {
+            mediator.setId(id.getAttributeValue());
+        }
 
         OMElement corelateOn = elem.getFirstChildWithName(CORELATE_ON_Q);
         if (corelateOn != null) {

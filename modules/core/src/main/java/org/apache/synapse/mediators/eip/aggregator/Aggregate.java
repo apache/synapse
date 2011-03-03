@@ -111,7 +111,8 @@ public class Aggregate extends TimerTask {
 
                 // get total messages for this group, from the first message we have collected
                 MessageContext mc = messages.get(0);
-                Object prop = mc.getProperty(EIPConstants.MESSAGE_SEQUENCE);
+                Object prop = mc.getProperty(EIPConstants.MESSAGE_SEQUENCE +
+                        (aggregateMediator.getId() != null ? "." + aggregateMediator.getId() : ""));
             
                 if (prop != null && prop instanceof String) {
                     String[] msgSequence = prop.toString().split(

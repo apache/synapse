@@ -54,6 +54,8 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
     /** the list of targets to which cloned copies of the message will be given for mediation */
     private List<Target> targets = new ArrayList<Target>();
 
+    private String id = null;
+
     /**
      * This will implement the mediate method of the Mediator interface and will provide the
      * functionality of cloning message into the specified targets and mediation
@@ -109,19 +111,30 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
      * @param synCtx          - MessageContext which is subjected to the cloning
      * @param messageSequence - the position of this message of the cloned set
      * @param messageCount    - total of cloned copies
+     *
      * @return MessageContext the cloned message context
      */
     private MessageContext getClonedMessageContext(MessageContext synCtx, int messageSequence,
-        int messageCount) {
+                                                   int messageCount) {
 
         MessageContext newCtx = null;
         try {
             newCtx = MessageHelper.cloneMessageContext(synCtx);
 
-            // set the property MESSAGE_SEQUENCE to the MC for aggregation purposes
-            newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
-                String.valueOf(messageSequence) + EIPConstants.MESSAGE_SEQUENCE_DELEMITER +
-                messageCount);            
+            if (id != null) {
+                // set the parent correlation details to the cloned MC -
+                //                              for the use of aggregation like tasks
+                newCtx.setProperty(EIPConstants.AGGREGATE_CORRELATION + "." + id,
+                        synCtx.getMessageID());
+                // set the property MESSAGE_SEQUENCE to the MC for aggregation purposes
+                newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE + "." + id,
+                        String.valueOf(messageSequence) + EIPConstants.MESSAGE_SEQUENCE_DELEMITER +
+                                messageCount);
+            } else {
+                newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
+                        String.valueOf(messageSequence) + EIPConstants.MESSAGE_SEQUENCE_DELEMITER +
+                                messageCount);
+            }
         } catch (AxisFault axisFault) {
             handleException("Error cloning the message context", axisFault, synCtx);
         }
@@ -151,6 +164,14 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
 
     public void addTarget(Target target) {
         this.targets.add(target);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void init(SynapseEnvironment se) {

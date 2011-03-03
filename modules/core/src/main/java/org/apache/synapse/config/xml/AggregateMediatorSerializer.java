@@ -43,6 +43,10 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
         OMElement aggregator = fac.createOMElement("aggregate", synNS);
         saveTracingState(aggregator, mediator);
 
+        if (mediator.getId() != null) {
+            aggregator.addAttribute("id", mediator.getId(), nullNS);
+        }
+
         if (mediator.getCorrelateExpression() != null) {
             OMElement corelateOn = fac.createOMElement("correlateOn", synNS);
             SynapseXPathSerializer.serializeXPath(

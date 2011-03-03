@@ -67,6 +67,10 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
             itrElem.addAttribute("continueParent", Boolean.toString(true), nullNS);
         }
 
+        if (itrMed.getId() != null) {
+            itrElem.addAttribute("id", itrMed.getId(), nullNS);
+        }
+
         if (itrMed.isPreservePayload()) {
             itrElem.addAttribute("preservePayload", Boolean.toString(true), nullNS);
         }

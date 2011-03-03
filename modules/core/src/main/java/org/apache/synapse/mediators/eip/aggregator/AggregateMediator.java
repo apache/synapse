@@ -81,6 +81,8 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
     private Map<String, Aggregate> activeAggregates =
         Collections.synchronizedMap(new HashMap<String, Aggregate>());
 
+    private String id = null;
+
     /** Lock object to provide the synchronized access to the activeAggregates on checking */
     private final Object lock = new Object();
 
@@ -131,7 +133,8 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
 
         try {
             Aggregate aggregate = null;
-
+            String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + "." + id :
+                    EIPConstants.AGGREGATE_CORRELATION);
             // if a correlateExpression is provided and there is a coresponding
             // element in the current message prepare to correlate the messages on that
             if (correlateExpression != null
@@ -176,13 +179,13 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                     }
                 }
 
-            } else if (synCtx.getProperty(EIPConstants.AGGREGATE_CORRELATION) != null) {
+            } else if (synCtx.getProperty(correlationIdName) != null) {
                 // if the correlattion cannot be found using the correlateExpression then
                 // try the default which is through the AGGREGATE_CORRELATION message property
                 // which is the unique original message id of a split or iterate operation and
                 // which thus can be used to uniquely group messages into aggregates
 
-                Object o = synCtx.getProperty(EIPConstants.AGGREGATE_CORRELATION);
+                Object o = synCtx.getProperty(correlationIdName);
                 String correlation;
 
                 if (o != null && o instanceof String) {
@@ -435,5 +438,13 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
 
     public Map getActiveAggregates() {
         return activeAggregates;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

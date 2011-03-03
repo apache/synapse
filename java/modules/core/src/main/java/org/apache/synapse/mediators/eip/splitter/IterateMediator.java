@@ -71,6 +71,8 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
     /** The target for the newly splitted messages */
     private Target target = null;
 
+    private String id = null;
+
     /**
      * Splits the message by iterating over the results of the given XPath expression
      *
@@ -171,10 +173,20 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         // clone the message for the mediation in iteration
         MessageContext newCtx = MessageHelper.cloneMessageContext(synCtx);
 
-        // set the messageSequence property for possibal aggreagtions
-        newCtx.setProperty(
-            EIPConstants.MESSAGE_SEQUENCE,
-            msgNumber + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + msgCount);
+        if (id != null) {
+            // set the parent correlation details to the cloned MC -
+            //                              for the use of aggregation like tasks
+            newCtx.setProperty(EIPConstants.AGGREGATE_CORRELATION + "." + id,
+                    synCtx.getMessageID());
+            // set the messageSequence property for possibal aggreagtions
+            newCtx.setProperty(
+                    EIPConstants.MESSAGE_SEQUENCE + "." + id,
+                    msgNumber + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + msgCount);
+        } else {
+            newCtx.setProperty(
+                    EIPConstants.MESSAGE_SEQUENCE,
+                    msgNumber + EIPConstants.MESSAGE_SEQUENCE_DELEMITER + msgCount);
+        }
 
         // get a clone of the envelope to be attached
         SOAPEnvelope newEnvelope = MessageHelper.cloneSOAPEnvelope(envelope);
@@ -251,6 +263,14 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
 
     public void setTarget(Target target) {
         this.target = target;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void init(SynapseEnvironment se) {

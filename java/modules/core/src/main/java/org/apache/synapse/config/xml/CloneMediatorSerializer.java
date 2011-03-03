@@ -62,6 +62,10 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
             cloneElem.addAttribute("continueParent", Boolean.toString(true), nullNS);
         }
 
+        if (clone.getId() != null) {
+            cloneElem.addAttribute("id", clone.getId(), nullNS);
+        }
+
         for (Iterator itr = clone.getTargets().iterator(); itr.hasNext();) {
             Object o = itr.next();
             if (o instanceof Target) {

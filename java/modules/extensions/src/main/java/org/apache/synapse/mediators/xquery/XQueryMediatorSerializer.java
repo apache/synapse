@@ -21,11 +21,14 @@ package org.apache.synapse.mediators.xquery;
 import net.sf.saxon.javax.xml.xquery.XQItemType;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
-import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.config.xml.ValueSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.util.List;
@@ -50,10 +53,11 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
         XQueryMediator queryMediator = (XQueryMediator) m;
 
         OMElement xquery = fac.createOMElement("xquery", synNS);
-        String key = queryMediator.getQueryKey();
+        Value key = queryMediator.getQueryKey();
         if (key != null) {
-            xquery.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, key));
+            // Serialize Key using KeySerializer
+            ValueSerializer keySerializer =  new ValueSerializer();
+            keySerializer.serializeValue(key, XMLConfigConstants.KEY, xquery);
 
         }
 

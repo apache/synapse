@@ -18,14 +18,16 @@
  */
 package org.apache.synapse.mediators.bsf;
 
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamConstants;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.ValueSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.mediators.Value;
+
+import javax.xml.stream.XMLStreamConstants;
+import java.util.Map;
 
 /**
  * Serializer for a script mediator
@@ -44,12 +46,16 @@ public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
         OMElement script = fac.createOMElement("script", synNS);
 
         String language = scriptMediator.getLanguage();
-        String key = scriptMediator.getKey();
+        Value key = scriptMediator.getKey();
         String function = scriptMediator.getFunction();
+        ValueSerializer keySerializer = new ValueSerializer();
 
         if (key != null) {
             script.addAttribute(fac.createOMAttribute("language", nullNS, language));
-            script.addAttribute(fac.createOMAttribute("key", nullNS, key));
+
+            // Serialize Value using ValueSerializer
+            keySerializer.serializeValue(key, XMLConfigConstants.KEY, script);
+
             if (!function.equals("mediate")) {
                 script.addAttribute(fac.createOMAttribute("function", nullNS, function));
             }
@@ -61,11 +67,14 @@ public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
             script.addChild(textData);
         }
 
-        Map<String, Object> includeMap = scriptMediator.getIncludeMap();
-        for (String includeKey : includeMap.keySet()) {
-            if (includeKey != null && includeKey.length() != 0) {
+        Map<Value, Object> includeMap = scriptMediator.getIncludeMap();
+        for (Value includeKey : includeMap.keySet()) {
+            if (includeKey != null) {
                 OMElement includeKeyElement = fac.createOMElement("include", synNS);
-                includeKeyElement.addAttribute(fac.createOMAttribute("key", nullNS, includeKey));
+
+                // Serialize Value using ValueSerializer
+                keySerializer.serializeValue(includeKey, XMLConfigConstants.KEY, includeKeyElement);
+
                 script.addChild(includeKeyElement);
             }
         }

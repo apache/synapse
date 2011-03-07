@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.Entry;
@@ -136,6 +137,9 @@ public class MultiXMLConfigurationBuilder {
             try {
                 return XMLConfigurationBuilder.getConfiguration(
                         new FileInputStream(synapseXML), properties);
+            } catch (SynapseException e) {
+                log.error("Error while loading the configuration from file: " + synapseXML.getName());
+                throw e;
             } catch (FileNotFoundException ignored) {}
         }
         return null;
@@ -178,6 +182,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), entry.getKey());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the local-entry from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -202,6 +209,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), proxy.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the proxy service from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -226,6 +236,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), startup.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the task from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -251,6 +264,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), sequence.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the sequence from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -275,6 +291,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), endpoint.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the endpoint from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
             }
         }
@@ -299,6 +318,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), eventSource.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the event-source from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
            }
         }
@@ -323,6 +345,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), executor.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the executor from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored) {}
            }
         }
@@ -349,6 +374,9 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
                                 messageStore.getName());
                     }
+                } catch (SynapseException e) {
+                    log.error("Error while loading the message-store from file: " + file.getName());
+                    throw e;
                 } catch (FileNotFoundException ignored ) { }
             }
         }

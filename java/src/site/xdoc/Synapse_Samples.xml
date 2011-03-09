@@ -188,7 +188,10 @@
 <li>
 <a href="#Sample154">Sample 154: Load Balancing with Proxy Service </a></li>
 <li>
-<a href="#Sample155">Sample 155: Dual channel invocation on both client side and server side of Synapse with Proxy Services</a></li></ul></li>
+<a href="#Sample155">Sample 155: Dual channel invocation on both client side and server side of Synapse with Proxy Services</a></li>
+<li>
+<a href="#Sample156">Sample 156: Service Integration with specifying the receiving sequence</a></li>
+</ul></li>
 <li>
 <a href="#ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a>
 <ul>
@@ -2087,6 +2090,7 @@ Connection: Keep-Alive
 <p>Run the client with </p>
 <pre xml:space="preserve">  ant loadbalancefailover -Dmode=session -Dtrpurl=http://localhost:8280/services/LBProxy </pre>
 <p>Functionality is similar to the sample #54. </p></div>
+
 <h2>
 <a name="Sample155" id="Sample155">Sample 155: Dual channel invocation on both client side and serverside of Synapse with Proxy Services</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
@@ -2116,6 +2120,105 @@ Connection: Keep-Alive
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy -Dmode=dualquote</pre>
 <p>In the above example, the request received is forwarded to the sample service hosted on Axis2 and the endpoint specifies to enable addressing and do the invocation over a dual channel. If you observe this message flow by using a TCPmon, you could see that on the channel you send the request to Synapse the response has been written as an HTTP 202 Accepted, where as the real response from Synapse will come over a different channel which cannot be obsesrved unless you use tcpdump to dump all the TCP level messages. </p>
 <p>At the same time you can observe the behaviour of the invocation between Synapse and the actual Axis2 service, where you can see a 202 Accepted message being delivered to Synapse as the response to the request. The actual response will be delivered to Synapse over a different channel. </p>
+
+<h2>
+<a name="Sample156" id="Sample156">Sample 156: Service Integration with specifying the receiving sequence</a></h2>
+<pre xml:space="preserve">
+&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;localEntry key=&quot;sec_policy&quot; src=&quot;file:repository/conf/sample/resources/policy/policy_3.xml&quot;/&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;enrich&gt;
+                    &lt;source type=&quot;body&quot;/&gt;
+                    &lt;target type=&quot;property&quot; property=&quot;REQUEST&quot;/&gt;
+                &lt;/enrich&gt;
+
+                &lt;send receive=&quot;SimpleServiceSeq&quot;&gt;
+                    &lt;endpoint name=&quot;secure&quot;&gt;
+                        &lt;address uri=&quot;http://localhost:9000/services/SecureStockQuoteService&quot;&gt;
+                            &lt;enableSec policy=&quot;sec_policy&quot;/&gt;
+                        &lt;/address&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;drop/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+
+
+    &lt;sequence name=&quot;SimpleServiceSeq&quot;&gt;
+        &lt;property name=&quot;SECURE_SER_AMT&quot; expression=&quot;//ns:getQuoteResponse/ns:return/ax21:last&quot;
+                  xmlns:ns=&quot;http://services.samples&quot; xmlns:ax21=&quot;http://services.samples/xsd&quot;/&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property name=&quot;SecureStockQuoteService-Amount&quot; expression=&quot;get-property(&#39;SECURE_SER_AMT&#39;)&quot;/&gt;
+        &lt;/log&gt;
+        &lt;enrich&gt;
+            &lt;source type=&quot;body&quot;/&gt;
+            &lt;target type=&quot;property&quot; property=&quot;SecureService_Res&quot;/&gt;
+        &lt;/enrich&gt;
+        &lt;enrich&gt;
+            &lt;source type=&quot;property&quot; property=&quot;REQUEST&quot;/&gt;
+            &lt;target type=&quot;body&quot;/&gt;
+        &lt;/enrich&gt;
+        &lt;send receive=&quot;ClientOutSeq&quot;&gt;
+            &lt;endpoint name=&quot;SimpleStockQuoteService&quot;&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name=&quot;ClientOutSeq&quot;&gt;
+        &lt;property name=&quot;SIMPLE_SER_AMT&quot; expression=&quot;//ns:getQuoteResponse/ns:return/ax21:last&quot;
+                  xmlns:ns=&quot;http://services.samples&quot; xmlns:ax21=&quot;http://services.samples/xsd&quot;/&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property name=&quot;SimpleStockQuoteService-Amount&quot; expression=&quot;get-property(&#39;SIMPLE_SER_AMT&#39;)&quot;/&gt;
+        &lt;/log&gt;
+        &lt;enrich&gt;
+            &lt;source type=&quot;body&quot;/&gt;
+            &lt;target type=&quot;property&quot; property=&quot;SimpleService_Res&quot;/&gt;
+        &lt;/enrich&gt;
+
+        &lt;filter xpath=&quot;fn:number(get-property(&#39;SIMPLE_SER_AMT&#39;)) &gt; fn:number(get-property(&#39;SECURE_SER_AMT&#39;))&quot;&gt;
+            &lt;then&gt;
+                &lt;log&gt;
+                    &lt;property name=&quot;StockQuote&quot; value=&quot;SecureStockQuoteService&quot;/&gt;
+                &lt;/log&gt;
+                &lt;enrich&gt;
+                    &lt;source type=&quot;property&quot; property=&quot;SecureService_Res&quot;/&gt;
+                    &lt;target type=&quot;body&quot;/&gt;
+                &lt;/enrich&gt;
+            &lt;/then&gt;
+            &lt;else&gt;
+                &lt;log&gt;
+                    &lt;property name=&quot;StockQuote&quot; value=&quot;SimpleStockQuoteService&quot;/&gt;
+                &lt;/log&gt;
+            &lt;/else&gt;
+        &lt;/filter&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+
+<p>
+<strong>Objective: Using synapse to integrate services.</strong> </p>
+<p>
+<p>
+<strong>Prerequisites:</strong>
+<br/> We will be using two services in this sample; i.e. SimpleStockQuoteService and SecureStockQuoteService. Therefore the prerequisites of sample 100 is also applied here.</p>
+<p>Start the Synapse configuration numbered 156: i.e. synapse -sample 156
+<br/> Start the Axis2 server and deploy the SimpleStockQuoteService and the SecureStockQuoteService, if not already done </p>
+
+<p>This sample contains a proxy service which provides the seamless integration of SimpleStockQuoteService and SecureStockQuoteService. Once a client send a request to this
+proxy service, it sends the same request to both these services and resolve the service with cheapest stock quote price.</p>
+<p>Execute the stock quote client by requesting for a cheapest stock quote from the proxy service as follows: </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy</pre>
+<p>Above sample uses the concept of specifying the receiving sequence in the send mediator. In this case once the message is sent from the in sequence then the response won't come to
+out sequence as the receiving sequence is specified in the send mediator.</p>
+
+
+
 <h1>
 <a name="ProxyServiceQoS" id="ProxyServiceQoS">QoS addition and deduction for service mediation (proxy) samples</a> </h1>
 <h2>

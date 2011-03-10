@@ -76,7 +76,8 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.
         EndpointDefinition epDefinition = wsdlEndpoint.getDefinition();
-        serializeCommonEndpointProperties(epDefinition, wsdlElement);
+        EndpointDefinitionSerializer serializer = new EndpointDefinitionSerializer();
+        serializer.serializeEndpointDefinition(epDefinition, wsdlElement);
         serializeSpecificEndpointProperties(epDefinition, wsdlElement);
         endpointElement.addChild(wsdlElement);
 

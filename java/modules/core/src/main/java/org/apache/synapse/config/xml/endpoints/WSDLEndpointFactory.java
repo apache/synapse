@@ -95,7 +95,13 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
         if (wsdlElement != null) {
 
-            EndpointDefinition endpoint = null;
+            EndpointDefinitionFactory fac = new EndpointDefinitionFactory();
+            EndpointDefinition endpoint = fac.createDefinition(wsdlElement);
+
+            // for now, QOS information has to be provided explicitly.
+            extractSpecificEndpointProperties(endpoint, wsdlElement);
+            wsdlEndpoint.setDefinition(endpoint);
+            processAuditStatus(endpoint, wsdlEndpoint.getName(), wsdlElement);
 
             // get the service name and port name. at this point we should not worry about
             // the presence of those parameters. they are handled by corresponding WSDL builders.
@@ -125,8 +131,8 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                                 String nsUri = omElement.getNamespace().getNamespaceURI();
                                 if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
 
-                                    endpoint = new WSDL11EndpointBuilder().
-                                            createEndpointDefinitionFromWSDL(
+                                    new WSDL11EndpointBuilder().
+                                            populateEndpointDefinitionFromWSDL(endpoint,
                                                     wsdlURI.trim(), omElement, serviceName, portName);
 
                                 } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
@@ -141,8 +147,6 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                         handleException("Couldn't create endpoint from the given WSDL URI : "
                                 + e.getMessage(), e);
                     }
-                } else {
-                    endpoint = new EndpointDefinition();
                 }
             }
 
@@ -161,7 +165,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                     if (!baseUri.endsWith(File.separator)) {
                         baseUri = baseUri + File.separator;
                     }
-                    endpoint = new WSDL11EndpointBuilder().createEndpointDefinitionFromWSDL(
+                    new WSDL11EndpointBuilder().populateEndpointDefinitionFromWSDL(endpoint,
                             baseUri, definitionElement, serviceName, portName);
                 } else {
                     endpoint = new EndpointDefinition();
@@ -173,16 +177,6 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                     (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "description"));
             if (endpoint == null && descriptionElement != null) {
                 handleException("WSDL 2.0 Endpoints are currently not supported.");
-            }
-
-            if (endpoint != null) {
-                // for now, QOS information has to be provided explicitly.
-                extractCommonEndpointProperties(endpoint, wsdlElement);
-                extractSpecificEndpointProperties(endpoint, wsdlElement);
-                wsdlEndpoint.setDefinition(endpoint);
-                processAuditStatus(endpoint, wsdlEndpoint.getName(), wsdlElement);
-            } else {
-                handleException("WSDL is not specified for WSDL endpoint.");
             }
         }
 

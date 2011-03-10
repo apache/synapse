@@ -106,13 +106,13 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
 
         OMAttribute address = elem.getAttribute(new QName("uri"));
-        EndpointDefinition endpointDefinition = new EndpointDefinition();
+        EndpointDefinitionFactory fac = new EndpointDefinitionFactory();
+        EndpointDefinition endpointDefinition = fac.createDefinition(elem);
 
         if (address != null) {
             endpointDefinition.setAddress(address.getAttributeValue().trim());
         }
 
-        extractCommonEndpointProperties(endpointDefinition, elem);
         extractSpecificEndpointProperties(endpointDefinition, elem);
         return endpointDefinition;
     }

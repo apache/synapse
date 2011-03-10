@@ -28,6 +28,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.TemplateSerializer;
+import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
@@ -129,7 +131,10 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         serializeSequences(definitions, sequences);
 
         // process templates
-        serializeTemplates(definitions, templates);
+        serializeMediatorTemplates(definitions, templates);
+
+        // serialize the endpoint templates
+        serializeEndpointTemplates(definitions, synCfg.getEndpointTemplates());
 
         // handle startups
         serializeStartups(definitions, synCfg.getStartups());
@@ -175,8 +180,8 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         }
     }
 
-    private static void serializeTemplates(OMElement definitions,
-                                           Map<String, TemplateMediator> eipSequences) {
+    private static void serializeMediatorTemplates(OMElement definitions,
+                                                   Map<String, TemplateMediator> eipSequences) {
         for (TemplateMediator template : eipSequences.values()) {
             MediatorSerializerFinder.getInstance().getSerializer(template)
                     .serializeMediator(definitions, template);
@@ -204,6 +209,14 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
                                                Map<String, MessageProcessor> processorMap ){
         for (MessageProcessor mp : processorMap.values()) {
             MessageProcessorSerializer.serializeMessageProcessor(definitions,mp);
+        }
+    }
+
+    private static void serializeEndpointTemplates(OMElement definitions,
+                                                   Map<String, Template> templateMap) {
+        for (Template template : templateMap.values()) {
+            TemplateSerializer serializer = new TemplateSerializer();
+            serializer.serializeEndpointTemplate(template, definitions);
         }
     }
 

@@ -287,7 +287,7 @@ public class MultiXMLConfigurationBuilder {
             for (File file : sequences) {
                 try {
                     OMElement document = parseFile(file);
-                    Mediator seq = SynapseXMLConfigurationFactory.defineTemplate(
+                    Mediator seq = SynapseXMLConfigurationFactory.defineMediatorTemplate(
                             synapseConfig, document, properties);
                     if (seq != null && seq instanceof TemplateMediator) {
                         TemplateMediator templateSeq = (TemplateMediator) seq;

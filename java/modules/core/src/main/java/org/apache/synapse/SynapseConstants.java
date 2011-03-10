@@ -413,7 +413,5 @@ public final class SynapseConstants {
     public static final String FAIL_SAFE_MODE_SEQUENCES = "sequences";
     public static final String FAIL_SAFE_MODE_EVENT_SOURCE = "eventsources";
     public static final String FAIL_SAFE_MODE_EXECUTORS = "executors";
-
-    
-
+    public static final String FAIL_SAFE_MODE_TEMPLATES = "executors";
 }

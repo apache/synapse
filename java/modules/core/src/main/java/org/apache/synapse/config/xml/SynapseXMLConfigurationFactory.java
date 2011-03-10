@@ -26,6 +26,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
@@ -95,7 +97,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineMessageStore(config, elt, properties);
                 } else if (XMLConfigConstants.MESSAGE_PROCESSOR_ELT.equals(elt.getQName())){
                     defineMessageProcessor(config,elt,properties);
-                }else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
+                } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt, properties);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
                     config.setDescription(elt.getText());
@@ -210,16 +212,21 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
             return mediator;
         } else {
-            handleException("Invalid sequence definition without a name");
+            if (failSafeSequenceEnabled) {
+                log.warn("Invalid sequence definition without a name");
+                log.warn("Continue in Sequence fail-safe mode.");
+            } else {
+                handleException("Invalid sequence definition without a name");
+            }
         }
         return null;
     }
 
-    public static Mediator defineTemplate(SynapseConfiguration config, OMElement ele,
-                                          Properties properties) {
+    public static Mediator defineMediatorTemplate(SynapseConfiguration config, OMElement ele,
+                                                  Properties properties) {
 
         boolean failSafeSequenceEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_SEQUENCES);
+                SynapseConstants.FAIL_SAFE_MODE_TEMPLATES);
 
         Mediator mediator = null;
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
@@ -239,7 +246,12 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
             return mediator;
         } else {
-            handleException("Invalid template definition without a name");
+            if (failSafeSequenceEnabled) {
+                log.warn("Invalid template definition without a name");
+                log.warn("Continue in fail-safe mode.");
+            } else {
+                handleException("Invalid template definition without a name");
+            }
         }
         return null;
     }
@@ -266,7 +278,12 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
             return endpoint;
         } else {
-            handleException("Invalid endpoint definition without a name");
+            if (failSafeEpEnabled) {
+                log.warn("Invalid endpoint definition without a name");
+                log.warn("Continue in Endpoint fail-safe mode.");
+            } else {
+                handleException("Invalid endpoint definition without a name");
+            }
         }
         return null;
     }
@@ -327,6 +344,44 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         MessageProcessor processor  = MessageProcessorFactory.createMessageProcessor(elem);
         config.addMessageProcessor(processor.getName() , processor);
         return processor;
+    }
+
+    public static Template defineEndpointTemplate(SynapseConfiguration config,
+                                                    OMElement elem, Properties properties) {
+        boolean failSafeExecutorsEnabled = isFailSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_TEMPLATES);
+        TemplateFactory templateFactory = new TemplateFactory();
+        String name = elem.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        try {
+            Template template = templateFactory.createEndpointTemplate(elem, properties);
+            if (template != null) {
+                config.addEndpointTemplate(template.getName(), template);
+            }
+            return template;
+        } catch (Exception e) {
+            if (failSafeExecutorsEnabled) {
+                log.warn("Endpoint Template: " + name + "configuration cannot be built.", e);
+                log.warn("Continue in Endpoint Template fail-safe mode.");
+            } else {
+                handleException("Endpoint Template configuration cannot be built.");
+            }
+        }
+        return null;
+    }
+
+    public static void defineTemplate(SynapseConfiguration config,
+                                      OMElement elem, Properties properties) {
+        OMElement element = elem.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
+        if (element != null) {
+            defineMediatorTemplate(config, elem, properties);
+        }
+
+        element = elem.getFirstChildWithName(
+                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
+        if (element != null) {
+            defineEndpointTemplate(config, elem, properties);
+        }
     }
 
     private static void handleException(String msg) {

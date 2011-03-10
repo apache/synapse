@@ -24,6 +24,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
@@ -171,7 +172,13 @@ public class MultiXMLConfigurationSerializer {
         }
 
         for (Object o : localEntries) {
-            if (o instanceof SequenceMediator) {
+            if (o instanceof TemplateMediator) {
+                TemplateMediator template = (TemplateMediator) o;
+                if (template.getFileName() == null) {
+                    MediatorSerializerFinder.getInstance().
+                            getSerializer(template).serializeMediator(definitions, template);
+                }
+            } else if (o instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) o;
                 if (seq.getFileName() == null) {
                     MediatorSerializerFinder.getInstance().
@@ -308,6 +315,26 @@ public class MultiXMLConfigurationSerializer {
         return seqElem;
     }
 
+    public OMElement serializeTemplate(TemplateMediator template, SynapseConfiguration synapseConfig,
+                                       OMElement parent) throws Exception {
+
+        File seqDir = createDirectory(currentDirectory, MultiXMLConfigurationBuilder.TEMPLATES_DIR);
+
+        OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(template).
+                serializeMediator(null, template);
+        String fileName = template.getFileName();
+        if (fileName != null) {
+            handleDeployment(seqDir, fileName, template.getName(),
+                    synapseConfig.getArtifactDeploymentStore());
+            File seqFile = new File(seqDir, fileName);
+            writeToFile(seqElem, seqFile);
+        } else if (parent != null) {
+            parent.addChild(seqElem);
+        }
+
+        return seqElem;
+    }
+
     public OMElement serializeEndpoint(Endpoint epr, SynapseConfiguration synapseConfig,
                                        OMElement parent) throws Exception {
 
@@ -329,7 +356,9 @@ public class MultiXMLConfigurationSerializer {
 
     public OMElement serializeLocalEntry(Object o, SynapseConfiguration synapseConfig,
                                          OMElement parent) throws Exception {
-        if (o instanceof SequenceMediator) {
+        if (o instanceof TemplateMediator) {
+            return serializeTemplate((TemplateMediator) o, synapseConfig, parent);
+        } else if (o instanceof SequenceMediator) {
             return serializeSequence((SequenceMediator) o, synapseConfig, parent);
         } else if (o instanceof Endpoint) {
             return serializeEndpoint((Endpoint) o, synapseConfig, parent);

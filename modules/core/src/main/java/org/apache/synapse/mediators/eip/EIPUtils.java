@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
@@ -48,8 +49,21 @@ public class EIPUtils {
      */
     public static List getMatchingElements(SOAPEnvelope envelope, SynapseXPath expression)
         throws JaxenException {
+        return getMatchingElements(envelope,null,expression);
+    }
 
-        Object o = expression.evaluate(envelope);
+    /**
+     * Return the set of elements specified by the XPath over the given envelope
+     *
+     * @param envelope SOAPEnvelope from which the elements will be extracted
+     * @param expression SynapseXPath expression describing the elements to be extracted
+     * @return List OMElements in the envelope matching the expression
+     * @throws JaxenException if the XPath expression evaluation fails
+     */
+    public static List getMatchingElements(SOAPEnvelope envelope,MessageContext synCtxt, SynapseXPath expression)
+        throws JaxenException {
+
+        Object o = expression.evaluate(envelope, synCtxt);
         if (o instanceof OMNode) {
             List list = new ArrayList();
             list.add(o);
@@ -69,11 +83,12 @@ public class EIPUtils {
      * @return List detached OMElements in the envelope matching the expression
      * @throws JaxenException if the XPath expression evaluation fails
      */
-    public static List<OMNode> getDetachedMatchingElements(SOAPEnvelope envelope, SynapseXPath expression)
+    public static List<OMNode> getDetachedMatchingElements(SOAPEnvelope envelope, MessageContext synCtxt,
+                                                           SynapseXPath expression)
         throws JaxenException {
 
         List<OMNode> elementList = new ArrayList<OMNode>();
-        Object o = expression.evaluate(envelope);
+        Object o = expression.evaluate(envelope, synCtxt);
         if (o instanceof OMNode) {
             elementList.add(((OMNode) o).detach());
         } else if (o instanceof List) {
@@ -95,11 +110,11 @@ public class EIPUtils {
      * @param expression SynapseXPath describing the enriching element
      * @throws JaxenException on failing of processing the xpath
      */
-    public static void enrichEnvelope(SOAPEnvelope envelope, SOAPEnvelope enricher,
+    public static void enrichEnvelope(SOAPEnvelope envelope, SOAPEnvelope enricher,  MessageContext synCtxt,
         SynapseXPath expression) throws JaxenException {
 
         OMElement enrichingElement;
-        List elementList = getMatchingElements(envelope, expression);
+        List elementList = getMatchingElements(envelope, synCtxt, expression);
 
         if (elementList != null && !elementList.isEmpty()) {
 
@@ -114,7 +129,7 @@ public class EIPUtils {
                 enrichingElement = envelope.getBody();
             }
 
-            List list = getMatchingElements(enricher, expression);
+            List list = getMatchingElements(enricher, synCtxt, expression);
             if (list != null) {
                 Iterator itr = list.iterator();
                 while (itr.hasNext()) {
@@ -125,5 +140,19 @@ public class EIPUtils {
                 }
             }
         }
-    }    
+    }
+
+    /**
+     * Util functions related to EIP Templates
+     */
+    public static String getTemplatePropertyMapping(String templateName, String parameter) {
+        return templateName + ":" + parameter;
+    }
+
+    public static void createSynapseEIPTemplateProperty(MessageContext synCtxt, String templateName,
+                                                        String  paramName, Object value) {
+        String targetSynapsePropName = getTemplatePropertyMapping(templateName,paramName);
+        synCtxt.setProperty(targetSynapsePropName,value);
+    }
+
 }

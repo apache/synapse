@@ -24,6 +24,7 @@ import org.apache.synapse.mediators.template.TemplateMediator;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *  Serializer class for Template to serialize into a  configuration as follows
@@ -52,8 +53,8 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
                         "onError", nullNS, mediator.getErrorHandler()));
             }
             serializeParams(templateElem,mediator);
+            serializeBody(templateElem, mediator.getList());
             saveTracingState(templateElem, mediator);
-            serializeChildren(templateElem, mediator.getList());
         }
 
         return templateElem;
@@ -61,15 +62,19 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
 
     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
         Collection<String> params = mediator.getParameters();
-        Iterator<String> paramIterator = params.iterator();
-        while (paramIterator.hasNext()){
-            String paramName = paramIterator.next();
-            if(!"".equals(paramName)){
+        for (String param : params) {
+            if (!"".equals(param)) {
                 OMElement paramEl = fac.createOMElement("parameter", synNS);
-                paramEl.addAttribute(fac.createOMAttribute("name",nullNS,paramName));
+                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, param));
                 templateElem.addChild(paramEl);
             }
         }
+    }
+
+    private void serializeBody(OMElement templateElem, List<Mediator> childMediatorList){
+        OMElement seqEl = fac.createOMElement("sequence", synNS);
+        templateElem.addChild(seqEl);
+        serializeChildren(seqEl, childMediatorList);
     }
 
     public String getMediatorClassName() {

@@ -21,6 +21,7 @@ package org.apache.synapse.util.xpath;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.description.AxisBindingOperation;
@@ -30,12 +31,15 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.synapse.mediators.template.TemplateContext;
 import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
+import org.jaxen.JaxenException;
 import org.jaxen.UnresolvableException;
 import org.jaxen.VariableContext;
 
 import java.util.Map;
 import java.io.UnsupportedEncodingException;
+import java.util.Stack;
 
 /**
  * Jaxen variable context for the XPath variables implicitly exposed by Synapse.
@@ -85,6 +89,19 @@ public class SynapseXPathVariableContext implements VariableContext {
     }
 
     /**
+     * <p>Initializes the <code>SynapseVariableContext</code> with the specified envelope</p>
+     *
+     * @param parent the parent variable context
+     * @param synCtx Synapse Message context to be initialized for the variable resolution
+     * @param env envelope to be initialized for the variable resolution
+     */
+    public SynapseXPathVariableContext(VariableContext parent, MessageContext synCtx, SOAPEnvelope env) {
+        this.parent = parent;
+        this.synCtx = synCtx;
+        this.env = env;
+    }
+
+    /**
      * Gets the variable values resolved from the context. This includes the
      * <dl>
      *   <dt><tt>body</tt></dt>
@@ -103,7 +120,7 @@ public class SynapseXPathVariableContext implements VariableContext {
      * </dl>
      * If the variable is unknown, this method attempts to resolve it using
      * the parent variable context.
-     * 
+     *
      * @param namespaceURI namespaces for the variable resolution
      * @param prefix string prefix for the variable resolution
      * @param localName string local name for the variable resolution
@@ -114,9 +131,9 @@ public class SynapseXPathVariableContext implements VariableContext {
         throws UnresolvableException {
 
         if (namespaceURI == null) {
-            
+
             if (env != null) {
-                
+
                 if (SynapseXPathConstants.SOAP_BODY_VARIABLE.equals(localName)) {
                     return env.getBody();
                 } else if (SynapseXPathConstants.SOAP_HEADER_VARIABLE.equals(localName)) {
@@ -135,6 +152,22 @@ public class SynapseXPathVariableContext implements VariableContext {
                     return ((Axis2MessageContext)
                         synCtx).getAxis2MessageContext().getProperty(localName);
 
+                } else if (SynapseXPathConstants.FUNC_CONTEXT_VARIABLE_PREFIX.equals(prefix)) {
+                    Stack<TemplateContext> functionStack = (Stack) synCtx.getProperty(SynapseConstants.SYNAPSE__FUNCTION__STACK);
+                    TemplateContext topCtxt = functionStack.peek();
+                    if (topCtxt != null) {
+                        Object result = topCtxt.getParameterValue(localName);
+                        if (result != null && result instanceof SynapseXPath && env != null) {
+                            SynapseXPath expression = (SynapseXPath) topCtxt.getParameterValue(localName);
+                            try {
+                                return expression.evaluate(env);
+                            } catch (JaxenException e) {
+                                return null;
+                            }
+                        } else {
+                            return result;
+                        }
+                    }
                 } else if (SynapseXPathConstants.TRANSPORT_VARIABLE_PREFIX.equals(prefix)) {
 
                     org.apache.axis2.context.MessageContext axis2MessageContext =
@@ -167,7 +200,7 @@ public class SynapseXPathVariableContext implements VariableContext {
                         int i = completeURL.indexOf("?");
                         if (i > -1) {
                             String queryString = completeURL.substring(i + 1);
-                            
+
                             if (queryString != null && !queryString.equals("")) {
                                 String params[] = queryString.split(queryParameterSeparator);
 

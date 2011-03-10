@@ -65,6 +65,8 @@ public class MediatorSerializerFinder {
         ConditionalRouterMediatorSerializer.class,
         SamplingThrottleMediatorSerializer.class,
         EnrichMediatorSerializer.class,
+        TemplateMediatorSerializer.class,
+        InvokeMediatorSerializer.class,
         MessageStoreMediatorSerializer.class
     };
 

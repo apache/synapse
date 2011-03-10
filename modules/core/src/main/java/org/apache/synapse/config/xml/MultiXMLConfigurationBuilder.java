@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
@@ -72,6 +73,7 @@ public class MultiXMLConfigurationBuilder {
 
     public static final String PROXY_SERVICES_DIR  = "proxy-services";
     public static final String SEQUENCES_DIR       = "sequences";
+    public static final String TEMPLATES_DIR       = "templates";
     public static final String ENDPOINTS_DIR       = "endpoints";
     public static final String LOCAL_ENTRY_DIR     = "local-entries";
     public static final String TASKS_DIR           = "tasks";
@@ -120,6 +122,7 @@ public class MultiXMLConfigurationBuilder {
         createLocalEntries(synapseConfig, root, properties);
         createEndpoints(synapseConfig, root, properties);
         createSequences(synapseConfig, root, properties);
+        createTemplates(synapseConfig, root, properties);
         createProxyServices(synapseConfig, root, properties);
         createTasks(synapseConfig, root, properties);
         createEventSources(synapseConfig, root, properties);
@@ -267,6 +270,31 @@ public class MultiXMLConfigurationBuilder {
                 } catch (SynapseException e) {
                     log.error("Error while loading the sequence from file: " + file.getName());
                     throw e;
+                } catch (FileNotFoundException ignored) {}
+            }
+        }
+    }
+
+    private static void createTemplates(SynapseConfiguration synapseConfig, String rootDirPath,
+                                        Properties properties) throws XMLStreamException {
+
+        File sequencesDir = new File(rootDirPath, TEMPLATES_DIR);
+        if (sequencesDir.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading sequences from : " + sequencesDir.getPath());
+            }
+            File[] sequences = sequencesDir.listFiles(filter);
+            for (File file : sequences) {
+                try {
+                    OMElement document = parseFile(file);
+                    Mediator seq = SynapseXMLConfigurationFactory.defineTemplate(
+                            synapseConfig, document, properties);
+                    if (seq != null && seq instanceof TemplateMediator) {
+                        TemplateMediator templateSeq = (TemplateMediator) seq;
+                        templateSeq.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), templateSeq.getName());
+                    }
                 } catch (FileNotFoundException ignored) {}
             }
         }

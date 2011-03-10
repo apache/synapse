@@ -77,6 +77,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     } else {
                         defineSequence(config, elt, properties);
                     }
+                } else if (XMLConfigConstants.TEMPLATE_ELT.equals(elt.getQName())) {
+                    defineTemplate(config, elt, properties);
                 } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
                     defineEndpoint(config, elt, properties);
                 } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
@@ -209,6 +211,35 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             return mediator;
         } else {
             handleException("Invalid sequence definition without a name");
+        }
+        return null;
+    }
+
+    public static Mediator defineTemplate(SynapseConfiguration config, OMElement ele,
+                                          Properties properties) {
+
+        boolean failSafeSequenceEnabled = isFailSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_SEQUENCES);
+
+        Mediator mediator = null;
+        String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        if (name != null) {
+            try {
+                mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
+                if (mediator != null) {
+                    config.addSequence(name, mediator);
+                }
+            } catch (Exception e) {
+                if (failSafeSequenceEnabled) {
+                    log.warn("Template configuration : " + name +" cannot be built.", e);
+                    log.warn("Continue in fail-safe mode.");
+                } else {
+                    handleException("Template configuration : " + name +" cannot be built.");
+                }
+            }
+            return mediator;
+        } else {
+            handleException("Invalid template definition without a name");
         }
         return null;
     }

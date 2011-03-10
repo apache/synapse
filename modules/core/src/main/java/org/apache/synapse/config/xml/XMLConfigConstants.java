@@ -37,6 +37,8 @@ public class XMLConfigConstants {
     //-- PropertyMediator --
     /** The scope name for synapse message context properties */
     public static final String SCOPE_DEFAULT = "default";
+    /** The scope name for synapse function template properties */
+    public static final String SCOPE_FUNC = "func";
     /** The scope name for axis2 message context properties */
     public static final String SCOPE_AXIS2 = "axis2";
     /** The scope name for axis2 message context client options properties */
@@ -63,6 +65,7 @@ public class XMLConfigConstants {
     public static final QName DEFINITIONS_ELT = new QName(SYNAPSE_NAMESPACE, "definitions");
     public static final QName DESCRIPTION_ELT = new QName(SYNAPSE_NAMESPACE, "description");
     public static final QName SEQUENCE_ELT    = new QName(SYNAPSE_NAMESPACE, "sequence");
+    public static final QName TEMPLATE_ELT    = new QName(SYNAPSE_NAMESPACE, "template");
     public static final QName ENDPOINT_ELT    = new QName(SYNAPSE_NAMESPACE, "endpoint");
     public static final QName ENTRY_ELT       = new QName(SYNAPSE_NAMESPACE, "localEntry");
     public static final QName REGISTRY_ELT    = new QName(SYNAPSE_NAMESPACE, "registry");

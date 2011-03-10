@@ -30,6 +30,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.template.TemplateContext;
 import org.apache.synapse.registry.Registry;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -42,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Stack;
 
 /**
  * Implements the XPath extension function synapse:get-property(scope,prop-name)
@@ -104,7 +106,8 @@ public class GetPropertyFunction implements Function {
                     if (!XMLConfigConstants.SCOPE_AXIS2.equals(argOne) &&
                         !XMLConfigConstants.SCOPE_DEFAULT.equals(argOne) &&
                         !XMLConfigConstants.SCOPE_TRANSPORT.equals(argOne) &&
-                            !XMLConfigConstants.SCOPE_REGISTRY.equals(argOne)) {
+                            !XMLConfigConstants.SCOPE_REGISTRY.equals(argOne) &&
+                            !XMLConfigConstants.SCOPE_FUNC.equals(argOne)) {
                         return evaluate(XMLConfigConstants.SCOPE_DEFAULT, args.get(0),
                             args.get(1), context.getNavigator());
                     } else {
@@ -268,6 +271,12 @@ public class GetPropertyFunction implements Function {
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             return axis2MessageContext.getProperty(key);
 
+        } else if (XMLConfigConstants.SCOPE_FUNC.equals(scope)) {
+            Stack<TemplateContext> functionStack = (Stack) synCtx.getProperty(SynapseConstants.SYNAPSE__FUNCTION__STACK);
+            TemplateContext topCtxt = functionStack.peek();
+            if (topCtxt!=null) {
+                return topCtxt.getParameterValue(key);
+            }
         } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
                 && synCtx instanceof Axis2MessageContext) {
 

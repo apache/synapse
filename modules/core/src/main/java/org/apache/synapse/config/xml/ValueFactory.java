@@ -21,9 +21,11 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
@@ -53,10 +55,15 @@ public class ValueFactory {
 
         if (attKey != null) {
             String attributeValue = attKey.getAttributeValue();
-            if (isDynamicKey(attributeValue)) {
+            boolean hasEscape = isEscapedExpression(attributeValue);
+            if (!hasEscape && isDynamicKey(attributeValue)) {
                 /** dynamic key */
                 SynapseXPath synXpath = createSynXpath(elem, attributeValue);
                 key = new Value(synXpath);
+            } else if (hasEscape) {
+                /** escaped expr */
+                key = new Value(getEscapedExpression(attributeValue));
+                key.setNamespaces(elem);
             } else {
                 /** static key */
                 key = new Value(attributeValue);
@@ -90,6 +97,33 @@ public class ValueFactory {
         }
         return dynamicKey;
     }
+
+    /**
+     * we'll focus on the trivial escape ie:- ones that have escape characters at start and end
+     */
+    private boolean isEscapedExpression(String escapeExpr){
+        final char startEscapeChar = '{';
+        final char endEscapeChar = '}';
+        String expr = escapeExpr.trim();
+        if(expr.length() <= 3){
+            return false;
+        }
+        //check if this is a escape expression ie:- {{//m0:getQuote}}
+        char firstChar = expr.charAt(0);
+        char nextTofirstChar = expr.charAt(1);
+        char lastChar = expr.charAt(expr.length() - 1);
+        char prevTolastChar = expr.charAt(expr.length() - 2);
+        //if starting and ending chars have braces ;
+        if (startEscapeChar == firstChar && endEscapeChar == lastChar) {
+            return firstChar == nextTofirstChar && lastChar == prevTolastChar;
+        }
+        return false;
+    }
+
+    private String getEscapedExpression(String originalExpr){
+        return originalExpr.trim().substring(1, originalExpr.length() - 1);
+    }
+
 
     /**
      * Create synapse xpath expression

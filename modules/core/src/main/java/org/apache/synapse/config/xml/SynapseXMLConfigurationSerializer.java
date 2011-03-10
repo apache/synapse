@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
@@ -95,6 +96,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         Map<String, Entry> entries = new HashMap<String, Entry>();
         Map<String, Endpoint> endpoints = new HashMap<String, Endpoint>();
         Map<String, SequenceMediator> sequences = new HashMap<String, SequenceMediator>();
+        Map<String, TemplateMediator> templates = new HashMap<String, TemplateMediator>();
 
         itr = synCfg.getLocalRegistry().keySet().iterator();
         while (itr.hasNext()) {
@@ -103,7 +105,9 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
                 continue;
             }
             Object o = synCfg.getLocalRegistry().get(key);
-            if (o instanceof SequenceMediator) {
+            if (o instanceof TemplateMediator){
+                templates.put(key.toString(), (TemplateMediator) o);
+            } else if (o instanceof SequenceMediator) {
                 sequences.put(key.toString(), (SequenceMediator) o);
             } else if (o instanceof Endpoint) {
                 endpoints.put(key.toString(), (Endpoint) o);
@@ -123,6 +127,9 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
 
         // process sequences
         serializeSequences(definitions, sequences);
+
+        // process templates
+        serializeTemplates(definitions, templates);
 
         // handle startups
         serializeStartups(definitions, synCfg.getStartups());
@@ -164,6 +171,15 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         for (SequenceMediator seq : sequences.values()) {
             MediatorSerializerFinder.getInstance().getSerializer(seq)
                     .serializeMediator(definitions, seq);
+
+        }
+    }
+
+    private static void serializeTemplates(OMElement definitions,
+                                           Map<String, TemplateMediator> eipSequences) {
+        for (TemplateMediator template : eipSequences.values()) {
+            MediatorSerializerFinder.getInstance().getSerializer(template)
+                    .serializeMediator(definitions, template);
 
         }
     }

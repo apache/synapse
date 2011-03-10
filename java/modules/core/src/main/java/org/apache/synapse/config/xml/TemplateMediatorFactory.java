@@ -40,27 +40,29 @@ import java.util.Properties;
 public class TemplateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName TEMPLATE_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "template");
-    private TemplateMediator templateTemplateMediator;
-    private OMElement templateElem;
+    private static final QName TEMPLATE_BODY_Q
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
+
     /**
      * Element  QName Definitions
      */
-    public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
+    public static final QName PARAMETER_Q = new QName(
+            XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
 
 
     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
-        templateTemplateMediator = new TemplateMediator();
-        templateElem = elem;
-        OMAttribute nameAttr = templateElem.getAttribute(ATT_NAME);
-        OMAttribute errorHandlerAttr = templateElem.getAttribute(ATT_ONERROR);
+        TemplateMediator templateTemplateMediator = new TemplateMediator();
+        OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
+        OMAttribute errorHandlerAttr = elem.getAttribute(ATT_ONERROR);
         if (nameAttr != null) {
             templateTemplateMediator.setName(nameAttr.getAttributeValue());
             if (errorHandlerAttr != null) {
                 templateTemplateMediator.setErrorHandler(errorHandlerAttr.getAttributeValue());
             }
-            processAuditStatus(templateTemplateMediator, templateElem);
-            initParameters();
-            addChildren(templateElem, templateTemplateMediator, properties);
+            processAuditStatus(templateTemplateMediator, elem);
+            initParameters(elem, templateTemplateMediator);
+            OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
+            addChildren(templateBodyElem, templateTemplateMediator, properties);
         } else {
             String msg = "A EIP template should be a named mediator .";
             log.error(msg);
@@ -69,7 +71,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
         return templateTemplateMediator;
     }
 
-    private void initParameters() {
+    private void initParameters(OMElement templateElem, TemplateMediator templateMediator) {
         Iterator subElements = templateElem.getChildElements();
         Collection<String> paramNames = new ArrayList<String>();
         while (subElements.hasNext()) {
@@ -82,7 +84,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
                 child.detach();
             }
         }
-        templateTemplateMediator.setParameters(paramNames);
+        templateMediator.setParameters(paramNames);
     }
 
     public QName getTagQName() {

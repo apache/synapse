@@ -38,7 +38,7 @@ import java.util.Properties;
 
 /**
  *
- * 
+ *
  * This class is based on J2SE Service Provider model
  * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
  */
@@ -50,7 +50,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 	private static final Class[] mediatorFactories = {
         SequenceMediatorFactory.class,
         LogMediatorFactory.class,
-        SendMediatorFactory.class,         
+        SendMediatorFactory.class,
         FilterMediatorFactory.class,
         SynapseMediatorFactory.class,
         DropMediatorFactory.class,
@@ -60,7 +60,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
         SwitchMediatorFactory.class,
         InMediatorFactory.class,
         OutMediatorFactory.class,
-        RMSequenceMediatorFactory.class,          
+        RMSequenceMediatorFactory.class,
         ClassMediatorFactory.class,
         ValidateMediatorFactory.class,
         XSLTMediatorFactory.class,
@@ -80,7 +80,9 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
         SamplingThrottleMediatorFactory.class,
         URLRewriteMediatorFactory.class,
         EnrichMediatorFactory.class,
-        MessageStoreMediatorFactory.class
+        MessageStoreMediatorFactory.class,
+        TemplateMediatorFactory.class,
+        InvokeMediatorFactory.class
     };
 
     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
@@ -148,7 +150,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 	 * This method returns a Processor given an OMElement. This will be used
 	 * recursively by the elements which contain processor elements themselves
 	 * (e.g. rules)
-	 * 
+	 *
 	 * @param element XML representation of a mediator
      * @param properties bag of properties to pass in any information to the factory
      * @return Processor
@@ -197,7 +199,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
             throw new SynapseException(msg, e);
 		}
 	}
-    
+
     /**
      * This method exposes all the MediatorFactories and its Extensions
      * @return factoryMap
@@ -208,7 +210,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 
     /**
      * Allow the mediator factory finder to act as an XMLToObjectMapper for Mediators
-     * (i.e. Sequence Mediator) loaded dynamically from a Registry 
+     * (i.e. Sequence Mediator) loaded dynamically from a Registry
      * @param om node from which the object is expected
      * @return Object buit from the om node
      */

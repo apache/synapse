@@ -19,11 +19,18 @@
 
 package org.apache.synapse.mediators;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents a Value
@@ -48,6 +55,7 @@ public class Value {
      */
     private SynapseXPath expression = null;
 
+    private List<OMNamespace> namespaceList = new ArrayList<OMNamespace>();
     /**
      * Create a key instance using a static key
      *
@@ -81,6 +89,18 @@ public class Value {
      * @return SynapseXpath
      */
     public SynapseXPath getExpression() {
+        if(expression == null && keyValue != null && hasExprTypeKey()){
+            try {
+                expression = new SynapseXPath (keyValue.substring(1, keyValue.length()-1));
+                for (OMNamespace aNamespaceList : namespaceList) {
+                    expression.addNamespace(aNamespaceList);
+                }
+            } catch (JaxenException e) {
+                expression = null;
+                handleException("Can not evaluate escaped expression..");
+
+            }
+        }
         return expression;
     }
 
@@ -125,6 +145,23 @@ public class Value {
         throw new SynapseException(msg);
     }
 
+
+    /**
+     * checks whether key returned by #getKeyValue() is a string of an expression type.
+     * @return if true if this is an expression
+     */
+    public boolean hasExprTypeKey() {
+        return keyValue != null && keyValue.startsWith("{") && keyValue.endsWith("}");
+    }
+
+    public void setNamespaces(OMElement elem){
+        Iterator namespaces = elem.getAllDeclaredNamespaces();
+        while (namespaces.hasNext()){
+            OMNamespace ns = (OMNamespace) namespaces.next();
+            namespaceList.add(ns);
+        }
+    }
+
     @Override
     public String toString() {
         return "Value {" +
@@ -133,6 +170,7 @@ public class Value {
                 (expression != null ? ", expression =" + expression : "") +
                 '}';
     }
+
 }
 
 

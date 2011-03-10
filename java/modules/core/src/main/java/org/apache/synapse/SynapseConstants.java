@@ -104,6 +104,7 @@ public final class SynapseConstants {
     /** ServerManager MBean category and id */
     public static final String SERVER_MANAGER_MBEAN = "ServerManager";
     public static final String RECEIVING_SEQUENCE = "RECEIVING_SEQUENCE";
+    public static final String SYNAPSE__FUNCTION__STACK = "_SYNAPSE_FUNCTION_STACK";
 
     /** Parameter names in the axis2.xml that can be used to configure the synapse */
     public static final class Axis2Param {

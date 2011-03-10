@@ -99,7 +99,7 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
 
             // get the iteration elements and iterate through the list,
             // this call will also detach all the iteration elements 
-            List splitElements = EIPUtils.getDetachedMatchingElements(envelope, expression);
+            List splitElements = EIPUtils.getDetachedMatchingElements(envelope, synCtx, expression);
 
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Splitting with XPath : " + expression + " resulted in " +

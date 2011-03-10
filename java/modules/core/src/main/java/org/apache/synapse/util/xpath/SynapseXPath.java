@@ -78,7 +78,7 @@ import java.util.*;
  */
 public class SynapseXPath extends AXIOMXPath {
     private static final long serialVersionUID = 7639226137534334222L;
-    
+
     private static final Log log = LogFactory.getLog(SynapseXPath.class);
 
     /**
@@ -95,7 +95,7 @@ public class SynapseXPath extends AXIOMXPath {
     /**
      * Construct an XPath expression from a given string and initialize its
      * namespace context based on a given element.
-     * 
+     *
      * @param element The element that determines the namespace context of the
      *                XPath expression. See {@link #addNamespaces(OMElement)}
      *                for more details.
@@ -111,8 +111,8 @@ public class SynapseXPath extends AXIOMXPath {
      * Construct an XPath expression from a given attribute.
      * The string representation of the expression is taken from the attribute
      * value, while the attribute's owner element is used to determine the
-     * namespace context of the expression. 
-     * 
+     * namespace context of the expression.
+     *
      * @param attribute the attribute to construct the expression from
      * @throws JaxenException if there is a syntax error while parsing the expression
      *                        or if the namespace context could not be set up
@@ -125,7 +125,7 @@ public class SynapseXPath extends AXIOMXPath {
         if (xPathStr.indexOf('{') == -1) {
             return new SynapseXPath(xPathStr);
         }
-        
+
         int count = 0;
         StringBuffer newXPath = new StringBuffer();
 
@@ -221,6 +221,37 @@ public class SynapseXPath extends AXIOMXPath {
         return null;
     }
 
+    /**
+     * Specialized form of xpath evaluation function.An xpath evaluate() will be performed using two contexts
+     * (ie:-soap-envelope and on Synapse Message Context). This is useful for evaluating xpath on a
+     * nodeset for function contexts (we need both nodeset and synapse ctxts for evaluating function
+     * scope expressions)
+     * @param primaryContext  a context object ie:-  a soap envelope
+     * @param secondaryContext  a context object ie:-synapse message ctxt
+     * @return result
+     */
+    public Object evaluate(Object primaryContext, MessageContext secondaryContext) {
+        Object result = null;
+        //if result is still not found use second ctxt ie:-syn-ctxt with a wrapper to evaluate
+        if (secondaryContext != null) {
+            try {
+                //wrapper Context is used to evaluate 'dynamic' function scope objects
+                result = evaluate(new ContextWrapper((SOAPEnvelope) primaryContext,secondaryContext));
+            } catch (Exception e) {
+                handleException("Evaluation of the XPath expression " + this.toString() +
+                                    " resulted in an error", e);
+            }
+        } else {
+            try {
+                result = evaluate(primaryContext);
+            } catch (JaxenException e) {
+                handleException("Evaluation of the XPath expression " + this.toString() +
+                                " resulted in an error", e);
+            }
+        }
+        return result;
+    }
+
     public void addNamespace(OMNamespace ns) throws JaxenException {
         addNamespace(ns.getPrefix(), ns.getNamespaceURI());
     }
@@ -245,7 +276,7 @@ public class SynapseXPath extends AXIOMXPath {
      * Note that the behavior described here also applies to all evaluation
      * methods such as {@link #evaluate(Object)} or {@link #selectSingleNode(Object)},
      * given that these methods all use {@link #getContext(Object)}.
-     * 
+     *
      * @see SynapseXPathFunctionContext#getFunction(String, String, String)
      * @see SynapseXPathVariableContext#getVariableValue(String, String, String)
      */
@@ -273,6 +304,18 @@ public class SynapseXPath extends AXIOMXPath {
             Context context = new Context(contextSupport);
             context.setNodeSet(new SingletonList(env));
             return context;
+        } else if (obj instanceof ContextWrapper) {
+            ContextWrapper wrapper = (ContextWrapper) obj;
+            ContextSupport baseContextSupport = getContextSupport();
+            ContextSupport contextSupport =
+                new ContextSupport(baseContextSupport.getNamespaceContext(),
+                                   baseContextSupport.getFunctionContext(),
+                                   new SynapseXPathVariableContext(baseContextSupport.getVariableContext(), wrapper.getMessageCtxt(),
+                                                                    wrapper.getEnvelope()),
+                                   baseContextSupport.getNavigator());
+            Context context = new Context(contextSupport);
+            context.setNodeSet(new SingletonList(wrapper.getEnvelope()));
+            return context;
         } else {
             return super.getContext(obj);
         }
@@ -281,5 +324,27 @@ public class SynapseXPath extends AXIOMXPath {
     private void handleException(String msg, Throwable e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    /**
+     * This is a wrapper class used to inject both envelope and message contexts for xpath
+     * We use this to resolve function scope xpath variables
+     */
+    private static class ContextWrapper{
+        private MessageContext ctxt;
+        private SOAPEnvelope env;
+
+        public ContextWrapper(SOAPEnvelope env, MessageContext ctxt){
+            this.env = env;
+            this.ctxt = ctxt;
+        }
+
+        public SOAPEnvelope getEnvelope() {
+            return env;
+        }
+
+        public MessageContext getMessageCtxt() {
+            return ctxt;
+        }
     }
 }

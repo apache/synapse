@@ -365,7 +365,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                     }
 
                     EIPUtils.enrichEnvelope(
-                            newCtx.getEnvelope(), synCtx.getEnvelope(), aggregationExpression);
+                            newCtx.getEnvelope(), synCtx.getEnvelope(), synCtx, aggregationExpression);
 
                     if (log.isDebugEnabled()) {
                         log.debug("Merged result : " + newCtx.getEnvelope());

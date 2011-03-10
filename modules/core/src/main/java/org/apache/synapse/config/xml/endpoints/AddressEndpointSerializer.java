@@ -49,7 +49,7 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
         // serialize the properties
         serializeProperties(addressEndpoint, endpointElement);
         //serialize attributes
-        serializeCommonAttributes(endpoint,endpointElement);
+        serializeCommonAttributes(endpoint, endpointElement);
 
         EndpointDefinition epAddress = addressEndpoint.getDefinition();
         OMElement addressElement = serializeEndpointDefinition(epAddress);
@@ -70,9 +70,10 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
             handleException("Invalid Endpoint. Address is required");
         }
 
-        serializeCommonEndpointProperties(endpointDefinition, element);
-        serializeSpecificEndpointProperties(endpointDefinition, element);
+        EndpointDefinitionSerializer serializer = new EndpointDefinitionSerializer();
+        serializer.serializeEndpointDefinition(endpointDefinition, element);
 
+        serializeSpecificEndpointProperties(endpointDefinition, element);
         return element;
     }
 }

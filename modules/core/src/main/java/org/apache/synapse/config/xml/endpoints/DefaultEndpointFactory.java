@@ -137,8 +137,8 @@ public class DefaultEndpointFactory extends EndpointFactory {
      * @return EndpointDefinition object containing the endpoint details.
      */
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
-        EndpointDefinition endpointDefinition = new EndpointDefinition();
-        extractCommonEndpointProperties(endpointDefinition, elem);
+        EndpointDefinitionFactory fac = new EndpointDefinitionFactory();
+        EndpointDefinition endpointDefinition = fac.createDefinition(elem);
         extractSpecificEndpointProperties(endpointDefinition, elem);
         return endpointDefinition;
     }

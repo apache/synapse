@@ -88,8 +88,10 @@ public class DefaultEndpointSerializer extends EndpointSerializer {
     }
 
     public OMElement serializeEndpointDefinition(EndpointDefinition endpointDefinition) {
+        EndpointDefinitionSerializer serializer = new EndpointDefinitionSerializer();
+
         OMElement element = fac.createOMElement("default", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        serializeCommonEndpointProperties(endpointDefinition, element);
+        serializer.serializeEndpointDefinition(endpointDefinition, element);
         serializeSpecificEndpointProperties(endpointDefinition, element);
         return element;
     }

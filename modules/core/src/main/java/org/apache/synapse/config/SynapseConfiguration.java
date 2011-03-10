@@ -24,6 +24,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.endpoints.TemplateEndpoint;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
@@ -135,6 +137,16 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Message processors in the synapse configuration
      */
     private Map<String , MessageProcessor> messageProcessors = new ConcurrentHashMap<String ,MessageProcessor>();
+
+    /**
+     * Endpoint templates to create actual endpoints
+     */
+    private Map<String, Template> endpointTemplates = new ConcurrentHashMap<String, Template>();
+
+    /**
+     * Endpoints map for holding the endpoints references
+     */
+    private Map<String, TemplateEndpoint> endpointGroups = new ConcurrentHashMap<String, TemplateEndpoint>();
 
     /**
      * Description/documentation of the configuration
@@ -1394,5 +1406,21 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         if (entry == null) {
             handleException("Cannot locate an either local or remote enrty for key : " + key);
         }
+    }
+
+    public void addEndpointGroup(String name, TemplateEndpoint group) {
+        endpointGroups.put(name, group);
+    }
+
+    public Map<String, TemplateEndpoint> getEndpointGroups() {
+        return endpointGroups;
+    }
+
+    public void addEndpointTemplate(String name, Template template) {
+        endpointTemplates.put(name, template);
+    }
+
+    public Map<String, Template> getEndpointTemplates() {
+        return endpointTemplates;
     }
 }

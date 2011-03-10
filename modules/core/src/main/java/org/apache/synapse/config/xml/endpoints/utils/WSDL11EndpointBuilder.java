@@ -58,14 +58,17 @@ public class WSDL11EndpointBuilder {
      * Creates an EndpointDefinition for WSDL endpoint from an inline WSDL supplied in the WSDL
      * endpoint configuration.
      *
+     * @param endpointDefinition the endpoint definition to populate
      * @param baseUri base uri of the wsdl
      * @param wsdl    OMElement representing the inline WSDL
      * @param service Service of the endpoint
      * @param port    Port of the endpoint
      * @return EndpointDefinition containing the information retrieved from the WSDL
      */
-    public EndpointDefinition createEndpointDefinitionFromWSDL(String baseUri, OMElement wsdl,
-                                                               String service, String port) {
+    public EndpointDefinition populateEndpointDefinitionFromWSDL(
+            EndpointDefinition endpointDefinition,
+            String baseUri, OMElement wsdl,
+            String service, String port) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -87,7 +90,8 @@ public class WSDL11EndpointBuilder {
                 WSDLFactory fac = WSDLFactory.newInstance();
                 WSDLReader reader = fac.newWSDLReader();
                 Definition definition = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
-                return createEndpointDefinitionFromWSDL(definition, service, port);
+                return createEndpointDefinitionFromWSDL(
+                        endpointDefinition, definition, service, port);
             }
         } catch (XMLStreamException e) {
             handleException("Error retrieving the WSDL definition from the inline WSDL.", e);
@@ -98,8 +102,10 @@ public class WSDL11EndpointBuilder {
         return null;
     }
 
-    private EndpointDefinition createEndpointDefinitionFromWSDL(Definition definition,
-                                                                String serviceName, String portName) {
+    private EndpointDefinition createEndpointDefinitionFromWSDL(
+            EndpointDefinition endpointDefinition,
+            Definition definition,
+            String serviceName, String portName) {
 
         if (definition == null) {
             handleException("WSDL document is not specified.");
@@ -163,7 +169,6 @@ public class WSDL11EndpointBuilder {
         }
 
         if (serviceURL != null) {
-            EndpointDefinition endpointDefinition = new EndpointDefinition();
             endpointDefinition.setAddress(serviceURL);
             if (SynapseConstants.FORMAT_SOAP11.equals(format)) {
                 endpointDefinition.setForceSOAP11(true);

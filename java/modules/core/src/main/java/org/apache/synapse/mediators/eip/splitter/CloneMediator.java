@@ -56,6 +56,8 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
 
     private String id = null;
 
+    private boolean sequential = false;
+
     /**
      * This will implement the mediate method of the Mediator interface and will provide the
      * functionality of cloning message into the specified targets and mediation
@@ -172,6 +174,14 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isSequential() {
+        return sequential;
+    }
+
+    public void setSequential(boolean sequential) {
+        this.sequential = sequential;
     }
 
     public void init(SynapseEnvironment se) {

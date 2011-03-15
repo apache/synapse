@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.store.MessageStore;
@@ -38,6 +39,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.util.Properties;
@@ -278,22 +280,43 @@ public class MultiXMLConfigurationBuilder {
     private static void createTemplates(SynapseConfiguration synapseConfig, String rootDirPath,
                                         Properties properties) throws XMLStreamException {
 
-        File sequencesDir = new File(rootDirPath, TEMPLATES_DIR);
-        if (sequencesDir.exists()) {
+        File templatesDir = new File(rootDirPath, TEMPLATES_DIR);
+        if (templatesDir.exists()) {
             if (log.isDebugEnabled()) {
-                log.debug("Loading sequences from : " + sequencesDir.getPath());
+                log.debug("Loading template from : " + templatesDir.getPath());
             }
-            File[] sequences = sequencesDir.listFiles(filter);
+            File[] sequences = templatesDir.listFiles(filter);
             for (File file : sequences) {
                 try {
                     OMElement document = parseFile(file);
-                    Mediator seq = SynapseXMLConfigurationFactory.defineMediatorTemplate(
+                    SynapseXMLConfigurationFactory.defineTemplate(
                             synapseConfig, document, properties);
-                    if (seq != null && seq instanceof TemplateMediator) {
-                        TemplateMediator templateSeq = (TemplateMediator) seq;
-                        templateSeq.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), templateSeq.getName());
+                    OMElement element = document.getFirstChildWithName(
+                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
+                    if (element != null) {
+                        TemplateMediator mediator =
+                                (TemplateMediator) SynapseXMLConfigurationFactory.defineMediatorTemplate(
+                                        synapseConfig, document, properties);
+                        if (mediator != null) {
+                            mediator.setFileName(file.getName());
+                            synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                    file.getAbsolutePath(), mediator.getName());
+                        }
+                        return;
+                    }
+
+                    element = document.getFirstChildWithName(
+                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
+                    if (element != null) {
+                        Template endpointTemplate =
+                                SynapseXMLConfigurationFactory.defineEndpointTemplate(
+                                        synapseConfig, document, properties);
+                        if (endpointTemplate != null) {
+                            endpointTemplate.setFileName(file.getName());
+                            synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                    file.getAbsolutePath(), endpointTemplate.getFileName());
+                        }
+                        return;
                     }
                 } catch (FileNotFoundException ignored) {}
             }

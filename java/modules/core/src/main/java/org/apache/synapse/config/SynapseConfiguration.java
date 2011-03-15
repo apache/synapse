@@ -19,13 +19,15 @@
 
 package org.apache.synapse.config;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.config.xml.XMLToTemplateMapper;
+import org.apache.synapse.config.xml.endpoints.TemplateFactory;
 import org.apache.synapse.endpoints.Template;
-import org.apache.synapse.endpoints.TemplateEndpoint;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
@@ -142,11 +144,6 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Endpoint templates to create actual endpoints
      */
     private Map<String, Template> endpointTemplates = new ConcurrentHashMap<String, Template>();
-
-    /**
-     * Endpoints map for holding the endpoints references
-     */
-    private Map<String, TemplateEndpoint> endpointGroups = new ConcurrentHashMap<String, TemplateEndpoint>();
 
     /**
      * Description/documentation of the configuration
@@ -1408,23 +1405,62 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
     }
 
-    public void addEndpointGroup(String name, TemplateEndpoint group) {
-        endpointGroups.put(name, group);
-    }
-
-    public Map<String, TemplateEndpoint> getEndpointGroups() {
-        return endpointGroups;
-    }
-
     public void addEndpointTemplate(String name, Template template) {
-        endpointTemplates.put(name, template);
+        assertAlreadyExists(name, SEQUENCE);
+        localRegistry.put(name, template);
     }
 
-    public Map<String, Template> getEndpointTemplates() {
-        return endpointTemplates;
-    }
+    public Template getEndpointTemplate(String key) {
+        Object o = getEntry(key);
+        if (o instanceof Mediator) {
+            return (Template) o;
+        }
 
-    public Template getEndpointTemplate(String name) {
-        return endpointTemplates.get(name);
+        Entry entry = null;
+        if (o == null) {
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+        } else {
+            Object object = localRegistry.get(key);
+            if (object instanceof Entry) {
+                entry = (Entry) object;
+            }
+        }
+
+        assertEntryNull(entry, key);
+
+        //noinspection ConstantConditions
+        if (entry.getMapper() == null) {
+            entry.setMapper(new XMLToTemplateMapper());
+        }
+
+        if (entry.getType() == Entry.REMOTE_ENTRY) {
+            if (registry != null) {
+                o = registry.getResource(entry, getProperties());
+                if (o != null && o instanceof Template) {
+                    localRegistry.put(key, entry);
+                    return (Template) o;
+                } else if (o instanceof OMNode) {
+                    Template m = new TemplateFactory().createEndpointTemplate(
+                            (OMElement) o, properties);
+                    if (m != null) {
+                        entry.setValue(m);
+                        return m;
+                    }
+                }
+            }
+        } else {
+            Object value = entry.getValue();
+            if (value instanceof OMNode) {
+                Object object = entry.getMapper().getObjectFromOMNode(
+                        (OMNode) value, getProperties());
+                if (object instanceof Template) {
+                    entry.setValue(object);
+                    return (Template) object;
+                }
+            }
+        }
+
+        return null;
     }
 }

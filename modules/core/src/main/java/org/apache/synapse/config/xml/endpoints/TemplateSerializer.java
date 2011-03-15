@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Template;
 
 import javax.xml.namespace.QName;
+import java.util.List;
 import java.util.Map;
 
 public class TemplateSerializer {
@@ -42,14 +43,12 @@ public class TemplateSerializer {
 
         templateElement.addAttribute(fac.createOMAttribute("name", nullNS, template.getName()));
 
-        Map<String, String> parameters = template.getParameters();
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+        List<String> parameters = template.getParameters();
+        for (String entry : parameters) {
             OMElement paramElement = fac.createOMElement(
                     new QName(SynapseConstants.SYNAPSE_NAMESPACE, "parameter"));
 
-            paramElement.addAttribute(fac.createOMAttribute("name", nullNS, entry.getKey()));
-            paramElement.addAttribute(fac.createOMAttribute("value", nullNS, entry.getValue()));
-
+            paramElement.addAttribute(fac.createOMAttribute("name", nullNS, entry));
             templateElement.addChild(paramElement);
         }
 

@@ -107,7 +107,8 @@ public class Template implements SynapseArtifact {
         if (value.startsWith("$")) {
             String param = value.substring(1);
 
-            if (templateEndpoint.getParameters().containsKey(param)) {
+            if (templateEndpoint.getParameters().containsKey(param) &&
+                    parameters.containsKey(param)) {
                 return templateEndpoint.getParameterValue(param);
             }
         }

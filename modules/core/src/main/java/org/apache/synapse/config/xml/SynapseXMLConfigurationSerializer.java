@@ -99,6 +99,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         Map<String, Endpoint> endpoints = new HashMap<String, Endpoint>();
         Map<String, SequenceMediator> sequences = new HashMap<String, SequenceMediator>();
         Map<String, TemplateMediator> templates = new HashMap<String, TemplateMediator>();
+        Map<String, Template> endpointTemplates = new HashMap<String, Template>();
 
         itr = synCfg.getLocalRegistry().keySet().iterator();
         while (itr.hasNext()) {
@@ -113,6 +114,8 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
                 sequences.put(key.toString(), (SequenceMediator) o);
             } else if (o instanceof Endpoint) {
                 endpoints.put(key.toString(), (Endpoint) o);
+            } else if (o instanceof Template) {
+                endpointTemplates.put(key.toString(), (Template) o);
             } else if (o instanceof Entry) {
                 entries.put(key.toString(), (Entry) o);
             } else {
@@ -134,7 +137,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         serializeMediatorTemplates(definitions, templates);
 
         // serialize the endpoint templates
-        serializeEndpointTemplates(definitions, synCfg.getEndpointTemplates());
+        serializeEndpointTemplates(definitions, endpointTemplates);
 
         // handle startups
         serializeStartups(definitions, synCfg.getStartups());

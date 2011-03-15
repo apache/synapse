@@ -87,7 +87,7 @@ public class TemplateEndpoint extends AbstractEndpoint {
         super.init(synapseEnvironment);
 
         Template endpointTemplate = synapseEnvironment.getSynapseConfiguration().
-                getEndpointTemplates().get(template);
+                getEndpointTemplate(template);
 
         if (endpointTemplate == null) {
             handleException("Template " + template +
@@ -122,7 +122,7 @@ public class TemplateEndpoint extends AbstractEndpoint {
                 log.debug("Loading template endpoint with key : " + template);
             }
 
-            Template eprTemplate = synCfg.getEndpointTemplates().get(template);
+            Template eprTemplate = synCfg.getEndpointTemplate(template);
 
             if (eprTemplate != null) {
                 realEndpoint = eprTemplate.create(this, synCfg.getProperties());

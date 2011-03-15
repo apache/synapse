@@ -1412,7 +1412,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
     public Template getEndpointTemplate(String key) {
         Object o = getEntry(key);
-        if (o instanceof Mediator) {
+        if (o instanceof Template) {
             return (Template) o;
         }
 

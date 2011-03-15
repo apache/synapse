@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.HashMap;
@@ -41,6 +43,8 @@ public class TemplateEndpoint extends AbstractEndpoint {
 
     @Override
     public void send(MessageContext synCtx) {
+        reLoadAndInitEndpoint(synCtx.getEnvironment());
+
         if (realEndpoint != null) {
             realEndpoint.send(synCtx);
         } else {
@@ -90,14 +94,45 @@ public class TemplateEndpoint extends AbstractEndpoint {
                     " cannot be found for the endpoint " + getName());
         }
 
-        realEndpoint = endpointTemplate.create(this,
-                synapseEnvironment.getSynapseConfiguration().getProperties());
+        reLoadAndInitEndpoint(synapseEnvironment);
+    }
 
-        realEndpoint.init(synapseEnvironment);
+    /**
+     * Reload as needed , either from registry , local entries or predefined endpoints
+     * @param se synapse environment
+     */
+    private synchronized void reLoadAndInitEndpoint(SynapseEnvironment se) {
+        SynapseConfiguration synCfg = se.getSynapseConfiguration();
 
-        if (realEndpoint == null) {
-            handleException("Couldn't retrieve the endpoint " + getName() +
-                    " from the template: " + endpointTemplate.getName());
+        boolean reLoad = (realEndpoint == null);
+        if (!reLoad) {
+            Entry entry = synCfg.getEntryDefinition(template);
+            if (entry != null && entry.isDynamic()) {
+                if (!entry.isCached() || entry.isExpired()) {
+                    reLoad = true;
+                }
+            } else {
+                // If the endpoint is static we should reload it from the Synapse config
+                reLoad = true;
+            }
+        }
+
+        if (reLoad) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading template endpoint with key : " + template);
+            }
+
+            Template eprTemplate = synCfg.getEndpointTemplates().get(template);
+
+            if (eprTemplate != null) {
+                realEndpoint = eprTemplate.create(this, synCfg.getProperties());
+            } else {
+                log.warn("Couldn't retrieve the endpoint template with the key:" + template);
+            }
+
+            if (realEndpoint != null && !realEndpoint.isInitialized()) {
+                realEndpoint.init(se);
+            }
         }
     }
 }

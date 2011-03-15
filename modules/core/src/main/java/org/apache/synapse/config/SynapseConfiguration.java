@@ -1423,4 +1423,8 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     public Map<String, Template> getEndpointTemplates() {
         return endpointTemplates;
     }
+
+    public Template getEndpointTemplate(String name) {
+        return endpointTemplates.get(name);
+    }
 }

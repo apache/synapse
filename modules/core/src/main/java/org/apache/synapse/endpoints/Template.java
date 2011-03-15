@@ -21,8 +21,7 @@ package org.apache.synapse.endpoints;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 
 import java.util.HashMap;
@@ -30,12 +29,19 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-public class Template {
+/**
+ * A template with the endpoint information.
+ */
+public class Template implements SynapseArtifact {
     private OMElement element = null;
 
     private String name = null;
 
     private Map<String, String> parameters = new HashMap<String, String>();
+
+    private String fileName = null;
+
+    private String description = null;
 
     public Endpoint create(TemplateEndpoint templateEndpoint, Properties properties) {
         // first go through all the elements and replace with the parameters
@@ -67,10 +73,6 @@ public class Template {
 
     public OMElement getElement() {
         return element;
-    }
-
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
     }
 
     private void replaceElement(TemplateEndpoint templateEndpoint, OMElement element) {
@@ -111,5 +113,21 @@ public class Template {
         }
 
         return null;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

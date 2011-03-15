@@ -41,6 +41,9 @@ public class TemplateFactory {
         OMAttribute nameAttribute = element.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
 
+        template.addParameter("name");
+        template.addParameter("uri");
+
         if (nameAttribute != null) {
             template.setName(nameAttribute.getAttributeValue());
         } else {
@@ -54,20 +57,14 @@ public class TemplateFactory {
             OMElement paramElement = (OMElement) paramItr.next();
 
             OMAttribute paramName = paramElement.getAttribute(new QName("name"));
-            OMAttribute paramValue = paramElement.getAttribute(new QName("value"));
 
             if (paramName == null) {
                 handleException("parameter name should be present");
             }
 
-            if (paramValue == null) {
-                handleException("parameter value should be present");
-            }
-
             assert paramName != null;
-            assert paramValue != null;
 
-            template.addParameter(paramName.getAttributeValue(), paramValue.getAttributeValue());
+            template.addParameter(paramName.getAttributeValue());
         }
 
         OMElement endpointElement = element.getFirstChildWithName(

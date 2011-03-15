@@ -24,10 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * A template with the endpoint information.
@@ -37,7 +34,7 @@ public class Template implements SynapseArtifact {
 
     private String name = null;
 
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private List<String> parameters = new ArrayList<String>();
 
     private String fileName = null;
 
@@ -59,12 +56,12 @@ public class Template implements SynapseArtifact {
         this.name = name;
     }
 
-    public Map<String, String> getParameters() {
+    public List<String> getParameters() {
         return parameters;
     }
 
-    public void addParameter(String name, String value) {
-        parameters.put(name, value);
+    public void addParameter(String name) {
+        parameters.add(name);
     }
 
     public void setElement(OMElement element) {
@@ -108,7 +105,7 @@ public class Template implements SynapseArtifact {
             String param = value.substring(1);
 
             if (templateEndpoint.getParameters().containsKey(param) &&
-                    parameters.containsKey(param)) {
+                    parameters.contains(param)) {
                 return templateEndpoint.getParameterValue(param);
             }
         }

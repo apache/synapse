@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
@@ -234,7 +235,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             try {
                 mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
                 if (mediator != null) {
-                    config.addSequence(name, mediator);
+                    config.addSequenceTemplate(name, (TemplateMediator) mediator) ;
                 }
             } catch (Exception e) {
                 if (failSafeSequenceEnabled) {

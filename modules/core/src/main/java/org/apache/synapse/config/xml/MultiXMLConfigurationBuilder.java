@@ -289,8 +289,6 @@ public class MultiXMLConfigurationBuilder {
             for (File file : sequences) {
                 try {
                     OMElement document = parseFile(file);
-                    SynapseXMLConfigurationFactory.defineTemplate(
-                            synapseConfig, document, properties);
                     OMElement element = document.getFirstChildWithName(
                             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
                     if (element != null) {
@@ -303,20 +301,21 @@ public class MultiXMLConfigurationBuilder {
                                     file.getAbsolutePath(), mediator.getName());
                         }
                         return;
-                    }
+                    } else {
 
-                    element = document.getFirstChildWithName(
-                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
-                    if (element != null) {
-                        Template endpointTemplate =
-                                SynapseXMLConfigurationFactory.defineEndpointTemplate(
-                                        synapseConfig, document, properties);
-                        if (endpointTemplate != null) {
-                            endpointTemplate.setFileName(file.getName());
-                            synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                    file.getAbsolutePath(), endpointTemplate.getFileName());
+                        element = document.getFirstChildWithName(
+                                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
+                        if (element != null) {
+                            Template endpointTemplate =
+                                    SynapseXMLConfigurationFactory.defineEndpointTemplate(
+                                            synapseConfig, document, properties);
+                            if (endpointTemplate != null) {
+                                endpointTemplate.setFileName(file.getName());
+                                synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                        file.getAbsolutePath(), endpointTemplate.getFileName());
+                            }
+                            return;
                         }
-                        return;
                     }
                 } catch (FileNotFoundException ignored) {}
             }

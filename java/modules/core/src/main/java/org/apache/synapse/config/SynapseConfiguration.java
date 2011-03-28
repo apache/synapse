@@ -194,6 +194,21 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
     }
 
+    /**
+     * Update a sequence-template into the local registry. If a template already exists
+     * by the specified key a runtime exception is thrown.
+     *
+     * @param key the name for the sequence
+     * @param mediator a Sequence mediator
+     */
+    public synchronized void updateSequenceTemplate(String key, TemplateMediator mediator) {
+        localRegistry.put(key, mediator);
+
+        for (SynapseObserver o : observers) {
+            o.sequenceTemplateAdded(mediator);
+        }
+    }
+
     public synchronized void updateSequence(String key, Mediator mediator) {
         localRegistry.put(key, mediator);
         for (SynapseObserver o : observers) {
@@ -1530,6 +1545,19 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     public void addEndpointTemplate(String name, Template template) {
         assertAlreadyExists(name, SEQUENCE);
         localRegistry.put(name, template);
+    }
+
+    public void updateEndpointTemplate(String name, Template template) {
+        localRegistry.put(name, template);
+    }
+
+    public void removeEndpointTemplate(String name) {
+        Object sequence = localRegistry.get(name);
+        if (sequence instanceof Template) {
+            localRegistry.remove(name);
+        } else {
+            handleException("No template exists by the key/name : " + name);
+        }
     }
 
     public Template getEndpointTemplate(String key) {

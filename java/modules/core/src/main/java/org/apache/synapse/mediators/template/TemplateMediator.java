@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
 
+import javax.sound.midi.Sequence;
 import java.util.Collection;
 import java.util.Stack;
 

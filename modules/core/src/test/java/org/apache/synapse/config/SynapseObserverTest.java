@@ -26,6 +26,7 @@ import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
+import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.startup.quartz.SimpleQuartz;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -42,6 +43,7 @@ public class SynapseObserverTest extends TestCase {
     private static final int STARTUP    = 4;
     private static final int EVENT_SRC  = 5;
     private static final int EXECUTOR   = 6;
+    private static final int SEQUENCE_TEMPLATE   = 7;
 
     SimpleSynapseObserver observer = new SimpleSynapseObserver();
 
@@ -63,6 +65,13 @@ public class SynapseObserverTest extends TestCase {
         assertItemAdded(seq.getName(), SEQUENCE);
         synapseConfig.removeSequence(seq.getName());
         assertItemRemoved(seq.getName(), SEQUENCE);
+
+        TemplateMediator template = new TemplateMediator();
+        template.setName("template1");
+        synapseConfig.addSequenceTemplate(template.getName(), template);
+        assertItemAdded(template.getName(), SEQUENCE_TEMPLATE);
+        synapseConfig.removeSequenceTemplate(template.getName());
+        assertItemRemoved(template.getName(), SEQUENCE_TEMPLATE);
 
         Entry entry = new Entry();
         entry.setKey("entry1");
@@ -118,6 +127,7 @@ public class SynapseObserverTest extends TestCase {
             tracker.put(STARTUP, new HashSet<String>());
             tracker.put(EVENT_SRC, new HashSet<String>());
             tracker.put(EXECUTOR, new HashSet<String>());
+            tracker.put(SEQUENCE_TEMPLATE, new HashSet<String>());
         }
 
         public void endpointAdded(Endpoint endpoint) {
@@ -158,6 +168,14 @@ public class SynapseObserverTest extends TestCase {
 
         public void sequenceRemoved(Mediator sequence) {
             tracker.get(SEQUENCE).remove(((SequenceMediator) sequence).getName());
+        }
+
+        public void sequenceTemplateAdded(Mediator template) {
+            tracker.get(SEQUENCE_TEMPLATE).add(((TemplateMediator) template).getName());
+        }
+
+        public void sequenceTemplateRemoved(Mediator template) {
+            tracker.get(SEQUENCE_TEMPLATE).remove(((TemplateMediator) template).getName());
         }
 
         public void startupAdded(Startup startup) {

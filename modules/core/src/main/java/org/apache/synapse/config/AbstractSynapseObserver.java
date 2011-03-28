@@ -28,6 +28,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.mediators.template.TemplateMediator;
 
 public abstract class AbstractSynapseObserver implements SynapseObserver {
 
@@ -45,6 +46,16 @@ public abstract class AbstractSynapseObserver implements SynapseObserver {
     public void sequenceRemoved(Mediator sequence) {
         log.info("Sequence : " + ((SequenceMediator) sequence).getName() + " was  removed " +
                 "from the Synapse configuration successfully");
+    }
+
+    public void sequenceTemplateAdded(Mediator template) {
+        log.info("Template : " + ((TemplateMediator) template).getName() + " was added " +
+                "to the Synapse configuration successfully" );
+    }
+
+    public void sequenceTemplateRemoved(Mediator template) {
+        log.info("Template : " + ((TemplateMediator) template).getName() + " was removed " +
+                "to the Synapse configuration successfully" );
     }
 
     public void entryAdded(Entry entry) {

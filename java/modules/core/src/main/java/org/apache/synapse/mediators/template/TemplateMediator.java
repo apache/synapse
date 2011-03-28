@@ -22,7 +22,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.AbstractListMediator;
 
 import java.util.Collection;
 import java.util.Stack;
@@ -34,11 +34,12 @@ import java.util.Stack;
  *  xpath extension var or function , defined under function scope
  *  ie:- $func:p1 or get-property('func','p2')
  */
-public class TemplateMediator extends SequenceMediator {
+public class TemplateMediator extends AbstractListMediator {
 
     private Collection<String> paramNames;
 
     private String eipPatternName;
+    private String fileName;
 
     public void setParameters(Collection<String> paramNames) {
         this.paramNames = paramNames;
@@ -107,4 +108,11 @@ public class TemplateMediator extends SequenceMediator {
         }
     }
 
+    public void setFileName(String name) {
+        fileName = name;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
 }

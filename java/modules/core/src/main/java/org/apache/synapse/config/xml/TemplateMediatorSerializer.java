@@ -47,11 +47,6 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
         if (mediator.getName() != null) {
             templateElem.addAttribute(fac.createOMAttribute(
                     "name", nullNS, mediator.getName()));
-
-            if (mediator.getErrorHandler() != null) {
-                templateElem.addAttribute(fac.createOMAttribute(
-                        "onError", nullNS, mediator.getErrorHandler()));
-            }
             serializeParams(templateElem,mediator);
             serializeBody(templateElem, mediator.getList());
             saveTracingState(templateElem, mediator);
@@ -63,7 +58,7 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
         Collection<String> params = mediator.getParameters();
         for (String param : params) {
-            if (!"".equals(param)) {
+            if (param != null && !"".equals(param)) {
                 OMElement paramEl = fac.createOMElement("parameter", synNS);
                 paramEl.addAttribute(fac.createOMAttribute("name", nullNS, param));
                 templateElem.addChild(paramEl);

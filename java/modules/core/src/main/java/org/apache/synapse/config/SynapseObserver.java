@@ -45,6 +45,18 @@ public interface SynapseObserver {
      */
     public void sequenceRemoved(Mediator sequence);
 
+    /** Event fired when a new sequence template is added to the configuration
+     *
+     * @param template the Sequence mediator added to the configuration
+     */
+    public void sequenceTemplateAdded(Mediator template);
+
+    /** Event fired when an existing sequence template is removed from the configuration
+     *
+     * @param template the Sequence removed from the configuration
+     */
+    public void sequenceTemplateRemoved(Mediator template);
+
     /** Event fired when an entry is added to the configuration
      *
      * @param entry the Entry added to the configuration

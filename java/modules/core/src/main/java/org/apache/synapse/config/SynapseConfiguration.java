@@ -25,9 +25,11 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.config.xml.TemplateMediatorFactory;
 import org.apache.synapse.config.xml.XMLToTemplateMapper;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
@@ -61,6 +63,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     private static final String ENTRY = "entry";
     private static final String ENDPOINT = "endpoint";
     private static final String SEQUENCE = "sequence"; 
+    private static final String TEMPLATE = "sequence-template";
 
     /**
      * The remote registry made available to the Synapse configuration. Only one
@@ -173,6 +176,24 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
     }
 
+    /**
+     * Add a sequence-template into the local registry. If a template already exists by the specified
+     * key a runtime exception is thrown.
+     *
+     * @param key
+     *            the name for the sequence
+     * @param mediator
+     *            a Sequence mediator
+     */
+    public synchronized void addSequenceTemplate(String key, TemplateMediator mediator) {
+        assertAlreadyExists(key, TEMPLATE);
+        localRegistry.put(key, mediator);
+
+        for (SynapseObserver o : observers) {
+            o.sequenceTemplateAdded(mediator);
+        }
+    }
+
     public synchronized void updateSequence(String key, Mediator mediator) {
         localRegistry.put(key, mediator);
         for (SynapseObserver o : observers) {
@@ -218,6 +239,89 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
         return definedSequences;
     }
+
+    /**
+     * Returns the map of defined synapse templates in the configuration excluding the
+     * fetched sequences from remote registry.
+     *
+     * @return Map of Templates defined in the local configuration
+     */
+    public Map<String, TemplateMediator> getSequenceTemplates() {
+
+        Map<String, TemplateMediator> definedTemplates = new HashMap<String, TemplateMediator>();
+
+        synchronized (this) {
+            for (Object o : localRegistry.values()) {
+                if (o instanceof TemplateMediator) {
+                    TemplateMediator template = (TemplateMediator) o;
+                    definedTemplates.put(template.getName(), template);
+                }
+            }
+        }
+        return definedTemplates;
+    }
+
+     /**
+     * Return the template specified with the given key
+     *
+     * @param key
+     *            the key being referenced for the template
+     * @return the template referenced by the key from local/remote registry
+     */
+    public TemplateMediator getSequenceTemplate(String key) {
+        Object o = getEntry(key);
+        if (o instanceof TemplateMediator) {
+            return (TemplateMediator) o;
+        }
+
+        Entry entry = null;
+        if (o == null) {
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+        } else {
+            Object object = localRegistry.get(key);
+            if (object instanceof Entry) {
+                entry = (Entry) object;
+            }
+        }
+
+        assertEntryNull(entry, key);
+
+        //noinspection ConstantConditions
+        if (entry.getMapper() == null) {
+            entry.setMapper(new XMLToTemplateMapper());
+        }
+
+        if (entry.getType() == Entry.REMOTE_ENTRY) {
+            if (registry != null) {
+                o = registry.getResource(entry, getProperties());
+                if (o != null && o instanceof TemplateMediator) {
+                    localRegistry.put(key, entry);
+                    return (TemplateMediator) o;
+                } else if (o instanceof OMNode) {
+                    TemplateMediator m = (TemplateMediator) new TemplateMediatorFactory().createMediator(
+                            (OMElement) o, properties);
+                    if (m != null) {
+                        entry.setValue(m);
+                        return m;
+                    }
+                }
+            }
+        } else {
+            Object value = entry.getValue();
+            if (value instanceof OMNode) {
+                Object object = entry.getMapper().getObjectFromOMNode(
+                        (OMNode) value, getProperties());
+                if (object instanceof TemplateMediator) {
+                    entry.setValue(object);
+                    return (TemplateMediator) object;
+                }
+            }
+        }
+
+        return null;
+    }
+
 
     /**
      * Gets the mandatory sequence, from the direct reference. This is also available in the
@@ -316,6 +420,24 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             }
         } else {
             handleException("No sequence exists by the key/name : " + key);
+        }
+    }
+
+    /**
+     * Removes a template from the local registry
+     *
+     * @param name
+     *            of the template to be removed
+     */
+    public synchronized void removeSequenceTemplate(String name) {
+        Object sequence = localRegistry.get(name);
+        if (sequence instanceof TemplateMediator) {
+            localRegistry.remove(name);
+            for (SynapseObserver o : observers) {
+                o.sequenceTemplateRemoved((Mediator) sequence);
+            }
+        } else {
+            handleException("No template exists by the key/name : " + name);
         }
     }
 

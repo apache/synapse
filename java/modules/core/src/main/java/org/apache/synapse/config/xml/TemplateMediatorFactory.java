@@ -53,12 +53,8 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
         TemplateMediator templateTemplateMediator = new TemplateMediator();
         OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
-        OMAttribute errorHandlerAttr = elem.getAttribute(ATT_ONERROR);
         if (nameAttr != null) {
             templateTemplateMediator.setName(nameAttr.getAttributeValue());
-            if (errorHandlerAttr != null) {
-                templateTemplateMediator.setErrorHandler(errorHandlerAttr.getAttributeValue());
-            }
             processAuditStatus(templateTemplateMediator, elem);
             initParameters(elem, templateTemplateMediator);
             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);

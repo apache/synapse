@@ -46,6 +46,8 @@ import org.apache.synapse.util.PolicyInfo;
 import org.apache.synapse.util.resolver.CustomWSDLLocator;
 import org.apache.synapse.util.resolver.CustomXmlSchemaURIResolver;
 import org.apache.synapse.util.resolver.ResourceMap;
+import org.apache.synapse.util.resolver.UserDefinedWSDLLocator;
+import org.apache.synapse.util.resolver.UserDefinedXmlSchemaURIResolver;
 import org.xml.sax.InputSource;
 
 import javax.xml.stream.XMLStreamException;
@@ -373,34 +375,42 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                         if (trace()) {
                             trace.info("Setting up custom resolvers");
                         }
-                        // Set up the URIResolver
-
-                        if (resourceMap != null) {
-                            // if the resource map is available use it
-                            wsdlToAxisServiceBuilder.setCustomResolver(
-                                new CustomXmlSchemaURIResolver(resourceMap, synCfg));
-                            // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
-                            if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
-                                ((WSDL11ToAxisServiceBuilder)
-                                    wsdlToAxisServiceBuilder).setCustomWSDLResolver(
-                                    new CustomWSDLLocator(new InputSource(wsdlInputStream),
-                                                          wsdlURI != null ? wsdlURI.toString() : "",
-                                                          resourceMap, synCfg));
-                            }
+                        
+                        // load the UserDefined WSDLResolver and SchemaURIResolver implementations
+                        if (synCfg.getProperty(SynapseConstants.SYNAPSE_WSDL_RESOLVER) != null &&
+                                synCfg.getProperty(SynapseConstants.SYNAPSE_SCHEMA_RESOLVER) != null) {
+                            setUserDefinedResourceResolvers(synCfg, wsdlInputStream,
+                                    wsdlToAxisServiceBuilder);
                         } else {
-                            //if the resource map isn't available ,
-                            //then each import URIs will be resolved using base URI 
-                            wsdlToAxisServiceBuilder.setCustomResolver(
-                                new CustomXmlSchemaURIResolver());
-                            // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
-                            if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
-                                ((WSDL11ToAxisServiceBuilder)
-                                    wsdlToAxisServiceBuilder).setCustomWSDLResolver(
-                                    new CustomWSDLLocator(new InputSource(wsdlInputStream),
-                                            wsdlURI != null ? wsdlURI.toString() : ""));
+                            //Use the Custom Resolvers
+                            // Set up the URIResolver
+
+                            if (resourceMap != null) {
+                                // if the resource map is available use it
+                                wsdlToAxisServiceBuilder.setCustomResolver(
+                                        new CustomXmlSchemaURIResolver(resourceMap, synCfg));
+                                // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
+                                if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
+                                    ((WSDL11ToAxisServiceBuilder)
+                                            wsdlToAxisServiceBuilder).setCustomWSDLResolver(
+                                            new CustomWSDLLocator(new InputSource(wsdlInputStream),
+                                                    wsdlURI != null ? wsdlURI.toString() : "",
+                                                    resourceMap, synCfg));
+                                }
+                            } else {
+                                //if the resource map isn't available ,
+                                //then each import URIs will be resolved using base URI
+                                wsdlToAxisServiceBuilder.setCustomResolver(
+                                        new CustomXmlSchemaURIResolver());
+                                // Axis 2 also needs a WSDLLocator for WSDL 1.1 documents
+                                if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
+                                    ((WSDL11ToAxisServiceBuilder)
+                                            wsdlToAxisServiceBuilder).setCustomWSDLResolver(
+                                            new CustomWSDLLocator(new InputSource(wsdlInputStream),
+                                                    wsdlURI != null ? wsdlURI.toString() : ""));
+                                }
                             }
                         }
-
                         if (trace()) {
                             trace.info("Populating Axis2 service using WSDL");
                             if (trace.isTraceEnabled()) {
@@ -616,6 +626,49 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
 
         auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
         return proxyService;
+    }
+
+    private void setUserDefinedResourceResolvers(SynapseConfiguration synCfg,
+                                                 InputStream wsdlInputStream,
+                                                 WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder) {
+        String wsdlResolverName = synCfg.getProperty(SynapseConstants.SYNAPSE_WSDL_RESOLVER);
+        String schemaResolverName = synCfg.getProperty(SynapseConstants.SYNAPSE_SCHEMA_RESOLVER);
+        Class wsdlClazz, schemaClazz;
+        Object wsdlClzzObject, schemaClazzObject;
+        try {
+            wsdlClazz = Class.forName(wsdlResolverName);
+            schemaClazz = Class.forName(schemaResolverName);
+        } catch (ClassNotFoundException e) {
+            String msg =
+                    "System could not find the class defined for the specific properties" +
+                            " \n WSDLResolverImplementation:" + wsdlResolverName +
+                            "\n SchemaResolverImplementation:" + schemaResolverName;
+            handleException(msg, e);
+            return;
+        }
+
+        try {
+            wsdlClzzObject = wsdlClazz.newInstance();
+            schemaClazzObject = schemaClazz.newInstance();
+        } catch (Exception e) {
+            String msg = "Could not create an instance from the class";
+            handleException(msg, e);
+            return;
+        }
+
+        UserDefinedXmlSchemaURIResolver userDefSchemaResolver =
+                (UserDefinedXmlSchemaURIResolver) schemaClazzObject;
+        userDefSchemaResolver.init(resourceMap, synCfg, wsdlKey);
+
+        wsdlToAxisServiceBuilder.setCustomResolver(userDefSchemaResolver);
+        if (wsdlToAxisServiceBuilder instanceof WSDL11ToAxisServiceBuilder) {
+            UserDefinedWSDLLocator userDefWSDLLocator = (UserDefinedWSDLLocator) wsdlClzzObject;
+            userDefWSDLLocator.init(new InputSource(wsdlInputStream),
+                    wsdlURI != null ? wsdlURI.toString() : "", resourceMap, synCfg,
+                    wsdlKey);
+            ((WSDL11ToAxisServiceBuilder) wsdlToAxisServiceBuilder).
+                    setCustomWSDLResolver(userDefWSDLLocator);
+        }
     }
 
     private Policy getPolicyFromKey(String key, SynapseConfiguration synCfg) {

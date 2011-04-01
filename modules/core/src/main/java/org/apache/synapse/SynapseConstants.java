@@ -105,6 +105,8 @@ public final class SynapseConstants {
     public static final String SERVER_MANAGER_MBEAN = "ServerManager";
     public static final String RECEIVING_SEQUENCE = "RECEIVING_SEQUENCE";
     public static final String SYNAPSE__FUNCTION__STACK = "_SYNAPSE_FUNCTION_STACK";
+    public static final String SYNAPSE_WSDL_RESOLVER = "synapse.wsdl.resolver";
+    public static final String SYNAPSE_SCHEMA_RESOLVER = "synapse.schema.resolver";
 
     /** Parameter names in the axis2.xml that can be used to configure the synapse */
     public static final class Axis2Param {

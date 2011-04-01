@@ -41,7 +41,12 @@ import java.util.Properties;
  */
 public class InvokeMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName INVOKE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "invoke");
+    private static final QName INVOKE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "call-template");
+
+    /**
+     * Element  QName Definitions
+     */
+    public static final QName WITH_PARAM_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "with-param");
 
     InvokeMediator invoker;
 
@@ -64,7 +69,7 @@ public class InvokeMediatorFactory extends AbstractMediatorFactory {
         Iterator subElements = elem.getChildElements();
         while (subElements.hasNext()) {
             OMElement child = (OMElement) subElements.next();
-            if (child.getQName().equals(TemplateMediatorFactory.PARAMETER_Q)) {
+            if (child.getQName().equals(WITH_PARAM_Q)) {
                 OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
                 Value paramValue = new ValueFactory().createValue("value", child);
                 if (paramNameAttr != null) {

@@ -37,7 +37,7 @@ import java.util.Map;
  * </invoke>
  */
 public class InvokeMediatorSerializer extends AbstractMediatorSerializer {
-    public static final String INVOKE_N = "invoke";
+    public static final String INVOKE_N = "call-template";
 
     @Override
     protected OMElement serializeSpecificMediator(Mediator m) {
@@ -64,7 +64,7 @@ public class InvokeMediatorSerializer extends AbstractMediatorSerializer {
         while (paramIterator.hasNext()) {
             String paramName = paramIterator.next();
             if (!"".equals(paramName)) {
-                OMElement paramEl = fac.createOMElement(TemplateMediatorFactory.PARAMETER_Q.getLocalPart(),
+                OMElement paramEl = fac.createOMElement(InvokeMediatorFactory.WITH_PARAM_Q.getLocalPart(),
                                                         synNS);
                 paramEl.addAttribute(fac.createOMAttribute("name", nullNS, paramName));
                 //serialize value attribute

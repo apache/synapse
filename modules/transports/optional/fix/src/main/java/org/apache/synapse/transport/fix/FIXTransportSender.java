@@ -46,7 +46,7 @@ import java.util.Map;
  * <p/>
  * This transport sender implementation does not support forwarding FIX messages to sessions with
  * different BeginString values.When it performs a message forwarding it makes sure the forwarding
- * takes place according to the conditions specified in the 'Thirs Party Routing' section in the
+ * takes place according to the conditions specified in the 'Third Party Routing' section in the
  * FIX protocol specification.
  */
 public class FIXTransportSender extends AbstractTransportSender {
@@ -108,7 +108,7 @@ public class FIXTransportSender extends AbstractTransportSender {
         try {
             fixMessage = FIXUtils.getInstance().createFIXMessage(msgCtx);
         } catch (IOException e) {
-            handleException("Exception occured while creating the FIX message from SOAP Envelope", e);
+            handleException("Exception occurred while creating the FIX message from SOAP Envelope", e);
         }
 
         if (FIXConstants.FIX_ACCEPTOR.equals(fixApplication)) {
@@ -118,11 +118,12 @@ public class FIXTransportSender extends AbstractTransportSender {
                 sendUsingEPR(targetEPR, serviceName, fixMessage, sourceSession, counter, msgCtx);
             } else if (outTransportInfo != null && outTransportInfo instanceof FIXOutTransportInfo) {
                 //Send the message back to the sender
-                sendUsingTrpOutInfo(outTransportInfo, serviceName, fixMessage, sourceSession, counter);
+                sendUsingTrpOutInfo(outTransportInfo, serviceName, fixMessage,
+                        sourceSession, counter, msgCtx);
             }
         } else if (FIXConstants.FIX_INITIATOR.equals(fixApplication)) {
 
-            if (sendUsingAcceptorSession(serviceName, fixMessage, sourceSession, counter)) {
+            if (sendUsingAcceptorSession(serviceName, fixMessage, sourceSession, counter, msgCtx)) {
                 return;
             } else if (targetEPR != null) {
                 sendUsingEPR(targetEPR, serviceName, fixMessage, sourceSession, counter, msgCtx);
@@ -135,12 +136,12 @@ public class FIXTransportSender extends AbstractTransportSender {
             if (targetEPR != null) {
                 sendUsingEPR(targetEPR, serviceName, fixMessage, sourceSession, counter, msgCtx);
             } else {
-                sendUsingAcceptorSession(serviceName, fixMessage, sourceSession, counter);
+                sendUsingAcceptorSession(serviceName, fixMessage, sourceSession, counter, msgCtx);
             }
         }
     }
 
-    private boolean isTargetVald(Map<String, String> fieldValues, SessionID targetSession,
+    private boolean isTargetValid(Map<String, String> fieldValues, SessionID targetSession,
                                  boolean beginStrValidation) {
         
         String beginString = fieldValues.get(FIXConstants.BEGIN_STRING);
@@ -239,7 +240,7 @@ public class FIXTransportSender extends AbstractTransportSender {
 
     /**
      * Puts DeliverToX fields in the message to enable the message to be forwarded at the destination.
-     * This method retireves the parameters from the services.xml and put them in the message as
+     * This method retrieves the parameters from the services.xml and put them in the message as
      * DeliverToX fields. Should be used when a response message has to forwarded at the destination.
      *
      * @param message the FIX message to be forwarded
@@ -322,12 +323,14 @@ public class FIXTransportSender extends AbstractTransportSender {
      * @param fixMessage  the FIX message to be sent
      * @param srcSession  String uniquely identifying the incoming session
      * @param counter     application level sequence number of the message
-     * @param serviceName name of the AxisSerivce for the message
+     * @param serviceName name of the AxisService for the message
+     * @param msgCtx      Axis2 MessageContext
      * @return boolean value indicating the result
      * @throws AxisFault on error
      */
     private boolean sendUsingTrpOutInfo(OutTransportInfo trpOutInfo, String serviceName,
-                                        Message fixMessage, String srcSession, int counter) throws AxisFault {
+                                        Message fixMessage, String srcSession, int counter,
+                                        MessageContext msgCtx) throws AxisFault {
 
         FIXOutTransportInfo fixOut = (FIXOutTransportInfo) trpOutInfo;
         SessionID sessionID = fixOut.getSessionID();
@@ -356,7 +359,7 @@ public class FIXTransportSender extends AbstractTransportSender {
         }
 
         try {
-            messageSender.sendMessage(fixMessage, sessionID, srcSession, counter, null, null);
+            messageSender.sendMessage(fixMessage, sessionID, srcSession, counter, msgCtx, null);
             return true;
         } catch (SessionNotFound e) {
             log.error("Error while sending the FIX message. Session " + sessionID.toString() + " does" +
@@ -366,22 +369,23 @@ public class FIXTransportSender extends AbstractTransportSender {
     }
 
     /**
-     * Send the message using a session in the aaceptor side
+     * Send the message using a session in the acceptor side
      *
      * @param serviceName the service of the message
      * @param fixMessage  the FIX message to be sent
      * @param srcSession  String uniquely identifying the incoming session
      * @param counter     the application level sequence number of the message
+     * @param msgCtx      Axi2 MessageContext
      * @return boolean value indicating the result
      * @throws AxisFault on error
      */
     private boolean sendUsingAcceptorSession(String serviceName, Message fixMessage, String srcSession,
-                                             int counter) throws AxisFault {
+                                             int counter, MessageContext msgCtx) throws AxisFault {
 
         Map<String, String> fieldValues = FIXUtils.getMessageForwardingParameters(fixMessage);
         String deliverToCompID = fieldValues.get(FIXConstants.DELIVER_TO_COMP_ID);
 
-        Acceptor acceptor = sessionFactory.getAccepter(serviceName);
+        Acceptor acceptor = sessionFactory.getAcceptor(serviceName);
         SessionID sessionID = null;
 
         AxisService service = cfgCtx.getAxisConfiguration().getService(serviceName);
@@ -390,14 +394,14 @@ public class FIXTransportSender extends AbstractTransportSender {
             ArrayList<SessionID> sessions = acceptor.getSessions();
             if (sessions.size() == 1) {
                 sessionID = sessions.get(0);
-                if (deliverToCompID != null && !isTargetVald(fieldValues, sessionID, isValidationOn(service))) {
+                if (deliverToCompID != null && !isTargetValid(fieldValues, sessionID, isValidationOn(service))) {
                     sessionID = null;
                 }
 
             } else if (sessions.size() > 1 && deliverToCompID != null) {
-                for (int i = 0; i < sessions.size(); i++) {
-                    sessionID = sessions.get(i);
-                    if (isTargetVald(fieldValues, sessionID, isValidationOn(service))) {
+                for (SessionID session : sessions) {
+                    sessionID = session;
+                    if (isTargetValid(fieldValues, sessionID, isValidationOn(service))) {
                         break;
                     }
                 }
@@ -407,7 +411,8 @@ public class FIXTransportSender extends AbstractTransportSender {
         if (sessionID != null) {
             //Found a valid session. Now forward the message...
             FIXOutTransportInfo fixOutInfo = new FIXOutTransportInfo(sessionID);
-            return sendUsingTrpOutInfo(fixOutInfo, serviceName, fixMessage, srcSession, counter);
+            return sendUsingTrpOutInfo(fixOutInfo, serviceName, fixMessage,
+                    srcSession, counter, msgCtx);
         }
         return false;
     }

@@ -213,7 +213,7 @@ public class FIXUtils {
                 List<Group> groupList = message.getGroups(groupKey);
                 Iterator<Group> groupIterator = groupList.iterator();
 
-                while(groupIterator.hasNext()) {
+                while (groupIterator.hasNext()) {
                     Group msgGroup = groupIterator.next();
                     OMElement groupField = soapFactory.createOMElement(FIXConstants.FIX_GROUP, null);
                     // rec. call the method to process the repeating groups

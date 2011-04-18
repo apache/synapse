@@ -41,11 +41,12 @@ import quickfix.field.SenderCompID;
 import quickfix.field.TargetCompID;
 
 import javax.xml.namespace.QName;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * FIXIncomingMessageHandler is responsible for handling all incoming FIX messages. This is where the
@@ -63,11 +64,12 @@ public class FIXIncomingMessageHandler implements Application {
     /** A boolean value indicating the type of the FIX application */
     private boolean acceptor;
     /** A Map of counters with one counter per session */
-    private Map<SessionID, Integer> countersMap;
+    private Map<SessionID, AtomicInteger> countersMap;
     private Queue<MessageContext> outgoingMessages;
-    private boolean allNewApproach;
-    private boolean dropExtraResponses;
+    private boolean allNewApproach = true;
+    private boolean dropExtraResponses = false;
     private Semaphore semaphore;
+    private SessionEventHandler eventHandler;
 
     public FIXIncomingMessageHandler(ConfigurationContext cfgCtx, WorkerPool workerPool,
                              AxisService service, boolean acceptor) {
@@ -76,25 +78,43 @@ public class FIXIncomingMessageHandler implements Application {
         this.service = service;
         this.log = LogFactory.getLog(this.getClass());
         this.acceptor = acceptor;
-        countersMap = new HashMap<SessionID, Integer>();
+        countersMap = new ConcurrentHashMap<SessionID, AtomicInteger>();
         outgoingMessages = new LinkedBlockingQueue<MessageContext>();
         semaphore = new Semaphore(0);
         getResponseHandlingApproach();
+
+        Parameter eventHandlerParam;
+        if (acceptor) {
+            eventHandlerParam = service.getParameter(FIXConstants.FIX_ACCEPTOR_EVENT_HANDLER);
+        } else {
+            eventHandlerParam = service.getParameter(FIXConstants.FIX_INITIATOR_EVENT_HANDLER);
+        }
+
+        if (eventHandlerParam != null && eventHandlerParam.getValue() != null &&
+                !"".equals(eventHandlerParam.getValue())) {
+            try {
+                Class clazz = getClass().getClassLoader().loadClass(
+                        (String) eventHandlerParam.getValue());
+                eventHandler = (SessionEventHandler) clazz.newInstance();
+            } catch (ClassNotFoundException e) {
+                log.error("Unable to find the session event handler class: " +
+                        eventHandlerParam.getValue(), e);
+            } catch (Exception e) {
+                log.error("Error while initializing the session event handler class: " +
+                        eventHandlerParam.getValue(), e);
+            }
+        }
     }
 
     private void getResponseHandlingApproach() {
         Parameter param = service.getParameter(FIXConstants.FIX_RESPONSE_HANDLER_APPROACH);
         if (param != null && "false".equals(param.getValue().toString())) {
             allNewApproach = false;
-        } else {
-            allNewApproach = true;
         }
 
         Parameter dropResponsesParam = service.getParameter(FIXConstants.FIX_DROP_EXTRA_RESPONSES);
         if (dropResponsesParam != null && "true".equals(dropResponsesParam.getValue().toString())) {
             dropExtraResponses = true;
-        } else {
-            dropExtraResponses = false;
         }
     }
 
@@ -119,12 +139,15 @@ public class FIXIncomingMessageHandler implements Application {
      * Sessions exist whether or not a counter party is connected to it. As soon
      * as a session is created, the application can begin sending messages to it. If no one
      * is logged on, the messages will be sent at the time a connection is
-     * established with the counterparty.
+     * established with the counter party.
      *
      * @param sessionID QuickFIX session ID
      */
     public void onCreate(SessionID sessionID) {
         log.info("New FIX session created: " + sessionID.toString());
+        if (eventHandler != null) {
+            eventHandler.onCreate(sessionID);
+        }
     }
 
     /**
@@ -136,9 +159,15 @@ public class FIXIncomingMessageHandler implements Application {
      * @param sessionID QuickFIX session ID
      */
     public void onLogon(SessionID sessionID) {
-        countersMap.put(sessionID, 0);
+        if (!countersMap.containsKey(sessionID)) {
+            countersMap.put(sessionID, new AtomicInteger(0));
+        }
         log.info("FIX session logged on: " + sessionID.toString());
         semaphore.release();
+
+        if (eventHandler != null) {
+            eventHandler.onLogon(sessionID);
+        }
     }
 
     /**
@@ -149,11 +178,14 @@ public class FIXIncomingMessageHandler implements Application {
      * @param sessionID QuickFIX session ID
      */
     public void onLogout(SessionID sessionID) {
-        countersMap.put(sessionID, 0);
         FIXTransportSender trpSender = (FIXTransportSender) cfgCtx.getAxisConfiguration().
                 getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
         trpSender.logOutIncomingSession(sessionID);
         log.info("FIX session logged out: " + sessionID.toString());
+
+        if (eventHandler != null) {
+            eventHandler.onLogout(sessionID);
+        }
     }
 
     /**
@@ -182,6 +214,10 @@ public class FIXIncomingMessageHandler implements Application {
                 log.trace("Message: " + message.toString());
             }
         }
+
+        if (eventHandler != null) {
+            eventHandler.toAdmin(message, sessionID);
+        }
     }
 
     /**
@@ -209,11 +245,15 @@ public class FIXIncomingMessageHandler implements Application {
                 log.trace("Message: " + message.toString());
             }
         }
+
+        if (eventHandler != null) {
+            eventHandler.fromAdmin(message, sessionID);
+        }
     }
 
     /**
      * This is a callback for application messages that are being sent to a
-     * counterparty.
+     * counter party.
      *
      * @param message QuickFIX message
      * @param sessionID QuickFIX session ID
@@ -235,6 +275,10 @@ public class FIXIncomingMessageHandler implements Application {
             if (log.isTraceEnabled()) {
                 log.trace("Message: " + message.toString());
             }
+        }
+
+        if (eventHandler != null) {
+            eventHandler.toApp(message, sessionID);
         }
     }
 
@@ -264,10 +308,12 @@ public class FIXIncomingMessageHandler implements Application {
             }
         }
 
-        int counter = countersMap.get(sessionID);
-        counter++;
-        countersMap.put(sessionID, counter);
-
+        AtomicInteger atomicCounter = countersMap.get(sessionID);
+        int counter = atomicCounter.incrementAndGet();
+        boolean rolled = atomicCounter.compareAndSet(FIXConstants.DEFAULT_COUNTER_UPPER_LIMIT, 0);
+        if (rolled && log.isDebugEnabled()) {
+            log.debug("Incoming request counter rolled over for the session: " + sessionID);
+        }
         workerPool.execute(new FIXWorkerThread(message, sessionID, counter));
     }
 
@@ -288,7 +334,12 @@ public class FIXIncomingMessageHandler implements Application {
         }
 
         private void handleIncomingRequest() {
-            //Create message context for the incmong message
+            if (log.isDebugEnabled()) {
+                log.debug("Source session: " + sessionID + " - Received message with sequence " +
+                        "number " + counter);
+            }
+
+            //Create message context for the incoming message
             AbstractTransportListener trpListener = (AbstractTransportListener) cfgCtx.getAxisConfiguration().
                     getTransportIn(FIXConstants.TRANSPORT_NAME).getReceiver();
 
@@ -311,16 +362,12 @@ public class FIXIncomingMessageHandler implements Application {
                     msgCtx.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
                     msgCtx.setSoapAction("urn:" + operation.getName().getLocalPart());
                 }
-            } else {
-                log.warn("Service information not available for the FIX message processor");
-                return;
             }
 
             String fixApplication = FIXConstants.FIX_INITIATOR;
             if (acceptor) {
                 fixApplication = FIXConstants.FIX_ACCEPTOR;
-            }
-            else {
+            } else {
                 msgCtx.setProperty("synapse.isresponse", true);
             }
 

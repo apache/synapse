@@ -435,7 +435,7 @@ public class FIXTransportSender extends AbstractTransportSender {
     }
 
     public void logOutIncomingSession(SessionID sessionID) {
-        messageSender.cleanUpMessages(sessionID.toString());
+        //messageSender.cleanUpMessages(sessionID.toString());
     }
 
 }

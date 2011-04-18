@@ -54,6 +54,7 @@ public class FIXConstants {
     public static final long DEFAULT_HEART_BT_INT_VALUE = 30;
     public static final String DEFAULT_START_TIME_VALUE = "00:00:00";
     public static final String DEFAULT_END_TIME_VALUE = "00:00:00";
+    public static final int DEFAULT_COUNTER_UPPER_LIMIT = 1000000000;
 
     public static final String HEART_BY_INT = "HeartBtInt";
     public static final String BEGIN_STRING = "BeginString";
@@ -101,5 +102,12 @@ public class FIXConstants {
     public static final String FIX_BEGIN_STRING_VALIDATION = "transport.fix.BeginStringValidation";
 
     public static final String FIX_DROP_EXTRA_RESPONSES = "transport.fix.DropExtraResponses";
+
+    public static final String FIX_ACCEPTOR_EVENT_HANDLER = "transport.fix.AcceptorSessionEventHandler";
+    public static final String FIX_INITIATOR_EVENT_HANDLER = "transport.fix.InitiatorSessionEventHandler";
+
+    //--------------------------- Message level properties -----------------------------------
+
+    public static final String FIX_IGNORE_ORDER = "transport.fix.IgnoreOrder";
 
 }

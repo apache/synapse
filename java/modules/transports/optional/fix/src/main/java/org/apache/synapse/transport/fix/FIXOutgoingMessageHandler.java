@@ -20,28 +20,32 @@
 package org.apache.synapse.transport.fix;
 
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import quickfix.Message;
 import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.SessionNotFound;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * FIXOutgoingMessageHandler makes sure that messages are delivered in the order they were received by
- * a FIX acceptor. In case the message arrived over a different transport srill this class will try to
+ * a FIX acceptor. In case the message arrived over a different transport still this class will try to
  * put the messages in correct order based on the counter value of the message.
  */
 public class FIXOutgoingMessageHandler {
+
+    private static final Log log = LogFactory.getLog(FIXOutgoingMessageHandler.class);
 
     private Map<String, Integer> countersMap;
     private Map<String, Map<Integer,Object[]>> messagesMap;
     private FIXSessionFactory sessionFactory;
 
     public FIXOutgoingMessageHandler() {
-        countersMap = new HashMap<String, Integer>();
-        messagesMap = new HashMap<String, Map<Integer,Object[]>>();
+        countersMap = new ConcurrentHashMap<String, Integer>();
+        messagesMap = new ConcurrentHashMap<String, Map<Integer,Object[]>>();
     }
 
     public void setSessionFactory(FIXSessionFactory sessionFactory) {
@@ -64,35 +68,43 @@ public class FIXOutgoingMessageHandler {
     public synchronized void sendMessage(Message message, SessionID targetSession, String sourceSession,
                             int counter, MessageContext msgCtx, String targetEPR) throws SessionNotFound {
 
-        if (sourceSession != null && counter != -1) {
+        boolean ignoreOrder = "true".equals(msgCtx.getProperty(FIXConstants.FIX_IGNORE_ORDER));
+        if (sourceSession != null && counter != -1 && !ignoreOrder) {
 
             int expectedValue;
             if (countersMap.containsKey(sourceSession)) {
                 expectedValue = countersMap.get(sourceSession);
-            }
-            else {
+            } else {
                 //create new entries in the respective Maps
                 //counter starts at 1
                 countersMap.put(sourceSession, 1);
-                messagesMap.put(sourceSession, new HashMap<Integer,Object[]>());
+                messagesMap.put(sourceSession, new ConcurrentHashMap<Integer,Object[]>());
                 expectedValue = 1;
             }
 
             if (expectedValue == counter) {
                 sendToTarget(msgCtx, targetEPR, message, targetSession);
-                countersMap.put(sourceSession, expectedValue++);
+                if (FIXConstants.DEFAULT_COUNTER_UPPER_LIMIT == expectedValue) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Outgoing request counter rolled over for the session: " +
+                                sourceSession + " (from " + expectedValue + ")");
+                    }
+                    expectedValue = 1;
+                }
+                countersMap.put(sourceSession, ++expectedValue);
                 sendQueuedMessages(expectedValue, sourceSession);
             }
             else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Source session: " + sourceSession + " - Expected sequence number (" +
+                            expectedValue + ") does not match with the actual sequence number (" +
+                            counter + "). Holding the message back for later delivery.");
+                }
+
                 //save the message to be sent later...
                 Map<Integer,Object[]> messages = messagesMap.get(sourceSession);
-                Object[] obj = new Object[4];
-                obj[0] = message;
-                obj[1] = targetSession;
-                obj[2] = msgCtx;
-                obj[3] = targetEPR;
+                Object[] obj = new Object[] { message, targetSession, msgCtx, targetEPR } ;
                 messages.put(counter, obj);
-                messagesMap.put(sourceSession, messages);
             }
         }
         else {
@@ -144,11 +156,23 @@ public class FIXOutgoingMessageHandler {
             String targetEPR = null;
             if (obj[2] != null) {
                 msgCtx = (MessageContext) obj[2];
-                targetEPR = obj[3].toString();
+                targetEPR = (String) obj[3];
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Source session: " + session + " - Sending the previously queued message " +
+                        "with the sequence number: " + expectedValue);
             }
             sendToTarget(msgCtx, targetEPR, message, sessionID);
             messages.remove(expectedValue);
-            obj = messages.get(expectedValue++);
+            if (FIXConstants.DEFAULT_COUNTER_UPPER_LIMIT == expectedValue) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Outgoing request counter rolled over for the session: " + session +
+                        " (from " + expectedValue + ")");
+                }
+                expectedValue = 1;
+            }
+            obj = messages.get(++expectedValue);
         }
         messagesMap.put(session, messages);
         countersMap.put(session, expectedValue);
@@ -163,6 +187,12 @@ public class FIXOutgoingMessageHandler {
                 if (obj != null) {
                     Message message = (Message) obj[0];
                     SessionID sessionID = (SessionID) obj[1];
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Source session: " + session + " - Flushing the previously queued " +
+                                "message with the sequence number: " + expectedValue);
+                    }
+
                     try {
                         Session.sendToTarget(message, sessionID);
                     } catch (SessionNotFound ignore) { }

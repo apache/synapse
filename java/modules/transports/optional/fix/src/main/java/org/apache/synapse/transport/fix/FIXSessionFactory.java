@@ -98,7 +98,7 @@ public class FIXSessionFactory {
      * acceptorStore keyed by the service name and start it.
      *
      * @param service the AxisService
-     * @return true if the acceptor was created and started properly and false otherwise
+     * @return true if the acceptor is successfully initialized and false otherwise
      * @throws AxisFault if the acceptor cannot be created
      */
     public boolean createFIXAcceptor(AxisService service) throws AxisFault {
@@ -175,7 +175,7 @@ public class FIXSessionFactory {
             try {
                 settings = new SessionSettings(fixConfigStream);
             } catch (ConfigError e) {
-                throw new AxisFault("Error in the specified FIX configuration for the initiaotr. " +
+                throw new AxisFault("Error in the specified FIX configuration for the initiator. " +
                         "Unable to initialize a FIX session for the service " +
                         service.getName(), e);
             }
@@ -349,7 +349,7 @@ public class FIXSessionFactory {
      * @param serviceName the name of the AxisService
      * @return a FIX Acceptor for the service
      */
-    public Acceptor getAccepter(String serviceName) {
+    public Acceptor getAcceptor(String serviceName) {
         return acceptorStore.get(serviceName);
     }
 
@@ -361,7 +361,7 @@ public class FIXSessionFactory {
      */
    public Initiator getInitiator(String fixEPR) {
         return initiatorStore.get(fixEPR);
-    }
+   }
 
     /**
      * Get the FIX configuration URL from the services.xml.
@@ -391,8 +391,8 @@ public class FIXSessionFactory {
             } catch (IOException e) {
                 log.error("Error while reading from the URL " + fixConfigURLValue, e);
             }
-        } else if (log.isDebugEnabled()) {
-            log.debug("FIX configuration URL is not specified for the service " + service.getName());
+        } else {
+            log.info("FIX configuration URL is not specified for the service " + service.getName());
         }
 
         return fixConfigStream;
@@ -506,8 +506,7 @@ public class FIXSessionFactory {
             jmxExporter.setRegistrationBehavior(JmxExporter.REGISTRATION_IGNORE_EXISTING);
             jmxExporter.export(connector);
         } catch (JMException e) {
-            log.error("Error while initializing JMX support for the FIX sessions in " +
-                    "service: " + service, e);
+            log.error("Error while initializing JMX support for the service: " + service, e);
         }
     }
 }

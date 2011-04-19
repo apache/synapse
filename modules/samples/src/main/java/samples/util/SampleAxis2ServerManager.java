@@ -18,6 +18,7 @@
  */
 package samples.util;
 
+import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
@@ -41,7 +42,7 @@ public class SampleAxis2ServerManager {
 
     public static final int DEFAULT_PORT = 9000;
 
-    private ConfigurationContext configctx;
+    private ConfigurationContext configCtx;
     
     private ListenerManager listenerManager;
 
@@ -89,26 +90,27 @@ public class SampleAxis2ServerManager {
                     + new File(confLocation).getAbsolutePath());
         }
         try {
-            configctx = ConfigurationContextFactory
+            configCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(repoLocation,
                     confLocation);
 
-            configurePort(configctx);
+            configurePort(configCtx);
+
+            // Start the transport listeners
+            listenerManager = new ListenerManager();
+            listenerManager.init(configCtx);
+            listenerManager.start();
 
             // Need to initialize the cluster manager at last since we are changing the servers
             // HTTP/S ports above. In the axis2.xml file, we need to set the "AvoidInitiation" param
             // to "true"
-            /*ClusteringAgent clusteringAgent =
-                    configctx.getAxisConfiguration().getClusteringAgent();
+            ClusteringAgent clusteringAgent =
+                    configCtx.getAxisConfiguration().getClusteringAgent();
             if(clusteringAgent != null) {
-                clusteringAgent.setConfigurationContext(configctx);
+                clusteringAgent.setConfigurationContext(configCtx);
                 clusteringAgent.init();
-            }*/
+            }
 
-            // Finally start the transport listeners
-            listenerManager = new ListenerManager();
-            listenerManager.init(configctx);
-            listenerManager.start();
             log.info("[SimpleAxisServer] Started");
         } catch (Throwable t) {
             log.fatal("[SimpleAxisServer] Shutting down. Error starting SimpleAxisServer", t);
@@ -122,8 +124,8 @@ public class SampleAxis2ServerManager {
             listenerManager.destroy();
         }
         //we need to call this method to clean the team fils we created.
-        if (configctx != null) {
-            configctx.terminate();
+        if (configCtx != null) {
+            configCtx.terminate();
         }
     }
 

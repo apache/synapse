@@ -29,4 +29,8 @@ public class WeightedRoundRobinView implements WeightedRoundRobinViewMBean {
     public void changeWeight(int pos, int weight) {
         algorithm.changeWeight(pos, weight);
     }
+
+    public int[] getWeights() {
+        return algorithm.getWeights();
+    }
 }

@@ -21,4 +21,6 @@ package org.apache.synapse.endpoints.algorithms;
 
 public interface WeightedRoundRobinViewMBean {
     void changeWeight(int pos, int weight);
+
+    int[] getWeights();
 }

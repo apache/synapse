@@ -339,9 +339,26 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
             state.weight = weight;
 
             calculate();
+
+            reset(null);
         } finally {
             writeLock.unlock();
         }
     }
 
+    public int[] getWeights() {
+        int weights[] = new int[endpointStates.length];
+
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = 1;
+        }
+
+        for (EndpointState state : endpointStates) {
+            if (state.getEndpointPosition() < weights.length && state.getEndpointPosition() >= 0) {
+                weights[state.getEndpointPosition()] = state.getWeight();
+            }
+        }
+
+        return weights;
+    }
 }

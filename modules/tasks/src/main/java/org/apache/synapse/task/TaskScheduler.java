@@ -213,6 +213,63 @@ public class TaskScheduler {
     }
 
     /**
+     * Schedule a Task
+     *
+     * @param taskDescription TaskDescription , an information about Task
+     * @param resources       Any initial resources for task
+     * @param jobClass        Quartz job class
+     * @param task            The task to be executed
+     */
+    public void scheduleTask(TaskDescription taskDescription, Map<String,
+            Object> resources, Class<? extends Job> jobClass, Task task) {
+
+        assertInitialized();
+        assertStarted();
+
+        if (taskDescription == null) {
+            throw new SynapseTaskException("Task Description cannot be found", log);
+        }
+
+        if (jobClass == null) {
+            throw new SynapseTaskException("Job Class cannot be found", log);
+        }
+
+        if (triggerFactory == null) {
+            throw new SynapseTaskException("TriggerFactory cannot be found", log);
+        }
+
+        if (jobDetailFactory == null) {
+            throw new SynapseTaskException("JobDetailFactory cannot be found", log);
+        }
+
+        Trigger trigger = triggerFactory.createTrigger(taskDescription);
+        if (trigger == null) {
+            throw new SynapseTaskException("Trigger cannot be created from : "
+                    + taskDescription, log);
+        }
+
+        JobDetail jobDetail = jobDetailFactory.createJobDetail(taskDescription,
+                resources, jobClass);
+        if (jobDetail == null) {
+            throw new SynapseTaskException("JobDetail cannot be created from : " + taskDescription +
+                    " and job class " + jobClass.getName(), log);
+        }
+
+        jobDetail.getJobDataMap().put(TaskDescription.INSTANCE, task);
+
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("scheduling job : " + jobDetail + " with trigger " + trigger);
+            }
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            throw new SynapseTaskException("Error scheduling job : " + jobDetail
+                    + " with trigger " + trigger);
+        }
+
+    }
+
+    /**
      * ShutDown the underlying quartz scheduler
      */
     public void shutDown() {

@@ -90,6 +90,7 @@
     <deployer extension="xml" directory="conf/synapse-config/tasks" class="org.apache.synapse.deployers.TaskDeployer"/>
     <deployer extension="xml" directory="conf/synapse-config/priority-executors" class="org.apache.synapse.deployers.PriorityExecutorDeployer"/>
     <deployer extension="xml" directory="conf/synapse-config/templates" class="org.apache.synapse.deployers.TemplateDeployer"/>
+    <deployer extension="xml" directory="conf/synapse-config/message-stores" class="org.apache.synapse.deployers.MessageStoreDeployer"/>
 
     <!-- Following parameter will set the host name for the epr-->
     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->

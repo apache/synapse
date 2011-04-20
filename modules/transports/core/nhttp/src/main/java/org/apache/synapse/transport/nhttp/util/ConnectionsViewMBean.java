@@ -34,7 +34,7 @@ public interface ConnectionsViewMBean {
     public Map getRequestSizesMap();
     public Map getResponseSizesMap();
     public Date getLastResetTime();
-
+    public Map getActiveConnectionsPerHosts();
     public void reset();
     
 }

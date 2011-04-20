@@ -26,6 +26,7 @@ import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.task.Task;
 
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.task.TaskDescription;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -53,24 +54,33 @@ public class SimpleQuartzJob implements Job {
             handleException("No " + CLASSNAME + " in JobDetails");
         }
 
-        Task task = null;
-        try {
-            task = (Task) getClass().getClassLoader().loadClass(jobClassName).newInstance();
-        } catch (Exception e) {
-            handleException("Cannot instantiate task : " + jobClassName, e);
+        boolean initRequired = false;
+
+        Task task = (Task) jdm.get(TaskDescription.INSTANCE);
+        if (task == null) {
+            initRequired = true;
         }
 
-        Set properties = (Set) jdm.get(PROPERTIES);
-        for (Object property : properties) {
-            OMElement prop = (OMElement) property;
-            log.debug("Found Property : " + prop.toString());
-            PropertyHelper.setStaticProperty(prop, task);
-        }
-
-        // 1. Initialize
         SynapseEnvironment se = (SynapseEnvironment) jdm.get("SynapseEnvironment");
-        if (task instanceof ManagedLifecycle && se != null) {
-            ((ManagedLifecycle) task).init(se);
+
+        if (initRequired) {
+            try {
+                task = (Task) getClass().getClassLoader().loadClass(jobClassName).newInstance();
+            } catch (Exception e) {
+                handleException("Cannot instantiate task : " + jobClassName, e);
+            }
+
+            Set properties = (Set) jdm.get(PROPERTIES);
+            for (Object property : properties) {
+                OMElement prop = (OMElement) property;
+                log.debug("Found Property : " + prop.toString());
+                PropertyHelper.setStaticProperty(prop, task);
+            }
+
+            // 1. Initialize
+            if (task instanceof ManagedLifecycle && se != null) {
+                ((ManagedLifecycle) task).init(se);
+            }
         }
 
         // 2. Execute
@@ -78,9 +88,11 @@ public class SimpleQuartzJob implements Job {
             task.execute();
         }
 
-        // 3. Destroy
-        if (task instanceof ManagedLifecycle && se != null) {
-            ((ManagedLifecycle) task).destroy();
+        if (initRequired) {
+            // 3. Destroy
+            if (task instanceof ManagedLifecycle && se != null) {
+                ((ManagedLifecycle) task).destroy();
+            }
         }
     }
 

@@ -60,7 +60,8 @@ public class ConnectionsView implements ConnectionsViewMBean {
     private AtomicInteger activeConnections = new AtomicInteger(0);
     private AtomicInteger shortTermOpenedConnections = new AtomicInteger(0);
     private AtomicInteger longTermOpenedConnections = new AtomicInteger(0);
-
+    // The map keeps the key as connectionhost:port and value as the number of connections for that host
+    private Map<String,AtomicInteger> activeConnectionsPerHost = new HashMap<String,AtomicInteger>();
     // The array length must be equal to the number of buckets
     private AtomicInteger[] requestSizeCounters = new AtomicInteger[6];
     private AtomicInteger[] responseSizeCounters = new AtomicInteger[6];
@@ -262,4 +263,18 @@ public class ConnectionsView implements ConnectionsViewMBean {
         }
         return sum;
     }
+
+    /**
+     * Setter method for activeConnectionsPerHost, this will get called during connection creation
+     * and Connection shutdown operations
+     * @param activeConnectionsPerHost
+     */
+    public void setActiveConnectionPerHostEntry(Map<String,AtomicInteger> activeConnectionsPerHost){
+        this.activeConnectionsPerHost = activeConnectionsPerHost;
+    }
+
+    public Map getActiveConnectionsPerHosts(){
+        return activeConnectionsPerHost;
+    }
+
 }

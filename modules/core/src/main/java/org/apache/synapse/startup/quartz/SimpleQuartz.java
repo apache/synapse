@@ -19,9 +19,12 @@
 
 package org.apache.synapse.startup.quartz;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.AbstractStartup;
 import org.apache.synapse.task.*;
@@ -32,6 +35,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * This class is instantiated by SimpleQuartzFactory (or by hand)
@@ -48,6 +52,8 @@ public class SimpleQuartz extends AbstractStartup {
 
     private SynapseTaskManager taskManager;
 
+    private Task task = null;
+
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
     }
@@ -59,6 +65,10 @@ public class SimpleQuartz extends AbstractStartup {
                 log.debug("There is no Task to be deleted");
             }
             return;
+        }
+
+        if (task instanceof ManagedLifecycle) {
+            ((ManagedLifecycle) task).destroy();
         }
 
         if (taskManager.isInitialized()) {
@@ -131,6 +141,24 @@ public class SimpleQuartz extends AbstractStartup {
             }
         }
 
+        try {
+            task = (Task) getClass().getClassLoader().loadClass(
+                    taskDescription.getTaskClass()).newInstance();
+        } catch (Exception e) {
+            handleException("Cannot instantiate task : " + taskDescription.getTaskClass(), e);
+        }
+
+        Set properties = taskDescription.getProperties();
+        for (Object property : properties) {
+            OMElement prop = (OMElement) property;
+            log.debug("Found Property : " + prop.toString());
+            PropertyHelper.setStaticProperty(prop, task);
+        }
+
+        if (task instanceof ManagedLifecycle) {
+            ((ManagedLifecycle)task).init(synapseEnvironment);
+        }
+
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(SimpleQuartzJob.SYNAPSE_ENVIRONMENT, synapseEnvironment);
 
@@ -141,7 +169,7 @@ public class SimpleQuartz extends AbstractStartup {
                 if (!taskScheduler.isInitialized()) {
                     taskScheduler.init(synapseEnvironment.getSynapseConfiguration().getProperties());
                 }
-                taskScheduler.scheduleTask(taskDescription, map, SimpleQuartzJob.class);
+                taskScheduler.scheduleTask(taskDescription, map, SimpleQuartzJob.class, task);
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("TaskScheduler cannot be found for :" +
@@ -169,5 +197,10 @@ public class SimpleQuartz extends AbstractStartup {
     private static void handleException(String message) {
         log.error(message);
         throw new SynapseException(message);
+    }
+
+    private static void handleException(String message, Exception e) {
+        log.error(message, e);
+        throw new SynapseException(message, e);
     }
 }

@@ -33,6 +33,7 @@ public class TaskDescription {
 
     public static final String CLASSNAME = "ClassName";
     public static final String PROPERTIES = "Properties";
+    public static final String INSTANCE = "Instance";
     public static final String DEFAULT_GROUP = "synapse.simple.quartz";
     private String cron;
     private int repeatCount = SimpleTrigger.REPEAT_INDEFINITELY;

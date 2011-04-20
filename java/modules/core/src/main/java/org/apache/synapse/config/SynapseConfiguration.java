@@ -276,6 +276,27 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         return definedTemplates;
     }
 
+    /**
+     * Returns the map of defined synapse endpoint templates in the configuration excluding the
+     * fetched sequences from remote registry.
+     *
+     * @return Map of Templates defined in the local configuration
+     */
+    public Map<String, Template> getEndpointTemplates() {
+
+        Map<String, Template> definedTemplates = new HashMap<String, Template>();
+
+        synchronized (this) {
+            for (Object o : localRegistry.values()) {
+                if (o instanceof Template) {
+                    Template template = (Template) o;
+                    definedTemplates.put(template.getName(), template);
+                }
+            }
+        }
+        return definedTemplates;
+    }
+
      /**
      * Return the template specified with the given key
      *

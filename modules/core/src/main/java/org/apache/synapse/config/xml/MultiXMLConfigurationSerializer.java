@@ -99,7 +99,8 @@ public class MultiXMLConfigurationSerializer {
             serializeTasks(synapseConfig.getStartups(), synapseConfig, definitions);
             serializeLocalRegistryValues(synapseConfig.getLocalRegistry().values(),
                     synapseConfig, definitions);
-            serializeExecutors(synapseConfig.getPriorityExecutors().values(), definitions);
+            serializeExecutors(synapseConfig.getPriorityExecutors().values(),
+                    synapseConfig, definitions);
             serializeMessageStores(synapseConfig.getMessageStores().values(), definitions);
             serializeSynapseXML(definitions);
 
@@ -389,14 +390,20 @@ public class MultiXMLConfigurationSerializer {
         return null;
     }
 
-    public OMElement serializeExecutor(PriorityExecutor source, OMElement parent) throws Exception {
+    public OMElement serializeExecutor(PriorityExecutor source, SynapseConfiguration synapseConfig,
+                                       OMElement parent) throws Exception {
         File executorDir = createDirectory(currentDirectory,
                 MultiXMLConfigurationBuilder.EXECUTORS_DIR);
 
         OMElement eventDirElem = PriorityExecutorSerializer.serialize(null, source,
                 SynapseConstants.SYNAPSE_NAMESPACE);
 
+        File entriesDir = createDirectory(currentDirectory,
+                    MultiXMLConfigurationBuilder.EXECUTORS_DIR);
+        String fileName = source.getFileName();
         if (source.getFileName() != null) {
+            handleDeployment(entriesDir, fileName, source.getName(),
+                        synapseConfig.getArtifactDeploymentStore());
             File eventSrcFile = new File(executorDir, source.getFileName());
             writeToFile(eventDirElem, eventSrcFile);
         } else if (parent != null) {
@@ -480,9 +487,10 @@ public class MultiXMLConfigurationSerializer {
     }
 
     private void serializeExecutors(Collection<PriorityExecutor> executors,
+                                    SynapseConfiguration synapseConfig,
                                        OMElement parent) throws Exception {
         for (PriorityExecutor source : executors) {
-            serializeExecutor(source, parent);
+            serializeExecutor(source, synapseConfig, parent);
         }
     }
 

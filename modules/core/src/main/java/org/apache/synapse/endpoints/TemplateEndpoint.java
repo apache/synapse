@@ -104,6 +104,7 @@ public class TemplateEndpoint extends AbstractEndpoint {
     private synchronized void reLoadAndInitEndpoint(SynapseEnvironment se) {
         SynapseConfiguration synCfg = se.getSynapseConfiguration();
 
+        //always do reloading at init
         boolean reLoad = (realEndpoint == null);
         if (!reLoad) {
             Entry entry = synCfg.getEntryDefinition(template);
@@ -112,8 +113,11 @@ public class TemplateEndpoint extends AbstractEndpoint {
                     reLoad = true;
                 }
             } else {
-                // If the endpoint is static we should reload it from the Synapse config
-                reLoad = true;
+                // this endpoint is static -->
+                // since template-endpoint is static, should ONLY be loaded at initialization to prevent
+                // reloading every single time this endpoint is executed..
+                // incase tempalate config has changed this endpoint should be redeployed
+                reLoad = false;
             }
         }
 

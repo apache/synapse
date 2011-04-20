@@ -243,7 +243,9 @@ public class MessageHelper {
         if (envelope.getHeader() != null) {
             Iterator itr = envelope.getHeader().cloneOMElement().getChildren();
             while (itr.hasNext()) {
-                newEnvelope.getHeader().addChild((OMNode) itr.next());
+                OMNode node = (OMNode) itr.next();
+                itr.remove();
+                newEnvelope.getHeader().addChild(node);
             }
         }
 
@@ -256,7 +258,9 @@ public class MessageHelper {
             } else {
                 Iterator itr = envelope.getBody().cloneOMElement().getChildren();
                 while (itr.hasNext()) {
-                    newEnvelope.getBody().addChild((OMNode) itr.next());
+                    OMNode node = (OMNode) itr.next();
+                    itr.remove();
+                    newEnvelope.getBody().addChild(node);
                 }
             }
         }

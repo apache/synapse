@@ -537,6 +537,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 lstMetrics.incrementMessagesSent();
             }
 
+        } catch (ProtocolException e) {
+            log.error(e + " (Synapse may be trying to send an exact response more than once )");
         } catch (HttpException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();

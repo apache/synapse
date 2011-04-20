@@ -21,6 +21,9 @@ package org.apache.synapse.transport.nhttp.util;
 
 import org.apache.axis2.transport.base.MetricsCollector;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+
 /**
  * <p>This simple extension of the Axis2 transport MetricsCollector implementation,
  * maintains a ConnectionsView instance, which is updated based on the events fired
@@ -70,4 +73,8 @@ public class NhttpMetricsCollector extends MetricsCollector {
             view.notifyMessageSize(l, !listener);
         }
     }
+    public void setConnectionsPerHosts(Map<String, AtomicInteger> activeConnectionsPerHost){
+        view.setActiveConnectionPerHostEntry(activeConnectionsPerHost);
+    }
+
 }

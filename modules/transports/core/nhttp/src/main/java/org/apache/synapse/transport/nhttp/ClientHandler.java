@@ -153,6 +153,9 @@ public class ClientHandler implements NHttpClientHandler {
         this.countConnections = NHttpConfiguration.getInstance().isCountConnections();
         // set the connection map to the configuration context
         cfgCtx.setProperty(NhttpConstants.OPEN_CONNNECTIONS_MAP, openConnections);
+
+        // set the latest openConnections map to MBean data during connection creation
+        metrics.setConnectionsPerHosts(openConnections);
     }
 
     public void requestReady(final NHttpClientConnection conn) {
@@ -192,7 +195,7 @@ public class ClientHandler implements NHttpClientHandler {
         if (countConnections) {
             recordConnection(conn);
         }
-        
+
         try {
             processConnection(conn, (Axis2HttpRequest) attachment);
         } catch (ConnectionClosedException e) {

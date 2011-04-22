@@ -67,7 +67,8 @@ public class MediatorSerializerFinder {
         EnrichMediatorSerializer.class,
         TemplateMediatorSerializer.class,
         InvokeMediatorSerializer.class,
-        MessageStoreMediatorSerializer.class
+        MessageStoreMediatorSerializer.class,
+        URLRewriteMediatorSerializer.class
     };
 
     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();

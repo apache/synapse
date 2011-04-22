@@ -97,13 +97,9 @@ public class SynapseConfigurationBuilder {
 
         } else if (synapseConfigLocation.isDirectory()) {
             // build the Synapse configuration by processing given directory hierarchy
-            try {
-                synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile, properties);
-                log.info("Loaded Synapse configuration from the artifact " +
-                        "repository at : " + configFile);
-            } catch (XMLStreamException e) {
-                handleException("Could not initialize Synapse : " + e.getMessage(), e);
-            }
+            synCfg = MultiXMLConfigurationBuilder.getConfiguration(configFile, properties);
+            log.info("Loaded Synapse configuration from the artifact " +
+                    "repository at : " + configFile);
         }
 
         assert synCfg != null;
@@ -115,7 +111,7 @@ public class SynapseConfigurationBuilder {
                 log.debug("Only the registry is defined in the synapse configuration, trying " +
                         "to fetch a configuration from the registry");
             }
-            // TODO: support a artifact repo for registry as well instead of just the synapse.xml
+            // TODO: support a artifact repository for registry as well instead of just the synapse.xml
             OMNode remoteConfigNode = localConfigReg.lookup("synapse.xml");
             if (remoteConfigNode != null) {
                 try {
@@ -127,7 +123,7 @@ public class SynapseConfigurationBuilder {
                     if (synCfg.getRegistry() == null) {
                         synCfg.setRegistry(localConfigReg);
                     } else {
-                        log.warn("Registry declaration has been overwriten by the registry " +
+                        log.warn("Registry declaration has been overwritten by the registry " +
                                 "declaration found at the remote configuration");
                     }
                 } catch (XMLStreamException xse) {
@@ -143,7 +139,7 @@ public class SynapseConfigurationBuilder {
             SynapseConfigUtils.setDefaultMainSequence(synCfg);
         }
 
-        // Check for the fault sequence and add a deafult fault sequence if not present
+        // Check for the fault sequence and add a default fault sequence if not present
         if (synCfg.getFaultSequence() == null) {
             SynapseConfigUtils.setDefaultFaultSequence(synCfg);
         }

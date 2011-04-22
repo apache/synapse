@@ -60,12 +60,9 @@ public class MultiXMLConfigurationSerializer {
     private File rootDirectory;
     private File currentDirectory;
 
-    //private SynapseArtifactDeploymentStore deploymentStore;
-
     public MultiXMLConfigurationSerializer(String directoryPath) {
         rootDirectory = new File(directoryPath);
         currentDirectory = rootDirectory;
-        //deploymentStore = SynapseArtifactDeploymentStore.getInstance();
     }
 
     /**
@@ -73,7 +70,7 @@ public class MultiXMLConfigurationSerializer {
      * thread safe and hence it must not be called by multiple concurrent threads. This method
      * will first serialize the configuration to a temporary directory at the same level as the
      * rootDirectory and then rename/move it as the new rootDirectory. If an error occurs
-     * while saving the configuration, the temporaty files will be removed and the old
+     * while saving the configuration, the temporary files will be removed and the old
      * rootDirectory will be left intact. 
      *
      * @param synapseConfig configuration to be serialized
@@ -86,6 +83,9 @@ public class MultiXMLConfigurationSerializer {
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
         OMElement definitions = fac.createOMElement("definitions", synNS);
+
+        boolean serializationDone = false;
+        boolean errorOccurred = false;
 
         try {
             currentDirectory = createTempDirectoryStructure();
@@ -104,6 +104,8 @@ public class MultiXMLConfigurationSerializer {
             serializeMessageStores(synapseConfig.getMessageStores().values(), definitions);
             serializeSynapseXML(definitions);
 
+            serializationDone = true;
+
             markConfigurationForSerialization(synapseConfig);
             if (rootDirectory.exists()) {
                 if (log.isDebugEnabled()) {
@@ -120,10 +122,15 @@ public class MultiXMLConfigurationSerializer {
             FileUtils.moveDirectory(currentDirectory, rootDirectory);
 
         } catch (Exception e) {
-            log.error("Error occured while serializing the Synapse configuration.", e);
-
+            log.error("Error occurred while serializing the Synapse configuration.", e);
+            errorOccurred = true;
         } finally {
-            deleteTempDirectory();
+            if (!serializationDone || !errorOccurred) {
+                deleteTempDirectory();
+            } else {
+                log.warn("An error has been encountered after the serialization - Leaving the " +
+                        "temporary files for recovery purposes");
+            }
             currentDirectory = rootDirectory;
         }
     }

@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -42,21 +43,22 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.util.Iterator;
 import java.util.Properties;
 
 /**
  * <p>
  * This optional configuration builder creates the Synapse configuration by processing
- * a specified file hierarchy. If the root of the specified file hierarchy is CONF_HOME,
- * then the following directories are expected to be in CONF_HOME.
+ * a specified file hierarchy. If the root of the specified file hierarchy is CONFIG_HOME,
+ * then the following directories are expected to be in CONFIG_HOME.
  * <ul>
- *  <li>CONF_HOME/proxy-services</li>
- *  <li>CONF_HOME/sequences</li>
- *  <li>CONF_HOME/endpoints</li>
- *  <li>CONF_HOME/local-entries</li>
- *  <li>CONF_HOME/tasks</li>
- *  <li>CONF_HOME/event-sources</li>
- *  <li>CONF_HOME/priority-executors</li>
+ *  <li>CONFIG_HOME/proxy-services</li>
+ *  <li>CONFIG_HOME/sequences</li>
+ *  <li>CONFIG_HOME/endpoints</li>
+ *  <li>CONFIG_HOME/local-entries</li>
+ *  <li>CONFIG_HOME/tasks</li>
+ *  <li>CONFIG_HOME/event-sources</li>
+ *  <li>CONFIG_HOME/priority-executors</li>
  * </ul>
  *
  * Each of these directories will house a set of XML files. Each file will define exactly
@@ -64,9 +66,9 @@ import java.util.Properties;
  * </p>
  * <p>
  * In addition to the directories mentioned above one can have the following file in
- * CONF_HOME
+ * CONFIG_HOME
  * <ul>
- *  <li>CONF_HOME/registry.xml</li>
+ *  <li>CONFIG_HOME/registry.xml</li>
  * </ul>
  * </p>
  *
@@ -87,19 +89,13 @@ public class MultiXMLConfigurationBuilder {
 
     public static final String SEPARATE_REGISTRY_DEFINITION = "__separateRegDef";
 
+    private static final String[] extensions = { "xml" };
+
     private static Log log = LogFactory.getLog(MultiXMLConfigurationBuilder.class);
 
-    private static FileFilter filter = new FileFilter() {
-        public boolean accept(File pathname) {
-            return (pathname.isFile() && pathname.getName().endsWith(".xml"));
-        }
-    };
+    public static SynapseConfiguration getConfiguration(String root, Properties properties) {
 
-    public static SynapseConfiguration getConfiguration(String root, Properties properties)
-            throws XMLStreamException {
-
-        log.info("Building synapse configuration from the " +
-                "synapse artifact repository at : " + root);
+        log.info("Building synapse configuration from the synapse artifact repository at : " + root);
 
         // First try to load the configuration from synapse.xml
         SynapseConfiguration synapseConfig = createConfigurationFromSynapseXML(root, properties);
@@ -108,7 +104,7 @@ public class MultiXMLConfigurationBuilder {
             synapseConfig.setDefaultQName(XMLConfigConstants.DEFINITIONS_ELT);
         } else if (log.isDebugEnabled()) {
             log.debug("Found a synapse configuration in the " + SynapseConstants.SYNAPSE_XML
-                    + " file at the artifact repository root, which gets the precedence "
+                    + " file at the artifact repository root, which gets precedence "
                     + "over other definitions");
         }
 
@@ -117,8 +113,8 @@ public class MultiXMLConfigurationBuilder {
             createRegistry(synapseConfig, root, properties);
         } else if (log.isDebugEnabled()) {
             log.debug("Using the registry defined in the " + SynapseConstants.SYNAPSE_XML
-                    + " as the registry, any definitions in the "
-                    + REGISTRY_FILE + " will be neglected");
+                    + " as the registry, any definitions in the "+ REGISTRY_FILE +
+                    " will be neglected");
         }
 
         createLocalEntries(synapseConfig, root, properties);
@@ -135,23 +131,37 @@ public class MultiXMLConfigurationBuilder {
     }
 
     private static SynapseConfiguration createConfigurationFromSynapseXML(
-            String rootDirPath, Properties properties) throws XMLStreamException {
+            String rootDirPath, Properties properties) {
 
         File synapseXML = new File(rootDirPath, SynapseConstants.SYNAPSE_XML);
-        if (synapseXML.exists() && synapseXML.isFile()) {
-            try {
-                return XMLConfigurationBuilder.getConfiguration(
-                        new FileInputStream(synapseXML), properties);
-            } catch (SynapseException e) {
-                log.error("Error while loading the configuration from file: " + synapseXML.getName());
-                throw e;
-            } catch (FileNotFoundException ignored) {}
+        if (!synapseXML.exists() || !synapseXML.isFile()) {
+            return null;
         }
-        return null;
+
+        FileInputStream is;
+        SynapseConfiguration config = null;
+        try {
+            is = FileUtils.openInputStream(synapseXML);
+        } catch (IOException e) {
+            handleException("Error while opening the file: " + synapseXML.getName(), e);
+            return null;
+        }
+
+        try {
+            config = XMLConfigurationBuilder.getConfiguration(is, properties);
+            is.close();
+        } catch (XMLStreamException e) {
+            handleException("Error while loading the Synapse configuration from the " +
+                    synapseXML.getName() + " file", e);
+        } catch (IOException e) {
+            log.warn("Error while closing the input stream from file: " + synapseXML.getName(), e);
+        }
+
+        return config;
     }
 
     private static void createRegistry(SynapseConfiguration synapseConfig, String rootDirPath,
-                                       Properties properties) throws XMLStreamException {
+                                       Properties properties) {
 
         File registryDef = new File(rootDirPath, REGISTRY_FILE);
         if (registryDef.exists() && registryDef.isFile()) {
@@ -159,253 +169,226 @@ public class MultiXMLConfigurationBuilder {
                 log.debug("Initializing Synapse registry from the configuration at : " +
                         registryDef.getPath());
             }
-            try {
-                OMElement document = parseFile(registryDef);
-                SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document, properties);
-                synapseConfig.setProperty(SEPARATE_REGISTRY_DEFINITION,
-                        String.valueOf(Boolean.TRUE));
-            } catch (FileNotFoundException ignored) {}
+            OMElement document = getOMElement(registryDef);
+            SynapseXMLConfigurationFactory.defineRegistry(synapseConfig, document, properties);
+            synapseConfig.setProperty(SEPARATE_REGISTRY_DEFINITION,
+                    String.valueOf(Boolean.TRUE));
         }
     }
 
     private static void createLocalEntries(SynapseConfiguration synapseConfig, String rootDirPath,
-                                           Properties properties) throws XMLStreamException {
+                                           Properties properties) {
 
         File localEntriesDir = new File(rootDirPath, LOCAL_ENTRY_DIR);
         if (localEntriesDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading local entry definitions from : " + localEntriesDir.getPath());
             }
-            File[] entryDefinitions = localEntriesDir.listFiles(filter);
-            for (File file : entryDefinitions) {
-                try {
-                    OMElement document = parseFile(file);
-                    Entry entry = SynapseXMLConfigurationFactory.defineEntry(
-                            synapseConfig, document, properties);
-                    if (entry != null) {
-                        entry.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), entry.getKey());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the local-entry from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
-            }
+
+            Iterator entryDefinitions = FileUtils.iterateFiles(localEntriesDir, extensions, false);
+            while (entryDefinitions.hasNext()) {
+                File file = (File) entryDefinitions.next();
+                OMElement document = getOMElement(file);
+                Entry entry = SynapseXMLConfigurationFactory.defineEntry(synapseConfig, document,
+                        properties);
+                if (entry != null) {
+                    entry.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                            entry.getKey());
+                }
+             }
         }
     }
 
     private static void createProxyServices(SynapseConfiguration synapseConfig, String rootDirPath,
-                                            Properties properties) throws XMLStreamException {
+                                            Properties properties) {
 
         File proxyServicesDir = new File(rootDirPath, PROXY_SERVICES_DIR);
         if (proxyServicesDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading proxy services from : " + proxyServicesDir.getPath());
             }
-            File[] proxyDefinitions = proxyServicesDir.listFiles(filter);
-            for (File file : proxyDefinitions) {
-                try {
-                    OMElement document = parseFile(file);
-                    ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(
-                            synapseConfig, document, properties);
-                    if (proxy != null) {
-                        proxy.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), proxy.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the proxy service from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
-            }
+
+            Iterator proxyDefinitions = FileUtils.iterateFiles(proxyServicesDir, extensions, false);
+            while (proxyDefinitions.hasNext()) {
+                File file = (File) proxyDefinitions.next();
+                OMElement document = getOMElement(file);
+                ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(synapseConfig,
+                        document, properties);
+                if (proxy != null) {
+                    proxy.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
+                            file.getAbsolutePath(), proxy.getName());
+                 }
+             }
         }
     }
 
     private static void createTasks(SynapseConfiguration synapseConfig, String rootDirPath,
-                                    Properties properties) throws XMLStreamException {
+                                    Properties properties) {
 
         File tasksDir = new File(rootDirPath, TASKS_DIR);
         if (tasksDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading tasks from : " + tasksDir.getPath());
             }
-            File[] taskDefinitions = tasksDir.listFiles(filter);
-            for (File file : taskDefinitions) {
-                try {
-                    OMElement document = parseFile(file);
-                    Startup startup = SynapseXMLConfigurationFactory.defineStartup(
-                            synapseConfig, document, properties);
-                    if (startup != null) {
-                        startup.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), startup.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the task from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
-            }
+
+            Iterator taskDefinitions = FileUtils.iterateFiles(tasksDir, extensions, false);
+            while (taskDefinitions.hasNext()) {
+                File file = (File) taskDefinitions.next();
+                OMElement document = getOMElement(file);
+                Startup startup = SynapseXMLConfigurationFactory.defineStartup(synapseConfig,
+                        document, properties);
+                startup.setFileName(file.getName());
+                synapseConfig.getArtifactDeploymentStore().addArtifact(
+                        file.getAbsolutePath(), startup.getName());
+             }
         }
     }
 
     private static void createSequences(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) throws XMLStreamException {
+                                        Properties properties) {
 
         File sequencesDir = new File(rootDirPath, SEQUENCES_DIR);
         if (sequencesDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading sequences from : " + sequencesDir.getPath());
             }
-            File[] sequences = sequencesDir.listFiles(filter);
-            for (File file : sequences) {
-                try {
-                    OMElement document = parseFile(file);
-                    Mediator seq = SynapseXMLConfigurationFactory.defineSequence(
-                            synapseConfig, document, properties);
-                    if (seq != null && seq instanceof SequenceMediator) {
-                        SequenceMediator sequence = (SequenceMediator) seq;
-                        sequence.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), sequence.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the sequence from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
-            }
+
+            Iterator sequences = FileUtils.iterateFiles(sequencesDir, extensions, false);
+            while (sequences.hasNext()) {
+                File file = (File) sequences.next();
+                OMElement document = getOMElement(file);
+                Mediator seq = SynapseXMLConfigurationFactory.defineSequence(synapseConfig,
+                        document, properties);
+                if (seq != null && seq instanceof SequenceMediator) {
+                    SequenceMediator sequence = (SequenceMediator) seq;
+                    sequence.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
+                            file.getAbsolutePath(), sequence.getName());
+                 }
+             }
         }
     }
 
     private static void createTemplates(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) throws XMLStreamException {
+                                        Properties properties) {
 
         File templatesDir = new File(rootDirPath, TEMPLATES_DIR);
         if (templatesDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading template from : " + templatesDir.getPath());
             }
-            File[] sequences = templatesDir.listFiles(filter);
-            for (File file : sequences) {
-                try {
-                    OMElement document = parseFile(file);
-                    OMElement element = document.getFirstChildWithName(
+            Iterator templates = FileUtils.iterateFiles(templatesDir, extensions, false);
+            while (templates.hasNext()) {
+                File file = (File) templates.next();
+                OMElement document = getOMElement(file);
+                OMElement element = document.getFirstChildWithName(
                             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
+                if (element != null) {
+                    TemplateMediator mediator =
+                            (TemplateMediator) SynapseXMLConfigurationFactory.defineMediatorTemplate(
+                                    synapseConfig, document, properties);
+                    if (mediator != null) {
+                        mediator.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), mediator.getName());
+                    }
+                    return;
+
+                } else {
+                    element = document.getFirstChildWithName(
+                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
                     if (element != null) {
-                        TemplateMediator mediator =
-                                (TemplateMediator) SynapseXMLConfigurationFactory.defineMediatorTemplate(
+                        Template endpointTemplate =
+                                SynapseXMLConfigurationFactory.defineEndpointTemplate(
                                         synapseConfig, document, properties);
-                        if (mediator != null) {
-                            mediator.setFileName(file.getName());
+                        if (endpointTemplate != null) {
+                            endpointTemplate.setFileName(file.getName());
                             synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                    file.getAbsolutePath(), mediator.getName());
+                                    file.getAbsolutePath(), endpointTemplate.getFileName());
                         }
                         return;
-                    } else {
-
-                        element = document.getFirstChildWithName(
-                                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
-                        if (element != null) {
-                            Template endpointTemplate =
-                                    SynapseXMLConfigurationFactory.defineEndpointTemplate(
-                                            synapseConfig, document, properties);
-                            if (endpointTemplate != null) {
-                                endpointTemplate.setFileName(file.getName());
-                                synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                        file.getAbsolutePath(), endpointTemplate.getFileName());
-                            }
-                            return;
-                        }
                     }
-                } catch (FileNotFoundException ignored) {}
+                }
             }
         }
     }
 
     private static void createEndpoints(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) throws XMLStreamException {
+                                        Properties properties) {
 
         File endpointsDir = new File(rootDirPath, ENDPOINTS_DIR);
         if (endpointsDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading endpoints from : " + endpointsDir.getPath());
             }
-            File[] endpoints = endpointsDir.listFiles(filter);
-            for (File file : endpoints) {
-                try {
-                    OMElement document = parseFile(file);
-                    Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
-                            synapseConfig, document, properties);
-                    if (endpoint != null) {
-                        endpoint.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), endpoint.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the endpoint from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
+
+            Iterator endpoints = FileUtils.iterateFiles(endpointsDir, extensions, false);
+            while (endpoints.hasNext()) {
+                File file = (File) endpoints.next();
+                OMElement document = getOMElement(file);
+                Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
+                        synapseConfig, document, properties);
+                if (endpoint != null) {
+                    endpoint.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
+                            file.getAbsolutePath(), endpoint.getName());
+                }
             }
         }
     }
 
     private static void createEventSources(SynapseConfiguration synapseConfig, String rootDirPath,
-                                           Properties properties) throws XMLStreamException {
+                                           Properties properties) {
 
         File eventsDir = new File(rootDirPath, EVENTS_DIR);
         if (eventsDir.exists()) {
             if (log.isDebugEnabled()) {
                 log.debug("Loading event sources from : " + eventsDir.getPath());
             }
-            File[] events = eventsDir.listFiles(filter);
-            for (File file : events) {
-                try {
-                    OMElement document = parseFile(file);
-                    SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
-                            defineEventSource(synapseConfig, document, properties);
-                    if (eventSource != null) {
-                        eventSource.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), eventSource.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the event-source from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
-           }
+
+            Iterator events = FileUtils.iterateFiles(eventsDir, extensions, false);
+            while (events.hasNext()) {
+                File file = (File) events.next();
+                OMElement document = getOMElement(file);
+                SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
+                        defineEventSource(synapseConfig, document, properties);
+                if (eventSource != null) {
+                    eventSource.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
+                            file.getAbsolutePath(), eventSource.getName());
+                }
+            }
         }
     }
 
     private static void createExecutors(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) throws XMLStreamException {
+                                        Properties properties) {
 
-        File eventsDir = new File(rootDirPath, EXECUTORS_DIR);
-        if (eventsDir.exists()) {
+        File executorsDir = new File(rootDirPath, EXECUTORS_DIR);
+        if (executorsDir.exists()) {
             if (log.isDebugEnabled()) {
-                log.debug("Loading event sources from : " + eventsDir.getPath());
+                log.debug("Loading event sources from : " + executorsDir.getPath());
             }
-            File[] events = eventsDir.listFiles(filter);
-            for (File file : events) {
-                try {
-                    OMElement document = parseFile(file);
-                    PriorityExecutor executor = SynapseXMLConfigurationFactory.
-                            defineExecutor(synapseConfig, document, properties);
-                    if (executor != null) {
-                        executor.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), executor.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the executor from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored) {}
-           }
+
+            Iterator executors = FileUtils.iterateFiles(executorsDir, extensions, false);
+            while (executors.hasNext()) {
+                File file = (File) executors.next();
+                OMElement document = getOMElement(file);
+                PriorityExecutor executor = SynapseXMLConfigurationFactory.
+                        defineExecutor(synapseConfig, document, properties);
+                if (executor != null) {
+                    executor.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
+                            file.getAbsolutePath(), executor.getName());
+                }
+            }
         }
     }
 
     private static void createMessageStores(SynapseConfiguration synapseConfig ,
-                                            String rootDirPath, Properties properties)
-            throws XMLStreamException {
+                                            String rootDirPath, Properties properties) {
 
         File messageStoresDir = new File(rootDirPath, MESSAGE_STORE_DIR);
         if (messageStoresDir.exists() ) {
@@ -413,30 +396,47 @@ public class MultiXMLConfigurationBuilder {
                 log.debug("Loading Message Stores from :" + messageStoresDir.getPath());
             }
 
-            File[] messageStores = messageStoresDir.listFiles(filter);
-            for (File file : messageStores) {
-                try {
-                    OMElement document = parseFile(file);
-                    MessageStore messageStore = SynapseXMLConfigurationFactory.defineMessageStore(
-                            synapseConfig, document, properties);
-                    if (messageStore != null) {
-                        messageStore.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                                messageStore.getName());
-                    }
-                } catch (SynapseException e) {
-                    log.error("Error while loading the message-store from file: " + file.getName());
-                    throw e;
-                } catch (FileNotFoundException ignored ) { }
+            Iterator messageStores = FileUtils.iterateFiles(messageStoresDir, extensions, false);
+            while (messageStores.hasNext()) {
+                File file = (File) messageStores.next();
+                OMElement document = getOMElement(file);
+                MessageStore messageStore = SynapseXMLConfigurationFactory.defineMessageStore(
+                        synapseConfig, document, properties);
+                if (messageStore != null) {
+                    messageStore.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                            messageStore.getName());
+                }
             }
         }
     }
 
-    private static OMElement parseFile(File file)
-            throws FileNotFoundException, XMLStreamException {
-        InputStream is = new FileInputStream(file);
-        OMElement document = new StAXOMBuilder(is).getDocumentElement();
-        document.build();
+    private static OMElement getOMElement(File file) {
+        FileInputStream is;
+        OMElement document = null;
+
+        try {
+            is = FileUtils.openInputStream(file);
+        } catch (IOException e) {
+            handleException("Error while opening the file: " + file.getName() + " for reading", e);
+            return null;
+        }
+
+        try {
+            document = new StAXOMBuilder(is).getDocumentElement();
+            document.build();
+            is.close();
+        } catch (XMLStreamException e) {
+            handleException("Error while parsing the content of the file: " + file.getName(), e);
+        } catch (IOException e) {
+            log.warn("Error while closing the input stream from the file: " + file.getName(), e);
+        }
+
         return document;
+    }
+
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

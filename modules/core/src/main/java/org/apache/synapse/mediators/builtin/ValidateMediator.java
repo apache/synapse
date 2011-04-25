@@ -26,12 +26,14 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.jaxp.SchemaResourceResolver;
 import org.apache.synapse.util.resolver.ResourceMap;
+import org.apache.synapse.util.resolver.UserDefinedXmlSchemaURIResolver;
 import org.apache.synapse.util.xpath.SourceXPathSupport;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.xml.sax.SAXException;
@@ -140,10 +142,16 @@ public class ValidateMediator extends AbstractListMediator {
                     String propName = schemaKey.evaluateValue(synCtx);
                     sources[i++] = SynapseConfigUtils.getStreamSource(synCtx.getEntry(propName));
                 }
-
+                // load the UserDefined SchemaURIResolver implementations
                 try {
-                    factory.setResourceResolver(
-                            new SchemaResourceResolver(synCtx.getConfiguration(), resourceMap));
+                	SynapseConfiguration synCfg = synCtx.getConfiguration();
+                	if(synCfg.getProperty(SynapseConstants.SYNAPSE_SCHEMA_RESOLVER) !=null){
+                		setUserDefinedSchemaResourceResolver(synCtx);
+                	}
+                	else{
+                		factory.setResourceResolver(
+                		                            new SchemaResourceResolver(synCtx.getConfiguration(), resourceMap));
+                	}
                     cachedSchema = factory.newSchema(sources);
                 } catch (SAXException e) {
                     handleException("Error creating a new schema objects for " +
@@ -214,6 +222,39 @@ public class ValidateMediator extends AbstractListMediator {
         return true;
     }
 
+    /**
+     * UserDefined schema resource resolver
+
+     * @param synCtx message context
+     */
+    private void setUserDefinedSchemaResourceResolver(MessageContext synCtx) {
+        SynapseConfiguration synCfg = synCtx.getConfiguration();
+        String schemaResolverName = synCfg.getProperty(SynapseConstants.SYNAPSE_SCHEMA_RESOLVER);
+        Class schemaClazz;
+        Object schemaClazzObject;
+        try {
+            schemaClazz = Class.forName(schemaResolverName);
+        } catch (ClassNotFoundException e) {
+            String msg =
+                    "System could not find the class defined for the specific properties" +
+                            "\n SchemaResolverImplementation:" + schemaResolverName;
+            handleException(msg, e, synCtx);
+            return;
+        }
+
+        try {
+            schemaClazzObject = schemaClazz.newInstance();
+
+            UserDefinedXmlSchemaURIResolver userDefSchemaResResolver =
+                    (UserDefinedXmlSchemaURIResolver) schemaClazzObject;
+            userDefSchemaResResolver.init(resourceMap, synCfg, schemaKeys);
+            factory.setResourceResolver(userDefSchemaResResolver);
+        } catch (Exception e) {
+            String msg = "Could not create an instance from the class";
+            handleException(msg, e, synCtx);
+        }
+    }
+    
     /**
      * Get the validation Source for the message context
      *

@@ -45,14 +45,12 @@ import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 
 import javax.xml.namespace.QName;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
-    public static String failSafeStr = "";
 
     public SynapseConfiguration getConfiguration(OMElement definitions, Properties properties) {
 
@@ -62,9 +60,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
         SynapseConfiguration config = SynapseConfigUtils.newConfiguration();               
         config.setDefaultQName(definitions.getQName());
-
-        
-        failSafeStr = properties.getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
 
         Iterator itr = definitions.getChildren();
         while (itr.hasNext()) {
@@ -97,7 +92,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 } else if(XMLConfigConstants.MESSAGE_STORE_ELT.equals(elt.getQName())) {
                     defineMessageStore(config, elt, properties);
                 } else if (XMLConfigConstants.MESSAGE_PROCESSOR_ELT.equals(elt.getQName())){
-                    defineMessageProcessor(config,elt,properties);
+                    defineMessageProcessor(config, elt, properties);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt, properties);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
@@ -132,9 +127,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem,
                                            Properties properties) {
-        boolean failSafeProxyEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES);
-
         ProxyService proxy = null;
 
         try {
@@ -143,16 +135,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 config.addProxyService(proxy.getName(), proxy);
             }
         } catch (Exception e) {
-            if (failSafeProxyEnabled) {
-                log.warn("Proxy Service configuration : " +
-                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "name")))
-                        + " cannot be built.", e);
-                log.warn("Continue in Proxy Service Fail-safe mode.");
-            } else {
-                handleException("Proxy Service configuration : " +
-                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "name")))
-                        + " cannot be built.");
-            }
+            String msg = "Proxy Service configuration: " + elem.getAttributeValue((
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "name"))) + " cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES, msg, e);
         }
         
         return proxy;
@@ -160,9 +145,6 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static Entry defineEntry(SynapseConfiguration config, OMElement elem,
                                     Properties properties) {
-        boolean failSafeLocalEntriesEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_LOCALENTRIES);
-
         Entry entry = null;
 
         try {
@@ -171,23 +153,15 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 config.addEntry(entry.getKey(), entry);
             }
         } catch (Exception e) {
-            if (failSafeLocalEntriesEnabled) {
-                log.warn("Local Entry configuration : " +
-                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) +" cannot be built", e);
-                log.warn("Continue in Local Entry fail-safe mode.");
-            } else {
-                handleException("Local Entry configuration : " +
-                        elem.getAttributeValue((new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) +" cannot be built");
-            }
+            String msg = "Local entry configuration: " + elem.getAttributeValue((
+                    new QName(XMLConfigConstants.NULL_NAMESPACE, "key"))) + " cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_LOCALENTRIES, msg, e);
         }
         return entry;
     }
 
     public static Mediator defineSequence(SynapseConfiguration config, OMElement ele,
                                           Properties properties) {
-
-        boolean failSafeSequenceEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_SEQUENCES);
 
         Mediator mediator = null;
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
@@ -204,30 +178,19 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     }
                 }
             } catch (Exception e) {
-                if (failSafeSequenceEnabled) {
-                    log.warn("Sequence configuration : " + name +" cannot be built.", e);
-                    log.warn("Continue in Sequence fail-safe mode.");
-                } else {
-                    handleException("Sequence configuration : " + name +" cannot be built.");
-                }
+                String msg = "Sequence configuration : " + name + " cannot be built";
+                handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg, e);
             }
             return mediator;
         } else {
-            if (failSafeSequenceEnabled) {
-                log.warn("Invalid sequence definition without a name");
-                log.warn("Continue in Sequence fail-safe mode.");
-            } else {
-                handleException("Invalid sequence definition without a name");
-            }
+            String msg = "Invalid sequence definition without a name";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
         }
         return null;
     }
 
     public static Mediator defineMediatorTemplate(SynapseConfiguration config, OMElement ele,
                                                   Properties properties) {
-
-        boolean failSafeSequenceEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_TEMPLATES);
 
         Mediator mediator = null;
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
@@ -238,28 +201,19 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     config.addSequenceTemplate(name, (TemplateMediator) mediator) ;
                 }
             } catch (Exception e) {
-                if (failSafeSequenceEnabled) {
-                    log.warn("Template configuration : " + name +" cannot be built.", e);
-                    log.warn("Continue in fail-safe mode.");
-                } else {
-                    handleException("Template configuration : " + name +" cannot be built.");
-                }
+                String msg = "Template configuration : " + name + " cannot be built";
+                handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg, e);
             }
             return mediator;
         } else {
-            if (failSafeSequenceEnabled) {
-                log.warn("Invalid template definition without a name");
-                log.warn("Continue in fail-safe mode.");
-            } else {
-                handleException("Invalid template definition without a name");
-            }
+            String msg = "Invalid mediation template definition without a name";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
         }
         return null;
     }
 
     public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele,
                                           Properties properties) {
-        boolean failSafeEpEnabled = isFailSafeEnabled(SynapseConstants.FAIL_SAFE_MODE_EP);
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         Endpoint endpoint = null;
@@ -270,29 +224,20 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     config.addEndpoint(name.trim(), endpoint);
                 }
             } catch (Exception e) {
-                if (failSafeEpEnabled) {
-                    log.warn("Endpoint configuration : " + name + " cannot be built.", e);
-                    log.warn("Continue in Endpoint fail-safe mode.");
-                } else {
-                    handleException("Endpoint configuration " + name + " cannot be built.");
-                }
+                String msg = "Endpoint configuration : " + name + " cannot be built";
+                handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg, e);
             }
             return endpoint;
         } else {
-            if (failSafeEpEnabled) {
-                log.warn("Invalid endpoint definition without a name");
-                log.warn("Continue in Endpoint fail-safe mode.");
-            } else {
-                handleException("Invalid endpoint definition without a name");
-            }
+            String msg = "Invalid endpoint definition without a name";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
         }
         return null;
     }
 
     public static SynapseEventSource defineEventSource(SynapseConfiguration config,
                                                        OMElement elem, Properties properties) {
-        boolean failSafeEventSourcesEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_EVENT_SOURCE);
+
         SynapseEventSource eventSource = null;
 
         try {
@@ -301,20 +246,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 config.addEventSource(eventSource.getName(), eventSource);
             }
         } catch (Exception e) {
-            if (failSafeEventSourcesEnabled) {
-                log.warn("Event Source configuration cannot be built.", e);
-                log.warn("Continue in Event Source fail-safe mode.");
-            } else {
-                handleException("Event Source configuration cannot be built.");
-            }
+            String msg = "Event Source configuration cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EVENT_SOURCE, msg, e);
         }
         return eventSource;
     }
 
     public static PriorityExecutor defineExecutor(SynapseConfiguration config,
                                                        OMElement elem, Properties properties) {
-        boolean failSafeExecutorsEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_EXECUTORS);
 
         PriorityExecutor executor = null;
         try {
@@ -323,12 +262,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             assert executor != null;
             config.addPriorityExecutor(executor.getName(), executor);
         } catch (AxisFault axisFault) {
-            if (failSafeExecutorsEnabled) {
-                log.warn("Executor configuration cannot be built.");
-                log.warn("Continue in Executor fail-safe mode.");
-            } else {
-                handleException("Failed to create the priority-executor configuration");
-            }            
+            String msg = "Executor configuration cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EXECUTORS, msg, axisFault);
         }
         return executor;
     }
@@ -349,8 +284,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static Template defineEndpointTemplate(SynapseConfiguration config,
                                                     OMElement elem, Properties properties) {
-        boolean failSafeExecutorsEnabled = isFailSafeEnabled(
-                SynapseConstants.FAIL_SAFE_MODE_TEMPLATES);
+
         TemplateFactory templateFactory = new TemplateFactory();
         String name = elem.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         try {
@@ -360,12 +294,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             }
             return template;
         } catch (Exception e) {
-            if (failSafeExecutorsEnabled) {
-                log.warn("Endpoint Template: " + name + "configuration cannot be built.", e);
-                log.warn("Continue in Endpoint Template fail-safe mode.");
-            } else {
-                handleException("Endpoint Template configuration cannot be built.");
-            }
+            String msg = "Endpoint Template: " + name + "configuration cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg, e);
         }
         return null;
     }
@@ -399,17 +329,20 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return SynapseXMLConfigurationSerializer.class;
     }
 
-    private static boolean isFailSafeEnabled(String componentName) {
-        if (failSafeStr != null) {
-            String[] failSafeComponents = failSafeStr.split(",");
-            if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
-                    || Arrays.<String>asList(failSafeComponents).indexOf(componentName) >= 0) {
-                return true;
-            }
+    private static void handleConfigurationError(String componentType, String msg) {
+        if (SynapseConfigUtils.isFailSafeEnabled(componentType)) {
+            log.warn(msg + " - Continue in fail-safe mode");
         } else {
-            return true; // Enabled by default
+            handleException(msg);
         }
-        return false;
     }
 
+    private static void handleConfigurationError(String componentType, String msg, Exception e) {
+        if (SynapseConfigUtils.isFailSafeEnabled(componentType)) {
+            log.warn(msg + " - Continue in fail-safe mode", e);
+        } else {
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
+    }
 }

@@ -276,12 +276,6 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
             } catch (IOException e) {
                 //handleException("Error reading from wsdl URI", e);
 
-                if (isFailSafeEnabled(axisCfg)) {
-                    log.warn("Proxy Service configuration : " + name + " cannot be built.", e);
-                    log.warn("Continue in Proxy Service Fail-safe mode.");
-                    return null;
-                }
-
                 boolean enablePublishWSDLSafeMode = false;
                 Map proxyParameters= this.getParameterMap();
                 if (!proxyParameters.isEmpty()) {
@@ -633,22 +627,6 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
 
         auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
         return proxyService;
-    }
-
-    private boolean isFailSafeEnabled(AxisConfiguration axisConfig) {
-        String failSafeStr = SynapseConfigUtils.getSynapseEnvironment(axisConfig).
-                getSynapseConfiguration().getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
-        if (failSafeStr != null) {
-            String[] failSafeComponents = failSafeStr.split(",");
-            List<String> stringList = Arrays.<String>asList(failSafeComponents);
-            if (stringList.indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
-                    || stringList.indexOf(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES) >= 0) {
-                return true;
-            }
-        } else {
-            return true; // Enabled by default
-        }
-        return false;
     }
 
     private void setUserDefinedResourceResolvers(SynapseConfiguration synCfg,

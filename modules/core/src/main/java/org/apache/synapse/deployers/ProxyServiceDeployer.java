@@ -24,13 +24,13 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
 import org.apache.synapse.config.xml.ProxyServiceSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -46,23 +46,9 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
     @Override
     public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
                                         Properties properties) {
-        boolean failSafeProxyEnabled = false;
-        try {
-            failSafeStr = getSynapseConfiguration().getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
-            if (failSafeStr != null) {
-                String[] failSafeComponents = failSafeStr.split(",");
-                if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
-                        || Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES) >= 0) {
-                    failSafeProxyEnabled = true; 
-                }
-            } else {
-                failSafeProxyEnabled = true; // Enabled by default
-            }
-            
-        } catch (DeploymentException ignored) {
 
-        }
-
+        boolean failSafeProxyEnabled = SynapseConfigUtils.isFailSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES);
 
         if (log.isDebugEnabled()) {
             log.debug("ProxyService Deployment from file : " + fileName + " : Started");
@@ -99,8 +85,8 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
             }
         } catch (Exception e) {
             if (failSafeProxyEnabled) {
-                log.warn("Proxy Service : " + fileName + " : Hot Deployment Failed - " + e.getMessage());
-                log.warn("Proxy Service : Fail-Safe mode.");
+                log.warn("Proxy service hot deployment from file: " + fileName + " failed - " +
+                        "Continue in fail-safe mode", e);
             } else {
                 handleSynapseArtifactDeploymentError(
                         "ProxyService Deployment from the file : " + fileName + " : Failed.", e);

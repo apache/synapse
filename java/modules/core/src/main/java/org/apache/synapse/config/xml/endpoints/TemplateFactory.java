@@ -41,8 +41,6 @@ public class TemplateFactory {
         OMAttribute nameAttribute = element.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
 
-        template.addParameter("name");
-        template.addParameter("uri");
 
         if (nameAttribute != null) {
             template.setName(nameAttribute.getAttributeValue());
@@ -64,7 +62,14 @@ public class TemplateFactory {
 
             assert paramName != null;
 
-            template.addParameter(paramName.getAttributeValue());
+            template.addParameter(paramName.getAttributeValue().trim());
+        }
+
+        if (!template.getParameters().contains("name")) {
+            template.addParameter("name");
+        }
+        if (!template.getParameters().contains("uri")) {
+            template.addParameter("uri");
         }
 
         OMElement endpointElement = element.getFirstChildWithName(

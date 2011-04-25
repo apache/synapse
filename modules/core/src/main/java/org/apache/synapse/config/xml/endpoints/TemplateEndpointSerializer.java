@@ -32,10 +32,14 @@ import javax.xml.namespace.QName;
 import java.util.Map;
 
 public class TemplateEndpointSerializer extends EndpointSerializer {
-    protected static OMFactory fac = OMAbstractFactory.getOMFactory();
 
-    protected static final OMNamespace nullNS
-            = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+    protected static OMNamespace nullNS;
+
+    public TemplateEndpointSerializer() {
+        fac = OMAbstractFactory.getOMFactory();
+        nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+
+    }
 
     public OMElement serializeEndpoint(Endpoint epr) {
         TemplateEndpoint endpoints = (TemplateEndpoint) epr;

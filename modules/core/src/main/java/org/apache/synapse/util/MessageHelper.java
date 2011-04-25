@@ -145,21 +145,21 @@ public class MessageHelper {
         
         Map headers = (Map) msgCtx.
                 getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        Map<String, String> clonedHeaders;
+        Map<String, Object> clonedHeaders;
         if (headers instanceof TreeMap) {
-            clonedHeaders = new TreeMap<String, String>(new Comparator<String>() {
+            clonedHeaders = new TreeMap<String, Object>(new Comparator<String>() {
                 public int compare(String s1, String s2) {
                     return s1.compareToIgnoreCase(s2);
                 }
             });
         } else {
-            clonedHeaders = new HashMap<String, String>();
+            clonedHeaders = new HashMap<String, Object>();
         }
 
         if (headers != null && !headers.isEmpty()) {
             for (Object o : headers.keySet()) {
                 String headerName = (String) o;
-                clonedHeaders.put(headerName, (String) headers.get(headerName));
+                clonedHeaders.put(headerName, headers.get(headerName));
             }
         }
 

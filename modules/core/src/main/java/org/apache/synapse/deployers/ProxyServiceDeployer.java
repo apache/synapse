@@ -99,7 +99,7 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
             }
         } catch (Exception e) {
             if (failSafeProxyEnabled) {
-                log.warn("Proxy Service : " + fileName + " : Hot Deployment Failed" + e.getMessage());
+                log.warn("Proxy Service : " + fileName + " : Hot Deployment Failed - " + e.getMessage());
                 log.warn("Proxy Service : Fail-Safe mode.");
             } else {
                 handleSynapseArtifactDeploymentError(

@@ -35,16 +35,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.commons.util.RMIRegistryController;
+import org.apache.synapse.config.*;
 import org.apache.synapse.securevault.SecurityConstants;
 import org.apache.synapse.securevault.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.jmx.JmxInformation;
 import org.apache.synapse.commons.jmx.JmxInformationFactory;
-import org.apache.synapse.config.Entry;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.SynapseConfigurationBuilder;
-import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.*;
 import org.apache.synapse.eventing.SynapseEventSource;
@@ -160,7 +157,7 @@ public class Axis2SynapseController implements SynapseController {
             log.fatal("Error adding the parameter to the Axis Configuration");
         }
 
-        // we retrieve these properties to initialize the task scheduler in the envrionment
+        // we retrieve these properties to initialize the task scheduler in the environment
         Object repo =
                 serverContextInformation.getProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY);
         Object taskScheduler = serverContextInformation.getProperty(TaskConstants.TASK_SCHEDULER);
@@ -190,7 +187,7 @@ public class Axis2SynapseController implements SynapseController {
     private void initXpathExtensions() {
         Axis2SynapseEnvironment axis2SynapseEnvironment = (Axis2SynapseEnvironment) synapseEnvironment;
 
-        /*Initalize Function Context extensions for xpath
+        /*Initialize Function Context extensions for xpath
          */
         List<SynapseXpathFunctionContextProvider> functionExtensions =
                 XpathExtensionUtil.getRegisteredFunctionExtensions();
@@ -198,7 +195,7 @@ public class Axis2SynapseController implements SynapseController {
             axis2SynapseEnvironment.setXpathFunctionExtensions(functionExtension);
         }
 
-        /*Initalize Variable Context extensions for xpath
+        /*Initialize Variable Context extensions for xpath
          */
         List<SynapseXpathVariableResolver> variableExtensions =
                 XpathExtensionUtil.getRegisteredVariableExtensions();
@@ -290,9 +287,9 @@ public class Axis2SynapseController implements SynapseController {
      * {@inheritDoc}
      */
     public void startMaintenance() {
-        log.info("Putting transport listners, senders and tasks into maintenence mode..");
+        log.info("Putting transport listeners, senders and tasks into maintenance mode..");
 
-        // pause transport listers and senders
+        // pause transport listeners and senders
         Axis2TransportHelper transportHelper = new Axis2TransportHelper(configurationContext);
         transportHelper.pauseListeners();
         transportHelper.pauseSenders();
@@ -303,14 +300,14 @@ public class Axis2SynapseController implements SynapseController {
             synapseTaskManager.pauseAll();
         }
 
-        log.info("Entered maintenence mode");
+        log.info("Entered maintenance mode");
     }
 
     /**
      * {@inheritDoc}
      */
     public void endMaintenance() {
-        log.info("Resuming transport listners, senders and tasks from maintenence mode...");
+        log.info("Resuming transport listeners, senders and tasks from maintenance mode...");
 
         // resume transport listeners and senders
         Axis2TransportHelper transportHelper = new Axis2TransportHelper(configurationContext);
@@ -323,7 +320,7 @@ public class Axis2SynapseController implements SynapseController {
             synapseTaskManager.resumeAll();
         }
 
-        log.info("Resumed normal operation from maintenence mode");
+        log.info("Resumed normal operation from maintenance mode");
     }
 
     /**
@@ -387,7 +384,7 @@ public class Axis2SynapseController implements SynapseController {
                 }
             }
         } catch (AxisFault e) {
-            log.error("Error stopping the Axis2 Environemnt");
+            log.error("Error stopping the Axis2 Environment");
         }
     }
 
@@ -493,7 +490,7 @@ public class Axis2SynapseController implements SynapseController {
                     "' to the Axis2 configuration : " + e.getMessage(), e);
         }
 
-        addServerIPAndHostEnrties();
+        addServerIPAndHostEntries();
 
         return synapseConfiguration;
     }
@@ -669,18 +666,8 @@ public class Axis2SynapseController implements SynapseController {
      */
     private void deployProxyServices() {
 
-        boolean failSafeProxyEnabled = false;
-        String failSafeMode = synapseConfiguration.getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
-
-        if (failSafeMode != null) {
-            String[] failSafeComponents = failSafeMode.split(",");
-            if (Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
-                    || Arrays.<String>asList(failSafeComponents).indexOf(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES) >= 0) {
-                failSafeProxyEnabled = true;
-            }
-        } else {
-            failSafeProxyEnabled = true; // Enabled by default
-        }
+        boolean failSafeProxyEnabled = SynapseConfigUtils.isFailSafeEnabled(
+                SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES);
 
         log.info("Deploying Proxy services...");
         String thisServerName = serverConfigurationInformation.getServerName();
@@ -778,7 +765,7 @@ public class Axis2SynapseController implements SynapseController {
     }
 
     /**
-     * Initiating DataSourceRepositoryHolder with a new datasource information repository or
+     * Initiating DataSourceRepositoryHolder with a new data source information repository or
      * reusing an existing repository.
      *
      * @param serverContextInformation ServerContextInformation instance
@@ -821,7 +808,7 @@ public class Axis2SynapseController implements SynapseController {
         }
     }
 
-    private void addServerIPAndHostEnrties() {
+    private void addServerIPAndHostEntries() {
         String hostName = serverConfigurationInformation.getHostName();
         String ipAddress = serverConfigurationInformation.getIpAddress();
         if (hostName != null && !"".equals(hostName)) {

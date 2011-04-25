@@ -54,6 +54,7 @@ import java.io.*;
 import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.List;
 import java.util.ArrayList;
@@ -835,6 +836,22 @@ public class SynapseConfigUtils {
         fault.configure(configuration);
 
         config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
+    }
+
+    public static boolean isFailSafeEnabled(String componentName) {
+        Properties synapseProps = SynapsePropertiesLoader.loadSynapseProperties();
+        String failSafeStr = synapseProps.getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
+        if (failSafeStr != null) {
+            String[] failSafeComponents = failSafeStr.split(",");
+            List<String> componentList = Arrays.<String>asList(failSafeComponents);
+            if (componentList.indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
+                    || componentList.indexOf(componentName) >= 0) {
+                return true;
+            }
+        } else {
+            return true; // Enabled by default
+        }
+        return false;
     }
 }
 

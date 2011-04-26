@@ -174,7 +174,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
             // check if a wsdl 2.0 document is supplied inline
             OMElement descriptionElement = wsdlElement.getFirstChildWithName
-                    (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "description"));
+                    (new QName(WSDL2Constants.WSDL_NAMESPACE, "description"));
             if (endpoint == null && descriptionElement != null) {
                 handleException("WSDL 2.0 Endpoints are currently not supported.");
             }

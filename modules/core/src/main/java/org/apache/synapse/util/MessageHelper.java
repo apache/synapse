@@ -105,8 +105,8 @@ public class MessageHelper {
      * most of the attributes of the MC like opCtx and so on are still kept as references. Otherwise
      * there will be perf issues. But ..... this may reveal in some conflicts in the cloned message
      * if you try to do advanced mediations with the cloned message, in which case you should
-     * mannually get a clone of the changing part of the MC and set that cloned part to your MC.
-     * Changing the MC after doing that will solve most of the issues. (Note: U dont have to worrie
+     * manually get a clone of the changing part of the MC and set that cloned part to your MC.
+     * Changing the MC after doing that will solve most of the issues. (Note: You don't have to worry
      * about the SOAPEnvelope, it is a cloned copy and not a reference from any other MC)
      *
      * @param mc - this will be cloned for getting an exact copy
@@ -211,7 +211,7 @@ public class MessageHelper {
         while (itr.hasNext()) {
             String key = (String) itr.next();
             if (key != null) {
-                // In a clustered environment, all the properties that need to be relpicated,
+                // In a clustered environment, all the properties that need to be replicated,
                 // are replicated explicitly  by the corresponding Mediators (Ex: throttle,
                 // cache), and therefore we should avoid any implicit replication
                 newMC.setNonReplicableProperty(key, ori.getPropertyNonReplicable(key));
@@ -273,8 +273,8 @@ public class MessageHelper {
      * because this will be called for each and every message going out from synapse. The parent
      * of the cloning options object is kept as a reference.
      *
-     * @param options clonning object
-     * @return clonned Options object
+     * @param options cloning object
+     * @return cloned Options object
      */
     public static Options cloneOptions(Options options) {
 

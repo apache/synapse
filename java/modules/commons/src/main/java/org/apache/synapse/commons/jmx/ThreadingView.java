@@ -92,7 +92,8 @@ public class ThreadingView implements ThreadingViewMBean {
     }
 
     public ThreadingView(String threadNamePrefix, boolean periodicLogs, double alertMargin) {
-        this.threadNamePrefix = threadNamePrefix;
+        this(threadNamePrefix);
+
         this.periodicLogs = periodicLogs;
         if (alertMargin > 0 && alertMargin < 100) {
             this.alertMargin = alertMargin;
@@ -100,7 +101,6 @@ public class ThreadingView implements ThreadingViewMBean {
             log.warn("Invalid alert margin for the thread group: " + threadNamePrefix + " - " +
                     "Using default value");
         }
-        initMBean();
     }
 
     public void destroy() {

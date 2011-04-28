@@ -22,6 +22,7 @@ package org.apache.synapse.transport.nhttp.util;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
 import java.util.*;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
@@ -60,7 +61,8 @@ public class ConnectionsView implements ConnectionsViewMBean {
     private AtomicInteger activeConnections = new AtomicInteger(0);
     private AtomicInteger shortTermOpenedConnections = new AtomicInteger(0);
     private AtomicInteger longTermOpenedConnections = new AtomicInteger(0);
-    // The map keeps the key as connectionhost:port and value as the number of connections for that host
+    // The map keeps the key as connection host:port and value as the number of connections for
+    // that host
     private Map<String,AtomicInteger> activeConnectionsPerHost = new HashMap<String,AtomicInteger>();
     // The array length must be equal to the number of buckets
     private AtomicInteger[] requestSizeCounters = new AtomicInteger[6];
@@ -68,12 +70,20 @@ public class ConnectionsView implements ConnectionsViewMBean {
 
     private Date resetTime = Calendar.getInstance().getTime();
 
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
 
     private String name;
 
-    public ConnectionsView(String name) {
+    public ConnectionsView(final String name) {
         this.name = name;
+
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            int counter = 0;
+
+            public Thread newThread(Runnable r) {
+                return new Thread(r, name + "-connections-view-" + counter++);
+            }
+        });
 
         initCounters(requestSizeCounters);
         initCounters(responseSizeCounters);
@@ -104,12 +114,21 @@ public class ConnectionsView implements ConnectionsViewMBean {
         };
         scheduler.scheduleAtFixedRate(longTermCollector, LONG_DATA_COLLECTION_PERIOD,
                 LONG_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
-        MBeanRegistrar.getInstance().registerMBean(this, NHTTP_CONNECTIONS, name);
+        boolean registered = false;
+        try {
+            registered = MBeanRegistrar.getInstance().registerMBean(this, NHTTP_CONNECTIONS, name);
+        } finally {
+            if (!registered) {
+                scheduler.shutdownNow();
+            }
+        }
     }
 
     public void destroy() {
         MBeanRegistrar.getInstance().unRegisterMBean(NHTTP_CONNECTIONS, name);
-        scheduler.shutdownNow();
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
     }
 
     private void initCounters(AtomicInteger[] counters) {
@@ -267,6 +286,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
     /**
      * Setter method for activeConnectionsPerHost, this will get called during connection creation
      * and Connection shutdown operations
+     *
      * @param activeConnectionsPerHost
      */
     public void setActiveConnectionPerHostEntry(Map<String,AtomicInteger> activeConnectionsPerHost){

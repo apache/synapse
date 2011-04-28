@@ -83,7 +83,7 @@ public class LatencyView implements LatencyViewMBean {
     private Queue<Long> longTermLatencyDataQueue = new LinkedList<Long>();
 
     /** Scheduled executor on which data collectors are executed */
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
 
     private double allTimeAvgLatency = 0.0;
     private int count = 0;
@@ -93,16 +93,34 @@ public class LatencyView implements LatencyViewMBean {
 
     public LatencyView(boolean isHttps) {
         name = "nio-http" + (isHttps ? "s" : "");
+
+        scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            int counter = 0;
+
+            public Thread newThread(Runnable r) {
+                return new Thread(r, name + "-latency-view-" + counter++);
+            }
+        });
+
         scheduler.scheduleAtFixedRate(new ShortTermDataCollector(), SMALL_DATA_COLLECTION_PERIOD,
                 SMALL_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(new LongTermDataCollector(), LARGE_DATA_COLLECTION_PERIOD,
                 LARGE_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
-        MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
+        boolean registered = false;
+        try {
+            registered = MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
+        } finally {
+            if (!registered) {
+                scheduler.shutdownNow();
+            }
+        }
     }
 
     public void destroy() {
         MBeanRegistrar.getInstance().unRegisterMBean(NHTTP_LATENCY_VIEW, name);
-        scheduler.shutdownNow();
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
     }
 
     /**

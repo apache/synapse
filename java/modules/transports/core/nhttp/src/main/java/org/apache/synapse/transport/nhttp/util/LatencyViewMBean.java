@@ -21,6 +21,10 @@ package org.apache.synapse.transport.nhttp.util;
 
 import java.util.Date;
 
+/**
+ * Provides metrics related to the latency added by the NHTTP transport while mediating
+ * messages through.
+ */
 public interface LatencyViewMBean {
 
     public double getAllTimeAvgLatency();

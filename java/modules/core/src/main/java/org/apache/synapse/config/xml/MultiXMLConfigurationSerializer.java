@@ -19,11 +19,14 @@
 
 package org.apache.synapse.config.xml;
 
+import net.sf.saxon.value.SequenceType;
+import org.apache.synapse.config.xml.endpoints.TemplateSerializer;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -192,6 +195,11 @@ public class MultiXMLConfigurationSerializer {
                     MediatorSerializerFinder.getInstance().
                             getSerializer(seq).serializeMediator(definitions, seq);
                 }
+            } else if (o instanceof Template) {
+                Template templEndpoint = (Template) o;
+                if (templEndpoint.getFileName() == null) {
+                    new TemplateSerializer().serializeEndpointTemplate(templEndpoint, definitions);
+                }
             } else if (o instanceof AbstractEndpoint) {
                 AbstractEndpoint endpoint = (AbstractEndpoint) o;
                 if (endpoint.getFileName() == null) {
@@ -343,6 +351,25 @@ public class MultiXMLConfigurationSerializer {
         return seqElem;
     }
 
+    public OMElement serializeTemplate(Template template, SynapseConfiguration synapseConfig,
+                                       OMElement parent) throws Exception {
+
+        File seqDir = createDirectory(currentDirectory, MultiXMLConfigurationBuilder.TEMPLATES_DIR);
+
+        OMElement seqElem = new TemplateSerializer().serializeEndpointTemplate(template, parent);
+        String fileName = template.getFileName();
+        if (fileName != null) {
+            handleDeployment(seqDir, fileName, template.getName(),
+                    synapseConfig.getArtifactDeploymentStore());
+            File seqFile = new File(seqDir, fileName);
+            writeToFile(seqElem, seqFile);
+        } else if (parent != null) {
+            parent.addChild(seqElem);
+        }
+
+        return seqElem;
+    }
+
     public OMElement serializeEndpoint(Endpoint epr, SynapseConfiguration synapseConfig,
                                        OMElement parent) throws Exception {
 
@@ -368,6 +395,8 @@ public class MultiXMLConfigurationSerializer {
             return serializeTemplate((TemplateMediator) o, synapseConfig, parent);
         } else if (o instanceof SequenceMediator) {
             return serializeSequence((SequenceMediator) o, synapseConfig, parent);
+        } else if (o instanceof Template) {
+            return serializeTemplate((Template) o, synapseConfig, parent);
         } else if (o instanceof Endpoint) {
             return serializeEndpoint((Endpoint) o, synapseConfig, parent);
         } else if (o instanceof Entry) {
@@ -611,6 +640,20 @@ public class MultiXMLConfigurationSerializer {
             if (exec.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         EXECUTORS_DIR), exec.getFileName(), exec.getName(), deploymentStore);
+            }
+        }
+
+        for (TemplateMediator medTempl : synapseConfig.getSequenceTemplates().values()) {
+            if (medTempl.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        TEMPLATES_DIR), medTempl.getFileName(), medTempl.getName(), deploymentStore);
+            }
+        }
+
+        for (Template endTempl : synapseConfig.getEndpointTemplates().values()) {
+            if (endTempl.getFileName() != null) {
+                handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
+                        TEMPLATES_DIR), endTempl.getFileName(), endTempl.getName(), deploymentStore);
             }
         }
     }

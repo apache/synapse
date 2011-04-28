@@ -40,7 +40,7 @@ public class MBeanRegistrar {
     private MBeanRegistrar() {
     }
 
-    public void registerMBean(Object mBeanInstance, String category, String id) {
+    public boolean registerMBean(Object mBeanInstance, String category, String id) {
         assertNull(mBeanInstance, "MBean instance is null");
         assertNull(category, "MBean instance category is null");
         assertNull(id, "MBean instance name is null");
@@ -54,23 +54,27 @@ public class MBeanRegistrar {
                 mbs.unregisterMBean(name);
                 mbs.registerMBean(mBeanInstance, name);
             }
+            return true;
         } catch (Exception e) {
             log.warn("Error registering a MBean with name ' " + id +
                     " ' and category name ' " + category + "' for JMX management", e);
+            return false;
         }
     }
 
-    public void unRegisterMBean(String category, String id) {
+    public boolean unRegisterMBean(String category, String id) {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName objName = new ObjectName(getObjectName(category, id));
             if (mbs.isRegistered(objName)) {
                 mbs.unregisterMBean(objName);
+                return true;
             }
         } catch (Exception e) {
             log.warn("Error un-registering a  MBean with name ' " + id +
                     " ' and category name ' " + category + "' for JMX management", e);
         }
+        return false;
     }
 
     private String getObjectName(String category, String id) {

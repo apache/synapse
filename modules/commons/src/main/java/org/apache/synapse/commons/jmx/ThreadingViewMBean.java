@@ -21,7 +21,9 @@ package org.apache.synapse.commons.jmx;
 
 import java.util.Date;
 
-@SuppressWarnings({"UnusedDeclaration"})
+/**
+ * Provides metrics related to a given thread pool or group.
+ */
 public interface ThreadingViewMBean {
 
     public int getTotalWorkerCount();

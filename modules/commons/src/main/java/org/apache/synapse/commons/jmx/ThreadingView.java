@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.lang.management.ThreadMXBean;
 import java.lang.management.ManagementFactory;
@@ -78,10 +79,17 @@ public class ThreadingView implements ThreadingViewMBean {
 
     private static final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
 
-    public ThreadingView(String threadNamePrefix) {
+    public ThreadingView(final String threadNamePrefix) {
         this.threadNamePrefix = threadNamePrefix;
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            int counter = 0;
+
+            public Thread newThread(Runnable r) {
+                return new Thread(r, threadNamePrefix + "-thread-view-" + counter++);
+            }
+        });
         initMBean();
     }
 
@@ -103,7 +111,9 @@ public class ThreadingView implements ThreadingViewMBean {
                     threadNamePrefix);
         }
         MBeanRegistrar.getInstance().unRegisterMBean(SYNAPSE_THREADING_VIEW, threadNamePrefix);
-        scheduler.shutdownNow();
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
     }
 
     private void initMBean() {
@@ -115,8 +125,15 @@ public class ThreadingView implements ThreadingViewMBean {
                 SHORT_SAMPLING_PERIOD, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(new LongTermDataCollectorTask(), LONG_SAMPLING_PERIOD,
                 LONG_SAMPLING_PERIOD, TimeUnit.SECONDS);
-        MBeanRegistrar.getInstance().registerMBean(this, SYNAPSE_THREADING_VIEW,
-                    threadNamePrefix);
+        boolean registered = false;
+        try {
+            registered = MBeanRegistrar.getInstance().registerMBean(this, SYNAPSE_THREADING_VIEW,
+                        threadNamePrefix);
+        } finally {
+            if (!registered) {
+                scheduler.shutdownNow();
+            }
+        }
     }
 
     public int getTotalWorkerCount() {

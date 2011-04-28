@@ -95,8 +95,14 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
         if (wsdlElement != null) {
 
-            EndpointDefinitionFactory fac = new EndpointDefinitionFactory();
-            EndpointDefinition endpoint = fac.createDefinition(wsdlElement);
+            DefinitionFactory fac = getEndpointDefinitionFactory();
+            EndpointDefinition endpoint;
+            if (fac == null) {
+                fac = new EndpointDefinitionFactory();
+                endpoint = fac.createDefinition(wsdlElement);
+            } else {
+                endpoint = fac.createDefinition(wsdlElement);
+            }
 
             // for now, QOS information has to be provided explicitly.
             extractSpecificEndpointProperties(endpoint, wsdlElement);

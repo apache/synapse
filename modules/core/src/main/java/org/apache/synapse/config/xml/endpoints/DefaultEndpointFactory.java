@@ -121,9 +121,9 @@ public class DefaultEndpointFactory extends EndpointFactory {
                 definition.setForceREST(true);
                 definition.setFormat(SynapseConstants.FORMAT_REST);
 
-            } else {
+            } /*else if(!TemplateMappingsPopulator.populateMapping(definition, EndpointDefinition.EndpointDefKey.format, forceValue)) {
                 handleException("force value -\"" + forceValue + "\" not yet implemented");
-            }
+            }*/
         }
 
     }
@@ -137,8 +137,14 @@ public class DefaultEndpointFactory extends EndpointFactory {
      * @return EndpointDefinition object containing the endpoint details.
      */
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
-        EndpointDefinitionFactory fac = new EndpointDefinitionFactory();
-        EndpointDefinition endpointDefinition = fac.createDefinition(elem);
+        DefinitionFactory fac = getEndpointDefinitionFactory();
+        EndpointDefinition endpointDefinition;
+        if (fac == null) {
+            fac = new EndpointDefinitionFactory();
+            endpointDefinition = fac.createDefinition(elem);
+        } else{
+            endpointDefinition = fac.createDefinition(elem);
+        }
         extractSpecificEndpointProperties(endpointDefinition, elem);
         return endpointDefinition;
     }

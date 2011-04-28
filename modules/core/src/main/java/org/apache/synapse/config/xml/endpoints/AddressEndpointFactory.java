@@ -106,8 +106,14 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
     public EndpointDefinition createEndpointDefinition(OMElement elem) {
 
         OMAttribute address = elem.getAttribute(new QName("uri"));
-        EndpointDefinitionFactory fac = new EndpointDefinitionFactory();
-        EndpointDefinition endpointDefinition = fac.createDefinition(elem);
+        DefinitionFactory fac = getEndpointDefinitionFactory();
+        EndpointDefinition endpointDefinition;
+        if (fac == null) {
+            fac = new EndpointDefinitionFactory();
+            endpointDefinition = fac.createDefinition(elem);
+        } else{
+            endpointDefinition = fac.createDefinition(elem);
+        }
 
         if (address != null) {
             endpointDefinition.setAddress(address.getAttributeValue().trim());

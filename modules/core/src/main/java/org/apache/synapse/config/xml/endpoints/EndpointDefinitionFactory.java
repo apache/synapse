@@ -31,7 +31,7 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 import javax.xml.namespace.QName;
 import java.util.StringTokenizer;
 
-public class EndpointDefinitionFactory {
+public class EndpointDefinitionFactory implements DefinitionFactory{
     public static final Log log = LogFactory.getLog(EndpointDefinitionFactory.class);
 
     /**

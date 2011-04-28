@@ -58,6 +58,6 @@ public class TemplateSerializer {
             parent.addChild(templateElement);
         }
 
-        return parent;
+        return templateElement;
     }
 }

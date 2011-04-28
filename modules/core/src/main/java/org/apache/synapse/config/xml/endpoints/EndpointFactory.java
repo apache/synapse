@@ -53,6 +53,7 @@ import java.util.*;
 public abstract class EndpointFactory implements XMLToObjectMapper {
 
     static Log log;
+    private DefinitionFactory customDefnFactory = null;
 
     protected EndpointFactory() {
         log = LogFactory.getLog(this.getClass());
@@ -77,6 +78,25 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     public static Endpoint getEndpointFromElement(OMElement elem, boolean isAnonymous,
                                                   Properties properties) {
         return getEndpointFactory(elem).createEndpointWithName(elem, isAnonymous, properties);
+    }
+
+    /**
+     * Core method which is exposed for the external use, and this will find the proper
+     * {@link EndpointFactory} and create the endpoint which is of the format {@link Endpoint}.However
+     * defintion for this endpoint will be built using a custom Endpoint Defn factory.
+     *
+     * @param elem        XML from which the endpoint will be built
+     * @param factory    custom definition factory which this endpoint will be used to build
+     * @param isAnonymous whether this is an anonymous endpoint or not
+     * @param properties bag of properties to pass in any information to the factory
+     * @return created endpoint
+     */
+    public static Endpoint getEndpointFromElement(OMElement elem,DefinitionFactory factory,
+                                                  boolean isAnonymous,
+                                                  Properties properties) {
+        EndpointFactory fac = getEndpointFactory(elem);
+        fac.setEndpointDefinitionFactory(factory);
+        return fac.createEndpointWithName(elem, isAnonymous, properties);
     }
 
     /**
@@ -248,6 +268,22 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         }
 
         return endpoints;
+    }
+
+    /**
+     * provide a custom Endpoint definition factory
+     * @param factory
+     */
+    public void setEndpointDefinitionFactory(DefinitionFactory factory){
+        customDefnFactory = factory;
+    }
+
+    /**
+     * return current factory for building this endpoint definition
+     * @return
+     */
+    public DefinitionFactory getEndpointDefinitionFactory(){
+        return customDefnFactory;
     }
 
     /**

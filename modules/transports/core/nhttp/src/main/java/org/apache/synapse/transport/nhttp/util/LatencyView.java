@@ -95,10 +95,8 @@ public class LatencyView implements LatencyViewMBean {
         name = "nio-http" + (isHttps ? "s" : "");
 
         scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            int counter = 0;
-
             public Thread newThread(Runnable r) {
-                return new Thread(r, name + "-latency-view-" + counter++);
+                return new Thread(r, name + "-latency-view");
             }
         });
 

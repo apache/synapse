@@ -78,10 +78,8 @@ public class ConnectionsView implements ConnectionsViewMBean {
         this.name = name;
 
         this.scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            int counter = 0;
-
             public Thread newThread(Runnable r) {
-                return new Thread(r, name + "-connections-view-" + counter++);
+                return new Thread(r, name + "-connections-view");
             }
         });
 

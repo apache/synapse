@@ -22,6 +22,10 @@ package org.apache.synapse.transport.nhttp.util;
 import java.util.Map;
 import java.util.Date;
 
+/**
+ * Provides metrics related to the number of connections created and maintained by
+ * the NHTTP transport.
+ */
 public interface ConnectionsViewMBean {
 
     public int getActiveConnections();

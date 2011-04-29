@@ -217,7 +217,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 synCtx.setProperty(SynapseConstants.OUT_ONLY,
                         "true");    // Set one way message for events
                 try {
-                    getEndpointFromURL(subscription.getEndpointUrl())
+                    getEndpointFromURL(subscription.getEndpointUrl(), synCtx.getEnvironment())
                             .send(MessageHelper.cloneMessageContext(synCtx));
                 } catch (AxisFault axisFault) {
                     log.error("Event sending failure " + axisFault.toString());
@@ -413,13 +413,17 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * Create a Endpoint for a given URL
      *
      * @param endpointUrl      URL
+     * @param se    synapse environment
      * @return AddressEndpoint address endpoint
      */
-    private Endpoint getEndpointFromURL(String endpointUrl) {
+    private Endpoint getEndpointFromURL(String endpointUrl, SynapseEnvironment se) {
         AddressEndpoint endpoint = new AddressEndpoint();
         EndpointDefinition def = new EndpointDefinition();
         def.setAddress(endpointUrl.trim());
         endpoint.setDefinition(def);
+
+        endpoint.init(se);
+
         return endpoint;
     }
 

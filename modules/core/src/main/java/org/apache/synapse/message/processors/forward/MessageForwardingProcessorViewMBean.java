@@ -16,21 +16,21 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.message.processors.dlc;
+package org.apache.synapse.message.processors.forward;
 
 import java.util.List;
 
-public interface DeadLetterChannelViewMBean {
+public interface MessageForwardingProcessorViewMBean {
 
     /**
      * try resending all messages stored in the message store via associated endpoints.
      */
-    public void resendAll();
+    public void resendAll() throws Exception;
 
     /**
      * Delete all the Messages in Message store
      */
-    public void deleteAll();
+    public void deleteAll() throws Exception;
 
 
     /**
@@ -38,7 +38,7 @@ public interface DeadLetterChannelViewMBean {
      *
      * @return a list of message ID values
      */
-    public List<String> getMessageIds();
+    public List<String> messageIdList() throws Exception;
 
     /**
      * Resend the Message with the given id
@@ -47,14 +47,14 @@ public interface DeadLetterChannelViewMBean {
      * @param messageID ID of the message to be resent
      * @return true if the resend operation was successful and false otherwise
      */
-    public void  resend(String messageID);
+    public void  resend(String messageID) throws Exception;
 
     /**
      * Delete the Message with Given id
      *
      * @param messageID ID of the message to be deleted
      */
-    public void delete(String messageID);
+    public void delete(String messageID) throws Exception;
 
     /**
      * Get the SOAP envelope of the given Message with given ID
@@ -62,12 +62,31 @@ public interface DeadLetterChannelViewMBean {
      * @param messageID ID of the message to be returned
      * @return the SOAP envelope content as a string
      */
-    public String getEnvelope(String messageID);
+    public String getEnvelope(String messageID) throws Exception;
 
     /**
      *
      * @return the number of Messages stored in the store.
      */
     public int getSize();
+
+    /**
+     * Get the Status of the Message Processor
+     * @return  status of the Processor
+     */
+    public boolean isActive();
+
+    /**
+     * Activate the Message Processor.
+     * This will resume processing the Messages if its in deactivated state and
+     * reset the Send attempt count.
+     */
+    public void activate();
+
+    /**
+     * Deactivate the Message Processor
+     * This will stop the processing of Messages.
+     */
+    public void deactivate();
 
 }

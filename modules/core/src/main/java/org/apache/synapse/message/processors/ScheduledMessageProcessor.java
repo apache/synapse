@@ -32,6 +32,9 @@ import java.util.Map;
 public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor {
 
 
+    public static final String SCHEDULED_MESSAGE_PROCESSOR_GROUP =
+            "synapse.message.processor.quartz";
+
     protected Log log = LogFactory.getLog(this.getClass());
 
     /**
@@ -65,7 +68,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
     /**
      * Keep the state of the message processor
      */
-    private State state = State.DESTROY;
+    protected State state = State.DESTROY;
 
 
     public void start() {
@@ -82,20 +85,21 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
                         e.getMessage() + cronExpression, e);
             }
         }
-        trigger.setName(messageStore + "-trigger");
+        trigger.setName(name + "-trigger");
 
         JobDetail jobDetail = getJobDetail();
-        JobDataMap jobDataMap = new JobDataMap();
+        JobDataMap jobDataMap = getJobDataMap();
         jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE,
                 configuration.getMessageStore(messageStore));
         jobDataMap.put(MessageProcessorConsents.PARAMETERS, parameters);
         jobDetail.setJobDataMap(jobDataMap);
+        jobDetail.setGroup(SCHEDULED_MESSAGE_PROCESSOR_GROUP);
 
         try {
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             throw new SynapseException("Error scheduling job : " + jobDetail
-                    + " with trigger " + trigger);
+                    + " with trigger " + trigger ,e);
         }
     }
 
@@ -157,6 +161,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
         try {
             scheduler = sf.getScheduler();
+
         } catch (SchedulerException e) {
             throw new SynapseException("Error getting a  scheduler instance form scheduler" +
                     " factory " + sf, e);
@@ -175,8 +180,16 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
     protected abstract JobDetail getJobDetail();
 
-    public void destroy() {
-        state = State.DESTROY;
+    protected JobDataMap getJobDataMap() {
+        return new JobDataMap();
     }
 
+    public void destroy() {
+        try {
+            scheduler.deleteJob(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+        } catch (SchedulerException e) {
+            log.error("Error while destroying the task " + e);
+        }
+        state = State.DESTROY;
+    }
 }

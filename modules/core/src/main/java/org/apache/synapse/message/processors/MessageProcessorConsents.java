@@ -20,11 +20,19 @@ package org.apache.synapse.message.processors;
 
 public final class MessageProcessorConsents {
 
-    public static final String MESSAGE_STORE = "MESSAGE_STORE";
+    public static final String MESSAGE_STORE = "message.store";
     public static final String PARAMETERS = "parameters";
 
+    /**
+     * Scheduled Message Processor parameters
+     */
     public static final String QUARTZ_CONF = "quartz.conf";
     public static final String INTERVAL = "interval";
     public static final String CRON_EXPRESSION = "cronExpression";
+
+    /**
+     * Message processor parameters
+     */
+    public static final String MAX_DELIVER_ATTEMPTS = "max.deliver.attempts";
 
 }

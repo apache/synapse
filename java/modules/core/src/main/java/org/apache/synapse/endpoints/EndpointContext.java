@@ -94,8 +94,11 @@ public class EndpointContext {
 
         if (clustered) {
             if (endpointName == null) {
-                handleException("For proper clustered mode operation, all endpoints should " +
+                if (endpointDefinition != null &&
+                    !endpointDefinition.isReplicationDisabled()) {
+                    handleException("For proper clustered mode operation, all endpoints should " +
                         "be uniquely named");
+                }
             }
             this.isClustered = true;
             this.cfgCtx = cfgCtx;

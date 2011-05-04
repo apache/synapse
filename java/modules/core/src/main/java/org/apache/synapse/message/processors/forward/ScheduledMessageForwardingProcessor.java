@@ -138,5 +138,14 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
         }
         state = State.DESTROY;
     }
+
+
+    /**
+     * Return the JMS view of Message Processor
+     * @return
+     */
+    public MessageForwardingProcessorView getView() {
+        return view;
+    }
 }
 

@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.TestUtils;
 import org.jaxen.SimpleVariableContext;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -96,6 +97,30 @@ public class SynapseXPathTest extends TestCase {
         assertEquals(message, new SynapseXPath("$axis2:test").evaluate(synCtx));
         assertEquals(1234, new SynapseXPath("$axis2:test2").numberValueOf(synCtx).intValue());
         assertTrue(new SynapseXPath("$axis2:test2 = 1234").booleanValueOf(synCtx));
+    }
+
+    public void testTransportHeaders() throws Exception {
+        Axis2MessageContext synCtx = TestUtils.getAxis2MessageContext("<test/>", null);
+        org.apache.axis2.context.MessageContext axis2MessageCtx =
+                synCtx.getAxis2MessageContext();
+        Object headers = axis2MessageCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        String name = "MyHeader";
+        String resultValue = "TestValue";
+        if (headers != null && headers instanceof Map) {
+            Map headersMap = (Map) headers;
+            headersMap.put(name, resultValue);
+        }
+
+        if (headers == null) {
+            Map headersMap = new HashMap();
+            headersMap.put(name, resultValue);
+            axis2MessageCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+                    headersMap);
+        }
+
+        assertEquals(resultValue, new SynapseXPath("$trp:" + name).evaluate(synCtx));
     }
     
     public void testStandardXPathFunctions() throws Exception {

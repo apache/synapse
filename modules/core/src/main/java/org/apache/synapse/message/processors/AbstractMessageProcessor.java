@@ -45,6 +45,8 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
     protected String name;
 
+    protected String fileName;
+
     protected SynapseConfiguration configuration;
 
     protected enum State {
@@ -106,5 +108,13 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setFileName(String filename) {
+        this.fileName = filename;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

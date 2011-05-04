@@ -71,4 +71,18 @@ public interface MessageProcessor extends ManagedLifecycle , Nameable , SynapseA
      * @return
      */
     public boolean isStarted();
+
+     /**
+     * Set the name of the file that the Message Processor is configured
+     *
+     * @param filename Name of the file where this artifact is defined
+     */
+    public void setFileName(String filename);
+
+    /**
+     * get the file name that the message processor is configured
+     *
+     * @return Name of the file where this artifact is defined
+     */
+    public String getFileName();
 }

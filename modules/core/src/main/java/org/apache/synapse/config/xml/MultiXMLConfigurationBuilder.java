@@ -30,6 +30,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.Entry;
@@ -84,6 +85,7 @@ public class MultiXMLConfigurationBuilder {
     public static final String EVENTS_DIR          = "event-sources";
     public static final String EXECUTORS_DIR       = "priority-executors";
     public static final String MESSAGE_STORE_DIR   = "message-stores";
+    public static final String MESSAGE_PROCESSOR_DIR   = "message-processors";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 
@@ -126,6 +128,7 @@ public class MultiXMLConfigurationBuilder {
         createEventSources(synapseConfig, root, properties);
         createExecutors(synapseConfig, root, properties);
         createMessageStores(synapseConfig, root, properties);
+        createMessageProcessors(synapseConfig,root,properties);
 
         return synapseConfig;
     }
@@ -410,6 +413,32 @@ public class MultiXMLConfigurationBuilder {
             }
         }
     }
+
+
+    private static void createMessageProcessors(SynapseConfiguration synapseConfig,
+                                            String rootDirPath, Properties properties) {
+
+        File messageProcessorDir = new File(rootDirPath, MESSAGE_PROCESSOR_DIR);
+        if (messageProcessorDir.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading Message Processors from :" + messageProcessorDir.getPath());
+            }
+
+            Iterator messageProcessors = FileUtils.iterateFiles(messageProcessorDir, extensions, false);
+            while (messageProcessors.hasNext()) {
+                File file = (File) messageProcessors.next();
+                OMElement document = getOMElement(file);
+                MessageProcessor messageProcessor = SynapseXMLConfigurationFactory.defineMessageProcessor(
+                        synapseConfig, document, properties);
+                if (messageProcessor != null) {
+                    messageProcessor.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                            messageProcessor.getName());
+                }
+            }
+        }
+    }
+
 
     private static OMElement getOMElement(File file) {
         FileInputStream is;

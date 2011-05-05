@@ -18,12 +18,13 @@
  */
 package org.apache.synapse.message.processors.forward;
 
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseArtifact;
+import org.apache.synapse.*;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -86,6 +87,27 @@ public class ForwardingJob implements StatefulJob {
 
             MessageContext messageContext = messageStore.peek();
             if (messageContext != null) {
+
+
+                //If The Message not belongs to this server we ignore it.
+                String serverName = (String)
+                        messageContext.getProperty(SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
+
+                if(serverName != null && messageContext instanceof Axis2MessageContext) {
+
+                    AxisConfiguration configuration = ((Axis2MessageContext)messageContext).
+                            getAxis2MessageContext().
+                            getConfigurationContext().getAxisConfiguration();
+
+                    String myServerName = getAxis2ParameterValue(configuration,
+                            SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
+
+                    if(!serverName.equals(myServerName)) {
+                        return;
+                    }
+
+                }
+
                 Set proSet = messageContext.getPropertyKeySet();
 
                 if (proSet != null) {
@@ -217,6 +239,29 @@ public class ForwardingJob implements StatefulJob {
         sender.init();
 
         return sender;
+    }
+
+
+    /**
+     * Helper method to get a value of a parameters in the AxisConfiguration
+     *
+     * @param axisConfiguration AxisConfiguration instance
+     * @param paramKey The name / key of the parameter
+     * @return The value of the parameter
+     */
+    private static String getAxis2ParameterValue(AxisConfiguration axisConfiguration,
+                                                 String paramKey) {
+
+        Parameter parameter = axisConfiguration.getParameter(paramKey);
+        if (parameter == null) {
+            return null;
+        }
+        Object value = parameter.getValue();
+        if (value != null && value instanceof String) {
+            return (String) parameter.getValue();
+        } else {
+            return null;
+        }
     }
 
 }

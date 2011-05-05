@@ -357,6 +357,7 @@ public class TemporaryData {
                 log.debug("Deleting temporary file " + temporaryFile);
             }
             FileUtils.deleteQuietly(temporaryFile);
+            temporaryFile = null;
         }
     }
 

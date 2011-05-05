@@ -28,6 +28,7 @@ import org.apache.synapse.config.xml.eventing.EventSourceSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
+import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.eventing.SynapseEventSource;
@@ -105,6 +106,7 @@ public class MultiXMLConfigurationSerializer {
             serializeExecutors(synapseConfig.getPriorityExecutors().values(),
                     synapseConfig, definitions);
             serializeMessageStores(synapseConfig.getMessageStores().values(), definitions);
+            serializeMessageProcessors(synapseConfig.getMessageProcessors().values(),definitions);
             serializeSynapseXML(definitions);
 
             serializationDone = true;
@@ -163,6 +165,8 @@ public class MultiXMLConfigurationSerializer {
         Collection localEntries = synapseConfig.getLocalRegistry().values();
         Collection<PriorityExecutor> executors = synapseConfig.getPriorityExecutors().values();
         Collection<MessageStore> messageStores = synapseConfig.getMessageStores().values();
+        Collection<MessageProcessor> messageProcessors =
+                synapseConfig.getMessageProcessors().values();
 
         for (ProxyService service : proxyServices) {
             if (service.getFileName() == null) {
@@ -228,6 +232,12 @@ public class MultiXMLConfigurationSerializer {
         for (MessageStore messageStore : messageStores) {
             if(messageStore.getFileName() == null) {
                 MessageStoreSerializer.serializeMessageStore(definitions,messageStore);
+            }
+        }
+
+        for(MessageProcessor messageProcessor : messageProcessors) {
+            if(messageProcessor.getFileName() == null) {
+                MessageProcessorSerializer.serializeMessageProcessor(definitions,messageProcessor);
             }
         }
 
@@ -469,6 +479,29 @@ public class MultiXMLConfigurationSerializer {
         return messageStoreElem;
     }
 
+
+     public OMElement serializeMessageProcessor(MessageProcessor messageProcessor,
+                                           OMElement parent) throws Exception {
+
+        File messageProcessorDir = createDirectory(currentDirectory,
+                MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR);
+        OMElement messageProcessorElem = MessageProcessorSerializer.serializeMessageProcessor(null,
+                messageProcessor);
+
+        String fileName = messageProcessor.getFileName();
+        if (fileName != null) {
+            // TODO: Call handleDeployment
+            File messageProcessorFile = new File(messageProcessorDir , fileName);
+            writeToFile(messageProcessorElem , messageProcessorFile);
+
+        } else if (parent != null) {
+            parent.addChild(messageProcessorElem);
+        }
+
+        return messageProcessorElem;
+    }
+
+
     private void writeToFile(OMElement content, File file) throws Exception {
         File tempFile = File.createTempFile("syn_mx_", ".xml");
         OutputStream out = new FileOutputStream(tempFile);
@@ -534,6 +567,13 @@ public class MultiXMLConfigurationSerializer {
                                          OMElement parent) throws Exception{
         for (MessageStore messageStore : messaegeStores) {
             serializeMessageStore(messageStore, parent);
+        }
+    }
+
+    private void serializeMessageProcessors(Collection<MessageProcessor> messageProcessors,
+                                         OMElement parent) throws Exception{
+        for (MessageProcessor messageProcessor : messageProcessors) {
+            serializeMessageProcessor(messageProcessor, parent);
         }
     }
 

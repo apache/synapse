@@ -17,8 +17,11 @@
 */
 package org.apache.synapse.mediators.store;
 
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.message.store.MessageStore;
@@ -58,6 +61,24 @@ public class MessageStoreMediator extends AbstractMediator{
                 if(log.isDebugEnabled()) {
                     log.debug("Message Store mediator storing the message : \n " + synCtx.getEnvelope());
                 }
+
+                // Here we set the server name in the message context before storing the message.
+                //This can be used by the Processors in a clustering setup.
+                if(synCtx instanceof Axis2MessageContext) {
+
+                    String serverName =
+                                        getAxis2ParameterValue(((Axis2MessageContext)synCtx).
+                                        getAxis2MessageContext().
+                                        getConfigurationContext().getAxisConfiguration(),
+                                        SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
+                    if(serverName != null) {
+                        synCtx.setProperty(SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME,
+                                serverName);
+                    }
+
+                }
+
+
                 messageStore.offer(synCtx);
 
                 // with the nio transport, this causes the listener not to write a 202
@@ -94,5 +115,27 @@ public class MessageStoreMediator extends AbstractMediator{
 
     public void setOnStoreSequence(String  onStoreSequence) {
         this.onStoreSequence = onStoreSequence;
+    }
+
+     /**
+     * Helper method to get a value of a parameters in the AxisConfiguration
+     *
+     * @param axisConfiguration AxisConfiguration instance
+     * @param paramKey The name / key of the parameter
+     * @return The value of the parameter
+     */
+    private static String getAxis2ParameterValue(AxisConfiguration axisConfiguration,
+                                                 String paramKey) {
+
+        Parameter parameter = axisConfiguration.getParameter(paramKey);
+        if (parameter == null) {
+            return null;
+        }
+        Object value = parameter.getValue();
+        if (value != null && value instanceof String) {
+            return (String) parameter.getValue();
+        } else {
+            return null;
+        }
     }
 }

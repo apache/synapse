@@ -184,7 +184,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                 isClusteringEnabled = Boolean.FALSE;
             }
 
-            context = new EndpointContext(getName(), getDefinition(), isClusteringEnabled, cc);
+            context = new EndpointContext(getName(), getDefinition(), isClusteringEnabled,
+                    cc, metricsMBean);
         }
         initialized = true;
 

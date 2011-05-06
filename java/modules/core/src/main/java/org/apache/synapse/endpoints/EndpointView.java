@@ -23,9 +23,11 @@ import org.apache.axis2.transport.base.MessageLevelMetricsCollector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is the metrics collector and JMX control point for Endpoints
@@ -58,6 +60,16 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     private long minSizeSent;
     private long maxSizeSent;
     private double avgSizeSent;
+
+    private int consecutiveSuspensions;
+    private int consecutiveTimeouts;
+    private int totalSuspensions;
+    private int totalTimeouts;
+    private AtomicInteger suspensions = new AtomicInteger(0);
+    private AtomicInteger timeouts = new AtomicInteger(0);
+    private Date suspendedAt;
+    private Date timedoutAt;
+
     private final Map<Integer, Long> sendingFaultTable =
         Collections.synchronizedMap(new HashMap<Integer, Long>());
 
@@ -65,6 +77,10 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         Collections.synchronizedMap(new HashMap<Integer, Long>());
 
     private long lastResetTime = System.currentTimeMillis();
+
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private Queue<Integer> suspensionCounts = new LinkedList<Integer>();
+    private Queue<Integer> timeoutCounts = new LinkedList<Integer>();
 
     /**
      * Create a new MBean to manage the given endpoint
@@ -74,6 +90,23 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     public EndpointView(String endpointName, Endpoint endpoint) {
         this.endpointName = endpointName;
         this.endpoint = endpoint;
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                if (suspensionCounts.size() == 15) {
+                    suspensionCounts.remove();
+                }
+                suspensionCounts.offer(suspensions.getAndSet(0));
+
+                if (timeoutCounts.size() == 15) {
+                    timeoutCounts.remove();
+                }
+                timeoutCounts.offer(timeouts.getAndSet(0));
+            }
+        }, 60, 60, TimeUnit.SECONDS);
+    }
+
+    public void destroy() {
+        scheduler.shutdownNow();
     }
 
     // --- endpoint control ---
@@ -274,6 +307,98 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         } else {
             return responseCodeTable;
         }
+    }
+
+    public Date getSuspendedAt() {
+        return suspendedAt;
+    }
+
+    public void setSuspendedAt(Date suspendedAt) {
+        this.suspendedAt = suspendedAt;
+    }
+
+    public Date getTimedoutAt() {
+        return timedoutAt;
+    }
+
+    public void setTimedoutAt(Date timedoutAt) {
+        this.timedoutAt = timedoutAt;
+    }
+
+    public int getConsecutiveEndpointSuspensions() {
+        return consecutiveSuspensions;
+    }
+
+    public void incrementSuspensions() {
+        consecutiveSuspensions++;
+        totalSuspensions++;
+        suspensions.incrementAndGet();
+    }
+
+    public void resetConsecutiveSuspensions() {
+        consecutiveSuspensions = 0;
+    }
+
+    public int getConsecutiveEndpointTimeouts() {
+        return consecutiveTimeouts;
+    }
+
+    public void incrementTimeouts() {
+        consecutiveTimeouts++;
+        totalTimeouts++;
+        timeouts.incrementAndGet();
+    }
+
+    public void resetConsecutiveTimeouts() {
+        consecutiveTimeouts = 0;
+    }
+
+    public int getTotalEndpointSuspensions() {
+        return totalSuspensions;
+    }
+
+    public int getTotalEndpointTimeouts() {
+        return totalTimeouts;
+    }
+
+    public int getLastMinuteEndpointSuspensions() {
+        return getTotal(suspensionCounts, 1);
+    }
+
+    public int getLast5MinuteEndpointSuspensions() {
+        return getTotal(suspensionCounts, 5);
+    }
+
+    public int getLast15MinuteEndpointSuspensions() {
+        return getTotal(suspensionCounts, 15);
+    }
+
+    public int getLastMinuteEndpointTimeouts() {
+        return getTotal(timeoutCounts, 1);
+    }
+
+    public int getLast5MinuteEndpointTimeouts() {
+        return getTotal(timeoutCounts, 5);
+    }
+
+    public int getLast15MinuteEndpointTimeouts() {
+        return getTotal(timeoutCounts, 15);
+    }
+
+    private int getTotal(Queue<Integer> queue, int count) {
+        int sum = 0;
+        Integer[] array = queue.toArray(new Integer[queue.size()]);
+
+        if (count > array.length) {
+            for (int i = 0; i < array.length; i++) {
+                sum +=array[i];
+            }
+        } else {
+            for (int i = 0; i < count; i++) {
+                sum += array[array.length - 1 - i];
+            }
+        }
+        return sum;
     }
 
     /**

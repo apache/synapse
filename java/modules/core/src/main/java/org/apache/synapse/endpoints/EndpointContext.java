@@ -173,6 +173,7 @@ public class EndpointContext {
 
         if (isClustered) {
             Replicator.setAndReplicateState(STATE_KEY, state, cfgCtx);
+            if (definition == null) return;
             switch (state) {
                 case ST_ACTIVE: {
                     Replicator.setAndReplicateState(REMAINING_RETRIES_KEY,
@@ -223,6 +224,7 @@ public class EndpointContext {
         } else {
 
             localState = state;
+            if (definition == null) return;
             switch (state) {
                 case ST_ACTIVE: {
                     localRemainingRetries = definition.getRetriesOnTimeoutBeforeSuspend();

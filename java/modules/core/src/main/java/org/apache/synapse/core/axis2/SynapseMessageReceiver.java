@@ -79,9 +79,6 @@ public class SynapseMessageReceiver implements MessageReceiver {
         ((Axis2MessageContext) synCtx).setServiceLog(serviceLog);
 
         try {
-            // set default fault handler
-            synCtx.pushFaultHandler(new MediatorFaultHandler(synCtx.getFaultSequence()));
-
             // invoke synapse message mediation through the main sequence
             synCtx.getEnvironment().injectMessage(synCtx);
 

@@ -20,6 +20,7 @@
 package org.apache.synapse.endpoints;
 
 import java.util.Map;
+import java.util.Date;
 
 public interface EndpointViewMBean {
 
@@ -42,6 +43,19 @@ public interface EndpointViewMBean {
     public double getAvgSizeSent();
     public Map getSendingFaultTable();
     public Map getResponseCodeTable();
+
+    public Date getSuspendedAt();
+    public Date getTimedoutAt();
+    public int getConsecutiveEndpointSuspensions();
+    public int getConsecutiveEndpointTimeouts();
+    public int getTotalEndpointSuspensions();
+    public int getTotalEndpointTimeouts();
+    public int getLastMinuteEndpointSuspensions();
+    public int getLast5MinuteEndpointSuspensions();
+    public int getLast15MinuteEndpointSuspensions();
+    public int getLastMinuteEndpointTimeouts();
+    public int getLast5MinuteEndpointTimeouts();
+    public int getLast15MinuteEndpointTimeouts();
 
     // JMX Operations
     public void switchOn() throws Exception;

@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.Replicator;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -52,7 +53,7 @@ public class EndpointContext {
      */
     public static final int ST_SUSPENDED   = 3;
     /**
-     * An endpoint manually switched off into maintenence -
+     * An endpoint manually switched off into maintenance -
      * it will never change state automatically
      */
     public static final int ST_OFF = 4;
@@ -75,6 +76,9 @@ public class EndpointContext {
     /** The endpoint definition that holds static endpoint information */
     private EndpointDefinition definition = null;
 
+    /** Metrics bean to notify the state changes */
+    private EndpointView metricsBean = null;
+
     // for clustered mode operation, keys pre-computed and used for replication
     private final String STATE_KEY;
     private final String NEXT_RETRY_TIME_KEY;
@@ -90,7 +94,7 @@ public class EndpointContext {
      * @param cfgCtx the Axis2 configurationContext for clustering
      */
     public EndpointContext(String endpointName, EndpointDefinition endpointDefinition,
-                           boolean clustered, ConfigurationContext cfgCtx) {
+                           boolean clustered, ConfigurationContext cfgCtx, EndpointView metricsBean) {
 
         if (clustered) {
             if (endpointName == null) {
@@ -111,6 +115,8 @@ public class EndpointContext {
             this.endpointName = endpointDefinition.toString();
         }
 
+        this.metricsBean = metricsBean;
+
         STATE_KEY = KEY_PREFIX + endpointName + STATE;
         NEXT_RETRY_TIME_KEY = KEY_PREFIX + endpointName + NEXT_RETRY_TIME;
         REMAINING_RETRIES_KEY = KEY_PREFIX + endpointName + REMAINING_RETRIES;
@@ -123,12 +129,47 @@ public class EndpointContext {
         }
     }
 
+    private void recordStatistics(int state) {
+        if (metricsBean == null) {
+            return;
+        }
+
+        switch (state) {
+            case ST_ACTIVE:
+                metricsBean.resetConsecutiveSuspensions();
+                metricsBean.resetConsecutiveTimeouts();
+                metricsBean.setSuspendedAt(null);
+                metricsBean.setTimedoutAt(null);
+                break;
+
+            case ST_TIMEOUT:
+                metricsBean.resetConsecutiveSuspensions();
+                metricsBean.incrementTimeouts();
+                if (localState != ST_TIMEOUT) {
+                    metricsBean.setTimedoutAt(Calendar.getInstance().getTime());
+                    metricsBean.setSuspendedAt(null);
+                }
+                break;
+
+            case ST_SUSPENDED:
+                metricsBean.resetConsecutiveTimeouts();
+                metricsBean.incrementSuspensions();
+                if (localState != ST_SUSPENDED) {
+                    metricsBean.setSuspendedAt(Calendar.getInstance().getTime());
+                    metricsBean.setTimedoutAt(null);
+                }
+                break;
+        }
+    }
+
     /**
      * Update the internal state of the endpoint
      *
      * @param state the new state of the endpoint
      */
     private void setState(int state) {
+
+        recordStatistics(state);
 
         if (isClustered) {
             Replicator.setAndReplicateState(STATE_KEY, state, cfgCtx);

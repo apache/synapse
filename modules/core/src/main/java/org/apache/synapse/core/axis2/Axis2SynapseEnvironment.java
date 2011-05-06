@@ -156,6 +156,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         // if this is not a response to a proxy service
         String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
         if (proxyName == null || "".equals(proxyName)) {
+            // set default fault handler
+            synCtx.pushFaultHandler(new MediatorFaultHandler(synCtx.getFaultSequence()));
             if (receivingSequence != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Using Sequence with name: " + receivingSequence
@@ -175,7 +177,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 }
                 return synCtx.getMainSequence().mediate(synCtx);
             }
-
         }
 
         ProxyService proxyService = synCtx.getConfiguration().getProxyService(proxyName);

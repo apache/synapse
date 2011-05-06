@@ -23,10 +23,9 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.xml.MessageProcessorFactory;
-import org.apache.synapse.config.xml.MessageStoreSerializer;
+import org.apache.synapse.config.xml.MessageProcessorSerializer;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.message.processors.MessageProcessor;
-import org.apache.synapse.message.store.MessageStore;
 
 import java.io.File;
 import java.util.Properties;
@@ -98,19 +97,20 @@ public class MessageProcessorDeployer extends AbstractSynapseArtifactDeployer {
             }
 
             mp.init(getSynapseEnvironment());
-            MessageStore existingMs = getSynapseConfiguration().getMessageStore(existingArtifactName);
+            MessageProcessor existingMp = getSynapseConfiguration().getMessageProcessors().
+                    get(existingArtifactName);
 
             // We should add the updated MessageProcessor as a new MessageProcessor
             // and remove the old one
             getSynapseConfiguration().addMessageProcessor(mp.getName(), mp);
-            getSynapseConfiguration().removeMessageStore(existingArtifactName);
+            getSynapseConfiguration().removeMessageProcessor(existingArtifactName);
             log.info("MessageProcessor: " + existingArtifactName + " has been undeployed");
 
 
             log.info("MessageProcessor: " + mp.getName() + " has been updated from the file: " + fileName);
 
             waitForCompletion();
-            existingMs.destroy();
+            existingMp.destroy();
             return mp.getName();
 
         } catch (DeploymentException e) {
@@ -132,7 +132,7 @@ public class MessageProcessorDeployer extends AbstractSynapseArtifactDeployer {
             MessageProcessor mp =
                     getSynapseConfiguration().getMessageProcessors().get(artifactName);
             if (mp != null) {
-                getSynapseConfiguration().removeMessageStore(artifactName);
+                getSynapseConfiguration().removeMessageProcessor(artifactName);
                 if (log.isDebugEnabled()) {
                     log.debug("Destroying the MessageProcessor named : " + artifactName);
                 }
@@ -159,13 +159,13 @@ public class MessageProcessorDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
-            MessageStore ms
-                    = getSynapseConfiguration().getMessageStore(artifactName);
-            OMElement msElem = MessageStoreSerializer.serializeMessageStore(null, ms);
-            if (ms.getFileName() != null) {
+            MessageProcessor mp
+                    = getSynapseConfiguration().getMessageProcessors().get(artifactName);
+            OMElement msElem = MessageProcessorSerializer.serializeMessageProcessor(null, mp);
+            if (mp.getFileName() != null) {
                 String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                         + File.separator + MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR
-                        + File.separator + ms.getFileName();
+                        + File.separator + mp.getFileName();
                 writeToFile(msElem, fileName);
                 if (log.isDebugEnabled()) {
                     log.debug("Restoring the MessageProcessor with name : "

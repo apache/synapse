@@ -235,6 +235,8 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                         if (responseMessageContext.getReplyTo() != null) {
                             sc.setTargetEPR(responseMessageContext.getReplyTo());
                         }
+
+                        complete(msgctx);
                     } else {
                         throw new AxisFault(
                                 Messages.getMessage("blockingInvocationExpectsResponse"));

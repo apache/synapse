@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.message.processors.AbstractMessageProcessor;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.quartz.JobDetail;
+import org.quartz.SchedulerException;
 
 public class SamplingProcessor extends ScheduledMessageProcessor{
     private Log log = LogFactory.getLog(SamplingProcessor.class);
@@ -34,8 +35,19 @@ public class SamplingProcessor extends ScheduledMessageProcessor{
     @Override
     protected JobDetail getJobDetail() {
         JobDetail jobDetail = new JobDetail();
-        jobDetail.setName(messageStore + "-job");
+        jobDetail.setName(name + "-sampling-job");
         jobDetail.setJobClass(SamplingJob.class);
         return jobDetail;
+    }
+
+    @Override
+    public void destroy() {
+         try {
+            scheduler.deleteJob(name + "-sampling-job",
+                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+        } catch (SchedulerException e) {
+            log.error("Error while destroying the task " + e);
+        }
+        state = State.DESTROY;
     }
 }

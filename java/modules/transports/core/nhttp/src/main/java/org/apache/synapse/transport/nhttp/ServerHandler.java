@@ -114,6 +114,7 @@ public class ServerHandler implements NHttpServiceHandler {
     private boolean restDispatching = true;
     
     private LatencyView latencyView = null;
+    private LatencyView s2sLatencyView = null;
     private ThreadingView threadingView = null;
 
     public static final String REQUEST_SINK_BUFFER = "synapse.request-sink-buffer";
@@ -135,7 +136,8 @@ public class ServerHandler implements NHttpServiceHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.allocator = new HeapByteBufferAllocator();
         this.activeConnections = new ArrayList<NHttpServerConnection>();
-        this.latencyView = new LatencyView(isHttps);
+        this.latencyView = new LatencyView("NHTTPLatencyView", isHttps);
+        this.s2sLatencyView = new LatencyView("NHTTPS2SLatencyView", isHttps);
         this.threadingView = new ThreadingView("HttpServerWorker", true, 50);
         this.restDispatching = listenerContext.isRestDispatching();
 
@@ -371,7 +373,20 @@ public class ServerHandler implements NHttpServiceHandler {
         final HttpResponse response) throws IOException, HttpException {
         try {
             conn.suspendInput();
-            httpProcessor.process(response, conn.getContext());
+            HttpContext context = conn.getContext();
+            httpProcessor.process(response, context);
+
+            if (context.getAttribute(NhttpConstants.REQ_ARRIVAL_TIME) != null &&
+                context.getAttribute(NhttpConstants.REQ_DEPARTURE_TIME) != null &&
+                context.getAttribute(NhttpConstants.RES_HEADER_ARRIVAL_TIME) != null) {
+
+                s2sLatencyView.notifyTimes(
+                    (Long) context.getAttribute(NhttpConstants.REQ_ARRIVAL_TIME),
+                    (Long) context.getAttribute(NhttpConstants.REQ_DEPARTURE_TIME),
+                    (Long) context.getAttribute(NhttpConstants.RES_HEADER_ARRIVAL_TIME),
+                    System.currentTimeMillis());
+            }
+
             conn.submitResponse(response);
         } catch (HttpException e) {
             shutdownConnection(conn);
@@ -600,6 +615,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
     public void stop() {
         latencyView.destroy();
+        s2sLatencyView.destroy();
         threadingView.destroy();
 
         try {

@@ -54,8 +54,6 @@ import java.util.Calendar;
  */
 public class LatencyView implements LatencyViewMBean {
 
-    private static final String NHTTP_LATENCY_VIEW = "NhttpTransportLatency";
-
     private static final int SMALL_DATA_COLLECTION_PERIOD = 5;
     private static final int LARGE_DATA_COLLECTION_PERIOD = 5 * 60;
     private static final int SAMPLES_PER_MINUTE = 60/ SMALL_DATA_COLLECTION_PERIOD;
@@ -89,14 +87,16 @@ public class LatencyView implements LatencyViewMBean {
     private int count = 0;
     private Date resetTime = Calendar.getInstance().getTime();
 
+    private String latencyMode;
     private String name;
 
-    public LatencyView(boolean isHttps) {
+    public LatencyView(final String latencyMode, boolean isHttps) {
+        this.latencyMode = latencyMode;
         name = "nio-http" + (isHttps ? "s" : "");
 
         scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             public Thread newThread(Runnable r) {
-                return new Thread(r, name + "-latency-view");
+                return new Thread(r, latencyMode + "-" + name + "-latency-view");
             }
         });
 
@@ -106,7 +106,7 @@ public class LatencyView implements LatencyViewMBean {
                 LARGE_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
         boolean registered = false;
         try {
-            registered = MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
+            registered = MBeanRegistrar.getInstance().registerMBean(this, this.latencyMode, name);
         } finally {
             if (!registered) {
                 scheduler.shutdownNow();
@@ -115,7 +115,7 @@ public class LatencyView implements LatencyViewMBean {
     }
 
     public void destroy() {
-        MBeanRegistrar.getInstance().unRegisterMBean(NHTTP_LATENCY_VIEW, name);
+        MBeanRegistrar.getInstance().unRegisterMBean(latencyMode, name);
         if (!scheduler.isShutdown()) {
             scheduler.shutdownNow();
         }

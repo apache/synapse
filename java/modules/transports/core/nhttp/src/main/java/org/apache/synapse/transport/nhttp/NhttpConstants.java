@@ -116,6 +116,7 @@ public class NhttpConstants {
     public static final String REQ_ARRIVAL_TIME = "REQ_ARRIVAL_TIME";
     public static final String REQ_DEPARTURE_TIME = "REQ_DEPARTURE_TIME";
     public static final String RES_ARRIVAL_TIME = "RES_ARRIVAL_TIME";
+    public static final String RES_HEADER_ARRIVAL_TIME = "RES_HEADER_ARRIVAL_TIME";
     public static final String RES_DEPARTURE_TIME = "RES_DEPARTURE_TIME";
 
     /**

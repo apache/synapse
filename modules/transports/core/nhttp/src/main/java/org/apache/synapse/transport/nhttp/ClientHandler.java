@@ -635,6 +635,9 @@ public class ClientHandler implements NHttpClientHandler {
      */
     public void responseReceived(final NHttpClientConnection conn) {
 
+        setServerContextAttribute(NhttpConstants.RES_HEADER_ARRIVAL_TIME,
+                System.currentTimeMillis(), conn);
+
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
 

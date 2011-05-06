@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -78,7 +79,8 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     private long lastResetTime = System.currentTimeMillis();
 
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService scheduler;
+
     private Queue<Integer> suspensionCounts = new LinkedList<Integer>();
     private Queue<Integer> timeoutCounts = new LinkedList<Integer>();
 
@@ -87,9 +89,16 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @param endpointName the name of the endpoint
      * @param endpoint the actual endpoint
      */
-    public EndpointView(String endpointName, Endpoint endpoint) {
+    public EndpointView(final String endpointName, Endpoint endpoint) {
         this.endpointName = endpointName;
         this.endpoint = endpoint;
+
+        scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                return new Thread(r, endpointName + "-endpoint-stat-collector");
+            }
+        });
+
         scheduler.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 if (suspensionCounts.size() == 15) {

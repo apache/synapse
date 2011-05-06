@@ -50,7 +50,7 @@ import java.util.List;
  */
 public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
 
-    private ServiceClient sc = null;
+    private ConfigurationContext configCtx = null;
     private String serviceURL = null;
     private String action = null;
     private String requestKey = null;
@@ -75,6 +75,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         }
 
         try {
+            ServiceClient sc = new ServiceClient(configCtx, null);
             Options options = new Options();
             options.setTo(new EndpointReference(serviceURL));
 
@@ -107,6 +108,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
             OMElement result = null;
             try {
+                options.setCallTransportCleanup(true);
                 result = sc.sendReceive(request);
             } catch (AxisFault axisFault) {
                 handleFault(synCtx, axisFault);
@@ -218,11 +220,9 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void init(SynapseEnvironment synEnv) {
         try {
-            ConfigurationContext cfgCtx
-                    = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+            configCtx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
                     clientRepository != null ? clientRepository : DEFAULT_CLIENT_REPO,
-                    axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
-            sc = new ServiceClient(cfgCtx, null);
+            axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
         } catch (AxisFault e) {
             String msg = "Error initializing callout mediator : " + e.getMessage();
             log.error(msg, e);
@@ -232,11 +232,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void destroy() {
         try {
-            sc.cleanup();
-        } catch (AxisFault af) {
-            log.warn("Error while cleaning up the service client instance used by the " +
-                    "Callout mediator", af);
-        }
+            configCtx.terminate();
+        } catch (AxisFault ignore) {}
     }
 
     public String getServiceURL() {

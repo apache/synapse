@@ -93,6 +93,12 @@ public class MediatorWorker implements Runnable {
                 warn(false, "Exception encountered but no fault handler found - " +
                     "message dropped", synCtx);
             }
+        } catch (Throwable e) {
+            String msg = "Unexpected error executing task/async inject, message dropped";
+            log.error(msg, e);
+            if (synCtx.getServiceLog() != null) {
+                synCtx.getServiceLog().error(msg, e);
+            }
         }
         synCtx = null;
         seq = null;

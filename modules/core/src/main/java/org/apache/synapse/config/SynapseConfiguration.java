@@ -1246,6 +1246,19 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         for(PriorityExecutor pe : executors.values()) {
             pe.destroy();
         }
+
+        // destroy the Message Stores
+        for(MessageStore ms : messageStores.values()) {
+            ms.destroy();
+        }
+
+        // destroy the Message processors
+        for(MessageProcessor mp : messageProcessors.values()) {
+            mp.destroy();
+        }
+
+
+
     }
 
     /**

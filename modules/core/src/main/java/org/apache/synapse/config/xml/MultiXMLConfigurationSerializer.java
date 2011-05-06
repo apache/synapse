@@ -105,8 +105,10 @@ public class MultiXMLConfigurationSerializer {
                     synapseConfig, definitions);
             serializeExecutors(synapseConfig.getPriorityExecutors().values(),
                     synapseConfig, definitions);
-            serializeMessageStores(synapseConfig.getMessageStores().values(), definitions);
-            serializeMessageProcessors(synapseConfig.getMessageProcessors().values(),definitions);
+            serializeMessageStores(synapseConfig.getMessageStores().values(), synapseConfig,
+                    definitions);
+            serializeMessageProcessors(synapseConfig.getMessageProcessors().values(),synapseConfig,
+                    definitions);
             serializeSynapseXML(definitions);
 
             serializationDone = true;
@@ -459,7 +461,7 @@ public class MultiXMLConfigurationSerializer {
         return eventDirElem;
     }
 
-    public OMElement serializeMessageStore(MessageStore messagestore,
+    public OMElement serializeMessageStore(MessageStore messagestore,SynapseConfiguration synConfig,
                                            OMElement parent) throws Exception {
 
         File messageStoreDir = createDirectory(currentDirectory,
@@ -481,6 +483,7 @@ public class MultiXMLConfigurationSerializer {
 
 
      public OMElement serializeMessageProcessor(MessageProcessor messageProcessor,
+                                                SynapseConfiguration synapseConfiguration ,
                                            OMElement parent) throws Exception {
 
         File messageProcessorDir = createDirectory(currentDirectory,
@@ -490,7 +493,10 @@ public class MultiXMLConfigurationSerializer {
 
         String fileName = messageProcessor.getFileName();
         if (fileName != null) {
-            // TODO: Call handleDeployment
+            if (currentDirectory == rootDirectory) {
+                handleDeployment(messageProcessorDir, fileName, messageProcessor.getName(),
+                        synapseConfiguration.getArtifactDeploymentStore());
+            }
             File messageProcessorFile = new File(messageProcessorDir , fileName);
             writeToFile(messageProcessorElem , messageProcessorFile);
 
@@ -564,16 +570,18 @@ public class MultiXMLConfigurationSerializer {
     }
 
     private void serializeMessageStores(Collection<MessageStore> messaegeStores,
+                                        SynapseConfiguration configuration,
                                          OMElement parent) throws Exception{
         for (MessageStore messageStore : messaegeStores) {
-            serializeMessageStore(messageStore, parent);
+            serializeMessageStore(messageStore,configuration ,parent);
         }
     }
 
     private void serializeMessageProcessors(Collection<MessageProcessor> messageProcessors,
+                                            SynapseConfiguration configuration,
                                          OMElement parent) throws Exception{
         for (MessageProcessor messageProcessor : messageProcessors) {
-            serializeMessageProcessor(messageProcessor, parent);
+            serializeMessageProcessor(messageProcessor,configuration,parent);
         }
     }
 
@@ -602,6 +610,8 @@ public class MultiXMLConfigurationSerializer {
         createDirectory(tempDirectory, MultiXMLConfigurationBuilder.SEQUENCES_DIR);
         createDirectory(tempDirectory, MultiXMLConfigurationBuilder.TASKS_DIR);
         createDirectory(tempDirectory, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR);
+        createDirectory(tempDirectory, MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR);
 
         return tempDirectory;
     }
@@ -680,6 +690,20 @@ public class MultiXMLConfigurationSerializer {
             if (exec.getFileName() != null) {
                 handleDeployment(new File(rootDirectory, MultiXMLConfigurationBuilder.
                         EXECUTORS_DIR), exec.getFileName(), exec.getName(), deploymentStore);
+            }
+        }
+
+        for(MessageStore ms : synapseConfig.getMessageStores().values()) {
+            if(ms.getFileName() != null) {
+                handleDeployment(new File(rootDirectory,MultiXMLConfigurationBuilder.
+                        MESSAGE_STORE_DIR),ms.getFileName(), ms.getName(),deploymentStore);
+            }
+        }
+
+        for(MessageProcessor mp : synapseConfig.getMessageProcessors().values()) {
+            if(mp.getFileName() != null) {
+                handleDeployment(new File(rootDirectory,MultiXMLConfigurationBuilder.
+                        MESSAGE_PROCESSOR_DIR),mp.getFileName(), mp.getName(),deploymentStore);
             }
         }
 

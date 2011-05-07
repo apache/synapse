@@ -136,13 +136,16 @@ public class SOAPUtils {
 
                         Iterator itrChildren = soapHeader.getChildren();
                         while (itrChildren.hasNext()) {
-                            newSOAPHeader.addChild(((OMNode) itrChildren.next()));
+                            OMNode node = (OMNode) itrChildren.next();
+                            itrChildren.remove();
+                            newSOAPHeader.addChild(node);
                         }
 
                         newEnvelope.getHeader().addChild(newSOAPHeader);
                     } // while(allAttributes.hasNext())
 
                 } else {
+                    itr.remove();
                     newEnvelope.getHeader().addChild(omNode);
                 }
 
@@ -198,13 +201,15 @@ public class SOAPUtils {
                                 = soap12Factory.createSOAPFaultDetail(newSOAPFault);
                         Iterator<OMElement> iter = detail.getAllDetailEntries();
                         while (iter.hasNext()) {
-                          OMElement detailEntry = iter.next();
-                          newSOAPFaultDetail.addDetailEntry(detailEntry);
+                            OMElement detailEntry = iter.next();
+                            iter.remove();
+                            newSOAPFaultDetail.addDetailEntry(detailEntry);
                         }
                          newSOAPFault.setDetail(newSOAPFaultDetail);
                     }
 
                 } else {
+                    itrBodyChildren.remove();
                     newEnvelope.getBody().addChild(omNode);
 
                 } // if (omNode instanceof SOAPFault)
@@ -287,13 +292,16 @@ public class SOAPUtils {
 
                         Iterator itrChildren = soapHeaderBlock.getChildren();
                         while (itrChildren.hasNext()) {
-                            newSOAPHeader.addChild(((OMNode) itrChildren.next()));
+                            OMNode node = (OMNode) itrChildren.next();
+                            itrChildren.remove();
+                            newSOAPHeader.addChild(node);
                         }
 
                         newEnvelope.getHeader().addChild(newSOAPHeader);
                     }
 
                 } else {
+                    itr.remove();
                     newEnvelope.getHeader().addChild(omNode);
                 }
             }
@@ -331,6 +339,7 @@ public class SOAPUtils {
                     Iterator iterAllSoapTexts = allSoapTexts.iterator();
                     if (iterAllSoapTexts.hasNext()) {
                         SOAPFaultText soapFaultText = (SOAPFaultText) iterAllSoapTexts.next();
+                        iterAllSoapTexts.remove();
                         newSOAPFaultReason.setText(soapFaultText.getText());
                     }
                 }
@@ -342,6 +351,7 @@ public class SOAPUtils {
                     Iterator<OMElement> iter = detail.getAllDetailEntries();
                     while (iter.hasNext()) {
                         OMElement detailEntry = iter.next();
+                        iter.remove();
                         newSOAPFaultDetail.addDetailEntry(detailEntry);
                     }
                     newSOAPFault.setDetail(newSOAPFaultDetail);
@@ -352,6 +362,7 @@ public class SOAPUtils {
                 while (itr.hasNext()) {
                     OMNode omNode = (OMNode) itr.next();
                     if (omNode != null) {
+                        itr.remove();
                         newEnvelope.getBody().addChild(omNode);
                     }
                 }

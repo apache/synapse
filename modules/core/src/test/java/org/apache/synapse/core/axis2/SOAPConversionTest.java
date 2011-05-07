@@ -18,7 +18,6 @@
 
 package org.apache.synapse.core.axis2;
 
-import junit.framework.TestCase;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;

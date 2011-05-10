@@ -111,7 +111,10 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
             msgContext.setTo(new EndpointReference(uri));
         }
 
-        if (uri.equals("/favicon.ico")) {
+        if (isServiceListBlocked(uri)) {
+            response.setStatusCode(HttpStatus.SC_FORBIDDEN);
+            serverHandler.commitResponseHideExceptions(conn,  response);
+        } else if (uri.equals("/favicon.ico")) {
             response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
             response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
             serverHandler.commitResponseHideExceptions(conn, response);
@@ -147,6 +150,20 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
         } catch (IOException ignore) {
         }
 
+    }
+
+    /**
+     * Is the incoming URI is requesting service list and http.block_service_list=true in
+     * nhttp.properties
+     * @param incomingURI incoming URI
+     * @return whether to proceed with incomingURI
+
+     */
+    protected boolean isServiceListBlocked(String incomingURI) {
+        String isBlocked = NHttpConfiguration.getInstance().isServiceListBlocked();
+
+        return (("/services").equals(incomingURI) || ("/services" + "/").equals(incomingURI)) &&
+               Boolean.parseBoolean(isBlocked);
     }
 
     /**

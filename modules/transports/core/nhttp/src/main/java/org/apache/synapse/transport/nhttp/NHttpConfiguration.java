@@ -63,6 +63,11 @@ public final class NHttpConfiguration {
     private Properties props;
     List<String> methods;
 
+    /** Comma separated list of blocked uris*/
+    public static final String BLOCK_SERVICE_LIST = "http.block_service_list";
+    /** Default value for BLOCK_SERVICE_LIST*/
+    public static final String BLOCK_SERVICE_LIST_DEFAULT = "false";
+    
     private NHttpConfiguration() {
         try {
             props = MiscellaneousUtil.loadProperties("nhttp.properties");
@@ -132,6 +137,10 @@ public final class NHttpConfiguration {
 
     public boolean isCountConnections() {
         return getBooleanValue(NhttpConstants.COUNT_CONNECTIONS, false);
+    }
+
+    public String isServiceListBlocked() {
+        return getStringValue(BLOCK_SERVICE_LIST, BLOCK_SERVICE_LIST_DEFAULT);
     }
 
     /**

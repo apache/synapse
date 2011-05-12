@@ -295,7 +295,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 entry.setNextPollTime(now + entry.getPollInterval());
 
             } else if (log.isDebugEnabled()) {
-                log.debug("Unable to access or read file or directory : " + VFSUtils.maskURLPassword(fileURI));
+				log.debug("Unable to access or read file or directory : " + VFSUtils.maskURLPassword(fileURI)+ "." +
+						  " Reason: " + (fileObject.exists()? (fileObject.isReadable()? "Unknown reason":"The file can not be read!"):
+						  "The file does not exists!"));
             }
             onPollCompletion(entry);
         } catch (FileSystemException e) {

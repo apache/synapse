@@ -32,7 +32,7 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="rule" minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="rewriterule" minOccurs="1" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:choice maxOccurs="unbounded">
                             <xs:element name="condition" minOccurs="0" maxOccurs="1">

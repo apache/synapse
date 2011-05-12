@@ -60,6 +60,11 @@ public class URLRewriteMediator extends AbstractMediator {
             } else {
                 messageContext.setTo(new EndpointReference(fragments.toURIString()));
             }
+            
+            if(log.isDebugEnabled()) {
+                log.debug("URL Rewrite Mediator has rewritten the address url : \n " + messageContext.getEnvelope());
+            }
+            
         } catch (URISyntaxException e) {
             handleException("Error while constructing a URI from the fragments", e, messageContext);
         }

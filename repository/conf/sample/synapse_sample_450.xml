@@ -24,9 +24,9 @@
     <sequence name="main">
         <in>
             <rewrite>
-                <rule>
+                <rewriterule>
                     <action type="replace" regex="soap" value="services" fragment="path"/>
-                </rule>
+                </rewriterule>
             </rewrite>
             <send/>
         </in>

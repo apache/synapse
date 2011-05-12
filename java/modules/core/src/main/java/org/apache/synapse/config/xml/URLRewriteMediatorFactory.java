@@ -41,7 +41,7 @@ import java.util.Properties;
  *
  * <pre>
  *  &lt;rewrite [inProperty="inputURL"] [outProperty="outputURL"]&gt;
- *      &lt;rule&gt;
+ *      &lt;rewriterule&gt;
  *          &lt;condition&gt;
  *              evaluator configuration
  *          &lt;/condition&gt; ?
@@ -51,7 +51,7 @@ import java.util.Properties;
  *              [type="set | append | prepend | replace | remove"]
  *              [fragment="protocol | user | host | port | path | query | ref | full"]
  *              [regex="regex"] /&gt; +
- *      &lt;/rule&gt; *
+ *      &lt;/rewriterule&gt; *
  *  &lt;/rewrite&gt;
  * </pre>
  */
@@ -59,7 +59,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName REWRITE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "rewrite");
 
-    private static final QName RULE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "rule");
+    private static final QName RULE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "rewriterule");
     private static final QName CONDITION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "condition");
     private static final QName ACTION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "action");
 
@@ -100,6 +100,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
             mediator.addRule(parseRule((OMElement) rules.next()));
         }
         processAuditStatus(mediator, element);
+        
         return mediator;
     }
 

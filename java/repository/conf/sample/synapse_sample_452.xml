@@ -26,22 +26,22 @@
             <property name="http.port" value="9000"/>
             <property name="https.port" value="9002"/>
             <rewrite>
-                <rule>
+                <rewriterule>
                     <action fragment="host" value="localhost"/>
                     <action fragment="path" type="prepend" value="/services"/>
-                </rule>
-                <rule>
+                </rewriterule>
+                <rewriterule>
                     <condition>
                         <equal type="url" source="protocol" value="http"/>
                     </condition>
                     <action fragment="port" xpath="get-property('http.port')"/>
-                </rule>
-                <rule>
+                </rewriterule>
+                <rewriterule>
                     <condition>
                         <equal type="url" source="protocol" value="https"/>
                     </condition>
                     <action fragment="port" xpath="get-property('https.port')"/>
-                </rule>
+                </rewriterule>
             </rewrite>
             <log level="full"/>
             <send/>

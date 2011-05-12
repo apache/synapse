@@ -24,7 +24,7 @@
     <sequence name="main">
         <in>
             <rewrite>
-                <rule>
+                <rewriterule>
                     <condition>
                         <and>
                             <equal type="url" source="host" value="localhost"/>
@@ -35,7 +35,7 @@
                     </condition>
                     <action fragment="protocol" value="https"/>
                     <action fragment="port" value="9002"/>
-                </rule>
+                </rewriterule>
             </rewrite>
             <send/>
         </in>

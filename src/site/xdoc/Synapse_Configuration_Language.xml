@@ -1590,13 +1590,13 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       <a name="rewrite" id="rewrite">URLRewrite</a>
     </h4>
 <pre xml:space="preserve">&lt;rewrite [inProperty="string"] [outProperty="string"]&gt;
-   &lt;rule&gt;
+   &lt;rewriterule&gt;
       &lt;condition&gt;
          ...
       &lt;/condition&gt;?
       &lt;action [type="append|prepend|replace|remove|set"] [value="string"]
           [xpath="xpath"] [fragment="protocol|host|port|path|query|ref|user|full"] [regex="regex"]&gt;+
-   &lt;/rule&gt;+
+   &lt;/rewriterule&gt;+
 &lt;/rewrite&gt;</pre>
     <p/>
     <p>
@@ -1610,13 +1610,13 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     </p>
     <p>
       The rewrite mediator applies URL transformations by evaluating a set of rules on
-      the message. Rules are specified using the 'rule' element. Rules are evaluated in the
+      the message. Rules are specified using the 'rewriterule' element. Rules are evaluated in the
       order they are specified. A rule can consist of an optional condition and one or more
       rewrite actions. If the condition is provided it will be evaluated first. If it evaluates
       to 'true' all the specified rewrite actions will be executed. Otherwise the set of
       actions will be skipped. If no condition is specified, the provided rewrite actions
       will be always executed. The condition should be wrapped in a 'condition' element within
-      the 'rule' element. Rewrite actions are specified using 'action' elements.
+      the 'rewriterule' element. Rewrite actions are specified using 'action' elements.
     </p>
     <p>
       The 'type' attribute on the 'action' element states which type of action should be

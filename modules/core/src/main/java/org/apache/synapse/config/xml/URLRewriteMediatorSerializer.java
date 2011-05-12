@@ -41,9 +41,22 @@ public class URLRewriteMediatorSerializer extends AbstractMediatorSerializer {
         }
 
         URLRewriteMediator mediator = (URLRewriteMediator) m;
-        OMElement rewrite = fac.createOMElement("rewrite", synNS);
-        saveTracingState(rewrite, mediator);
+        OMElement rewrite = fac.createOMElement("rewrite", synNS);        
+        
+        String inProperty = mediator.getInputProperty();
+        String outProperty = mediator.getOutputProperty();
+        
+        if (inProperty != null) {
+        	rewrite.addAttribute(fac.createOMAttribute("inProperty", nullNS,
+        	                                              inProperty));
+        }
+        if (outProperty != null) {
+        	rewrite.addAttribute(fac.createOMAttribute("outProperty", nullNS,
+        	                                              outProperty));
+        }
 
+        saveTracingState(rewrite, mediator);
+        
         List<RewriteRule> rules = mediator.getRules();
         try {
             for (RewriteRule r : rules) {
@@ -58,7 +71,7 @@ public class URLRewriteMediatorSerializer extends AbstractMediatorSerializer {
     }
 
     private OMElement serializeRule(RewriteRule r) throws EvaluatorException {
-        OMElement rule = fac.createOMElement("rule", synNS);
+        OMElement rule = fac.createOMElement("rewriterule", synNS);
         Evaluator condition = r.getCondition();
         if (condition != null) {
             OMElement conditionElt = fac.createOMElement("condition", synNS);

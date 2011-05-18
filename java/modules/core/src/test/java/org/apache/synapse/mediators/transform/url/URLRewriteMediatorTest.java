@@ -224,7 +224,7 @@ public class URLRewriteMediatorTest extends TestCase {
     public void testFullRewriteScenario1() throws Exception {
         String xml =
                 "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                "    <rule>\n" +
+                "    <rewriterule>\n" +
                 "        <condition>\n" +
                 "            <and>\n" +
                 "                <equal type=\"url\" source=\"protocol\" value=\"http\"/>\n" +
@@ -234,16 +234,16 @@ public class URLRewriteMediatorTest extends TestCase {
                 "        <action value=\"https\" fragment=\"protocol\"/>\n" +
                 "        <action value=\"test.com\" fragment=\"host\"/>\n" +
                 "        <action value=\"9443\" fragment=\"port\"/>\n" +
-                "    </rule>\n" +
-                "    <rule>\n" +
+                "    </rewriterule>\n" +
+                "    <rewriterule>\n" +
                 "        <condition>\n" +
                 "            <not>\n" +
                 "                <match type=\"url\" source=\"path\" regex=\"/services/.*\"/>\n" +
                 "            </not>\n" +
                 "        </condition>\n" +
                 "        <action value=\"/services\" type=\"prepend\" fragment=\"path\"/>\n" +
-                "    </rule>\n" +
-                "    <rule>\n" +
+                "    </rewriterule>\n" +
+                "    <rewriterule>\n" +
                 "        <condition>\n" +
                 "            <and>\n" +
                 "               <match type=\"url\" source=\"path\" regex=\".*/MyService\"/>\n" +
@@ -252,7 +252,7 @@ public class URLRewriteMediatorTest extends TestCase {
                 "        </condition>        \n" +
                 "        <action fragment=\"path\" value=\"StockQuoteService\" regex=\"MyService\" type=\"replace\"/>\n" +
                 "        <action fragment=\"ref\" value=\"id\"/>\n" +
-                "    </rule>\n" +
+                "    </rewriterule>\n" +
                 "</rewrite>";
 
         OMElement element = AXIOMUtil.stringToOM(xml);

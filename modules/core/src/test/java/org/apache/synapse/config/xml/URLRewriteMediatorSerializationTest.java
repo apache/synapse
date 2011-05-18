@@ -30,37 +30,37 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testSerializationScenario1() {
-        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rule>" +
+        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rewriterule>" +
                 "<action fragment=\"protocol\" value=\"https\" type=\"set\"/><action " +
                 "fragment=\"host\" value=\"www.test.com\" type=\"set\"/><action " +
                 "fragment=\"port\" value=\"9090\" type=\"set\"/><action fragment=\"path\" " +
-                "value=\"/services\" type=\"prepend\"/></rule></rewrite>";
+                "value=\"/services\" type=\"prepend\"/></rewriterule></rewrite>";
         assertTrue(serialization(xml, urlRewriteMediatorFactory, urlRewriteMediatorSerializer));
     }
 
     public void testSerializationScenario2() {
         String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\">" +
-                "<rule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
+                "<rewriterule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/><action " +
                 "fragment=\"port\" value=\"9090\" type=\"set\"/><action fragment=\"path\" " +
-                "value=\"/services\" type=\"prepend\"/></rule>" +
+                "value=\"/services\" type=\"prepend\"/></rewriterule>" +
                 "</rewrite>";
         assertTrue(serialization(xml, urlRewriteMediatorFactory, urlRewriteMediatorSerializer));
     }
 
     public void testSerializationScenario3() {
-        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rule>" +
-                "<action fragment=\"full\" value=\"http://localhost:8080/synapse\" type=\"set\"/></rule>" +
-                "<rule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
+        String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rewriterule>" +
+                "<action fragment=\"full\" value=\"http://localhost:8080/synapse\" type=\"set\"/></rewriterule>" +
+                "<rewriterule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/>" +
                 "<action fragment=\"port\" xpath=\"get-property('port')\" type=\"set\"/>" +
-                "<action fragment=\"path\" value=\"/services\" type=\"prepend\"/></rule><rule>" +
+                "<action fragment=\"path\" value=\"/services\" type=\"prepend\"/></rewriterule><rewriterule>" +
                 "<condition><and xmlns=\"\"><match type=\"url\" source=\"host\" regex=\"www.test.com\"/>" +
                 "<equal type=\"url\" source=\"port\" value=\"9090\"/></and></condition>" +
                 "<action fragment=\"path\" regex=\".*/FooService\" type=\"replace\" " +
-                "value=\"/BarService\"/></rule>" +
+                "value=\"/BarService\"/></rewriterule>" +
                 "</rewrite>";
         assertTrue(serialization(xml, urlRewriteMediatorFactory, urlRewriteMediatorSerializer));
     }

@@ -199,8 +199,8 @@ public class Aggregate extends TimerTask {
         this.correlation = correlation;
     }
 
-    public List<MessageContext> getMessages() {
-        return messages;
+    public synchronized List<MessageContext> getMessages() {
+        return new ArrayList<MessageContext>(messages);
     }
 
     public void setMessages(List<MessageContext> messages) {

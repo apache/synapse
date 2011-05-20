@@ -35,7 +35,6 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
     public static final String SCHEDULED_MESSAGE_PROCESSOR_GROUP =
             "synapse.message.processor.quartz";
 
-    protected Log log = LogFactory.getLog(this.getClass());
 
     /**
      * The scheduler, run the the processor

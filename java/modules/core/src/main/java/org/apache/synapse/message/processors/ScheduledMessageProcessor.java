@@ -34,7 +34,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
     public static final String SCHEDULED_MESSAGE_PROCESSOR_GROUP =
             "synapse.message.processor.quartz";
-
+    public static final String PROCESSOR_INSTANCE = "processor.instance";
 
     /**
      * The scheduler, run the the processor

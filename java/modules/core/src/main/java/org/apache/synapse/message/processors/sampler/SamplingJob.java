@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.message.processors.MessageProcessorConsents;
+import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -46,8 +47,16 @@ public class SamplingJob implements Job {
 
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(
                 MessageProcessorConsents.PARAMETERS);
+        SamplingProcessor processor = (SamplingProcessor)
+                jdm.get(ScheduledMessageProcessor.PROCESSOR_INSTANCE);
+
         final Object concurrency = jdm.get(SamplingProcessor.CONCURRENCY);
         final String sequence = (String) parameters.get(SamplingProcessor.SEQUENCE);
+
+        // if processor is not active we do not proceed with the processing
+        if(!processor.isActive()) {
+            return;
+        }
 
         int conc = 1;
         if (concurrency instanceof Integer) {

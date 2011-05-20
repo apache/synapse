@@ -21,10 +21,14 @@ package org.apache.synapse.message.processors.sampler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.message.processors.AbstractMessageProcessor;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SamplingProcessor extends ScheduledMessageProcessor{
     private Log log = LogFactory.getLog(SamplingProcessor.class);
@@ -32,12 +36,34 @@ public class SamplingProcessor extends ScheduledMessageProcessor{
     public static final String CONCURRENCY = "concurrency";
     public static final String SEQUENCE = "sequence";
 
+    private AtomicBoolean active = new AtomicBoolean(true);
+
+    private SamplingProcessorView view;
+
+    @Override
+    public void init(SynapseEnvironment se) {
+        super.init(se);
+        view = new SamplingProcessorView(this);
+
+        // register MBean
+        org.apache.synapse.commons.jmx.MBeanRegistrar.getInstance().registerMBean(view,
+                "Message Sampling Processor view", getName());
+    }
+
     @Override
     protected JobDetail getJobDetail() {
         JobDetail jobDetail = new JobDetail();
         jobDetail.setName(name + "-sampling-job");
         jobDetail.setJobClass(SamplingJob.class);
         return jobDetail;
+    }
+
+    @Override
+    protected JobDataMap getJobDataMap() {
+        JobDataMap jdm = new JobDataMap();
+        jdm.put(PROCESSOR_INSTANCE,this);
+        return jdm;
+
     }
 
     @Override
@@ -49,5 +75,21 @@ public class SamplingProcessor extends ScheduledMessageProcessor{
             log.error("Error while destroying the task " + e);
         }
         state = State.DESTROY;
+    }
+
+    public boolean isActive() {
+        return active.get();
+    }
+
+    public void activate() {
+        active.set(true);
+    }
+
+    public void deactivate() {
+        active.set(false);
+    }
+
+    public SamplingProcessorView getView() {
+        return view;
     }
 }

@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor{
 
     public static final String BLOCKING_SENDER = "blocking.sender";
-    public static final String PROCESSOR_INSTANCE = "processor.instance";
+
 
     private BlockingMessageSender sender = null;
 

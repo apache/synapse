@@ -158,6 +158,9 @@ public class ForwardingJob implements StatefulJob {
                                 errorStop = true;
                                 continue;
 
+                            } else if(outCtx == null) {
+                                // This Means we have invoked an out only operation
+                                messageStore.poll();
                             }
 
                             // If there is a sequence defined to send success replies,

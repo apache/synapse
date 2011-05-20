@@ -130,7 +130,12 @@ public class BlockingMessageSender {
             OMElement result = null;
             try {
                 OMElement payload = axis2Ctx.getEnvelope().getBody().getFirstElement();
-                result = sc.sendReceive(payload);
+                if(outOnlyMessage) {
+                    sc.sendRobust(payload);
+                } else {
+                    result = sc.sendReceive(payload);
+                }
+
             } catch (Exception axisFault) {
 
                 // Here if Message is not a Out only Message

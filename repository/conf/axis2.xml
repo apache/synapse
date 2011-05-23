@@ -278,7 +278,10 @@
         <!--<parameter name="HostnameVerifier">DefaultAndLocalhost</parameter>
             supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
     </transportSender>
-    
+   
+    <!-- Uncomment Transport sender for the non blocking local transport-->
+    <!--transportSender name="local" class="org.apache.axis2.transport.local.NonBlockingLocalTransportSender"/-->
+ 
     <transportSender name="jms" class="org.apache.axis2.transport.jms.JMSSender">
         <!-- uncomment this and configure to use connection pools for sending messages
         <parameter name="myTopicConnectionFactory">

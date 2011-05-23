@@ -235,7 +235,9 @@
 <li>
 <a href="#Sample265">Sample 265: Switching from TCP to HTTP/S</a></li>
 <li>
-<a href="#Sample266">Sample 266: Switching from UDP to HTTP/S</a></li>    
+<a href="#Sample266">Sample 266: Switching from UDP to HTTP/S</a></li>
+<li>
+<a href="#Sample268">Sample 268: Proxy services with the Local transport</a></li>
 </ul></li>
 <li>
 <a href="#Task">Introduction to Synapse tasks</a>
@@ -3249,6 +3251,93 @@ it will first try to read the content type from the 'contentType' message proper
   <p>The sample Axis2 server console will print a message indicating that it has received the request: </p>
   <pre xml:space="preserve">Thu May 20 12:25:01 IST 2010 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 17621 stocks of IBM at $ 73.48068475255796
 </pre>
+
+    <h2>
+      <a name="Sample268" id="Sample268">Sample 268: Proxy services with the Local transport</a>
+    </h2>
+    <pre xml:space="preserve">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy xmlns="http://ws.apache.org/ns/synapse" name="LocalTransportProxy"
+           transports="https http" startOnLoad="true" trace="disable"&gt;
+        &lt;target&gt;
+            &lt;endpoint name="ep1"&gt;
+                &lt;address uri="local://localhost/services/SecondProxy"/&gt;
+            &lt;/endpoint&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;log level="custom"&gt;
+                    &lt;property name="LocalTransportProxy" value="In sequence of LocalTransportProxy invoked!"/&gt;
+                &lt;/log&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;log level="custom"&gt;
+                    &lt;property name="LocalTransportProxy" value="Out sequence of LocalTransportProxy invoked!"/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/samples/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+    &lt;proxy xmlns="http://ws.apache.org/ns/synapse" name="SecondProxy"
+           transports="https http" startOnLoad="true" trace="disable"&gt;
+        &lt;target&gt;
+            &lt;endpoint name="ep2"&gt;
+                &lt;address uri="local://localhost/services/StockQuoteProxy"/&gt;
+            &lt;/endpoint&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;log level="custom"&gt;
+                    &lt;property name="SecondProxy" value="In sequence of Second proxy invoked!"/&gt;
+                &lt;/log&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;log level="custom"&gt;
+                    &lt;property name="SecondProxy" value="Out sequence of Second proxy invoked!"/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/samples/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+    &lt;proxy xmlns="http://ws.apache.org/ns/synapse" name="StockQuoteProxy"
+           startOnLoad="true"&gt;
+        &lt;target&gt;
+            &lt;endpoint name="ep3"&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;log level="custom"&gt;
+                    &lt;property name="StockQuoteProxy"
+                              value="Out sequence of StockQuote proxy invoked!"/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/samples/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+    <p>
+      <strong>Objective: Demonstrate the use of Local transport with Proxy services</strong>
+    </p>
+    <p>
+      <strong>Prerequisites:</strong>
+      <br/>You need to configure Synpase to use the Local transport. Refer
+        <a href="Synapse_Samples_Setup.html#udp">Setting Up the Local Transport</a>
+        section in the sample setup guide for more details.
+      <br/>Start Synpase using sample 268: i.e. synapse -sample 268
+      <br/>Start Axis2 server with SimpleStockService deployed
+    </p>
+    <p>
+      This sample contains three proxy services. The stockquote client invokes the LocalTransportProxy. Then the message
+        will be sent to the SecondProxy and then it will be sent to the StockQuoteProxy. The StockQuoteProxy will invoke
+        the backend service and return the response to the client. In this sample, the communication between proxy services
+        are done through the Local transport. Since Local transport calls are in-JVM calls, it will reduce the time taken
+        for the communication between proxy services.
+    </p>
+    <p>Invoke the stockquote client using the following command.</p>
+    <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:8280/services/LocalTransportProxy</pre>
+    <p>The sample Axis2 server console will print a message indicating that it has received the request: </p>
+    <pre xml:space="preserve">Thu May 20 12:25:01 IST 2010 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 17621 stocks of IBM at $ 73.48068475255796
+  </pre>
 
   <h1>
 <a name="Task" id="Task">Introduction to Synapse Tasks</a> </h1>

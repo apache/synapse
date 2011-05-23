@@ -739,6 +739,20 @@ SocketConnectPort=9876</pre>
      transport sender configuration in the samples/axis2Client/client_repo/conf/axis2.xml file.
     </p>
 
+    <h2 id="local">
+      Setting up the Non Blocking Local Transport
+    </h2>
+    <p>
+      To enable the Local transport for samples first you need to download the Axis2 Local transport
+      jar (ie. axis2-transport-local-1.7.0-SNAPSHOT.jar) and copy it to the lib directory of Synapse. Then
+      open up the axis2.xml file and uncomment the Local transport sender configuration:
+    </p>
+    <pre xml:space="preserve">
+    &lt;transportSender name="local" class="org.apache.axis2.transport.local.NonBlockingLocalTransportSender"/&gt;</pre>
+    <p>
+     The Local transport implementation comes with a TransportSender only. It does not ship a TransportListener.
+    </p>
+
     <h2 id="script">
       Configuring Synapse for Script Mediator Support
     </h2>

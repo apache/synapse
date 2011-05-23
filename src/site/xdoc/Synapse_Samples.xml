@@ -3321,7 +3321,7 @@ it will first try to read the content type from the 'contentType' message proper
     <p>
       <strong>Prerequisites:</strong>
       <br/>You need to configure Synpase to use the Local transport. Refer
-        <a href="Synapse_Samples_Setup.html#udp">Setting Up the Local Transport</a>
+        <a href="Synapse_Samples_Setup.html#local">Setting Up the Local Transport</a>
         section in the sample setup guide for more details.
       <br/>Start Synpase using sample 268: i.e. synapse -sample 268
       <br/>Start Axis2 server with SimpleStockService deployed

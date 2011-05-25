@@ -143,7 +143,7 @@
 <li>
 <a href="#Sample13">Sample 15: Message Enrichment through Synapse</a></li>
 <li>
-<a href="#Sample16">Sample 16: Introduction to dynamic and static registry keys</a></li>
+<a href="#Sample16">Sample 16: Introduction to dynamic and static keys</a></li>
 </ul></li>
 
 <li>
@@ -969,7 +969,7 @@ Standard dual channel :: Stock price = $57.16686934968289</pre>
 <p>You can try with different local entries as the source with the correct target xpath values. </p>
 
 <h2>
-<a name="Sample16" id="Sample16">Sample 16: Introduction to dynamic and static registry keys</a></h2>
+<a name="Sample16" id="Sample16">Sample 16: Introduction to dynamic and static keys</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
     &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;

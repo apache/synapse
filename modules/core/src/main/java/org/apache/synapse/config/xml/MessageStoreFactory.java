@@ -99,7 +99,7 @@ public class MessageStoreFactory {
 
 
 
-        log.info("Successfully created Message Store" + nameAtt.getAttributeValue());
+        log.info("Successfully created Message Store: " + nameAtt.getAttributeValue());
         return messageStore;
     }
 

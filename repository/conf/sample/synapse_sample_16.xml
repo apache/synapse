@@ -18,7 +18,7 @@
 ~  under the License.
 -->
 
-<!-- Introduction to dynamic and static registry keys  -->
+<!-- Introduction to dynamic and static keys  -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->

@@ -26,6 +26,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -80,11 +81,21 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
             OMAttribute repoAttr = configElt.getAttribute(ATT_REPOSITORY);
 
             if (axis2xmlAttr != null && axis2xmlAttr.getAttributeValue() != null) {
-                callout.setAxis2xml(axis2xmlAttr.getAttributeValue());
+                File axis2xml = new File(axis2xmlAttr.getAttributeValue());
+                if (axis2xml.exists() && axis2xml.isFile()) {
+                    callout.setAxis2xml(axis2xmlAttr.getAttributeValue());
+                } else {
+                    handleException("Invalid axis2.xml path: " + axis2xmlAttr.getAttributeValue());
+                }
             }
 
             if (repoAttr != null && repoAttr.getAttributeValue() != null) {
-                callout.setClientRepository(repoAttr.getAttributeValue());
+                File repo = new File(repoAttr.getAttributeValue());
+                if (repo.exists() && repo.isDirectory()) {
+                    callout.setClientRepository(repoAttr.getAttributeValue());
+                } else {
+                    handleException("Invalid repository path: " + repoAttr.getAttributeValue());
+                }
             }
         }
 

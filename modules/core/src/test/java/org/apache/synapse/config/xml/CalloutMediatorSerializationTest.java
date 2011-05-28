@@ -19,6 +19,8 @@
 
 package org.apache.synapse.config.xml;
 
+import java.io.File;
+
 /**
  * Factory and Serializer tests for the Callout Mediator
  */
@@ -46,11 +48,13 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, calloutMediatorSerializer));
     }
 
-    public void testCalloutMediatorSerializationScenarioTwo() {
+    public void testCalloutMediatorSerializationScenarioTwo() throws Exception {
+        File axis2xml = new File("axis2.xml");
+        axis2xml.createNewFile();
         String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
-                          "action=\"urn:getQuote\"><configuration axis2xml=\"axis2_custom.xml\" " +
-                          "repository=\"path_to_repo\"/><source xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                          "action=\"urn:getQuote\"><configuration axis2xml=\"axis2.xml\" " +
+                          "repository=\".\"/><source xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
                           "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" key=\"key1\"/>" +
                           "<target xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
                           "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" key=\"key2\"/></callout>";

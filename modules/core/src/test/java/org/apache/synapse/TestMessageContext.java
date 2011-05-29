@@ -31,6 +31,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.mediators.template.TemplateMediator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -309,5 +310,24 @@ public class TestMessageContext implements MessageContext {
 
     public Log getServiceLog() {
         return LogFactory.getLog(TestMessageContext.class);
+    }
+
+    public Mediator getSequenceTemplate(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator m = getConfiguration().getSequence(key);
+            if (m instanceof TemplateMediator) {
+                TemplateMediator templateMediator = (TemplateMediator) m;
+                synchronized (m) {
+                    if (!templateMediator.isInitialized()) {
+                        templateMediator.init(synEnv);
+                    }
+                }
+            }
+            localEntries.put(key, m);
+            return m;
+        }
     }
 }

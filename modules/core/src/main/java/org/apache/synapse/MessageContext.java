@@ -119,6 +119,17 @@ public interface MessageContext {
     public Mediator getSequence(String key);
 
     /**
+     * Return the Sequence Template with the given key from the configuration, or the local message
+     * context. This method looks up for the Template with the given key from the local
+     * message context to make this look up transactional - i.e. a request and response
+     * message pair will not see a difference in the said sequence if it was dynamic and
+     * changed in between at the registry
+     * @param key the sequence key to be looked up
+     * @return the Template mediator mapped to the key
+     */
+    public Mediator getSequenceTemplate(String key);
+
+    /**
      * Return the endpoint with the given key from the configuration, or the local message
      * context. This method looks up for the endpoint with the given key from the local
      * message context to make this look up transactional - i.e. a request and response

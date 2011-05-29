@@ -41,6 +41,8 @@ public class TemplateMediator extends AbstractListMediator {
 
     private String eipPatternName;
     private String fileName;
+    /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
+    private boolean initialized = false;
 
     public void setParameters(Collection<String> paramNames) {
         this.paramNames = paramNames;
@@ -56,10 +58,6 @@ public class TemplateMediator extends AbstractListMediator {
 
     public String getName() {
         return eipPatternName;
-    }
-
-    public void init(SynapseEnvironment env) {
-        super.init(env);
     }
 
     public boolean mediate(MessageContext synCtx) {
@@ -115,5 +113,25 @@ public class TemplateMediator extends AbstractListMediator {
 
     public String getFileName() {
         return fileName;
+    }
+
+    @Override
+    public synchronized void init(SynapseEnvironment se) {
+        if (!initialized) {
+            super.init(se);
+            initialized = true;
+        }
+    }
+
+    @Override
+    public synchronized void destroy() {
+        if (initialized) {
+            super.destroy();
+            initialized = false;
+        }
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }

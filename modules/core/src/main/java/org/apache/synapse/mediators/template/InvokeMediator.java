@@ -65,7 +65,7 @@ public class InvokeMediator extends AbstractMediator {
         }
         populateParameters(synCtx);
         //get the target function template and invoke by passing populated parameters
-        Mediator mediator = synCtx.getConfiguration().getSequence(targetTemplate);
+        Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);
         if (mediator != null && mediator instanceof TemplateMediator) {
             return mediator.mediate(synCtx);
         }

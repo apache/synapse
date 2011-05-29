@@ -39,6 +39,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.template.TemplateMediator;
 
 import java.util.*;
 
@@ -138,6 +139,25 @@ public class Axis2MessageContext implements MessageContext {
                 synchronized (m) {
                     if (!seqMediator.isInitialized()) {
                         seqMediator.init(synEnv);
+                    }
+                }
+            }
+            localEntries.put(key, m);
+            return m;
+        }
+    }
+
+    public Mediator getSequenceTemplate(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator m = getConfiguration().getSequence(key);
+            if (m instanceof TemplateMediator) {
+                TemplateMediator templateMediator = (TemplateMediator) m;
+                synchronized (m) {
+                    if (!templateMediator.isInitialized()) {
+                        templateMediator.init(synEnv);
                     }
                 }
             }

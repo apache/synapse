@@ -31,7 +31,9 @@ import org.apache.commons.vfs.FileSystemManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -105,7 +107,7 @@ public class VFSUtils extends BaseUtils {
      * @param fo representing the processign file item
      * @return boolean true if the lock has been acquired or false if not
      */
-    public static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {
+    public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {
         
         // generate a random lock value to ensure that there are no two parties
         // processing the same file
@@ -138,7 +140,7 @@ public class VFSUtils extends BaseUtils {
                     stream.close();
                 } catch (IOException e) {
                     lockObject.delete();
-                    log.debug("Couldn't create the lock file before processing the file "
+                    log.error("Couldn't create the lock file before processing the file "
                             + fullPath, e);
                     return false;
                 } finally {
@@ -146,7 +148,7 @@ public class VFSUtils extends BaseUtils {
                 }
 
                 // check whether the lock is in place and is it me who holds the lock. This is
-                // required because it is possible to write the lock file symultaniously by
+                // required because it is possible to write the lock file simultaneously by
                 // two processing parties. It checks whether the lock file content is the same
                 // as the written random lock value.
                 // NOTE: this may not be optimal but is sub optimal
@@ -157,11 +159,15 @@ public class VFSUtils extends BaseUtils {
                 }
             }
         } catch (FileSystemException fse) {
-            log.debug("Cannot get the lock for the file : " + maskURLPassword(fo.getName().getURI())
+            log.error("Cannot get the lock for the file : " + maskURLPassword(fo.getName().getURI())
                     + " before processing");
         }
         return false;
     }
+
+      public static String getSystemTime(String dateFormat) {
+            return new SimpleDateFormat(dateFormat).format(new Date());
+      }
 
     /**
      * Release a file item lock acquired either by the VFS listener or a sender
@@ -210,10 +216,10 @@ public class VFSUtils extends BaseUtils {
                 log.debug("The lock has been acquired by an another party");
             }
         } catch (FileSystemException e) {
-            log.debug("Couldn't verify the lock", e);
+            log.error("Couldn't verify the lock", e);
             return false;
         } catch (IOException e) {
-            log.debug("Couldn't verify the lock", e);
+            log.error("Couldn't verify the lock", e);
             return false;
         }
         return false;

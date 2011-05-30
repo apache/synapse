@@ -66,4 +66,52 @@ public final class VFSConstants {
     public static final String FILE_NAME = "FILE_NAME";
     public static final String FILE_LENGTH = "FILE_LENGTH";
     public static final String LAST_MODIFIED = "LAST_MODIFIED";
+
+      /**
+       * If a rename/move operation failed, we'll keep track of a list in a text file and this will
+       * provide the ability to configure that property file name
+       */
+      public static final String TRANSPORT_FAILED_RECORDS_FILE_NAME =
+              "transport.vfs.FailedRecordsFileName";
+
+      /**
+       * The default name of the failed file
+       */
+      public static final String DEFAULT_FAILED_RECORDS_FILE_NAME =
+              "vfs-move-failed-records.properties";
+
+      /**
+       * The location to place the property file that contains the failed files
+       */
+      public static final String TRANSPORT_FAILED_RECORDS_FILE_DESTINATION =
+              "transport.vfs.FailedRecordsFileDestination";
+
+      /**
+       * The default location to place the record file
+       */
+      public static final String DEFAULT_FAILED_RECORDS_FILE_DESTINATION = "repository/conf/";
+
+      /**
+       * Once a record/file is marked as failed we'll try again to move the file after this amount
+       * of milliseconds
+       */
+      public static final String TRANSPORT_FAILED_RECORD_NEXT_RETRY_DURATION =
+              "transport.vfs.FailedRecordNextRetryDuration";
+
+      public static final int DEFAULT_NEXT_RETRY_DURATION = 3000; // 3 seconds
+
+      /**
+       * This specify the folder to which a move failed file should be moved to ( in next successful)
+       * attempt
+       */
+      public static final String TRANSPORT_FILE_MOVE_AFTER_FAILED_MOVE =
+              "transport.vfs.MoveAfterFailedMove";
+
+      public static final String TRANSPORT_FAILED_RECORD_TIMESTAMP_FORMAT =
+              "transport.vfs.MoveFailedRecordTimestampFormat";
+
+      public static final String DEFAULT_TRANSPORT_FAILED_RECORD_TIMESTAMP_FORMAT =
+              "dd/MM/yyyy/ HH:mm:ss";
+
+      public static final String FAILED_RECORD_DELIMITER = " ";
 }

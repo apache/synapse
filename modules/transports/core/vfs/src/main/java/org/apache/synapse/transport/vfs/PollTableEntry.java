@@ -69,11 +69,41 @@ public class PollTableEntry extends AbstractPollTableEntry {
     private long reconnectTimeout;
     private boolean fileLocking;
 
+    private String moveAfterMoveFailure;
+
+    private int nextRetryDurationForFailedMove;
+
+    private String failedRecordFileName;
+
+    private String failedRecordFileDestination;
+
+    private String failedRecordTimestampFormat;
+
     public PollTableEntry(boolean fileLocking) {
         this.fileLocking = fileLocking;
     }
 
-    @Override
+      public String getMoveAfterMoveFailure() {
+            return moveAfterMoveFailure;
+      }
+
+      public int getNextRetryDuration() {
+            return nextRetryDurationForFailedMove;
+      }
+
+      public String getFailedRecordFileName() {
+            return failedRecordFileName;
+      }
+
+      public String getFailedRecordFileDestination() {
+            return failedRecordFileDestination;
+      }
+
+      public String getFailedRecordTimestampFormat() {
+            return failedRecordTimestampFormat;
+      }
+
+      @Override
     public EndpointReference[] getEndpointReferences(AxisService service, String ip) {
         return new EndpointReference[] { new EndpointReference("vfs:" + fileURI) };
     }
@@ -243,6 +273,34 @@ public class PollTableEntry extends AbstractPollTableEntry {
                 fileLocking = true;
             } else if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strFileLocking)) {
                 fileLocking = false;
+            }
+
+            moveAfterMoveFailure = ParamUtils.getOptionalParam(params,
+                    VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILED_MOVE);
+
+            String nextRetryDuration = ParamUtils.getOptionalParam(
+                    params, VFSConstants.TRANSPORT_FAILED_RECORD_NEXT_RETRY_DURATION);
+            nextRetryDurationForFailedMove = nextRetryDuration != null ? Integer.parseInt(nextRetryDuration) :
+                    VFSConstants.DEFAULT_NEXT_RETRY_DURATION;
+
+            failedRecordFileName = ParamUtils.getOptionalParam(params,
+                    VFSConstants.TRANSPORT_FAILED_RECORDS_FILE_NAME);
+            if (failedRecordFileName == null) {
+                failedRecordFileName = VFSConstants.DEFAULT_FAILED_RECORDS_FILE_NAME;
+            }
+
+            failedRecordFileDestination = ParamUtils.getOptionalParam(params,
+                    VFSConstants.TRANSPORT_FAILED_RECORDS_FILE_DESTINATION);
+
+            if (failedRecordFileDestination == null) {
+                failedRecordFileDestination = VFSConstants.DEFAULT_FAILED_RECORDS_FILE_DESTINATION;
+            }
+
+            failedRecordTimestampFormat = ParamUtils.getOptionalParam(params,
+                    VFSConstants.TRANSPORT_FAILED_RECORD_TIMESTAMP_FORMAT);
+            if (failedRecordTimestampFormat == null) {
+                failedRecordTimestampFormat =
+                        VFSConstants.DEFAULT_TRANSPORT_FAILED_RECORD_TIMESTAMP_FORMAT;
             }
             
             return super.loadConfiguration(params);

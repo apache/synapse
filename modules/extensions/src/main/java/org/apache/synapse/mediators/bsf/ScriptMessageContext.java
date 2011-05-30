@@ -377,4 +377,8 @@ public class ScriptMessageContext implements MessageContext {
     public Log getServiceLog() {
         return LogFactory.getLog(ScriptMessageContext.class);
     }
+
+    public Mediator getSequenceTemplate(String key) {
+        return mc.getSequenceTemplate(key);
+    }
 }

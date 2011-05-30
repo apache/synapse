@@ -378,6 +378,11 @@ public class ScriptMessageContext implements MessageContext {
         return LogFactory.getLog(ScriptMessageContext.class);
     }
 
+    /**
+     * Get the sequence template from the key
+     * @param key the sequence key to be looked up
+     * @return the sequence template
+     */
     public Mediator getSequenceTemplate(String key) {
         return mc.getSequenceTemplate(key);
     }

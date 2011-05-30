@@ -34,16 +34,17 @@ import org.apache.axis2.transport.base.AbstractPollingTransportListener;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.ManagementSupport;
+import org.apache.axis2.transport.base.threads.WorkerPool;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
 
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The "vfs" transport is a polling based transport - i.e. it gets kicked off at
@@ -118,6 +119,14 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
      */
     private boolean globalFileLockingFlag = true;
 
+    private WorkerPool workerPool = null;
+
+    private static final int STATE_STOPPED = 0;
+
+    private static final int STATE_RUNNING = 1;
+
+    private volatile int removeTaskState = STATE_STOPPED;
+
     @Override
     protected void doInit() throws AxisFault {
         super.doInit();
@@ -125,6 +134,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             StandardFileSystemManager fsm = new StandardFileSystemManager();
             fsm.setConfiguration(getClass().getClassLoader().getResource("providers.xml"));
             fsm.init();
+            this.workerPool = super.workerPool;
             fsManager = fsm;
             Parameter lockFlagParam = getTransportInDescription().getParameter(VFSConstants.TRANSPORT_FILE_LOCKING);
             if (lockFlagParam != null) {
@@ -204,8 +214,12 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
 
                 // if this is a file that would translate to a single message
                 if (children == null || children.length == 0) {
+                    boolean isFailedRecord = false;
+                    if (entry.getMoveAfterMoveFailure() != null) {
+                        isFailedRecord = isFailedRecord(fileObject, entry);
+                    }
 
-                    if (fileObject.getType() == FileType.FILE) {
+                    if (fileObject.getType() == FileType.FILE && !isFailedRecord) {
                         if (!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled() &&
                                 VFSUtils.acquireLock(fsManager, fileObject))) {
                             try {
@@ -214,22 +228,46 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                 metrics.incrementMessagesReceived();
 
                             } catch (AxisFault e) {
-                                if (entry.isFileLockingEnabled()) {
-                                    VFSUtils.releaseLock(fsManager, fileObject);
-                                }
                                 logException("Error processing File URI : "
                                         + fileObject.getName(), e);
                                 entry.setLastPollState(PollTableEntry.FAILED);
                                 metrics.incrementFaultsReceiving();
                             }
 
-                            moveOrDeleteAfterProcessing(entry, fileObject);
+                            try {
+                                  moveOrDeleteAfterProcessing(entry, fileObject);
+                            } catch (AxisFault axisFault) {
+
+                                  logException("File object '" + fileObject.getURL().toString() + "' " +
+                                            "cloud not be moved", axisFault);
+                                  entry.setLastPollState(PollTableEntry.FAILED);
+                                  String timeStamp =
+                                            VFSUtils.getSystemTime(entry.getFailedRecordTimestampFormat());
+                                  addFailedRecord(entry, fileObject, timeStamp);
+                            }
                             if (entry.isFileLockingEnabled()) {
-                                VFSUtils.releaseLock(fsManager, fileObject);
+                                   VFSUtils.releaseLock(fsManager, fileObject);
+                                    if (log.isDebugEnabled()) {
+                                    log.debug("Removed the lock file '" + fileObject.toString() +
+                                            ".lock' of the file '" + fileObject.toString());
+                              }
                             }
                         } else if (log.isDebugEnabled()) {
                             log.debug("Couldn't get the lock for processing the file : "
                                     + fileObject.getName());
+                        } else if (isFailedRecord) {
+                            if (entry.isFileLockingEnabled()) {
+                                VFSUtils.releaseLock(fsManager, fileObject);
+                            }
+                            // schedule a cleanup task if the file is there
+                            if (fsManager.resolveFile(fileObject.getURL().toString()) != null &&
+                                    removeTaskState == STATE_STOPPED && entry.getMoveAfterMoveFailure() != null) {
+                                workerPool.execute(new FileRemoveTask(entry, fileObject));
+                            }
+                            if (log.isDebugEnabled()) {
+                                log.debug("File '" + fileObject.getURL() + "' has been marked as a failed" +
+                                        " record, it will not process");
+                            }
                         }
                     }
 
@@ -241,13 +279,18 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                         log.debug("File name pattern : " + entry.getFileNamePattern());
                     }
                     for (FileObject child : children) {
+                        boolean isFailedRecord = false;
+                        if (entry.getMoveAfterMoveFailure() != null) {
+                            isFailedRecord = isFailedRecord(child, entry);
+                        }
                         if (log.isDebugEnabled()) {
                             log.debug("Matching file : " + child.getName().getBaseName());
                         }
                         if ((entry.getFileNamePattern() != null) && (
                                 child.getName().getBaseName().matches(entry.getFileNamePattern()))
                                 && (!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled()
-                                && VFSUtils.acquireLock(fsManager, child)))) {
+                                && VFSUtils.acquireLock(fsManager, child))) &&
+                                !isFailedRecord) {
                             try {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Processing file :" + child);
@@ -259,9 +302,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                 metrics.incrementMessagesReceived();
 
                             } catch (Exception e) {
-                                if (entry.isFileLockingEnabled()) {
-                                    VFSUtils.releaseLock(fsManager, child);
-                                }
                                 logException("Error processing File URI : " + child.getName(), e);
                                 failCount++;
                                 // tell moveOrDeleteAfterProcessing() file failed
@@ -269,13 +309,39 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                 metrics.incrementFaultsReceiving();
                             }
 
-                            moveOrDeleteAfterProcessing(entry, child);
-                            if (entry.isFileLockingEnabled()) {
+                              try {
+                                    moveOrDeleteAfterProcessing(entry, child);
+                              } catch (AxisFault axisFault) {
+                                    logException("File object '" + child.getURL().toString() +
+                                            "'cloud not be moved", axisFault);
+                                    failCount++;
+                                    entry.setLastPollState(PollTableEntry.FAILED);
+                                    String timeStamp =
+                                            VFSUtils.getSystemTime(entry.getFailedRecordTimestampFormat());
+                                    addFailedRecord(entry, child, timeStamp);
+                              }
+                              if (entry.isFileLockingEnabled()) {
                                 VFSUtils.releaseLock(fsManager, child);
                             }
-                        } else if (log.isDebugEnabled()) {
+                        } else if (!(!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled()
+                                && VFSUtils.acquireLock(fsManager, fileObject))) &&
+                                log.isDebugEnabled()) {
                             log.debug("Couldn't get the lock for processing the file : "
                                     + child.getName());
+                        } else if(isFailedRecord){
+                              if (entry.isFileLockingEnabled()) {
+                                VFSUtils.releaseLock(fsManager, child);
+                                VFSUtils.releaseLock(fsManager, fileObject);
+                            }
+                            if (fsManager.resolveFile(child.getURL().toString()) != null &&
+                                    removeTaskState == STATE_STOPPED && entry.getMoveAfterMoveFailure() != null) {
+                                workerPool.execute(new FileRemoveTask(entry, child));
+                            }
+                            if (log.isDebugEnabled()) {
+                                log.debug("File '" + fileObject.getURL() +
+                                        "' has been marked as a failed record, it will not " +
+                                        "process");
+                            }
                         }
 
                     }
@@ -310,7 +376,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
      * @param entry the PollTableEntry for the file that has been processed
      * @param fileObject the FileObject representing the file to be moved or deleted
      */
-    private void moveOrDeleteAfterProcessing(final PollTableEntry entry, FileObject fileObject) {
+    private void moveOrDeleteAfterProcessing(final PollTableEntry entry, FileObject fileObject)
+                        throws AxisFault{
 
         String moveToDirectoryURI = null;
         try {
@@ -347,7 +414,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 try {
                     fileObject.moveTo(dest);
                 } catch (FileSystemException e) {
-                    log.error("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
+                    handleException("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
                 }
             } else {
                 try {
@@ -356,7 +423,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     }
                     fileObject.close();
                     if (!fileObject.delete()) {
-                        log.error("Cannot delete file : " + fileObject);
+                        String msg = "Cannot delete file : " + fileObject;
+                        log.error(msg);
+                        throw new AxisFault(msg);
                     }
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
@@ -512,5 +581,138 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
     @Override
     protected PollTableEntry createEndpoint() {
         return new PollTableEntry(globalFileLockingFlag);
+    }
+
+    private synchronized void addFailedRecord(PollTableEntry pollTableEntry,
+                                              FileObject failedObject,
+                                              String timeString) {
+        try {
+            String record = failedObject.getName().getBaseName() + VFSConstants.FAILED_RECORD_DELIMITER
+                    + timeString;
+            String recordFile = pollTableEntry.getFailedRecordFileDestination() +
+                    pollTableEntry.getFailedRecordFileName();
+            File failedRecordFile = new File(recordFile);
+            if (!failedRecordFile.exists()) {
+                FileUtils.writeStringToFile(failedRecordFile, record);
+                if (log.isDebugEnabled()) {
+                    log.debug("Added fail record '" + record + "' into the record file '"
+                            + recordFile + "'");
+                }
+            } else {
+                List<String> content = FileUtils.readLines(failedRecordFile);
+                if (!content.contains(record)) {
+                    content.add(record);
+                }
+                FileUtils.writeLines(failedRecordFile, content);
+            }
+        } catch (IOException e) {
+            log.fatal("Failure while writing the failed records!", e);
+        }
+    }
+
+    private boolean isFailedRecord(FileObject fileObject, PollTableEntry entry) {
+        String failedFile = entry.getFailedRecordFileDestination() +
+                entry.getFailedRecordFileName();
+        File file = new File(failedFile);
+        if (file.exists()) {
+            try {
+                List list = FileUtils.readLines(file);
+                for (Object aList : list) {
+                    String str = (String) aList;
+                    StringTokenizer st = new StringTokenizer(str,
+                            VFSConstants.FAILED_RECORD_DELIMITER);
+                    String fileName = st.nextToken();
+                    if (fileName != null &&
+                            fileName.equals(fileObject.getName().getBaseName())) {
+                        return true;
+                    }
+                }
+            } catch (IOException e) {
+                log.fatal("Error while reading the file '" + failedFile + "'", e);
+            }
+        }
+        return false;
+    }
+
+    private class FileRemoveTask implements Runnable {
+        private FileObject failedFileObject;
+        private PollTableEntry pollTableEntry;
+
+        public FileRemoveTask(PollTableEntry pollTableEntry, FileObject fileObject) {
+            this.pollTableEntry = pollTableEntry;
+            this.failedFileObject = fileObject;
+        }
+
+        public void run() {
+            if (log.isDebugEnabled()) {
+                log.debug("New file remove task is starting..thread id : " +
+                        Thread.currentThread().getName());
+            }
+            // there has been a failure, basically it should be a move operation
+            // failure. we'll re-try to move in a loop suspending with the
+            // configured amount of time
+            // we'll check if the lock is still there and if the lock is there
+            // then we assume that the respective file object is also there
+            // try to remove the folder waiting on a busy loop, if the remove operation success
+            // we just exit from the busy loop and mark end of the file move task.
+            boolean isDeletionSucceed = false;
+            int nextRetryDuration = pollTableEntry.getNextRetryDuration();
+            int count = 0;
+            while (!isDeletionSucceed) {
+                try {
+                    reTryFailedMove(pollTableEntry, failedFileObject);
+                    isDeletionSucceed = true;
+                    removeTaskState = STATE_STOPPED;
+                } catch (AxisFault axisFault) {
+                    removeTaskState = STATE_RUNNING;
+                    try {
+                        log.error("Remove attempt '" + (count++) + "' failed for the file '" +
+                                failedFileObject.getURL().toString() + "', next re-try will be " +
+                                "after '" + nextRetryDuration + "' milliseconds");
+                    } catch (FileSystemException e) {
+                        log.error("Error while retrying the file url of the file object '" +
+                                failedFileObject + "'");
+                    }
+                    try {
+                        Thread.sleep(nextRetryDuration);
+                    } catch (InterruptedException ignore) {
+                        // ignore
+                    }
+                }
+            }
+        }
+
+        private synchronized void reTryFailedMove(PollTableEntry entry, FileObject fileObject)
+                throws AxisFault {
+            try {
+
+                String moveToDirectoryURI = entry.getMoveAfterMoveFailure();
+                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI);
+                if (!moveToDirectory.exists()) {
+                    moveToDirectory.createFolder();
+                }
+                String prefix;
+                if (entry.getMoveTimestampFormat() != null) {
+                    prefix = entry.getMoveTimestampFormat().format(new Date());
+                } else {
+                    prefix = "";
+                }
+                FileObject dest = moveToDirectory.resolveFile(
+                        prefix + fileObject.getName().getBaseName());
+                if (log.isDebugEnabled()) {
+                    log.debug("The failed file is moving to :" + dest.getName().getURI());
+                }
+                try {
+                    fileObject.moveTo(dest);
+                } catch (FileSystemException e) {
+                    handleException("Error moving the failed file : " + fileObject + " to " +
+                            moveToDirectoryURI, e);
+                }
+            } catch (FileSystemException e) {
+                handleException("Cloud not move the failed file object '" + fileObject + "'", e);
+            } catch (IOException e) {
+                handleException("Cloud not create the folder", e);
+            }
+        }
     }
 }

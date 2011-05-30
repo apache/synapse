@@ -328,7 +328,23 @@
   This option can be used to achieve streaming of large payloads. Note that this feature is
   still somewhat experimental and might be superseded by a more flexible mechanism in a future
   release.
-  
+
+  [<<<transport.vfs.MoveAfterFailedMove >>> (Optional)]
+  New destination to move the failed file
+
+  [<<<transport.vfs.FailedRecordsFileName >>> (Optional)]
+  The file name to maintain the list of failure files. Default is vfs-move-failed-records.properties.
+
+  [<<<transport.vfs.FailedRecordsFileDestination  >>> (Optional)]
+  The destination of the failed file. Default is repository/conf/.
+
+  [<<<transport.vfs.MoveFailedRecordTimestampFormat >>> (Optional)]
+  When adding record to the failed file entries is logged the as: file_name time_stamp. This will
+  configure the time stamp format. Default format is dd-MM-yyyy HH:mm:ss.
+
+  [<<<transport.vfs.FailedRecordNextRetryDuration  >>> (Optional)]
+  The time in millisecond for the move task to wait until next re-try. Default is 3000 milliseconds.
+
   []
   
   Note that since the VFS endpoints are configured at the level of the service, the only parameter

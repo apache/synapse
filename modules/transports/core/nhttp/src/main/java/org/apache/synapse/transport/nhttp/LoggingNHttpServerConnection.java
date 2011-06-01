@@ -20,11 +20,12 @@ package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
 import java.nio.channels.ReadableByteChannel;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
-import org.apache.http.HttpMessage;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestFactory;
 import org.apache.http.HttpResponse;
@@ -38,108 +39,129 @@ import org.apache.http.nio.reactor.SessionOutputBuffer;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 
-class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
+public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
+
+    private static final AtomicLong COUNT = new AtomicLong();
 
     private final Log log;
+    private final Log iolog;
     private final Log headerlog;
-    
+    private final Log wirelog;
+    private final String id;
+
     public LoggingNHttpServerConnection(
-            final Log log,
-            final Log headerlog,
             final IOSession session,
             final HttpRequestFactory requestFactory,
             final ByteBufferAllocator allocator,
             final HttpParams params) {
         super(session, requestFactory, allocator, params);
-        this.log = log;
-        this.headerlog = headerlog;
+        this.log = LogFactory.getLog(getClass());
+        this.iolog = LogFactory.getLog(session.getClass());
+        this.headerlog = LogFactory.getLog(LoggingUtils.HEADER_LOG_ID);
+        this.wirelog = LogFactory.getLog(LoggingUtils.WIRE_LOG_ID);
+        this.id = "http-incoming-" + COUNT.incrementAndGet();
+        if (this.iolog.isDebugEnabled() || this.wirelog.isDebugEnabled()) {
+            this.session = new LoggingIOSession(session, this.id, this.iolog, this.wirelog);
+        }
     }
 
     @Override
     public void close() throws IOException {
-        this.log.debug("Close connection");        
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(this.id + ": Close connection");
+        }
         super.close();
     }
 
     @Override
     public void shutdown() throws IOException {
-        this.log.debug("Shutdown connection");        
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(this.id + ": Shutdown connection");
+        }
         super.shutdown();
     }
-    
+
     @Override
     public void submitResponse(final HttpResponse response) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + this + ": "  + response.getStatusLine().toString());
+            this.log.debug(this.id + ": "  + response.getStatusLine().toString());
         }
         super.submitResponse(response);
     }
 
     @Override
     public void consumeInput(final NHttpServiceHandler handler) {
-        this.log.debug("Consume input");        
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(this.id + ": Consume input");
+        }
         super.consumeInput(handler);
     }
 
     @Override
     public void produceOutput(final NHttpServiceHandler handler) {
-        this.log.debug("Produce output");        
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(this.id + ": Produce output");
+        }
         super.produceOutput(handler);
     }
-    
+
     @Override
-    protected NHttpMessageWriter createResponseWriter(
-            final SessionOutputBuffer buffer, 
+    protected NHttpMessageWriter<HttpResponse> createResponseWriter(
+            final SessionOutputBuffer buffer,
             final HttpParams params) {
         return new LoggingNHttpMessageWriter(
                 super.createResponseWriter(buffer, params));
     }
 
     @Override
-    protected NHttpMessageParser createRequestParser(
-            final SessionInputBuffer buffer, 
+    protected NHttpMessageParser<HttpRequest> createRequestParser(
+            final SessionInputBuffer buffer,
             final HttpRequestFactory requestFactory,
             final HttpParams params) {
         return new LoggingNHttpMessageParser(
                 super.createRequestParser(buffer, requestFactory, params));
     }
 
-    class LoggingNHttpMessageWriter implements NHttpMessageWriter {
+    @Override
+    public String toString() {
+        return this.id;
+    }
 
-        private final NHttpMessageWriter writer;
-        
-        public LoggingNHttpMessageWriter(final NHttpMessageWriter writer) {
+    class LoggingNHttpMessageWriter implements NHttpMessageWriter<HttpResponse> {
+
+        private final NHttpMessageWriter<HttpResponse> writer;
+
+        public LoggingNHttpMessageWriter(final NHttpMessageWriter<HttpResponse> writer) {
             super();
             this.writer = writer;
         }
-        
+
         public void reset() {
             this.writer.reset();
         }
 
-        public void write(final HttpMessage message) throws IOException, HttpException {
+        public void write(final HttpResponse message) throws IOException, HttpException {
             if (message != null && headerlog.isDebugEnabled()) {
-                HttpResponse response = (HttpResponse) message; 
-                headerlog.debug("<< " + response.getStatusLine().toString());
-                Header[] headers = response.getAllHeaders();
+                headerlog.debug(id + " << " + message.getStatusLine().toString());
+                Header[] headers = message.getAllHeaders();
                 for (int i = 0; i < headers.length; i++) {
-                    headerlog.debug("<< " + headers[i].toString());
+                    headerlog.debug(id + " << " + headers[i].toString());
                 }
             }
             this.writer.write(message);
         }
-        
-    }
-    
-    class LoggingNHttpMessageParser implements NHttpMessageParser {
 
-        private final NHttpMessageParser parser;
-        
-        public LoggingNHttpMessageParser(final NHttpMessageParser parser) {
+    }
+
+    class LoggingNHttpMessageParser implements NHttpMessageParser<HttpRequest> {
+
+        private final NHttpMessageParser<HttpRequest> parser;
+
+        public LoggingNHttpMessageParser(final NHttpMessageParser<HttpRequest> parser) {
             super();
             this.parser = parser;
         }
-        
+
         public void reset() {
             this.parser.reset();
         }
@@ -148,19 +170,18 @@ class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
             return this.parser.fillBuffer(channel);
         }
 
-        public HttpMessage parse() throws IOException, HttpException {
-            HttpMessage message = this.parser.parse();
+        public HttpRequest parse() throws IOException, HttpException {
+            HttpRequest message = this.parser.parse();
             if (message != null && headerlog.isDebugEnabled()) {
-                HttpRequest request = (HttpRequest) message; 
-                headerlog.debug(">> " + request.getRequestLine().toString());
-                Header[] headers = request.getAllHeaders();
+                headerlog.debug(id + " >> " + message.getRequestLine().toString());
+                Header[] headers = message.getAllHeaders();
                 for (int i = 0; i < headers.length; i++) {
-                    headerlog.debug(">> " + headers[i].toString());
+                    headerlog.debug(id + " >> " + headers[i].toString());
                 }
             }
             return message;
         }
-        
+
     }
 
 }

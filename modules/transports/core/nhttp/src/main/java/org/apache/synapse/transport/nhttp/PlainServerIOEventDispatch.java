@@ -32,7 +32,6 @@ public class PlainServerIOEventDispatch extends DefaultServerIOEventDispatch {
     
     @Override
     protected NHttpServerIOTarget createConnection(IOSession session) {
-        session = LoggingUtils.decorate(session, "server");
         return LoggingUtils.createServerConnection(
                 session, 
                 createHttpRequestFactory(), 

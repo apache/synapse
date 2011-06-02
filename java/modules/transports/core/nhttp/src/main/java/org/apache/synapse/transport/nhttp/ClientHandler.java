@@ -61,8 +61,12 @@ import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 import org.apache.synapse.commons.jmx.ThreadingView;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -723,11 +727,13 @@ public class ClientHandler implements NHttpClientHandler {
                             // Since we need to notify the SynapseCallback receiver to remove the
                             // call backs registered  we set a custom property
                             if (outMsgCtx.getOperationContext().isComplete()) {
+                                setHeaders(context, response, outMsgCtx, responseMsgCtx);
                                 outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
                                 mr.receive(outMsgCtx);
                             }
                             return;
                         }
+                        setHeaders(context, response, outMsgCtx, responseMsgCtx);
                         responseMsgCtx.setServerSide(true);
                         responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
                         responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN,
@@ -811,6 +817,53 @@ public class ClientHandler implements NHttpClientHandler {
                 
                 processResponse(conn, context, response);
             }
+        }
+    }
+
+    private void setHeaders(HttpContext context, HttpResponse response,
+                            MessageContext outMsgCtx, MessageContext responseMsgCtx) {
+        Header[] headers = response.getAllHeaders();
+        if (headers != null && headers.length > 0) {
+
+            Map<String, String> headerMap
+                    = new TreeMap<String, String>(new Comparator<String>() {
+                public int compare(String o1, String o2) {
+                    return o1.compareToIgnoreCase(o2);
+                }
+            });
+            String endpointURLPrefix = (String) context.getAttribute(NhttpConstants.ENDPOINT_PREFIX);
+
+            String servicePrefix = (String) outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX);
+            for (int i = 0; i < headers.length; i++) {
+                Header header = headers[i];
+                if ("Location".equals(header.getName())
+                        && endpointURLPrefix != null && servicePrefix != null) {
+                    //Here, we are changing only the host name and the port of the new URI - value of the Location
+                    //header.
+                    //If the new URI is again referring to a resource in the server to which the original request
+                    //is sent, then replace the hostname and port of the URI with the hostname and port of synapse
+                    //We are not changing the request url here, only the host name and the port.
+                    try {
+                        URI serviceURI = new URI(servicePrefix);
+                        URI endpointURI = new URI(endpointURLPrefix);
+                        URI locationURI = new URI(header.getValue());
+
+                        if (locationURI.getHost().equalsIgnoreCase(endpointURI.getHost())) {
+                            URI newURI = new URI(locationURI.getScheme(), locationURI.getUserInfo(),
+                                    serviceURI.getHost(), serviceURI.getPort(), locationURI.getPath(),
+                                    locationURI.getQuery(), locationURI.getFragment());
+                            headerMap.put(header.getName(), newURI.toString());
+                            responseMsgCtx.setProperty(NhttpConstants.SERVICE_PREFIX,
+                                    outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX));
+                        }
+                    } catch (URISyntaxException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                } else {
+                    headerMap.put(header.getName(), header.getValue());
+                }
+            }
+            responseMsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
         }
     }
 

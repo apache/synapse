@@ -178,6 +178,8 @@ public class SynapseXPathVariableContext implements VariableContext {
                     if (headers != null && headers instanceof Map) {
                         Map headersMap = (Map) headers;
                         return headersMap.get(localName);
+                    } else {
+                        return null;
                     }
                 } else if (SynapseXPathConstants.URL_VARIABLE_PREFIX.equals(prefix)) {
 

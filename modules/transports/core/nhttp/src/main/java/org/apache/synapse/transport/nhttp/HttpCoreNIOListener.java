@@ -67,7 +67,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private String customEPRPrefix;
     /** The custom URI map for the services if there are any */
     private Map<String, String> serviceNameToEPRMap = new HashMap<String, String>();
-    /** The servicename map for the custom URI if there are any */
+    /** The service name map for the custom URI if there are any */
     private Map<String, String> eprToServiceNameMap = new HashMap<String, String>();
     /** the axis observer that gets notified of service life cycle events*/
     private final AxisObserver axisObserver = new GenericAxisObserver();
@@ -386,23 +386,26 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      */
     public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
 
-        String trailler = "";
+        String trailer = "";
         //Strip out the operation name
         if (serviceName.indexOf('/') != -1) {
-            trailler += serviceName.substring(serviceName.indexOf("/"));
+            trailer += serviceName.substring(serviceName.indexOf("/"));
             serviceName = serviceName.substring(0, serviceName.indexOf('/'));
         }
         // strip out the endpoint name if present
         if (serviceName.indexOf('.') != -1) {
-            trailler += serviceName.substring(serviceName.indexOf("."));
+            trailer += serviceName.substring(serviceName.indexOf("."));
             serviceName = serviceName.substring(0, serviceName.indexOf('.'));
         }
 
         if (serviceNameToEPRMap.containsKey(serviceName)) {
             return new EndpointReference(
-                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailler);
+                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailer);
         } else {
-            return new EndpointReference(serviceEPRPrefix + serviceName + trailler);
+            if (serviceEPRPrefix == null) {
+                return null;
+            }
+            return new EndpointReference(serviceEPRPrefix + serviceName + trailer);
         }
     }
 
@@ -415,25 +418,27 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      */
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
 
-        String trailler = "";
+        String trailer = "";
         //Strip out the operation name
         if (serviceName.indexOf('/') != -1) {
-            trailler += serviceName.substring(serviceName.indexOf("/"));
+            trailer += serviceName.substring(serviceName.indexOf("/"));
             serviceName = serviceName.substring(0, serviceName.indexOf('/'));
         }
         // strip out the endpoint name if present
         if (serviceName.indexOf('.') != -1) {
-            trailler += serviceName.substring(serviceName.indexOf("."));
+            trailer += serviceName.substring(serviceName.indexOf("."));
             serviceName = serviceName.substring(0, serviceName.indexOf('.'));
         }
 
         EndpointReference[] endpointReferences = new EndpointReference[1];
         if (serviceNameToEPRMap.containsKey(serviceName)) {
             endpointReferences[0] = new EndpointReference(
-                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailler);
+                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailer);
         } else {
-            endpointReferences[0]
-                    = new EndpointReference(serviceEPRPrefix + serviceName + trailler);
+            if (serviceEPRPrefix == null) {
+                return null;
+            }
+            endpointReferences[0] = new EndpointReference(serviceEPRPrefix + serviceName + trailer);
         }
         return endpointReferences;
     }

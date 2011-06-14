@@ -166,7 +166,9 @@
 <li>
 <a href="#Sample57">Sample 57: Dynamic load balancing between 3 nodes</a></li>
 <li>
-<a href="#Sample58">Sample 58: Static load balancing between 3 nodes</a></li></ul></li>
+<a href="#Sample58">Sample 58: Static load balancing between 3 nodes</a></li>
+<li>
+<a href="#Sample59">Sample 59: Weighted load balancing between 3 endpoints</a></li></ul></li>
 <li>
 <a href="#MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a>
 <ul>
@@ -1654,8 +1656,101 @@ Content-ID:
 [java] Request: 67 ==&gt; Response from server: MyServer3
 ...</pre>
 <p>Now restart MyServer1. You can observe that requests will be again sent to all three servers. </p>
-<h1>
-<a name="MessageMediationQoS" id="MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a> </h1>
+<h2><a name="Sample59">Sample 59: Weighted load balancing between 3
+endpoints</a> </h2>
+<pre xml:space="preserve">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;loadbalance
+                            algorithm="org.apache.synapse.endpoints.algorithms.WeightedRoundRobin"&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendOnFailure&gt;
+                                    &lt;initialDuration&gt;20000&lt;/initialDuration&gt;
+                                    &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                                &lt;/suspendOnFailure&gt;
+                            &lt;/address&gt;
+                            &lt;property name="loadbalance.weight" value="1"/&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendOnFailure&gt;
+                                    &lt;initialDuration&gt;20000&lt;/initialDuration&gt;
+                                    &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                                &lt;/suspendOnFailure&gt;
+                            &lt;/address&gt;
+                            &lt;property name="loadbalance.weight" value="2"/&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendOnFailure&gt;
+                                    &lt;initialDuration&gt;20000&lt;/initialDuration&gt;
+                                    &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                                &lt;/suspendOnFailure&gt;
+                            &lt;/address&gt;
+                            &lt;property name="loadbalance.weight" value="3"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the weighted load balancing among a set of
+endpoints</strong> </p>
+
+<p><strong>Prerequisites:</strong> </p>
+
+<p>Start ESB with sample configuration 59. (i.e. wso2esb-samples -sn 59) </p>
+
+<p>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52.</p>
+
+<p>Above configuration sends messages with the weighted loadbalance behaviour. Weight of each leaf
+address endpoint is defined by integer value of "loadbalance.weight" property associated with each endpoint.
+If weight of a endpoint is x, x number of requests will send to that endpoint before switch to next active endpoint.
+<br/>To test this, run the loadbalancefailover client to send 100 requests as follows: </p>
+<pre xml:space="preserve">ant loadbalancefailover -Di=100</pre>
+
+<p>This client sends 100 requests to the LoadbalanceFailoverService through
+ESB. ESB will distribute the load among the three endpoints mentioned in the
+configuration in weighted round-robin manner. LoadbalanceFailoverService appends the
+name of the server to the response, so that client can determine which server
+has processed the message. If you examine the console output of the client,
+you can see that requests are processed by three servers as follows: </p>
+<pre xml:space="preserve">[java] Request: 1 ==&gt; Response from server: MyServer1
+[java] Request: 2 ==&gt; Response from server: MyServer2
+[java] Request: 3 ==&gt; Response from server: MyServer2
+[java] Request: 4 ==&gt; Response from server: MyServer3
+[java] Request: 5 ==&gt; Response from server: MyServer3
+[java] Request: 6 ==&gt; Response from server: MyServer3
+[java] Request: 7 ==&gt; Response from server: MyServer1
+[java] Request: 8 ==&gt; Response from server: MyServer2
+[java] Request: 9 ==&gt; Response from server: MyServer2
+[java] Request: 10 ==&gt; Response from server: MyServer3
+[java] Request: 11 ==&gt; Response from server: MyServer3
+[java] Request: 12 ==&gt; Response from server: MyServer3
+...</pre>
+<p>As logs, endpoint with weight 1 received a 1 request and endpoint with weight 2 received 2
+requests and etc... in a cycle</p>
+<h1><a name="MessageMediationQoS" id="MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a> </h1>
 <h2>
 <a name="Sample100" id="Sample100">Sample 100: Using WS-Security for outgoing messages</a></h2>
 <pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
@@ -2211,7 +2306,7 @@ Connection: Keep-Alive
 
 <p>
 <strong>Objective: Using synapse to integrate services.</strong> </p>
-<p>
+<p/>
 <p>
 <strong>Prerequisites:</strong>
 <br/> We will be using two services in this sample; i.e. SimpleStockQuoteService and SecureStockQuoteService. Therefore the prerequisites of sample 100 is also applied here.</p>

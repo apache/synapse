@@ -171,6 +171,8 @@ public class Source {
                             OMElement ele = (OMElement) node;
                             sourceNodeList.add(ele);
                         }
+                    } else if (node instanceof OMText) {
+                        sourceNodeList.add((OMText) node);
                     }
                 }
             } else {

@@ -1226,6 +1226,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             seq.destroy();
         }
 
+        //destroy sequence templates
+        for (TemplateMediator seqTemplate : getSequenceTemplates().values()) {
+            seqTemplate.destroy();
+        }
+
         // destroy the managed endpoints
         for (Endpoint endpoint : getDefinedEndpoints().values()) {
             endpoint.destroy();
@@ -1282,6 +1287,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         //initialize endpoints
         for (Endpoint endpoint : getDefinedEndpoints().values()) {
             endpoint.init(se);
+        }
+
+        //initialize sequence templates
+        for (TemplateMediator seqTemplate : getSequenceTemplates().values()) {
+            seqTemplate.init(se);
         }
 
          // initialize managed mediators

@@ -195,7 +195,7 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
         // node specified by the attachPath
         if (preservePayload) {
 
-            Object attachElem = attachPath.evaluate(newEnvelope);
+            Object attachElem = attachPath.evaluate(newEnvelope, synCtx);
             if (attachElem != null &&
                 attachElem instanceof List && !((List) attachElem).isEmpty()) {
                 attachElem = ((List) attachElem).get(0);

@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.builder.StAXBuilder;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -93,6 +94,9 @@ public class Source {
                         }
                     } else if (o instanceof OMText) {
                         sourceNodeList.add((OMText) o);
+                    } else if (o instanceof String) {
+			OMFactory fac = OMAbstractFactory.getOMFactory();
+			sourceNodeList.add(fac.createOMText(o.toString()));	
                     }
                 }
             } else {

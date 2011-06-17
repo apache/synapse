@@ -1721,7 +1721,7 @@ endpoints</strong> </p>
 
 <p><strong>Prerequisites:</strong> </p>
 
-<p>Start ESB with sample configuration 59. (i.e. wso2esb-samples -sn 59) </p>
+<p>Start ESB with sample configuration 59. (i.e. synapse -sample 59) </p>
 
 <p>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52.</p>
 

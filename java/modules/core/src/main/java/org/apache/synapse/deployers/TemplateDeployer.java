@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.TemplateMediatorSerializer;
@@ -56,9 +57,9 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
 
                 Template tm = templateFactory.createEndpointTemplate(artifactConfig, properties);
 
-                tm.setName(new File(fileName).getName());
+                tm.setFileName(new File(fileName).getName());
                 if (log.isDebugEnabled()) {
-                    log.debug("Sequence Template named '" + tm.getName()
+                    log.debug("Endpoint Template named '" + tm.getName()
                             + "' has been built from the file " + fileName);
                 }
 
@@ -66,7 +67,7 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                 if (log.isDebugEnabled()) {
                     log.debug("Template Deployment from file : " + fileName + " : Completed");
                 }
-                log.info("Template named '" + tm.getName()
+                log.info("Endpoint Template named '" + tm.getName()
                         + "' has been deployed from file : " + fileName);
 
                 return tm.getName();
@@ -127,9 +128,9 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
 
                 Template tm = templateFactory.createEndpointTemplate(artifactConfig, properties);
 
-                tm.setName(new File(fileName).getName());
+                tm.setFileName(new File(fileName).getName());
                 if (log.isDebugEnabled()) {
-                    log.debug("Sequence Template named '" + tm.getName()
+                    log.debug("Endpoint Template named '" + tm.getName()
                             + "' has been built from the file " + fileName);
                 }
 
@@ -201,7 +202,23 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
-            Template st = getSynapseConfiguration().getEndpointTemplate(artifactName);
+            Template st = null;
+            try {
+                st = getSynapseConfiguration().getEndpointTemplate(artifactName);
+            } catch (SynapseException e) {
+                //could not locate an endpoint template for this particular un-delpoyment. This name refers
+                //probably to a sequence tempalte. Thus if  throws a Synapse exception with following message
+                //catch n log that and continue this process for undeployment of a sequence template
+                if (e.getMessage().indexOf("Cannot locate an either local or remote enrty for key") != -1) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Undeploying template is not of endpoint type. Undeployer will now check " +
+                                  "for sequence template for the key: " + artifactName);
+                    }
+                } else {
+                    //different error hence stop undeployment/report failure
+                    throw e;
+                }
+            }
             if (st != null) {
                 getSynapseConfiguration().removeEndpointTemplate(artifactName);
                 if (log.isDebugEnabled()) {
@@ -224,7 +241,7 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                         log.debug("Template Undeployment of the template named : "
                                 + artifactName + " : Completed");
                     }
-                    log.info("Template named '" + st.getName() + "' has been undeployed");
+                    log.info("Template named '" + tm.getName() + "' has been undeployed");
                 } else {
                     log.debug("Template task " + artifactName + " has already been undeployed");
                 }

@@ -24,8 +24,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.commons.evaluators.config.EvaluatorSerializerFinder;
 import org.apache.synapse.commons.evaluators.config.EvaluatorSerializer;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
+import org.apache.synapse.mediators.filters.router.ConditionalRoute;
 import org.apache.synapse.mediators.filters.router.ConditionalRouterMediator;
-import org.apache.synapse.mediators.filters.router.Route;
 
 /**
  * <pre>
@@ -49,21 +49,21 @@ public class ConditionalRouterMediatorSerializer extends AbstractMediatorSeriali
                     Boolean.toString(conditionalRouterMediator.isContinueAfter()), nullNS);
         }
 
-        for (Route route : conditionalRouterMediator.getRoutes()) {
-            OMElement routeElem = fac.createOMElement("route", synNS);
+        for (ConditionalRoute conditionalRoute : conditionalRouterMediator.getConditionalRoutes()) {
+            OMElement routeElem = fac.createOMElement("conditionalRoute", synNS);
 
-            if (route.isBreakRouteExplicitlySet()) {
-                routeElem.addAttribute("breakRoute", Boolean.toString(route.isBreakRoute()), nullNS);
+            if (conditionalRoute.isBreakRouteExplicitlySet()) {
+                routeElem.addAttribute("breakRoute", Boolean.toString(conditionalRoute.isBreakRoute()), nullNS);
             }
             
-            if (route.getEvaluator() != null) {
+            if (conditionalRoute.getEvaluator() != null) {
                 EvaluatorSerializer evaluatorSerializer =
                         EvaluatorSerializerFinder.getInstance().getSerializer(
-                                route.getEvaluator().getName());
+                                conditionalRoute.getEvaluator().getName());
                 if (evaluatorSerializer != null) {
                     OMElement conditionElement = fac.createOMElement("condition", synNS);
                     try {
-                        evaluatorSerializer.serialize(conditionElement, route.getEvaluator());
+                        evaluatorSerializer.serialize(conditionElement, conditionalRoute.getEvaluator());
                     } catch (EvaluatorException e) {
                         handleException("Cannot serialize the Evaluator", e);
                     }
@@ -72,13 +72,13 @@ public class ConditionalRouterMediatorSerializer extends AbstractMediatorSeriali
                 }
             }
 
-            if (route.getTarget() != null) {
-                routeElem.addChild(TargetSerializer.serializeTarget(route.getTarget()));
+            if (conditionalRoute.getTarget() != null) {
+                routeElem.addChild(TargetSerializer.serializeTarget(conditionalRoute.getTarget()));
             } else {
-                handleException("Route in a conditional router has to have a target");
+                handleException("ConditionalRoute in a conditional router has to have a target");
             }
 
-            if (route.getTarget().isAsynchronous()) {
+            if (conditionalRoute.getTarget().isAsynchronous()) {
                 routeElem.addAttribute(fac.createOMAttribute("asynchronous", nullNS, "true"));
             }
 

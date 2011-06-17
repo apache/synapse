@@ -25,7 +25,7 @@ import org.apache.synapse.mediators.eip.Target;
 /**
  * 
  */
-public class Route {
+public class ConditionalRoute {
 
     private Evaluator evaluator;
 

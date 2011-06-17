@@ -28,16 +28,16 @@
     <xs:element name="conditionalRouter">
         <xs:annotation>
             <xs:documentation source="description">
-                ConditionalRouter mediator to route messages by looking at the
+                ConditionalRouter mediator to conditionalRoute messages by looking at the
                 provided conditions by evaluating xpath over the current message
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="route" minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="conditionalRoute" minOccurs="1" maxOccurs="unbounded">
                     <xs:annotation>
                         <xs:documentation>
-                            A single route in the conditional router, which should have a condition
+                            A single conditionalRoute in the conditional router, which should have a condition
                             and a target
                         </xs:documentation>
                     </xs:annotation>

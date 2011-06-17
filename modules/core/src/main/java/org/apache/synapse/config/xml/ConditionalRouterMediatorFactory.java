@@ -27,7 +27,7 @@ import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.config.EvaluatorFactoryFinder;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.filters.router.ConditionalRouterMediator;
-import org.apache.synapse.mediators.filters.router.Route;
+import org.apache.synapse.mediators.filters.router.ConditionalRoute;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -48,7 +48,7 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
     private static final QName CONDITIONAL_ROUTER_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "conditionalRouter");
     private static final QName ROUTE_Q
-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "route");
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "conditionalRoute");
     private static final QName CONDITION_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "condition");
     private static final QName TARGET_Q
@@ -82,19 +82,19 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
         Iterator itr = elem.getChildrenWithName(ROUTE_Q);
         while (itr.hasNext()) {
             OMElement routeElem = (OMElement) itr.next();
-            Route route = new Route();
+            ConditionalRoute conditionalRoute = new ConditionalRoute();
 
             if (routeElem.getAttribute(BREAK_ROUTE_ATTR) != null) {
                 if (JavaUtils.isTrueExplicitly(
                         routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim())) {
 
-                    route.setBreakRoute(true);
+                    conditionalRoute.setBreakRoute(true);
                 } else if (JavaUtils.isFalseExplicitly(
                         routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim())) {
 
-                    route.setBreakRoute(false);
+                    conditionalRoute.setBreakRoute(false);
                 } else {
-                    handleException("breakRoute attribute value of the route element must " +
+                    handleException("breakRoute attribute value of the conditionalRoute element must " +
                             "be either 'true' or 'false', the value found is : "
                             + routeElem.getAttributeValue(BREAK_ROUTE_ATTR).trim());
                 }
@@ -109,7 +109,7 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
             try {
                 Evaluator evaluator = EvaluatorFactoryFinder.getInstance().getEvaluator(
                         conditionElem.getFirstElement());
-                route.setEvaluator(evaluator);
+                conditionalRoute.setEvaluator(evaluator);
             } catch (EvaluatorException ee) {
                 handleException("Couldn't build the condition of the conditional router", ee);
             }
@@ -121,8 +121,8 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
             } else {
                 target.setAsynchronous(false);
             }
-            route.setTarget(target);
-            conditionalRouterMediator.addRoute(route);
+            conditionalRoute.setTarget(target);
+            conditionalRouterMediator.addRoute(conditionalRoute);
         }
         return conditionalRouterMediator;
     }

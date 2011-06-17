@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class ConditionalRouterMediator extends AbstractMediator {
 
-    private List<Route> routes = new ArrayList<Route>();
+    private List<ConditionalRoute> conditionalRoutes = new ArrayList<ConditionalRoute>();
 
     private boolean continueAfter;
     
@@ -69,10 +69,10 @@ public class ConditionalRouterMediator extends AbstractMediator {
         context.setMessageContext(((Axis2MessageContext) synCtx).getAxis2MessageContext());
 
         try {
-            for (Route route : routes) {
-                if (route.getEvaluator().evaluate(context)) {
-                    route.getTarget().mediate(synCtx);
-                    if (route.isBreakRoute()) {
+            for (ConditionalRoute conditionalRoute : conditionalRoutes) {
+                if (conditionalRoute.getEvaluator().evaluate(context)) {
+                    conditionalRoute.getTarget().mediate(synCtx);
+                    if (conditionalRoute.isBreakRoute()) {
                         break;
                     }
                 }
@@ -83,12 +83,12 @@ public class ConditionalRouterMediator extends AbstractMediator {
         return continueAfter;
     }
 
-    public List<Route> getRoutes() {
-        return routes;
+    public List<ConditionalRoute> getConditionalRoutes() {
+        return conditionalRoutes;
     }
 
-    public void addRoute(Route route) {
-        routes.add(route);
+    public void addRoute(ConditionalRoute conditionalRoute) {
+        conditionalRoutes.add(conditionalRoute);
     }
 
     public boolean isContinueAfter() {

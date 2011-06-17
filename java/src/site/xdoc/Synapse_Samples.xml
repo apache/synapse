@@ -2407,7 +2407,7 @@ out sequence as the receiving sequence is specified in the send mediator.</p>
           <strong>Objective: Routing Messages based on the HTTP Transport properties.</strong>
         </p>
         <p>
-          <strong>Prerequisites:</strong><br/> Start the Synapse configuration numbered 157: i.e. wso2esb-samples -sn 157
+          <strong>Prerequisites:</strong><br/> Start the Synapse configuration numbered 157: i.e. synapse -sample 157
             <br/>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done.
             For this particular case we will be using 'curl' to send requests with custom HTTP Headers to the proxy service. You may use a similar tool with facilitate those requirements.
             <br/><br/>The request file : stockQuoteReq.xml, should contain the following request.

@@ -139,4 +139,20 @@ public class TemplateEndpoint extends AbstractEndpoint {
             }
         }
     }
+
+    public boolean readyToSend() {
+        if (realEndpoint != null && realEndpoint.readyToSend()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Template Endpoint" + this.toString()
+                          + " is at ready state");
+            }
+            return true;
+        }
+
+
+        log.warn("Template Endpoint " + this.toString()
+                 + " is not in a ready state to process message");
+
+        return false;
+    }
 }

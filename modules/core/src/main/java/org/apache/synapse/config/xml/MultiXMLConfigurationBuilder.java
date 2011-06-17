@@ -309,7 +309,7 @@ public class MultiXMLConfigurationBuilder {
                         if (endpointTemplate != null) {
                             endpointTemplate.setFileName(file.getName());
                             synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                    file.getAbsolutePath(), endpointTemplate.getFileName());
+                                    file.getAbsolutePath(), endpointTemplate.getName());
                         }
                         return;
                     }

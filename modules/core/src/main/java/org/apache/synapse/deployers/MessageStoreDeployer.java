@@ -16,7 +16,6 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-
 package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
@@ -103,8 +102,8 @@ public class MessageStoreDeployer extends AbstractSynapseArtifactDeployer{
             MessageStore existingMs = getSynapseConfiguration().getMessageStore(existingArtifactName);
 
             // We should add the updated MessageStore as a new MessageStore and remove the old one
-            getSynapseConfiguration().addMessageStore(ms.getName(), ms);
             getSynapseConfiguration().removeMessageStore(existingArtifactName);
+            getSynapseConfiguration().addMessageStore(ms.getName(), ms);
             log.info("MessageStore: " + existingArtifactName + " has been undeployed");
 
 

@@ -65,6 +65,8 @@ public class ForwardingJob implements StatefulJob {
 
         int maxDeliverAttempts = -1;
         String mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);
+
+
         if (mdaParam != null) {
             maxDeliverAttempts = Integer.parseInt(mdaParam);
 
@@ -78,10 +80,6 @@ public class ForwardingJob implements StatefulJob {
         // there is no message store attached.
         if(!processor.isActive() || messageStore == null) {
             return;
-        }
-
-        if (maxDeliverAttempts > 0) {
-            processor.incrementSendAttemptCount();
         }
 
         boolean errorStop = false;
@@ -134,6 +132,11 @@ public class ForwardingJob implements StatefulJob {
                             if (outCtx != null && "true".equals(outCtx.
                                     getProperty(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR))) {
                                 // This Means an Error has occurred
+
+                                if (maxDeliverAttempts > 0) {
+                                    processor.incrementSendAttemptCount();
+                                }
+
                                 if (parameters != null &&
                                         parameters.get(
                                                 ForwardingProcessorConstants.FAULT_SEQUENCE) != null) {
@@ -151,7 +154,7 @@ public class ForwardingJob implements StatefulJob {
                                 }
 
                                 if (maxDeliverAttempts > 0) {
-                                    if(processor.getSendAttemptCount() > maxDeliverAttempts) {
+                                    if(processor.getSendAttemptCount() >= maxDeliverAttempts) {
                                         processor.deactivate();
                                     }
                                 }
@@ -160,7 +163,10 @@ public class ForwardingJob implements StatefulJob {
 
                             } else if(outCtx == null) {
                                 // This Means we have invoked an out only operation
+                                // remove the message and reset the count
                                 messageStore.poll();
+                                processor.resetSentAttemptCount();
+                                continue;
                             }
 
                             // If there is a sequence defined to send success replies,
@@ -182,10 +188,14 @@ public class ForwardingJob implements StatefulJob {
                             }
 
                             // If no Exception Occurred We remove the Message
+                            // and reset the delivery attempt count
+                            processor.resetSentAttemptCount();
                             messageStore.poll();
                         } catch (Exception e) {
+
                             if (maxDeliverAttempts > 0) {
-                                if (processor.getSendAttemptCount() > maxDeliverAttempts) {
+                                processor.incrementSendAttemptCount();
+                                if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
                                     processor.deactivate();
                                 }
                             }
@@ -214,11 +224,6 @@ public class ForwardingJob implements StatefulJob {
                 }
 
             } else {
-                if (maxDeliverAttempts > 0) {
-                    if (processor.getSendAttemptCount() > maxDeliverAttempts) {
-                        processor.deactivate();
-                    }
-                }
                 errorStop = true;
             }
         }

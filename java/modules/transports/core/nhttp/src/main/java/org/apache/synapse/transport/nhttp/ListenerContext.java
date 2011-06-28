@@ -96,6 +96,16 @@ public class ListenerContext {
             port = Integer.parseInt((String) param.getValue());
         }
 
+        int portOffset = 0;
+
+        try {
+            portOffset = Integer.parseInt(System.getProperty(NhttpConstants.PORT_OFFSET, "0"));
+        } catch (NumberFormatException e) {
+            handleException("portOffset System property should be a valid Integer", e);
+        }
+
+        port = port + portOffset;
+
         param = transportIn.getParameter(NhttpConstants.BIND_ADDRESS);
         if (param != null) {
             bindAddress = ((String) param.getValue()).trim();

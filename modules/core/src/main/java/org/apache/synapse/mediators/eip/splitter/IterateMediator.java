@@ -109,7 +109,8 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
             // if not preservePayload remove all the child elements
             if (!preservePayload && envelope.getBody() != null) {
                 for (Iterator itr = envelope.getBody().getChildren(); itr.hasNext();) {
-                    ((OMNode) itr.next()).detach();
+                    itr.next();
+                    itr.remove();
                 }
             }
 

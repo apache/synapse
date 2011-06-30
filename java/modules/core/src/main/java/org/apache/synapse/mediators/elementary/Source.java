@@ -233,7 +233,6 @@ public class Source {
         } else {
             soapFactory = OMAbstractFactory.getSOAP11Factory();
         }
-
         StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(inlineElement.getXMLStreamReader(),
                 soapFactory, inlineElement.getQName().getNamespaceURI());
         return builder.getSOAPEnvelope();

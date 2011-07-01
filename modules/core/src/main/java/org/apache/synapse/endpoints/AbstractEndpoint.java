@@ -86,6 +86,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     /** The Sequence name associated with the endpoint*/
     protected String errorHandler = null;
 
+    private boolean enableMBeanStats = true;
+
     protected AbstractEndpoint() {
         log = LogFactory.getLog(this.getClass());
     }
@@ -166,8 +168,24 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     public void setName(String endpointName) {
         this.endpointName = endpointName;
-        metricsMBean = new EndpointView(endpointName, this);
-        MBeanRegistrar.getInstance().registerMBean(metricsMBean, "Endpoint", endpointName);
+        if (enableMBeanStats) {
+            if(endpointName != null && !"".equals(endpointName.trim())){
+                //we skip stat collection for endpoints with no defined name
+                log.warn("Endpoint Name not found. Skipped JMX statistics collection for this endpoint");
+                return;
+            }
+            metricsMBean = new EndpointView(endpointName, this);
+            MBeanRegistrar.getInstance().registerMBean(metricsMBean, "Endpoint", endpointName);
+        }
+    }
+
+    /**
+     * set whether this endpoint needs to be registered for JMX Mbeans. some endpoints may not need
+     * to register under MBean and setting false will cut the additional overhead.
+     * @param flag set true/false
+     */
+    public void setEnableMBeanStats(boolean flag){
+        enableMBeanStats = flag;
     }
 
     //----------------------- default method implementations and common code -----------------------
@@ -548,7 +566,9 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     }
 
     public void destroy() {
-        MBeanRegistrar.getInstance().unRegisterMBean("Endpoint", endpointName);
+        if (enableMBeanStats) {
+            MBeanRegistrar.getInstance().unRegisterMBean("Endpoint", endpointName);
+        }
         this.initialized = false;
     }
 

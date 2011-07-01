@@ -95,7 +95,7 @@ public abstract class AbstractDispatcher implements Dispatcher {
 
                     for(String sessionId : sessionIds){
                         if(sessionId != null && sessionId.indexOf("JSESSIONID") != -1){
-                            return sessionId;
+                            return sessionId.trim();
                         }
                     }
 

@@ -42,6 +42,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Represents a dynamic load balance endpoint. The application membership is not static,
@@ -213,6 +214,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         }
 
         Endpoint endpoint = getEndpoint(to, synCtx);
+        faultHandler.setCurrentEp(endpoint);
         if (isSessionAffinityBasedLB() && newSession) {
             prepareEndPointSequence(synCtx, endpoint);
             synCtx.setProperty(SynapseConstants.PROP_SAL_ENDPOINT_CURRENT_MEMBER, currentMember);
@@ -288,7 +290,8 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
      */
     private Endpoint getEndpoint(EndpointReference to, MessageContext synCtx) {
         AddressEndpoint endpoint = new AddressEndpoint();
-        endpoint.setName("DynamicLoadBalanceAddressEndpoint-" + Math.random());
+        endpoint.setEnableMBeanStats(false);
+        endpoint.setName("DYNAMIC_LOADBALANCE_EP_" + UUID.randomUUID());
         EndpointDefinition definition = new EndpointDefinition();
         definition.setReplicationDisabled(true);
         definition.setAddress(to.getAddress());
@@ -308,6 +311,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
 
         private EndpointReference to;
         private Member currentMember;
+        private Endpoint currentEp;
 
         public void setCurrentMember(Member currentMember) {
             this.currentMember = currentMember;
@@ -318,6 +322,10 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         }
 
         public void onFault(MessageContext synCtx) {
+            //cleanup endpoint if exists
+            if(currentEp != null){
+                currentEp.destroy();
+            }
             if (currentMember == null) {
                 return;
             }
@@ -338,6 +346,10 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
                 }
             }
             sendToApplicationMember(synCtx, currentMember, true);
+        }
+
+        public void setCurrentEp(Endpoint currentEp) {
+            this.currentEp = currentEp;
         }
     }
 }

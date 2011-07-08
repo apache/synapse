@@ -44,6 +44,8 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.util.MessageHelper;
 
 
+import java.util.Iterator;
+
 public class BlockingMessageSender {
 
     private ServiceClient sc = null;
@@ -125,6 +127,19 @@ public class BlockingMessageSender {
 
             options.setProperty(
                     AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+
+            //clean existing headers
+            // otherwise when retrying same header element will add multiple times
+            sc.removeHeaders();
+
+            axis2Ctx.getAttachmentMap();
+            Iterator itr = axis2Ctx.getEnvelope().getHeader().getChildren();
+            while (itr.hasNext()) {
+                Object o =itr.next();
+                if ( o instanceof OMElement ){
+                    sc.addHeader((OMElement)o);
+                }
+            }
 
             sc.setOptions(options);
             OMElement result = null;

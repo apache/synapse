@@ -313,7 +313,8 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultCodeValue != null) {
             fault_code = faultCodeValue;
         } else {
-            fault_code = QName.valueOf(faultCodeExpr.stringValueOf(synCtx));
+            String codeStr =  faultCodeExpr.stringValueOf(synCtx);
+            fault_code = new QName(fault.getNamespace().getNamespaceURI(),codeStr);
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
@@ -348,6 +349,7 @@ public class FaultMediator extends AbstractMediator {
             case SOAP12:
                 SOAPFaultText text = factory.createSOAPFaultText();
                 text.setText(reasonString);
+                text.setLang("en");
                 reason.addSOAPText(text);
                 break;
         }

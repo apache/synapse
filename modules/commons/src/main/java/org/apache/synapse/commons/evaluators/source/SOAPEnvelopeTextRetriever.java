@@ -23,10 +23,10 @@ import org.apache.synapse.commons.evaluators.EvaluatorContext;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
-import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMDocument;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
 import org.jaxen.JaxenException;
 
 import java.util.List;
@@ -61,18 +61,18 @@ public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
 
             StringBuffer textValue = new StringBuffer();
             for (Object o : list) {
-                if (o instanceof OMTextImpl) {
-                    textValue.append(((OMTextImpl) o).getText());
+                if (o instanceof OMText) {
+                    textValue.append(((OMText) o).getText());
 
-                } else if (o instanceof OMElementImpl) {
-                    String s = ((OMElementImpl) o).getText();
+                } else if (o instanceof OMElement) {
+                    String s = ((OMElement) o).getText();
                     if (s.trim().length() == 0) {
                         s = o.toString();
                     }
                     textValue.append(s);
 
-                } else if (o instanceof OMDocumentImpl) {
-                    textValue.append(((OMDocumentImpl) o).getOMDocumentElement().toString());
+                } else if (o instanceof OMDocument) {
+                    textValue.append(((OMDocument) o).getOMDocumentElement().toString());
                 } else if (o instanceof OMAttribute) {
                     textValue.append(((OMAttribute) o).getAttributeValue());
                 }

@@ -18,9 +18,9 @@
  */
 package org.apache.synapse.transport.nhttp;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.*;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.builder.BuilderUtil;
@@ -214,7 +214,7 @@ public class ClientWorker implements Runnable {
                         log.debug(errorMessage, e);
                         log.debug("Creating the SOAPFault to be injected...");
                     }
-                    SOAPFactory factory = new SOAP11Factory();
+                    SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
                     envelope = factory.getDefaultFaultEnvelope();
                     SOAPFaultDetail detail = factory.createSOAPFaultDetail();
                     detail.setText(errorMessage);
@@ -232,7 +232,7 @@ public class ClientWorker implements Runnable {
             } else {
                 // there is no response entity-body
                 responseMsgCtx.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
-                responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                responseMsgCtx.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
             }
 
             // copy the HTTP status code as a message context property with the key HTTP_SC to be

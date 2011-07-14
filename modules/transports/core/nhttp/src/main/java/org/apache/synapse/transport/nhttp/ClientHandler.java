@@ -18,11 +18,10 @@
  */
 package org.apache.synapse.transport.nhttp;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -748,9 +747,9 @@ public class ClientHandler implements NHttpClientHandler {
                         responseMsgCtx.setTo(null);
 
                         if (!outMsgCtx.isDoingREST() && !outMsgCtx.isSOAP11()) {
-                            responseMsgCtx.setEnvelope(new SOAP12Factory().getDefaultEnvelope());
+                            responseMsgCtx.setEnvelope(OMAbstractFactory.getSOAP12Factory().getDefaultEnvelope());
                         } else {
-                            responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                            responseMsgCtx.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
                         }
                         responseMsgCtx.setProperty(AddressingConstants.
                                 DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);

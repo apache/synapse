@@ -19,8 +19,8 @@
 
 package org.apache.synapse.transport.nhttp.util;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
@@ -161,7 +161,7 @@ public class RESTUtil {
         msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
         msgContext.setServerSide(true);
         msgContext.setDoingREST(true);
-        msgContext.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+        msgContext.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
         msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
         AxisEngine.receive(msgContext);
     }

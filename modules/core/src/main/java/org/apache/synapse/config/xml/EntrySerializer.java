@@ -28,7 +28,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -81,9 +80,8 @@ public class EntrySerializer {
         } else if (type == Entry.INLINE_TEXT) {
             Object value = entry.getValue();
             if (value != null && value instanceof String) {
-                OMTextImpl textData = (OMTextImpl) fac.createOMText(((String) value).trim());
-                textData.setType(XMLStreamConstants.CDATA);
-                entryElement.addChild(textData);
+                entryElement.addChild(fac.createOMText(((String) value).trim(),
+                        XMLStreamConstants.CDATA));
             }
         } else if (type == Entry.REMOTE_ENTRY) {
             // nothing to serialize

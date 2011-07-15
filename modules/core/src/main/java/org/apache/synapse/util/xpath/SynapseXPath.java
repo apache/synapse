@@ -20,11 +20,10 @@
 package org.apache.synapse.util.xpath;
 
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.impl.llom.OMDocumentImpl;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
@@ -186,21 +185,21 @@ public class SynapseXPath extends AXIOMXPath {
                         return null;
                     }
 
-                    if (o instanceof OMTextImpl) {
-                        textValue.append(((OMTextImpl) o).getText());
-                    } else if (o instanceof OMElementImpl) {
+                    if (o instanceof OMText) {
+                        textValue.append(((OMText) o).getText());
+                    } else if (o instanceof OMElement) {
 
-                        String s = ((OMElementImpl) o).getText();
+                        String s = ((OMElement) o).getText();
 
                         if (s.trim().length() == 0) {
                             s = o.toString();
                         }
                         textValue.append(s);
 
-                    } else if (o instanceof OMDocumentImpl) {
+                    } else if (o instanceof OMDocument) {
 
                         textValue.append(
-                            ((OMDocumentImpl) o).getOMDocumentElement().toString());
+                            ((OMDocument) o).getOMDocumentElement().toString());
                     } else if (o instanceof OMAttribute) {
                         textValue.append(
                             ((OMAttribute) o).getAttributeValue());

@@ -26,7 +26,6 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMSourcedElement;
 import org.apache.axiom.om.ds.OMDataSourceExtBase;
 import org.apache.axiom.om.impl.MTOMXMLStreamWriter;
-import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
 import org.apache.axiom.om.impl.serialize.StreamingOMSerializer;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.util.blob.OverflowBlob;
@@ -57,7 +56,7 @@ public class TextFileDataSource extends OMDataSourceExtBase {
     public static OMSourcedElement createOMSourcedElement(OverflowBlob overflowBlob, Charset charset) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
         TextFileDataSource txtFileDS = new TextFileDataSource(overflowBlob, charset);
-        return new OMSourcedElementImpl(BaseConstants.DEFAULT_TEXT_WRAPPER, fac, txtFileDS);
+        return fac.createOMElement(txtFileDS, BaseConstants.DEFAULT_TEXT_WRAPPER);
     }
 
     @Override

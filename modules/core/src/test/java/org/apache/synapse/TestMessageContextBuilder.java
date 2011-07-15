@@ -33,11 +33,11 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.config.Entry;
@@ -139,7 +139,7 @@ public class TestMessageContextBuilder {
         SOAPEnvelope envelope;
         if (parser != null) {
             if (contentIsEnvelope) {
-                envelope = new StAXSOAPModelBuilder(parser).getSOAPEnvelope();
+                envelope = OMXMLBuilderFactory.createStAXSOAPModelBuilder(parser).getSOAPEnvelope();
             } else {
                 envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
                 
@@ -148,7 +148,7 @@ public class TestMessageContextBuilder {
                 omDoc.addChild(envelope);
                 
                 SOAPBody body = envelope.getBody();
-                StAXOMBuilder builder = new StAXOMBuilder(parser);
+                OMXMLParserWrapper builder = OMXMLBuilderFactory.createStAXOMBuilder(parser);
                 OMElement bodyElement = builder.getDocumentElement();
                 if (addTextAroundBody) {
                     OMFactory fac = OMAbstractFactory.getOMFactory();

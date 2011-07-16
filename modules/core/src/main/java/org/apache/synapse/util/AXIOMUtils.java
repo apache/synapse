@@ -24,8 +24,8 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.impl.dom.NodeImpl;
 import org.apache.axiom.om.impl.jaxp.OMSource;
+import org.w3c.dom.Node;
 
 /**
  * Utility class with AXIOM helper methods.
@@ -42,8 +42,8 @@ public class AXIOMUtils {
      */
     public static Source asSource(OMNode node) {
         // Note: Once we depend on JDK 1.6, we could also use StAXSource from JAXP 1.4.
-        if (node instanceof NodeImpl) {
-            return new DOMSource((NodeImpl)node);
+        if (node instanceof Node) {
+            return new DOMSource((Node)node);
         } else {
             return new OMSource((OMElement)node);
         }

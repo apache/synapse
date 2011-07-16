@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -42,7 +41,7 @@ public class XMLConfigurationBuilder {
 
         log.info("Generating the Synapse configuration model by parsing the XML configuration");
         
-        OMElement definitions = new StAXOMBuilder(is).getDocumentElement();
+        OMElement definitions = OMXMLBuilderFactory.createOMBuilder(is).getDocumentElement();
         definitions.build();
 
         return ConfigurationFactoryAndSerializerFinder.getInstance()

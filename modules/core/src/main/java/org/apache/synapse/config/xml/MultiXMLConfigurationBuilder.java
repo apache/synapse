@@ -20,7 +20,8 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -452,10 +453,10 @@ public class MultiXMLConfigurationBuilder {
         }
 
         try {
-            document = new StAXOMBuilder(is).getDocumentElement();
+            document = OMXMLBuilderFactory.createOMBuilder(is).getDocumentElement();
             document.build();
             is.close();
-        } catch (XMLStreamException e) {
+        } catch (OMException e) {
             handleException("Error while parsing the content of the file: " + file.getName(), e);
         } catch (IOException e) {
             log.warn("Error while closing the input stream from the file: " + file.getName(), e);

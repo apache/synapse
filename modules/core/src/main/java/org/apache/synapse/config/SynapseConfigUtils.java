@@ -21,7 +21,6 @@ package org.apache.synapse.config;
 
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.util.AXIOMUtil;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
@@ -198,7 +197,7 @@ public class SynapseConfigUtils {
             try {
                 XMLStreamReader parser = XMLInputFactory.newInstance().
                         createXMLStreamReader(inputStream);
-                StAXOMBuilder builder = new StAXOMBuilder(parser);
+                OMXMLParserWrapper builder = OMXMLBuilderFactory.createStAXOMBuilder(parser);
                 OMElement omElem = builder.getDocumentElement();
 
                 // detach from URL connection and keep in memory
@@ -286,7 +285,7 @@ public class SynapseConfigUtils {
         }
         InputStream inStream = connection.getInputStream();
         try {
-            StAXOMBuilder builder = new StAXOMBuilder(inStream);
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(inStream);
             OMElement doc = builder.getDocumentElement();
             doc.build();
             return doc;

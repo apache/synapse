@@ -31,7 +31,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.soap.SOAP11Version;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -298,7 +299,7 @@ public class PayloadHelper {
 	}
 
 	public static void setStAXPayload(SOAPEnvelope envelope, XMLStreamReader streamReader) {
-		StAXOMBuilder builder = new StAXOMBuilder(envelope.getOMFactory(), streamReader);
+		OMXMLParserWrapper builder = OMXMLBuilderFactory.createStAXOMBuilder(envelope.getOMFactory(), streamReader);
 		OMElement el = builder.getDocumentElement();
 		setXMLPayload(envelope, el);
 	}

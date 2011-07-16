@@ -21,8 +21,7 @@ package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.AbstractDeployer;
 import org.apache.axis2.deployment.DeploymentException;
@@ -40,7 +39,6 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.util.Properties;
 
@@ -122,8 +120,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
             try {
                 // construct the xml element from the file, it has to be XML,
                 // since all synapse artifacts are XML based
-                OMElement element = new StAXOMBuilder(
-                        StAXUtils.createXMLStreamReader(in)).getDocumentElement();
+                OMElement element = OMXMLBuilderFactory.createOMBuilder(in).getDocumentElement();
                 Properties properties = new Properties();
                 properties.put(SynapseConstants.RESOLVE_ROOT, getSynapseEnvironment()
                         .getServerContextInformation()
@@ -169,9 +166,6 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
             }
         } catch (IOException ex) {
             handleDeploymentError("Deployment of synapse artifact failed. Error reading "
-                    + filename + " : " + ex.getMessage(), ex, filename);
-        } catch (XMLStreamException ex) {
-            handleDeploymentError("Deployment of synapse artifact failed. Error parsing "
                     + filename + " : " + ex.getMessage(), ex, filename);
         } catch (OMException ex) {
             handleDeploymentError("Deployment of synapse artifact failed. Error parsing "

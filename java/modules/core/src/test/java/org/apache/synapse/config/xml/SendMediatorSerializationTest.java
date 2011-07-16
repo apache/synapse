@@ -19,8 +19,9 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
@@ -278,7 +279,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
         try {
 
             XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createStAXOMBuilder(reader);
             OMElement omElement = builder.getDocumentElement();
             return omElement;
 

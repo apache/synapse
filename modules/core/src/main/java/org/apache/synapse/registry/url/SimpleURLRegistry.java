@@ -20,7 +20,6 @@
 package org.apache.synapse.registry.url;
 
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -91,7 +90,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
                 XMLStreamReader parser = XMLInputFactory.newInstance().
                         createXMLStreamReader(inputStream);
-                StAXOMBuilder builder = new StAXOMBuilder(parser);
+                OMXMLParserWrapper builder = OMXMLBuilderFactory.createStAXOMBuilder(parser);
                 result = builder.getDocumentElement();
 
             } catch (OMException ignored) {

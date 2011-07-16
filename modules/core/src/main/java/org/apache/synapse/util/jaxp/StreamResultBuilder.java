@@ -20,9 +20,8 @@
 package org.apache.synapse.util.jaxp;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.util.StAXUtils;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,9 +81,9 @@ public class StreamResultBuilder implements ResultBuilder {
                 return null;
             }
             if (expectedOutput == ResultBuilderFactory.Output.SOAP_ENVELOPE) {
-                return new StAXSOAPModelBuilder(reader).getSOAPEnvelope();
+                return OMXMLBuilderFactory.createStAXSOAPModelBuilder(reader).getSOAPEnvelope();
             } else {
-                return new StAXOMBuilder(reader).getDocumentElement();
+                return OMXMLBuilderFactory.createStAXOMBuilder(reader).getDocumentElement();
             }
         }
     }

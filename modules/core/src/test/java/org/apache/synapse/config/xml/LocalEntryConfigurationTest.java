@@ -20,8 +20,9 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.util.AXIOMUtil;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.config.Entry;
 
 import javax.xml.stream.XMLStreamException;
@@ -353,7 +354,7 @@ public class LocalEntryConfigurationTest extends AbstractTestCase {
             xmlInFac.setProperty("javax.xml.stream.isCoalescing", false);
 
             XMLStreamReader parser = xmlInFac.createXMLStreamReader(strReader);
-            StAXOMBuilder builder = new StAXOMBuilder(parser);
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createStAXOMBuilder(parser);
             return builder.getDocumentElement();
         }
     }

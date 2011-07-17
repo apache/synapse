@@ -44,7 +44,7 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
 
         QName qName = mediator.getQName();
         if (qName != null) {
-            if (qName.getNamespaceURI() != null) {
+            if (qName.getNamespaceURI().length() != 0) {
                 header.addAttribute(fac.createOMAttribute(
                     "name", nullNS,
                     (qName.getPrefix() != null && !"".equals(qName.getPrefix())

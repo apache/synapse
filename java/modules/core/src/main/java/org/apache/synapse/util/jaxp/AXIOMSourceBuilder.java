@@ -19,16 +19,18 @@
 
 package org.apache.synapse.util.jaxp;
 
+import javax.xml.transform.sax.SAXSource;
+
+import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.jaxp.OMSource;
 
 /**
  * {@link SourceBuilder} implementation that transforms the AXIOM tree to SAX
- * using {@link OMSource}.
+ * using {@link OMContainer#getSAXSource(boolean)}.
  */
 public class AXIOMSourceBuilder implements SourceBuilder {
-    public OMSource getSource(OMElement node) {
-        return new OMSource(node);
+    public SAXSource getSource(OMElement node) {
+        return node.getSAXSource(true);
     }
 
     public void release() {

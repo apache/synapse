@@ -22,9 +22,8 @@ package org.apache.synapse.util;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.impl.jaxp.OMSource;
 import org.w3c.dom.Node;
 
 /**
@@ -45,7 +44,7 @@ public class AXIOMUtils {
         if (node instanceof Node) {
             return new DOMSource((Node)node);
         } else {
-            return new OMSource((OMElement)node);
+            return ((OMContainer)node).getSAXSource(true);
         }
     }
 }

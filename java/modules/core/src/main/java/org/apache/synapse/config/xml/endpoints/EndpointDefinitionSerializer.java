@@ -121,11 +121,12 @@ public class EndpointDefinitionSerializer {
             OMElement action = fac.createOMElement("responseAction", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
                 action.setText("discard");
+                timeout.addChild(action);
             } else if (endpointDefinition.getTimeoutAction()
                     == SynapseConstants.DISCARD_AND_FAULT) {
                 action.setText("fault");
+                timeout.addChild(action);
             }
-            timeout.addChild(action);
         }
 
         if (endpointDefinition.getInitialSuspendDuration() != -1 ||

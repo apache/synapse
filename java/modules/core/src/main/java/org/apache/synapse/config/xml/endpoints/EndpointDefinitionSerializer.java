@@ -126,6 +126,11 @@ public class EndpointDefinitionSerializer {
                     == SynapseConstants.DISCARD_AND_FAULT) {
                 action.setText("fault");
                 timeout.addChild(action);
+            } else if (endpointDefinition.getTimeoutAction()
+                    == SynapseConstants.NONE) {
+                // if the action is not given, it is set to fault
+                action.setText("fault");
+                timeout.addChild(action);
             }
         }
 

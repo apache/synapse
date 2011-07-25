@@ -2902,7 +2902,7 @@ Transfer-Encoding: chunked
 <br/> You will need access to an FTP server and an SMTP server to try this sample. </p>
 <p>Start the Axis2 server and deploy the SimpleStockQuoteService if not already done </p>
 <p>Enable mail transport sender in the Synapse axis2.xml. See 
-<a href="Synapse_Samples_Setup.html       #mailsender">Setting up mail transport sender</a> </p>
+<a href="Synapse_Samples_Setup.html#mailsender">Setting up mail transport sender</a> </p>
 <p>Create a new test directory in the FTP server. Open SYNAPSE_HOME/repository/conf/sample/synapse_sample_255.xml and edit the following values. Change transport.vfs.FileURI parameter value point to the test directory at the FTP server. Change outSequence endpoint address uri email address to a working email address. Values you have to change are marked with &lt;!--CHANGE--&gt;. </p>
 <p>Start the Synapse configuration numbered 255: i.e. synapse -sample 255 </p>
 <p>Copy SYNAPSE_HOME/repository/conf/sample/resources/vfs/test.xml to the ftp directory given in transport.vfs.FileURI above. </p>

@@ -257,6 +257,7 @@ public class FaultMediator extends AbstractMediator {
             if (soapHeader != null) {
                 for (Iterator iter = soapHeader.examineAllHeaderBlocks(); iter.hasNext();) {
                     Object o = iter.next();
+                    iter.remove();
                     if (o instanceof SOAPHeaderBlock) {
                         SOAPHeaderBlock header = (SOAPHeaderBlock) o;
                         faultEnvelope.getHeader().addChild(header);

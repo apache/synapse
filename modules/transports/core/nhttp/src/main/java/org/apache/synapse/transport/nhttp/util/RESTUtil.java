@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.WSDL20DefaultValueHolder;
@@ -141,6 +142,34 @@ public class RESTUtil {
     }
 
     /**
+     * Processes the HTTP GET / DELETE request and builds the SOAP info-set of the REST message
+     *
+     * @param msgContext        The MessageContext of the Request Message
+     * @param out               The output stream of the response
+     * @param requestURI        The URL that the request came to
+     * @param contentTypeHeader The contentType header of the request
+     * @param builder           The message builder to use
+     * @param httpMethod        The http method of the request
+     * @param dispatching   Weather we should do service dispatching
+     * @throws AxisFault - Thrown in case a fault occurs
+     */
+    public static void processGetAndDeleteRequest(MessageContext msgContext, OutputStream out,
+                                                  String requestURI, Header contentTypeHeader,
+                                                  Builder builder, String httpMethod,
+                                                  boolean dispatching)
+            throws AxisFault {
+
+        String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
+
+        prepareMessageContext(msgContext, requestURI, httpMethod, out, contentType, dispatching);
+
+        msgContext.setProperty(NhttpConstants.NO_ENTITY_BODY, Boolean.TRUE);
+
+        org.apache.axis2.transport.http.util.RESTUtil.processURLRequest(msgContext, out,
+                contentType, builder);
+    }
+
+    /**
      * Processes the HTTP GET request and builds the SOAP info-set of the REST message
      *
      * @param msgContext The MessageContext of the Request Message
@@ -187,6 +216,30 @@ public class RESTUtil {
                 os, contentType, dispatching);
         org.apache.axis2.transport.http.util.RESTUtil.processXMLRequest(msgContext, is, os,
                 contentType);
+    }
+
+    /**
+     * Processes the HTTP POST request and builds the SOAP info-set of the REST message
+     *
+     * @param msgContext        The MessageContext of the Request Message
+     * @param is                The  input stream of the request
+     * @param os                The output stream of the response
+     * @param requestURI        The URL that the request came to
+     * @param contentTypeHeader The contentType header of the request
+     * @param builder           The message builder to use
+     * @param dispatching  Weather we should do dispatching
+     * @throws AxisFault - Thrown in case a fault occurs
+     */
+    public static void processPOSTRequest(MessageContext msgContext, InputStream is,
+                                          OutputStream os, String requestURI,
+                                          Header contentTypeHeader, Builder builder,
+                                          boolean dispatching) throws AxisFault {
+
+        String contentType = contentTypeHeader != null ? contentTypeHeader.getValue() : null;
+        prepareMessageContext(msgContext, requestURI, HTTPConstants.HTTP_METHOD_POST,
+                os, contentType, dispatching);
+        org.apache.axis2.transport.http.util.RESTUtil.processXMLRequest(msgContext, is, os,
+                contentType, builder);
     }
 
     /**

@@ -21,12 +21,14 @@ package org.apache.synapse.transport.nhttp;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.MessageContextBuilder;
@@ -35,6 +37,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
+import org.apache.synapse.transport.nhttp.endpoints.Endpoint;
+import org.apache.synapse.transport.nhttp.endpoints.EndpointsConfiguration;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
 
@@ -78,6 +82,8 @@ public class ServerWorker implements Runnable {
     private boolean isRestDispatching = true;
     /** WSDL processor for Get requests */
     private HttpGetRequestProcessor httpGetRequestProcessor = null;
+
+    private EndpointsConfiguration endpointsConfiguration = null;
     
     private static final String SOAPACTION   = "SOAPAction";
     private static final String LOCATION     = "Location";
@@ -122,6 +128,7 @@ public class ServerWorker implements Runnable {
         this.msgContext = createMessageContext(request);
         this.isRestDispatching = listenerContext.isRestDispatching();
         this.httpGetRequestProcessor = listenerContext.getHttpGetRequestProcessor();
+        this.endpointsConfiguration = listenerContext.getEndpoints();
     }
 
     /**
@@ -397,22 +404,48 @@ public class ServerWorker implements Runnable {
             String charSetEncoding = BuilderUtil.getCharSetEncoding(contentTypeStr);
             msgContext.setProperty(
                     Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
+            boolean eprFound = false;
+            if (endpointsConfiguration != null) {
+                Endpoint epr = endpointsConfiguration.getEndpoint(request.getRequestLine().getUri());
+                if (epr != null) {
+                    eprFound = true;
+                    String type = TransportUtils.getContentType(contentTypeStr, msgContext);
+                    msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, type);
+                    epr.setParameters(msgContext);
 
+                    Builder builder = epr.getBuilder(type);
+                    if (HTTPTransportUtils.isRESTRequest(contentTypeStr)) {
+                        RESTUtil.processPOSTRequest(msgContext, is, os,
+                                request.getRequestLine().getUri(), contentType, builder, isRestDispatching);
+                    } else {
 
-            if (HTTPTransportUtils.isRESTRequest(contentTypeStr)) {
-                RESTUtil.processPOSTRequest(msgContext, is, os,
-                        request.getRequestLine().getUri(), contentType, isRestDispatching);
-            } else {
-
-                Header soapAction  = request.getFirstHeader(SOAPACTION);
-                HTTPTransportUtils.processHTTPPostRequest(
-                        msgContext, is,
-                        os,
-                        contentTypeStr,
-                        (soapAction != null  ? soapAction.getValue()  : null),
-                        request.getRequestLine().getUri());
+                        Header soapAction = request.getFirstHeader(SOAPACTION);
+                        HTTPTransportUtils.processHTTPPostRequest(
+                                msgContext, is,
+                                os,
+                                contentTypeStr, builder,
+                                (soapAction != null ? soapAction.getValue() : null),
+                                request.getRequestLine().getUri());
+                    }
+                }
             }
 
+            if (!eprFound) {
+                if (HTTPTransportUtils.isRESTRequest(contentTypeStr)) {
+                    RESTUtil.processPOSTRequest(msgContext, is, os,
+                            request.getRequestLine().getUri(), contentType, isRestDispatching);
+                } else {
+
+                    Header soapAction = request.getFirstHeader(SOAPACTION);
+                    HTTPTransportUtils.processHTTPPostRequest(
+                            msgContext, is,
+                            os,
+                            contentTypeStr,
+                            (soapAction != null ? soapAction.getValue() : null),
+                            request.getRequestLine().getUri());
+                }
+
+            }
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);
         }
@@ -451,9 +484,33 @@ public class ServerWorker implements Runnable {
      */
     private void processGetAndDelete(String method) {
         try {
-            RESTUtil.processGetAndDeleteRequest(
-                    msgContext, os, request.getRequestLine().getUri(),
-                    request.getFirstHeader(HTTP.CONTENT_TYPE), method, isRestDispatching);
+            Header contentType = request.getFirstHeader(HTTP.CONTENT_TYPE);
+            String contentTypeStr = contentType != null ?
+                    contentType.getValue() : inferContentType();
+
+            boolean eprFound = false;
+            if (endpointsConfiguration != null) {
+                Endpoint epr = endpointsConfiguration.getEndpoint(request.getRequestLine().getUri());
+                if (epr != null) {
+                    eprFound = true;
+                    String type = TransportUtils.getContentType(contentTypeStr, msgContext);
+                    msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, type);
+
+                    epr.setParameters(msgContext);
+
+                    Builder builder = epr.getBuilder(type);
+                    RESTUtil.processGetAndDeleteRequest(
+                            msgContext, os, request.getRequestLine().getUri(),
+                            request.getFirstHeader(HTTP.CONTENT_TYPE), builder,
+                            method, isRestDispatching);
+                }
+            }
+
+            if (!eprFound) {
+                RESTUtil.processGetAndDeleteRequest(
+                        msgContext, os, request.getRequestLine().getUri(),
+                        request.getFirstHeader(HTTP.CONTENT_TYPE), method, isRestDispatching);
+            }
             // do not let the output stream close (as by default below) since
             // we are serving this GET/DELETE request through the Synapse engine
         } catch (AxisFault axisFault) {

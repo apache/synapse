@@ -40,6 +40,8 @@ import org.apache.synapse.commons.evaluators.Parser;
 import org.apache.synapse.commons.executors.ExecutorConstants;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
+import org.apache.synapse.transport.nhttp.endpoints.EndpointsConfiguration;
+import org.apache.synapse.transport.nhttp.endpoints.config.EndpointsConfigurationFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 
 import javax.xml.namespace.QName;
@@ -81,6 +83,8 @@ public class ListenerContext {
 
     private HttpParams params = null;
 
+    /** Endpoints configuration for specific HTTP Urls */
+    private EndpointsConfiguration endpoints = null;
 
     public ListenerContext(ConfigurationContext cfgCtx,
                            TransportInDescription transportIn,
@@ -149,6 +153,12 @@ public class ListenerContext {
         }
 
         params = getListenerParameters();
+
+
+        param = transportIn.getParameter(NhttpConstants.ENDPOINTS_CONFIGURATION);
+        if (param != null && param.getValue() != null) {
+            endpoints = new EndpointsConfigurationFactory().create(param.getValue().toString());
+        }
     }
 
 /**
@@ -301,6 +311,10 @@ public class ListenerContext {
 
     public HttpParams getParams() {
         return params;
+    }
+
+    public EndpointsConfiguration getEndpoints() {
+        return endpoints;
     }
 
     private void handleException(String msg, Exception e) throws AxisFault {

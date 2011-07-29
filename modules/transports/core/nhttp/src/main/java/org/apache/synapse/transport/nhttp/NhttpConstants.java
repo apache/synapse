@@ -142,4 +142,5 @@ public class NhttpConstants {
     /** Use to flag a connection close */
     public static final String FORCE_CONNECTION_CLOSE = "FORCE_CONNECTION_CLOSE";
     public static final String PORT_OFFSET = "portOffset";
+    public static final String ENDPOINTS_CONFIGURATION = "endpointsConfiguration";
 }

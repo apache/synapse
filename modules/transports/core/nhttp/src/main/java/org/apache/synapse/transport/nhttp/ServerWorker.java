@@ -30,6 +30,8 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.MetricsCollector;
+import org.apache.axis2.transport.base.endpoint.URLEndpoint;
+import org.apache.axis2.transport.base.endpoint.URLEndpointsConfiguration;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
@@ -37,8 +39,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
-import org.apache.synapse.transport.nhttp.endpoints.Endpoint;
-import org.apache.synapse.transport.nhttp.endpoints.EndpointsConfiguration;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
 
@@ -83,7 +83,7 @@ public class ServerWorker implements Runnable {
     /** WSDL processor for Get requests */
     private HttpGetRequestProcessor httpGetRequestProcessor = null;
 
-    private EndpointsConfiguration endpointsConfiguration = null;
+    private URLEndpointsConfiguration endpointsConfiguration = null;
     
     private static final String SOAPACTION   = "SOAPAction";
     private static final String LOCATION     = "Location";
@@ -406,7 +406,7 @@ public class ServerWorker implements Runnable {
                     Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
             boolean eprFound = false;
             if (endpointsConfiguration != null) {
-                Endpoint epr = endpointsConfiguration.getEndpoint(request.getRequestLine().getUri());
+                URLEndpoint epr = endpointsConfiguration.getEndpoint(request.getRequestLine().getUri());
                 if (epr != null) {
                     eprFound = true;
                     String type = TransportUtils.getContentType(contentTypeStr, msgContext);
@@ -490,7 +490,7 @@ public class ServerWorker implements Runnable {
 
             boolean eprFound = false;
             if (endpointsConfiguration != null) {
-                Endpoint epr = endpointsConfiguration.getEndpoint(request.getRequestLine().getUri());
+                URLEndpoint epr = endpointsConfiguration.getEndpoint(request.getRequestLine().getUri());
                 if (epr != null) {
                     eprFound = true;
                     String type = TransportUtils.getContentType(contentTypeStr, msgContext);

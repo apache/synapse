@@ -27,6 +27,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.TransportListener;
+import org.apache.axis2.transport.base.endpoint.URLEndpointsConfiguration;
+import org.apache.axis2.transport.base.endpoint.config.URLEndpointsConfigurationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.params.NIOReactorPNames;
@@ -40,8 +42,6 @@ import org.apache.synapse.commons.evaluators.Parser;
 import org.apache.synapse.commons.executors.ExecutorConstants;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.commons.executors.config.PriorityExecutorFactory;
-import org.apache.synapse.transport.nhttp.endpoints.EndpointsConfiguration;
-import org.apache.synapse.transport.nhttp.endpoints.config.EndpointsConfigurationFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 
 import javax.xml.namespace.QName;
@@ -84,7 +84,7 @@ public class ListenerContext {
     private HttpParams params = null;
 
     /** Endpoints configuration for specific HTTP Urls */
-    private EndpointsConfiguration endpoints = null;
+    private URLEndpointsConfiguration endpoints = null;
 
     public ListenerContext(ConfigurationContext cfgCtx,
                            TransportInDescription transportIn,
@@ -157,7 +157,7 @@ public class ListenerContext {
 
         param = transportIn.getParameter(NhttpConstants.ENDPOINTS_CONFIGURATION);
         if (param != null && param.getValue() != null) {
-            endpoints = new EndpointsConfigurationFactory().create(param.getValue().toString());
+            endpoints = new URLEndpointsConfigurationFactory().create(param.getValue().toString());
         }
     }
 
@@ -313,7 +313,7 @@ public class ListenerContext {
         return params;
     }
 
-    public EndpointsConfiguration getEndpoints() {
+    public URLEndpointsConfiguration getEndpoints() {
         return endpoints;
     }
 

@@ -211,6 +211,7 @@ public class XSLTMediator extends AbstractMediator {
         OMNode sourceNode = source.selectOMNode(synCtx, synLog);
         boolean isSoapEnvelope = (sourceNode == synCtx.getEnvelope());
         boolean isSoapBody = (sourceNode == synCtx.getEnvelope().getBody());
+        boolean isSoapHeader = (sourceNode == synCtx.getEnvelope().getHeader());
 
         // Derive actual key from message context
         String generatedXsltKey = xsltKey.evaluateValue(synCtx);
@@ -331,6 +332,18 @@ public class XSLTMediator extends AbstractMediator {
                         OMElement child = (OMElement) itr.next();
                         synCtx.getEnvelope().getBody().addChild(child);
                     }
+
+                } else if (isSoapHeader) {
+                    for (Iterator itr = synCtx.getEnvelope().getHeader().getChildElements();
+                         itr.hasNext();) {
+						OMElement child = (OMElement) itr.next();
+						child.detach();
+					}
+
+					for (Iterator itr = result.getChildElements(); itr.hasNext();) {
+						OMElement child = (OMElement) itr.next();
+						synCtx.getEnvelope().getHeader().addChild(child);
+					}
 
                 } else {
                     sourceNode.insertSiblingAfter(result);

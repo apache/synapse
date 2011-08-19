@@ -475,11 +475,12 @@ public class Axis2FlexibleMEPClient {
             }
         }
 
-        if (restContentType instanceof String) {
-
+        if (restContentType != null && restContentType instanceof String) {
+            String contentType = TransportUtils.getContentType((String) restContentType, originalInMsgCtx);
             axisOutMsgCtx.setProperty(
-                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
-                    TransportUtils.getContentType((String)restContentType, originalInMsgCtx));
+                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE, contentType);
+            originalInMsgCtx.setProperty(
+                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE, contentType);
         }
     }
 

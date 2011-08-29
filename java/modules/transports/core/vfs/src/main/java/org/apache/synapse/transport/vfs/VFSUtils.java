@@ -177,7 +177,12 @@ public class VFSUtils extends BaseUtils {
      */
     public static void releaseLock(FileSystemManager fsManager, FileObject fo) {
         try {
-            FileObject lockObject = fsManager.resolveFile(fo.getURL().toString() + ".lock");
+            String fullPath = fo.getURL().toString();
+            int pos = fullPath.indexOf("?");
+            if (pos > -1) {
+                fullPath = fullPath.substring(0, pos);
+            }
+            FileObject lockObject = fsManager.resolveFile(fullPath + ".lock");
             if (lockObject.exists()) {
                 lockObject.delete();
             }

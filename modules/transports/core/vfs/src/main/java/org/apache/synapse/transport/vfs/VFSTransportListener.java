@@ -187,18 +187,23 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 wasError = false;
 
             } catch (FileSystemException e) {
-                log.error("cannot resolve fileObject", e);
-                if (maxRetryCount <= retryCount)
-                    processFailure("cannot resolve fileObject repeatedly: "
-                            + e.getMessage(), e, entry);
-                return;
+                if (retryCount >= maxRetryCount) {
+                    processFailure("Repeatedly failed to resolve the file URI: " +
+                            VFSUtils.maskURLPassword(fileURI), e, entry);
+                    return;
+                } else {
+                    log.warn("Failed to resolve the file URI: " +
+                            VFSUtils.maskURLPassword(fileURI) + ", in attempt " + retryCount +
+                            ", " + e.getMessage() + " Retrying in " + reconnectionTimeout +
+                            " milliseconds.");
+                }
             }
 
             if (wasError) {
                 try {
                     Thread.sleep(reconnectionTimeout);
                 } catch (InterruptedException e2) {
-                    e2.printStackTrace();
+                    log.error("Thread was interrupted while waiting to reconnect.", e2);
                 }
             }
         }

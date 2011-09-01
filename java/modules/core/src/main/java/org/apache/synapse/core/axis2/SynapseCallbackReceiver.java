@@ -29,6 +29,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -304,10 +305,15 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 response.removeProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
             }
 
-             // copy the message type property thats used by the out message to the response message
-            response.setProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
-                axisOutMsgCtx.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE));
-            
+            Object messageType = axisOutMsgCtx.getProperty(
+                    org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
+            if (!HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(messageType)) {
+                 // copy the message type property that's used by the out message to the
+                 // response message
+                response.setProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
+                    messageType);
+            }
+
             // compare original received message (axisOutMsgCtx) soap version with the response
             // if they are different change to original version 
             if(axisOutMsgCtx.isSOAP11() != response.isSOAP11()) {

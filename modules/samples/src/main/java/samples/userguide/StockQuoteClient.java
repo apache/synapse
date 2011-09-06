@@ -20,7 +20,7 @@
 package samples.userguide;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.Constants;
@@ -40,6 +40,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import samples.common.StockQuoteHandler;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -269,8 +271,13 @@ public class StockQuoteClient {
     }
 
     private static Policy loadPolicy(String xmlPath) throws Exception {
-        StAXOMBuilder builder = new StAXOMBuilder(xmlPath);
-        return PolicyEngine.getPolicy(builder.getDocumentElement());
+        InputStream in = new FileInputStream(xmlPath);
+        try {
+            return PolicyEngine.getPolicy(
+                    OMXMLBuilderFactory.createOMBuilder(in).getDocumentElement());
+        } finally {
+            in.close();
+        }
     }
 
     private static double getRandom(double base, double varience, boolean onlypositive) {

@@ -468,13 +468,13 @@ public class MessageHelper {
                     if (!preserveAddressing) {
                         // if we don't need to preserve addressing headers remove without checking
                         if (headerBlock.isProcessed()) {
-                            headerBlock.detach();
+                            it.remove();
                         }
                     } else {
                         // else remove only if not an addressing header
                         if (!isAddressingHeader(headerBlock)) {
                             if (headerBlock.isProcessed()) {
-                                headerBlock.detach();
+                                it.remove();
                             }
                         }
                     }

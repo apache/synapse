@@ -18,7 +18,7 @@
   -->
 
 <serviceGroup>
-<service name="SecureStockQuoteService">
+<service name="SecureStockQuoteService" scope="application">
 	<module ref="rampart"/>
 	
     <messageReceivers>

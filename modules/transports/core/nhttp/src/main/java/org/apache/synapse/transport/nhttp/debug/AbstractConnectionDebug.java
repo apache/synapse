@@ -19,10 +19,9 @@
 
 package org.apache.synapse.transport.nhttp.debug;
 
+import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.http.Header;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +30,7 @@ import java.util.List;
  */
 public abstract class AbstractConnectionDebug {
 
-    protected final DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
+    protected static final FastDateFormat formatter = FastDateFormat.getInstance("HH:mm:ss.SSS");
 
     protected String keyValueSeparator;
     protected String fieldSeparator;

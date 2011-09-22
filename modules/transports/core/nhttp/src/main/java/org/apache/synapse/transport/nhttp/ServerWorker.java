@@ -250,11 +250,25 @@ public class ServerWorker implements Runnable {
         msgContext.setProperty(NhttpConstants.REST_URL_POSTFIX, uri);
         String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));
         if (servicePrefix.indexOf("://") == -1) {
-            HttpInetConnection inetConn = (HttpInetConnection) conn;
-            InetAddress localAddr = inetConn.getLocalAddress();
-            if (localAddr != null) {
-                servicePrefix = (isHttps ? "https://" : "http://") +
-                        localAddr.getHostName() + ":" + inetConn.getLocalPort() + servicePrefix;
+            // If the URL in the request line is not absolute, then we first try to get the Host
+            // header to build the absolute URL. We only use the local network address/port of
+            // the HTTP connection if no Host header is present. This is not only consistent, but
+            // also avoids the overhead of the InetAddress#getHostName() method.
+            String host;
+            Header hostHeader = request.getFirstHeader(HTTP.TARGET_HOST);
+            if (hostHeader != null) {
+                host = hostHeader.getValue();
+            } else {
+                HttpInetConnection inetConn = (HttpInetConnection) conn;
+                InetAddress localAddr = inetConn.getLocalAddress();
+                if (localAddr != null) {
+                    host = localAddr.getHostName() + ":" + inetConn.getLocalPort();
+                } else {
+                    host = null;
+                }
+            }
+            if (host != null) {
+                servicePrefix = (isHttps ? "https://" : "http://") + host + servicePrefix;
             }
         }
         msgContext.setProperty(NhttpConstants.SERVICE_PREFIX, servicePrefix);

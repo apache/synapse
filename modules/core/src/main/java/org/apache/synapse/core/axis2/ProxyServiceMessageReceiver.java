@@ -38,6 +38,12 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
     private static final Log log = LogFactory.getLog(ProxyServiceMessageReceiver.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
+    /**
+     * LogFactory instance used to look up the service log. Note that the lookup of the LogFactory
+     * is relatively expensive, while the lookup of the Log instance is very fast.
+     */
+    private static final LogFactory logFactory = LogFactory.getFactory();
+    
     /** The name of the Proxy Service */
     private String name = null;
     /** The proxy service */
@@ -79,7 +85,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 ComponentType.PROXYSERVICE);
         
         // get service log for this message and attach to the message context also set proxy name
-        Log serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + name);
+        Log serviceLog = logFactory.getInstance(SynapseConstants.SERVICE_LOGGER_PREFIX + name);
         ((Axis2MessageContext) synCtx).setServiceLog(serviceLog);
 
         synCtx.setProperty(SynapseConstants.PROXY_SERVICE, name);

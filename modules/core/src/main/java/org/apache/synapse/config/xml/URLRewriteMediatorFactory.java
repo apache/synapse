@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.Mediator;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.config.EvaluatorFactoryFinder;
@@ -136,15 +135,16 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
         String value = actionElement.getAttributeValue(ATT_VALUE);
         String xpath = actionElement.getAttributeValue(ATT_XPATH);
         String type = actionElement.getAttributeValue(ATT_TYPE);
-
+        QName xpath_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "xpath");
+        
         if (value == null && xpath == null && !ACTION_REMOVE.equals(type)) {
             handleException("value or xpath attribute is required on the action element");
         }
 
         RewriteAction action = new RewriteAction();
         if (xpath != null) {
-            try {
-                action.setXpath(new SynapseXPath(xpath));
+            try {        
+            	action.setXpath(SynapseXPathFactory.getSynapseXPath(actionElement, xpath_Q));
             } catch (JaxenException e) {
                 handleException("Error while parsing the XPath expression: " + xpath, e);
             }

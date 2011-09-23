@@ -1409,6 +1409,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
 <pre xml:space="preserve"> &lt;validate [source="xpath"]&gt;
    &lt;property name="validation-feature-id" value="true|false"/&gt;*
    &lt;schema key="string"/&gt;+
+   &lt;resource location="string" key="string"/&gt; +
    &lt;on-fail&gt;
      mediator+
    &lt;/on-fail&gt;
@@ -1421,7 +1422,12 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
       the on-fail sequence of mediators is executed. Properties could be used to
       turn on/off some of the underlying features of the validator (See <a
       href="http://xerces.apache.org/xerces2-j/features.html">http://xerces.apache.org/xerces2-j/features.html</a>)
-    </p>
+	  </p>
+	  <p>
+	  The &lt;resource&gt;  can be used to specify external schema resources, which can be used to 
+	  validate the messages. External schema resources can be defined as localentries and with &lt;resource&gt;
+	  user could point the specified localentries.
+	  </p>
     <p/>
     <h4>
       <a name="Callout" id="Callout">Callout</a>

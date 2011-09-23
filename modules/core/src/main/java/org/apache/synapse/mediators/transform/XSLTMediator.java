@@ -230,6 +230,8 @@ public class XSLTMediator extends AbstractMediator {
                 // only first thread should create the template
                 if (isCreationOrRecreationRequired(synCtx)) {
                     cachedTemplates = createTemplate(synCtx, synLog, generatedXsltKey);
+                } else {
+                    cachedTemplates = cachedTemplatesMap.get(generatedXsltKey);
                 }
             }
         }

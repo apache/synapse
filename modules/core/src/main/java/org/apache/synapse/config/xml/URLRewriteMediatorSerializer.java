@@ -94,8 +94,8 @@ public class URLRewriteMediatorSerializer extends AbstractMediatorSerializer {
         OMElement action = fac.createOMElement("action", synNS);
         if (a.getValue() != null) {
             action.addAttribute("value", a.getValue(), null);
-        } else if (a.getXpath() != null) {
-            action.addAttribute("xpath", a.getXpath().toString(), null);
+        } else if (a.getXpath() != null) {         
+            SynapseXPathSerializer.serializeXPath(a.getXpath(), action, "xpath");
         }
 
         if (a.getRegex() != null) {

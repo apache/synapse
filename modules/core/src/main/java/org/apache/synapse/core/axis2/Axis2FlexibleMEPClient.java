@@ -181,7 +181,15 @@ public class Axis2FlexibleMEPClient {
                 }                
 
             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {
-                axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
+                if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {
+                    if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD).
+                            toString().equals(Constants.Configuration.HTTP_METHOD_GET)
+                            || originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD).
+                            toString().equals(Constants.Configuration.HTTP_METHOD_DELETE)) {
+                        // Removing message type for GET and DELETE requests
+                        axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);
+                    }
+                }
                 axisOutMsgCtx.setDoingREST(true);
             } else {
                 processWSDL2RESTRequestMessageType(originalInMsgCtx, axisOutMsgCtx);

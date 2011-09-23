@@ -95,8 +95,8 @@ public class Source {
                     } else if (o instanceof OMText) {
                         sourceNodeList.add((OMText) o);
                     } else if (o instanceof String) {
-			OMFactory fac = OMAbstractFactory.getOMFactory();
-			sourceNodeList.add(fac.createOMText(o.toString()));	
+                        OMFactory fac = OMAbstractFactory.getOMFactory();
+                        sourceNodeList.add(fac.createOMText(o.toString()));
                     }
                 }
             } else {
@@ -124,32 +124,9 @@ public class Source {
                     sourceNodeList.add(((OMElement) o).cloneOMElement());
                 }
             } else if (o instanceof String) {
-                String soap = (String) o;
-                try {
-                    XMLStreamReader xmlReader =
-                            StAXUtils.createXMLStreamReader(new ByteArrayInputStream(soap.getBytes()));
-                    StAXBuilder builder = new StAXSOAPModelBuilder(xmlReader);
-                    OMElement elem = builder.getDocumentElement();
-                    elem.build();
-                    if (elem instanceof SOAPEnvelope) {
-                        SOAPEnvelope soapEnvelope = (SOAPEnvelope) elem;
-                        String soapNamespace = soapEnvelope.getNamespace().getNamespaceURI();
-                        if (soapEnvelope.getHeader() == null) {
-                            SOAPFactory soapFactory;
-                            if (soapNamespace.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-                                soapFactory = OMAbstractFactory.getSOAP12Factory();
-                            } else {
-                                soapFactory = OMAbstractFactory.getSOAP11Factory();
-                            }
-                            soapFactory.createSOAPHeader(soapEnvelope);
-                        }
-                        sourceNodeList.add(soapEnvelope);
-                    } else {
-                        sourceNodeList.add(elem);
-                    }
-                } catch (XMLStreamException e) {
-                    synLog.error("Source Property cannot be parsed : " + e.getStackTrace().toString());
-                }
+                String sourceStr = (String) o;
+                OMFactory fac = OMAbstractFactory.getOMFactory();
+                sourceNodeList.add(fac.createOMText(sourceStr));
             } else if (o instanceof ArrayList) {
                 ArrayList nodesList = (ArrayList) o;
                 for (Object node : nodesList) {
@@ -211,7 +188,7 @@ public class Source {
                         sourceNodeList.add((OMElement) inlineObj);
                     }
                 } else if (inlineObj instanceof OMText) {
-                    sourceNodeList.add((OMText)inlineObj);
+                    sourceNodeList.add((OMText) inlineObj);
                 } else if (inlineObj instanceof String) {
                     sourceNodeList.add(
                             OMAbstractFactory.getOMFactory().createOMText(inlineObj.toString()));

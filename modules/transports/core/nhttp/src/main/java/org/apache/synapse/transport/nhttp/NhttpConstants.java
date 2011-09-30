@@ -90,13 +90,14 @@ public class NhttpConstants {
     public static final int SND_IO_ERROR_SENDING   = 101500;
     public static final int SND_IO_ERROR_RECEIVING = 101501;
 
-    public static final int CONNECTION_FAILED  = 101503;
-    public static final int CONNECTION_TIMEOUT = 101504;
-    public static final int CONNECTION_CLOSED  = 101505;
-    public static final int PROTOCOL_VIOLATION = 101506;
-    public static final int CONNECT_CANCEL     = 101507;
-    public static final int CONNECT_TIMEOUT    = 101508;
-    public static final int SEND_ABORT         = 101509;
+    public static final int CONNECTION_FAILED           = 101503;
+    public static final int CONNECTION_TIMEOUT          = 101504;
+    public static final int CONNECTION_CLOSED           = 101505;
+    public static final int PROTOCOL_VIOLATION          = 101506;
+    public static final int CONNECT_CANCEL              = 101507;
+    public static final int CONNECT_TIMEOUT             = 101508;
+    public static final int SEND_ABORT                  = 101509;
+    public static final int RESPONSE_PROCESSING_FAILURE = 101510;
     // ********** DO NOT CHANGE THESE UNLESS CORRESPONDING SYNAPSE CONSTANT ARE CHANGED ************
 
     public static final String REST_URL_POSTFIX = "REST_URL_POSTFIX";

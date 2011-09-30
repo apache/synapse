@@ -31,6 +31,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -251,7 +252,28 @@ public class ClientWorker implements Runnable {
             try {
                 AxisEngine.receive(responseMsgCtx);
             } catch (AxisFault af) {
-                log.error("Fault processing response message through Axis2", af);
+                 // This will be reached if an exception is thrown within an Axis2 handler
+                String errorMessage = "Fault processing response message through Axis2: " +
+                        af.getMessage();
+
+                log.warn(errorMessage);
+                if (log.isDebugEnabled()) {
+                    log.debug(errorMessage, af);
+                    log.debug("Directly invoking SynapseCallbackReceiver after setting " +
+                            "error properties");
+                }
+
+                responseMsgCtx.setProperty(
+                        NhttpConstants.SENDING_FAULT, Boolean.TRUE);
+                responseMsgCtx.setProperty(
+                        NhttpConstants.ERROR_CODE, NhttpConstants.RESPONSE_PROCESSING_FAILURE);
+                responseMsgCtx.setProperty(
+                        NhttpConstants.ERROR_MESSAGE, errorMessage.split("\n")[0]);
+                responseMsgCtx.setProperty(
+                        NhttpConstants.ERROR_DETAIL, JavaUtils.stackToString(af));
+                responseMsgCtx.setProperty(
+                        NhttpConstants.ERROR_EXCEPTION, af);
+                responseMsgCtx.getAxisOperation().getMessageReceiver().receive(responseMsgCtx);
             }
 
         } catch (AxisFault af) {

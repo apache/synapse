@@ -377,12 +377,13 @@ public final class SynapseConstants {
     public static final int SND_IO_ERROR_SENDING     = 101500;
     public static final int SND_IO_ERROR_RECEIVING   = 101501;
 
-    public static final int NHTTP_CONNECTION_FAILED  = 101503;
-    public static final int NHTTP_CONNECTION_TIMEOUT = 101504;
-    public static final int NHTTP_CONNECTION_CLOSED  = 101505;
-    public static final int NHTTP_PROTOCOL_VIOLATION = 101506;
-    public static final int NHTTP_CONNECT_CANCEL     = 101507;
-    public static final int NHTTP_CONNECT_TIMEOUT    = 101508;
+    public static final int NHTTP_CONNECTION_FAILED           = 101503;
+    public static final int NHTTP_CONNECTION_TIMEOUT          = 101504;
+    public static final int NHTTP_CONNECTION_CLOSED           = 101505;
+    public static final int NHTTP_PROTOCOL_VIOLATION          = 101506;
+    public static final int NHTTP_CONNECT_CANCEL              = 101507;
+    public static final int NHTTP_CONNECT_TIMEOUT             = 101508;
+    public static final int NHTTP_RESPONSE_PROCESSING_FAILURE = 101510;
 
     // Endpoint failures
     public static final int ENDPOINT_LB_NONE_READY   = 303000;

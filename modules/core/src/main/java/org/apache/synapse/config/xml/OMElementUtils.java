@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMContainer;
-import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
@@ -89,36 +88,22 @@ public class OMElementUtils {
      * @param log
      */
     public static void addNameSpaces(XPath xpath, OMElement elem, Log log) {
+        Iterator it = elem.getNamespacesInScope();
+        while (it.hasNext()) {
 
-        OMElement currentElem = elem;
+            OMNamespace n = (OMNamespace) it.next();
+            // Exclude the default namespace as explained in the Javadoc above
+            if (n.getPrefix().length() > 0) {
 
-        while (currentElem != null) {
-            Iterator it = currentElem.getAllDeclaredNamespaces();
-            while (it.hasNext()) {
-
-                OMNamespace n = (OMNamespace) it.next();
-                // Exclude the default namespace as explained in the Javadoc above
-                if (n != null && !"".equals(n.getPrefix())) {
-
-                    try {
-                        xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
-                    } catch (JaxenException je) {
-                        String msg = "Error adding declared name space with prefix : "
-                            + n.getPrefix() + "and uri : " + n.getNamespaceURI()
-                            + " to the XPath : " + xpath;
-                        log.error(msg);
-                        throw new SynapseException(msg, je);
-                    }
+                try {
+                    xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
+                } catch (JaxenException je) {
+                    String msg = "Error adding declared name space with prefix : "
+                        + n.getPrefix() + "and uri : " + n.getNamespaceURI()
+                        + " to the XPath : " + xpath;
+                    log.error(msg);
+                    throw new SynapseException(msg, je);
                 }
-            }
-
-            OMContainer parent = currentElem.getParent();
-            //if the parent is a document element or parent is null ,then return
-            if (parent == null || parent instanceof OMDocument) {
-                return;
-            }
-            if (parent instanceof OMElement) {
-                currentElem = (OMElement) parent;
             }
         }
     }

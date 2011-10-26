@@ -155,7 +155,7 @@ public class Value {
     }
 
     public void setNamespaces(OMElement elem){
-        Iterator namespaces = elem.getAllDeclaredNamespaces();
+        Iterator namespaces = elem.getNamespacesInScope();
         while (namespaces.hasNext()){
             OMNamespace ns = (OMNamespace) namespaces.next();
             namespaceList.add(ns);

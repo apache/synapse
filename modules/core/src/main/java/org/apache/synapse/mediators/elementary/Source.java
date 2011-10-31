@@ -24,21 +24,16 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.impl.builder.StAXBuilder;
-import org.apache.axiom.om.util.StAXUtils;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,7 +157,7 @@ public class Source {
         } else if (sourceType == EnrichMediator.INLINE) {
             if (inlineOMNode instanceof OMElement) {
                 OMElement inlineOMElement = (OMElement) inlineOMNode;
-                if (inlineOMElement.getQName().getLocalPart().equals("Envelope")) {
+                if (inlineOMElement.getLocalName().equals("Envelope")) {
                     SOAPEnvelope soapEnvelope = getSOAPEnvFromOM(inlineOMElement);
                     if (soapEnvelope != null) {
                         sourceNodeList.add(soapEnvelope);
@@ -177,7 +172,7 @@ public class Source {
             } else if (inlineKey != null) {
                 Object inlineObj = synCtx.getEntry(inlineKey);
                 if (inlineObj instanceof OMElement) {
-                    if (((OMElement) inlineObj).getQName().getLocalPart().equals("Envelope")) {
+                    if (((OMElement) inlineObj).getLocalName().equals("Envelope")) {
                         SOAPEnvelope soapEnvelope = getSOAPEnvFromOM((OMElement) inlineObj);
                         if (soapEnvelope != null) {
                             sourceNodeList.add(soapEnvelope);
@@ -203,16 +198,8 @@ public class Source {
     }
 
     private SOAPEnvelope getSOAPEnvFromOM(OMElement inlineElement) {
-        SOAPFactory soapFactory;
-        if (inlineElement.getQName().getNamespaceURI().equals(
-                SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-            soapFactory = OMAbstractFactory.getSOAP12Factory();
-        } else {
-            soapFactory = OMAbstractFactory.getSOAP11Factory();
-        }
-        StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(inlineElement.getXMLStreamReader(),
-                soapFactory, inlineElement.getQName().getNamespaceURI());
-        return builder.getSOAPEnvelope();
+        return OMXMLBuilderFactory.createStAXSOAPModelBuilder(
+                inlineElement.getXMLStreamReader()).getSOAPEnvelope();
     }
 
     public SynapseXPath getXpath() {

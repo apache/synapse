@@ -263,7 +263,7 @@ public class Axis2FlexibleMEPClient {
                     && axisOutMsgCtx.getEnvelope().getBody().getFirstElement() != null) {
                 axisOutMsgCtx.setProperty(WSDL2Constants.ATTR_WHTTP_LOCATION,
                         axisOutMsgCtx.getEnvelope().getBody().getFirstElement()
-                                .getQName().getLocalPart());
+                                .getLocalName());
             }
         }
 

@@ -57,31 +57,51 @@ public class Axis2HttpRequest {
 
     private static final Log log = LogFactory.getLog(Axis2HttpRequest.class);
 
-    /** the EPR of the destination */
+    /**
+     * the EPR of the destination
+     */
     private EndpointReference epr = null;
-    /** the HttpHost that contains the HTTP connection information */
+    /**
+     * the HttpHost that contains the HTTP connection information
+     */
     private HttpHost httpHost = null;
-    /** The [socket | connect] timeout */
+    /**
+     * The [socket | connect] timeout
+     */
     private int timeout = -1;
-    /** the message context being sent */
+    /**
+     * the message context being sent
+     */
     private MessageContext msgContext = null;
-    /** The Axis2 MessageFormatter that will ensure proper serialization as per Axis2 semantics */
+    /**
+     * The Axis2 MessageFormatter that will ensure proper serialization as per Axis2 semantics
+     */
     MessageFormatter messageFormatter = null;
-    /** The OM Output format holder */
+    /**
+     * The OM Output format holder
+     */
     OMOutputFormat format = null;
     private ContentOutputBuffer outputBuffer = null;
-    /** ready to begin streaming? */
+    /**
+     * ready to begin streaming?
+     */
     private volatile boolean readyToStream = false;
-    /** The sending of this request has fully completed */
+    /**
+     * The sending of this request has fully completed
+     */
     private volatile boolean sendingCompleted = false;
     /**
      * for request complete checking - request complete means the request has been fully sent
      * and the response it fully received
      */
     private volatile boolean completed = false;
-    /** The URL prefix of the endpoint (to be used for Location header re-writing in the response)*/
+    /**
+     * The URL prefix of the endpoint (to be used for Location header re-writing in the response)
+     */
     private String endpointURLPrefix = null;
-    /** weather chunking is enabled or not */
+    /**
+     * weather chunking is enabled or not
+     */
     private boolean chunked = true;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
@@ -141,6 +161,7 @@ public class Axis2HttpRequest {
 
     /**
      * Create and return a new HttpPost request to the destination EPR
+     *
      * @return the HttpRequest to be sent out
      * @throws IOException in error retrieving the <code>HttpRequest</code>
      */
@@ -157,12 +178,12 @@ public class Axis2HttpRequest {
 
             URL url = new URL(epr.getAddress());
             httpRequest = new BasicHttpEntityEnclosingRequest(
-                httpMethod,
-                msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
-                    epr.getAddress() : url.getPath()
-                        + (url.getQuery() != null ? "?" + url.getQuery() : ""),
-                msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
-                    HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
+                    httpMethod,
+                    msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
+                            epr.getAddress() : url.getPath()
+                            + (url.getQuery() != null ? "?" + url.getQuery() : ""),
+                    msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
+                            HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
 
             BasicHttpEntity entity = new BasicHttpEntity();
 
@@ -177,10 +198,10 @@ public class Axis2HttpRequest {
             ((BasicHttpEntityEnclosingRequest) httpRequest).setEntity(entity);
 
             httpRequest.setHeader(
-                HTTP.CONTENT_TYPE,
-                messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+                    HTTP.CONTENT_TYPE,
+                    messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
-        } else if ("GET".equals(httpMethod)) {
+        } else if ("GET".equals(httpMethod) || "DELETE".equals(httpMethod)) {
 
             URL reqURI = messageFormatter.getTargetAddress(
                     msgContext, format, new URL(epr.getAddress()));
@@ -196,13 +217,14 @@ public class Axis2HttpRequest {
                     msgContext, format, msgContext.getSoapAction()));
 
         } else {
-
+            URL reqURI = new URL(epr.getAddress());
             httpRequest = new BasicHttpRequest(
-                httpMethod,
-                msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
-                    epr.getAddress() : new URL(epr.getAddress()).getPath(),
-                msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
-                    HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
+                    httpMethod,
+                    msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI) ?
+                            epr.getAddress() : reqURI.getPath()
+                            + (reqURI.getQuery() != null ? "?" + reqURI.getQuery() : ""),
+                    msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0) ?
+                            HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
         }
 
         // set any transport headers
@@ -231,18 +253,18 @@ public class Axis2HttpRequest {
         }
 
         if (msgContext.isSOAP11() && soapAction != null &&
-            soapAction.length() > 0) {
+                soapAction.length() > 0) {
             Header existingHeader =
-                httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
+                    httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
             if (existingHeader != null) {
                 httpRequest.removeHeader(existingHeader);
             }
             httpRequest.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
-                messageFormatter.formatSOAPAction(msgContext, null, soapAction));
+                    messageFormatter.formatSOAPAction(msgContext, null, soapAction));
         }
 
         if (NHttpConfiguration.getInstance().isKeepAliveDisabled() ||
-            msgContext.isPropertyTrue(NhttpConstants.NO_KEEPALIVE)) {
+                msgContext.isPropertyTrue(NhttpConstants.NO_KEEPALIVE)) {
             httpRequest.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
         }
 
@@ -252,6 +274,7 @@ public class Axis2HttpRequest {
     /**
      * Start streaming the message into the Pipe, so that the contents could be read off the source
      * channel returned by getSourceChannel()
+     *
      * @throws AxisFault on error
      */
     public void streamMessageContents() throws AxisFault {
@@ -264,11 +287,12 @@ public class Axis2HttpRequest {
             }
         }
 
-        synchronized(this) {
+        synchronized (this) {
             while (!readyToStream && !completed) {
                 try {
                     this.wait();
-                } catch (InterruptedException ignore) {}
+                } catch (InterruptedException ignore) {
+                }
             }
         }
 
@@ -289,11 +313,11 @@ public class Axis2HttpRequest {
                 if (t != null && t.getCause() != null && t.getCause() instanceof ClosedChannelException) {
                     if (log.isDebugEnabled()) {
                         log.debug("Ignore closed channel exception, as the " +
-                            "SessionRequestCallback handles this exception");
+                                "SessionRequestCallback handles this exception");
                     }
                 } else {
                     Integer errorCode = msgContext == null ? null :
-                        (Integer) msgContext.getProperty(NhttpConstants.ERROR_CODE);
+                            (Integer) msgContext.getProperty(NhttpConstants.ERROR_CODE);
                     if (errorCode == null || errorCode == NhttpConstants.SEND_ABORT) {
                         if (log.isDebugEnabled()) {
                             log.debug("Remote server aborted request being sent, and responded");
@@ -306,8 +330,7 @@ public class Axis2HttpRequest {
                         }
                     }
                 }
-            }
-            finally {
+            } finally {
                 try {
                     out.flush();
                     out.close();
@@ -321,6 +344,7 @@ public class Axis2HttpRequest {
 
     /**
      * Write the stream to a temporary storage and calculate the content length
+     *
      * @param entity HTTPEntity
      * @throws IOException if an exception occurred while writing data
      */
@@ -338,6 +362,7 @@ public class Axis2HttpRequest {
 
     /**
      * Take the data from temporary storage and write it to the output stream
+     *
      * @param out output stream
      * @throws IOException if an exception occurred while writing data
      */

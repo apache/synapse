@@ -478,7 +478,8 @@ public class Axis2FlexibleMEPClient {
 
             String httpMethod = (String) originalInMsgCtx.getProperty(
                     Constants.Configuration.HTTP_METHOD);
-            if (Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)) {
+            if (Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)
+                    || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod)) {
                 restContentType = HTTPConstants.MEDIA_TYPE_X_WWW_FORM;
             }
         }
@@ -508,7 +509,8 @@ public class Axis2FlexibleMEPClient {
             String httpMethod = (String) originalInMsgCtx.getProperty(
                     Constants.Configuration.HTTP_METHOD);
 
-            isRestRequest = Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod);
+            isRestRequest = Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)
+                    || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod);
 
             if (!isRestRequest) {
 

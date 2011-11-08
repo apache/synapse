@@ -19,22 +19,33 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
+import java.util.Collection;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.PropertyInclude;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.PropertyInclude;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.aspects.statistics.StatisticsConfigurable;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.MediatorPropertySerializer;
-import org.apache.synapse.endpoints.*;
+import org.apache.synapse.endpoints.AbstractEndpoint;
+import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.DefaultEndpoint;
+import org.apache.synapse.endpoints.DynamicLoadbalanceEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
-
-import javax.xml.namespace.QName;
-import java.util.Collection;
+import org.apache.synapse.endpoints.FailoverEndpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
+import org.apache.synapse.endpoints.LoadbalanceEndpoint;
+import org.apache.synapse.endpoints.RecipientListEndpoint;
+import org.apache.synapse.endpoints.ResolvingEndpoint;
+import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
+import org.apache.synapse.endpoints.TemplateEndpoint;
+import org.apache.synapse.endpoints.WSDLEndpoint;
+import org.apache.synapse.mediators.MediatorProperty;
 
 /**
  * All endpoint serializers should implement this interface. Use EndpointSerializer to
@@ -135,6 +146,8 @@ public abstract class EndpointSerializer {
             return new FailoverEndpointSerializer();
         } else if (endpoint instanceof TemplateEndpoint) {
             return new TemplateEndpointSerializer();
+        } else if(endpoint instanceof RecipientListEndpoint){
+        	return new RecipientListEndpointSerializer();
         }
 
         throw new SynapseException("Serializer for endpoint " +

@@ -232,6 +232,12 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
         if (foElement != null) {
             return FailoverEndpointFactory.getInstance();
         }
+        
+        OMElement rcplElement = configElement.getFirstChildWithName
+        		(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "recipientlist"));
+        if(rcplElement != null){
+        	return RecipientListEndpointFactory.getInstance();
+        }
 
         handleException("Invalid endpoint configuration.");
         // just to make the compiler happy : never executes

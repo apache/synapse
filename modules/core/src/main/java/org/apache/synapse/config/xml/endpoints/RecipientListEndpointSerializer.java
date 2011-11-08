@@ -81,7 +81,7 @@ public class RecipientListEndpointSerializer extends EndpointSerializer {
             OMElement dynamicEpEle = fac.createOMElement(
                     "endpoints", SynapseConstants.SYNAPSE_OMNAMESPACE, recipientListElement);
             new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEnpointSet(), "value", dynamicEpEle);
-            dynamicEpEle.addAttribute(fac.createOMAttribute("max-cache", null,
+            dynamicEpEle.addAttribute(fac.createOMAttribute("cache", null,
                                                             String.valueOf(recipientListEndpoint.getCurrentPoolSize())));
             recipientListElement.addChild(dynamicEpEle);
         }

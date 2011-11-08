@@ -61,7 +61,6 @@ public class RecipientListEndpoint extends AbstractEndpoint {
 	/**
 	 * Should this recipient list failover;
 	 */
-	private boolean failover;
     private int currentPool;
 
     private SynapseEnvironment env = null;
@@ -129,15 +128,12 @@ public class RecipientListEndpoint extends AbstractEndpoint {
                 } catch (AxisFault e) {
                     handleException("Error cloning the message context", e);
                 }
-
                 //Used when aggregating responses
                 newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
                                    String.valueOf(i++) + EIPConstants.MESSAGE_SEQUENCE_DELEMITER +
                                    children.size());
-
                 // evaluate the endpoint properties
                 evaluateProperties(newCtx);
-
                 newCtx.pushFaultHandler(this);
                 childEndpoint.send(newCtx);
             }
@@ -309,14 +305,6 @@ public class RecipientListEndpoint extends AbstractEndpoint {
 
 	public void setMembers(List<Member> members) {
 		this.members = members;
-	}
-
-	public boolean isFailover() {
-		return failover;
-	}
-
-	public void setFailover(boolean failover) {
-		this.failover = failover;
 	}
 
     public Value getDynamicEnpointSet() {

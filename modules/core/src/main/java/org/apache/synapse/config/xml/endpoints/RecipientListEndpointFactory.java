@@ -112,10 +112,10 @@ public class RecipientListEndpointFactory extends EndpointFactory {
             } else if (recipientListElement.getFirstChildWithName(DYNAMIC_SET) != null) {
                 OMElement dynamicSetElement = recipientListElement.getFirstChildWithName(DYNAMIC_SET);
                 Value dynamicEndpointSet = new ValueFactory().createValue("value", dynamicSetElement);
-                String maxStr = dynamicSetElement.getAttributeValue(new QName("max-cache"));
+                String cachedEpsStr = dynamicSetElement.getAttributeValue(new QName("cache"));
                 int maxCache = -1;
                 try {
-                    maxCache = Integer.parseInt(maxStr);
+                    maxCache = Integer.parseInt(cachedEpsStr);
                 } catch (NumberFormatException e) {
 
                 }

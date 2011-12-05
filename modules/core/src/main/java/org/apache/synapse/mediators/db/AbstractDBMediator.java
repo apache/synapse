@@ -269,57 +269,109 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                 case Types.CHAR:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR: {
-                    ps.setString(column++, value);
+                    if (value != null && value.length() != 0) {
+                        ps.setString(column++, value);
+                    } else {
+                        ps.setString(column++, null);
+                    }
                     break;
                 }
                 case Types.NUMERIC:
                 case Types.DECIMAL: {
-                    ps.setBigDecimal(column++, new BigDecimal(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setBigDecimal(column++, new BigDecimal(value));
+                    } else {
+                        ps.setBigDecimal(column++, null);
+                    }
                     break;
                 }
                 case Types.BIT: {
-                    ps.setBoolean(column++, Boolean.parseBoolean(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setBoolean(column++, Boolean.parseBoolean(value));
+                    } else {
+                        ps.setNull(column++, Types.BIT);
+                    }
                     break;
                 }
                 case Types.TINYINT: {
-                    ps.setByte(column++, Byte.parseByte(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setByte(column++, Byte.parseByte(value));
+                    } else {
+                        ps.setNull(column++, Types.TINYINT);
+                    }
                     break;
                 }
                 case Types.SMALLINT: {
-                    ps.setShort(column++, Short.parseShort(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setShort(column++, Short.parseShort(value));
+                    } else {
+                        ps.setNull(column++, Types.SMALLINT);
+                    }
                     break;
                 }
                 case Types.INTEGER: {
-                    ps.setInt(column++, Integer.parseInt(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setInt(column++, Integer.parseInt(value));
+                    } else {
+                        ps.setNull(column++, Types.INTEGER);
+                    }
                     break;
                 }
                 case Types.BIGINT: {
-                    ps.setLong(column++, Long.parseLong(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setLong(column++, Long.parseLong(value));
+                    } else {
+                        ps.setNull(column++, Types.BIGINT);
+                    }
                     break;
                 }
                 case Types.REAL: {
-                    ps.setFloat(column++, Float.parseFloat(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setFloat(column++, Float.parseFloat(value));
+                    } else {
+                        ps.setNull(column++, Types.REAL);
+                    }
                     break;
                 }
                 case Types.FLOAT: {
-                    ps.setDouble(column++, Double.parseDouble(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setDouble(column++, Double.parseDouble(value));
+                    } else {
+                        ps.setNull(column++, Types.FLOAT);
+                    }
                     break;
                 }
                 case Types.DOUBLE: {
-                    ps.setDouble(column++, Double.parseDouble(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setDouble(column++, Double.parseDouble(value));
+                    } else {
+                        ps.setNull(column++, Types.DOUBLE);
+                    }
                     break;
                 }
                 // skip BINARY, VARBINARY and LONGVARBINARY
                 case Types.DATE: {
-                    ps.setDate(column++, Date.valueOf(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setDate(column++, Date.valueOf(value));
+                    } else {
+                        ps.setNull(column++, Types.DATE);
+                    }
                     break;
                 }
                 case Types.TIME: {
-                    ps.setTime(column++, Time.valueOf(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setTime(column++, Time.valueOf(value));
+                    } else {
+                        ps.setNull(column++, Types.TIME);
+                    }
                     break;
                 }
                 case Types.TIMESTAMP: {
-                    ps.setTimestamp(column++, Timestamp.valueOf(value));
+                    if (value != null && value.length() != 0) {
+                        ps.setTimestamp(column++, Timestamp.valueOf(value));
+                    } else {
+                        ps.setNull(column++, Types.TIMESTAMP);
+                    }
                     break;
                 }
                 // skip CLOB, BLOB, ARRAY, DISTINCT, STRUCT, REF, JAVA_OBJECT

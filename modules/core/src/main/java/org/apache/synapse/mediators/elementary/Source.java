@@ -19,12 +19,7 @@
 
 package org.apache.synapse.mediators.elementary;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -45,7 +40,7 @@ import java.util.List;
  * 3. SOAP Envelope
  * 4. SOAP Body
  * <p/>
- * If clone is true a clone will be create and stored from the origincal content. Otherwise a
+ * If clone is true a clone will be create and stored from the original content. Otherwise a
  * reference will be stored.
  * <p/>
  * In case of property a OMElement is stored in a property and it will be fetched.

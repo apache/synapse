@@ -148,4 +148,3 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
         return view;
     }
 }
-

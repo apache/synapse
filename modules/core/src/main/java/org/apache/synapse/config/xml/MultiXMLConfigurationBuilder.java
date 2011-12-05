@@ -298,7 +298,6 @@ public class MultiXMLConfigurationBuilder {
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
                                 file.getAbsolutePath(), mediator.getName());
                     }
-                    return;
 
                 } else {
                     element = document.getFirstChildWithName(
@@ -312,7 +311,6 @@ public class MultiXMLConfigurationBuilder {
                             synapseConfig.getArtifactDeploymentStore().addArtifact(
                                     file.getAbsolutePath(), endpointTemplate.getName());
                         }
-                        return;
                     }
                 }
             }

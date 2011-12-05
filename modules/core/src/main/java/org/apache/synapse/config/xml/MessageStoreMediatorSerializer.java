@@ -24,8 +24,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.store.MessageStoreMediator;
 
-import javax.xml.namespace.QName;
-
 /**
  * Serialize  an instance of a MessageStore mediator to the XML configuration .
  * <pre>
@@ -35,7 +33,6 @@ import javax.xml.namespace.QName;
  */
 public class MessageStoreMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final QName STORE_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "store");
     private static final String  ATT_MESSAGE_STORE   = "messageStore";
     private static final String  ATT_SEQUENCE   = "sequence";
 
@@ -51,7 +48,7 @@ public class MessageStoreMediatorSerializer extends AbstractMediatorSerializer {
 
         String messageStoreName = messageStoreMediator.getMessageStoreName();
 
-        OMElement storeElem = fac.createOMElement(STORE_Q);
+        OMElement storeElem = fac.createOMElement("store", synNS);
 
         String name = messageStoreMediator.getName();
 

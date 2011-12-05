@@ -169,7 +169,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     public void setName(String endpointName) {
         this.endpointName = endpointName;
         if (enableMBeanStats) {
-            if(endpointName != null && !"".equals(endpointName.trim())){
+            if (endpointName == null || "".equals(endpointName.trim())) {
                 //we skip stat collection for endpoints with no defined name
                 log.warn("Endpoint Name not found. Skipped JMX statistics collection for this endpoint");
                 return;

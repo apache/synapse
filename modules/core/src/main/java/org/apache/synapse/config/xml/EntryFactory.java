@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
@@ -47,6 +48,25 @@ public class EntryFactory implements XMLToObjectMapper {
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
     public static Entry createEntry(OMElement elem, Properties properties) {
+        String customFactory = SynapsePropertiesLoader.getPropertyValue("synapse.entry.factory", "");
+        if (customFactory != null && !"".equals(customFactory)) {
+            try {
+                Class c = Class.forName(customFactory);
+                Object o = c.newInstance();
+                if (o instanceof IEntryFactory) {
+                    return ((IEntryFactory)o).createEntry(elem);
+                }
+            } catch (ClassNotFoundException e) {
+                 handleException("Class specified by the synapse.entry.factory " +
+                         "synapse property not found: " + customFactory, e);
+            } catch (InstantiationException e) {
+                handleException("Class specified by the synapse.entry.factory " +
+                         "synapse property cannot be instantiated: " + customFactory, e);
+            } catch (IllegalAccessException e) {
+                handleException("Class specified by the synapse.entry.factory " +
+                         "synapse property cannot be accessed: " + customFactory, e);
+            }
+        }
 
         OMAttribute key = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
         if (key == null) {
@@ -93,6 +113,11 @@ public class EntryFactory implements XMLToObjectMapper {
 
             return entry;
         }
+    }
+
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 
     private static void handleException(String msg) {

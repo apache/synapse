@@ -218,7 +218,7 @@ public class MessageHelper {
             }
         }
 
-        newMC.setServerSide(ori.isServerSide());
+        newMC.setServerSide(false);
 
         return newMC;
     }

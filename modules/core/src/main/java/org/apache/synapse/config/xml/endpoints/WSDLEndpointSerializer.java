@@ -44,11 +44,6 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
         
         WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) endpoint;
-
-        // serialize the parameters
-        serializeProperties(wsdlEndpoint, endpointElement);
-
-        serializeCommonAttributes(endpoint,endpointElement);
         
 
         OMElement wsdlElement = fac.createOMElement("wsdl", SynapseConstants.SYNAPSE_OMNAMESPACE);
@@ -80,6 +75,10 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         serializer.serializeEndpointDefinition(epDefinition, wsdlElement);
         serializeSpecificEndpointProperties(epDefinition, wsdlElement);
         endpointElement.addChild(wsdlElement);
+
+        // serialize the parameters
+        serializeProperties(wsdlEndpoint, endpointElement);
+        serializeCommonAttributes(endpoint,endpointElement);
 
         return endpointElement;
     }

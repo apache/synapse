@@ -704,7 +704,8 @@ public class Axis2SynapseController implements SynapseController {
                 }
             } catch (SynapseException e) {
                 if (failSafeProxyEnabled) {
-                    log.warn("The proxy service " + proxy.getName() + " cannot be deployed. Continue in Proxy Service fail-safe mode.");
+                    log.warn("The proxy service " + proxy.getName() + " cannot be deployed - " +
+                            "Continue in Proxy Service fail-safe mode.");
                 } else {
                     handleException("The proxy service " + proxy.getName() + " : Deployment Error");
                 }

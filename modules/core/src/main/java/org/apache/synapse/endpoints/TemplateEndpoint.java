@@ -90,8 +90,11 @@ public class TemplateEndpoint extends AbstractEndpoint {
                 getEndpointTemplate(template);
 
         if (endpointTemplate == null) {
-            handleException("Template " + template +
+            //if template is not already available we will warn the user
+            //thus template endpoint will get initialized at runtime
+            log.warn("Template " + template +
                     " cannot be found for the endpoint " + getName());
+            return;
         }
 
         reLoadAndInitEndpoint(synapseEnvironment);

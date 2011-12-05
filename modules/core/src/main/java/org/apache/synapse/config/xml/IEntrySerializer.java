@@ -17,20 +17,13 @@
  *  under the License.
  */
 
-package org.apache.synapse.endpoints.algorithms;
+package org.apache.synapse.config.xml;
 
-public class WeightedRoundRobinView implements WeightedRoundRobinViewMBean {
-    private WeightedRoundRobin algorithm = null;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.config.Entry;
 
-    public WeightedRoundRobinView(WeightedRoundRobin algorithm) {
-        this.algorithm = algorithm;
-    }
+public interface IEntrySerializer {
 
-    public void changeWeight(int pos, int weight) {
-        algorithm.changeWeight(pos, weight);
-    }
+    public OMElement serializeEntry(Entry entry, OMElement parent);
 
-    public int[] getCurrentWeights() {
-        return algorithm.getCurrentWeights();
-    }
 }

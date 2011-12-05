@@ -90,7 +90,7 @@ public class MessageProcessorFactory {
             assert processor != null;
             processor.setMessageStoreName(storeAtt.getAttributeValue());
         } else {
-            handleException("Can't create message processor with out a message processor");
+            handleException("Can't create message processor without a message store");
         }
 
         OMElement descriptionElem = elem.getFirstChildWithName(DESCRIPTION_Q);

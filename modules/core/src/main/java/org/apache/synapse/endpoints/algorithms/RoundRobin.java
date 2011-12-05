@@ -26,6 +26,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This is the implementation of the round robin load balancing algorithm. It simply iterates
@@ -41,6 +43,8 @@ public class RoundRobin implements LoadbalanceAlgorithm {
     private List endpoints = null;
 
     private List<Member> members;
+
+    private final Lock lock = new ReentrantLock();
 
     public RoundRobin() {
 
@@ -100,25 +104,38 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         if (members.size() == 0) {
             return null;
         }
-        Member current;
-        synchronized (algorithmContext) {
+        Member current = null;
+        lock.lock();
+        try {
             int currentMemberIndex = algorithmContext.getCurrentEndpointIndex();
             if (currentMemberIndex >= members.size()) {
                 currentMemberIndex = 0;
             }
-            current = members.get(currentMemberIndex);
-            if (currentMemberIndex == members.size() - 1) {
-                currentMemberIndex = 0;
-            } else {
-                currentMemberIndex++;
-            }
+            int index = members.size();
+            do {
+                current = members.get(currentMemberIndex);
+                if (currentMemberIndex == members.size() - 1) {
+                    currentMemberIndex = 0;
+                } else {
+                    currentMemberIndex++;
+                }
+                index--;
+            } while (current.isSuspended() && index > 0);
             algorithmContext.setCurrentEndpointIndex(currentMemberIndex);
             if (log.isDebugEnabled()) {
                 log.debug("Members       : " + members.size());
                 log.debug("Current member: " + current);
             }
+
+        } finally {
+            lock.unlock();
         }
         return current;
+    }
+
+    @Override
+    public LoadbalanceAlgorithm clone() {
+        return new RoundRobin();
     }
 
     public void reset(AlgorithmContext algorithmContext) {

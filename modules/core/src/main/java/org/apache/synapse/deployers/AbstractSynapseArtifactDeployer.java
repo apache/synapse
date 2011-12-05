@@ -29,7 +29,6 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerConfigurationInformation;
@@ -71,6 +70,15 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         this.cfgCtx = configCtx;
     }
 
+    private boolean isHotDeploymentEnabled() {
+        try {
+            return getSynapseConfiguration().isAllowHotUpdate();
+        } catch (DeploymentException e) {
+            log.warn("Error while retrieving the SynapseConfiguration", e);
+            return false;
+        }
+    }
+
     /**
      * This method is called by the axis2 deployment framework and it performs a synapse artifact
      * specific yet common across all the artifacts, set of tasks and delegate the actual deployment
@@ -84,7 +92,15 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
-        String filename = FilenameUtils.normalize(deploymentFileData.getAbsolutePath());
+        if (!isHotDeploymentEnabled()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Hot deployment has been suspended - Ignoring");
+            }
+            return;
+        }
+
+        String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
+                deploymentFileData.getAbsolutePath());
         if (log.isDebugEnabled()) {
             log.debug("Deployment of the synapse artifact from file : " + filename + " : STARTED");
         }
@@ -116,7 +132,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         }
         
         try {
-            InputStream in = new FileInputStream(filename);
+            InputStream in = FileUtils.openInputStream(new File(filename));
             try {
                 // construct the xml element from the file, it has to be XML,
                 // since all synapse artifacts are XML based
@@ -125,7 +141,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 properties.put(SynapseConstants.RESOLVE_ROOT, getSynapseEnvironment()
                         .getServerContextInformation()
                         .getServerConfigurationInformation().getResolveRoot());
-                String artifatcName = null;
+                String artifactName = null;
                 if (deploymentStore.isUpdatingArtifact(filename)) {
 
                     if (log.isDebugEnabled()) {
@@ -136,7 +152,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                             = deploymentStore.getUpdatingArtifactWithFileName(filename);
                     deploymentStore.removeUpdatingArtifact(filename);
                     try {
-                        artifatcName = updateSynapseArtifact(
+                        artifactName = updateSynapseArtifact(
                                 element, filename, existingArtifactName, properties);
                     } catch (SynapseArtifactDeploymentException sade) {
                         log.error("Update of the Synapse Artifact from file : "
@@ -145,12 +161,12 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                                 + backupFile(deploymentFileData.getFile()));
                         log.info("Restoring the existing artifact into the file : " + filename);
                         restoreSynapseArtifact(existingArtifactName);
-                        artifatcName = existingArtifactName;
+                        artifactName = existingArtifactName;
                     }
                 } else {
                     // new artifact hot-deployment case
                     try {
-                        artifatcName = deploySynapseArtifact(element, filename, properties);
+                        artifactName = deploySynapseArtifact(element, filename, properties);
                     } catch (SynapseArtifactDeploymentException sade) {
                         log.error("Deployment of the Synapse Artifact from file : "
                                 + filename + " : Failed!", sade);
@@ -158,8 +174,8 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                                 + backupFile(deploymentFileData.getFile()));
                     }
                 }
-                if (artifatcName != null) {
-                    deploymentStore.addArtifact(filename, artifatcName);
+                if (artifactName != null) {
+                    deploymentStore.addArtifact(filename, artifactName);
                 }
             } finally {
                 in.close();
@@ -191,9 +207,16 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      */
     public void undeploy(String fileName) throws DeploymentException {
 
-        fileName = FilenameUtils.normalize(fileName);
+        if (!isHotDeploymentEnabled()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Hot deployment has been suspended - Ignoring");
+            }
+            return;
+        }
+
+        fileName = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(fileName);
         if (log.isDebugEnabled()) {
-            log.debug("UnDeployment of the synapse artifact from file : "
+            log.debug("Undeployment of the synapse artifact from file : "
                     + fileName + " : STARTED");
         }
 
@@ -207,7 +230,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 log.debug("BackedUp artifact detected with filename : " + fileName);
             }
             // only one undeployment trigger can happen after a backup and hence remove it from
-            // backedUpFiles at the first hit, allowing the further undeploymentsto take place
+            // backedUpFiles at the first hit, allowing the further undeployment to take place
             // as usual
             deploymentStore.removeBackedUpArtifact(fileName);
             return;
@@ -357,7 +380,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
         SynapseArtifactDeploymentStore deploymentStore =
                 getSynapseConfiguration().getArtifactDeploymentStore();
         deploymentStore.addRestoredArtifact(fileName);
-        OutputStream out = new FileOutputStream(new File(fileName));
+        OutputStream out = FileUtils.openOutputStream(new File(fileName));
         XMLPrettyPrinter.prettify(content, out);
         out.flush();
         out.close();
@@ -389,7 +412,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
 
     private void handleDeploymentError(String msg, Exception e, String fileName)
             throws DeploymentException {
-        fileName = FilenameUtils.normalize(fileName);
+        fileName = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(fileName);
         log.error(msg, e);
         SynapseArtifactDeploymentStore deploymentStore =
                 getSynapseConfiguration().getArtifactDeploymentStore();
@@ -404,8 +427,8 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
     }
 
     private String backupFile(File file) throws DeploymentException {
-        String filePath = FilenameUtils.normalize(file.getAbsolutePath());
-
+        String filePath = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
+                file.getAbsolutePath());
         SynapseArtifactDeploymentStore deploymentStore =
                 getSynapseConfiguration().getArtifactDeploymentStore();
 

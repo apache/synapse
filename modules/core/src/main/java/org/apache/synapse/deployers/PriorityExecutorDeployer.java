@@ -35,7 +35,8 @@ import java.io.File;
 import java.util.Properties;
 
 public class PriorityExecutorDeployer extends AbstractSynapseArtifactDeployer {
-    private static Log log = LogFactory.getLog(LocalEntryDeployer.class);
+
+    private static Log log = LogFactory.getLog(PriorityExecutorDeployer.class);
 
     @Override
     public String deploySynapseArtifact(OMElement artifactConfig,

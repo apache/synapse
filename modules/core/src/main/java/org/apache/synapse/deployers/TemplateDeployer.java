@@ -138,7 +138,7 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                         getEndpointTemplate(existingArtifactName);
 
                 if (existingArtifactName.equals(tm.getName())) {
-                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), existingSt);
+                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), tm);
                 } else {
                     getSynapseConfiguration().addEndpointTemplate(tm.getName(), tm);
                     getSynapseConfiguration().removeEndpointTemplate(existingSt.getName());
@@ -171,7 +171,7 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                                 getSequenceTemplate(existingArtifactName);
 
                         if (existingArtifactName.equals(tm.getName())) {
-                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), existingSt);
+                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), tm);
                         } else {
                             getSynapseConfiguration().addSequenceTemplate(tm.getName(), tm);
                             getSynapseConfiguration().removeSequenceTemplate(existingSt.getName());
@@ -206,10 +206,10 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
             try {
                 st = getSynapseConfiguration().getEndpointTemplate(artifactName);
             } catch (SynapseException e) {
-                //could not locate an endpoint template for this particular un-delpoyment. This name refers
-                //probably to a sequence tempalte. Thus if  throws a Synapse exception with following message
+                //could not locate an endpoint template for this particular un-deployment. This name refers
+                //probably to a sequence template. Thus if  throws a Synapse exception with following message
                 //catch n log that and continue this process for undeployment of a sequence template
-                if (e.getMessage().indexOf("Cannot locate an either local or remote enrty for key") != -1) {
+                if (e.getMessage().indexOf("Cannot locate an either local or remote entry for key") != -1) {
                     if (log.isDebugEnabled()) {
                         log.debug("Undeploying template is not of endpoint type. Undeployer will now check " +
                                   "for sequence template for the key: " + artifactName);

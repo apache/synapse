@@ -48,22 +48,22 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
 
         try {
             Startup st = StartupFinder.getInstance().getStartup(artifactConfig, properties);
-                st.setFileName((new File(fileName)).getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("StartupTask named '" + st.getName()
-                            + "' has been built from the file " + fileName);
-                }
-                st.init(getSynapseEnvironment());
-                if (log.isDebugEnabled()) {
-                    log.debug("Initialized the StartupTask : " + st.getName());
-                }
-                getSynapseConfiguration().addStartup(st);
-                if (log.isDebugEnabled()) {
-                    log.debug("StartupTask Deployment from file : " + fileName + " : Completed");
-                }
-                log.info("StartupTask named '" + st.getName()
-                        + "' has been deployed from file : " + fileName);
-                return st.getName();
+            st.setFileName((new File(fileName)).getName());
+            if (log.isDebugEnabled()) {
+                log.debug("StartupTask named '" + st.getName()
+                        + "' has been built from the file " + fileName);
+            }
+            st.init(getSynapseEnvironment());
+            if (log.isDebugEnabled()) {
+                log.debug("Initialized the StartupTask : " + st.getName());
+            }
+            getSynapseConfiguration().addStartup(st);
+            if (log.isDebugEnabled()) {
+                log.debug("StartupTask Deployment from file : " + fileName + " : Completed");
+            }
+            log.info("StartupTask named '" + st.getName()
+                    + "' has been deployed from file : " + fileName);
+            return st.getName();
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError(
                     "StartupTask Deployment from the file : " + fileName + " : Failed.", e);
@@ -87,9 +87,11 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
             if (log.isDebugEnabled()) {
                 log.debug("StartupTask: " + st.getName() + " has been built from the file: " + fileName);
             }
-            st.init(getSynapseEnvironment());
 
             Startup existingSt = getSynapseConfiguration().getStartup(existingArtifactName);
+            existingSt.destroy();
+
+            st.init(getSynapseEnvironment());
             if (existingArtifactName.equals(st.getName())) {
                 getSynapseConfiguration().updateStartup(st);
             } else {
@@ -98,7 +100,6 @@ public class TaskDeployer extends AbstractSynapseArtifactDeployer {
                 log.info("StartupTask: " + existingArtifactName + " has been undeployed");
             }
 
-            existingSt.destroy();
             log.info("StartupTask: " + st.getName() + " has been updated from the file: " + fileName);
             return st.getName();
 

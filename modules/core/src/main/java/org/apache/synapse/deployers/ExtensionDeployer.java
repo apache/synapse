@@ -151,7 +151,7 @@ public class ExtensionDeployer extends AbstractDeployer {
                 = new BufferedReader(new InputStreamReader(servicesURL.openStream()));
             try {
                 String className;
-                while ((className = in.readLine()) != null) {
+                while ((className = in.readLine()) != null && (!className.trim().equals(""))) {
                     log.info("Loading the " + providerClassName + " implementation: " + className);
                     try {
                         Class<? extends T> clazz

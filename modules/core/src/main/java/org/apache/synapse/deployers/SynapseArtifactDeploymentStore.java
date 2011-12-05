@@ -24,10 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Keeps track of the artifacts deployed with files inside the synapse repository</p>
@@ -41,6 +39,7 @@ import java.util.Map;
  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
  */
 public final class SynapseArtifactDeploymentStore {
+
     /** Keeps track of the deployed artifacts in the synapse environment */
     private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
 
@@ -48,10 +47,10 @@ public final class SynapseArtifactDeploymentStore {
     private Map<String, String> updatingArtifacts = new HashMap<String, String>();
 
     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */
-    private List<String> restoredFiles = new ArrayList<String>();
+    private Set<String> restoredFiles = new HashSet<String>();
 
     /** Keeps track of the backed up artifacts in the synapse environment in a particular instance */
-    private List<String> backedUpFiles = new ArrayList<String>();
+    private Set<String> backedUpFiles = new HashSet<String>();
    
     private static final Log log = LogFactory.getLog(SynapseArtifactDeploymentStore.class);
 
@@ -228,6 +227,14 @@ public final class SynapseArtifactDeploymentStore {
     }
 
     public static String getNormalizedAbsolutePath(String fileName) {
-        return FilenameUtils.normalize(new File(fileName).getAbsolutePath());
+        String path;
+        File file = new File(fileName);
+        try {
+            path = file.getCanonicalPath();
+        } catch (IOException e) {
+            log.warn("Error while computing the canonical path of file: " + fileName);
+            path = file.getAbsolutePath();
+        }
+        return FilenameUtils.normalize(path);
     }
 }

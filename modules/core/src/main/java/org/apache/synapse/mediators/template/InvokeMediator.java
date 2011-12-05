@@ -63,9 +63,10 @@ public class InvokeMediator extends AbstractMediator {
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
-        populateParameters(synCtx);
+
         //get the target function template and invoke by passing populated parameters
         Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);
+        populateParameters(synCtx, ((TemplateMediator)mediator).getName());
         if (mediator != null && mediator instanceof TemplateMediator) {
             return mediator.mediate(synCtx);
         }
@@ -73,17 +74,19 @@ public class InvokeMediator extends AbstractMediator {
     }
 
     /**
-     * poplulate declared parameters on temp synapse properties
+     * populate declared parameters on temp synapse properties
      * @param synCtx
+     * @param templateQualifiedName
      */
-    private void populateParameters(MessageContext synCtx) {
+    private void populateParameters(MessageContext synCtx, String templateQualifiedName) {
         Iterator<String> params = pName2ExpressionMap.keySet().iterator();
         while (params.hasNext()) {
             String parameter = params.next();
             if (!"".equals(parameter)) {
                 Value expression = pName2ExpressionMap.get(parameter);
                 if (expression != null) {
-                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, targetTemplate, parameter, expression);
+                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, templateQualifiedName,
+                            parameter, expression);
                 }
             }
         }

@@ -78,8 +78,6 @@ public class MessageStoreMediator extends AbstractMediator{
 
                 }
 
-                // Ensure that the message is fully read
-                synCtx.getEnvelope().buildWithAttachments();
                 messageStore.offer(synCtx);
 
                 // with the nio transport, this causes the listener not to write a 202

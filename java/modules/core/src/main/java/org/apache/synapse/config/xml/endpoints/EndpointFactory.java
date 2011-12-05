@@ -64,7 +64,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     public static final QName ON_FAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "onError");
 
     private static final QName DESCRIPTION_Q
-            = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "description");
 
     /**
      * Core method which is exposed for the external use, and this will find the proper
@@ -83,7 +83,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
     /**
      * Core method which is exposed for the external use, and this will find the proper
      * {@link EndpointFactory} and create the endpoint which is of the format {@link Endpoint}.However
-     * defintion for this endpoint will be built using a custom Endpoint Defn factory.
+     * definition for this endpoint will be built using a custom Endpoint Defn factory.
      *
      * @param elem        XML from which the endpoint will be built
      * @param factory    custom definition factory which this endpoint will be used to build

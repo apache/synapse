@@ -29,7 +29,7 @@ import java.util.List;
  * All load balance algorithms must implement this interface. Implementations of this interface can
  * be registered in LoadbalanceManagers.
  */
-public interface LoadbalanceAlgorithm {
+public interface LoadbalanceAlgorithm extends Cloneable {
 
     /**
      * Set the application members
@@ -84,4 +84,6 @@ public interface LoadbalanceAlgorithm {
      * @return the name of the algorithm implemented
      */
     public String getName();
+
+    public LoadbalanceAlgorithm clone();
 }

@@ -237,6 +237,10 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         return WeightedRRLCAlgorithm.class.getName();
     }
 
+    public LoadbalanceAlgorithm clone() {
+        return null;
+    }
+
     public int getEndpointCursor() {
         return endpointCursor;
     }

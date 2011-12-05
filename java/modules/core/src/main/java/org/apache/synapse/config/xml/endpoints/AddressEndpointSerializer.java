@@ -46,14 +46,14 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) endpoint;
 
+        EndpointDefinition epAddress = addressEndpoint.getDefinition();
+        OMElement addressElement = serializeEndpointDefinition(epAddress);
+        endpointElement.addChild(addressElement);
+
         // serialize the properties
         serializeProperties(addressEndpoint, endpointElement);
         //serialize attributes
         serializeCommonAttributes(endpoint, endpointElement);
-
-        EndpointDefinition epAddress = addressEndpoint.getDefinition();
-        OMElement addressElement = serializeEndpointDefinition(epAddress);
-        endpointElement.addChild(addressElement);
 
         return endpointElement;
     }

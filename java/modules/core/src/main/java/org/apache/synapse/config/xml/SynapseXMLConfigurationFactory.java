@@ -178,7 +178,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     }
                 }
             } catch (Exception e) {
-                String msg = "Sequence configuration : " + name + " cannot be built";
+                String msg = "Sequence configuration: " + name + " cannot be built";
                 handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg, e);
             }
             return mediator;
@@ -201,7 +201,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     config.addSequenceTemplate(name, (TemplateMediator) mediator) ;
                 }
             } catch (Exception e) {
-                String msg = "Template configuration : " + name + " cannot be built";
+                String msg = "Template configuration: " + name + " cannot be built";
                 handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg, e);
             }
             return mediator;
@@ -224,7 +224,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     config.addEndpoint(name.trim(), endpoint);
                 }
             } catch (Exception e) {
-                String msg = "Endpoint configuration : " + name + " cannot be built";
+                String msg = "Endpoint configuration: " + name + " cannot be built";
                 handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg, e);
             }
             return endpoint;

@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * This class represents a real endpoint referred by a key. An Indirect endpoint does not really
- * have a life, but merely acts as a virtual endpoint for the actual endpoint refferred.
+ * have a life, but merely acts as a virtual endpoint for the actual endpoint referred.
  */
 public class IndirectEndpoint extends AbstractEndpoint {
 
@@ -90,7 +90,7 @@ public class IndirectEndpoint extends AbstractEndpoint {
 
     @Override
     /**
-     * Since an Indirect never sends messages for real, it has no moetrics.. but those of its
+     * Since an Indirect never sends messages for real, it has no metrics.. but those of its
      * actual endpoint
      */
     public EndpointView getMetricsMBean() {
@@ -152,6 +152,14 @@ public class IndirectEndpoint extends AbstractEndpoint {
                 realEndpoint = synCfg.getEndpoint(key);
                 if (realEndpoint != null && !realEndpoint.isInitialized()) {
                     realEndpoint.init(synapseEnvironment);
+                }
+            } else {
+                Endpoint epr = synCfg.getEndpoint(key);
+                if (epr != realEndpoint) {
+                    realEndpoint = epr;
+                    if (realEndpoint != null && !realEndpoint.isInitialized()) {
+                        realEndpoint.init(synapseEnvironment);
+                    }
                 }
             }
         }

@@ -120,6 +120,8 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
             String failover = loadbalanceElement.getAttributeValue(new QName("failover"));
             if (failover != null && failover.equalsIgnoreCase("false")) {
                 loadbalanceEndpoint.setFailover(false);
+            } else {
+                loadbalanceEndpoint.setFailover(true);
             }
 
             OMElement eventHandler =

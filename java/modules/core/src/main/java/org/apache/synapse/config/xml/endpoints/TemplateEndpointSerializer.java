@@ -44,8 +44,8 @@ public class TemplateEndpointSerializer extends EndpointSerializer {
     public OMElement serializeEndpoint(Endpoint epr) {
         TemplateEndpoint endpoints = (TemplateEndpoint) epr;
 
-        OMElement endpointElement = fac.createOMElement(
-                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
+        OMElement endpointElement = fac.createOMElement("endpoint",
+                SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         if (endpoints.getName() != null) {
             endpointElement.addAttribute(

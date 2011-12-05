@@ -28,6 +28,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -52,6 +53,26 @@ public class EntrySerializer {
      * @return OMElement representing the entry
      */
     public static OMElement serializeEntry(Entry entry, OMElement parent) {
+
+        String customFactory = SynapsePropertiesLoader.getPropertyValue("synapse.entry.serializer", "");
+        if (customFactory != null && !"".equals(customFactory)) {
+            try {
+                Class c = Class.forName(customFactory);
+                Object o = c.newInstance();
+                if (o instanceof IEntrySerializer) {
+                    return ((IEntrySerializer) o).serializeEntry(entry, parent);
+                }
+            } catch (ClassNotFoundException e) {
+                 handleException("Class specified by the synapse.entry.factory " +
+                         "synapse property not found: " + customFactory, e);
+            } catch (InstantiationException e) {
+                handleException("Class specified by the synapse.entry.factory " +
+                         "synapse property cannot be instantiated: " + customFactory, e);
+            } catch (IllegalAccessException e) {
+                handleException("Class specified by the synapse.entry.factory " +
+                         "synapse property cannot be accessed: " + customFactory, e);
+            }
+        }
 
         OMElement entryElement = fac.createOMElement("localEntry", synNS);
         
@@ -99,5 +120,10 @@ public class EntrySerializer {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

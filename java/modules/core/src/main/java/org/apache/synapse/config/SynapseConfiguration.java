@@ -156,7 +156,9 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * The artifact deployment store to keep track of the items deployed
      */
-    SynapseArtifactDeploymentStore artifactDeploymentStore = new SynapseArtifactDeploymentStore();
+    private SynapseArtifactDeploymentStore artifactDeploymentStore = new SynapseArtifactDeploymentStore();
+
+    private boolean allowHotUpdate = true;
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -361,8 +363,8 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
     /**
      * Gets the mandatory sequence, from the direct reference. This is also available in the
-     * {@link SynapseConfiguration#getSequence} but this method improves the performance hence this
-     * will be required for all messages
+     * {@link SynapseConfiguration#getSequence(String)} but this method improves the
+     * performance hence this will be required for all messages
      *
      * @return mandatory sequence direct reference in the local configuration
      */
@@ -1516,7 +1518,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * @param processor instance
      */
     public void addMessageProcessor(String name , MessageProcessor processor) {
-        if(!(messageProcessors.containsKey(processor))) {
+        if(!(messageProcessors.containsKey(name))) {
             messageProcessors.put(name , processor);
         } else {
             handleException("Duplicate Message Processor " + name);
@@ -1582,12 +1584,12 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
     private void assertEntryNull(Entry entry, String key) {
         if (entry == null) {
-            handleException("Cannot locate an either local or remote enrty for key : " + key);
+            handleException("Cannot locate an either local or remote entry for key : " + key);
         }
     }
 
     public void addEndpointTemplate(String name, Template template) {
-        assertAlreadyExists(name, SEQUENCE);
+        assertAlreadyExists(name, "template");
         localRegistry.put(name, template);
     }
 
@@ -1656,5 +1658,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
 
         return null;
+    }
+
+    public boolean isAllowHotUpdate() {
+        return allowHotUpdate;
+    }
+
+    public void setAllowHotUpdate(boolean allowHotUpdate) {
+        this.allowHotUpdate = allowHotUpdate;
     }
 }

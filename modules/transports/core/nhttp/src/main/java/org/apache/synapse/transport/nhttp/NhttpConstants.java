@@ -144,4 +144,6 @@ public class NhttpConstants {
     public static final String FORCE_CONNECTION_CLOSE = "FORCE_CONNECTION_CLOSE";
     public static final String PORT_OFFSET = "portOffset";
     public static final String ENDPOINTS_CONFIGURATION = "endpointsConfiguration";
+
+    public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 }

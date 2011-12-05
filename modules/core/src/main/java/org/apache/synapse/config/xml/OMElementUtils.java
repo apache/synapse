@@ -75,7 +75,7 @@ public class OMElementUtils {
      * Note that the default namespace is explicitly excluded and not added to the
      * namespace context. This implies that XPath expressions
      * appearing in Synapse configuration files follow the same rule as in XSL
-     * stylesheets. Indeed, the XSLT specification defines the namespace context of
+     * style sheets. Indeed, the XSLT specification defines the namespace context of
      * an XPath expression as follows:
      * <blockquote>
      * the set of namespace declarations are those in scope on the element which has the

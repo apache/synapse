@@ -842,7 +842,7 @@ public class SynapseConfigUtils {
         String failSafeStr = synapseProps.getProperty(SynapseConstants.FAIL_SAFE_MODE_STATUS);
         if (failSafeStr != null) {
             String[] failSafeComponents = failSafeStr.split(",");
-            List<String> componentList = Arrays.<String>asList(failSafeComponents);
+            List<String> componentList = Arrays.asList(failSafeComponents);
             if (componentList.indexOf(SynapseConstants.FAIL_SAFE_MODE_ALL) >= 0
                     || componentList.indexOf(componentName) >= 0) {
                 return true;

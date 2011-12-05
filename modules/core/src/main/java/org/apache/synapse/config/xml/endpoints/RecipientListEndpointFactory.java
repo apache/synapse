@@ -38,14 +38,14 @@ import org.apache.synapse.endpoints.RecipientListEndpoint;
 import org.apache.synapse.mediators.Value;
 
 /**
- * @author nuwan
  * <p>
  * Creates {@link RecipientListEndpoint} using an XML configuration.
- * <p/>
+ * </p>
+ * <p>
  * &lt;endpoint [name="name"]&gt;
- * &lt;recipientlist&gt;
- * &lt;member hostName="host" httpPort="port" httpsPort="port"&gt;+
- * &lt;/recipientlist&gt;
+ *   &lt;recipientlist&gt;
+ *     &lt;member hostName="host" httpPort="port" httpsPort="port"&gt;+
+ *   &lt;/recipientlist&gt;
  * &lt;/endpoint&gt;
  * </p>
  */
@@ -84,19 +84,18 @@ public class RecipientListEndpointFactory extends EndpointFactory {
             }
             
 			// set endpoints or members
-			if (recipientListElement
-					.getFirstChildWithName(XMLConfigConstants.ENDPOINT_ELT) != null) {
+			if (recipientListElement.
+                    getFirstChildWithName(XMLConfigConstants.ENDPOINT_ELT) != null) {
 				if (recipientListElement.getChildrenWithName((MEMBER)).hasNext()) {
-					String msg = "Invalid Synapse configuration. "
-							+ "child elements";
+					String msg = "Invalid Synapse configuration. child elements";
 					log.error(msg);
 					throw new SynapseException(msg);
 				}
 				List<Endpoint> endpoints = getEndpoints(recipientListElement,
 						recipientListEndpoint, properties);
 				recipientListEndpoint.setChildren(endpoints);
-			}
-			else if(recipientListElement.getFirstChildWithName(MEMBER) != null){
+
+			} else if (recipientListElement.getFirstChildWithName(MEMBER) != null) {
 				if(recipientListElement.
                         getChildrenWithName((XMLConfigConstants.ENDPOINT_ELT)).hasNext()){
                     String msg =
@@ -109,19 +108,16 @@ public class RecipientListEndpointFactory extends EndpointFactory {
 				
             	List<Member> members = getMembers(recipientListElement);
             	recipientListEndpoint.setMembers(members);
+
             } else if (recipientListElement.getFirstChildWithName(DYNAMIC_SET) != null) {
                 OMElement dynamicSetElement = recipientListElement.getFirstChildWithName(DYNAMIC_SET);
                 Value dynamicEndpointSet = new ValueFactory().createValue("value", dynamicSetElement);
-                String cachedEpsStr = dynamicSetElement.getAttributeValue(new QName("cache"));
-                int maxCache = -1;
-                try {
-                    maxCache = Integer.parseInt(cachedEpsStr);
-                } catch (NumberFormatException e) {
-
+                String maxCacheStr = dynamicSetElement.getAttributeValue(new QName("max-cache"));
+                int maxCache = RecipientListEndpoint.DEFAULT_MAX_POOL ;
+                if (maxCacheStr != null) {
+                    maxCache = Integer.parseInt(maxCacheStr);
                 }
-                recipientListEndpoint = new RecipientListEndpoint(maxCache < 0 ?
-                                                                  RecipientListEndpoint.DEFAULT_MAX_POOL :
-                                                                  maxCache);
+                recipientListEndpoint = new RecipientListEndpoint(maxCache);
                 if (name != null) {
                     recipientListEndpoint.setName(name.getAttributeValue());
                 }
@@ -137,6 +133,9 @@ public class RecipientListEndpointFactory extends EndpointFactory {
                 log.error(msg);
                 throw new SynapseException(msg);
             }
+
+            // process the parameters
+            processProperties(recipientListEndpoint, epConfig);
 			
 			return recipientListEndpoint;
 		}

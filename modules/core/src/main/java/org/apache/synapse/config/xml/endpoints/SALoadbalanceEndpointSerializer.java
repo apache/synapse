@@ -54,6 +54,10 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
         
         serializeCommonAttributes(endpoint,endpointElement);
 
+        OMElement loadbalanceElement
+                = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
+        endpointElement.addChild(loadbalanceElement);
+
         Dispatcher dispatcher = loadbalanceEndpoint.getDispatcher();
         if (dispatcher != null) {
 
@@ -77,10 +81,6 @@ public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
             }
             endpointElement.addChild(sessionElement);
         }
-
-        OMElement loadbalanceElement
-                = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        endpointElement.addChild(loadbalanceElement);
 
         loadbalanceElement.addAttribute(XMLConfigConstants.LOADBALANCE_ALGORITHM,
                 loadbalanceEndpoint.getAlgorithm().getClass().getName(),

@@ -46,9 +46,6 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
         
         LoadbalanceEndpoint loadbalanceEndpoint = (LoadbalanceEndpoint) endpoint;
 
-        // serialize the parameters
-        serializeProperties(loadbalanceEndpoint, endpointElement);
-
         serializeCommonAttributes(endpoint,endpointElement);
 
         OMElement loadbalanceElement
@@ -83,6 +80,10 @@ public class LoadbalanceEndpointSerializer extends EndpointSerializer {
                 loadbalanceElement.addChild(memberEle);
             }
         }
+
+        // serialize the parameters
+        serializeProperties(loadbalanceEndpoint, endpointElement);
+
         return endpointElement;
     }
 }

@@ -148,6 +148,10 @@ public class MultiXMLConfigurationSerializer {
 
     private boolean isWritable(File file) {
         if (file.isDirectory()) {
+            if (file.getName().startsWith(".") || file.isHidden()) {
+                return true;
+            }
+
             File[] children = file.listFiles();
             for (File child : children) {
                 if (!isWritable(child)) {
@@ -301,8 +305,8 @@ public class MultiXMLConfigurationSerializer {
             }
         }
 
-        for(MessageProcessor messageProcessor : messageProcessors) {
-            if(messageProcessor.getFileName() == null) {
+        for (MessageProcessor messageProcessor : messageProcessors) {
+            if (messageProcessor.getFileName() == null) {
                 MessageProcessorSerializer.serializeMessageProcessor(definitions,messageProcessor);
             }
         }

@@ -74,10 +74,17 @@ public abstract class AbstractDispatcher implements Dispatcher {
             Map headerMap = getTransportHeaderMap(synCtx);
 
             if (headerMap != null) {
+                Object hostObj = headerMap.get("Host");
+                if (log.isDebugEnabled()) {
+                    log.debug("A request received with the Host Name : " + hostObj);
+                }
                 Object cookieObj = headerMap.get(key);
 
                 if (cookieObj instanceof String) {
                     String cookie = (String) cookieObj;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Cookies String : " + cookie);
+                    }
                     
                     // extract the first name value pair of the Set-Cookie header, which is considered
                     // as the session id which will be sent back from the client with the Cookie header
@@ -93,8 +100,11 @@ public abstract class AbstractDispatcher implements Dispatcher {
                         return null;
                     }
 
-                    for(String sessionId : sessionIds){
-                        if(sessionId != null && sessionId.indexOf("JSESSIONID") != -1){
+                    for (String sessionId : sessionIds){
+                        if(sessionId != null && sessionId.indexOf("JSESSIONID") != -1) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Extracted SessionID : " + sessionId);
+                            }
                             return sessionId.trim();
                         }
                     }

@@ -94,19 +94,8 @@ public class AlgorithmContext {
      * @param currentEPR The current position
      */
     public void setCurrentEndpointIndex(int currentEPR) {
-
-        if (isClusteringEnabled) {
-
-            if (log.isDebugEnabled()) {
-                log.debug("Set EPR with key : " + CURRENT_EPR_PROP_KEY + " as : " + currentEPR);
-            }
-            Replicator.setAndReplicateState(CURRENT_EPR_PROP_KEY, currentEPR, cfgCtx);
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Setting the current EPR as : " + currentEPR);
-            }
-            this.currentEPR = currentEPR;
-        }
+        this.currentEPR = currentEPR;
+        cfgCtx.setNonReplicableProperty(CURRENT_EPR_PROP_KEY, currentEPR);
     }
 
     /**

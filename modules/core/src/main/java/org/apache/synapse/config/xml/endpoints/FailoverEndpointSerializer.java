@@ -44,9 +44,6 @@ public class FailoverEndpointSerializer extends EndpointSerializer {
         OMElement endpointElement
                 = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
-        // serialize the parameters
-        serializeProperties(failoverEndpoint, endpointElement);
-
         OMElement failoverElement
                 = fac.createOMElement("failover", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(failoverElement);
@@ -60,6 +57,9 @@ public class FailoverEndpointSerializer extends EndpointSerializer {
         if (!failoverEndpoint.isDynamic()) {
             failoverElement.addAttribute("dynamic", "false", null);
         }
+
+        // serialize the parameters
+        serializeProperties(failoverEndpoint, endpointElement);
 
         return endpointElement;
     }

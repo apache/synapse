@@ -28,12 +28,9 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.RecipientListEndpoint;
 
 /**
- * @author nuwan
- * 
- * erializes {@link RecipientListEndpoint} to an XML configuration.
+ * Serializes {@link RecipientListEndpoint} to an XML configuration.
  *
  * @see RecipientListEndpointFactory
- *
  */
 public class RecipientListEndpointSerializer extends EndpointSerializer {
 
@@ -80,9 +77,10 @@ public class RecipientListEndpointSerializer extends EndpointSerializer {
         }else{
             OMElement dynamicEpEle = fac.createOMElement(
                     "endpoints", SynapseConstants.SYNAPSE_OMNAMESPACE, recipientListElement);
-            new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEnpointSet(), "value", dynamicEpEle);
-            dynamicEpEle.addAttribute(fac.createOMAttribute("cache", null,
-                                                            String.valueOf(recipientListEndpoint.getCurrentPoolSize())));
+            new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEnpointSet(),
+                    "value", dynamicEpEle);
+            dynamicEpEle.addAttribute(fac.createOMAttribute("max-cache", null,
+                    String.valueOf(recipientListEndpoint.getCurrentPoolSize())));
             recipientListElement.addChild(dynamicEpEle);
         }
 

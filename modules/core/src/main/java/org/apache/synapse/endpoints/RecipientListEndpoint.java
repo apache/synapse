@@ -61,6 +61,7 @@ public class RecipientListEndpoint extends AbstractEndpoint {
 	/**
 	 * Should this recipient list failover;
 	 */
+    private boolean failover;
     private int currentPool;
 
     private SynapseEnvironment env = null;
@@ -318,6 +319,14 @@ public class RecipientListEndpoint extends AbstractEndpoint {
     public int getCurrentPoolSize() {
         return currentPool;
     }
+
+    public boolean isFailover() {
+		return failover;
+	}
+
+	public void setFailover(boolean failover) {
+		this.failover = failover;
+	}
 
     /**
      * create a simple LRU cached Endpoint pool for dynamic endpoints

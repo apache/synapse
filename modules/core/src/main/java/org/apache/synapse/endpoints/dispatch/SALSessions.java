@@ -223,7 +223,7 @@ public class SALSessions {
 
         if (sessionID == null || "".equals(sessionID)) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot find session ID .Returing null");
+                log.debug("Cannot find session ID .Returning null");
             }
             return null;
         }
@@ -342,7 +342,9 @@ public class SALSessions {
                 }
 
                 if (!toBeRemoved.isEmpty()) {
-                    log.info("Clearing expired sessions");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Clearing expired sessions");
+                    }
 
                     for (String key : toBeRemoved) {
                         Replicator.removeAndReplicateState(key, configCtx);
@@ -364,7 +366,9 @@ public class SALSessions {
                 }
 
                 if (!toBeRemoved.isEmpty()) {
-                    log.info("Clearing expired sessions");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Clearing expired sessions");
+                    }
                     establishedSessions.keySet().removeAll(toBeRemoved);
                 }
             }

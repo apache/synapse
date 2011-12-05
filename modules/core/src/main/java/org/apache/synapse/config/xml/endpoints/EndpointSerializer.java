@@ -95,7 +95,7 @@ public abstract class EndpointSerializer {
     private OMElement getSerializedDescription(Endpoint endpoint) {
 
         OMElement descriptionElem = fac.createOMElement(
-                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description"));
+                "description", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         if (endpoint.getDescription() != null) {
             descriptionElem.setText(endpoint.getDescription());

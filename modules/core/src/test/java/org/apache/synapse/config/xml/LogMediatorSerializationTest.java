@@ -18,6 +18,14 @@
  */
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.jaxen.JaxenException;
+
+import javax.xml.stream.XMLStreamException;
+
 /**
  *
  *
@@ -95,15 +103,38 @@ public class LogMediatorSerializationTest extends AbstractTestCase {
                 logMediatorSerializer));
     }
 
+    public void testXPath() {
+        try {
+            OMElement element = AXIOMUtil.stringToOM(getXmlOfMediatorScenarioOneA("full"));
+
+            AXIOMXPath xPath = new AXIOMXPath("//property/@name");
+            //xPath.addNamespace(SynapseConstants.SYNAPSE_NAMESPACE, "");
+            Object o = xPath.selectSingleNode(element);
+            if (o instanceof OMAttribute) {
+                System.out.println(((OMAttribute) o).getAttributeValue());
+            }
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        } catch (JaxenException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getXmlOfMediatorScenarioOne(String level) {
         return "<log xmlns=\"http://ws.apache.org/ns/synapse\" level=\"" +
                 level + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }
 
-    private String getXmlOfMediatorScenarioTwo(String level, String seperator) {
+    private String getXmlOfMediatorScenarioOneA(String level) {
+        return "<log level=\"" +
+                level + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
+
+    }
+
+    private String getXmlOfMediatorScenarioTwo(String level, String separator) {
         return "<log xmlns=\"http://ws.apache.org/ns/synapse\" level=\"" +
-                level + "\" separator=\"" + seperator +
+                level + "\" separator=\"" + separator +
                 "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }

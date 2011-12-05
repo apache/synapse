@@ -19,7 +19,13 @@
 
 package org.apache.synapse.endpoints.dispatch;
 
+import org.apache.http.protocol.HTTP;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -33,6 +39,7 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
     /*HTTP Headers  */
     private final static String COOKIE = "Cookie";
     private final static String SET_COOKIE = "Set-Cookie";
+    public static final String HOSTS = "hosts";
 
     /**
      * Check if "Cookie" HTTP header is available. If so, check if that cookie is in the session
@@ -43,7 +50,52 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
      * @return Endpoint Server endpoint for the given HTTP session.
      */
     public SessionInformation getSession(MessageContext synCtx) {
-        return SALSessions.getInstance().getSession(extractSessionID(synCtx, COOKIE));
+        String hostName = extractHost(synCtx);
+        if (log.isDebugEnabled()) {
+            log.debug("Extracted Host Name : " + hostName);
+        }
+
+        // print TO
+        org.apache.axis2.context.MessageContext axis2MessageContext =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint Address : " + axis2MessageContext.getTo().getAddress());
+        }
+
+        Map headerMap = getTransportHeaderMap(synCtx);
+        String contentType = (String)headerMap.get("Content-Type");
+        if (log.isDebugEnabled()) {
+            log.debug("Content Type : " + contentType);
+        }
+
+        if (hostName == null) {
+            return SALSessions.getInstance().getSession(extractSessionID(synCtx, COOKIE));
+        } else {
+            List<String> sessionList = extractSessionIDs(synCtx, COOKIE);
+            if (sessionList != null) {
+                for (String sessionID : sessionList) {
+                    SessionInformation sessionInfoObj = SALSessions.getInstance().getSession(sessionID);
+                    if (sessionInfoObj != null) {
+                        Map<String, String> subDomainNames =
+                                (Map<String, String>) sessionInfoObj.getMember().getProperties().get(HOSTS);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Member Domain : " + (subDomainNames != null ? subDomainNames.get(hostName) : null) +
+                                      " : Session ID " + sessionID);
+                        }
+                        if (subDomainNames != null && subDomainNames.get(hostName) != null) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Found a matching sessionInfo Object for the " + hostName);
+                            }
+                            return sessionInfoObj;
+                        }
+                    }
+                }
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Did not find a session info obj.");
+        }
+        return null;
     }
 
     /**
@@ -85,5 +137,80 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
 
     public void removeSessionID(MessageContext syCtx) {
         removeSessionID(syCtx, COOKIE);
+    }
+
+    protected List<String> extractSessionIDs(MessageContext synCtx, String key) {
+        List<String> sessionList = new ArrayList<String>();
+        if (key != null) {
+            Map headerMap = getTransportHeaderMap(synCtx);
+            if (headerMap != null) {
+                Object hostObj = headerMap.get("Host");
+                if (log.isDebugEnabled()) {
+                    log.debug("A request received with the Host Name : " + hostObj);
+                }
+                Object cookieObj = headerMap.get(key);
+                if (cookieObj instanceof String) {
+                    String cookie = (String) cookieObj;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Cookies String : " + cookie);
+                    }
+                    // extract the first name value pair of the Set-Cookie header, which is considered
+                    // as the session id which will be sent back from the client with the Cookie header
+                    // for example;
+                    //      Set-Cookie: JSESSIONID=760764CB72E96A7221506823748CF2AE; Path=/
+                    // will result in the session id "JSESSIONID=760764CB72E96A7221506823748CF2AE"
+                    String[] sessionIds = cookie.split(";");
+                    if (sessionIds == null || sessionIds.length == 0) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Cannot find a session id for the cookie : " + cookie);
+                        }
+                        return null;
+                    }
+                    for(String sessionId : sessionIds){
+                        if(sessionId != null && sessionId.contains("JSESSIONID")) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Extracted SessionID : " + sessionId);
+                            }
+                            sessionList.add(sessionId.trim());
+                        }
+                    }
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Couldn't find the " + key + " header to find the session");
+                    }
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Couldn't find the TRANSPORT_HEADERS to find the session");
+                }
+
+            }
+        }
+        return sessionList;
+    }
+
+    private String extractHost(MessageContext synCtx) {
+        Map headerMap = getTransportHeaderMap(synCtx);
+        String hostName = null;
+        if (headerMap != null) {
+            Object hostObj = headerMap.get(HTTP.TARGET_HOST);
+            hostName = (String) hostObj;
+            if (hostName.contains(":")) {
+                hostName = hostName.substring(0, hostName.indexOf(":"));
+            }
+        }
+        return hostName;
+    }
+
+    private Map getTransportHeaderMap(MessageContext synCtx) {
+
+        org.apache.axis2.context.MessageContext axis2MessageContext =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+        Object o = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        if (o != null && o instanceof Map) {
+            return (Map) o;
+        }
+        return null;
     }
 }

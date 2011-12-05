@@ -159,6 +159,10 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
         return WeightedRoundRobin.class.getName();
     }
 
+    public LoadbalanceAlgorithm clone() {
+        return null;
+    }
+
     public void init(SynapseEnvironment se) {
         if (endpoints == null) {
             String msg = "Endpoints are not set, cannot initialize the algorithm";
@@ -346,7 +350,7 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
         }
     }
 
-    public int[] getWeights() {
+    public int[] getCurrentWeights() {
         int weights[] = new int[endpointStates.length];
 
         for (int i = 0; i < weights.length; i++) {

@@ -20,7 +20,6 @@
 package org.apache.synapse;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -53,7 +52,7 @@ public class TestMessageContextBuilder {
     private final Map<String,Entry> entries = new HashMap<String,Entry>();
     private boolean requireAxis2MessageContext;
     private String contentString;
-    private String contentFile;
+    private URL contentURL;
     private boolean contentIsEnvelope;
     private boolean addTextAroundBody;
     
@@ -67,15 +66,27 @@ public class TestMessageContextBuilder {
         contentIsEnvelope = false;
         return this;
     }
-    
-    public TestMessageContextBuilder setBodyFromFile(String path) {
-        this.contentFile = path;
-        contentIsEnvelope = false;
+
+    private TestMessageContextBuilder setContentFromFile(String path, boolean contentIsEnvelope) {
+        try {
+            contentURL = new File(path).toURL();
+        } catch (MalformedURLException ex) {
+            throw new Error(ex);
+        }
+        this.contentIsEnvelope = contentIsEnvelope;
         return this;
     }
     
+    public TestMessageContextBuilder setBodyFromFile(String path) {
+        return setContentFromFile(path, false);
+    }
+    
     public TestMessageContextBuilder setEnvelopeFromFile(String path) {
-        this.contentFile = path;
+        return setContentFromFile(path, true);
+    }
+    
+    public TestMessageContextBuilder setEnvelope(URL url) {
+        contentURL = url;
         contentIsEnvelope = true;
         return this;
     }
@@ -132,8 +143,8 @@ public class TestMessageContextBuilder {
         XMLStreamReader parser = null;
         if (contentString != null) {
             parser = StAXUtils.createXMLStreamReader(new StringReader(contentString));
-        } else if (contentFile != null) {
-            parser = StAXUtils.createXMLStreamReader(new FileInputStream(contentFile));
+        } else if (contentURL != null) {
+            parser = StAXUtils.createXMLStreamReader(contentURL.openStream());
         }
         
         SOAPEnvelope envelope;

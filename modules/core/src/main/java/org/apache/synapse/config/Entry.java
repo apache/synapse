@@ -117,11 +117,11 @@ public class Entry implements SynapseArtifact {
      * OMElement otherwise.
      * @return Either an OMElement or a String
      */
-    public Object getValue() {
+    public synchronized Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public synchronized void setValue(Object value) {
         this.value = value;
     }
 
@@ -129,7 +129,7 @@ public class Entry implements SynapseArtifact {
      *
      * @return mapper
      */
-    public XMLToObjectMapper getMapper() {
+    public synchronized XMLToObjectMapper getMapper() {
         return mapper;
     }
 
@@ -138,7 +138,7 @@ public class Entry implements SynapseArtifact {
      *
      * @param mapper XMLToObjectMapper instance
      */
-    public void setMapper(XMLToObjectMapper mapper) {
+    public synchronized void setMapper(XMLToObjectMapper mapper) {
         this.mapper = mapper;
     }
 

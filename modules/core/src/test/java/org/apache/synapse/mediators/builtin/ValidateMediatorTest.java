@@ -20,6 +20,8 @@
 package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
+
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContextBuilder;
@@ -400,5 +402,19 @@ public class ValidateMediatorTest extends TestCase {
         return keyList;
     }
 
-
+    /**
+     * Regression test for SYNAPSE-501.
+     * 
+     * @throws Exception
+     */
+    public void testSynapse501() throws Exception {
+        ValidateMediatorFactory mf = new ValidateMediatorFactory();
+        ValidateMediator validate = (ValidateMediator)mf.createMediator(
+                OMXMLBuilderFactory.createOMBuilder(ValidateMediatorTest.class.getResourceAsStream("synapse-501-conf.xml")).getDocumentElement(),
+                new Properties());
+        MessageContext synCtx = new TestMessageContextBuilder()
+                .addEntry("validate_schema", ValidateMediatorTest.class.getResource("synapse-501.xsd"))
+                .setEnvelope(ValidateMediatorTest.class.getResource("synapse-501-soap.xml")).build();
+        test(validate, synCtx, false);
+    }
 }

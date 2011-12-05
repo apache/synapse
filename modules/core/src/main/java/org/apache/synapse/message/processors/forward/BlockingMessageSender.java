@@ -132,7 +132,6 @@ public class BlockingMessageSender {
             // otherwise when retrying same header element will add multiple times
             sc.removeHeaders();
 
-            axis2Ctx.getAttachmentMap();
             Iterator itr = axis2Ctx.getEnvelope().getHeader().getChildren();
             while (itr.hasNext()) {
                 Object o =itr.next();

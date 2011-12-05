@@ -44,6 +44,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         lock.lock();
         try {
             if (messageContext != null) {
+                messageContext.getEnvelope().build();
                 messageList.put(messageContext.getMessageID(), messageContext);
                 /** Notify observers */
                 notifyMessageAddition(messageContext.getMessageID());

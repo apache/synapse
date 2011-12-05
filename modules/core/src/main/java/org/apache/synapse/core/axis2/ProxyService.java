@@ -575,10 +575,8 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                     proxyServiceGroup.addService(proxyService);
                     axisCfg.addServiceGroup(proxyServiceGroup);
                 } else {
-                    // First set the parent of the service - Otherwise there's an issue
-                    // generating endpoints
-                    proxyService.setParent(axisCfg.getServiceGroup(serviceGroup));
                     // Simply add the service to the existing group
+                    proxyService.setParent(axisCfg.getServiceGroup(serviceGroup));
                     axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);
                 }
             }

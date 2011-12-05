@@ -20,7 +20,6 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
@@ -28,7 +27,6 @@ import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 /**
  * This is the MessageReceiver set to act on behalf of Proxy services.
@@ -186,8 +184,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
             if (!synCtx.getFaultStack().isEmpty()) {
                 warn(traceOn, "Executing fault handler due to exception encountered", synCtx);
-                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx, syne);
-
+                (synCtx.getFaultStack().pop()).handleFault(synCtx, syne);
             } else {
                 warn(traceOn, "Exception encountered but no fault handler found - " +
                     "message dropped", synCtx);

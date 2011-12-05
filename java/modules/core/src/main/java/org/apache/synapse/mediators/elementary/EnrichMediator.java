@@ -29,12 +29,12 @@ import java.util.ArrayList;
 /**
  * Syntax for EnrichMediator
  * <p/>
- * <xmlStore>
+ * <enrich>
  * <source [clone=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
  * <target [replace=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
- * </xmlStore>
+ * </enrich>
  * <p/>
- * This mediator will first get an OMELement from the source. Then put it to the current message
+ * This mediator will first get an OMElement from the source. Then put it to the current message
  * according to the target element.
  * <p/>
  * Both target and source can specify a type. These are the types supported

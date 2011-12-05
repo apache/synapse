@@ -122,6 +122,9 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         MessageContext newCtx = null;
         try {
             newCtx = MessageHelper.cloneMessageContext(synCtx);
+            // Set isServerSide property in the cloned message context
+            ((Axis2MessageContext) newCtx).getAxis2MessageContext().setServerSide(
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().isServerSide());
 
             if (id != null) {
                 // set the parent correlation details to the cloned MC -

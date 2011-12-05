@@ -23,6 +23,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.Callback;
@@ -187,11 +188,12 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             responseMessageContext.setOptions(options);
             responseMessageContext.setServerSide(true);
 			addMessageContext(responseMessageContext);
+            responseMessageContext.setProperty("synapse.send", "true");
 
             AxisEngine.send(msgctx);
 
             // did the engine receive a immediate synchronous response?
-            // e.g. sometimes the transport sender may listen for a syncronous reply
+            // e.g. sometimes the transport sender may listen for a synchronous reply
 			if (msgctx.getProperty(MessageContext.TRANSPORT_IN) != null) {
 
                 responseMessageContext.setOperationContext(msgctx.getOperationContext());                
@@ -225,6 +227,16 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                 if (responseMessageContext.getEnvelope() == null) {
                     // If request is REST we assume the responseMessageContext is
                     // REST, so set the variable
+
+                    Options options = responseMessageContext.getOptions();
+                    if (options != null) {
+                        RelatesTo relatesTo = options.getRelatesTo();
+                        if (relatesTo != null) {
+                            relatesTo.setValue(msgctx.getMessageID());
+                        } else {
+                            options.addRelatesTo(new RelatesTo(msgctx.getMessageID()));
+                        }
+                    }
 
                     SOAPEnvelope resenvelope =
                         TransportUtils.createSOAPMessage(responseMessageContext);

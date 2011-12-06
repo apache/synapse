@@ -343,7 +343,7 @@
     <!--                  Clustering                       -->
     <!-- ================================================= -->
     <!-- Configure the following for preparing Synapse to a clustered environment -->
-    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
+    <clustering class="org.apache.axis2.clustering.tribes.TribesClusteringAgent" enable="false">
 
         <!--
            This parameter indicates whther the cluster has to be automatically initalized

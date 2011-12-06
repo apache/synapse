@@ -441,7 +441,7 @@
         <groupManagement enable="false">
             <applicationDomain name="apache.axis2.app.domain"
                                description="Axis2 group"
-                               handler="org.apache.axis2.clustering.DefaultLoadBalanceEventHandler"/>
+                               agent="org.apache.axis2.clustering.management.DefaultGroupManagementAgent"/>
         </groupManagement>
             
         <!--

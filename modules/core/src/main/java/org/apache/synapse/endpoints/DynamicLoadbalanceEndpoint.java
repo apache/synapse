@@ -40,7 +40,13 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Represents a dynamic load balance endpoint. The application membership is not static,
@@ -106,7 +112,6 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
     public void send(MessageContext synCtx) {
         SessionInformation sessionInformation = null;
         Member currentMember = null;
-        //TODO Temp hack: ESB removes the session id from request in a random manner.
         setCookieHeader(synCtx);
 
         ConfigurationContext configCtx =
@@ -145,8 +150,6 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
             }
 
         }
-
-        setupTransportHeaders(synCtx);
         DynamicLoadbalanceFaultHandlerImpl faultHandler = new DynamicLoadbalanceFaultHandlerImpl();
         if (sessionInformation != null && currentMember != null) {
             //send message on current session
@@ -208,37 +211,6 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         }
         return null;
     }
-
-    /**
-     * Adds the X-Forwarded-For header to the outgoing message.
-     *
-     * @param synCtx Current message context
-     */
-	protected void setupTransportHeaders(MessageContext synCtx) {
-		Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
-        org.apache.axis2.context.MessageContext axis2MessageCtx =
-                axis2smc.getAxis2MessageContext();
-        Object headers = axis2MessageCtx.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        if (headers != null && headers instanceof Map ) {
-        	Map headersMap = (Map) headers;
-        	String xForwardFor = (String) headersMap.get(NhttpConstants.HEADER_X_FORWARDED_FOR);
-        	String remoteHost = (String) axis2MessageCtx.getProperty(
-                    org.apache.axis2.context.MessageContext.REMOTE_ADDR);
-
-            if (xForwardFor != null && !"".equals(xForwardFor)) {
-                StringBuilder xForwardedForString = new StringBuilder();
-                xForwardedForString.append(xForwardFor);
-                if (remoteHost != null && !"".equals(remoteHost)) {
-                    xForwardedForString.append(",").append(remoteHost);
-                }
-                headersMap.put(NhttpConstants.HEADER_X_FORWARDED_FOR, xForwardedForString.toString());
-            } else {
-                headersMap.put(NhttpConstants.HEADER_X_FORWARDED_FOR,remoteHost);
-            }
-
-        }
-	}
 
     public void setName(String name) {
         super.setName(name);
@@ -310,8 +282,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         }
 
         Map<String, String> memberHosts;
-        if ((memberHosts = (Map<String, String>) currentMember.getProperties().get(
-                HttpSessionDispatcher.HOSTS)) == null) {
+        if ((memberHosts = (Map<String, String>) currentMember.getProperties().get(HttpSessionDispatcher.HOSTS)) == null) {
             currentMember.getProperties().put(HttpSessionDispatcher.HOSTS,
                     memberHosts = new HashMap<String, String>());
         }

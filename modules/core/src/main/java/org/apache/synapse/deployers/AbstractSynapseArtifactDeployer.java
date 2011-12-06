@@ -92,13 +92,6 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      */
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
-        if (!isHotDeploymentEnabled()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Hot deployment has been suspended - Ignoring");
-            }
-            return;
-        }
-
         String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
                 deploymentFileData.getAbsolutePath());
         if (log.isDebugEnabled()) {
@@ -111,6 +104,13 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 log.debug("Skipped the artifact deployment (since the Synapse " +
                         "server doesn't seem to be started yet), from file : "
                         + deploymentFileData.getAbsolutePath());
+            }
+            return;
+        }
+
+        if (!isHotDeploymentEnabled()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Hot deployment has been suspended - Ignoring");
             }
             return;
         }

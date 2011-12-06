@@ -127,11 +127,15 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
         } else if (serviceName != null && parameters.containsKey("wsdl")) {
             generateWsdl(request, response, msgContext,
                     conn, os, serviceName, parameters, isRestDispatching);
+            return;
         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
             generateWsdl2(request, response, msgContext,
                     conn, os, serviceName, isRestDispatching);
+            return;
         } else if (serviceName != null && parameters.containsKey("xsd")) {
-            generateXsd(response, conn, os, serviceName, parameters);
+            generateXsd(request, response, msgContext, conn, os, serviceName,
+                    parameters, isRestDispatching);
+            return;
         } else if (serviceName != null && parameters.containsKey("info")) {
             generateServiceDetailsPage(response, conn, os, serviceName);
         } else if (uri.startsWith(servicePath) &&
@@ -144,12 +148,15 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
         }
 
         // make sure that the output stream is flushed and closed properly
+        closeOutputStream(os);
+    }
+
+    private void closeOutputStream(OutputStream os) {
         try {
             os.flush();
             os.close();
         } catch (IOException ignore) {
         }
-
     }
 
     /**
@@ -186,7 +193,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
             if (serviceName.startsWith("/")) {
                 serviceName = serviceName.substring(1);
             }
-            if (serviceName.indexOf("?") != -1) {
+            if (serviceName.contains("?")) {
                 serviceName = serviceName.substring(0, serviceName.indexOf("?"));
             }
         } else {
@@ -277,15 +284,19 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
     /**
      * Generates Schema.
      *
+     * @param request     HttpRequest
      * @param response    HttpResponse
+     * @param messageCtx  Current MessageContext
      * @param conn        NHttpServerConnection
      * @param os          OutputStream
      * @param serviceName service name
      * @param parameters  url parameters
+     * @param isRestDispatching Whether to handle this as REST
      */
-    protected void generateXsd(HttpResponse response, NHttpServerConnection conn,
+    protected void generateXsd(HttpRequest request, HttpResponse response,
+                               MessageContext messageCtx, NHttpServerConnection conn,
                                OutputStream os, String serviceName,
-                               Map<String, String> parameters) {
+                               Map<String, String> parameters, boolean isRestDispatching) {
         if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
             AxisService service = cfgCtx.getAxisConfiguration()
                     .getServices().get(serviceName);
@@ -296,11 +307,15 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
                     serverHandler.commitResponseHideExceptions(conn, response);
                     os.write(baos.toByteArray());
+                    closeOutputStream(os);
 
                 } catch (Exception e) {
                     handleBrowserException(response, conn, os,
                             "Error generating ?xsd output for service : " + serviceName, e);
                 }
+            } else {
+                processGetAndDelete(request, response, messageCtx, conn, os,
+                        serviceName, isRestDispatching);
             }
 
         } else {
@@ -330,6 +345,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
                         response.addHeader(CONTENT_TYPE, TEXT_XML);
                         serverHandler.commitResponseHideExceptions(conn, response);
                         os.write(baos.toByteArray());
+                        closeOutputStream(os);
                     } catch (Exception e) {
                         handleBrowserException(response, conn, os,
                                 "Error generating named ?xsd output for service : " + serviceName, e);
@@ -338,7 +354,11 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
                 } else {
                     // no schema available by that name  - send 404
                     response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+                    closeOutputStream(os);
                 }
+            } else {
+                processGetAndDelete(request, response, messageCtx, conn, os,
+                        serviceName, isRestDispatching);
             }
         }
     }
@@ -373,6 +393,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
                 response.addHeader(CONTENT_TYPE, TEXT_XML);
                 serverHandler.commitResponseHideExceptions(conn, response);
                 os.write(baos.toByteArray());
+                closeOutputStream(os);
 
             } catch (Exception e) {
                 handleBrowserException(response, conn, os,
@@ -416,6 +437,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
                 response.addHeader(CONTENT_TYPE, TEXT_XML);
                 serverHandler.commitResponseHideExceptions(conn, response);
                 os.write(baos.toByteArray());
+                closeOutputStream(os);
 
             } catch (Exception e) {
                 handleBrowserException(response, conn, os,
@@ -602,7 +624,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
         Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
         boolean servicesFound = false;
 
-        StringBuffer resultBuf = new StringBuffer();
+        StringBuilder resultBuf = new StringBuilder();
         resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
 
         if ((services != null) && !services.isEmpty()) {

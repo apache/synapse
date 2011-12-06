@@ -168,7 +168,10 @@
 <li>
 <a href="#Sample58">Sample 58: Static load balancing between 3 nodes</a></li>
 <li>
-<a href="#Sample59">Sample 59: Weighted load balancing between 3 endpoints</a></li></ul></li>
+<a href="#Sample59">Sample 59: Weighted load balancing between 3 endpoints</a></li>
+<li>
+<a href="#Sample60">Sample 60: Service dynamic load balancing between 2 Service nodes</a></li>
+</ul></li>    
 <li>
 <a href="#MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a>
 <ul>
@@ -1752,6 +1755,138 @@ you can see that requests are processed by three servers as follows: </p>
 ...</pre>
 <p>As logs, endpoint with weight 1 received a 1 request and endpoint with weight 2 received 2
 requests and etc... in a cycle</p>
+
+<h2>
+<a name="Sample60" id="Sample57">Sample 60: Service dynamic load balancing between 2 Service nodes</a></h2>
+<pre xml:space="preserve">
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;property name="SERVICE_PREFIX" expression="$axis2:SERVICE_PREFIX"/&gt;
+            &lt;send&gt;
+                &lt;endpoint name="sdlbEndpoint"&gt;
+                    &lt;serviceDynamicLoadbalance failover="true"
+                                               algorithm="org.apache.synapse.endpoints.algorithms.RoundRobin"&gt;
+                        &lt;loadBalancerConfig&gt;
+                            &lt;services&gt;
+                                &lt;service&gt;
+                                    &lt;hosts&gt;
+                                        &lt;host&gt;test1.synapse.apache.org&lt;/host&gt;
+                                    &lt;/hosts&gt;
+                                    &lt;domain&gt;test1.synapse.domain&lt;/domain&gt;
+                                &lt;/service&gt;
+                                &lt;service&gt;
+                                    &lt;hosts&gt;
+                                        &lt;host&gt;test2.synapse.apache.org&lt;/host&gt;
+                                    &lt;/hosts&gt;
+                                    &lt;domain&gt;test2.synapse.domain&lt;/domain&gt;
+                                &lt;/service&gt;
+                            &lt;/services&gt;
+                        &lt;/loadBalancerConfig&gt;
+                    &lt;/serviceDynamicLoadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;
+</pre>
+<p>
+<strong>Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services. Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes. In this context, a Cloud Service is also associated with a clustering domain</strong> </p>
+<p>
+<strong>Prerequisites:</strong>
+<br/>
+Put the following entries into the /etc/hosts file on your machine.
+
+<pre>
+127.0.0.1&nbsp;&nbsp;&nbsp;test1.synapse.apache.org
+127.0.0.1&nbsp;&nbsp;&nbsp;test2.synapse.apache.org
+</pre>
+
+<br/>Enable clustering in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;clustering&quot; element.
+
+<br/>
+Enabled groupManagement in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file by copying the following configuration under the clustering section.
+</p>
+<pre>
+&lt;groupManagement enable="true"&gt;
+    &lt;applicationDomain name="test1.synapse.domain"
+                       description="Axis2 group"
+                       agent="org.apache.axis2.clustering.management.DefaultGroupManagementAgent"/&gt;
+    &lt;applicationDomain name="test2.synapse.domain"
+                       description="Axis2 group"
+                       agent="org.apache.axis2.clustering.management.DefaultGroupManagementAgent"/&gt;
+&lt;/groupManagement&gt;
+</pre>
+
+<p>
+Now we are done with configuring Synapse. Start the Synapse server with sample configuration 60. (i.e. synapse -sample 60)
+</p>
+<p>
+Now we will look at configuring the Axis2 servers.
+Deploy the LoadbalanceFailoverService by switching to &lt;Synapse installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService directory and running ant. Enable clustering in the &lt;Synapse installation directory&gt;/samples/axis2Server/ repository/conf/axis2.xml by setting the &quot;enable&quot; attribute of the &quot;clustering&quot; element. Set the applicationDomain to <strong>test1.synapse.domain</strong>.
+Next Start 2 instances of sample Axis2 server on HTTP ports 9001, 9002 and 9003 and give some unique names to each server.
+</p>
+<p>Example commands to run sample Axis2 servers from the &lt;Synapse installation directory&gt;/samples/axis2Server directory in Linux are listed below: </p>
+<pre xml:space="preserve">
+./axis2server.sh -http 9001 -https 9005 -name <strong>test1</strong>.synapse.apache.org-server1
+./axis2server.sh -http 9002 -https 9006 -name <strong>test1</strong>.synapse.apache.org-server2
+</pre>
+<p>Now we are done with setting up the environment for load balance sample. Start the load balance and failover client using the following command: </p>
+<pre xml:space="preserve">
+ant loadbalancefailover -Di=100 -Dtrpurl=http://<strong>test1</strong>.synapse.apache.org:8280/services/LBService1
+</pre>
+<p>This client sends 100 requests to the LoadbalanceFailoverService through Synapse. Synapse will route the request to the nodes in the <strong>test1.synapse.domain</strong> clustering domain in a round-robin manner. LoadbalanceFailoverService appends the name of the server to the response, so that client can determine which server has processed the message. If you examine the console output of the client, you can see that requests are processed by three servers as follows: </p>
+<pre xml:space="preserve">
+[java] Request: 1 ==&gt; Response from server: test1.synapse.apache.org-server1
+[java] Request: 2 ==&gt; Response from server: test1.synapse.apache.org-server2
+[java] Request: 3 ==&gt; Response from server: test1.synapse.apache.org-server1
+[java] Request: 4 ==&gt; Response from server: test1.synapse.apache.org-server2
+[java] Request: 5 ==&gt; Response from server: test1.synapse.apache.org-server1
+[java] Request: 6 ==&gt; Response from server: test1.synapse.apache.org-server2
+...
+</pre>
+<p>
+Shutdown the Axis2 servers you started in the above steps &amp; edit the &lt;Synapse installation directory&gt;/samples/axis2Server/repository.conf/axis2.xml file, and change the clustering applicationDomain to test2.synapse.domain. Now restart 2 instances of this Axis2 server as follows:
+</p>
+<pre>
+./axis2server.sh -http 9001 -https 9005 -name <strong>test2</strong>.synapse.apache.org-server1
+./axis2server.sh -http 9002 -https 9006 -name <strong>test2</strong>.synapse.apache.org-server2
+</pre>
+<p>Now we are done with setting up the environment for load balance sample. Start the load balance and failover client using the following command: </p>
+<pre xml:space="preserve">
+ant loadbalancefailover -Di=100 -Dtrpurl=http://<strong>test2</strong>.synapse.apache.org:8280/services/LBService1
+</pre>
+<p>This client sends 100 requests to the LoadbalanceFailoverService through Synapse. Synapse will route the request to the nodes in the <strong>test2.synapse.domain</strong> clustering domain in a round-robin manner.If you examine the console output of the client, you can see that requests are processed by three servers as follows: </p>
+<pre xml:space="preserve">
+[java] Request: 1 ==&gt; Response from server: test2.synapse.apache.org-server1
+[java] Request: 2 ==&gt; Response from server: test2.synapse.apache.org-server2
+[java] Request: 3 ==&gt; Response from server: test2.synapse.apache.org-server1
+[java] Request: 4 ==&gt; Response from server: test2.synapse.apache.org-server2
+[java] Request: 5 ==&gt; Response from server: test2.synapse.apache.org-server1
+[java] Request: 6 ==&gt; Response from server: test2.synapse.apache.org-server2
+...
+</pre>
+
+<p>
+For the sake of simplicity, we have shown how to run this sample for one clustering domain at a time. However, you can make a copy of the axis2Server directory, and setup both domains simultaneously, and run the sample client to see how the requests are load balanced in a round-robin manner within each clustering domain.
+</p>
+
 <h1><a name="MessageMediationQoS" id="MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a> </h1>
 <h2>
 <a name="Sample100" id="Sample100">Sample 100: Using WS-Security for outgoing messages</a></h2>

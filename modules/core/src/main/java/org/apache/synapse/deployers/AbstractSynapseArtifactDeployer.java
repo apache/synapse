@@ -336,7 +336,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);
         if (synCfgParam == null) {
             throw new DeploymentException("SynapseConfiguration not found. " +
-                    "Are you sure that you are running Synapse?");
+                    "Unable to continue the deployment operation.");
         }
         return (SynapseConfiguration) synCfgParam.getValue();
     }
@@ -346,7 +346,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                 cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);
         if (synCfgParam == null) {
             throw new DeploymentException("SynapseEnvironment not found. " +
-                    "Are you sure that you are running Synapse?");
+                    "Unable to continue the deployment operation.");
         }
         return (SynapseEnvironment) synCfgParam.getValue();
     }
@@ -358,7 +358,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                         SynapseConstants.SYNAPSE_SERVER_CONFIG_INFO);
         if (serverCfgParam == null) {
             throw new DeploymentException("SynapseConfigurationInformation not found. " +
-                    "Are you sure that you are running Synapse?");
+                    "Unable to continue the deployment operation.");
         }
         return (ServerConfigurationInformation) serverCfgParam.getValue();
     }
@@ -370,7 +370,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
                         SynapseConstants.SYNAPSE_SERVER_CTX_INFO);
         if (serverCtxParam == null) {
             throw new DeploymentException("ServerContextInformation not found. " +
-                    "Are you sure that you are running Synapse?");
+                    "Unable to continue the deployment operation.");
         }
         return (ServerContextInformation) serverCtxParam.getValue();
     }

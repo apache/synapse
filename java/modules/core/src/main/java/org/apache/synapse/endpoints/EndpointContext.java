@@ -387,7 +387,7 @@ public class EndpointContext {
                 } else if (state == ST_OFF) {
                     return false;
 
-                } else if (System.currentTimeMillis() > nextRetryTime) {
+                } else if (System.currentTimeMillis() >= nextRetryTime) {
                     // if we are not active, but reached the next retry time, return true but do not
                     // make a state change. We will make the state change on a successful send
                     // if we are in the ST_TIMEOUT state, reduce a remaining retry
@@ -420,13 +420,12 @@ public class EndpointContext {
             } else if (localState == ST_OFF) {
                 return false;
 
-            } else if (System.currentTimeMillis() > localNextRetryTime) {
+            } else if (System.currentTimeMillis() >= localNextRetryTime) {
 
                 // if we are not active, but reached the next retry time, return true but do not
                 // make a state change. We will make the state change on a successful send
                 // if we are in the ST_TIMEOUT state, reduce a remaining retry
                 if (localState == ST_TIMEOUT) {
-                    localRemainingRetries--;
 
                     if (log.isDebugEnabled()) {
                         log.debug("Endpoint : " + endpointName + " which is currently in timeout " +

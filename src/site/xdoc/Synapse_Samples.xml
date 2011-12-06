@@ -1807,7 +1807,13 @@ requests and etc... in a cycle</p>
 &lt;/definitions&gt;
 </pre>
 <p>
-<strong>Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services. Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes. In this context, a Cloud Service is also associated with a clustering domain</strong> </p>
+<strong>
+    Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services.
+    Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes.
+    In this context, a Cloud Service is also associated with a clustering domain. 
+    This can be used in place of the DynamicLoadbalanceEndpoint as well.
+</strong>
+</p>
 <p>
 <strong>Prerequisites:</strong>
 <br/>

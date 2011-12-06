@@ -476,6 +476,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             response.setHeader(
                 HTTP.CONTENT_TYPE,
                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+        } else if ( Boolean.TRUE == noEntityBody) {
+            ((BasicHttpEntity)response.getEntity()).setChunked(false);
+            ((BasicHttpEntity)response.getEntity()).setContentLength(0);
         }
         response.setStatusCode(determineHttpStatusCode(msgContext, response));
 

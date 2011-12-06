@@ -722,14 +722,23 @@ public class ClientHandler implements NHttpClientHandler {
                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
                         if (responseMsgCtx == null ||
+                                outMsgCtx.getOptions().isUseSeparateListener() ||
+                                outMsgCtx.getOperationContext().isComplete()) {
+                            if (responseMsgCtx != null &&
+                                    responseMsgCtx.getProperty("synapse.send") == null) {
+                                return;
+                            }
+                        } else if (responseMsgCtx == null ||
                                 outMsgCtx.getOptions().isUseSeparateListener()) {
                             // Since we need to notify the SynapseCallback receiver to remove the
                             // call backs registered  we set a custom property
-                            if (outMsgCtx.getOperationContext().isComplete()) {
-                                setHeaders(context, response, outMsgCtx, responseMsgCtx);
-                                outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
-                                mr.receive(outMsgCtx);
-                            }
+                            setHeaders(context, response, outMsgCtx, responseMsgCtx);
+                            outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
+                            mr.receive(outMsgCtx);
+                            return;
+                        }
+
+                        if (responseMsgCtx == null) {
                             return;
                         }
                         setHeaders(context, response, outMsgCtx, responseMsgCtx);

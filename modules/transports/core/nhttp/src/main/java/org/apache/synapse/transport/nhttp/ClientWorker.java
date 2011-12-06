@@ -43,6 +43,8 @@ import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -112,6 +114,7 @@ public class ClientWorker implements Runnable {
                 responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
             }
 
+            responseMsgCtx.setProperty(MessageContext.IN_MESSAGE_CONTEXT, outMsgCtx);
             responseMsgCtx.setServerSide(true);
             responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
             responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN, outMsgCtx
@@ -130,15 +133,35 @@ public class ClientWorker implements Runnable {
                     }
                 });
                 
-                for (int i=0; i<headers.length; i++) {
+                String servicePrefix = (String)outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX);
+                for (int i = 0; i < headers.length; i++) {
                     Header header = headers[i];
-                    if ("Location".equals(header.getName())
-                        && endpointURLPrefix != null
-                        && outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX) != null) {
-                        
-                        headerMap.put(header.getName(),
-                            header.getValue().replaceAll(endpointURLPrefix,
-                                (String) outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX)));
+                    if ("Location".equals(header.getName()) &&
+                            endpointURLPrefix != null && servicePrefix != null) {
+                        // Here, we are changing only the host name and the port of the new URI
+                        // value of the Location header.
+                        // If the new URI is again referring to a resource in the server to which the
+                        // original request is sent, then replace the hostname and port of the URI
+                        // with the hostname and port of synapse.
+                        // We are not changing the request url here, only the hostname and the port.
+                        try {
+                            URI serviceURI = new URI(servicePrefix);
+                            URI endpointURI = new URI(endpointURLPrefix);
+                            URI locationURI = new URI(header.getValue());
+
+                            if(locationURI.getHost().equalsIgnoreCase(endpointURI.getHost())){
+                                URI newURI = new URI(locationURI.getScheme(), locationURI.getUserInfo(),
+                                        serviceURI.getHost(), serviceURI.getPort(), locationURI.getPath(),
+                                        locationURI.getQuery(), locationURI.getFragment());
+                                headerMap.put(header.getName(), newURI.toString());
+                                responseMsgCtx.setProperty(NhttpConstants.SERVICE_PREFIX,
+                                        outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX));
+                            } else {
+                                headerMap.put(header.getName(), header.getValue());
+                            }
+                        } catch (URISyntaxException e) {
+                            log.error(e.getMessage(), e);
+                        }
                     } else {
                         headerMap.put(header.getName(), header.getValue());
                     }
@@ -278,7 +301,6 @@ public class ClientWorker implements Runnable {
 
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);
-            return;
         } catch (XMLStreamException e) {
             log.error("Error creating response SOAP envelope", e);
         } catch (IOException e) {

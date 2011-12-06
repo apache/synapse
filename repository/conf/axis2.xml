@@ -343,7 +343,7 @@
     <!--                  Clustering                       -->
     <!-- ================================================= -->
     <!-- Configure the following for preparing Synapse to a clustered environment -->
-    <cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
+    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
 
         <!--
            This parameter indicates whther the cluster has to be automatically initalized
@@ -434,14 +434,15 @@
         </members>
 
         <!--
-        Enable the load balancer entry if you need to run this node as a load balancer.
-        Multiple application domains with different LoadBalanceEventHandler implementations
+        Enable the groupManagement entry if you need to run this node as a cluster manager.
+        Multiple application domains with different GroupManagementAgent implementations
         can be defined in this section.
         -->
-        <loadBalancer enable="false">
+        <groupManagement enable="false">
             <applicationDomain name="apache.axis2.app.domain"
+                               description="Axis2 group"
                                handler="org.apache.axis2.clustering.DefaultLoadBalanceEventHandler"/>
-        </loadBalancer>
+        </groupManagement>
             
         <!--
            This interface is responsible for handling context replication. The property changes in
@@ -473,7 +474,7 @@
                 </context>
             </replication>
         </contextManager>
-    </cluster>
+    </clustering>
 
     <!-- ================================================= -->
     <!-- Phases  -->

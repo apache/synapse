@@ -258,7 +258,7 @@
     <!-- ================================================= -->
     <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->
     <!--
-    <clustering class="org.apache.axis2.cluster.tribes.TribesClusterManager">
+    <clustering class="org.apache.axis2.cluster.tribes.TribesClusteringAgent">
         <parameter name="param1">value1</parameter>
         <parameter name="domain">apache.axis2.domain</parameter>
     	<configurationManager class="org.apache.axis2.cluster.configuration.TribesConfigurationManager">

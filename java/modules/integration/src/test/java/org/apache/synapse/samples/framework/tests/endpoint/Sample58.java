@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.samples.framework.tests.message;
+package org.apache.synapse.samples.framework.tests.endpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,35 +24,38 @@ import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
-public class Sample0 extends SynapseTestCase {
+public class Sample58 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample0.class);
+    private static final Log log = LogFactory.getLog(Sample58.class);
     SampleClientResult result;
     StockQuoteSampleClient client;
+    String addUrl;
 
-    public Sample0() {
-        super(0);
+    public Sample58() {
+        super(58);
         client = getStockQuoteClient();
     }
 
 
-    public void testSmartClientMode() {
-        String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
-        String trpUrl = "http://localhost:8280/";
+    public void testStaticLB() {
+        addUrl = "http://localhost:8280/services/LBService1";
 
-        log.info("Running test: Smart Client mode");
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        new Thread(new Runnable() {
+            public void run() {
+                result = client.sessionlessClient(addUrl,null, 200);
+            }
+        }).start();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+        getBackendServerControllers().get(0).stop();
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
     }
-
-
-    public void testSynapseAsHTTPProxy() {
-        String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
-        String prxUrl = "http://localhost:8280/";
-
-        log.info("Running test: Using Synapse as a HTTP Proxy");
-        result = client.requestStandardQuote(addUrl, null, prxUrl, "IBM", null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
-    }
-
 }

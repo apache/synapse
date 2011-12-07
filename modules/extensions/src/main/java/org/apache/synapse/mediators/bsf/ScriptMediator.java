@@ -20,6 +20,8 @@
 package org.apache.synapse.mediators.bsf;
 
 import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
+import com.sun.script.groovy.GroovyScriptEngineFactory;
+import com.sun.script.jruby.JRubyScriptEngineFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.bsf.xml.XMLHelper;
@@ -400,6 +402,8 @@ public class ScriptMediator extends AbstractMediator {
 
         ScriptEngineManager manager = new ScriptEngineManager();
         manager.registerEngineExtension("js", new RhinoScriptEngineFactory());
+        manager.registerEngineExtension("groovy", new GroovyScriptEngineFactory());
+        manager.registerEngineExtension("rb", new JRubyScriptEngineFactory());
 
         this.scriptEngine = manager.getEngineByExtension(language);
         if (scriptEngine == null) {

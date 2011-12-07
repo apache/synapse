@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.clients.EventSampleClient;
@@ -59,12 +60,11 @@ public abstract class SynapseTestCase extends TestCase {
         this.sampleId = sampleId;
         log.info("Creating Synapse TestCase for test " + sampleId);
         currentLocation = System.getProperty("user.dir") + File.separator;
-        sampleDescriptor = File.separator + "sample" + sampleId + ".xml";
+        sampleDescriptor = "/sample" + sampleId + ".xml";
         configuration = new SampleConfiguration();
         backendServerControllers = new ArrayList<BackEndServerController>();
-        System.setProperty("java.io.tmpdir", currentLocation + "modules" + File.separator +
-                "integration" + File.separator + "target" + File.separator + "temp");
-
+        System.setProperty("java.io.tmpdir", FilenameUtils.normalize(
+                currentLocation + "modules/integration/target/temp"));
     }
 
     /**
@@ -412,19 +412,21 @@ public abstract class SynapseTestCase extends TestCase {
                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
 
         if (clientRepo == null) {
-            configuration.getClientConfig().setClientRepo(currentLocation +
-                    SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO);
+            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
+                    currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO));
         } else {
             log.info("Using client Axis2 repository location: " + clientRepo);
-            configuration.getClientConfig().setClientRepo(currentLocation + clientRepo);
+            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
+                    currentLocation + clientRepo));
         }
 
         if (clientAxis2Xml == null) {
-            configuration.getClientConfig().setAxis2Xml(currentLocation +
-                    SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML);
+            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
+                    currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML));
         } else {
             log.info("Using client Axis2 XML: " + clientAxis2Xml);
-            configuration.getClientConfig().setAxis2Xml(currentLocation + clientAxis2Xml);
+            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
+                    currentLocation + clientAxis2Xml));
         }
         return true;
 

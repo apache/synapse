@@ -591,7 +591,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Returns the map of defined entries in the configuration excluding the
      * fetched entries from remote registry.
      *
-     * @return Map of Entries defined in the local configuraion
+     * @return Map of Entries defined in the local configuration
      */
     public Map<String, Entry> getDefinedEntries() {
 

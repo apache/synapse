@@ -121,15 +121,15 @@ public class RecipientListEndpointFactory extends EndpointFactory {
                 if (name != null) {
                     recipientListEndpoint.setName(name.getAttributeValue());
                 }
-                recipientListEndpoint.setDynamicEnpointSet(dynamicEndpointSet);
+                recipientListEndpoint.setDynamicEndpointSet(dynamicEndpointSet);
             }
 
             if (recipientListEndpoint.getChildren() == null && 
             		recipientListEndpoint.getMembers() == null &&
-                    recipientListEndpoint.getDynamicEnpointSet() == null) {
-                String msg = "Invalid Synapse configuration.\n"
-                    + "A RecipientListEndpoint must have child/member elements, but the RecipientListEndpoint "
-                    + "'" + recipientListEndpoint.getName() + "' does not have any child/member/dynamic endpoint elements.";
+                    recipientListEndpoint.getDynamicEndpointSet() == null) {
+                String msg = "A RecipientListEndpoint must have child/member elements, but the " +
+                        "RecipientListEndpoint " + "'" + recipientListEndpoint.getName() + "' " +
+                        "does not have any child/member/dynamic endpoint elements.";
                 log.error(msg);
                 throw new SynapseException(msg);
             }
@@ -149,12 +149,7 @@ public class RecipientListEndpointFactory extends EndpointFactory {
         
         for(Iterator memberIter = loadbalanceElement.getChildrenWithName(MEMBER);
             memberIter.hasNext();){
-        	
-        	if(log.isDebugEnabled()){
-        		log.debug("Getting Members..");
-        	}
-        	
-            OMElement memberEle = (OMElement) memberIter.next();
+        	OMElement memberEle = (OMElement) memberIter.next();
             Member member = new Member(memberEle.getAttributeValue(new QName("hostName")), -1);
             String http = memberEle.getAttributeValue(new QName("httpPort"));
             if (http != null) {

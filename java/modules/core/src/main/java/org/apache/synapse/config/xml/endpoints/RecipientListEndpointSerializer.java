@@ -74,10 +74,10 @@ public class RecipientListEndpointSerializer extends EndpointSerializer {
                         "httpsPort", null, String.valueOf(member.getHttpsPort())));
                 recipientListElement.addChild(memberEle);
             }
-        }else{
+        } else {
             OMElement dynamicEpEle = fac.createOMElement(
                     "endpoints", SynapseConstants.SYNAPSE_OMNAMESPACE, recipientListElement);
-            new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEnpointSet(),
+            new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEndpointSet(),
                     "value", dynamicEpEle);
             dynamicEpEle.addAttribute(fac.createOMAttribute("max-cache", null,
                     String.valueOf(recipientListEndpoint.getCurrentPoolSize())));

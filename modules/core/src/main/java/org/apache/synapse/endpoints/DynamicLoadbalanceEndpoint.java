@@ -249,10 +249,12 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        //Removing the REST_URL_POSTFIX - this is a hack.
-        //In this loadbalance endpoint we create an endpoint per request by setting the complete url as the adress.
-        //If a REST message comes Axis2FlexibleMEPClient append the REST_URL_POSTFIX to the adress. Hence endpoint fails
-        //do send the request. e.g.  http://localhost:8080/example/index.html/example/index.html
+        // Removing the REST_URL_POSTFIX - this is a hack.
+        // In this loadbalance endpoint we create an endpoint per request by setting the complete
+        // url as the address.
+        // If a REST message comes Axis2FlexibleMEPClient append the REST_URL_POSTFIX to the address.
+        // Hence endpoint fails to send the request.
+        // e.g.  http://localhost:8080/example/index.html/example/index.html
         axis2MsgCtx.removeProperty(NhttpConstants.REST_URL_POSTFIX);
 
         String transport = axis2MsgCtx.getTransportIn().getName();

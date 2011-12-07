@@ -58,11 +58,13 @@ public abstract class SynapseTestCase extends TestCase {
     protected SynapseTestCase(int sampleId) {
         this.sampleId = sampleId;
         log.info("Creating Synapse TestCase for test " + sampleId);
-        currentLocation = System.getProperty("user.dir") + "/";
-        sampleDescriptor = "/sample" + sampleId + ".xml";
+        currentLocation = System.getProperty("user.dir") + File.separator;
+        sampleDescriptor = File.separator + "sample" + sampleId + ".xml";
         configuration = new SampleConfiguration();
         backendServerControllers = new ArrayList<BackEndServerController>();
-        System.setProperty("java.io.tmpdir", currentLocation + "modules/integration/target/temp");
+        System.setProperty("java.io.tmpdir", currentLocation + "modules" + File.separator +
+                "integration" + File.separator + "target" + File.separator + "temp");
+
     }
 
     /**
@@ -70,8 +72,6 @@ public abstract class SynapseTestCase extends TestCase {
      * Loads all configuration info. and starts the servers.
      */
     public void setUp() {
-        log.info("SynapseTestCase: Performing necessary steps to run test " + sampleId);
-
         assertTrue("Could not load the global descriptor file for sample " + sampleId,
                 loadDescriptorInfoFile());
         assertTrue("There are errors in global descriptor file for sample " + sampleId,
@@ -90,13 +90,13 @@ public abstract class SynapseTestCase extends TestCase {
         for (BackEndServerController bsc : backendServerControllers) {
             if (!bsc.start()) {
                 doCleanup();
-                fail("There was an error starting the server: " + bsc.getServerName());
+                fail("Error starting the server: " + bsc.getServerName());
             }
         }
 
         if (!pc.startProcess()) {
             doCleanup();
-            fail("There was an error starting synapse server");
+            fail("Error starting synapse server");
         }
     }
 
@@ -152,7 +152,7 @@ public abstract class SynapseTestCase extends TestCase {
         try {
             InputStream in = this.getClass().getResourceAsStream(sampleDescriptor);
             if (in == null) {
-                fail("Cannot read sample descriptor file. Verify that it exists in the resource dir");
+                fail("Cannot read sample descriptor file");
             }
             StAXOMBuilder builder = new StAXOMBuilder(in);
             sampleConfigElement = builder.getDocumentElement();
@@ -169,10 +169,11 @@ public abstract class SynapseTestCase extends TestCase {
      * @return true If the sample ID matches
      */
     private boolean processDescriptorFile() {
-        int fileID = -1;
-        Iterator itr = sampleConfigElement.getChildrenWithLocalName(SampleConfigConstants.TAG_SAMPLE_ID);
+        int fileId = -1;
+        Iterator itr = sampleConfigElement.getChildrenWithLocalName(
+                SampleConfigConstants.TAG_SAMPLE_ID);
         while (itr.hasNext()) {
-            fileID = Integer.parseInt(((OMElement) itr.next()).getText());
+            fileId = Integer.parseInt(((OMElement) itr.next()).getText());
         }
         itr = sampleConfigElement.getChildrenWithLocalName(SampleConfigConstants.TAG_SAMPLE_NAME);
         while (itr.hasNext()) {
@@ -180,7 +181,7 @@ public abstract class SynapseTestCase extends TestCase {
             configuration.setSampleName(sampleName);
         }
 
-        return sampleId == fileID;
+        return sampleId == fileId;
     }
 
     /**
@@ -191,7 +192,8 @@ public abstract class SynapseTestCase extends TestCase {
     private boolean initSynapseConfigInfo() {
         Properties synapseProperties = new Properties();
         OMElement synEle = null;
-        Iterator itr = sampleConfigElement.getChildrenWithLocalName(SampleConfigConstants.TAG_SYNAPSE_CONF);
+        Iterator itr = sampleConfigElement.getChildrenWithLocalName(
+                SampleConfigConstants.TAG_SYNAPSE_CONF);
         while (itr.hasNext()) {
             synEle = (OMElement) itr.next();
         }
@@ -222,18 +224,20 @@ public abstract class SynapseTestCase extends TestCase {
         } else {
             configuration.getSynapseConfig().setSynapseXml(synapseHome + synapseXml);
         }
+
         if (axis2Repo == null) {
-            log.info("synapse repository is not specified in the descriptor. using default value...");
             configuration.getSynapseConfig().setAxis2Repo(synapseHome +
                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
         } else {
+            log.info("Using Synapse Axis2 repository: " + axis2Repo);
             configuration.getSynapseConfig().setAxis2Repo(synapseHome + axis2Repo);
         }
+
         if (axis2Xml == null) {
-            log.info("synapse axis2.xml is not specified in the descriptor. using default value...");
             configuration.getSynapseConfig().setAxis2Xml(synapseHome +
                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
         } else {
+            log.info("Using Synapse Axis2 XML: " + axis2Xml);
             configuration.getSynapseConfig().setAxis2Xml(synapseHome + axis2Xml);
         }
 
@@ -264,10 +268,10 @@ public abstract class SynapseTestCase extends TestCase {
 
         // Processing JMS servers
         Properties jmsProperties = new Properties();
-        Iterator itr_JMS_Servers = bESConfigEle.getChildrenWithLocalName(
+        Iterator itrJmsServers = bESConfigEle.getChildrenWithLocalName(
                 SampleConfigConstants.TAG_BE_SERVER_CONF_JMS_BROKER);
-        while (itr_JMS_Servers.hasNext()) {
-            OMElement jmsServer = (OMElement) itr_JMS_Servers.next();
+        while (itrJmsServers.hasNext()) {
+            OMElement jmsServer = (OMElement) itrJmsServers.next();
             String serverID = jmsServer.getAttributeValue(new QName("id"));
             String serverName = "SampleJMSServer" + serverID;
             configuration.addNewJMSBroker(serverName);
@@ -284,17 +288,18 @@ public abstract class SynapseTestCase extends TestCase {
                     SampleConfigConstants.TAG_BE_SERVER_CONF_JMS_INITIAL_NAMING_FACTORY);
 
             if (providerURL == null) {
-                log.info("Using default provider url");
                 configuration.getJMSConfig(serverName).setProviderURL(
                         SampleConfigConstants.DEFAULT_BE_SERVER_CONF_JMS_PROVIDER_URL);
             } else {
+                log.info("Using provider URL: " + providerURL);
                 configuration.getJMSConfig(serverName).setProviderURL(providerURL);
             }
+
             if (initialNF == null) {
-                log.info("Using default initial naming factory");
                 configuration.getJMSConfig(serverName).setInitialNamingFactory(
                         SampleConfigConstants.DEFAULT_BE_SERVER_CONF_JMS_INITIAL_NAMING_FACTORY);
             } else {
+                log.info("Using initial context factory: " + initialNF);
                 configuration.getJMSConfig(serverName).setInitialNamingFactory(initialNF);
             }
 
@@ -328,10 +333,10 @@ public abstract class SynapseTestCase extends TestCase {
 
         // Processing axis2 servers
         Properties axis2Properties = new Properties();
-        Iterator itr_Axis2_Servers = bESConfigEle.getChildrenWithLocalName(
+        Iterator itrAxis2Servers = bESConfigEle.getChildrenWithLocalName(
                 SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_SERVER);
-        while (itr_Axis2_Servers.hasNext()) {
-            OMElement axis2Server = (OMElement) itr_Axis2_Servers.next();
+        while (itrAxis2Servers.hasNext()) {
+            OMElement axis2Server = (OMElement) itrAxis2Servers.next();
             String serverID = axis2Server.getAttributeValue(new QName("id"));
             String serverName = "SampleAxis2Server" + serverID;
             configuration.addNewAxis2Server(serverName);
@@ -354,17 +359,18 @@ public abstract class SynapseTestCase extends TestCase {
             configuration.getAxis2Config(serverName).setServerName(serverName);
 
             if (relAxis2Repo == null) {
-                log.info("axis2 repository is not specified in the descriptor. using default value...");
                 configuration.getAxis2Config(serverName).setAxis2Repo(axis2Home +
                         SampleConfigConstants.DEFAULT_BE_SERVER_CONF_AXIS2_REPO);
             } else {
+                log.info("Using Axis2 repository: " + relAxis2Repo);
                 configuration.getAxis2Config(serverName).setAxis2Repo(axis2Home + relAxis2Repo);
             }
+
             if (relAxis2Xml == null) {
-                log.info("axis2.xml is not specified in the descriptor. using default value...");
                 configuration.getAxis2Config(serverName).setAxis2Xml(axis2Home +
                         SampleConfigConstants.DEFAULT_BE_SERVER_CONF_AXIS2_XML);
             } else {
+                log.info("Using Axis2 XML: " + relAxis2Xml);
                 configuration.getAxis2Config(serverName).setAxis2Xml(axis2Home + relAxis2Xml);
             }
 
@@ -406,20 +412,18 @@ public abstract class SynapseTestCase extends TestCase {
                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
 
         if (clientRepo == null) {
-            log.info("client repository location is not specified in the descriptor. using default value...");
             configuration.getClientConfig().setClientRepo(currentLocation +
                     SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO);
-
         } else {
+            log.info("Using client Axis2 repository location: " + clientRepo);
             configuration.getClientConfig().setClientRepo(currentLocation + clientRepo);
         }
 
         if (clientAxis2Xml == null) {
-            log.info("client axis2.xml is not specified in the descriptor. using default value...");
             configuration.getClientConfig().setAxis2Xml(currentLocation +
                     SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML);
-
         } else {
+            log.info("Using client Axis2 XML: " + clientAxis2Xml);
             configuration.getClientConfig().setAxis2Xml(currentLocation + clientAxis2Xml);
         }
         return true;
@@ -443,8 +447,8 @@ public abstract class SynapseTestCase extends TestCase {
             FileUtils.writeStringToFile(tempSynapseAxis2, modifiedSynapseAxis2);
             configuration.getSynapseConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
 
-            for (BackEndServerController besc : backendServerControllers) {
-                String serverName = besc.getServerName();
+            for (BackEndServerController controller : backendServerControllers) {
+                String serverName = controller.getServerName();
                 String beAxis2Xml = configuration.getAxis2Config(serverName).getAxis2Xml();
                 String beAxis2Config = FileUtils.readFileToString(new File(beAxis2Xml));
                 String modifiedBEAxis2 = SynapseTestUtils.replace(beAxis2Config, "${replace.me}", ip);

@@ -72,6 +72,8 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
     private Throttle throttle;
     /* Lock used to ensure thread-safe creation of the throttle */
     private final Object throttleLock = new Object();
+    /* Last version of dynamic policy resource*/
+    private long version;
 
     public ThrottleMediator() {
         this.accessControler = new AccessRateController();
@@ -181,8 +183,10 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                         boolean reCreate = false;
                         // if the key refers to a dynamic resource
                         if (entry.isDynamic()) {
-                            if (!entry.isCached() || entry.isExpired()) {
+                            if ((!entry.isCached() || entry.isExpired()) &&
+                                    version != entry.getVersion()) {
                                 reCreate = true;
+                                version = entry.getVersion();
                             }
                         }
                         if (reCreate || throttle == null) {

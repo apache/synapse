@@ -1809,19 +1809,21 @@ requests and etc... in a cycle</p>
 <p>
 <strong>
     Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services.
+</strong>    
+</p>
+<p>
     Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes.
     In this context, a Cloud Service is also associated with a clustering domain. 
     This can be used in place of the DynamicLoadbalanceEndpoint as well.
-</strong>
 </p>
 <p>
 <strong>Prerequisites:</strong>
 <br/>
 Put the following entries into the /etc/hosts file on your machine.
 
-<pre>
-127.0.0.1&nbsp;&nbsp;&nbsp;test1.synapse.apache.org
-127.0.0.1&nbsp;&nbsp;&nbsp;test2.synapse.apache.org
+<pre xml:space="preserve">
+127.0.0.1    test1.synapse.apache.org
+127.0.0.1    test2.synapse.apache.org
 </pre>
 
 <br/>Enable clustering in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;clustering&quot; element.

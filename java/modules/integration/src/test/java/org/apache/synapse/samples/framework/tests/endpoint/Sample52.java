@@ -27,8 +27,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample52 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample52.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample52() {
         super(52);
@@ -37,12 +37,11 @@ public class Sample52 extends SynapseTestCase {
 
 
     public void testSessionLessLB() {
-        //String repo = getConfiguration().getClientConfig().getClientRepo();
         String addUrl = "http://localhost:8280/services/LBService1";
 
         log.info("Running test: Session-less load balancing between 3 endpoints");
-        result = client.sessionlessClient(addUrl, null, 100);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.sessionlessClient(addUrl, null, 100);
+        assertResponseReceived(result);
     }
 
 

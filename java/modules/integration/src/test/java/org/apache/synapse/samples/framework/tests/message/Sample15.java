@@ -27,8 +27,7 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample15 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample15.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+    private StockQuoteSampleClient client;
 
     public Sample15() {
         super(15);
@@ -40,8 +39,8 @@ public class Sample15 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280/services/StockQuote";
 
         log.info("Running test: Message Enrichment through Synapse");
-        result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
+        assertResponseReceived(result);
     }
 
 }

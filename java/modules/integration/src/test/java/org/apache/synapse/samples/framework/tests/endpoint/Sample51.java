@@ -30,8 +30,8 @@ import java.io.File;
 public class Sample51 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample51.class);
-    SampleClientResult result;
-    MTOMSwASampleClient client;
+
+    private MTOMSwASampleClient client;
 
     public Sample51() {
         super(51);
@@ -44,8 +44,8 @@ public class Sample51 extends SynapseTestCase {
         String filename = FilenameUtils.normalize(
                 currentLocation + "repository/conf/sample/resources/mtom/asf-logo.gif");
         log.info("Running test: MTOM optimization and request/response correlation ");
-        result = client.sendUsingMTOM(filename, ep);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.sendUsingMTOM(filename, ep);
+        assertResponseReceived(result);
     }
 
 
@@ -56,8 +56,8 @@ public class Sample51 extends SynapseTestCase {
                 currentLocation + "repository/conf/sample/resources/mtom/asf-logo.gif");
 
         log.info("Running test:SwA optimization and request/response correlation ");
-        result = client.sendUsingSWA(filename, ep);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.sendUsingSWA(filename, ep);
+        assertResponseReceived(result);
     }
 
 }

@@ -27,9 +27,10 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample58 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample58.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
-    String addUrl;
+
+    private SampleClientResult result;
+    private StockQuoteSampleClient client;
+
 
     public Sample58() {
         super(58);
@@ -38,11 +39,11 @@ public class Sample58 extends SynapseTestCase {
 
 
     public void testStaticLB() {
-        addUrl = "http://localhost:8280/services/LBService1";
+        final String addUrl = "http://localhost:8280/services/LBService1";
 
         new Thread(new Runnable() {
             public void run() {
-                result = client.sessionlessClient(addUrl,null, 200);
+                result = client.sessionlessClient(addUrl, null, 200);
             }
         }).start();
         try {

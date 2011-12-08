@@ -29,8 +29,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample5 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample5.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample5() {
         super(5);
@@ -43,11 +43,10 @@ public class Sample5 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280";
         String expectedError_MSFT = "bogus";
         String expectedError_SUN = "Connection refused";
-        String expectedError_IBM = "The input stream for an incoming message is null";
 
         log.info("Running test: Creating SOAP fault messages and changing the direction of a message");
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
-        assertFalse("Must not get a response", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
+        assertFalse("Must not get a response", result.responseReceived());
         Exception resultEx = result.getException();
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());
@@ -55,7 +54,7 @@ public class Sample5 extends SynapseTestCase {
         assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError_MSFT)!=-1);
 
         result = client.requestStandardQuote(addUrl, trpUrl, null, "SUN" ,null);
-        assertFalse("Must not get a response", result.gotResponse());
+        assertFalse("Must not get a response", result.responseReceived());
         resultEx = result.getException();
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());
@@ -63,7 +62,7 @@ public class Sample5 extends SynapseTestCase {
         assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError_SUN)!=-1);
 
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertFalse("Must not get a response", result.gotResponse());
+        assertFalse("Must not get a response", result.responseReceived());
         resultEx = result.getException();
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());

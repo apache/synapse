@@ -27,8 +27,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample6 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample6.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample6() {
         super(6);
@@ -40,8 +40,8 @@ public class Sample6 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280/";
 
         log.info("Running test: Dumb Client mode  ");
-        result = client.requestStandardQuote(null, trpUrl, null, null ,null);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(null, trpUrl, null, null ,null);
+        assertResponseReceived(result);
     }
 
 }

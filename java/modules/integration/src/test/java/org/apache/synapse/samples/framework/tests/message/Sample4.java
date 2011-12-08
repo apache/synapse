@@ -28,8 +28,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample4 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample4.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample4() {
         super(4);
@@ -42,16 +42,18 @@ public class Sample4 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280";
 
         log.info("Running test: Introduction to error handling");
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Did not get the correct response", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
+        assertResponseReceived(result);
+
         result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
-        assertFalse("Must not get a response", result.gotResponse());
+        assertFalse("Must not get a response", result.responseReceived());
         Exception resultEx = result.getException();
         assertNotNull("Did not receive expected error" , resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());
         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
+
         result = client.requestStandardQuote(addUrl, trpUrl, null, "SUN" ,null);
-        assertFalse("Must not get a response", result.gotResponse());
+        assertFalse("Must not get a response", result.responseReceived());
         Exception resultEx2 = result.getException();
         assertNotNull("Did not receive expected error" , resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());

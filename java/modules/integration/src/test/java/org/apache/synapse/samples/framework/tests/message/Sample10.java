@@ -41,7 +41,7 @@ public class Sample10 extends SynapseTestCase {
 
         log.info("Running test: Dynamic EndPoints with Registry");
         result = client.requestStandardQuote(null, trpUrl, null, "IBM", null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

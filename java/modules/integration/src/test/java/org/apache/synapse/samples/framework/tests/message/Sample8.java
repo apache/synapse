@@ -42,7 +42,7 @@ public class Sample8 extends SynapseTestCase {
 
         log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations  ");
         result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

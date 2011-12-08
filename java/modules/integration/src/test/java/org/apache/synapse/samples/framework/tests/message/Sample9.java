@@ -42,7 +42,7 @@ public class Sample9 extends SynapseTestCase {
 
         log.info("Running test: Dynamic Sequences with Registry");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

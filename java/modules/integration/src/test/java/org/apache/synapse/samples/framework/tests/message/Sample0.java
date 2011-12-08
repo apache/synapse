@@ -42,7 +42,7 @@ public class Sample0 extends SynapseTestCase {
 
         log.info("Running test: Smart Client mode");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 
@@ -52,7 +52,7 @@ public class Sample0 extends SynapseTestCase {
 
         log.info("Running test: Using Synapse as a HTTP Proxy");
         result = client.requestStandardQuote(addUrl, null, prxUrl, "IBM", null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

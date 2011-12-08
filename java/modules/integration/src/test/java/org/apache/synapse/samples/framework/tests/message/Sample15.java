@@ -41,7 +41,7 @@ public class Sample15 extends SynapseTestCase {
 
         log.info("Running test: Message Enrichment through Synapse");
         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

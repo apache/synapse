@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.derby.drda.NetworkServerControl;
+import org.apache.synapse.samples.framework.config.DerbyConfiguration;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -21,11 +22,10 @@ public class DerbyServerController implements BackEndServerController {
     private static final Log log = LogFactory.getLog(DerbyServerController.class);
 
     private String serverName;
-    private SampleConfiguration.DerbyServerSampleConfiguration configuration;
+    private DerbyConfiguration configuration;
     private NetworkServerControl server;
 
-    public DerbyServerController(String serverName,
-                                 SampleConfiguration.DerbyServerSampleConfiguration configuration) {
+    public DerbyServerController(String serverName, DerbyConfiguration configuration) {
         this.serverName = serverName;
         this.configuration = configuration;
     }

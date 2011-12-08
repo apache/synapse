@@ -19,19 +19,19 @@
 package org.apache.synapse.samples.framework;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Stores the results after executing a client
  */
 public class SampleClientResult {
 
-    private boolean responseReceived;
-    private boolean isFinished;
+    private AtomicInteger responseCount = new AtomicInteger(0);
     private Exception exception;
     private Properties clientProperties = new Properties();
 
-    public void setResponseReceived(boolean responseReceived) {
-        this.responseReceived = responseReceived;
+    public void incrementResponseCount() {
+        responseCount.incrementAndGet();
     }
 
     public void setException(Exception exception) {
@@ -39,19 +39,11 @@ public class SampleClientResult {
     }
 
     public boolean responseReceived() {
-        return responseReceived;
+        return responseCount.get() > 0;
     }
 
     public Exception getException() {
         return exception;
-    }
-
-    public boolean isFinished() {
-        return isFinished;
-    }
-
-    public void setFinished(boolean finished) {
-        isFinished = finished;
     }
 
     public void addProperty(String pName, String pValue){

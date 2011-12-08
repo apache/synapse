@@ -40,31 +40,26 @@ public class Sample55 extends SynapseTestCase {
     public void testSessionFullLBFailOver() {
         final String addUrl = "http://localhost:8280/services/LBService1";
         log.info("Running test: Failover sending among 3 endpoints");
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             public void run() {
                 result = client.statefulClient(addUrl, null, 200);
             }
-        }).start();
+        });
+        t.start();
 
         try {
-            Thread.sleep(2000);
+            t.join();
         } catch (InterruptedException e) {
 
         }
+
         getBackendServerControllers().get(0).stop();
-
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
 
         }
 
-        while (!result.isFinished()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
-        }
         assertTrue("Did not receive a response", result.responseReceived());
     }
 }

@@ -8,6 +8,7 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -23,12 +24,12 @@ public class Axis2BackEndServerController implements BackEndServerController {
     private BackEndServerThread serverThread;
     private ConfigurationContext configContext;
     private ListenerManager listenerManager;
-    private SampleConfiguration.Axis2SampleConfiguration configuration;
+    private Axis2ServerConfiguration configuration;
     private CountDownLatch cdLatch;
     private Exception processException;
 
     public Axis2BackEndServerController(String serverName,
-                                        SampleConfiguration.Axis2SampleConfiguration configuration) {
+                                        Axis2ServerConfiguration configuration) {
         this.serverName = serverName;
         this.configuration = configuration;
         serverThread = new BackEndServerThread();
@@ -87,7 +88,6 @@ public class Axis2BackEndServerController implements BackEndServerController {
 
                 // setting System.setProperty does not work since this all servers are run on same jvm
                 configContext.setProperty("server_name", serverName);
-
 
                 TransportInDescription httpTrsIn = configContext.getAxisConfiguration().
                         getTransportsIn().get("http");

@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.ServerManager;
+import org.apache.synapse.samples.framework.config.SynapseServerConfiguration;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -34,13 +35,13 @@ public class SynapseProcessController implements ProcessController {
     private static final Log log = LogFactory.getLog(SynapseProcessController.class);
 
     private ServerThread serverThread;
-    private SampleConfiguration.SynapseSampleConfiguration configuration;
+    private SynapseServerConfiguration configuration;
     private ServerConfigurationInformation information;
     private ServerManager manager;
     private CountDownLatch cdLatch;
     private Exception processException;
 
-    public SynapseProcessController(SampleConfiguration.SynapseSampleConfiguration configuration) {
+    public SynapseProcessController(SynapseServerConfiguration configuration) {
         this.configuration = configuration;
         information = new ServerConfigurationInformation();
         manager = new ServerManager();

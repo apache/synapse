@@ -22,6 +22,7 @@ package org.apache.synapse.samples.framework;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.samples.framework.config.JMSBrokerConfiguration;
 
 /**
  * Responsible for starting up and shutting down
@@ -32,11 +33,10 @@ public class JMSBrokerController implements BackEndServerController {
     private static final Log log = LogFactory.getLog(JMSBrokerController.class);
 
     private String serverName;
-    private SampleConfiguration.JMSBrokerSampleConfiguration configuration;
+    private JMSBrokerConfiguration configuration;
     private BrokerService broker;
 
-    public JMSBrokerController(String serverName,
-                               SampleConfiguration.JMSBrokerSampleConfiguration configuration) {
+    public JMSBrokerController(String serverName, JMSBrokerConfiguration configuration) {
         this.serverName = serverName;
         this.configuration = configuration;
     }

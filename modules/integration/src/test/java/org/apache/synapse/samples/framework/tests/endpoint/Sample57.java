@@ -45,41 +45,30 @@ public class Sample57 extends SynapseTestCase {
         } catch (InterruptedException e) {
 
         }
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             public void run() {
                 result = client.sessionlessClient(addUrl, null, 500);
             }
-        }).start();
+        });
+        t.start();
 
         try {
-            Thread.sleep(3000);
+            t.join();
         } catch (InterruptedException e) {
 
         }
 
-        while (!result.isFinished()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
-        }
-
-        new Thread(new Runnable() {
+        t = new Thread(new Runnable() {
             public void run() {
                 result = client.sessionlessClient(addUrl, null, 500);
             }
-        }).start();
+        });
+        t.start();
+
         try {
-            Thread.sleep(5000);
+            t.join();
         } catch (InterruptedException e) {
 
-        }
-
-        while (!result.isFinished()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
         }
 
         assertResponseReceived(result);

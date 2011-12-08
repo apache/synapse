@@ -42,7 +42,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
 import org.apache.synapse.samples.framework.SampleClientResult;
-import org.apache.synapse.samples.framework.SampleConfiguration;
+import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
@@ -56,45 +56,36 @@ public class StockQuoteSampleClient {
 
     private final static String COOKIE = "Cookie";
     private final static String SET_COOKIE = "Set-Cookie";
-    private ConfigurationContext configContext = null;
 
-    private Options options;
+    private ConfigurationContext configContext = null;
     private ServiceClient serviceClient;
-    //private SampleClientResult clientResult;
     private OMElement payload;
     private OMElement response;
     private boolean completed;
-    private SampleConfiguration.ClientSampleConfiguration configuration;
+    private Axis2ClientConfiguration clientConfig;
 
-    public StockQuoteSampleClient(SampleConfiguration.ClientSampleConfiguration configuration) {
-        this.configuration = configuration;
+    public StockQuoteSampleClient(Axis2ClientConfiguration clientConfig) {
+        this.clientConfig = clientConfig;
     }
 
-    private void initializeClient(String addUrl, String trpUrl, String prxUrl,
-                                  String svcPolicy, long timeout) throws Exception {
-        log.info("initialing client config...");
-        options = new Options();
-        /*clientResult = new SampleClientResult();
-        clientResult.setResponseReceived(false);*/
-        payload = null;
+    private void init(String addUrl, String trpUrl, String prxUrl,
+                      String policyKey, long timeout) throws Exception {
 
-        log.info("creating axis2 configuration context using the repo: " + configuration.getClientRepo());
+        log.info("Initializing sample Axis2 client");
 
-        configContext = ConfigurationContextFactory.
-                createConfigurationContextFromFileSystem(configuration.getClientRepo(),
-                        configuration.getAxis2Xml());
+        configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                    clientConfig.getClientRepo(), clientConfig.getAxis2Xml());
         serviceClient = new ServiceClient(configContext, null);
 
-        log.info("setting address, transport, proxy urls where applicable");
-        if (addUrl != null && !"null".equals(addUrl)) {
+        Options options = new Options();
+        if (addUrl != null && !"".equals(addUrl)) {
             serviceClient.engageModule("addressing");
             options.setTo(new EndpointReference(addUrl));
         }
-        if (trpUrl != null && !"null".equals(trpUrl)) {
+        if (trpUrl != null && !"".equals(trpUrl)) {
             options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);
         }
-
-        if (prxUrl != null && !"null".equals(prxUrl)) {
+        if (prxUrl != null && !"".equals(prxUrl)) {
             HttpTransportProperties.ProxyProperties proxyProperties =
                     new HttpTransportProperties.ProxyProperties();
             URL url = new URL(prxUrl);
@@ -106,15 +97,13 @@ public class StockQuoteSampleClient {
             options.setProperty(HTTPConstants.PROXY, proxyProperties);
         }
 
-        // apply any service policies if any
-        if (svcPolicy != null && !"null".equals(svcPolicy) && svcPolicy.length() > 0) {
+        if (policyKey != null && !"".equals(policyKey)) {
             log.info("Using WS-Security");
             serviceClient.engageModule("addressing");
             serviceClient.engageModule("rampart");
-            StAXOMBuilder builder = new StAXOMBuilder(svcPolicy);
+            StAXOMBuilder builder = new StAXOMBuilder(policyKey);
             Policy policy = PolicyEngine.getPolicy(builder.getDocumentElement());
-            options.setProperty(
-                    RampartMessageData.KEY_RAMPART_POLICY, policy);
+            options.setProperty(RampartMessageData.KEY_RAMPART_POLICY, policy);
         }
 
         if (timeout > 0) {
@@ -125,7 +114,7 @@ public class StockQuoteSampleClient {
         serviceClient.setOptions(options);
     }
 
-    private void terminateClient() {
+    private void terminate() {
         if (serviceClient != null) {
             try {
                 log.info("cleaning up client");
@@ -152,22 +141,20 @@ public class StockQuoteSampleClient {
         log.info("sending standard quote request");
         SampleClientResult clientResult = new SampleClientResult();
         try {
-            initializeClient(addUrl, trpUrl, prxUrl, svcPolicy, 10000);
+            init(addUrl, trpUrl, prxUrl, svcPolicy, 10000);
 
             payload = StockQuoteHandler.createStandardQuoteRequest(
                     symbol, 1);
-            options.setAction("urn:getQuote");
+            serviceClient.getOptions().setAction("urn:getQuote");
             OMElement resultElement = serviceClient.sendReceive(payload);
             log.info("Standard :: Stock price = $" +
                     StockQuoteHandler.parseStandardQuoteResponse(resultElement));
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
     }
 
@@ -176,12 +163,11 @@ public class StockQuoteSampleClient {
         log.info("sending dual quote request");
         SampleClientResult clientResult = new SampleClientResult();
         try {
-            initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
+            init(addUrl, trpUrl, prxUrl, null, 10000);
 
             payload = StockQuoteHandler.createStandardQuoteRequest(
                     symbol, 1);
-            options.setAction("urn:getQuote");
-            //serviceClient.engageModule("addressing");
+            serviceClient.getOptions().setAction("urn:getQuote");
             setCompleted(false);
             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback(this));
 
@@ -189,7 +175,7 @@ public class StockQuoteSampleClient {
                 if (isCompleted()) {
                     log.info("Standard dual channel :: Stock price = $" +
                             StockQuoteHandler.parseStandardQuoteResponse(getResponse()));
-                    clientResult.setResponseReceived(true);
+                    clientResult.incrementResponseCount();
                     break;
                 } else {
                     Thread.sleep(100);
@@ -197,11 +183,9 @@ public class StockQuoteSampleClient {
             }
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
     }
 
@@ -210,21 +194,19 @@ public class StockQuoteSampleClient {
         log.info("sending custom quote request");
         SampleClientResult clientResult = new SampleClientResult();
         try {
-            initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
+            init(addUrl, trpUrl, prxUrl, null, 10000);
 
             payload = StockQuoteHandler.createCustomQuoteRequest(symbol);
-            options.setAction("urn:getQuote");
+            serviceClient.getOptions().setAction("urn:getQuote");
             OMElement resultElement = serviceClient.sendReceive(payload);
             log.info("Custom :: Stock price = $" +
                     StockQuoteHandler.parseCustomQuoteResponse(resultElement));
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
     }
 
@@ -232,26 +214,23 @@ public class StockQuoteSampleClient {
         log.info("sending fire and forget (place order) request");
         SampleClientResult clientResult = new SampleClientResult();
         try {
-            initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
+            init(addUrl, trpUrl, prxUrl, null, 10000);
             double price = getRandom(100, 0.9, true);
             int quantity = (int) getRandom(10000, 1.0, true);
             payload = StockQuoteHandler.createPlaceOrderRequest(price, quantity, symbol);
-            options.setAction("urn:placeOrder");
+            serviceClient.getOptions().setAction("urn:placeOrder");
 
             serviceClient.fireAndForget(payload);
             Thread.sleep(5000);
 
-            log.info("Order placed for " + quantity
-                    + " shares of stock " + symbol
+            log.info("Order placed for " + quantity + " shares of stock " + symbol
                     + " at a price of $ " + price);
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
     }
 
@@ -260,25 +239,21 @@ public class StockQuoteSampleClient {
         log.info("sending rest request");
         SampleClientResult clientResult = new SampleClientResult();
         try {
-            initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
-
-            payload = StockQuoteHandler.createStandardQuoteRequest(
-                    symbol, 1);
-            options.setAction("urn:getQuote");
-            options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
+            init(addUrl, trpUrl, prxUrl, null, 10000);
+            payload = StockQuoteHandler.createStandardQuoteRequest(symbol, 1);
+            serviceClient.getOptions().setAction("urn:getQuote");
+            serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_REST,
+                    Constants.VALUE_TRUE);
             OMElement resultElement = serviceClient.sendReceive(payload);
-            log.info("Standard :: Stock price = $" +
-                    StockQuoteHandler.parseStandardQuoteResponse(resultElement));
-            clientResult.setResponseReceived(true);
+            log.info("Standard :: Stock price = $" + StockQuoteHandler.
+                    parseStandardQuoteResponse(resultElement));
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
-
     }
 
 
@@ -290,36 +265,26 @@ public class StockQuoteSampleClient {
             OMElement value = fac.createOMElement("Value", null);
             value.setText("Sample string");
 
-            initializeClient(addUrl, trpUrl, null, null, 10000);
-
-            options.setAction("urn:sampleOperation");
-
+            init(addUrl, trpUrl, null, null, 10000);
+            serviceClient.getOptions().setAction("urn:sampleOperation");
 
             String testString = "";
-
             long i = 0;
             while (i < iterations || infinite) {
                 serviceClient.getOptions().setManageSession(true);
                 OMElement responseElement = serviceClient.sendReceive(value);
                 String response = responseElement.getText();
-
-                if (!clientResult.responseReceived()) {
-                    clientResult.setResponseReceived(true);
-                }
+                clientResult.incrementResponseCount();
 
                 i++;
                 log.info("Request: " + i + " ==> " + response);
                 testString = testString.concat(":" + i + ">" + response + ":");
             }
-
-            clientResult.setFinished(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setFinished(true);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
     }
 
@@ -328,16 +293,14 @@ public class StockQuoteSampleClient {
         String session = null;
 
         SampleClientResult clientResult = new SampleClientResult();
-        clientResult.setResponseReceived(false);
         try {
             SOAPEnvelope env1 = buildSoapEnvelope("c1", "v1");
             SOAPEnvelope env2 = buildSoapEnvelope("c2", "v1");
             SOAPEnvelope env3 = buildSoapEnvelope("c3", "v1");
             SOAPEnvelope[] envelopes = {env1, env2, env3};
 
-            initializeClient(addUrl, trpUrl, null, null, 10000);
-
-            options.setAction("urn:sampleOperation");
+            init(addUrl, trpUrl, null, null, 10000);
+            serviceClient.getOptions().setAction("urn:sampleOperation");
 
             int i = 0;
             int sessionNumber;
@@ -372,13 +335,9 @@ public class StockQuoteSampleClient {
                     }
 
                     SOAPEnvelope responseEnvelope = responseContext.getEnvelope();
-
                     OMElement vElement =
                             responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
-
-                    if (!clientResult.responseReceived()) {
-                        clientResult.setResponseReceived(true);
-                    }
+                    clientResult.incrementResponseCount();
 
                     log.info("Request: " + i + " with Session ID: " +
                                     (httpSession ? cookie : sessionNumber) + " ---- " +
@@ -391,15 +350,11 @@ public class StockQuoteSampleClient {
                             "- Get a Fault : " + axisFault.getMessage(), axisFault);
                 }
             }
-
-            clientResult.setFinished(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setFinished(true);
             clientResult.setException(e);
         }
-        terminateClient();
-
+        terminate();
         return clientResult;
     }
 
@@ -421,7 +376,6 @@ public class StockQuoteSampleClient {
     }
 
     protected void setSessionID(MessageContext axis2MessageContext, String value) {
-
         if (value == null) {
             return;
         }
@@ -434,7 +388,6 @@ public class StockQuoteSampleClient {
     }
 
     protected String extractSessionID(MessageContext axis2MessageContext) {
-
         Object o = axis2MessageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
 
         if (o != null && o instanceof Map) {
@@ -475,10 +428,10 @@ public class StockQuoteSampleClient {
     }
 
 
-    private double getRandom(double base, double varience, boolean onlypositive) {
+    private double getRandom(double base, double variance, boolean positiveOnly) {
         double rand = Math.random();
-        return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
-                * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
+        return (base + ((rand > 0.5 ? 1 : -1) * variance * base * rand))
+                * (positiveOnly ? 1 : (rand > 0.5 ? 1 : -1));
     }
 
     public boolean isCompleted() {

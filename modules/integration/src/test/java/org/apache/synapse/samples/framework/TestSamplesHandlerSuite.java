@@ -24,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.tests.endpoint.*;
 import org.apache.synapse.samples.framework.tests.message.*;
+import org.apache.synapse.samples.framework.tests.qos.Sample100;
+import org.apache.synapse.samples.framework.tests.qos.Sample101;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -182,5 +184,9 @@ public class TestSamplesHandlerSuite extends TestSuite {
         //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
         sampleClassRepo.put("58", Sample58.class);
         sampleClassRepo.put("59", Sample59.class);
+
+        //QoS
+        sampleClassRepo.put("100", Sample100.class);
+        sampleClassRepo.put("101", Sample101.class);
     }
 }

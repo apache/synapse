@@ -25,21 +25,21 @@ import java.util.Properties;
  */
 public class SampleClientResult {
 
-    private boolean gotResponse;
+    private boolean responseReceived;
     private boolean isFinished;
     private Exception exception;
     private Properties clientProperties = new Properties();
 
-    public void setGotResponse(boolean gotResponse) {
-        this.gotResponse = gotResponse;
+    public void setResponseReceived(boolean responseReceived) {
+        this.responseReceived = responseReceived;
     }
 
     public void setException(Exception exception) {
         this.exception = exception;
     }
 
-    public boolean gotResponse() {
-        return gotResponse;
+    public boolean responseReceived() {
+        return responseReceived;
     }
 
     public Exception getException() {

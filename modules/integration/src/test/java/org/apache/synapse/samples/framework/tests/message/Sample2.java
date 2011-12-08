@@ -27,8 +27,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample2 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample2.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample2() {
         super(2);
@@ -41,10 +41,10 @@ public class Sample2 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280";
 
         log.info("Running test: CBR with the Switch-case mediator, using message properties");
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
+        assertResponseReceived(result);
         result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        assertResponseReceived(result);
     }
 
 }

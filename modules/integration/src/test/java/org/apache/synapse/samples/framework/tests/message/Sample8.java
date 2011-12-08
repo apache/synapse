@@ -27,8 +27,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample8 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample8.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample8() {
         super(8);
@@ -41,8 +41,8 @@ public class Sample8 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280/";
 
         log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations  ");
-        result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
+        assertResponseReceived(result);
     }
 
 }

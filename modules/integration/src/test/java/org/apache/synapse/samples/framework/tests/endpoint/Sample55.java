@@ -27,9 +27,9 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample55 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample55.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
-    String addUrl;
+
+    private SampleClientResult result;
+    private StockQuoteSampleClient client;
 
     public Sample55() {
         super(55);
@@ -38,14 +38,14 @@ public class Sample55 extends SynapseTestCase {
 
 
     public void testSessionFullLBFailOver() {
-        addUrl = "http://localhost:8280/services/LBService1";
-
+        final String addUrl = "http://localhost:8280/services/LBService1";
         log.info("Running test: Failover sending among 3 endpoints");
         new Thread(new Runnable() {
             public void run() {
-                result = client.statefulClient(addUrl,null, 200);
+                result = client.statefulClient(addUrl, null, 200);
             }
         }).start();
+
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -59,6 +59,12 @@ public class Sample55 extends SynapseTestCase {
 
         }
 
-        assertTrue("Did not receive a response", result.gotResponse());
+        while (!result.isFinished()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+        assertTrue("Did not receive a response", result.responseReceived());
     }
 }

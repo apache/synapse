@@ -27,8 +27,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample50 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample50.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample50() {
         super(50);
@@ -37,12 +37,10 @@ public class Sample50 extends SynapseTestCase {
 
 
     public void testRestToPox() {
-        String ep = "http://localhost:8280/services/MTOMSwASampleService";
         String trpUrl = "http://localhost:8280/services/StockQuote";
-
         log.info("Running test: HTTP REST request ");
-        result = client.requestRestQuote(null, trpUrl, null, "IBM");
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestRestQuote(null, trpUrl, null, "IBM");
+        assertResponseReceived(result);
     }
 
 }

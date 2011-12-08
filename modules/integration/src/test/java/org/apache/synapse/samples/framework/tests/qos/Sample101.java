@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.samples.framework.tests.endpoint;
+package org.apache.synapse.samples.framework.tests.qos;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,40 +24,24 @@ import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
-public class Sample57 extends SynapseTestCase {
+public class Sample101 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample57.class);
+    private static final Log log = LogFactory.getLog(Sample101.class);
+    SampleClientResult result;
+    StockQuoteSampleClient client;
 
-    private SampleClientResult result;
-    private StockQuoteSampleClient client;
-
-    public Sample57() {
-        super(57);
+    public Sample101() {
+        super(101);
         client = getStockQuoteClient();
     }
 
-    public void testDynamicLB() {
-        final String addUrl = "http://localhost:8280/services/LBService1";
 
-        log.info("Running test: Dynamic load balancing between 3 nodes");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
+    public void testWSRM() {
+        String addUrl = "http://localhost:8280/";
 
-        }
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                result = client.sessionlessClient(addUrl, null, 500);
-            }
-        });
-        t.start();
-
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-
-        }
-
-        assertResponseReceived(result);
+        log.info("Running test: Reliable message exchange");
+        result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
+        assertTrue("Client did not run successfully ", result.responseReceived());
     }
+
 }

@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.samples.framework.tests.endpoint;
+package org.apache.synapse.samples.framework.tests.qos;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,40 +24,23 @@ import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
-public class Sample57 extends SynapseTestCase {
+public class Sample100 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample57.class);
+    private static final Log log = LogFactory.getLog(Sample100.class);
+    SampleClientResult result;
+    StockQuoteSampleClient client;
 
-    private SampleClientResult result;
-    private StockQuoteSampleClient client;
-
-    public Sample57() {
-        super(57);
+    public Sample100() {
+        super(100);
         client = getStockQuoteClient();
     }
 
-    public void testDynamicLB() {
-        final String addUrl = "http://localhost:8280/services/LBService1";
 
-        log.info("Running test: Dynamic load balancing between 3 nodes");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-
-        }
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                result = client.sessionlessClient(addUrl, null, 500);
-            }
-        });
-        t.start();
-
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-
-        }
-
-        assertResponseReceived(result);
+    public void testWSSecurity() {
+        String trpUrl = "http://localhost:8280/";
+        log.info("Running test: Using WS-Security for outgoing messages");
+        result = client.requestStandardQuote(null, trpUrl, null, "IBM", null);
+        assertTrue("Client did not run successfully", result.responseReceived());
     }
+
 }

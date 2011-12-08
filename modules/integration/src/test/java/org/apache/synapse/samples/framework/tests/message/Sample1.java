@@ -41,7 +41,7 @@ public class Sample1 extends SynapseTestCase {
 
         log.info("Running test: Dumb Client mode");
         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

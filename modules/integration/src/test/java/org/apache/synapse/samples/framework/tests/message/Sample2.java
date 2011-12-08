@@ -42,9 +42,9 @@ public class Sample2 extends SynapseTestCase {
 
         log.info("Running test: CBR with the Switch-case mediator, using message properties");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
         result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

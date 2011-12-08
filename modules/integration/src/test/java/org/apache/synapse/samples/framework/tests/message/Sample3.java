@@ -42,7 +42,7 @@ public class Sample3 extends SynapseTestCase {
 
         log.info("Running test: Local Registry entry definitions, reusable endpoints and sequences");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

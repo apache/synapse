@@ -45,7 +45,7 @@ public class Sample51 extends SynapseTestCase {
                 currentLocation + "repository/conf/sample/resources/mtom/asf-logo.gif");
         log.info("Running test: MTOM optimization and request/response correlation ");
         result = client.sendUsingMTOM(filename, ep);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 
@@ -57,7 +57,7 @@ public class Sample51 extends SynapseTestCase {
 
         log.info("Running test:SwA optimization and request/response correlation ");
         result = client.sendUsingSWA(filename, ep);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

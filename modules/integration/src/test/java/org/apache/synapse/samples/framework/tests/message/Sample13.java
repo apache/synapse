@@ -42,7 +42,7 @@ public class Sample13 extends SynapseTestCase {
 
         log.info("Running test: Dual channel invocation through Synapse");
         result = client.requestDualQuote(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

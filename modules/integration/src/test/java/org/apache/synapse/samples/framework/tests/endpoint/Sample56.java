@@ -41,7 +41,7 @@ public class Sample56 extends SynapseTestCase {
 
         log.info("Running test: Smart Client mode");
         result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 

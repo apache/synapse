@@ -42,7 +42,7 @@ public class Sample52 extends SynapseTestCase {
 
         log.info("Running test: Session-less load balancing between 3 endpoints");
         result = client.sessionlessClient(addUrl, null, 100);
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 

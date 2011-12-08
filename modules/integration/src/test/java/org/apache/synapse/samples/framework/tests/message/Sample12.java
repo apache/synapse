@@ -42,7 +42,7 @@ public class Sample12 extends SynapseTestCase {
 
         log.info("Running test: One way messaging / fireAndForget through Synapse");
         result = client.placeOrder(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

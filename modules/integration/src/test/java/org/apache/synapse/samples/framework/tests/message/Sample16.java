@@ -42,7 +42,7 @@ public class Sample16 extends SynapseTestCase {
 
         log.info("Running test: Introduction to dynamic and static keys ");
         result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not get run successfully ", result.gotResponse());
+        assertTrue("Client did not run successfully ", result.gotResponse());
     }
 
 }

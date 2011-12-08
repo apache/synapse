@@ -44,29 +44,74 @@ public class Sample53 extends SynapseTestCase {
         addUrl = "http://localhost:8280/services/LBService1";
         log.info("Running test: Failover sending among 3 endpoints");
 
+        // Send some messages and check
         Thread t = new Thread(new Runnable() {
             public void run() {
-                result = client.sessionlessClient(addUrl, null, 10000);
+                result = client.sessionlessClient(addUrl, null, 10);
             }
         });
         t.start();
-
-        for (int i = 0; i < 3; i++) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-
-            }
-            getBackendServerControllers().get(i).stop();
-        }
-
         try {
             t.join();
         } catch (InterruptedException e) {
 
         }
-
         assertResponseReceived(result);
+
+        // Stop BE server 1
+        getBackendServerControllers().get(0).stop();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+
+        // Send another burst of messages and check
+        t = new Thread(new Runnable() {
+            public void run() {
+                result = client.sessionlessClient(addUrl, null, 10);
+            }
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+
+        }
+        assertResponseReceived(result);
+
+        // Stop BE server 2
+        getBackendServerControllers().get(1).stop();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+
+        // Send some more messages and check
+        t = new Thread(new Runnable() {
+            public void run() {
+                result = client.sessionlessClient(addUrl, null, 10);
+            }
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+
+        }
+        assertResponseReceived(result);
+
+        // Stop BE server 3
+        getBackendServerControllers().get(2).stop();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+
+        // Send another message - Should fail
+        result = client.sessionlessClient(addUrl, null, 1);
         Exception resultEx = result.getException();
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());

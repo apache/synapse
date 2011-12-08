@@ -60,7 +60,7 @@ public class StockQuoteSampleClient {
 
     private Options options;
     private ServiceClient serviceClient;
-    private SampleClientResult clientResult;
+    //private SampleClientResult clientResult;
     private OMElement payload;
     private OMElement response;
     private boolean completed;
@@ -74,8 +74,8 @@ public class StockQuoteSampleClient {
                                   String svcPolicy, long timeout) throws Exception {
         log.info("initialing client config...");
         options = new Options();
-        clientResult = new SampleClientResult();
-        clientResult.setGotResponse(false);
+        /*clientResult = new SampleClientResult();
+        clientResult.setResponseReceived(false);*/
         payload = null;
 
         log.info("creating axis2 configuration context using the repo: " + configuration.getClientRepo());
@@ -125,7 +125,7 @@ public class StockQuoteSampleClient {
         serviceClient.setOptions(options);
     }
 
-    private void deInitializeClient() {
+    private void terminateClient() {
         if (serviceClient != null) {
             try {
                 log.info("cleaning up client");
@@ -137,9 +137,20 @@ public class StockQuoteSampleClient {
         }
     }
 
+    /**
+     * Invoke the sample client and send a standard quote request
+     *
+     * @param addUrl Addressing URL
+     * @param trpUrl Transport URL
+     * @param prxUrl Proxy URL
+     * @param symbol Stock symbol
+     * @param svcPolicy Client policy
+     * @return SampleClientResult containing the invocation outcome
+     */
     public SampleClientResult requestStandardQuote(String addUrl, String trpUrl, String prxUrl,
                                                    String symbol, String svcPolicy) {
         log.info("sending standard quote request");
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl, trpUrl, prxUrl, svcPolicy, 10000);
 
@@ -149,22 +160,21 @@ public class StockQuoteSampleClient {
             OMElement resultElement = serviceClient.sendReceive(payload);
             log.info("Standard :: Stock price = $" +
                     StockQuoteHandler.parseStandardQuoteResponse(resultElement));
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
-
     }
 
     public SampleClientResult requestDualQuote(String addUrl, String trpUrl,
                                                String prxUrl, String symbol) {
         log.info("sending dual quote request");
-
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
 
@@ -179,7 +189,7 @@ public class StockQuoteSampleClient {
                 if (isCompleted()) {
                     log.info("Standard dual channel :: Stock price = $" +
                             StockQuoteHandler.parseStandardQuoteResponse(getResponse()));
-                    clientResult.setGotResponse(true);
+                    clientResult.setResponseReceived(true);
                     break;
                 } else {
                     Thread.sleep(100);
@@ -187,10 +197,10 @@ public class StockQuoteSampleClient {
             }
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
     }
@@ -198,7 +208,7 @@ public class StockQuoteSampleClient {
     public SampleClientResult requestCustomQuote(String addUrl, String trpUrl,
                                                  String prxUrl, String symbol) {
         log.info("sending custom quote request");
-
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
 
@@ -207,22 +217,21 @@ public class StockQuoteSampleClient {
             OMElement resultElement = serviceClient.sendReceive(payload);
             log.info("Custom :: Stock price = $" +
                     StockQuoteHandler.parseCustomQuoteResponse(resultElement));
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
     }
 
     public SampleClientResult placeOrder(String addUrl, String trpUrl, String prxUrl, String symbol) {
         log.info("sending fire and forget (place order) request");
-
+        SampleClientResult clientResult = new SampleClientResult();
         try {
-
             initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
             double price = getRandom(100, 0.9, true);
             int quantity = (int) getRandom(10000, 1.0, true);
@@ -235,13 +244,13 @@ public class StockQuoteSampleClient {
             log.info("Order placed for " + quantity
                     + " shares of stock " + symbol
                     + " at a price of $ " + price);
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
     }
@@ -249,7 +258,7 @@ public class StockQuoteSampleClient {
     public SampleClientResult requestRestQuote(String addUrl, String trpUrl,
                                                String prxUrl, String symbol) {
         log.info("sending rest request");
-
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl, trpUrl, prxUrl, null, 10000);
 
@@ -260,13 +269,13 @@ public class StockQuoteSampleClient {
             OMElement resultElement = serviceClient.sendReceive(payload);
             log.info("Standard :: Stock price = $" +
                     StockQuoteHandler.parseStandardQuoteResponse(resultElement));
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
 
@@ -274,6 +283,7 @@ public class StockQuoteSampleClient {
 
 
     public SampleClientResult sessionlessClient(String addUrl, String trpUrl, int iterations) {
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             boolean infinite = iterations <= 0;
             OMFactory fac = OMAbstractFactory.getOMFactory();
@@ -293,8 +303,8 @@ public class StockQuoteSampleClient {
                 OMElement responseElement = serviceClient.sendReceive(value);
                 String response = responseElement.getText();
 
-                if (!clientResult.gotResponse()) {
-                    clientResult.setGotResponse(true);
+                if (!clientResult.responseReceived()) {
+                    clientResult.setResponseReceived(true);
                 }
 
                 i++;
@@ -308,7 +318,7 @@ public class StockQuoteSampleClient {
             clientResult.setFinished(true);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
     }
@@ -317,11 +327,9 @@ public class StockQuoteSampleClient {
         boolean infinite = false;
         String session = null;
 
-        clientResult = new SampleClientResult();
-        clientResult.setGotResponse(false);
-
+        SampleClientResult clientResult = new SampleClientResult();
+        clientResult.setResponseReceived(false);
         try {
-
             SOAPEnvelope env1 = buildSoapEnvelope("c1", "v1");
             SOAPEnvelope env2 = buildSoapEnvelope("c2", "v1");
             SOAPEnvelope env3 = buildSoapEnvelope("c3", "v1");
@@ -368,8 +376,8 @@ public class StockQuoteSampleClient {
                     OMElement vElement =
                             responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
 
-                    if (!clientResult.gotResponse()) {
-                        clientResult.setGotResponse(true);
+                    if (!clientResult.responseReceived()) {
+                        clientResult.setResponseReceived(true);
                     }
 
                     log.info("Request: " + i + " with Session ID: " +
@@ -390,7 +398,7 @@ public class StockQuoteSampleClient {
             clientResult.setFinished(true);
             clientResult.setException(e);
         }
-        deInitializeClient();
+        terminateClient();
 
         return clientResult;
     }

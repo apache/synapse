@@ -114,10 +114,10 @@ public class MTOMSwASampleClient {
             dest.close();
             log.info("Saved response to file : " + tempFile.getAbsolutePath());
 
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
 
@@ -184,10 +184,10 @@ public class MTOMSwASampleClient {
 
             log.info("Saved response to file : " + tempFile.getAbsolutePath());
 
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
 

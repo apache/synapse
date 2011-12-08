@@ -27,22 +27,20 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample12 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample12.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+    private StockQuoteSampleClient client;
 
     public Sample12() {
         super(12);
         client = getStockQuoteClient();
     }
 
-
     public void testFireAndForget() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
 
         log.info("Running test: One way messaging / fireAndForget through Synapse");
-        result = client.placeOrder(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.placeOrder(addUrl, trpUrl, null, "IBM");
+        assertResponseReceived(result);
     }
 
 }

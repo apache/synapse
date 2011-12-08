@@ -27,9 +27,9 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample57 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample57.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
-    String addUrl;
+
+    private SampleClientResult result;
+    private StockQuoteSampleClient client;
 
     public Sample57() {
         super(57);
@@ -37,7 +37,7 @@ public class Sample57 extends SynapseTestCase {
     }
 
     public void testDynamicLB() {
-        addUrl = "http://localhost:8280/services/LBService1";
+        final String addUrl = "http://localhost:8280/services/LBService1";
 
         log.info("Running test: Dynamic load balancing between 3 nodes");
         try {
@@ -50,18 +50,20 @@ public class Sample57 extends SynapseTestCase {
                 result = client.sessionlessClient(addUrl, null, 500);
             }
         }).start();
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//
-//            }
-//            getbESControllers().get("SampleServer0").stop();
-//
+
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
 
         }
+
+        while (!result.isFinished()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
         new Thread(new Runnable() {
             public void run() {
                 result = client.sessionlessClient(addUrl, null, 500);
@@ -73,6 +75,13 @@ public class Sample57 extends SynapseTestCase {
 
         }
 
-        assertTrue("Did not receive a response", result.gotResponse());
+        while (!result.isFinished()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        assertResponseReceived(result);
     }
 }

@@ -28,9 +28,10 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample53 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample53.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
-    String addUrl;
+
+    private SampleClientResult result;
+    private StockQuoteSampleClient client;
+    private String addUrl;
 
     public Sample53() {
         super(53);
@@ -71,7 +72,7 @@ public class Sample53 extends SynapseTestCase {
             }
         }
 
-        assertTrue("Did not receive a response", result.gotResponse());
+        assertResponseReceived(result);
         Exception resultEx = result.getException();
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());

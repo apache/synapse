@@ -488,4 +488,8 @@ public abstract class SynapseTestCase extends TestCase {
     public MTOMSwASampleClient getMTOMSwASampleClient() {
         return new MTOMSwASampleClient(configuration.getClientConfig());
     }
+
+    protected void assertResponseReceived(SampleClientResult result) {
+        assertTrue("Client did not receive the expected response", result.responseReceived());
+    }
 }

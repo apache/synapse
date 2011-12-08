@@ -68,7 +68,7 @@ public class EventSampleClient {
     private void initializeClient(String addUrl) throws Exception {
         options = new Options();
         clientResult = new SampleClientResult();
-        clientResult.setGotResponse(false);
+        clientResult.setResponseReceived(false);
 
         ConfigurationContext configContext;
         configContext = ConfigurationContextFactory.
@@ -141,10 +141,10 @@ public class EventSampleClient {
                                     new QName(eventingNamespace.getNamespaceURI(), "Identifier")).getText();
             log.info("Subscription identifier: " + subId);
             clientResult.addProperty("subId", subId);
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -195,10 +195,10 @@ public class EventSampleClient {
             log.info("UnSubscribed to ID " + identifier);
             Thread.sleep(1000);
             log.info("UnSubscribe Response Received: " + response.toString());
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -258,10 +258,10 @@ public class EventSampleClient {
 
             }
             log.info("SynapseSubscription Renew Response Received: " + response.toString());
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -315,10 +315,10 @@ public class EventSampleClient {
 
             }
             log.info("GetStatus Response Received: " + response.toString());
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -351,10 +351,10 @@ public class EventSampleClient {
             serviceClient.fireAndForget(payload);
             log.info("Event sent to topic " + topic);
             Thread.sleep(1000);
-            clientResult.setGotResponse(true);
+            clientResult.setResponseReceived(true);
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setGotResponse(false);
+            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();

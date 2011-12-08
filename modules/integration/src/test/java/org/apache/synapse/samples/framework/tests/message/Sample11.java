@@ -27,7 +27,6 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample11 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample11.class);
-    SampleClientResult result;
     StockQuoteSampleClient client;
 
     public Sample11() {
@@ -41,8 +40,8 @@ public class Sample11 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280";
 
         log.info("Running test: Local Registry entry definitions, reusable endpoints and sequences");
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);
+        assertResponseReceived(result);
     }
 
 }

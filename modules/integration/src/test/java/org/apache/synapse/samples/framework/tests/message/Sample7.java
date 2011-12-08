@@ -28,8 +28,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample7 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample7.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+
+    private StockQuoteSampleClient client;
 
     public Sample7() {
         super(7);
@@ -43,8 +43,8 @@ public class Sample7 extends SynapseTestCase {
         String expectedError = "Invalid custom quote request";
 
         log.info("Running test: Creating SOAP fault messages and changing the direction of a message");
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);
-        assertFalse("Should not get a response", result.gotResponse());
+        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);
+        assertFalse("Should not get a response", result.responseReceived());
         Exception resultEx = result.getException();
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());

@@ -27,8 +27,7 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample13 extends SynapseTestCase {
 
     private static final Log log = LogFactory.getLog(Sample13.class);
-    SampleClientResult result;
-    StockQuoteSampleClient client;
+    private StockQuoteSampleClient client;
 
     public Sample13() {
         super(13);
@@ -41,8 +40,8 @@ public class Sample13 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280/";
 
         log.info("Running test: Dual channel invocation through Synapse");
-        result = client.requestDualQuote(addUrl, trpUrl, null, "IBM");
-        assertTrue("Client did not run successfully ", result.gotResponse());
+        SampleClientResult result = client.requestDualQuote(addUrl, trpUrl, null, "IBM");
+        assertResponseReceived(result);
     }
 
 }

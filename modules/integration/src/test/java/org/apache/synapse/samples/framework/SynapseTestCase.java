@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.clients.EventSampleClient;
 import org.apache.synapse.samples.framework.clients.MTOMSwASampleClient;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+import org.apache.synapse.samples.framework.config.SampleConfiguration;
 
 import javax.xml.namespace.QName;
 import java.io.File;
@@ -83,7 +84,7 @@ public abstract class SynapseTestCase extends TestCase {
         assertTrue("Could not load client configuration settings for the sample " + sampleId,
                 initClientConfigInfo());
 
-        if (configuration.getSynapseConfig().isClusteringEnabled()) {
+        if (configuration.getSynapseServerConfig().isClusteringEnabled()) {
             assertTrue("Could not properly configure clustering", configureClustering());
         }
 
@@ -216,35 +217,35 @@ public abstract class SynapseTestCase extends TestCase {
         Boolean clusteringEnabled = Boolean.parseBoolean(
                 (String) synapseProperties.get(SampleConfigConstants.TAG_ENABLE_CLUSTERING));
 
-        configuration.getSynapseConfig().setServerName("SynapseServerForSample" + sampleId);
+        configuration.getSynapseServerConfig().setServerName("SynapseServerForSample" + sampleId);
 
         if (synapseXml == null) {
             log.error("synapse config file must be specified for the sample");
             return false;
         } else {
-            configuration.getSynapseConfig().setSynapseXml(synapseHome + synapseXml);
+            configuration.getSynapseServerConfig().setSynapseXml(synapseHome + synapseXml);
         }
 
         if (axis2Repo == null) {
-            configuration.getSynapseConfig().setAxis2Repo(synapseHome +
+            configuration.getSynapseServerConfig().setAxis2Repo(synapseHome +
                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
         } else {
             log.info("Using Synapse Axis2 repository: " + axis2Repo);
-            configuration.getSynapseConfig().setAxis2Repo(synapseHome + axis2Repo);
+            configuration.getSynapseServerConfig().setAxis2Repo(synapseHome + axis2Repo);
         }
 
         if (axis2Xml == null) {
-            configuration.getSynapseConfig().setAxis2Xml(synapseHome +
+            configuration.getSynapseServerConfig().setAxis2Xml(synapseHome +
                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
         } else {
             log.info("Using Synapse Axis2 XML: " + axis2Xml);
-            configuration.getSynapseConfig().setAxis2Xml(synapseHome + axis2Xml);
+            configuration.getSynapseServerConfig().setAxis2Xml(synapseHome + axis2Xml);
         }
 
-        configuration.getSynapseConfig().setSynapseHome(synapseHome);
-        configuration.getSynapseConfig().setClusteringEnabled(clusteringEnabled);
+        configuration.getSynapseServerConfig().setSynapseHome(synapseHome);
+        configuration.getSynapseServerConfig().setClusteringEnabled(clusteringEnabled);
 
-        pc = new SynapseProcessController(configuration.getSynapseConfig());
+        pc = new SynapseProcessController(configuration.getSynapseServerConfig());
         return true;
     }
 
@@ -255,10 +256,10 @@ public abstract class SynapseTestCase extends TestCase {
      */
     private boolean initBackEndServersConfigInfo() {
         OMElement bESConfigEle = null;
-        Iterator itr_BEEle = sampleConfigElement.getChildrenWithLocalName(
+        Iterator itrBackEndElements = sampleConfigElement.getChildrenWithLocalName(
                 SampleConfigConstants.TAG_BE_SERVER_CONF);
-        while (itr_BEEle.hasNext()) {
-            bESConfigEle = (OMElement) itr_BEEle.next();
+        while (itrBackEndElements.hasNext()) {
+            bESConfigEle = (OMElement) itrBackEndElements.next();
         }
         if (bESConfigEle == null) {
             log.warn("No backend servers are defined");
@@ -412,20 +413,20 @@ public abstract class SynapseTestCase extends TestCase {
                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
 
         if (clientRepo == null) {
-            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
+            configuration.getAxis2ClientConfig().setClientRepo(FilenameUtils.normalize(
                     currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO));
         } else {
             log.info("Using client Axis2 repository location: " + clientRepo);
-            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
+            configuration.getAxis2ClientConfig().setClientRepo(FilenameUtils.normalize(
                     currentLocation + clientRepo));
         }
 
         if (clientAxis2Xml == null) {
-            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
+            configuration.getAxis2ClientConfig().setAxis2Xml(FilenameUtils.normalize(
                     currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML));
         } else {
             log.info("Using client Axis2 XML: " + clientAxis2Xml);
-            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
+            configuration.getAxis2ClientConfig().setAxis2Xml(FilenameUtils.normalize(
                     currentLocation + clientAxis2Xml));
         }
         return true;
@@ -441,13 +442,13 @@ public abstract class SynapseTestCase extends TestCase {
             }
             log.info(" Using the IP :" + ip);
 
-            String synapseAxis2Xml = configuration.getSynapseConfig().getAxis2Xml();
+            String synapseAxis2Xml = configuration.getSynapseServerConfig().getAxis2Xml();
             String axis2Config = FileUtils.readFileToString(new File(synapseAxis2Xml));
             String modifiedSynapseAxis2 = SynapseTestUtils.replace(axis2Config, "${replace.me}", ip);
             File tempSynapseAxis2 = File.createTempFile("axis2Syn-", "xml");
             tempSynapseAxis2.deleteOnExit();
             FileUtils.writeStringToFile(tempSynapseAxis2, modifiedSynapseAxis2);
-            configuration.getSynapseConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
+            configuration.getSynapseServerConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
 
             for (BackEndServerController controller : backendServerControllers) {
                 String serverName = controller.getServerName();
@@ -478,15 +479,15 @@ public abstract class SynapseTestCase extends TestCase {
     }
 
     public StockQuoteSampleClient getStockQuoteClient() {
-        return new StockQuoteSampleClient(configuration.getClientConfig());
+        return new StockQuoteSampleClient(configuration.getAxis2ClientConfig());
     }
 
     public EventSampleClient getEventSubscriberSampleClient() {
-        return new EventSampleClient(configuration.getClientConfig());
+        return new EventSampleClient(configuration.getAxis2ClientConfig());
     }
 
     public MTOMSwASampleClient getMTOMSwASampleClient() {
-        return new MTOMSwASampleClient(configuration.getClientConfig());
+        return new MTOMSwASampleClient(configuration.getAxis2ClientConfig());
     }
 
     protected void assertResponseReceived(SampleClientResult result) {

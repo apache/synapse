@@ -44,11 +44,12 @@ public class Sample53 extends SynapseTestCase {
         addUrl = "http://localhost:8280/services/LBService1";
         log.info("Running test: Failover sending among 3 endpoints");
 
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             public void run() {
-                result = client.sessionlessClient(addUrl, null, -1);
+                result = client.sessionlessClient(addUrl, null, 10000);
             }
-        }).start();
+        });
+        t.start();
 
         for (int i = 0; i < 3; i++) {
             try {
@@ -60,16 +61,9 @@ public class Sample53 extends SynapseTestCase {
         }
 
         try {
-            Thread.sleep(2000);
+            t.join();
         } catch (InterruptedException e) {
 
-        }
-
-        while (!result.isFinished()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
         }
 
         assertResponseReceived(result);
@@ -77,8 +71,7 @@ public class Sample53 extends SynapseTestCase {
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());
         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
-        assertTrue("Did not receive expected error",
-                resultEx.getMessage().indexOf(expectedError) != -1);
+        assertTrue("Did not receive expected error", resultEx.getMessage().contains(expectedError));
     }
 
 }

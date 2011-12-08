@@ -33,7 +33,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
-import org.apache.synapse.samples.framework.SampleConfiguration;
+import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
 
 import javax.xml.namespace.QName;
 
@@ -44,8 +44,7 @@ public class EventSampleClient {
 
     private Options options;
     private ServiceClient serviceClient;
-    private SampleClientResult clientResult;
-    private SampleConfiguration.ClientSampleConfiguration configuration;
+    private Axis2ClientConfiguration configuration;
     private OMFactory factory;
     private OMElement message;
     private OMNamespace schemaNamespace;
@@ -53,7 +52,7 @@ public class EventSampleClient {
     private OMNamespace addressingNamespace;
     private OMNamespace eventingNamespace;
 
-    public EventSampleClient(SampleConfiguration.ClientSampleConfiguration configuration) {
+    public EventSampleClient(Axis2ClientConfiguration configuration) {
         this.configuration = configuration;
         factory = OMAbstractFactory.getOMFactory();
         schemaNamespace = factory.createOMNamespace("http://www.w3.org/2001/XMLSchema", "xmlns");
@@ -67,9 +66,6 @@ public class EventSampleClient {
 
     private void initializeClient(String addUrl) throws Exception {
         options = new Options();
-        clientResult = new SampleClientResult();
-        clientResult.setResponseReceived(false);
-
         ConfigurationContext configContext;
         configContext = ConfigurationContextFactory.
                 createConfigurationContextFromFileSystem(configuration.getClientRepo(),
@@ -118,8 +114,8 @@ public class EventSampleClient {
         }
         subscribeOm.addChild(filterOm);
 
-
         log.info("Subscribing: " + subscribeOm.toString());
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl);
             options.setAction("http://schemas.xmlsoap.org/ws/2004/08/eventing/Subscribe");
@@ -141,10 +137,9 @@ public class EventSampleClient {
                                     new QName(eventingNamespace.getNamespaceURI(), "Identifier")).getText();
             log.info("Subscription identifier: " + subId);
             clientResult.addProperty("subId", subId);
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -184,6 +179,7 @@ public class EventSampleClient {
         OMElement subscribeOm = factory.createOMElement("Unsubscribe", eventingNamespace);
 
         log.info("UnSubscribing: " + subscribeOm.toString());
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl);
             options.setAction("http://schemas.xmlsoap.org/ws/2004/08/eventing/Unsubscribe");
@@ -195,10 +191,9 @@ public class EventSampleClient {
             log.info("UnSubscribed to ID " + identifier);
             Thread.sleep(1000);
             log.info("UnSubscribe Response Received: " + response.toString());
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -244,6 +239,7 @@ public class EventSampleClient {
 
 
         log.info("SynapseSubscription Renew \n" + subscribeOm.toString());
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl);
             OMElement identifierOm = factory.createOMElement("Identifier", eventingNamespace);
@@ -258,10 +254,9 @@ public class EventSampleClient {
 
             }
             log.info("SynapseSubscription Renew Response Received: " + response.toString());
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -300,6 +295,7 @@ public class EventSampleClient {
         OMElement subscribeOm = factory.createOMElement("GetStatus", eventingNamespace);
 
         log.info("GetStatus using: " + subscribeOm.toString());
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl);
             options.setAction("http://schemas.xmlsoap.org/ws/2004/08/eventing/GetStatus");
@@ -315,10 +311,9 @@ public class EventSampleClient {
 
             }
             log.info("GetStatus Response Received: " + response.toString());
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();
@@ -327,9 +322,9 @@ public class EventSampleClient {
 
     public SampleClientResult sendEvent(String addUrl, String symbol, String price, String qty,
                                         String topic, String topicns) {
+        SampleClientResult clientResult = new SampleClientResult();
         try {
             initializeClient(addUrl);
-
             OMNamespace aipNamespace = factory.createOMNamespace(topicns, "aip");
             // set the target topic
             OMElement topicOm = factory.createOMElement("Topic", aipNamespace);
@@ -351,10 +346,9 @@ public class EventSampleClient {
             serviceClient.fireAndForget(payload);
             log.info("Event sent to topic " + topic);
             Thread.sleep(1000);
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Fault Received : " + e.toString(), e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
         deInitializeClient();

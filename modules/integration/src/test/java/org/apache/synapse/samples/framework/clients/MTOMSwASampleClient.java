@@ -35,7 +35,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
-import org.apache.synapse.samples.framework.SampleConfiguration;
+import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -46,18 +46,15 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 
 public class MTOMSwASampleClient {
-    private static final Log log = LogFactory.getLog(StockQuoteSampleClient.class);
-    ConfigurationContext configContext = null;
 
-    Options options;
+    private static final Log log = LogFactory.getLog(StockQuoteSampleClient.class);
+
     SampleClientResult clientResult;
     OMElement payload;
-    OMElement response;
     ServiceClient serviceClient;
-    boolean completed;
-    SampleConfiguration.ClientSampleConfiguration configuration;
+    Axis2ClientConfiguration configuration;
 
-    public MTOMSwASampleClient(SampleConfiguration.ClientSampleConfiguration configuration) {
+    public MTOMSwASampleClient(Axis2ClientConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -113,11 +110,9 @@ public class MTOMSwASampleClient {
             dest.flush();
             dest.close();
             log.info("Saved response to file : " + tempFile.getAbsolutePath());
-
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
 
@@ -183,11 +178,9 @@ public class MTOMSwASampleClient {
             fos.close();
 
             log.info("Saved response to file : " + tempFile.getAbsolutePath());
-
-            clientResult.setResponseReceived(true);
+            clientResult.incrementResponseCount();
         } catch (Exception e) {
             log.error("Error invoking service", e);
-            clientResult.setResponseReceived(false);
             clientResult.setException(e);
         }
 

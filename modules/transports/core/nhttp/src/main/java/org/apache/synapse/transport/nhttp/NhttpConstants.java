@@ -146,4 +146,11 @@ public class NhttpConstants {
     public static final String ENDPOINTS_CONFIGURATION = "endpointsConfiguration";
 
     public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
+    /**
+     * nhttp property that must be defined in nhttp.properties to set receiver timeout
+     * and sender timeout.
+     */
+    public static final String SO_TIMEOUT_RECEIVER = "http.socket.timeout.receiver";
+    public static final String SO_TIMEOUT_SENDER = "http.socket.timeout.sender";
 }

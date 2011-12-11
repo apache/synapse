@@ -35,9 +35,9 @@ messages.</description>
     <download-page rdf:resource="http://synapse.apache.org/download.cgi" />
     <programming-language>Java</programming-language>
     <category rdf:resource="http://projects.apache.org/category/xml" />
-    <category rdf:resource="http://www.apache.org/category/http"/>
-    <category rdf:resource="http://www.apache.org/category/network-server"/>
-    <category rdf:resource="http://www.apache.org/category/network-client"/>
+    <category rdf:resource="http://projects.apache.org/category/http"/> 
+    <category rdf:resource="http://projects.apache.org/category/network-server"/> 
+    <category rdf:resource="http://projects.apache.org/category/network-client"/>
     
     <release>
       <Version>

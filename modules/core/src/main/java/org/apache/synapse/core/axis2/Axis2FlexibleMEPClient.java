@@ -188,7 +188,7 @@ public class Axis2FlexibleMEPClient {
                 }                
 
             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {
-                // format=rest is kept only backwards compatibility. We no longer needed that.
+                // format=rest is kept only for backward compatibility. We no longer needed that.
                 // Remove Message Type  for GET and DELETE Request
                 if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {
                     Object method = originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD);

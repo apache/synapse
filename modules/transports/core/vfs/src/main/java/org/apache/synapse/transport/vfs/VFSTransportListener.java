@@ -36,8 +36,8 @@ import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.vfs.*;
-import org.apache.commons.vfs.impl.StandardFileSystemManager;
+import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;

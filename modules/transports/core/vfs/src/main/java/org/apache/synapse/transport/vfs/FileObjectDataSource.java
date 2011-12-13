@@ -19,8 +19,8 @@
 package org.apache.synapse.transport.vfs;
 
 import org.apache.axiom.attachments.SizeAwareDataSource;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 
 import java.io.IOException;
 import java.io.InputStream;

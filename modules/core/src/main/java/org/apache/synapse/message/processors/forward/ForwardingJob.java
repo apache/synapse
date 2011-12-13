@@ -123,11 +123,10 @@ public class ForwardingJob implements StatefulJob {
                     Endpoint ep = messageContext.getEndpoint(targetEp);
 
                     if (ep instanceof AddressEndpoint) {
-                        AddressEndpoint addEp = (AddressEndpoint) ep;
-                        String addressUrl = addEp.getDefinition().getAddress();
 
                         try {
-                            MessageContext outCtx = sender.send(messageContext, addressUrl);
+                            MessageContext outCtx = sender.send(
+                                    ((AddressEndpoint) ep).getDefinition(), messageContext);
 
                             if (outCtx != null && "true".equals(outCtx.
                                     getProperty(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR))) {

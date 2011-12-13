@@ -197,7 +197,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-vfs</artifactId>
+            <artifactId>commons-vfs2</artifactId>
             <version>${commons.vfs.version}</version>
             <scope>test</scope>
         </dependency>

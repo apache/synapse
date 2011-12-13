@@ -96,10 +96,7 @@ public class ServiceLoadBalanceMembershipHandler implements LoadBalanceMembershi
     }
 
     public Member getNextApplicationMember(String host) {
-        DomainAlgorithmContext domainAlgorithmContext = hostDomainAlgorithmContextMap.get(host);
-        if(domainAlgorithmContext == null) {
-            throw new SynapseException("Domain not found for host" + host);
-        }
+        DomainAlgorithmContext domainAlgorithmContext = getDomainAlgorithmContext(host);
         String lbDomain = domainAlgorithmContext.getDomain();
         LoadbalanceAlgorithm algorithm = domainAlgorithmContext.getAlgorithm();
         GroupManagementAgent groupMgtAgent = clusteringAgent.getGroupManagementAgent(lbDomain);
@@ -113,6 +110,19 @@ public class ServiceLoadBalanceMembershipHandler implements LoadBalanceMembershi
         algorithm.setApplicationMembers(groupMgtAgent.getMembers());
         AlgorithmContext context = domainAlgorithmContext.getAlgorithmContext();
         return algorithm.getNextApplicationMember(context);
+    }
+
+    private DomainAlgorithmContext getDomainAlgorithmContext(String host) {
+        DomainAlgorithmContext domainAlgorithmContext = hostDomainAlgorithmContextMap.get(host);
+        if(domainAlgorithmContext == null) {
+            int indexOfDot;
+            if ((indexOfDot = host.indexOf(".")) != -1) {
+                domainAlgorithmContext = getDomainAlgorithmContext(host.substring(indexOfDot + 1));
+            } else {
+                throw new SynapseException("Domain not found for host" + host);
+            }
+        }
+        return domainAlgorithmContext;
     }
 
     public LoadbalanceAlgorithm getLoadbalanceAlgorithm() {

@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.tests.endpoint.*;
 import org.apache.synapse.samples.framework.tests.message.*;
+import org.apache.synapse.samples.framework.tests.proxy.*;
 import org.apache.synapse.samples.framework.tests.qos.Sample100;
 import org.apache.synapse.samples.framework.tests.qos.Sample101;
 
@@ -181,12 +182,22 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("54", Sample54.class);
         sampleClassRepo.put("55", Sample55.class);
         sampleClassRepo.put("56", Sample56.class);
-        //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
+        //sampleClassRepo.put("57", Sample57.class);  // intermittently fail
         sampleClassRepo.put("58", Sample58.class);
         sampleClassRepo.put("59", Sample59.class);
 
         //QoS
         sampleClassRepo.put("100", Sample100.class);
         sampleClassRepo.put("101", Sample101.class);
+
+        //Proxy Service
+        sampleClassRepo.put("150", Sample150.class);
+        sampleClassRepo.put("151", Sample151.class);
+        sampleClassRepo.put("152", Sample152.class);
+        //sampleClassRepo.put("153", Sample153.class); // unable to load the JKS files
+        sampleClassRepo.put("154", Sample154.class);
+        sampleClassRepo.put("155", Sample155.class);
+        sampleClassRepo.put("156", Sample156.class);
+        sampleClassRepo.put("157", Sample157.class);
     }
 }

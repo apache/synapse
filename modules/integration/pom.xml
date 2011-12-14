@@ -90,159 +90,142 @@
 
                                 <property name="temp.dir" value="target/temp"/>
                                 <property name="classes" value="${temp.dir}/classes"/>
-                                <property name="services"
-                                value="target/test_repos/axis2Server/services"/>
+                                <property name="services" value="target/test_repos/axis2Server/services"/>
 
-                                <property name="src"
-                                value="../samples/services/SimpleStockQuoteService/src"/>
+                                <property name="src" value="../samples/services/SimpleStockQuoteService/src"/>
 
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
 
                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
-                                <src path="${src}"/>
-                                <classpath refid="maven.compile.classpath"/>
+                                    <src path="${src}"/>
+                                    <classpath refid="maven.compile.classpath"/>
                                 </javac>
 
-                                <property name="SSQ.dir"
-                                value="${temp.dir}/SimpleStockQuote"/>
+                                <property name="SSQ.dir" value="${temp.dir}/SimpleStockQuote"/>
                                 <mkdir dir="${SSQ.dir}"/>
 
                                 <mkdir dir="${SSQ.dir}/META-INF"/>
-                                <copy file="${src}/../conf/services.xml"
-                                tofile="${SSQ.dir}/META-INF/services.xml"/>
+                                <copy file="${src}/../conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml"/>
                                 <!--<copy file="${src}/../wsdl/SimpleStockQuoteService.wsdl"-->
                                 <!--tofile="${SSQ.dir}/META-INF/service.wsdl"/>-->
                                 <copy toDir="${SSQ.dir}">
-                                <fileset dir="${classes}">
-                                <include name="**/*.class"/>
-                                </fileset>
+                                    <fileset dir="${classes}">
+                                        <include name="**/*.class"/>
+                                    </fileset>
                                 </copy>
 
                                 <jar destfile="${services}/SimpleStockQuoteService.aar">
-                                <fileset dir="${SSQ.dir}"/>
+                                    <fileset dir="${SSQ.dir}"/>
                                 </jar>
 
-                                <property name="src2"
-                                value="../samples/services/SecureStockQuoteService/src"/>
+                                <property name="src2" value="../samples/services/SecureStockQuoteService/src"/>
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
-                                <src path="${src2}"/>
-                                <classpath refid="maven.compile.classpath"/>
+                                    <src path="${src2}"/>
+                                    <classpath refid="maven.compile.classpath"/>
                                 </javac>
-                                <property name="SSQ2.dir"
-                                value="${temp.dir}/SecureStockQuoteService"/>
+                                <property name="SSQ2.dir" value="${temp.dir}/SecureStockQuoteService"/>
                                 <mkdir dir="${SSQ2.dir}"/>
                                 <mkdir dir="${SSQ2.dir}/META-INF"/>
-                                <copy file="${src2}/../conf/services.xml"
-                                tofile="${SSQ2.dir}/META-INF/services.xml"/>
+                                <copy file="${src2}/../conf/services.xml" tofile="${SSQ2.dir}/META-INF/services.xml"/>
                                 <!--<copy file="${src2}/../wsdl/SimpleStockQuoteService.wsdl"-->
                                 <!--tofile="${SSQ2.dir}/META-INF/service.wsdl"/>-->
-                                <copy file="${src2}/../store.jks"
-                                tofile="${SSQ2.dir}/store.jks"/>
+                                <copy file="${src2}/../store.jks" tofile="${SSQ2.dir}/store.jks"/>
                                 <copy toDir="${SSQ2.dir}">
-                                <fileset dir="${classes}">
-                                <include name="**/*.class"/>
-                                </fileset>
+                                    <fileset dir="${classes}">
+                                        <include name="**/*.class"/>
+                                    </fileset>
                                 </copy>
                                 <jar destfile="${services}/SecureStockQuoteService.aar">
-                                <fileset dir="${SSQ2.dir}"/>
+                                    <fileset dir="${SSQ2.dir}"/>
                                 </jar>
 
-                                <property name="src3"
-                                value="../samples/services/MTOMSwASampleService/src"/>
+                                <property name="src3" value="../samples/services/MTOMSwASampleService/src"/>
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
-                                <src path="${src3}"/>
-                                <classpath refid="maven.compile.classpath"/>
+                                    <src path="${src3}"/>
+                                    <classpath refid="maven.compile.classpath"/>
                                 </javac>
-                                <property name="SSQ3.dir"
-                                value="${temp.dir}/MTOMSwASampleService"/>
+                                <property name="SSQ3.dir" value="${temp.dir}/MTOMSwASampleService"/>
                                 <mkdir dir="${SSQ3.dir}"/>
                                 <mkdir dir="${SSQ3.dir}/META-INF"/>
-                                <copy file="${src3}/../conf/services.xml"
-                                tofile="${SSQ3.dir}/META-INF/services.xml"/>
+                                <copy file="${src3}/../conf/services.xml" tofile="${SSQ3.dir}/META-INF/services.xml"/>
                                 <copy toDir="${SSQ3.dir}">
-                                <fileset dir="${classes}">
-                                <include name="**/*.class"/>
-                                </fileset>
+                                    <fileset dir="${classes}">
+                                        <include name="**/*.class"/>
+                                    </fileset>
                                 </copy>
                                 <jar destfile="${services}/MTOMSwASampleService.aar">
-                                <fileset dir="${SSQ3.dir}"/>
+                                    <fileset dir="${SSQ3.dir}"/>
                                 </jar>
 
-                                <property name="src4"
-                                value="../samples/services/ReliableStockQuoteService/src"/>
+                                <property name="src4" value="../samples/services/ReliableStockQuoteService/src"/>
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
-                                <src path="${src4}"/>
-                                <classpath refid="maven.compile.classpath"/>
+                                    <src path="${src4}"/>
+                                    <classpath refid="maven.compile.classpath"/>
                                 </javac>
-                                <property name="RSQ.dir"
-                                value="${temp.dir}/ReliableStockQuoteService"/>
+                                <property name="RSQ.dir" value="${temp.dir}/ReliableStockQuoteService"/>
                                 <mkdir dir="${RSQ.dir}"/>
 
                                 <mkdir dir="${RSQ.dir}/META-INF"/>
-                                <copy file="${src4}/../conf/services.xml"
-                                tofile="${RSQ.dir}/META-INF/services.xml"/>
+                                <copy file="${src4}/../conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml"/>
                                 <!--<copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl"-->
                                 <!--tofile="${RSQ.dir}/META-INF/service.wsdl"/>-->
                                 <copy toDir="${RSQ.dir}">
-                                <fileset dir="${classes}">
-                                <include name="**/*.class"/>
-                                </fileset>
+                                    <fileset dir="${classes}">
+                                        <include name="**/*.class"/>
+                                    </fileset>
                                 </copy>
 
                                 <jar destfile="${services}/ReliableStockQuoteService.aar">
-                                <fileset dir="${RSQ.dir}"/>
+                                    <fileset dir="${RSQ.dir}"/>
                                 </jar>
 
-                                <property name="src5"
-                                value="../samples/services/LoadbalanceFailoverService/src"/>
+                                <property name="src5" value="../samples/services/LoadbalanceFailoverService/src"/>
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
-                                <src path="${src5}"/>
-                                <classpath refid="maven.compile.classpath"/>
+                                    <src path="${src5}"/>
+                                    <classpath refid="maven.compile.classpath"/>
                                 </javac>
 
                                 <property name="LBFA1.dir" value="${temp.dir}/LBService1"/>
                                 <mkdir dir="${LBFA1.dir}"/>
 
                                 <mkdir dir="${LBFA1.dir}/META-INF"/>
-                                <copy file="${src5}/../conf/service1/services.xml"
-                                tofile="${LBFA1.dir}/META-INF/services.xml"/>
+                                <copy file="${src5}/../conf/service1/services.xml" tofile="${LBFA1.dir}/META-INF/services.xml"/>
                                 <copy toDir="${LBFA1.dir}">
-                                <fileset dir="${classes}">
-                                <include name="**/LBService1.class"/>
-                                </fileset>
+                                    <fileset dir="${classes}">
+                                        <include name="**/LBService1.class"/>
+                                    </fileset>
                                 </copy>
 
                                 <jar destfile="${services}/LBService1.aar">
-                                <fileset dir="${LBFA1.dir}"/>
+                                    <fileset dir="${LBFA1.dir}"/>
                                 </jar>
 
                                 <property name="LBFA2.dir" value="${temp.dir}/LBService2"/>
                                 <mkdir dir="${LBFA2.dir}"/>
 
                                 <mkdir dir="${LBFA2.dir}/META-INF"/>
-                                <copy file="${src5}/../conf/service2/services.xml"
-                                tofile="${LBFA2.dir}/META-INF/services.xml"/>
+                                <copy file="${src5}/../conf/service2/services.xml" tofile="${LBFA2.dir}/META-INF/services.xml"/>
                                 <copy toDir="${LBFA2.dir}">
-                                <fileset dir="${classes}">
-                                <include name="**/LBService2.class"/>
-                                </fileset>
+                                    <fileset dir="${classes}">
+                                        <include name="**/LBService2.class"/>
+                                    </fileset>
                                 </copy>
 
                                 <jar destfile="${services}/LBService2.aar">
-                                <fileset dir="${LBFA2.dir}"/>
+                                    <fileset dir="${LBFA2.dir}"/>
                                 </jar>
 
                             </tasks>
@@ -479,12 +462,6 @@
             <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>slf4j-jdk14</artifactId>-->
-        <!--<version>1.6.1</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
@@ -497,24 +474,6 @@
             <version>3.0.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>1.1.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-all</artifactId>
-            <version>1.4.0</version>
-            <scope>test</scope>
-        </dependency>
-        <!--dependency>
-            <groupId>quickfixj</groupId>
-            <artifactId>quickfixj-examples</artifactId>
-            <version>1.5.0</version>
-            <scope>test</scope>
-        </dependency-->
     </dependencies>
 
 </project>

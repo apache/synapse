@@ -133,7 +133,7 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
                 }
                 log.info("ProxyService named '" + proxy.getName()
                         + "' has been " + (existingArtifactName.equals(proxy.getName()) ?
-                            "update" : "deployed") + " from file : " + fileName);
+                            "updated" : "deployed") + " from file : " + fileName);
                 return proxy.getName();
             } else {
                 handleSynapseArtifactDeploymentError("ProxyService Update Failed. The artifact " +

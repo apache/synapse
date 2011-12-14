@@ -18,9 +18,9 @@
   ~  under the License.
   -->
 <project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
@@ -32,12 +32,29 @@
     <packaging>jar</packaging>
     <name>Apache Synapse - Patches</name>
     <description>
-        Contains patches for dependencies of Synapse. The project's main artifact is a JAR file
-        containing all the patched classes. It also attaches a ZIP file with the individual JAR
-        files.
+        Automatically generates patches for dependencies of Synapse. The required source code should
+        be included with a dependency to the original dependency. It also attaches a ZIP file with
+        the individual JAR files.
     </description>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./jars</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -78,4 +95,11 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+            <version>${commons.vfs.version}</version>
+        </dependency>
+    </dependencies>
 </project>

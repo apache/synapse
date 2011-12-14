@@ -16,36 +16,27 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+package org.apache.synapse.rest.dispatch;
 
-package org.apache.synapse.samples.framework.config;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.rest.Resource;
 
-public class Axis2ClientConfiguration {
+import java.util.Collection;
 
-    private String clientRepo;
-    private String fileName;
-    private String axis2Xml;
+/**
+ * Interface for finding a Resource through which a given request can be mediated.
+ * Implementations of this interface should attempt to find a Resource out of the
+ * provided collection using which the given message can br further processed.
+ */
+public interface RESTDispatcher {
 
-    public String getClientRepo() {
-        return clientRepo;
-    }
+    /**
+     * Find a Resource instance suitable for processing the given message
+     *
+     * @param synCtx MessageContext to be processed through a Resource
+     * @param resources Collection of available Resource instances
+     * @return A matching Resource instance or null
+     */
+    public Resource findResource(MessageContext synCtx, Collection<Resource> resources);
 
-    public void setClientRepo(String clientRepo) {
-        this.clientRepo = clientRepo;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getAxis2Xml() {
-        return axis2Xml;
-    }
-
-    public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
-    }
 }

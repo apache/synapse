@@ -45,6 +45,7 @@ import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
 import org.apache.axiom.om.OMNode;
+import org.apache.synapse.rest.API;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -147,6 +148,8 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * Endpoint templates to create actual endpoints
      */
     private Map<String, Template> endpointTemplates = new ConcurrentHashMap<String, Template>();
+
+    private Map<String, API> apiTable = new ConcurrentHashMap<String, API>();
 
     /**
      * Description/documentation of the configuration
@@ -297,6 +300,51 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             }
         }
         return definedTemplates;
+    }
+
+    public void addAPI(String name, API api) {
+        if (!apiTable.containsKey(name)) {
+            for (API existingAPI : apiTable.values()) {
+                if (existingAPI.getContext().equals(api.getContext())) {
+                    handleException("URL context: " + api.getContext() + " is already registered" +
+                            " with the API: " + existingAPI.getName());
+                }
+            }
+            apiTable.put(name, api);
+        } else {
+            handleException("Duplicate resource definition by the name: " + name);
+        }
+    }
+
+    public void updateAPI(String name, API api) {
+        if (!apiTable.containsKey(name)) {
+            handleException("No API exists by the name: " + name);
+        } else {
+            for (API existingAPI : apiTable.values()) {
+                if (existingAPI.getContext().equals(api.getContext()) && !name.equals(api.getName())) {
+                    handleException("URL context: " + api.getContext() + " is already registered" +
+                            " with the API: " + existingAPI.getName());
+                }
+            }
+            apiTable.put(name, api);
+        }
+    }
+
+    public Collection<API> getAPIs() {
+        return Collections.unmodifiableCollection(apiTable.values());
+    }
+
+    public API getAPI(String name) {
+        return apiTable.get(name);
+    }
+
+    public void removeAPI(String name) {
+        API api = apiTable.get(name);
+        if (api != null) {
+            apiTable.remove(name);
+        } else {
+            handleException("No API exists by the name: " + name);
+        }
     }
 
      /**
@@ -1264,8 +1312,9 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             mp.destroy();
         }
 
-
-
+        for (API api : apiTable.values()) {
+            api.destroy();
+        }
     }
 
     /**
@@ -1343,6 +1392,10 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         // initialize message processors
         for(MessageProcessor messageProcessor : messageProcessors.values()) {
             messageProcessor.init(se);
+        }
+
+        for (API api : apiTable.values()) {
+            api.init(se);
         }
     }
 

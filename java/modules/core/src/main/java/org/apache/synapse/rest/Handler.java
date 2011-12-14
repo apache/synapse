@@ -17,35 +17,14 @@
  *  under the License.
  */
 
-package org.apache.synapse.samples.framework.config;
+package org.apache.synapse.rest;
 
-public class Axis2ClientConfiguration {
+import org.apache.synapse.MessageContext;
 
-    private String clientRepo;
-    private String fileName;
-    private String axis2Xml;
+public interface Handler {
 
-    public String getClientRepo() {
-        return clientRepo;
-    }
+    public boolean handleRequest(MessageContext messageContext);
 
-    public void setClientRepo(String clientRepo) {
-        this.clientRepo = clientRepo;
-    }
+    public boolean handleResponse(MessageContext messageContext);
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getAxis2Xml() {
-        return axis2Xml;
-    }
-
-    public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
-    }
 }

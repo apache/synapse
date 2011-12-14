@@ -30,6 +30,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.rest.RESTConstants;
+import org.apache.synapse.rest.RESTRequestHandler;
+import org.apache.synapse.rest.Resource;
 import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -61,6 +64,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private ExecutorService executorService;
     private boolean initialized = false;
     private SynapseTaskManager taskManager;
+    private RESTRequestHandler restHandler;
 
     /** The StatisticsCollector object */
     private StatisticsCollector statisticsCollector = new StatisticsCollector();
@@ -104,7 +108,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             synCfg.getProperty(SynapseThreadPool.SYN_THREAD_IDPREFIX,
                 SynapseThreadPool.SYNAPSE_THREAD_ID_PREFIX));
 
-        taskManager = new SynapseTaskManager();                
+        taskManager = new SynapseTaskManager();
+        restHandler = new RESTRequestHandler();
     }
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
@@ -172,6 +177,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                     return false;
                 }
             } else {
+                boolean processed = restHandler.process(synCtx);
+                if (processed) {
+                    return true;
+                }
+
                 if (log.isDebugEnabled()) {
                     log.debug("Using Main Sequence for injected message");
                 }

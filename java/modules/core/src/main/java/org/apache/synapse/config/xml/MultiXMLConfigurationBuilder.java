@@ -77,16 +77,17 @@ import java.util.Properties;
  */
 public class MultiXMLConfigurationBuilder {
 
-    public static final String PROXY_SERVICES_DIR  = "proxy-services";
-    public static final String SEQUENCES_DIR       = "sequences";
-    public static final String TEMPLATES_DIR       = "templates";
-    public static final String ENDPOINTS_DIR       = "endpoints";
-    public static final String LOCAL_ENTRY_DIR     = "local-entries";
-    public static final String TASKS_DIR           = "tasks";
-    public static final String EVENTS_DIR          = "event-sources";
-    public static final String EXECUTORS_DIR       = "priority-executors";
-    public static final String MESSAGE_STORE_DIR   = "message-stores";
-    public static final String MESSAGE_PROCESSOR_DIR   = "message-processors";
+    public static final String PROXY_SERVICES_DIR       = "proxy-services";
+    public static final String SEQUENCES_DIR            = "sequences";
+    public static final String TEMPLATES_DIR            = "templates";
+    public static final String ENDPOINTS_DIR            = "endpoints";
+    public static final String LOCAL_ENTRY_DIR          = "local-entries";
+    public static final String TASKS_DIR                = "tasks";
+    public static final String EVENTS_DIR               = "event-sources";
+    public static final String EXECUTORS_DIR            = "priority-executors";
+    public static final String MESSAGE_STORE_DIR        = "message-stores";
+    public static final String MESSAGE_PROCESSOR_DIR    = "message-processors";
+    public static final String REST_API_DIR             = "api";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 

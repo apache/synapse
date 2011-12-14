@@ -17,35 +17,10 @@
  *  under the License.
  */
 
-package org.apache.synapse.samples.framework.config;
+package org.apache.synapse.rest.dispatch;
 
-public class Axis2ClientConfiguration {
+public interface DispatcherHelper {
 
-    private String clientRepo;
-    private String fileName;
-    private String axis2Xml;
+    public String getString();
 
-    public String getClientRepo() {
-        return clientRepo;
-    }
-
-    public void setClientRepo(String clientRepo) {
-        this.clientRepo = clientRepo;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getAxis2Xml() {
-        return axis2Xml;
-    }
-
-    public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
-    }
 }

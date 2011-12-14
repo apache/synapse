@@ -29,6 +29,7 @@ import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.TemplateSerializer;
+import org.apache.synapse.config.xml.rest.APISerializer;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
@@ -43,6 +44,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.API;
 
 import javax.xml.namespace.QName;
 import java.util.Collection;
@@ -150,6 +152,8 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
        //Message Processors
         serializeMessageProcessors(definitions,synCfg.getMessageProcessors());
 
+        serializeAPIs(definitions, synCfg.getAPIs());
+
         return definitions;
     }
 
@@ -220,6 +224,14 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         for (Template template : templateMap.values()) {
             TemplateSerializer serializer = new TemplateSerializer();
             serializer.serializeEndpointTemplate(template, definitions);
+        }
+    }
+
+    private static void serializeAPIs(OMElement definitions,
+                                      Collection<API> apiSet) {
+        for (API api : apiSet) {
+            OMElement apiElt = APISerializer.serializeAPI(api);
+            definitions.addChild(apiElt);
         }
     }
 

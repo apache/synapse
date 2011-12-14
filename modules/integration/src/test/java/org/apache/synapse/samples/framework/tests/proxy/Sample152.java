@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.samples.framework.tests.proxy;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
@@ -38,8 +39,9 @@ public class Sample152 extends SynapseTestCase {
 
     public void testTransportAndFormatSwitching() {
         String url2 = "https://localhost:8243/services/StockQuoteProxy";
-        System.setProperty("javax.net.ssl.trustStore", System.getProperty("user.dir") +
+        String trustStore = FilenameUtils.normalize(System.getProperty("user.dir") +
                 "/modules/integration/src/test/resources/trust.jks");
+        System.setProperty("javax.net.ssl.trustStore", trustStore);
 
         log.info("Running test: Switching transports and message format from SOAP to REST/POX");
 

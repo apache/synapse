@@ -17,35 +17,22 @@
  *  under the License.
  */
 
-package org.apache.synapse.samples.framework.config;
+package org.apache.synapse.rest.dispatch;
 
-public class Axis2ClientConfiguration {
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.rest.dispatch.RESTDispatcher;
+import org.apache.synapse.rest.Resource;
 
-    private String clientRepo;
-    private String fileName;
-    private String axis2Xml;
+import java.util.Collection;
 
-    public String getClientRepo() {
-        return clientRepo;
-    }
+public class DefaultDispatcher implements RESTDispatcher {
 
-    public void setClientRepo(String clientRepo) {
-        this.clientRepo = clientRepo;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getAxis2Xml() {
-        return axis2Xml;
-    }
-
-    public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
+    public Resource findResource(MessageContext synCtx, Collection<Resource> resources) {
+        for (Resource resource : resources) {
+            if (resource.getDispatcherHelper() == null) {
+                return resource;
+            }
+        }
+        return null;
     }
 }

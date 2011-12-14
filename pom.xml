@@ -671,6 +671,12 @@
             <artifactId>commons-lang</artifactId>
             <scope>test</scope>
         </dependency>
+
+	<dependency>
+	    <groupId>org.wso2.uri.template</groupId>
+	    <artifactId>wso2-uri-templates</artifactId>
+	    <version>1.0.0</version>
+	</dependency>
         
         <!-- Caching dependencies -->
         <dependency>

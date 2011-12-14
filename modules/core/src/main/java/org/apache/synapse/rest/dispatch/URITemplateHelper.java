@@ -17,35 +17,32 @@
  *  under the License.
  */
 
-package org.apache.synapse.samples.framework.config;
+package org.apache.synapse.rest.dispatch;
 
-public class Axis2ClientConfiguration {
+import org.apache.synapse.SynapseException;
+import org.wso2.uri.template.URITemplate;
+import org.wso2.uri.template.URITemplateException;
 
-    private String clientRepo;
-    private String fileName;
-    private String axis2Xml;
+public class URITemplateHelper implements DispatcherHelper {
 
-    public String getClientRepo() {
-        return clientRepo;
+    private String templateString;
+
+    private URITemplate uriTemplate;
+
+    public URITemplateHelper(String templateString) {
+        this.templateString = templateString;
+        try {
+            this.uriTemplate = new URITemplate(templateString);
+        } catch (URITemplateException e) {
+            throw new SynapseException("Error while parsing the URI template", e);
+        }
     }
 
-    public void setClientRepo(String clientRepo) {
-        this.clientRepo = clientRepo;
+    public URITemplate getUriTemplate() {
+        return uriTemplate;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getAxis2Xml() {
-        return axis2Xml;
-    }
-
-    public void setAxis2Xml(String axis2Xml) {
-        this.axis2Xml = axis2Xml;
+    public String getString() {
+        return templateString;
     }
 }

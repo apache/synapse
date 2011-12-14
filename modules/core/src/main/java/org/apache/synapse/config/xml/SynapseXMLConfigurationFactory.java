@@ -27,6 +27,7 @@ import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
@@ -43,6 +44,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
+import org.apache.synapse.rest.API;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -95,6 +97,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     defineMessageProcessor(config, elt, properties);
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt, properties);
+                } else if (XMLConfigConstants.API_ELT.equals(elt.getQName())) {
+                    defineAPI(config, elt);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
                     config.setDescription(elt.getText());
                 } else {
@@ -313,6 +317,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         if (element != null) {
             defineEndpointTemplate(config, elem, properties);
         }
+    }
+
+    public static void defineAPI(SynapseConfiguration config, OMElement elem) {
+        API api = APIFactory.createAPI(elem);
+        config.addAPI(api.getName(), api);
     }
 
     private static void handleException(String msg) {

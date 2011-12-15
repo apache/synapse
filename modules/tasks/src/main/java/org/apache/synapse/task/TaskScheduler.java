@@ -281,7 +281,7 @@ public class TaskScheduler {
                     if (log.isDebugEnabled()) {
                         log.debug("ShuttingDown Task Scheduler : " + scheduler.getMetaData());
                     }
-                    scheduler.shutdown();
+                    scheduler.shutdown(true);
                 }
                 initialized = false;
             } catch (SchedulerException e) {

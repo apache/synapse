@@ -85,7 +85,7 @@
                         </li>
                         <li>
                             Enable the mail transport listener and mail transport sender for Synapse
-                            (refer mail transport setup guide for more details)
+                            (refer  <a href="setup/mail.html#mailTransportSender"> Mail transport setup</a> guide for more details)
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 256 (repository/conf/sample/synapse_sample_256.xml)

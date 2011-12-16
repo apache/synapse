@@ -79,8 +79,7 @@
                             more details).
                         </li>
                         <li>
-                            Enable the mail transport sender for Synapse (refer Mail transport setup
-                            guide for more details).
+                            Enable the mail transport sender for Synapse (refer <a href="setup/mail.html#mailTransportSender"> Mail transport setup</a> guide for more details).
                         </li>
                         <li>
                             Create a new test directory in the FTP site.

@@ -76,7 +76,7 @@
                     <ul>                
                         <li>
                             Setup and start a JMS broker (Apache ActiveMQ can be used as the
-                            JMS broker for this scenario. Refer JMS setup guide for information on
+                            JMS broker for this scenario.Refer <a href="setup/jms.html#intro">JMS setup guide</a> for information on
                             how to run ActiveMQ.)
                         </li>
                         <li>

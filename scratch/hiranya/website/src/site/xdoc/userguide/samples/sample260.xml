@@ -23,9 +23,8 @@
         <title>Apache Synapse - Sample 260</title>
     </properties>
     <body>
-        <section name="Sample 260: ">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
+        <section name="Sample 260:Switch from FIX to AMQP">
+    <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;proxy name="FIXProxy" transports="fix"&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
@@ -48,35 +47,46 @@
             file
         &lt;/parameter&gt;
     &lt;/proxy&gt;
-
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-
+					Demonstrate the capability of switching between FIX and AMQP protocols
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                           You will need the sample FIX blotter that comes with Quickfix/J (Banzai). Configure the blotter to establish sessions with Synapse. (refer
+                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details)
                         </li>
-                        <li>
-                            Start Synapse using the configuration numbered 260 (repository/conf/sample/synapse_sample_260.xml)
-                            <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 260<br/>
-                                Windows: synapse.bat -sample 260
-                            </div>
+                         <li>
+                           Configure the AMQP transport for Synapse. See Configure Synapse for  <a href="setup/jms.html#amqp"> AMQP Transport setup</a> for detail
+                        </li>
+                        <li> 
+                           To get an idea about the various transport parameters being used in this sample see FIX Transport Parameters .
                         </li>
                     </ul>
                 </p>
             </subsection>
             <subsection name="Executing the Client">
-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
-
-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
-
-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+            	<p>
+            	   Start the AMQP consumer, by switching to samples/axis2Client directory and running the consumer using the following command. Consumer will listen to the queue 'QpidStockQuoteService', accept the orders and reply to the queue 'replyQueue'.
+            	</p>
+                <div class="command">ant amqpconsumer -Dpropfile=$SYNAPSE_HOME/repository/conf/sample/resources/fix/direct.properties</div>
+				<p>
+				  Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_260.xml file
+				  and make sure that the transport.fix.AcceptorConfigURL property points
+				  to the fix-synapse.cfg file you created. Once done you can start the
+				  Synapse configuration numbered 260: i.e. synapse -sample 260. Note that
+				  Synapse creates a new FIX session with Banzai at this point.
+				</p>
+				<p>
+				  Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ MKT.
+				</p>
+				<p>
+				  Synapse will forward the order request by binding it to a JMS message payload and sending it to the AMQP consumer. AMQP consumer will send a execution back to Banzai.
+				</p>
             </subsection>
         </section>
         <p><a href="../samples.html">Back to Catalog</a></p>        

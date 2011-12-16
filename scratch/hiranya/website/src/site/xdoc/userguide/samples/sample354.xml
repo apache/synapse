@@ -71,6 +71,11 @@
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
+                     	<li>
+                           This sample uses Ruby so first setup support for this in Synapse as described at
+							<a href="setup/script.html#ruby">Configuring JRuby</a>
+							<br />
+                        </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>

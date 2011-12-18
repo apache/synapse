@@ -584,7 +584,7 @@
         </dependency>
 
         <dependency>
-            <groupId>xalan</groupId>
+            <groupId>org.apache.xalan</groupId>
             <artifactId>xalan</artifactId>
             <version>${xalan.version}</version>
         </dependency>

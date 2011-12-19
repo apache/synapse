@@ -1132,6 +1132,10 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
     <p>
       and the endpoint token refers to an anonymous endpoint definition.
     </p>
+    <p> If the response message is to be sent to a named sequence, the 'receive' attribute can be used: </p>
+    <pre xml:space="preserve"> &lt;send receive="recevingSequence"&gt;
+       (endpointref | endpoint)+
+    &lt;/send&gt;</pre>
     <p/>
     <h4>
       <a name="drop" id="drop">Drop</a>

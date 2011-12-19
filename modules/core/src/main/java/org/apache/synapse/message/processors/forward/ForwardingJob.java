@@ -122,6 +122,11 @@ public class ForwardingJob implements StatefulJob {
                 if (targetEp != null) {
                     Endpoint ep = messageContext.getEndpoint(targetEp);
 
+                    // stop processing if endpoint is not ready to send
+                    if(!ep.getContext().readyToSend()) {
+                        return;
+                    }
+
                     if (ep instanceof AddressEndpoint) {
 
                         try {

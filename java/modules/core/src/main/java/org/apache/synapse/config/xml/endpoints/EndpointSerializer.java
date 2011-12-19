@@ -121,7 +121,7 @@ public abstract class EndpointSerializer {
      * Returns the EndpointSerializer implementation for the given endpoint. Throws a SynapseException,
      * if there is no serializer for the given endpoint type.
      *
-     * @param endpoint Endpoint implementaion.
+     * @param endpoint Endpoint implementation.
      * @return EndpointSerializer implementation.
      */
     public static EndpointSerializer getEndpointSerializer(Endpoint endpoint) {

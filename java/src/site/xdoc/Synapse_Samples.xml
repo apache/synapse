@@ -144,6 +144,8 @@
 <a href="#Sample13">Sample 15: Message Enrichment through Synapse</a></li>
 <li>
 <a href="#Sample16">Sample 16: Introduction to dynamic and static keys</a></li>
+<li>
+<a href="#Sample17">Sample 17: Transforming / replacing message content with Payload-factory mediator</a></li>
 </ul></li>
 
 <li>
@@ -1013,6 +1015,77 @@ Standard dual channel :: Stock price = $57.16686934968289</pre>
 <p>The second XSLT resource &quot;transform/transform_back.xslt&quot; is used simply as a static key as usual. It is not included inside &quot;{ }&quot; and because of the mediator directly use the static value as the key. </p>
 <p>Execute the custom quote client as 'ant stockquote -Dmode=customquote …' and analys the output which is similar to the Sample 8. </p>
 <pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
+
+<h2>
+<a name="Sample17" id="Sample17">Sample 17: Transforming / replacing message content with Payload-factory mediator</a></h2>
+<pre xml:space="preserve">
+&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+
+    &lt;sequence name=&quot;main&quot;&gt;
+        &lt;in&gt;
+            &lt;!-- using payloadFactory mediator to transform the request message --&gt;
+            &lt;payloadFactory&gt;
+                &lt;format&gt;
+                    &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
+                        &lt;m:request&gt;
+                            &lt;m:symbol&gt;$1&lt;/m:symbol&gt;
+                        &lt;/m:request&gt;
+                    &lt;/m:getQuote&gt;
+                &lt;/format&gt;
+                &lt;args&gt;
+                    &lt;arg xmlns:m0=&quot;http://services.samples&quot; expression=&quot;//m0:Code&quot;/&gt;
+                &lt;/args&gt;
+            &lt;/payloadFactory&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;!-- using payloadFactory mediator to transform the response message --&gt;
+            &lt;payloadFactory&gt;
+                &lt;format&gt;
+                    &lt;m:CheckPriceResponse xmlns:m=&quot;http://services.samples/xsd&quot;&gt;
+                        &lt;m:Code&gt;$1&lt;/m:Code&gt;
+                        &lt;m:Price&gt;$2&lt;/m:Price&gt;
+                    &lt;/m:CheckPriceResponse&gt;
+                &lt;/format&gt;
+                &lt;args&gt;
+                    &lt;arg xmlns:m0=&quot;http://services.samples/xsd&quot; expression=&quot;//m0:symbol&quot;/&gt;
+                    &lt;arg xmlns:m0=&quot;http://services.samples/xsd&quot; expression=&quot;//m0:last&quot;/&gt;
+                &lt;/args&gt;
+            &lt;/payloadFactory&gt;
+        &lt;/out&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;
+</pre>
+
+<p>
+<strong>Objective: Introducing Payload-factory mediator</strong> </p>
+<p>
+<strong>Prerequisites:</strong>
+<br/> Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+<br/> Start the Synapse configuration numbered 17: i.e. synapse -sample 17</p>
+
+
+<p>
+This sample uses Payload-factory mediator to perform transformations as an alternative
+to XSLT mediator (Sample 8). In this sample, Synapse implements Message Translator EIP and acts
+an a translator between the client and the backend server.
+</p>
+
+<p>Execute the custom quote client as 'ant stockquote -Dmode=customquote ...'
+and analyze Synapse debug log output </p>
+<pre xml:space="preserve">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</pre>
+
+<p>Incoming message is transformed by the Payload-factory mediator into a standard stock quote 
+request as expected by the SimpleStockQuoteService deployed on the Axis2 server. 
+<code>printf()</code> style formatting is used to configure the transformation performed by 
+the mediator. Each argument in the mediator configuration could be a static value or an
+XPath expression. When an expression is used, argument value is fetched at runtime by evaluating 
+the provided XPath expression against the existing SOAP message. </p>
+
+<p>The response from the SimpleStockQuoteService is converted back into the custom format as 
+expected by the client during the out message processing, once again using Payload-factory 
+mediator.</p>
 
 <h1>
 <a name="Endpoints" id="Endpoints">Advanced mediations with endpoints</a> </h1>

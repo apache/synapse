@@ -557,7 +557,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
   &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
   
   &lt;timeout&gt;
-    &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
+    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
     &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
   &lt;/timeout&gt;?
   
@@ -612,7 +612,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
   &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
 
   &lt;timeout&gt;
-    &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;
+    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
     &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
   &lt;/timeout&gt;?
 
@@ -649,7 +649,7 @@ where "sequence/dynamic_seq_1.xml" refers to the following sequence definition f
   &lt;enableAddressing/&gt;?
   
   &lt;timeout&gt;
-    &lt;duration&gt;timeout-duration&lt;/duration&gt;
+    &lt;duration&gt;timeout duration in milliseconds&lt;/duration&gt;
     &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
   &lt;/timeout&gt;?
   &lt;markForSuspension&gt;

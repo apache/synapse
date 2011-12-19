@@ -249,6 +249,7 @@
                 <exclude>org.slf4j:jcl-over-slf4j:jar</exclude>
                 <exclude>org.slf4j:log4j-over-slf4j:jar</exclude>
                 <exclude>com.oopsconsultancy:xmltask:jar</exclude>
+		<exclude>xalan:xalan:jar</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>

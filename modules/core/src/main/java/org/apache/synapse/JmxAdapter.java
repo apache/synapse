@@ -223,8 +223,6 @@ public class JmxAdapter {
             if (jmxInformation.getRemoteAccessFile() != null) {
                 env.put("jmx.remote.x.access.file", jmxInformation.getRemoteAccessFile());
             }
-        } else {
-            log.warn("Using unsecured JMX remote access!");
         }
 
         if (jmxInformation.isRemoteSSL()) {

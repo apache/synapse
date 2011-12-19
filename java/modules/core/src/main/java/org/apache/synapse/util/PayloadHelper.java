@@ -201,8 +201,7 @@ public class PayloadHelper {
 			log.error("Text Node not found");
 			return null;
 		}
-		OMText text = (OMText) textNode;
-		return text.getText();
+		return el.getText();
 	}
 
 	public static String getTextPayload(MessageContext mc) {

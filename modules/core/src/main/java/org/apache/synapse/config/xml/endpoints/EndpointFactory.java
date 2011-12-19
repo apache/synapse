@@ -227,12 +227,6 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
             return DynamicLoadbalanceEndpointFactory.getInstance();
         }
 
-        OMElement sdlbElement = configElement.getFirstChildWithName
-                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "serviceDynamicLoadbalance"));
-        if (sdlbElement != null) {
-            return ServiceDynamicLoadbalanceEndpointFactory.getInstance();
-        }
-        
         OMElement foElement = configElement.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
         if (foElement != null) {

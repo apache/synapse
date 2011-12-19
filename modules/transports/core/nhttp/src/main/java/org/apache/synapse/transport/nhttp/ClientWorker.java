@@ -114,7 +114,6 @@ public class ClientWorker implements Runnable {
                 responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
             }
 
-            responseMsgCtx.setProperty(MessageContext.IN_MESSAGE_CONTEXT, outMsgCtx);
             responseMsgCtx.setServerSide(true);
             responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
             responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN, outMsgCtx

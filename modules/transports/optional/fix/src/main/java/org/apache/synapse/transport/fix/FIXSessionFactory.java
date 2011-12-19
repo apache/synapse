@@ -430,6 +430,8 @@ public class FIXSessionFactory {
                     logFactory = new JdbcLogFactory(settings);
                 } else if (FIXConstants.CONSOLE_BASED_MESSAGE_LOGGING.equals(method)) {
                     logFactory = new ScreenLogFactory();
+                } else if (FIXConstants.SLF4J_BASED_MESSAGE_LOGGING.equals(method)) {
+                    logFactory = new SLF4JLogFactory(settings);
                 } else {
                     log.warn("Invalid acceptor log method " + method + ". Using defaults.");
                 }

@@ -45,6 +45,7 @@ public class FIXConstants {
     public static final String FILE_BASED_MESSAGE_LOGGING = "file";
     public static final String JDBC_BASED_MESSAGE_LOGGING = "jdbc";
     public static final String CONSOLE_BASED_MESSAGE_LOGGING = "console";
+    public static final String SLF4J_BASED_MESSAGE_LOGGING = "slf4j";
 
     public static final String FILE_BASED_MESSAGE_STORE = "file";
     public static final String JDBC_BASED_MESSAGE_STORE = "jdbc";

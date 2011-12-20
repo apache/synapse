@@ -711,6 +711,164 @@
                     </tbody>
                 </table>
             </subsection>
+            <subsection name="Default Endpoint">
+                <p>
+                    Default endpoint is an endpoint defined for adding QoS and other configurations
+                    to the endpoint which is resolved from the 'To' address of the message context.
+                    All the configurations such as message format for the endpoint, the method to
+                    optimize attachments, reliable messaging, security policies for the endpoint
+                    can be specified as in the case of Address Endpoint. This endpoint differs from
+                    the address endpoint only in the 'uri' attribute which will not be present in
+                    this endpoint. Following section describes the configuration of a default
+                    endpoint.
+                </p>
+                <div class="xmlConf">&lt;default [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+         [encoding="<em>charset encoding</em>"]
+         [statistics="enable|disable"] [trace="enable|disable"]&gt;
+  &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+
+  &lt;timeout&gt;
+    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
+    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
+  &lt;/timeout&gt;?
+
+   &lt;markForSuspension&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+    &lt;/markForSuspension&gt;
+
+  &lt;suspendOnFailure&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+    &lt;/suspendOnFailure&gt;
+&lt;/default&gt;</div>
+            </subsection>
+            <subsection name="WSDL Endpoint">
+                <p>
+                    WSDL endpoint is an endpoint definition based on a specified WSDL document. The
+                    WSDL document can be specified either as a URI or as an inline definition within
+                    the configuration. The service and port name containing the target EPR has to be
+                    specified with the 'service' and 'port' (or 'endpoint') attributes respectively.
+                    Elements like 'enableRM', 'enableSec', 'enableAddressing', 'suspendOnFailure' and
+                    'timeout' are same as for an Address endpoint.
+                </p>
+                <div class="xmlConf">&lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
+      &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+      &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+      &lt;enableRM [policy="key"]/&gt;?
+      &lt;enableSec [policy="key"]/&gt;?
+      &lt;enableAddressing/&gt;?
+
+      &lt;timeout&gt;
+        &lt;duration&gt;timeout duration in milliseconds&lt;/duration&gt;
+        &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
+      &lt;/timeout&gt;?
+      &lt;markForSuspension&gt;
+            [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+            &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+            &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+        &lt;/markForSuspension&gt;
+
+      &lt;suspendOnFailure&gt;
+            [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+            &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+            &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+            &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+        &lt;/suspendOnFailure&gt;
+
+    &lt;/wsdl&gt;</div>
+            </subsection>
+            <subsection name="Load Balance Endpoint">
+                <p>
+                    A Load balanced endpoint distributes the messages (load) among a set of listed
+                    endpoints or static members by evaluating the load balancing policy and any other
+                    relevant parameters. The policy attribute of the load balance element specifies the
+                    load balance policy (algorithm) to be used for selecting the target endpoint or
+                    static member. Currently only the roundRobin policy is supported. The 'failover'
+                    attribute determines if the next endpoint or static member should be selected once
+                    the currently selected endpoint or static member has failed, and defaults to true.
+                    The set of endpoints or static members amongst which the load has to be distributed
+                    can be listed under the 'loadBalance' element. These endpoints can belong to any
+                    endpoint type mentioned in this document. For example, failover endpoints can be
+                    listed inside the load balance endpoint to load balance between failover groups etc.
+                    The 'loadbalance' element cannot have both 'endpoint' and 'member' child elements in
+                    the same configuration. In the case of the 'member' child element, the 'hostName',
+                    'httpPort' and/or 'httpsPort' attributes should be specified.
+                </p>
+                <p>
+                    The optional 'session' element makes the endpoint a session affinity based load
+                    balancing endpoint. If it is specified, sessions are bound to endpoints in the
+                    first message and all successive messages for those sessions are directed to their
+                    associated endpoints. Currently there are two types of sessions supported in session
+                    aware load balancing. Namely HTTP transport based session which identifies the
+                    sessions based on http cookies and the client session which identifies the session
+                    by looking at a SOAP header sent by the client with the QName
+                    '{http://ws.apache.org/ns/synapse}ClientID'. The 'failover' attribute mentioned
+                    above is not applicable for session affinity based endpoints and it is always
+                    considered as set to false. If it is required to have failover behavior in session
+                    affinity based load balance endpoints, failover endpoints should be listed as the
+                    target endpoints.
+                </p>
+                <div class="xmlConf">&lt;loadBalance [policy="roundRobin"] [algorithm="impl of org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm"]
+                        [failover="true|false"]&gt;
+        &lt;endpoint .../&gt;+
+        &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+
+    &lt;/loadBalance&gt;
+    &lt;session type="http|simpleClientSession"/&gt;?</div>
+            </subsection>
+            <subsection name="Dynamic Load Balance Endpoint">
+                <p>
+                    This is a special variation of the load balance endpoint where instead of
+                    having to specify the child endpoints explicitly, the endpoint automatically
+                    discovers the child endpoints available for load balancing. These child
+                    endpoints will be discovered using the 'membershipHandler' class. Generally, this
+                    class will use a group communication mechanism to discover the application members.
+                    The 'class' attribute of the 'membershipHandler' element should be an
+                    implementation of org.apache.synapse.core.LoadBalanceMembershipHandler.
+                    The 'membershipHandler' specific properties can be specified using the 'property'
+                    elements.  The 'policy' attribute of the 'dynamicLoadbalance' element specifies
+                    the load balance policy (algorithm) to be used for selecting the next member to
+                    which the message has to be forwarded. Currently only the 'roundRobin' policy is
+                    supported. 'The failover' attribute determines if the next member should be
+                    selected once the currently selected member has failed, and defaults to true.
+                </p>
+                <div class="xmlConf">&lt;dynamicLoadBalance [policy="roundRobin"] [failover="true|false"]&gt;
+    &lt;membershipHandler
+            class="impl of org.apache.synapse.core.LoadBalanceMembershipHandler"&gt;
+            &lt;property name="name" value="value"/&gt;+
+    &lt;/membershipHandler&gt;
+    &lt;/dynamicLoadBalance&gt;</div>
+                <p>
+                    Currently Synapse ships with one implementation of the LoadBalanceMembershipHandler
+                    interface. This class is named 'Axis2LoadBalanceMembershipHandler' and its
+                    usage is demonstrated in sample 57.
+                </p>
+            </subsection>
+            <subsection name="Fail-Over Endpoint">
+                <p>
+                    Failover endpoints send messages to the listed endpoints with the following
+                    failover behavior. At the start, the first listed endpoint is selected as the
+                    primary and all other endpoints are treated as backups. Incoming messages are
+                    always sent only to the primary endpoint. If the primary endpoint fails, next
+                    active endpoint is selected as the primary and failed endpoint is marked as
+                    inactive. Thus it sends messages successfully as long as there is at least one
+                    active endpoint among the listed endpoints.
+                </p>
+                <p>
+                    When a previously failed endpoint becomes available again, it will assume
+                    its position as the primary endpoint and the traffic will be routed to that endpoint.
+                    It is possible to disable this behavior by setting the 'dynamic' attribute to false.
+                </p>
+                <div class="xmlConf">&lt;failover [dynamic="true|false"]&gt;
+  &lt;endpoint .../&gt;+
+&lt;/failover&gt;</div>
+
+            </subsection>
         </section>
     </body>
 </document>

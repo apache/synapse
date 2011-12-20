@@ -361,27 +361,27 @@
                 hierarchy.
             </p>
             <div class="consoleOutput">synapse-config
-            |-- api
-            |-- endpoints
-            |   `-- foo.xml
-            |-- events
-            |   `-- event1.xml
-            |-- local-entries
-            |   `-- bar.xml
-            |-- priority-executors
-            |-- proxy-services
-            |   |-- proxy1.xml
-            |   |-- proxy2.xml
-            |   `-- proxy3.xml
-            |-- registry.xml
-            |-- sequences
-            |   |-- custom-logger.xml
-            |   |-- fault.xml
-            |   `-- main.xml
-            |-- synapse.xml
-            |-- tasks
-            |   `-- task1.xml</div>
-            `-- templates
+    |-- api
+    |-- endpoints
+    |   `-- foo.xml
+    |-- events
+    |   `-- event1.xml
+    |-- local-entries
+    |   `-- bar.xml
+    |-- priority-executors
+    |-- proxy-services
+    |   |-- proxy1.xml
+    |   |-- proxy2.xml
+    |   `-- proxy3.xml
+    |-- registry.xml
+    |-- sequences
+    |   |-- custom-logger.xml
+    |   |-- fault.xml
+    |   `-- main.xml
+    |-- synapse.xml
+    |-- tasks
+    |   `-- task1.xml
+    `-- templates</div>
         </section>
         <section name="Configuration Syntax">
             <p>
@@ -450,6 +450,118 @@
                 should be cached. More advanced registry implementations allows different cachable
                 durations to be specified for different resources, or mark some resources as never
                 expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)
+            </p>
+        </section>
+        <section name="Local Entries (Local Registry)">
+            <p>
+                Local entries provide a convenient way to import various external configuration
+                artifacts into the Synapse runtime. This includes WSDLs, policies, XSLT files,
+                and scripts. Local entry definitions are parsed at server startup and the referenced
+                configurations are loaded to the memory where they will remain until the server is
+                shut down. Other functional components such as sequences, endpoints and proxy services
+                can refer these locally defined in-memory configuration elements by using the local
+                entry keys.
+            </p>
+            <p>
+                The &lt;localEntry&gt; element is used to declare registry entries that are local
+                to the Synapse instance. Following syntax is used to define a local entry in the
+                Synapse configuration.
+            </p>
+            <div class="xmlConf">&lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;</div>
+            <p>
+                A local entry may contain static text or static XML specified as inline content.
+                Following examples show how such static content can be included in local entry
+                definitions.
+            </p>
+            <div class="xmlConf">&lt;localEntry key="version"&gt;0.1&lt;/localEntry&gt;
+
+&lt;localEntry key="validate_schema"&gt;
+    &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+     ...
+    &lt;/xs:schema&gt;
+&lt;/localEntry&gt;</div>
+            <p>
+                Note the validate_schema local entry which wraps some static XML schema content. A
+                mediator such as the validate mediator can refer this local entry to load its XML
+                schema definition.
+            </p>
+            <p>
+                A local entry may also point to a remote URL (specified using the 'src'
+                attribute) from which the contents can be loaded. This way the user does not have
+                to specify all external configurations in the Synapse configuration itself. The
+                required artifacts can be kept on the file system or hosted on a web server from where
+                Synapse can fetch them using a local entry definition. Following example shows
+                how a local entry is configured to load an XSLT file from the local file system.
+            </p>
+            <div class="xmlConf">&lt;localEntry key="xslt-key-req" src="file:repository/conf/sample/resources/transform/transform.xslt"/&gt;</div>
+            <p>
+                It is important to note that Synapse loads the local entry contents only during
+                server start up (even when they are defined with a remote URL). Therefore any
+                changes done on the remote artifacts will not reflect on Synapse until the server
+                is restarted. This is in contrast to the behavior with remote registry where
+                Synapse reloads configuration artifacts as soon as the cache period expires.
+            </p>
+        </section>
+        <section name="Sequences" id="sequences">
+            <p>
+                As explained earlier a sequence resembles a message flow in Synapse and consists
+                of an array of mediators. The &lt;sequence&gt; element is used to define a sequence
+                in the Synapse configuration.  Sequences can be defined with names so they can be
+                reused across the Synapse configuration. The sequences named 'main' and 'fault' have
+                special significance in a Synapse configuration. The 'main' sequence handles any message
+                that is accepted for '<a href="#message_mediation">Message Mediation</a>'. The
+                'fault' sequence is invoked if Synapse encounters a fault, and a custom fault handler
+                is not specified for the sequence via its 'onError' attribute. If the 'main' or
+                'fault' sequences are not defined locally or not found in the Registry, Synapse
+                auto generates suitable defaults at initialization.
+            </p>
+            <p>
+                A Dynamic Sequence may be defined by specifying a key reference to a registry entry.
+                As the remote registry entry changes, the sequence will dynamically be updated
+                according to the specified cache duration and expiration. If tracing is enabled on a
+                sequence, all messages being processed through the sequence would write tracing
+                information through each mediation step to the 'trace.log' file configured via the
+                log4j.properties configuration.
+            </p>
+            <p>
+                The syntax outline of a sequence definition is given below.
+            </p>
+            <div class="xmlConf">&lt;sequence name="string" [onError="string"] [key="string"] [trace="enable"] [statistics="enable"]&gt;
+    mediator*
+ &lt;/sequence&gt;</div>
+            <p>
+                The 'onError' attribute can be used to define a custom error handler sequence.
+                Statistics collection can be activated by setting the 'statistics' attribute to
+                'enable' on the sequence. In this mode the sequence will keep track of the number
+                of messages processed and their processing times. This statistical information can
+                then be retrieved through the Synapse statistics API.
+            </p>
+            <p>
+                All the immediate child elements of the sequence element must be valid mediators.
+                Following example shows a sequence configuration which consists of three child
+                mediators.
+            </p>
+            <div class="xmlConf">&lt;sequence name="main" onError="errorHandler"&gt;
+    &lt;log/&gt;
+    &lt;property name="test" value="test value"/&gt;
+    &lt;send/&gt;
+&lt;/sequence&gt;</div>
+            <p>
+                Sequences can also hand over messages to other sequences. In this sense a sequence
+                is analogous to a procedure in a larger program. In many programming languages
+                procedures can invoke other procedures. See the following example sequence
+                configuration.
+            </p>
+            <div class="xmlConf">&lt;sequence name="foo"&gt;
+    &lt;log/&gt;
+    &lt;property name="test" value="test value"/&gt;
+    &lt;sequence key="other_sequence"/&gt;
+    &lt;send/&gt;
+&lt;/sequence&gt;</div>
+            <p>
+                Note how the message is handed to a sequence named 'other_sequence' using the
+                'sequence' element. The 'key' attribute could point to another named sequence, a
+                local entry or a remote registry entry.
             </p>
         </section>
     </body>

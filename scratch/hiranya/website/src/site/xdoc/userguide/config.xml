@@ -297,6 +297,160 @@
                     interface to suit the actual registry being used.
                 </p>
             </subsection>
+            <subsection name="APIs">
+                <p>
+                    An API is similar to a web application deployed in Synapse. It provides a
+                    convenient approach for filtering and processing HTTP traffic (specially RESTful
+                    invocations) through the service bus.  Each API is anchored at a user defined
+                    URL context (eg: /ws) and can handle all the HTTP requests that
+                    fall within that context. Each API is also comprised of one or more resources.
+                    Resources contain the mediation logic for processing requests and responses.
+                    Resources can also be associated with a set of HTTP methods and header values.
+                    For an example one may define an API with two resources, where one resources is
+                    used to handle GET requests and the other is used to handle POST requests.
+                    Similarly an API can be defined with separate resources for handling XML and JSON
+                    content (by looking at the Content-type HTTP header).
+                </p>
+                <p>
+                    Resources bare a strong resemblance to proxy services. Similar to proxy services,
+                    a resource can also define an 'in sequence', an 'out sequence' and a 'fault
+                    sequence'. Just like in the case of proxy services, the 'in sequence' is used
+                    to process incoming requests and the 'out sequence' is used to mediate responses.
+                </p>
+                <p>
+                    APIs provide a powerful framework using which comprehensive REST APIs can be
+                    constructed on existing systems. For an example a set of SOAP services can be
+                    hidden behind an API defined in Synapse. Clients can access the API in Synapse
+                    by making pure RESTful invocations over HTTP. Synapse takes care of transforming
+                    the requests and routing them to appropriate back-end services which may or may
+                    not be based on REST.
+                </p>
+            </subsection>
+        </section>
+        <section name="Synapse Configuration Files">
+            <p>
+                All the XML files pertaining to the Synapse configuration are available in the
+                repository/conf/synapse-config directory of the Synapse installation. This file
+                hierarchy consists of two files named synapse.xml and registry.xml. In addition to
+                that, following sub-directories can be found in the synapse-config directory.
+            </p>
+            <ul>
+                <li>api</li>
+                <li>endpoints</li>
+                <li>events</li>
+                <li>local-entries</li>
+                <li>priority-executors</li>
+                <li>proxy-services</li>
+                <li>sequences</li>
+                <li>tasks</li>
+                <li>templates</li>
+            </ul>
+            <p>
+                Each of these sub-directories can contain zero or more configuration items. For
+                an example the 'endpoints' directory may contain zero or more endpoint definitions
+                and the 'sequences' directory may contain zero or more sequence definitions. The
+                registry adapter is defined in the top level registry.xml file. The synapse.xml file
+                is there mainly for backward compatibility reasons. It can be used to define any
+                type of configuration items. One may define few endpoints in the 'endpoints' directory
+                and a few endpoints in the synapse.xml file. However it is recommended to stick to
+                a single, consistent way of defining configuration elements. So you should either
+                define everything in synapse.xml file, or not use it at all.
+            </p>
+            <p>
+                The following tree diagram shows the high-level view of the resulting file
+                hierarchy.
+            </p>
+            <div class="consoleOutput">synapse-config
+            |-- api
+            |-- endpoints
+            |   `-- foo.xml
+            |-- events
+            |   `-- event1.xml
+            |-- local-entries
+            |   `-- bar.xml
+            |-- priority-executors
+            |-- proxy-services
+            |   |-- proxy1.xml
+            |   |-- proxy2.xml
+            |   `-- proxy3.xml
+            |-- registry.xml
+            |-- sequences
+            |   |-- custom-logger.xml
+            |   |-- fault.xml
+            |   `-- main.xml
+            |-- synapse.xml
+            |-- tasks
+            |   `-- task1.xml</div>
+            `-- templates
+        </section>
+        <section name="Configuration Syntax">
+            <p>
+                As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.
+                All these different configuration items should be wrapped in a top level 'definitions'
+                element. A configuration defined in the synapse.xml file looks like this at the
+                high level.
+            </p>
+            <div class="xmlConf">&lt;definitions&gt;
+   &lt;<a href="#registry">registry</a> provider="string"&gt;...&lt;/registry&gt;?
+   &lt;<a href="#localEntry">localEntry</a> key="string"&gt;...&lt;/localEntry&gt;?
+   &lt;<a href="#sequence">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
+   &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
+   &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
+   &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
+   &lt;<a href="#eventsource">eventSource</a> name="string" ...&gt;...&lt;/eventSource&gt;?
+   &lt;<a href="#executor">executor</a> name="string" ...&gt;...&lt;/executor&gt;?
+   &lt;<a href="#store">messageStore</a> name="string" ...&gt;...&lt;/messageStore&gt;?
+&lt;/definitions&gt;</div>
+            <p>
+                The registry adapter definition is defined under the &lt;registry&gt; element. Similarly
+                &lt;endpoint&gt;, &lt;sequence&gt;, &lt;proxy&gt;, &lt;localEntry&gt;, &lt;eventSource
+                and &lt;executor&gt; elements are used to define other functional components.
+            </p>
+            <p>
+                As pointed out earlier, the synapse.xml file is there in the synapse-config directory
+                for backwards compatibility reasons. Any artifact defined in this file can be
+                defined separately in its own XML file. The registry can be defined in the registry.xml
+                and other artifacts can be defined in the corresponding sub-directories of the synapse-config
+                directory. However the XML syntax used to configure these artifacts are always the same.
+                Next few sections of this document explains the XML syntax for defining various
+                types of components in the Synapse configuration.
+            </p>
+        </section>
+        <section name="Registry" id="registry">
+            <p>
+                The &lt;registry&gt; element is used to define the registry adapter used by the
+                Synapse runtime. The registry provider specifies an implementation class for the
+                registry being used, and optionally a number of configuration parameters as may be
+                required by the particular registry implementation. An outline configuration is given
+                below.
+            </p>
+            <div class="xmlConf">&lt;registry provider="string"/&gt;
+    &lt;parameter name="string"&gt;text | xml&lt;/parameter&gt;*
+&lt;/registry&gt;</div>
+            <p>
+                Registry entries loaded from a remote registry may be cached as governed by the
+                registry, and reloaded after the cache periods expires if a newer version is found.
+                Hence it is possible to define configuration elements such as (dynamic) sequences and
+                endpoints, as well as resources such as XSLT's, scripts or XSDs in the registry, and
+                update the configuration as these are allowed to dynamically change over time.
+            </p>
+            <p>
+                Synapse ships with a built-in URL based registry implementation called the
+                'SimpleURLRegistry' and this can be configured as follows:
+            </p>
+            <div class="xmlConf">&lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+  &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
+  &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+&lt;/registry&gt;</div>
+            <p>
+                The 'root' parameter specifies the root URL of the registry for loaded resources. The
+                SimpleURLRegistry keys are path fragments, that when combined with the root prefix
+                would form the full URL for the referenced resource. The 'cachableDuration' parameter
+                specifies the number of milliseconds for which resources loaded from the registry
+                should be cached. More advanced registry implementations allows different cachable
+                durations to be specified for different resources, or mark some resources as never
+                expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)
+            </p>
         </section>
     </body>
 </document>

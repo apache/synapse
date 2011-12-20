@@ -173,7 +173,12 @@
 <a href="#Sample59">Sample 59: Weighted load balancing between 3 endpoints</a></li>
 <li>
 <a href="#Sample60">Sample 60: Service dynamic load balancing between 2 Service nodes</a></li>
-</ul></li>    
+<li>
+<a href="#Sample60">Sample 61: Routing a message to a static list of recipients</a></li>
+<li>
+<a href="#Sample61">Sample 62: Routing a message to a dynamic list of recipients</a></li>
+<li>
+<a href="#Sample62">Sample 63: Routing a message to a dynamic list of recipients and aggregating the responses</a></li></ul></li>
 <li>
 <a href="#MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a>
 <ul>
@@ -1967,6 +1972,190 @@ ant loadbalancefailover -Di=100 -Dtrpurl=http://<strong>test2</strong>.synapse.a
 <p>
 For the sake of simplicity, we have shown how to run this sample for one clustering domain at a time. However, you can make a copy of the axis2Server directory, and setup both domains simultaneously, and run the sample client to see how the requests are load balanced in a round-robin manner within each clustering domain.
 </p>
+
+
+<h2><a name="Sample61">Sample 61: Routing a message to a static list of recipients</a></h2>
+<pre xml:space="preserve">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;!--List of Recipients (static)--&gt;
+                    &lt;recipientlist&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+			&lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/recipientlist&gt;
+                &lt;/endpoint&gt;
+           &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;log level="full"/&gt;
+            &lt;drop/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;
+</pre>
+<p><strong>Objective: Demonstrate message routing to a set of
+static endpoints</strong> </p>
+
+<p><strong>Prerequisites:</strong> </p>
+
+<p>Start ESB with sample configuration 61. (i.e. synapse -sample 61) </p>
+
+<p>Deploy the SimpleStockQuoteService and start three instances of sample Axis2 server as mentioned in sample 52.</p>
+
+<p>Above configuration routes a cloned copy of a message to each recipient defined within the static recipient list.
+<br/>To test this, run the stockquote client to send an out-only message: </p>
+<pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8280/</pre>
+
+<p>This client sends a request to the SimpleStockQuoteService through the
+ESB. ESB will create cloned copies of the message and route to the three endpoints
+mentioned in the configuration. SimpleStockQuoteService prints the details of the placed
+order. If you examine the console output of each server, you can see that requests are
+processed by the three servers as follows: </p>
+<pre xml:space="preserve">Accepted order #1 for : 15738 stocks of IBM at $ 185.51155223506518
+</pre>
+
+<p>Now shutdown MyServer1 and resend the request. You will observe that requests are still processed by MyServer2 and MyServer3.</p>
+
+<h2><a name="Sample62">Sample 62: Routing a message to a dynamic list of recipients</a></h2>
+<pre xml:space="preserve">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name=&quot;root&quot;&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
+        &lt;in&gt;
+            &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
+            &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; scope=&quot;axis2&quot; value=&quot;true&quot; /&gt;
+	    &lt;!--Dynamic Reclipient List--&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;recipientlist&gt;
+                        &lt;endpoints value=&quot;{get-property(&#39;registry&#39;,&#39;recipients/EP_LIST&#39;)}&quot;/&gt;
+                    &lt;/recipientlist&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name=&quot;errorHandler&quot;&gt;
+        &lt;makefault response=&quot;true&quot;&gt;
+            &lt;code xmlns:tns=&quot;http://www.w3.org/2003/05/soap-envelope&quot; value=&quot;tns:Receiver&quot;/&gt;
+            &lt;reason value=&quot;COULDN&#39;T SEND THE MESSAGE TO THE SERVER.&quot;/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;
+</pre>
+<p><strong>Objective: Demonstrate message routing to a set of
+dynamic endpoints</strong> </p>
+
+<p><strong>Prerequisites:</strong> </p>
+
+<p>Start ESB with sample configuration 62. (i.e. synapse -sample 62) </p>
+
+<p>Deploy the SimpleStockQuoteService and start three instances of sample Axis2 server as mentioned in sample 52.</p>
+
+<p>This sample does the same thing as in sample 60. The difference is that unlike in sample 60, this sample defines
+the endpoints as a dynamic list of recipients.
+<br/>To test this, run the stockquote client to send an out-only message: </p>
+<pre xml:space="preserve">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8280/</pre>
+
+<p>The behaviour of this sample should be similar to that of sample 60</p>
+
+<h2><a name="Sample63">Sample 63: Routing a message to a dynamic list of recipients and aggregating responses</a></h2>
+<pre xml:space="preserve">
+&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name=&quot;root&quot;&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;sequence name=&quot;main&quot; onError=&quot;errorHandler&quot;&gt;
+        &lt;in&gt;
+	    &lt;!--Dynamic Recipient List--&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                   &lt;recipientlist&gt;
+                        &lt;endpoints value=&quot;{get-property(&#39;registry&#39;,&#39;recipients/EP_LIST&#39;)}&quot;/&gt;
+                    &lt;/recipientlist&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+	    &lt;log level=&quot;full&quot;/&gt;
+	    &lt;!--Aggregate responses--&gt;
+            &lt;aggregate&gt;
+              &lt;onComplete xmlns:m0=&quot;http://services.samples&quot;
+                          expression=&quot;//m0:getQuoteResponse&quot;&gt;
+                 &lt;send/&gt;
+	      &lt;/onComplete&gt;
+	    &lt;/aggregate&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name=&quot;errorHandler&quot;&gt;
+        &lt;makefault response=&quot;true&quot;&gt;
+            &lt;code xmlns:tns=&quot;http://www.w3.org/2003/05/soap-envelope&quot; value=&quot;tns:Receiver&quot;/&gt;
+            &lt;reason value=&quot;COULDN&#39;T SEND THE MESSAGE TO THE SERVER.&quot;/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;
+</pre>
+<p><strong>Objective: Demonstrate message routing to a set of
+dynamic endpoints and aggregate responses</strong> </p>
+
+<p><strong>Prerequisites:</strong> </p>
+
+<p>Start ESB with sample configuration 63. (i.e. synapse -sample 63) </p>
+
+<p>Deploy the SimpleStockQuoteService and start three instances of sample Axis2 server as mentioned in sample 52.</p>
+
+<p>Above configuration routes a cloned copy of a message to each recipient defined within the dynamic recipient list.
+Each recipient will respond back with a stock quote. When all the responses appear to synapse those resonses will be
+aggregated to form the resultant response which will be sent back to the client.
+<br/>To test this, invoke the client as follows: </p>
+<pre xml:space="preserve">ant stockquote -Dtrpurl=http://localhost:8280/</pre>
+
+<p>If you sent your client request through a TCP based conversation monitoring tool such as TCPMon, you will notice the
+structrue of the aggregated response message.</p>
+
 
 <h1><a name="MessageMediationQoS" id="MessageMediationQoS">Quality of Service addition or deduction samples in message mediation</a> </h1>
 <h2>

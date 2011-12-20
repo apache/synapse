@@ -564,5 +564,153 @@
                 local entry or a remote registry entry.
             </p>
         </section>
+        <section name="Endpoints" id="endpoints">
+            <p>
+                An &lt;endpoint&gt; element defines a destination for an outgoing message. There
+                are several types of endpoints that can be defined in a Synapse configuration.
+            </p>
+            <ul>
+                <li>Address endpoint</li>
+                <li>WSDL endpoint</li>
+                <li>Load balance endpoint</li>
+                <li>Fail-over endpoint</li>
+                <li>Default endpoint</li>
+                <li>Recipient list endpoint</li>
+            </ul>
+            <p>
+                Configuration syntax and runtime semantics of these endpoint types differ from
+                each other. However the high level configuration syntax of an endpoint definition
+                takes the following form.
+            </p>
+            <div class="xmlConf">&lt;endpoint [name="string"] [key="string"]&gt;
+    <a href="#address-endpoint">address-endpoint</a> | <a href="#default-endpoint">default-endpoint</a> | <a href="#wsdl-endpoint">wsdl-endpoint</a> |
+    <a href="#load-balanced-endpoint">load-balanced-endpoint</a> | <a href="#fail-over-endpoint">fail-over-endpoint</a> |
+    <a href="#recipient-list-endpoint">recipient-list-endpoint</a>
+&lt;/endpoint&gt;</div>
+            <p>
+                Note how the endpoint definitions always start with an 'endpoint' element. The
+                immediate child element of this top level 'endpoint' element determines the type of
+                the endpoint. All above endpoint types can have a 'name' attribute, and such named
+                endpoints can be referred by other endpoints, through the key attribute. For example
+                if there is an endpoint named 'foo', the following endpoint can be used in any place,
+                where 'foo' has to be used.
+            </p>
+            <div class="xmlConf">&lt;endpoint key="foo"/&gt;</div>
+            <p>
+                This provides a simple mechanism for reusing endpoint definitions within a Synapse
+                configuration.
+            </p>
+            <p>
+                The 'trace' attribute turns on detailed trace information for messages being sent
+                to the endpoint. These will be available in the 'trace.log' file configured via the
+                log4j.properties file.
+            </p>
+            <subsection name="Address Endpoint">
+                <div class="xmlConf">&lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+         [encoding="<em>charset encoding</em>"]
+         [statistics="enable|disable"] [trace="enable|disable"]&gt;
+  &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+
+  &lt;timeout&gt;
+    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
+    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
+  &lt;/timeout&gt;?
+
+  &lt;markForSuspension&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+    &lt;/markForSuspension&gt;
+
+  &lt;suspendOnFailure&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+    &lt;/suspendOnFailure&gt;
+&lt;/address&gt;</div>
+                <p>
+                    Address endpoint is an endpoint defined by specifying the EPR and other
+                    attributes of the endpoint directly in the configuration. The 'uri' attribute
+                    of the address element contains the EPR of the target endpoint. Message format
+                    for the endpoint and the method to optimize attachments can be specified in the
+                    'format' and 'optimize' attributes respectively. Reliable messaging and security
+                    policies for the endpoint can be specified in the policy attribute of the
+                    'enableRM' and 'enableSec' elements respectively. WS-Addressing can be engaged
+                    for the messages sent to the endpoint by using the 'enableAddressing' element.
+                </p>
+                <p>
+                    The 'timeout' element of the endpoint configuration is used to set a specific
+                    socket timeout for the endpoint. By default this is set to 1 minute (60 seconds).
+                    When integrating with back-end services which take longer to respond the timeout
+                    duration should be increased accordingly. The 'responseAction' element states
+                    the action that should be taken in case a response is received after the timeout
+                    period has elapsed. Synapse can either 'discard' the delayed response or inject it
+                    into a 'fault' handler.
+                </p>
+                <p>
+                    A Synapse endpoint is a state machine. At any given point in time it could be
+                    in one of four states - Active, Timeout, Suspended and Switched Off. How and
+                    when an endpoint changes its state is configurable through the Synapse configuration.
+                    An endpoint in suspended or switched off states cannot be used to send messages.
+                    Such an attempt would generate a runtime error.
+                </p>
+                <p>
+                    By default an endpoint is in the 'Active' state. The endpoint will continue to
+                    forward requests as long as its in this state. If an active endpoint encounters
+                    an error while trying to send a message out (eg: a connection failure), the
+                    endpoint may get pushed into the 'Timeout' state or the 'Suspended' state.
+                    Generally most errors will put the endpoint straight into the 'Suspended' state.
+                    Connection timeouts (error code 101504) and connection closed errors (101505)
+                    are the only errors that will not directly suspend an endpoint. Using the
+                    'errorCodes' element in the 'suspendOnFailure' configuration one can explicitly
+                    define the errors for which the endpoint should be suspended. Similarly the
+                    'errorCodes' element in the 'markForSuspension' configuration can be used to
+                    define the errors for which the endpoint should be pushed into the 'Timeout'
+                    state.
+                </p>
+                <p>
+                    Endpoints in 'Timeout' state can be used to send messages. But any consecutive
+                    errors while in this state can push the endpoint into the 'Suspended' state.
+                    The number of consecutive errors that can suspend the endpoint can be configured
+                    using the 'retriesBeforeSuspension' element in the 'markForSuspension' configuration.
+                    The 'retryDelay' is used to specify a duration for which an endpoint will not be
+                    available for immediate use after moving it to the 'Timeout' state. This duration
+                    should be specified in milliseconds.
+                </p>
+                <p>
+                    An endpoint in 'Suspended' state cannot be used to send messages. However the
+                    suspension is only temporary. The suspend duration can be configured using the
+                    'initialDuration' element. When this time period expires a suspended endpoint
+                    becomes available for use again. However any recurring errors can put the
+                    endpoint back in the 'Suspended' state. Such consecutive suspensions can also
+                    progressively increase the suspend duration of the endpoint as configured by the
+                    'progressionFactor' element. But the suspend duration will never exceed the
+                    period configured in the 'maximumDuration' element. Note that both 'initialDuration'
+                    and 'maximumDuration' should be specified in milliseconds.
+                </p>
+                <p>
+                    Some example address endpoint configurations are given below. Note how the
+                    communication protocol is used as a suffix to indicate the outgoing transport.
+                </p>
+                <table border="1">
+                    <tbody>
+                        <tr><th>Transport</th><th>Sample address</th></tr>
+                        <tr><td>HTTP</td><td><tt>http://localhost:9000/services/SimpleStockQuoteService</tt></td></tr>
+                        <tr><td>JMS</td><td><tt>jms:/SimpleStockQuoteService?<br/>
+                          &#160;&#160;&#160;transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;<br/>
+                          &#160;&#160;&#160;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;<br/>
+                          &#160;&#160;&#160;java.naming.provider.url=tcp://localhost:61616&amp;<br/>
+                          &#160;&#160;&#160;transport.jms.DestinationType=topic</tt></td></tr>
+                        <tr><td>Mail</td><td><tt>mailto:guest@host</tt></td></tr>
+                        <tr><td>VFS</td><td><tt>vfs:file:///home/user/directory</tt></td></tr>
+                        <tr><td/><td><tt>vfs:file:///home/user/file</tt></td></tr>
+                        <tr><td/><td><tt>vfs:ftp://guest:guest@localhost/directory?vfs.passive=true</tt></td></tr>
+                    </tbody>
+                </table>
+            </subsection>
+        </section>
     </body>
 </document>

@@ -28,22 +28,24 @@
         </section>
         <section name="Introduction">
             <p>
-                Apache Synapse reads its configuration from a set of XML files.  This allows the
-                configuration to be easily hand edited, backed up from the file system, or even
-                included in a version control system for easier management and control (e.g. moving
-                a configuration from development, through QA, staging and into production). All these
-                XML configuration files are housed under the repository/conf/synapse-config directory.
+                Apache Synapse loads its configuration from a set of XML files. This enables the
+                user to easily hand edit the configuration, maintain backups and even include the
+                entire configuration in a version control system for easier management and control.
+                For an example one may check-in all Synapse configuration files into a version
+                control system such as Subversion and easily move the configuration files from
+                development, through QA, staging and into production.
             </p>
             <p>
-                Synapse also has the ability to load certain configuration elements from an external
-                registry. When using a registry to hold pieces of the configuration, certain items
-                such as endpoint definitions, sequences and local entries can be updated dynamically
-                while the Synapse ESB is executing.
+                All the configuration files related to Synapse are housed in the repository/conf/synapse-config
+                directory of the Synapse installation. Synapse is also capable of loading certain
+                configuration elements (eg: sequences, endpoints) from an external SOA registry.
+                When using a registry to store fragments of the configuration, some configuration
+                elements such as endpoints can be updated dynamically while Synapse is executing.
             </p>
             <p>
-                This article describes the hierarchy or XML files from which Synapse loads its
+                This article describes the hierarchy of XML files from which Synapse reads its
                 configuration. It describes the high level structure of the file set and the XML
-                syntax used to configure various elements in the Synapse configuration.
+                syntax used to configure various elements in Synapse.
             </p>
         </section>
         <section name="The Synapse Configuration">
@@ -51,9 +53,9 @@
                 A typical Synapse configuration is comprised of sequences, endpoints, proxy services
                 and local entries. In certain advanced scenarios, Synapse configuration may also
                 contain scheduled tasks, event sources, messages stores and priority executors.
-                Synapse configuration may also include a registry adapter through which Synapse can
-                import various resources to the mediation engine at runtime. Following diagram
-                illustrates different components of the Synapse configuration and how they interact
+                Synapse configuration may also include a registry adapter through which the mediation
+                engine can import various resources to the mediation engine at runtime. Following
+                diagram illustrates different functional components of Synapse and how they interact
                 with each other.
             </p>
             <!-- Image goes here -->
@@ -64,17 +66,18 @@
                 available as a <a href="http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">XML schema</a>.
             </p>
             <p>
-                Typically the Synapse ESB is deployed between an actual client and a back-end service
-                implementation to mediate the message flow. Therefore the Synapse ESB can accept a
-                message on behalf of the actual service, perform authentication, validation, transformation,
-                logging, routing and then decide the destination endpoint for the message and direct
-                it to an actual service. The Synapse ESB can also detect timeouts and transport failures
-                during communication or introduce load balancing, throttling or caching where necessary.
-                For fault scenarios such as authentication failures or schema validation failures, the
-                Synapse ESB can be configured to return a custom message or a fault to the requesting
-                client without forwarding the request to the actual service. All these scenarios
-                and usecases can be put into action by selecting the right set of functional components
-                and combining them appropriately in the Synapse configuration.
+                Typically the Synapse ESB is used to mediate the message flow between a client
+                and a back-end service implementation. Therefore Synapse can accept a message on
+                behalf of the actual service and perform a variety of mediation tasks on it such
+                as authentication, validation, transformation, logging and routing. Synapse can also
+                detect timeouts and other communication errors when connecting to back-end services.
+                In addition to that users can configure Synapse to perform load balancing, access
+                throttling and response caching. In case of a fault scenario, such as an authentication
+                failure or a schema validation failure, the Synapse ESB can be configured to return
+                a custom message or a SOAP fault to the requesting client without forwarding the
+                message to the back-end service. All these scenarios and use cases can be put into
+                action by selecting the right set of functional components of Synapse and combining
+                them appropriately through the Synapse configuration.
             </p>
             <p>
                 Depending on how functional components are used in the Synapse configuration, Synapse
@@ -102,12 +105,13 @@
                     access control etc, and could 'mediate' messages without the explicit knowledge
                     of the original client. If Synapse receives a message that is not accepted by any
                     proxy service, that message is handled through message mediation. Message mediation
-                    always processes messages according to the mediation sequence defined as 'main'.
+                    always processes messages according to the mediation sequence defined with
+                    the name 'main'.
                 </p>
             </subsection>
             <subsection name="Task Scheduling">
                 <p>
-                    In task scheduling, Synapse can execute a predefined task based on a user
+                    In task scheduling, Synapse can execute a predefined task (job) based on a user
                     specified schedule. This way a task can be configured to run exactly once or
                     multiple times with fixed intervals. The schedule can be defined by specifying
                     the number of times the task should be executed and the interval between
@@ -121,7 +125,7 @@
                     In eventing mode, Synapse can be used as an event source and users or systems can
                     subscribe to receive events from Synapse. Synapse can also act as an event broker
                     which receives events from other systems and delivers them to the appropriate
-                    subscribers with or without mediation. The set of subsribers will be selected
+                    subscribers with or without mediation. The set of subscribers will be selected
                     by applying a predefined filter criteria. This mode enables Synapse to integrate
                     applications and systems based on the Event Driven Architecture (EDA).
                 </p>
@@ -129,27 +133,65 @@
         </section>
         <section name="Functional Components Overview">
             <p>
-                We have already skimmed through some of the functional components available in
-                Synapse configuration. This section provides detailed information about each of
-                functional component types.
+                As described in the previous section, Synapse engine is comprised of a range of
+                functional components. Synapse configuration language is used to define, configure
+                and combine these components so various messaging scenarios and integration
+                patterns can be realized. Before diving into the specifics of the configuration
+                language, it is useful to have a thorough understanding of all the functional
+                components available, their capabilities and features. A good knowledge on Synapse
+                functional components will help you determine which components should be used to
+                implement any given scenario or use case. In turns it will allow you to develop
+                powerful and efficient Synapse configurations thus putting the ESB to maximum use.
+            </p>
+            <p>
+                As of now Synapse mediation engine consists of following functional elements:
+            </p>
+            <p>
+                <ul>
+                    <li>Mediators and sequences</li>
+                    <li>Endpoints</li>
+                    <li>Proxy services</li>
+                    <li>Scheduled tasks</li>
+                    <li>Event sources</li>
+                    <li>Sequence templates</li>
+                    <li>Endpoint templates</li>
+                    <li>Registry adapter</li>
+                    <li>APIs</li>
+                    <li>Priority executors</li>
+                    <li>Message stores and processors</li>
+                </ul>
             </p>
             <subsection name="Mediators and Sequences">
                 <p>
                     The Synapse ESB defines a 'mediator' as a component which performs a predefined
-                    action on a message during the message flow. Thus a mediator gets full access to
-                    a message at the point where it is defined to gain control, and could inspect the
-                    message, modify it or take an external action depending on some attributes or
-                    values of the current message. Writing a custom mediator in Java is easy
-                    and the supplementary documentation provides more details on this. The 'Class' and
-                    'POJO (command)' mediators allow one to plugin a Java class into the Synapse
-                    engine with minimal effort. In addition, the Script mediator allows one to provide
-                    an Apache BSF script (e.g. Javascript, Ruby, Groovy etc) for mediation.
+                    action on a message during a message flow. It is the most fundamental message
+                    processing unit in Synapse. A mediator can be thought of as a filter that resides
+                    in a message flow, which processes all the messages passing through it.
+                </p>
+                <p>
+                    A mediator gets full access to the messages at the point where it is defined.
+                    Thus they can inspect, validate and modify messages. Further, mediators can take
+                    external action such as looking up a database or invoking a remote service,
+                    depending on some attributes or values in the current message. Synapse ships
+                    with a variety of built-in mediators which are capable of handling an array of
+                    heterogeneous tasks. There are built-in mediators that can log the requests,
+                    perform content transformations, filter out traffic and a plethora of other
+                    messaging and integration activities.
+                </p>
+                <p>
+                    Synapse also provides an API using which custom mediators can be implemented
+                    easily in Java. The 'Class' and 'POJO (command)' mediators allow one to plugin a
+                    Java class into Synapse with minimal effort. In addition, the 'Script' mediator
+                    allows one to provide an Apache BSF script (eg: JavaScript, Ruby, Groovy etc)
+                    for mediation.
                 </p>
                 <p>
                     A mediation sequence, commonly called a 'sequence' is a list of mediators. A
                     sequence may be named for re-use, or defined in-line or anonymously within a
-                    configuration. Sequences may be defined within the Synapse configuration or within
-                    the Registry.
+                    configuration. Sequences may be defined within the Synapse configuration or in
+                    the Registry. From an ESB point of view, a sequence equates to a message flow.
+                    It can be thought of as a pipe consisting of many filters, where individual
+                    mediators play the role of the filters.
                 </p>
                 <p>
                     A Synapse configuration contains two special sequences named 'main' and 'fault'.
@@ -174,224 +216,87 @@
                     Load-balance endpoints - which are defined over a group of endpoints. Endpoints
                     may be defined within the local Synapse configuration or within the Registry.
                 </p>
-            </subsection>
-            <subsection name="Tasks">
                 <p>
-                    A task is a custom Java class that implements the org.apache.synapse.task.Task
-                    interface which contains a single "public void execute()" method. Such a task can
-                    be scheduled and managed via the Synapse ESB. The scheduling information for a
-                    task can be specified in the cron format or a simple format by the user. A task
-                    may also be specified as a one-time task where required, and can be used to trigger
-                    a callout or inject a message into the Synapse ESB.
+                    From a more practical stand point, an endpoint can be used to represent any
+                    entity to which Synapse can make a connection. An endpoint may represent a
+                    URL, a mail box, a JMS queue or a TCP socket. The 'send' mediator of Synapse
+                    which is used to forward messages can take an endpoint as an argument. In that
+                    case the 'send' mediator would forward the message to the specified endpoint.
+                </p>
+            </subsection>
+            <subsection name="Proxy Services">
+                <p>
+                    A proxy service is a virtual service exposed on Synapse. For the external
+                    clients, a proxy service looks like a full fledged web service which has a
+                    set of endpoint references (EPRs), a WSDL and a set of developer specified
+                    policies. But in reality, a proxy service sits in front of a real web service
+                    implementation, acting as a proxy, mediating messages back and forth. The
+                    actual business logic of the service resides in the real back-end web service.
+                    Proxy service simply hides the real service from the consumer and provides
+                    an interface through which the actual service can be reached but with some
+                    added mediation/routing logic.
+                </p>
+                <p>
+                    Proxy services have many use cases. A proxy can be used to expose an existing
+                    service over a different protocol or a schema. The mediation logic in the proxy
+                    can take care of performing the necessary content transformations and protocol
+                    switching. A proxy service can act as a load balancer or a lightweight process
+                    manager thereby hiding multiple back-end services from the client. Proxy services
+                    also provide a convenient way of extending existing web services without changing
+                    the back-end service implementations. For an example a proxy service can add logging
+                    and validation capabilities to an existing service without the developer having
+                    to implement such functionality at service level. Another very common usage of
+                    proxy services is to secure an existing service or a legacy system.
+                </p>
+                <p>
+                    A proxy service is a composite functional component. It is made of several
+                    sequences and endpoints. Typically a proxy service consists of an 'in sequence',
+                    an 'out sequence' and an endpoint. The 'in sequence' handles all the incoming
+                    requests sent by the client. Mediated messages are then forwarded to the target
+                    endpoint which generally points to the real back-end service. Responses coming
+                    back from the back-end service are processed by the 'out sequence'. In addition
+                    to these a 'fault sequence' can also be associated with a proxy service which
+                    is invoked in case of an error.
+                </p>
+                <p>
+                    In addition to the above basic configuration elements, a proxy service can
+                    also define a WSDL file to be published, a set of policies and various other
+                    parameters.
+                </p>
+            </subsection>
+            <subsection name="Scheduled Tasks">
+                <p>
+                    A scheduled task is a job deployed in the Synapse runtime for periodic execution.
+                    Users can program the jobs using the task API (Java) provided by Synapse. Once
+                    deployed, tasks can be configured to run periodically. The execution schedule
+                    can be configured by specifying the delay between successive executions or using
+                    the Unix Cron syntax.
                 </p>
             </subsection>
             <subsection name="Remote Registry and Local Registry (Local Entries)">
                 <p>
                     Synapse configuration can refer to an external registry/repository for resources
-                    used such as WSDL, schemas, scripts, XSLT and XQuery transformations etc. One or
+                    such as WSDLs, schemas, scripts, XSLT and XQuery transformations etc. One or
                     more remote registries may be hidden or merged behind a local registry interface
                     defined in the Synapse configuration. Resources from an external registry are
                     looked up using 'keys' - which are known to the external registry. The Synapse
                     ESB ships with a simple URL based registry implementation that uses the file system
-                    for storage of resources, and URL's or fragments as 'keys'.
+                    for storage of resources, and URLs or fragments as 'keys'.
                 </p>
                 <p>
                     A registry may define a duration for which a resource served may be cached by the
                     Synapse runtime. If such a duration is specified, the Synapse ESB is capable of
-                    refreshing the resource after cache expiry to support dynamic re-loading of resource
+                    refreshing the resource after cache expiry to support dynamic re-loading of resources
                     at runtime. Optionally, a configuration could define certain 'keys' to map to locally
                     defined entities. These entities may refer to a source URL or file, or may be defined
                     as in-line XML or text within the configuration itself. If a registry contains a
                     resource whose 'key' matches the key of a locally defined entry, the local entry
                     shadows the resource available in the registry. Thus it is possible to override
-                    registry resources locally from within a configuration. To integrate Synapse with
+                    registry resources locally from within the configuration. To integrate Synapse with
                     a custom/new registry, one needs to implement the org.apache.synapse.registry.Registry
                     interface to suit the actual registry being used.
                 </p>
             </subsection>
-            <subsection name="Event Sources">
-
-            </subsection>
-            <subsection name="Priority Executors">
-
-            </subsection>
-            <subsection name="Message Stores">
-                
-            </subsection>
-        </section>
-        <section name="Synapse Configuration Files">
-            <p>
-                All the XML files pertaining to Synapse configuration are available in the
-                repository/conf/synapse-config directory of the Synapse installation. This file
-                heirarchy consists of two files named synapse.xml and registry.xml. In addition to
-                that, following subdirectories can be found in the synapse-config directory.
-            </p>
-            <ul>
-                <li>endpoints</li>
-                <li>events</li>
-                <li>local-entries</li>
-                <li>proxy-services</li>
-                <li>sequences</li>
-                <li>tasks</li>
-            </ul>
-            <p>
-                Each of these subdirectories can contain zero or more configuration items. For
-                an example the 'endpoints' directory may contain zero or more endpoint definitions
-                and the 'sequences' directory may contain zero or more sequence definitions. The
-                registry adapter is defined in the top level registry.xml file. The synapse.xml file
-                is there mainly for backward compatibility reasons. It can be used to define any
-                type of configuration items. One may define few endpoints in the 'endpoints' directory
-                and a few endpoints in the synapse.xml file. However it is recommended to stick to
-                a single, consistent way of defining configuration elements.
-            </p>
-            <p>
-                The following tree diagram shows the high-level view of the resulting file
-                heirarchy.
-            </p>
-            <div class="consoleOutput">synapse-config
-            |-- endpoints
-            |   `-- foo.xml
-            |-- events
-            |   `-- event1.xml
-            |-- local-entries
-            |   `-- bar.xml
-            |-- proxy-services
-            |   |-- proxy1.xml
-            |   |-- proxy2.xml
-            |   `-- proxy3.xml
-            |-- registry.xml
-            |-- sequences
-            |   |-- custom-logger.xml
-            |   |-- fault.xml
-            |   `-- main.xml
-            |-- synapse.xml
-            `-- tasks
-                `-- task1.xml</div>
-        </section>
-        <section name="Contents of the synapse.xml File">
-            <p>
-                As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.
-                All these different configuration items should be wrapped in a top level
-                'definitions' element. A configuration defined in the synapse.xml file looks like
-                this at the high level.
-            </p>
-            <div class="xmlConf">&lt;definitions&gt;
-   &lt;<a href="#registry">registry</a> provider="string"&gt;...&lt;/registry&gt;?
-   &lt;<a href="#localEntry">localEntry</a> key="string"&gt;...&lt;/localEntry&gt;?
-   &lt;<a href="#sequence">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
-   &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
-   &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
-   &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
-   &lt;<a href="#eventsource">eventSource</a> name="string" ...&gt;...&lt;/eventSource&gt;?
-   &lt;<a href="#executor">executor</a> name="string" ...&gt;...&lt;/executor&gt;?
-   &lt;<a href="#store">messageStore</a> name="string" ...&gt;...&lt;/messageStore&gt;?
- &lt;/definitions&gt;</div>
-            <p>
-                The registry adapter definition is defined under the &lt;registry&gt; element. Similarly
-                &lt;endpoint&gt;, &lt;sequence&gt;, &lt;proxy&gt;, &lt;localEntry&gt;, &lt;eventSource
-                and &lt;executor&gt; elements are used to define other functional components.
-            </p>
-            <p>
-                As pointed out earlier, the synapse.xml file is there in the synapse-config directory
-                for backwards compatibility reasons. Any artifact defined in this file can be
-                defined separately in its own XML file. The registry can be defined in the registry.xml
-                and other artifacts can be defined in the corresponding subdirectories of the synapse-config
-                directory. However the XML syntax used to configure these artifacts are always the same.
-                Next few sections of this document explains the XML syntax for defining various
-                types of components in the Synapse configuration.
-            </p>
-        </section>
-        <section name="Registry" id="registry">
-            <p>
-                The &lt;registry&gt; element is used to define the remote registry used by the
-                Synapse runtime. The registry provider specifies an implementation class for the
-                registry being used, and optionally a number of configuration parameters as may be
-                required by the particular registry implementation. An outline configuration is given
-                below.
-            </p>
-            <div class="xmlConf">&lt;registry provider="string"/&gt;
-    &lt;parameter name="string"&gt;text | xml&lt;/parameter&gt;*
-&lt;/registry&gt;</div>
-            <p>
-                Registry entries loaded from a remote registry may be cached as governed by the
-                registry, and reloaded after the cache periods expires if a newer version is found.
-                Hence it is possible to define configuration elements such as (dynamic) sequences and
-                endpoints, as well as resources such as XSLT's, scripts or XSDs in the registry, and
-                update the configuration as these are allowed to dynamically change over time.
-            </p>
-            <p>
-                Synapse ships with a built-in URL based registry implementation called the
-                'SimpleURLRegistry' and this can be configured as follows:
-            </p>
-            <div class="xmlConf">&lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
-  &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
-  &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
-&lt;/registry&gt;</div>
-            <p>
-                The 'root' parameter specifies the root URL of the registry for loaded resources. The
-                SimpleURLRegistry keys are path fragments, that when combined with the root prefix
-                would form the full URL for the referenced resource. The 'cachableDuration' parameter
-                specifies the number of milliseconds for which resources loaded from the registry
-                should be cached. More advanced registry implementations allows different cachable
-                durations to be specified for different resources, or mark some resources as never
-                expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)
-            </p>
-        </section>
-        <section name="Local Registry (Local Entries)" id="localEntry">
-            <p>
-                The &lt;localEntry&gt; element is used to declare registry entries that are local to
-                the Synapse instance, as shown below.
-            </p>
-            <div class="xmlConf">&lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;</div>
-            <p>
-                These entries are top level entries which are globally visible within the entire
-                system. Values of these entries can be retrieved via the extension XPath function
-                'synapse:get-property(prop-name)' and the keys of these entries could be specified
-                wherever a registry key is expected within the configuration.
-            </p>
-            <p>
-                An entry can contain static text or static XML specified inline. A local entry may
-                also load its content from a URL (using the 'src' attribute). A local entry shadows
-                any entry with the same name from a remote registry.
-            </p>
-            <div class="xmlConf">&lt;localEntry key="version"&gt;0.1&lt;/localEntry&gt;
-
-&lt;localEntry key="validate_schema"&gt;
-    &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-     ...
-    &lt;/xs:schema&gt;
-&lt;/localEntry&gt;
-
-&lt;localEntry key="xslt-key-req" src="file:repository/conf/sample/resources/transform/transform.xslt"/&gt;</div>
-        </section>
-        <section name="Sequences" id="sequence">
-            <p>
-                A &lt;sequence&gt; element is used to define a sequence of mediators that can be
-                invoked later by name. The sequences named 'main' and 'fault' has special significance
-                in a Synapse configuration. The 'main' sequence handles any message that is accepted
-                for message mediation, and the 'fault' sequence is invoked if Synapse encounters a fault,
-                and a custom fault handler is not specified for the sequence via its 'onError' attribute.
-            </p>
-            <p>
-                A dynamic sequence may be defined by specifying a key reference to a registry entry.
-                As the remote registry entry changes, the sequence will dynamically be updated according
-                to the specified cache duration and expiration. If tracing is enabled on a sequence,
-                all messages being processed through the sequence would write tracing information
-                through  each mediation step to the trace.log file configured via the log4j.properties
-                configuration. Setting the trace log level to TRACE would additionally dump the message
-                and detailed trace information at each mediation step. A tracing enabled sequence
-                propagates this setting to invoked sub-sequences.
-            </p>
-            <div class="xmlConf">&lt;sequence name="main" onError="errorHandler"&gt;
-  .. &lt;!-- a 'main' sequence that invokes the sequence named 'errorHandler' on a fault --&gt; ..
-&lt;/sequence&gt;</div>
-            <div class="xmlConf">&lt;sequence key="sequence/dynamic_seq_1.xml"/&gt;
-where "sequence/dynamic_seq_1.xml" refers to the following sequence definition from the registry:
-
-&lt;sequence name="dynamic_sequence" xmlns="http://synapse.apache.org/ns/2010/04/configuraiton"&gt;
-  ..
-&lt;/sequence&gt;</div>
-            
         </section>
     </body>
 </document>

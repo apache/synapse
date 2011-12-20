@@ -25,8 +25,8 @@
     <body>
         <section name="Apache Synapse Samples Catalog">
             <p>
-                Apache Synapse comes prelaoded with a horde of sample configurations that
-                demonstrates various features of the service bus. This catalog lists out all
+                Apache Synapse comes preloaded with a horde of sample configurations that
+                demonstrate various features of the service bus. This catalog lists out all
                 these sample configurations and provides detailed information on how to run
                 them. These samples require an Apache ANT installation for you to be able to
                 try them out. If you are new to Synapse and have no experience running Synapse,

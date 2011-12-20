@@ -38,6 +38,11 @@ import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
 
+import javax.activation.DataHandler;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -319,7 +324,24 @@ public class GetPropertyFunction implements Function {
                     }
                 } else if (propEntry.getValue() != null) {
                     if (propEntry.getValue() instanceof OMText) {
-                        return ((OMText) propEntry.getValue()).getText();
+                        OMText omText = (OMText) propEntry.getValue();
+                        DataHandler dh = (DataHandler) omText.getDataHandler();
+                        if (omText.getDataHandler() != null) {
+                            try {
+                                InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());
+                                BufferedReader stringReader = new BufferedReader(streamReader);
+                                String omTextString = NULL_STRING;
+                                String tempStr;
+                                while ((tempStr = stringReader.readLine()) != null) {
+                                    omTextString = omTextString + tempStr;
+                                }
+                                return omTextString;
+                            } catch (IOException e) {
+                                return NULL_STRING;
+                            }
+                        } else {
+                            omText.getText();
+                        }
                     }
                     return propEntry.getValue().toString();
                 }

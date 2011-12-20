@@ -22,6 +22,7 @@ package org.apache.synapse.samples.framework;
 import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.samples.framework.tests.advanced.*;
 import org.apache.synapse.samples.framework.tests.endpoint.*;
 import org.apache.synapse.samples.framework.tests.message.*;
 import org.apache.synapse.samples.framework.tests.proxy.*;
@@ -199,5 +200,27 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("155", Sample155.class);
         sampleClassRepo.put("156", Sample156.class);
         sampleClassRepo.put("157", Sample157.class);
+
+        //Advanced
+        sampleClassRepo.put("350", Sample350.class);
+        sampleClassRepo.put("351", Sample351.class);
+        sampleClassRepo.put("352", Sample352.class);
+        sampleClassRepo.put("353", Sample353.class);
+        sampleClassRepo.put("354", Sample354.class);
+        sampleClassRepo.put("360", Sample360.class);
+        sampleClassRepo.put("361", Sample361.class);
+        sampleClassRepo.put("362", Sample362.class);
+        //sampleClassRepo.put("370", Sample370.class);   // neethi 3.0.x and wso2throttle incompatibility
+        //sampleClassRepo.put("371", Sample371.class);
+        //sampleClassRepo.put("372", Sample372.class);
+        sampleClassRepo.put("380", Sample380.class);
+        sampleClassRepo.put("390", Sample390.class);
+        sampleClassRepo.put("391", Sample391.class);
+        sampleClassRepo.put("420", Sample420.class);
+        //sampleClassRepo.put("430", Sample430.class);  // Problem with repo path
+        sampleClassRepo.put("450", Sample450.class);
+        sampleClassRepo.put("451", Sample451.class);
+        sampleClassRepo.put("452", Sample452.class);
+        sampleClassRepo.put("460", Sample460.class);
     }
 }

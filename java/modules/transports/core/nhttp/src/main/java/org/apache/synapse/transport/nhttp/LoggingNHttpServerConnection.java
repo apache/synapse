@@ -46,6 +46,7 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
     private final Log log;
     private final Log iolog;
     private final Log headerlog;
+    private final Log accesslog;
     private final Log wirelog;
     private final String id;
 
@@ -59,6 +60,7 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
         this.iolog = LogFactory.getLog(session.getClass());
         this.headerlog = LogFactory.getLog(LoggingUtils.HEADER_LOG_ID);
         this.wirelog = LogFactory.getLog(LoggingUtils.WIRE_LOG_ID);
+        this.accesslog = LogFactory.getLog(LoggingUtils.ACCESS_LOG_ID);
         this.id = "http-incoming-" + COUNT.incrementAndGet();
         if (this.iolog.isDebugEnabled() || this.wirelog.isDebugEnabled()) {
             this.session = new LoggingIOSession(session, this.id, this.iolog, this.wirelog);
@@ -148,6 +150,11 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
                     headerlog.debug(id + " << " + headers[i].toString());
                 }
             }
+
+            if (message != null && accesslog.isInfoEnabled()) {
+                AccessHandler.getAccess().addAccessToQueue(message);
+            }
+
             this.writer.write(message);
         }
 
@@ -179,6 +186,10 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
                     headerlog.debug(id + " >> " + headers[i].toString());
                 }
             }
+            if (message != null && accesslog.isInfoEnabled()) {
+                AccessHandler.getAccess().addAccessToQueue(message);
+            }
+
             return message;
         }
 

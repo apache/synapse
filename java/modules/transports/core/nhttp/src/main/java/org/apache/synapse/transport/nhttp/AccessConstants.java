@@ -39,7 +39,7 @@ public class AccessConstants {
     /**
      * The directory in which log files are created.
      */
-    public static String DIRECTORY = "repository/logs";
+    public static String DIRECTORY = "logs";
 
     /**
      * Gives the format of the date to be appended to the name of the access log file.

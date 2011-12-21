@@ -34,7 +34,8 @@ import org.apache.http.params.HttpParams;
 class LoggingUtils {
     
     public final static String HEADER_LOG_ID = "org.apache.synapse.transport.nhttp.headers"; 
-    public final static String WIRE_LOG_ID = "org.apache.synapse.transport.nhttp.wire"; 
+    public final static String WIRE_LOG_ID = "org.apache.synapse.transport.nhttp.wire";
+    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
 
     public static NHttpClientHandler decorate(NHttpClientHandler handler) {
         Log log = LogFactory.getLog(handler.getClass());

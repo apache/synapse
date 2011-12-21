@@ -326,6 +326,18 @@
                     not be based on REST.
                 </p>
             </subsection>
+            <subsection name="Priority Executors">
+                <p>
+                    Priority executors can be used to execute sequences with a given priority.
+                    Priority executors are used in high load scenarios where user wants to execute
+                    different sequences at different priority levels. This allows user to control
+                    the resources allocated to executing sequences and prevent high priority messages
+                    from getting delayed and dropped. A priority has a specific meaning compared to
+                    other priorities specified. For example if we have two priorities with value 10
+                    and 1, messages with priority 10 will get 10 times more resources than messages
+                    with priority 1.
+                </p>
+            </subsection>
         </section>
         <section name="Synapse Configuration Files">
             <p>
@@ -339,6 +351,8 @@
                 <li>endpoints</li>
                 <li>events</li>
                 <li>local-entries</li>
+                <li>message-processors</li>
+                <li>message-stores</li>
                 <li>priority-executors</li>
                 <li>proxy-services</li>
                 <li>sequences</li>
@@ -368,6 +382,8 @@
     |   `-- event1.xml
     |-- local-entries
     |   `-- bar.xml
+    |-- message-processors
+    |-- message-stores
     |-- priority-executors
     |-- proxy-services
     |   |-- proxy1.xml
@@ -1117,6 +1133,177 @@
                     </tr>
                 </tbody>
             </table>
+        </section>
+        <section name="Scheduled Tasks">
+            <p>
+                A &lt;task&gt; element is used to define a Synapse task (aka startup).
+            </p>
+            <div class="xmlConf">&lt;task class="mypackage.MyTask" name="string" [pinnedServers="(serverName)+"]&gt;
+   &lt;property name="stringProp" value="String"/&gt;
+   &lt;property name="xmlProp"&gt;
+     &lt;somexml&gt;config&lt;/somexml&gt;
+   &lt;/property&gt;
+   &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"] | [once=(true | false)])/&gt;
+&lt;/task&gt;</div>
+            <p>
+                A task is created and scheduled to run at specified time intervals or as specified
+                by the cron expression. The 'class' attribute specifies the actual task
+                implementation class (which must implement org.apache.synapse.task.Task interface)
+                to be executed at the specified interval/s, and name specifies an identifier for
+                the scheduled task.
+            </p>
+            <p>
+                Fields in the task class can be set using properties provided as string literals or
+                XML fragments. For example, if the task implementation class has a field named
+                'version' with a corresponding setter method, the configuration value which will be
+                assigned to this field before running the task can be specified using a property with
+                the name 'version'.
+            </p>
+            <p>
+                There are three different trigger mechanisms to schedule tasks. A simple trigger is
+                specified with a 'count' and an 'interval', implying that the task will run a
+                'count' number of times at specified intervals. A trigger may also be specified as
+                a cron trigger using a cron expression. A one-time trigger is specified using the
+                'once' attribute in the definition and could be specified as true in which case the
+                task will be executed only once just after the initialization of Synapse.
+            </p>
+            <p>
+                In clustered deployments sometimes it would be necessary to deploy a particular task
+                in a selected set of nodes. This can be achieved using the optional 'pinnedServers'
+                attribute. A list of server names or host names can be specified in this attribute.
+                At server startup, Synapse will match the current server name or the host name with
+                the values specified in this attribute to see whether the task should be initialized
+                or not.
+            </p>
+        </section>
+        <section name="Event Sources">
+            <p>
+                Event sources enable the user to run Synapse in the eventing mode of operation.
+                Synapse can act as an event source as well as an event broker. An event source
+                is defined using the &lt;eventSource&gt; configuration element.
+            </p>
+            <div class="xmlConf">&lt;eventSource name="string"&gt;
+	&lt;subscriptionManager class="mypackage.MyClass"&gt;
+		   &lt;parameter name="string"/&gt;
+	&lt;/subscriptionManager&gt;
+&lt;/eventSource&gt;</div>
+            <p>
+                Once an event source is deployed in Synapse, it will provide a service URL (EPR) to
+                which clients can send WS-Eventing subscription requests. Clients can subscribe,
+                unsubscribe and renew subscriptions by sending messages to this EPR. The subscription
+                manager configured inside the event source will be responsible for storing
+                and managing the subscriptions. The 'class' attribute of the 'subscriptionManager'
+                element should point to the Java class which provides this subscription management
+                functionality. Synapse ships with an in-memory subscription manager which
+                keeps and manages all subscriptions in memory.
+            </p>
+            <p>
+                Any additional parameters required to configure the subscription manager implementation
+                can be specified using the 'parameter' elements.
+            </p>
+        </section>
+        <section name="APIs">
+            <p>
+                APIs provide a flexible and powerful approach for defining full fledged REST APIs
+                in Synapse. An API definition starts with the &lt;api&gt; element.
+            </p>
+            <div class="xmlConf">&lt;api name="string" context="string" [hostname="string"][port="int"]&gt;
+   &lt;resource [methods="http-method-list"][inSequence="string"][outSequence="string"]
+   		[faultSequence="string"][content-type="string"][user-agent="str"]&gt;
+      &lt;inSequence&gt;...&lt;/inSequence&gt;?
+      &lt;outSequence&gt;...&lt;/outSequence&gt;?
+      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
+   &lt;/resource&gt;+
+   &lt;handlers&gt;
+      &lt;handler class="name"/&gt;+
+   &lt;/handlers&gt;?
+&lt;/api&gt;</div>
+            <p>
+                Each API definition must be uniquely named using the 'name' attribute. The 'context'
+                attribute is used to define the URL context at which the REST API will be anchored
+                (eg: /ws, /foo/bar, /soap). The API will only receive requests that fall in the
+                specified URL context. In addition to that an API could be bound to a particular
+                host and a port using the 'hostname' and 'port' attributes.
+            </p>
+            <p>
+                An API must also contain one or more resources. Resources define how messages
+                are processed and mediated by the API. An API can be associated with a set of HTTP
+                methods using the 'methods' attribute. This attribute can support a single method name
+                (eg: GET) or a space separated list of methods (eg: GET PUT DELETE). A resource
+                can also refer other sequences using the 'inSequence', 'outSequence' and 'faultSequence'
+                attributes. Alternatively these mediation sequences can be defined inline with the
+                resource using 'inSequence', 'outSequence' and 'faultSequence' tags.
+            </p>
+            <p>
+                An API can also optionally define a set of handlers. These handlers are invoked
+                for each incoming API request, before they are dispatched to the appropriate
+                resources. The 'class' attribute on the 'handler' elements should contain the
+                ful qualified names of the handler implementation classes.
+            </p>
+        </section>
+        <section name="Priority Executors">
+            <p>
+                The priority executor configuration syntax takes the following general form.
+            </p>
+            <div class="xmlConf">&lt;priority-executor name=&quot;string&quot;&gt;
+    &lt;queues isFixed=&quot;true|false&quot; nextQueue=&quot;class implementing NextQueueAlgorithm&quot;&gt;
+        &lt;queue [size=&quot;size of the queue&quot;] priority=&quot;priority of the messages put in to this queue&quot;/&gt;*
+    &lt;/queues&gt;
+    &lt;threads core=&quot;core number of threads&quot; max=&quot;max number of threads&#39; keep-alive=&quot;keep alive time&quot;/&gt;
+&lt;/priority-executor&gt;</div>
+            <p>
+                A priority executor consists of a thread pool and a set of queues for different
+                priority levels. Queues can be either bounded on unbounded in terms of capacity.
+                Each executor must define at least two queues. By default queues are unbounded.
+                By specifying the attribute 'size' they can be configured to have a limited capacity.
+                The 'priority' attribute specifies the priority level associated with a particular
+                queue. As explained earlier, higher the level, higher the priority the messages will
+                get.
+            </p>
+            <p>
+                The next queue algorithm is used to determine the next message processed. By default
+                Synapse uses a built-in priority queueing algorithm for this purpose. If required a
+                custom algorithm can be used by specifying the 'nextQueue' algorithm on the 'queues'
+                element.
+            </p>
+            <p>
+                The 'threads' element is used to configure the underlying thread pool. The 'core'
+                and 'max' attributes are used to specify the initial size and the maximum size of the
+                thread pool. A keep-alive time duration can be specified for idling threads using
+                the 'keep-alive' attribute where the duration is configured in seconds. If not
+                specified a default keep-alive duration of 5 seconds will be used.
+            </p>
+            <p>
+                In order to process messages through a priority executor one must use the 'enqueue'
+                mediator. This mediator can be used in a sequence or a proxy service to get all
+                requests processed through a pre-configured priority executor.
+            </p>
+            <div class="xmlConf">&lt;enqueue priority="10" executor="MyExecutor"/&gt;</div>
+            <p>
+                For best results it's recommended to dispatch messages into priority executors
+                straight from the transport level. This can be achieved by adding an additional
+                parameter to the NHTTP transport configuration in the axis2.xml file of Synapse.
+            </p>
+            <div class="xmlConf">&lt;parameter name="priorityConfigFile"&gt;file path&lt;/parameter&gt;</div>
+            <p>
+                The parameter should point to a separate XML configuration which defines the
+                priority configuration.
+            </p>
+            <div class="xmlConf">&lt;Priority-Configuration&gt;
+    &lt;priority-executor name="priority-executor"&gt;
+        &lt;queues isFixed="true|false"&gt;
+            &lt;queue [size=""] priority=""/&gt;*
+        &lt;/queues&gt;
+        &lt;threads core="core number of threads" max="max number of threads' keep-alive="keep alive time"/&gt;
+    &lt;/priority-executor&gt;
+
+    &lt;!-- conditions for calculating the priorities based on HTTP message --&gt;
+    &lt;conditions defaultPriority="default priority as an integer"&gt;
+        &lt;condition priority="priority value as an integer"&gt;
+            one evaluator, this evaluator can contain other evaluators
+        &lt;/condition&gt;
+    &lt;/conditions&gt;
+&lt;/Priority-Configuration&gt;</div>
         </section>
     </body>
 </document>

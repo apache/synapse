@@ -187,58 +187,5 @@
                 default and so you only need to meet the prerequisites described above.
             </p>
         </section>
-        <section name="Configure Synapse for AMQP Transport" id="amqp">
-	<p>
-		The samples used in this guide assumes the existence of a local QPid
-		(1.0-M2 or higher) installation properly installed and started up. You
-		also
-		need to copy the following client JAR files into the Synapse 'lib' folder
-		to support AMQP. These files are found in the 'lib' directory of the
-		QPid installation.
-	</p>
-	<ul>
-		<li>qpid-client-1.0-incubating-M2.jar</li>
-		<li>qpid-common-1.0-incubating-M2.jar</li>
-		<li>geronimo-jms_1.1_spec-1.0.jar</li>
-		<li>slf4j-api-1.4.0.jar **</li>
-		<li>slf4j-log4j12-1.4.0.jar **</li>
-	</ul>
-	<p>
-		** To configure FIX (Quickfix/J 1.3) with AMQP (QPid-1.0-M2) copy the
-		sl4j-* libraries comes with QPid and ignore the sl4j-* libraries with
-		Quickfix/J.
-	</p>
-	<p>
-		To enable the AMQP over JMS transport, you need to uncomment the JMS
-		transport
-		listener configuration. To enable AMQP over JMS for synapse, the
-		repository/conf/axis2.xml must be updated,
-		while to enable JMS support for the sample Axis2 server the
-		samples/axis2Server/repository/conf/axis2.xml file must be updated.
-	</p>
-	<div class="xmlConf">&lt;!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment --&gt;
-        &lt;transportReceiver name=&quot;jms&quot; class=&quot;org.apache.synapse.transport.jms.JMSListener&quot;&gt;
-        &lt;/transportReceiver&gt;
-        &lt;transportSender name=&quot;jms&quot; class=&quot;org.apache.synapse.transport.jms.JMSSender&quot;&gt;
-        &lt;/transportReceiver&gt;</div>
-      <p>Locate and edit the AMQP connection settings file for the message consumer, this fle is usually named direct.properties.</p>
-      <div class="xmlConf">java.naming.factory.initial = org.apache.qpid.jndi.PropertiesFileInitialContextFactory
-# register some connection factories
-# connectionfactory.[jndiname] = [ConnectionURL]
-connectionfactory.qpidConnectionfactory = amqp://guest:guest@clientid/test?brokerlist='tcp://localhost:5672'
-# Register an AMQP destination in JNDI
-# destination.[jniName] = [BindingURL]
-destination.directQueue = direct://amq.direct//QpidStockQuoteService?routingkey='QpidStockQuoteService'
-destination.replyQueue = direct://amq.direct//replyQueue?routingkey='replyQueue'</div>
-	  <p>Locate and edit the AMQP connection settings file for Synapse, this fle is usually named con.properties.</p>
-	   <div class="xmlConf">#initial context factory
-#java.naming.factory.initial =org.apache.qpid.jndi.PropertiesFileInitialContextFactory
-# register some connection factories
-# connectionfactory.[jndiname] = [ConnectionURL]
-connectionfactory.qpidConnectionfactory=amqp://guest:guest@clientid/test?brokerlist='tcp://localhost:5672'
-# Register an AMQP destination in JNDI
-# destination.[jndiName] = [BindingURL]
-destination.directQueue=direct://amq.direct//QpidStockQuoteService</div>
-</section>
-     </body>
+    </body>
 </document>

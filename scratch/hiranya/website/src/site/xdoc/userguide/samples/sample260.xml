@@ -63,7 +63,7 @@
                          <li>
                            Configure the AMQP transport for Synapse. See Configure Synapse for  <a href="setup/jms.html#amqp"> AMQP Transport setup</a> for detail
                         </li>
-                        <li> 
+                        <li>
                            To get an idea about the various transport parameters being used in this sample see FIX Transport Parameters .
                         </li>
                     </ul>

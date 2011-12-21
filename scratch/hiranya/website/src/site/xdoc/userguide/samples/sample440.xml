@@ -80,7 +80,7 @@
                 <p>
                     <ul>
                         <li>
-                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href="setup/script.html#json">Samples Setup Guide</a> for details) 
+                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href="setup/script.html#json">Samples Setup Guide</a> for details)
                         </li>
                         <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
@@ -89,7 +89,7 @@
                             Start Synapse using the configuration numbered 440 (repository/conf/sample/synapse_sample_440.xml)
                             <div class="command">
                                 Unix/Linux: sh synapse.sh -sample 440<br/>
-                                Windows: synapse.bat -sample 710
+                                Windows: synapse.bat -sample 440
                             </div>
                         </li>
                     </ul>
@@ -104,7 +104,7 @@
 					JSON client.</p>
 				<p>You may use a tool like TCPMon to monitor the JSON requests sent
 						over the wire. A sample JSON request and response is shown below:</p>
-				
+
                 <div class="consoleOutput">{"getQuote":{"request":{"symbol":"IBM"}}}</div>
 
                 <div class="consoleOutput">{"getQuoteResponse":{"return":{"change":3.853593376681722,"earnings":12.802850763714854,"high":67.92488310190126,"last":66.14619264746406,"lastTradeTimestamp":"Mon Aug 23 16:48:40 IST 2010","low":-66.04000424423522,"marketCap":-9334516.42324327,"name":"IBM Company","open":-64.61950137150009,"peRatio":-19.78600441437058,"percentageChange":5.411779328273005,"prevClose":71.2075112994578,"symbol":"IBM","volume":16842}}}</div>

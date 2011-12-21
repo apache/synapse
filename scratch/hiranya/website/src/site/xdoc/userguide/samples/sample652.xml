@@ -99,16 +99,16 @@
                     <ul>
                         <li>
                               Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
-                              <p>To run this sample it is required to deploy synpase on JBoss application server(This is only tested with JBoss application sever), you 
-                              can use the war distribution to deploy synapse on JBoss application server. Use the synpase_sample_652.xml as the synapse confiuration 
-                              file and start JBoss with that synpase configuration file. Also you need to define two XA datasources for above two datasources. 
+                              <p>To run this sample it is required to deploy synpase on JBoss application server(This is only tested with JBoss application sever), you
+                              can use the war distribution to deploy synapse on JBoss application server. Use the synpase_sample_652.xml as the synapse confiuration
+                              file and start JBoss with that synpase configuration file. Also you need to define two XA datasources for above two datasources.
                               You'll need to refer JBoss documentation to see how to do this.</p>
                               <p>
-                                It also required to have two database instances, this will be used by the two XA datasources. 
+                                It also required to have two database instances, this will be used by the two XA datasources.
                                 Refer the <a href="setup/db.html#derby">Sample Setup Guide </a> to see how you can set up the derby database server.
                               </p>
                               <p>
-                                In this sample a record is delete from one database and it is added into the second database. 
+                                In this sample a record is delete from one database and it is added into the second database.
                                 If either of the operations(deleting from the 1st database and adding into the second database)
                                 fails everything will be roll backed. The records will be untoched.
                               </p>

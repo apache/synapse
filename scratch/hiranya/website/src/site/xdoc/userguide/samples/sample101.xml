@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 101</title>
     </properties>
     <body>
-        <section name="Sample 101: Using WS-ReliableMessaging for Outgoing Messages 1.0">
+        <section name="Sample 101: Using WS-ReliableMessaging for Outgoing Messages">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;

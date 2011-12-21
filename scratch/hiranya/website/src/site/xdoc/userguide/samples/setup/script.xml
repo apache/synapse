@@ -84,15 +84,14 @@
       			of Synapse and add the following two entries under the 'messageBuilders' and
       			'messageFormatters' sections respectively.
     			</p>
-    			<div class="xmlConf">
-    &lt;messageBuilder contentType=&quot;application/json&quot;
-                         class=&quot;org.apache.axis2.json.JSONOMBuilder&quot;/&gt;
+    			<div class="xmlConf">&lt;messageBuilder contentType=&quot;application/json&quot;
+    class=&quot;org.apache.axis2.json.JSONOMBuilder&quot;/&gt;
 
-     &lt;messageFormatter contentType=&quot;application/json&quot;
-                         class=&quot;org.apache.axis2.json.JSONMessageFormatter&quot;/&gt;
-    			</div>
+&lt;messageFormatter contentType=&quot;application/json&quot;
+    class=&quot;org.apache.axis2.json.JSONMessageFormatter&quot;/&gt;</div>
     			<p>
-     If you are planning to run sample 440, you should also add the above two entries to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.
+                    If you are planning to run sample 440, you should also add the above two entries
+                    to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.
     			</p>
 			</subsection>
 

@@ -50,9 +50,8 @@
                         <li><a href="samples/sample10.html">Sample 10: Introduction to dynamic endpoints with registry</a></li>
                         <li><a href="samples/sample11.html">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
                         <li><a href="samples/sample12.html">Sample 12: One-way messaging / fire-and-forget through Synapse</a></li>
-                        <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li> 
-                        <li><a href="samples/sample14.html">Sample 14: Sequences and Endpoints as local registry items</a></li>
-                     </ul>
+                        <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li>
+                    </ul>
                 </p>
             </subsection>
             <subsection name="Endpoints">
@@ -74,8 +73,7 @@
                 <p>
                     <ul>
                         <li><a href="samples/sample100.html">Sample 100: Using WS-Security for outgoing messages</a></li>
-                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages 1.0</a></li>
-                        <li><a href="samples/sample102.html">Sample 102: Using WS-ReliableMessaging for outgoing messages 1.1</a></li>
+                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages</a></li>
                     </ul>
                 </p>
             </subsection>
@@ -112,10 +110,10 @@
                         <li><a href="samples/sample257.html">Sample 257: Proxy services with the FIX transport</a></li>
                         <li><a href="samples/sample258.html">Sample 258: Switching from HTTP to FIX </a></li>
                         <li><a href="samples/sample259.html">Sample 259: Switching from FIX to HTTP </a></li>
-                        <li><a href="samples/sample260.html">Sample 260: Switching from FIX to AMQP </a></li>
+                        <li><a href="">Sample 260: Switching from FIX to AMQP </a></li>
                         <li><a href="samples/sample261.html">Sample 261: Switch between different FIX versions </a></li>
                         <li><a href="samples/sample262.html">Sample 262: Content Based Routing of FIX messages </a></li>
-                        <li><a href="samples/sample263.html">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
+                        <li><a href="">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
                         <li><a href="samples/sample264.html">Sample 264: Request-response invocations with the JMS transport</a></li>
                         <li><a href="samples/sample265.html">Sample 265: Switching from TCP to HTTP/S</a></li>
                         <li><a href="samples/sample266.html">Sample 266: Switching from UDP to HTTP/S</a></li>
@@ -125,7 +123,7 @@
             <subsection name="Scheduled Tasks">
                 <p>
                     <ul>
-                        <li><a href="samples/sample300.html">Sample 300: Introduction to tasks with simple trigger</a></li>
+                        <li><a href="#Sample300">Sample 300: Introduction to tasks with simple trigger</a></li>
                     </ul>
                 </p>
             </subsection>
@@ -228,7 +226,7 @@
                     </ul>
                 </p>
             </subsection>
-             <subsection name="Priority Based Mediation">
+            <subsection name="Priority Based Mediation">
                 <p>
                     <ul>
                         <li><a href="samples/sample650.html">Sample 650: Introduction to priority based mediation</a></li>
@@ -247,7 +245,7 @@
                 <p>
                     <ul>
                         <!-- This sample should be renamed -->
-                        <li><a href="samples/sample440.html">Sample 440: Exposing a SOAP service over JSON</a></li>
+                        <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
                     </ul>
                 </p>
             </subsection>

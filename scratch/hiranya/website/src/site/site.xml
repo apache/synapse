@@ -35,8 +35,12 @@
         <menu name="Documentation">
             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
+            <item name="Extending the Service Bus" href="userguide/extending.html"/>
             <item name="Samples Catalog" href="userguide/samples.html"/>
             <item name="Configuration Language" href="userguide/config.html"/>
+            <item name="Upgrading" href="userguide/upgrading.html"/>
+            <item name="Deployment" href="userguide/deployment.html"/>
+            <item name="Transport" href="userguide/transports.html"/>
         </menu>
         <menu name="Developer Resources">
             <item name="Checkout the Source"/>

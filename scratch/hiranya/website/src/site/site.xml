@@ -33,6 +33,7 @@
             <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
         </menu>
         <menu name="Documentation">
+            <item name="Installation Guide" href="userguide/installation.html"/>
             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
             <item name="Extending the Service Bus" href="userguide/extending.html"/>

@@ -870,5 +870,253 @@
 
             </subsection>
         </section>
+        <section name="Proxy Services">
+            <p>
+                A &lt;proxy&gt; element is used to define a Synapse Proxy service.
+            </p>
+            <div class="xmlConf">&lt;proxy name="string" [transports="(http |https |jms |.. )+|all"] [pinnedServers="(serverName )+"] [serviceGroup="string"]&gt;
+   &lt;description&gt;...&lt;/description&gt;?
+   &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
+      &lt;inSequence&gt;...&lt;/inSequence&gt;?
+      &lt;outSequence&gt;...&lt;/outSequence&gt;?
+      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
+      &lt;endpoint&gt;...&lt;/endpoint&gt;?
+   &lt;/target&gt;?
+   &lt;publishWSDL key="string" uri="string"&gt;
+      ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?
+      &lt;resource location="..." key="..."/&gt;*
+   &lt;/publishWSDL&gt;?
+   &lt;enableAddressing/&gt;?
+   &lt;enableSec/&gt;?
+   &lt;enableRM/&gt;?
+   &lt;policy key="string" [type="(in | out)"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)
+   &lt;parameter name="string"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)
+      string | xml
+   &lt;/parameter&gt;
+&lt;/proxy&gt;</div>
+            <p>
+                A proxy service is created and exposed on the specified transports through the
+                underlying Axis2 engine, exposing service EPRs as per the standard Axis2
+                conventions (ie based on the service name). Note that currently Axis2 does not allow
+                custom URI's to be set for services on some transports such as http/s. A proxy
+                service could be exposed over all enabled Axis2 transports such as http, https,
+                JMS, Mail and File etc. or on a subset of these as specified by the optional
+                'transports' attribute. By default, if this attribute is not specified, Synapse
+                will attempt to expose the proxy service on all enabled transports.
+            </p>
+            <p>
+                In a clustered setup it might be required to deploy a particular proxy service
+                on a subset of the available nodes. This can be achieved using the 'pinnedServers'
+                attribute. This attribute takes a list of server names. At server startup Synapse
+                will check whether the name of the current host matches any of the names given
+                in this attribute and only deploy the proxy service if a match is found. The
+                server host name is picked from the system property 'SynapseServerName', failing
+                which the hostname of the machine would be used or default to 'localhost'. User can
+                specify a more meaningful name to a Synapse server instance by starting the server
+                using the following command.
+            </p>
+            <div class="command">./synapse.sh -serverName=&lt;ServerName&gt;</div>
+            <p>
+                If Synapse is started as a daemon or a service, the above setting should be specified
+                in the wrapper.conf file.
+            </p>
+            <p>
+                By default when a proxy service is created it is added to an Axis service group
+                which has the same name as the proxy service. With the 'serviceGroup' attribute
+                this behavior can be further configured. A custom Axis service group can be specified
+                for a proxy service using the 'serviceGroup' attribute. This way multiple proxy
+                services can be grouped together at Axis2 level thus greatly simplifying service
+                management tasks.
+            </p>
+            <p>
+                Each service could define the target for received messages as a named sequence or a
+                direct endpoint. Either target inSequence or endpoint is required for the proxy
+                configuration, and a target outSequence defines how responses should be handled. Any
+                WS-Policies provided would apply as service level policies, and any service parameters
+                could be passed into the proxy service's AxisService instance using the 'parameter'
+                elements (e.g. the JMS destination etc). If the proxy service should enable
+                WS-Reliable Messaging or Security, the appropriate modules should be engaged, and
+                specified service level policies will apply. To engage the required modules, one may
+                use the 'enableSec', 'enableRM' and 'enableAddressing' elements.
+            </p>
+            <p>
+                A dynamic proxy may be defined by specifying the properties of the proxy as dynamic
+                entries by referring them with the key. For example one could specify the
+                inSequence or endpoint with a remote key, without defining it in the local
+                configuration. As the remote registry entry changes, the properties of the proxy
+                will dynamically be updated accordingly. (Note: proxy service definition itself
+                cannot be specified to be dynamic; i.e &lt;proxy key="string"/&gt; is wrong)
+            </p>
+            <p>
+                A WSDL for the proxy service can be published using the 'publishWSDL' element.
+                The WSDL document can be loaded from the registry by specifying the 'key' attribute
+                or from any other location by specifying the 'uri' attribute. Alternatively the WSDL
+                can be provided inline as a child element of the 'publishWSDL' element. Artifacts
+                (schemas or other WSDL documents) imported by the WSDL can be resolved from the
+                registry by specifying appropriate 'resource' elements.
+            </p>
+            <div class="xmlConf">&lt;publishWSDL key="my.wsdl"&gt;
+   &lt;resource location="http://www.standards.org/standard.wsdl" key="standard.wsdl"/&gt;
+&lt;/publishWSDL&gt;</div>
+            <p>
+                In this example the WSDL is retrieved from the registry using the key 'my.wsdl'. It
+                imports another WSDL from location 'http://www.standards.org/standard.wsdl'. Instead
+                of loading it from this location, Synapse will retrieve the imported WSDL from the
+                registry entry 'standard.wsdl'.
+            </p>
+            <p>
+                Some well-known parameters that are useful when writing complex proxy services
+                are listed below. These can be included in a proxy configuration using 'parameter'
+                tags.
+            </p>
+            <table border="1" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
+                <tbody>
+                    <tr>
+                        <th>
+                            Parameter
+                        </th>
+                        <th>
+                            Value
+                        </th>
+                        <th>
+                            Default
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            useOriginalwsdl
+                        </td>
+                        <td>
+                            true|false
+                        </td>
+                        <td>
+                            false
+                        </td>
+                        <td>
+                            Use the given WSDL instead of generating the WSDL.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            modifyUserWSDLPortAddress
+                        </td>
+                        <td>
+                            true|false
+                        </td>
+                        <td>
+                            true
+                        </td>
+                        <td>
+                            (Effective only with useOriginalwsdl=true) If true (default) modify
+                            the port addresses to current host.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            showAbsoluteSchemaURL
+                        </td>
+                        <td>
+                            true|false
+                        </td>
+                        <td>
+                            false
+                        </td>
+                        <td>
+                            Show the absolute path of the referred schemas of the WSDL without
+                            showing the relative paths.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>
+                Following table lists some transport specific parameters that can be passed into
+                proxy service configurations.
+            </p>
+            <table border="1" cellpadding="0" cellspacing="0" style="width: 100%; font-size:small" class="data-table">
+                <tbody>
+                    <tr>
+                        <th>
+                            Transport
+                        </th>
+                        <th>
+                            Require
+                        </th>
+                        <th>
+                            Parameter
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            JMS
+                        </td>
+                        <td>
+                            Optional
+                        </td>
+                        <td>
+                            transport.jms.ConnectionFactory
+                        </td>
+                        <td>
+                            The JMS connection factory definition (from axis2.xml) to be used to
+                            listen for messages for this service
+                        </td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            Optional
+                        </td>
+                        <td>
+                            transport.jms.Destination
+                        </td>
+                        <td>
+                            The JMS destination name (Defaults to a Queue with the service name)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            Optional
+                        </td>
+                        <td>
+                            transport.jms.DestinationType
+                        </td>
+                        <td>
+                            The JMS destination type. Accept values 'queue' or 'topic' (default:
+                            queue)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            Optional
+                        </td>
+                        <td>
+                            transport.jms.ReplyDestination
+                        </td>
+                        <td>
+                            The destination where a reply will be posted
+                        </td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            Optional
+                        </td>
+                        <td>
+                            transport.jms.Wrapper
+                        </td>
+                        <td>
+                            The wrapper element for the JMS message
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
     </body>
 </document>

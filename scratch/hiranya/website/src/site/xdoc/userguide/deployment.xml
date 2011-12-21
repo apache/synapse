@@ -140,7 +140,8 @@
                 </p>
                 <ul>
                     <li>
-                        Place your mediation in <tt>repository/conf/synapse.xml</tt>.
+                        Place your mediation configuration in <tt>repository/conf/synapse-config</tt>
+                        directory.
                     </li>
                     <li>
                         Place any additional files such as WSDL files, endpoint definitions, etc.
@@ -246,15 +247,11 @@
                     only a few simple steps. To begin with, change to the directory where you want to
                     create the project and issue the following command:
                 </p>
-                <div class="source">
-                    <div class="command">mvn archetype:generate -DarchetypeCatalog=http://synapse.apache.org</div>
-                </div>
+                <div class="command">mvn archetype:generate -DarchetypeCatalog=http://synapse.apache.org</div>
                 <p>
                     In case of problems, you can try to use the latest version of the archetype catalog:
                 </p>
-                <div class="source">
-                    <div class="command">mvn archetype:generate <br/>-DarchetypeCatalog=http://svn.apache.org/repos/asf/synapse/trunk/java/src/site/resources</div>
-                </div>
+                <div class="command">mvn archetype:generate -DarchetypeCatalog=http://svn.apache.org/repos/asf/synapse/trunk/java/src/site/resources</div>
                 <p>
                     Finally, if you have build Synapse from sources, you don't need to specify a
                     catalog at all: the archetype is added automatically to the local catalog during
@@ -274,7 +271,8 @@
                 </p>
                 <ul>
                     <li>
-                        Add your mediation configuration to <tt>repository/conf/synapse.xml</tt>.
+                        Add your mediation configuration to <tt>repository/conf/synapse-config</tt>
+                        directory.
                     </li>
                     <li>
                         Customize the dependencies in <tt>pom.xml</tt>. In particular if additional
@@ -285,16 +283,14 @@
                         Enable and configure additional transports in <tt>repository/conf/axis2.xml</tt>.
                     </li>
                     <li>
-                        Place any other files referenced by <tt>synapse.xml</tt> into the
+                        Place any other files referenced by mediation configuration into the
                         <tt>repository</tt> directory.
                     </li>
                 </ul>
                 <p>
-                    The project is built as usually with the following command:
+                    The project is built as usual with the following command:
                 </p>
-                <div class="source">
-                    <div class="command">mvn package</div>
-                </div>
+                <div class="command">mvn package</div>
                 <p>
                     This will create a ZIP file (in the <tt>target</tt> directory) containing
                     everything that is needed to run your custom Synapse configuration. You only

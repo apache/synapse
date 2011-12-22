@@ -118,6 +118,131 @@
                     This behavior can also be configured using the 'category' attribute.
                 </p>
             </subsection>
+            <subsection name="Property Mediator" id="Property">
+                <p>
+                    Every message mediated through Synapse can have a set of associated properties.
+                    Synapse engine and the underlying transports set a number of properties on
+                    each message processed which can be manipulated by the user to modify the
+                    runtime behavior of the message flows. In addition, user can set his/her own
+                    properties on the message which is very helpful when it comes to managing
+                    message flow state and storing scenario specific variables. For an example in
+                    some situations a user might want to access a particular value in the request
+                    payload while processing a response. This can be easily achieved by setting the
+                    required value to a property in the request (in) sequence and then later accessing
+                    that property in the response (out) sequence.
+                </p>
+                <p>
+                    Property mediator is used to manipulate the properties of a message. This
+                    mediator can be used to set and remove property values. When it comes to setting
+                    property values, the input could be a constant or a variable value generated
+                    by an XPath expression. The syntax for configuring the property mediator is as
+                    follows.
+                </p>
+                <div class="xmlConf">&lt;property name="string" [action=set|remove] [type="string"] (value="literal" | expression="xpath") [scope=default|transport|axis2|axis2-client] [pattern="regex" [group="integer"]]&gt;
+    &lt;xml-element/&gt;?
+&lt;/property&gt;</div>
+                <p>
+                    The 'name' attribute specifies the name of the property which needs to be either
+                    set or removed  while the 'action' attribute specifies the exact action that needs
+                    to be carried out by the mediator. If not specified action will default to 'set'.
+                </p>
+                <p>
+                    When setting a property value, either the 'value' or the 'expression' attribute
+                    must be specified. The 'value' attribute can be used to set a constant as
+                    the property value whereas the 'expression' attribute can be used to specify an
+                    XPath expression. If an XPath expression is specified, Synapse will evaluate that
+                    on the message to determine the value that needs to be assigned to the property.
+                </p>
+                <p>
+                    Synapse properties are scoped. Therefore when using this mediator the user should
+                    specify the scope at which the property will be set or removed from. If not
+                    specified, property mediator will work at the 'default' scope. Properties set in
+                    this scope last as long as the transaction (request-response) exists. Properties
+                    set on scope 'axis2' has a shorter life span and it's mainly used for passing
+                    parameters to the underlying Axis2 engine. Properties set in the 'transport'
+                    scope will be treated as transport headers. For an example if it is required to
+                    send an HTTP header named 'CustomHeader' with an outgoing request, one may use
+                    the property mediator configuration.
+                </p>
+                <div class="xmlConf">&lt;property name="CustomHeader" value="some value" scope="transport" type="type name"/&gt;</div>
+                <p>
+                    This will force Synapse to send a transport header named 'CustomHeader' along
+                    with the outgoing message. Property mediator also supports a scope named
+                    'axis2-client'. Properties set in this scope will be treated as Axis2 client
+                    options.
+                </p>
+                <p>
+                    When using properties to store user or scenario specific information it is
+                    recommended to always use the 'default' scope. Other scopes should not be used
+                    for custom development or mediation work since they have the potential to
+                    alter the behavior of the underlying Axis2 engine and transports framework.
+                </p>
+                <p>
+                    By default property mediator sets all property values as strings. It is possible
+                    to set properties in other types by specifying the 'type' attribute. This attribute
+                    can accept one of following values.
+                </p>
+                <ul>
+                    <li>STRING</li>
+                    <li>BOOLEAN</li>
+                    <li>DOUBLE</li>
+                    <li>FLOAT</li>
+                    <li>INTEGER</li>
+                    <li>LONG</li>
+                    <li>SHORT</li>
+                    <li>OM</li>
+                </ul>
+                <p>
+                    The type names are case sensitive. Type 'OM' can be used to set XML property
+                    values on the message context. This becomes useful when the expression associated
+                    with the property mediator evaluates to an XML node during mediation. With the
+                    type attribute set to 'OM' the resulting XML will be converted to an AXIOM
+                    OMElement before assigning it to a property.
+                </p>
+                <p>
+                    It is also possible to use the property mediator to set some static XML content
+                    as a property value. To do this specify the static XML content as a child node
+                    of the 'property' element instead of using the 'value' attribute.
+                </p>
+            </subsection>
+            <subsection name="Send Mediator" id="Send">
+                <p>
+                    Send mediator is used to send requests to endpoints. The same can be used
+                    to send response messages back to clients. The send mediator is configured using
+                    the following XML syntax.
+                </p>
+                <div class="xmlConf">&lt;send [receive="string"]&gt;
+    (endpointref | endpoint)?
+&lt;/send&gt;</div>
+                <p>
+                    Messages are sent to the endpoint specified as the child of the
+                    'send' element. An optional receiving sequence can be configured using the
+                    'receive' attribute. When specified, response messages from the endpoint will
+                    be dispatched to the referred sequence. This makes it easier to implement
+                    complex service chaining scenarios, where the response from one service needs
+                    to be processed and directed to another service.
+                </p>
+                <p>
+                    The send mediator can be configured without any child endpoints. For an example
+                    following is a perfectly valid send mediator configuration.
+                </p>
+                <div class="xmlConf">&lt;send/&gt;</div>
+                <p>
+                    In this case the messages will be sent to an implicit endpoint. If the message
+                    is a request from a client, Synapse will lookup the 'To' header of the request and
+                    simply forward it to the service addressed by that header. If it is a response
+                    from a back-end service, Synapse will simply send it back to the original
+                    client who initiated the original message flow.
+                </p>
+                <p>
+                    The service invocations done by the send mediator may or may not be
+                    synchronous based on the underlying transport used. If the default non-blocking
+                    HTTP transport is used, the send mediator will make an asynchronous invocation
+                    and release the calling thread as soon as possible. Synapse will asynchronously
+                    handle the response from the endpoint while the giving the illusion that Synapse
+                    is making blocking service calls.
+                </p>
+            </subsection>
         </section>
     </body>
 </document>

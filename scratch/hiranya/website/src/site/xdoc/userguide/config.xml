@@ -42,6 +42,7 @@
                         <li><a href="#Endpoints">Endpoints</a></li>
                         <li><a href="#ProxyServices">Proxy Services</a></li>
                         <li><a href="#ScheduledTasks">Scheduled Tasks</a></li>
+                        <li><a href="#Templates">Templates</a></li>
                         <li><a href="#Registry">Remote Registry and Local Registry</a></li>
                         <li><a href="#API">APIs</a></li>
                         <li><a href="#PriorityExecutors">Priority Executors</a></li>
@@ -66,6 +67,7 @@
                 </li>
                 <li><a href="#ProxyServiceConfig">Proxy Service Configuration</a></li>
                 <li><a href="#TaskConfig">Scheduled Task Configuration</a></li>
+                <li><a href="#TemplateConfig">Template Configuration</a></li>
                 <li><a href="#EventSourceConfig">Event Source Configuration</a></li>
                 <li><a href="#APIConfig">API Configuration</a></li>
                 <li><a href="#ExecutorConfig">Priority Executor Configuration</a></li>
@@ -318,6 +320,36 @@
                     the Unix Cron syntax.
                 </p>
             </subsection>
+            <subsection name="Templates" id="Templates">
+                <p>
+                    A Template is an abstract concept in synapse. One way to view a template, is as
+                    a prototype or a function. Templates try to minimize redundancy in synapse
+                    artifacts (ie sequences and endpoints) by creating prototypes that users can
+                    re-use and utilize as and when needed. This is very much analogous to classes
+                    and instances of classes whereas, a template is a class that can be used to
+                    wield instance objects such as sequences and endpoints.
+                </p>
+                <p>
+                    Templates is an ideal way to improve re-usability and readability of
+                    ESB configurations (XML). Addition to that users can utilize predefined templates
+                    that reflect commonly used EIP patterns for rapid development of ESB
+                    message/mediation flows.There are two flavours of templates which are Endpoint
+                    and Sequence Templates.
+                </p>
+                <p>
+                    An endpoint template is an abstract definition of a synapse endpoint. Users have
+                    to invoke this kind of a template using a special template endpoint. Endpoint
+                    templates can specify various commons parameters of an endpoint that can be reused
+                    across many endpoint definitions (eg: address uri, timeouts, error codes etc).
+                </p>
+                <p>
+                    A sequence template defines a functional form of an ESB sequence. Sequence
+                    templates have the ability to parametrize a sequence flow. Generally
+                    parametrization is in the form of static values as well as xpath expressions.
+                    Users can invoke a template of this kind with a mediator named 'call-template'
+                    by passing in the required parameter values.
+                </p>
+            </subsection>
             <subsection name="Remote Registry and Local Registry (Local Entries)" id="Registry">
                 <p>
                     Synapse configuration can refer to an external registry/repository for resources
@@ -459,14 +491,16 @@
                 high level.
             </p>
             <div class="xmlConf">&lt;definitions&gt;
-   &lt;<a href="#registry">registry</a> provider="string"&gt;...&lt;/registry&gt;?
-   &lt;<a href="#localEntry">localEntry</a> key="string"&gt;...&lt;/localEntry&gt;?
-   &lt;<a href="#sequence">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
-   &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
-   &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
-   &lt;<a href="#task">task</a> name="string" ...&gt;...&lt;/task&gt;?
-   &lt;<a href="#eventsource">eventSource</a> name="string" ...&gt;...&lt;/eventSource&gt;?
-   &lt;<a href="#executor">executor</a> name="string" ...&gt;...&lt;/executor&gt;?
+   &lt;<a href="#RegistryConfig">registry</a> provider="string"&gt;...&lt;/registry&gt;?
+   &lt;<a href="#LocalEntryConfig">localEntry</a> key="string"&gt;...&lt;/localEntry&gt;?
+   &lt;<a href="#SequenceConfig">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
+   &lt;<a href="#EndpointConfig">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
+   &lt;<a href="#ProxyServiceConfig">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
+   &lt;<a href="#TaskConfig">task</a> name="string" ...&gt;...&lt;/task&gt;?
+   &lt;<a href="#EventSourceConfig">eventSource</a> name="string" ...&gt;...&lt;/eventSource&gt;?
+   &lt;<a href="#ExecutorConfig">executor</a> name="string" ...&gt;...&lt;/executor&gt;?
+   &lt;<a href="#APIConfig">api</a> name="string" ...&gt;...&lt;/api&gt;?
+   &lt;<a href="#TemplateConfig">template</a> name="string" ...&gt;...&lt;/template&gt;?
    &lt;<a href="#store">messageStore</a> name="string" ...&gt;...&lt;/messageStore&gt;?
 &lt;/definitions&gt;</div>
             <p>
@@ -1244,6 +1278,138 @@
                 At server startup, Synapse will match the current server name or the host name with
                 the values specified in this attribute to see whether the task should be initialized
                 or not.
+            </p>
+        </section>
+        <section name="Template Configuration" id="TemplateConfig">
+            <p>
+                As explained earlier templates in synapse are defined in two flavors; sequence and
+                endpoint templates. The configuration, syntax forms and semantics of these are explained
+                in the following section.
+            </p>
+            <p>
+                A sequence template consist of two parts. As in any kind of a function, it has a
+                parameter set definition (argument list) and a function body definition. An important
+                difference is sequence template parameters are not typed (typically these are
+                string parameters, but can be of any type which is determined at runtime). Also
+                function body is a typical esb flow or a sequence.
+            </p>
+            <p>
+                The syntax outline of a sequence template definition is given below.
+            </p>
+            <div class="xmlConf">&lt;template name=&quot;string&quot;&gt;
+    &lt;!-- parameters this sequence template will be supporting --&gt;
+    (
+    &lt;parameter name=&quot;string&quot;/&gt;
+    ) *
+    &lt;!--this is the in-line sequence of the template     --&gt;
+    &lt;sequence&gt;
+        mediator+
+    &lt;/sequence&gt;
+&lt;/template&gt;</div>
+            <p>
+                A sequence template is a top level element defined with the 'name' attribute in Synapse
+                configuration. Both endpoint and sequence templates start with a 'template' element.
+                Parameters (defined by &lt;parameter&gt; elements) are the inputs supported by a
+                sequence template. These sequence template parameters can be referred by any xpath
+                expression defined within the in-lined sequence. For example parameter named 'foo' can
+                be referred by a property mediator (defined inside the in-line sequence of the template)
+                in following ways.
+            </p>
+            <div class="xmlConf">&lt;property name="PropertyValue" expression="$func:foo"/&gt;
+&lt;property name="PropertyValue" expression="get-property('foo', 'func')"/&gt;</div>
+            <p>
+                Note the scope variable used in the XPath expression. We use 'function' scope or '$func'
+                to refer to template parameters.
+            </p>
+            <p>
+                Invoking a sequence template can be done with a mediator named 'call-template' by
+                passing parameter values. The syntax outline of a call template mediator definition
+                is given below.
+            </p>
+            <div class="xmlConf">&lt;call-template target=&quot;string&quot;&gt;
+    &lt;!-- parameter values will be passed on to a sequence template --&gt;
+    (
+    &lt;!--passing plain static values --&gt;
+    &lt;with-param name=&quot;string&quot; value=&quot;string&quot; /&gt; |
+    &lt;!--passing xpath expressions --&gt;
+    &lt;with-param name=&quot;string&quot; value=&quot;{string}&quot; /&gt; |
+    &lt;!--passing dynamic xpath expressions where values will be compiled dynamically--&gt;
+    &lt;with-param name=&quot;string&quot; value=&quot;{{string}}&quot; /&gt; |
+    ) *
+&lt;/call-template&gt;</div>
+
+            <p>
+                The 'call-template' mediator should define a target template it should be
+                invoking, with 'target' attribute.
+            </p>
+            <p>
+                The 'with-param' element is used to parse parameter values to a target
+                sequence template. Note that parameter names has to be exact matches to the names
+                specified in the target template. Parameter elements can contain three types of
+                parameterized values. xpath values are passed in within curly braces ({}) for value
+                attribute.
+            </p>
+            <p>
+                Endpoint templates are similar to the sequence templates in definition.  Unlike
+                sequence templates, endpoint templates are always parameterized using '$' prefixed
+                values (NOT xpath expressions). Users can parameterize endpoint configuration elements
+                with these '$' prefixed values. An example is shown below.
+            </p>
+            <div class="xmlConf">&lt;template name=&quot;ep_template&quot;&gt;
+    &lt;parameter name=&quot;codes&quot;/&gt;
+    &lt;parameter name=&quot;factor&quot;/&gt;
+    &lt;parameter name=&quot;retries&quot;/&gt;
+    &lt;endpoint name=&quot;$name&quot;&gt;
+        &lt;default&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;errorCodes&gt;$codes&lt;/errorCodes&gt;
+                &lt;progressionFactor&gt;$factor&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;$retries&lt;/retriesBeforeSuspension&gt;
+                &lt;retryDelay&gt;0&lt;/retryDelay&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/default&gt;
+     &lt;/endpoint&gt;
+&lt;/template&gt;</div>
+            <p>
+                The syntax outline of a endpoint template definition is given below.
+            </p>
+
+            <div class="xmlConf">&lt;template name=&quot;string&quot;&gt;
+    &lt;!-- parameters this endpoint template will be supporting --&gt;
+    (
+    &lt;parameter name=&quot;string&quot;/&gt;
+    ) *
+    &lt;!--this is the in-line endpoint of the template    --&gt;
+    &lt;endpoint [name=&quot;string&quot;] &gt;
+        address-endpoint | default-endpoint | wsdl-endpoint |
+        load-balanced-endpoint | fail-over-endpoint | recipient-list-endpoint
+    &lt;/endpoint&gt;
+&lt;/template&gt;</div>
+
+             <p>
+                 As described earlier template endpoint is the artifact that makes a template of an
+                 endpoint type into a concrete endpoint. In other words an endpoint template would
+                 be useless without a template endpoint referring to it. This is semantically similar
+                 to the relationship between a sequence template and a 'call-template' mediator.
+             </p>
+             <p>
+                The syntax outline of a template endpoint definition is as following..
+            </p>
+            <div class="xmlConf">&lt;endpoint [name=&quot;string&quot;] [key=&quot;string&quot;] template=&quot;string&quot;&gt;
+    &lt;!-- parameter values will be passed on to a endpoint template --&gt;
+    (
+    &lt;parameter name=&quot;string&quot; value=&quot;string&quot; /&gt;
+    ) *
+&lt;/endpoint&gt;</div>
+            <p>
+                Template endpoint defines parameter values that can parameterize an endpoint.
+                The 'template' attribute points to a target endpoint template.
+            </p>
+            <p>
+                As in the case of sequence template, note that parameter names has to be exact match
+                to the names specified in target endpoint template.
             </p>
         </section>
         <section name="Event Source Configuration" id="EventSourceConfig">

@@ -28,7 +28,7 @@
         <menu name="Main Menu">
             <item name="Home" href="index.html"/>
             <item name="Download"/>
-            <item name="History"/>
+            <item name="History" href="userguide/history.html"/>
             <item name="News"/>
             <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
         </menu>

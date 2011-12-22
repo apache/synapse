@@ -46,6 +46,7 @@
                         <li><a href="#Registry">Remote Registry and Local Registry</a></li>
                         <li><a href="#API">APIs</a></li>
                         <li><a href="#PriorityExecutors">Priority Executors</a></li>
+                        <li><a href="#Stores">Message Stores and Processors</a></li>
                     </ul>
                 </li>
                 <li><a href="#ConfigFiles">Synapse Configuration Files</a></li>
@@ -71,6 +72,7 @@
                 <li><a href="#EventSourceConfig">Event Source Configuration</a></li>
                 <li><a href="#APIConfig">API Configuration</a></li>
                 <li><a href="#ExecutorConfig">Priority Executor Configuration</a></li>
+                <li><a href="#StoresConfig">Message Stores and Processors Configuration</a></li>
             </ul>
         </section>
         <section name="Introduction" id="Intro">
@@ -413,6 +415,32 @@
                     other priorities specified. For example if we have two priorities with value 10
                     and 1, messages with priority 10 will get 10 times more resources than messages
                     with priority 1.
+                </p>
+            </subsection>
+            <subsection name="Message Stores and Processors" id="Stores">
+                <p>
+                    Message store acts as a unit of storage for messages/data exchanged during synapse
+                    runtime. By default synapse ships with a in-memory message store and the storage
+                    can be plugged in depending on the requirement. There is a specific mediator called
+                    store mediator which is able to direct message traffic to a particular message
+                    store at runtime.
+                </p>
+                <p>
+                    On the other hand a Message processor has the ability to connect to a message
+                    store and perform message mediation or required data manipulations. Essentially
+                    a particular message processor will be coupled with a message store and as a
+                    result respective message processor will be inherited with the traits of that
+                    particular message storage.
+                </p>
+                <p>
+                    For example in the eye of a message processor,  data/messages coming from in-memory
+                    message store will be seen as more volatile compared to a persistent message store.
+                    Nevertheless it will find it can perform operations much faster on the former.
+                    This is in fact a very powerful concept and hence depending on the processor and
+                    store combination users can define limitless number of EI patterns in synapse
+                    that could meet different runtime requirements and SLA's. Synapse by default
+                    support two processors which are scheduled message processor and sampling
+                    processor.
                 </p>
             </subsection>
         </section>
@@ -1541,6 +1569,59 @@
         &lt;/condition&gt;
     &lt;/conditions&gt;
 &lt;/Priority-Configuration&gt;</div>
+        </section>
+        <section name="Message Stores and Processors Configuration" id="StoresConfig">
+            <p>
+                Both Message Stores and processors are top level configuration of synapse. Following
+                section tries to describe some of the syntax of the message store/processors
+                configurations.
+            </p>
+
+            <p>
+                The syntax outline of a message store definition is given below.
+            </p>
+
+            <div class="xmlConf"> &lt;messageStore name=&quot;string&quot; class=&quot;classname&quot; &gt;
+    &lt;parameter name=&quot;string&quot; &gt; &quot;string&quot; &lt;/parameter&gt;*
+&lt;/messageStore&gt;</div>
+
+            <p>
+                The 'class' attribute value is the fully qualified class name of the underlying message
+                store implementation. There can be many message store implementations.Users can write
+                their own message store implementation and use it. Parameters section is used to
+                configure the parameters that is needed by underlying message store implementation.
+            </p>
+            <p>
+                The syntax outline of a message processor definition is given below.
+            </p>
+
+            <div class="xmlConf"> &lt;messageProcessor name=&quot;string&quot; class=&quot;class name&quot; messageStore=&quot;classname&quot; &gt;
+    &lt;parameter name=&quot;string&quot; &gt; &quot;string&quot; &lt;/parameter&gt;*
+&lt;/messageProcessor&gt;</div>
+
+            <p>
+                The 'class' attribute value is the fully qualified class name of the underlying message
+                processor implementation. There are two message processor implementations shipped by
+                default. There can be many message processor implementations.Users can write their
+                own message processor implementation and use it. Similar to message stores ,parameters
+                section here as well is used to configure the parameters that is needed by underlying
+                message processor implementation
+            </p>
+
+            <div class="xmlConf">Message Forwarding Processor : org.apache.synapse.message.processors.forward.ScheduledMessageForwardingProcessor</div>
+
+            <div class= "xmlConf">Sampling Processor : org.apache.synapse.message.processors.sampler.SamplingProcessor</div>
+
+            <p>
+                As mentioned earlier, there are several message store/processor implementations
+                shipped by default. However if users wants to extend these following interfaces are
+                available.
+            </p>
+            <div class="xmlConf">Interface: org.apache.synapse.message.store.MessageStore
+Abstract Class: org.apache.synapse.message.store.AbstractMessageStore
+
+Interface: org.apache.synapse.message.processors.MessageProcessor
+Abstract Class: org.apache.synapse.message.processors.AbstractMessageProcessor</div>
         </section>
     </body>
 </document>

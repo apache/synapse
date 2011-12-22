@@ -44,6 +44,17 @@
                         <li><a href="#Spring">Spring Mediator</a></li>
                     </ul>
                 </li>
+                <li>
+                    <a href="#AdvancedMediators">Advanced Mediators</a>
+                    <ul>
+                        <li><a href="#Aggregate">Aggregate Mediator</a></li>
+                        <li><a href="#Cache">Cache Mediator</a></li>
+                        <li><a href="#Callout">Callout Mediator</a></li>
+                        <li><a href="#Clone">Clone Mediator</a></li>
+                        <li><a href="#Iterate">Iterate Mediator</a></li>
+                        <li><a href="#Transaction">Transaction Mediator</a></li>
+                    </ul>
+                </li>
             </ul>
         </section>
         <section name="Introduction" id="Intro">
@@ -710,6 +721,179 @@
                     the given spring configuration. In addition to that, that bean must implement
                     the Mediator interface.
                 </p>
+            </subsection>
+        </section>
+        <section name="Advanced Mediators" id="AdvancedMediators">
+            <subsection name="Aggregate Mediator" id="Aggregate">
+                <p>
+                    Aggregate mediator implements the Message Aggregator EIP by aggregating the
+                    messages or responses for split messages generated using either the clone or
+                    iterate mediator.
+                </p>
+                <div class="xmlConf">&lt;aggregate [id="string"]&gt;
+    &lt;correlateOn expression="xpath"/&gt;?
+    &lt;completeCondition [timeout="time-in-seconds"]&gt;
+        &lt;messageCount min="int-min" max="int-max"/&gt;?
+    &lt;/completeCondition&gt;?
+    &lt;onComplete expression="xpath" [sequence="sequence-ref"]&gt;
+        (mediator +)?
+    &lt;/onComplete&gt;
+&lt;/aggregate&gt;</div>
+                <p>
+                    This mediator can also aggregate messages on the presence of matching elements
+                    specified by the correlateOn XPath expression. Aggregate will collect the
+                    messages coming into it until the messages collected on the aggregation
+                    satisfies the complete condition. The completion condition can specify a minimum
+                    or maximum number of messages to be collected, or a timeout value in seconds,
+                    after which the aggregation terminates. On completion of the aggregation it will
+                    merge all of the collected messages and invoke the onComplete sequence on it.
+                    The merged message would be created using the XPath expression specified by the
+                    attribute 'expression' on the 'onComplete' element.
+                </p>
+            </subsection>
+            <subsection name="Cache Mediator" id="Cache">
+                <p>
+                    Cache mediator is used for simple response message caching in Synapse. When a
+                    message reaches the cache mediator, it checks weather an equivalent message is
+                    already cached using a hash value.
+                </p>
+                <p>
+                    When the cache mediator detects that the message is a cached message, it fetches
+                    the cached response and prepares Synapse for sending the response. If a sequence
+                    is specified for a cache hit, user can send back the response message within
+                    this sequence using a send mediator. If a sequence is not specified, then cached
+                    response is sent back to the client.
+                </p>
+                <div class="xmlConf">&lt;cache [id="string"] [hashGenerator="class"] [timeout="seconds"] [scope=(per-host | per-mediator)]
+        collector=(true | false) [maxMessageSize="in-bytes"]&gt;
+    &lt;onCacheHit [sequence="key"]&gt;
+        (mediator)+
+    &lt;/onCacheHit&gt;?
+    &lt;implementation type=(memory | disk) maxSize="int"/&gt;
+&lt;/cache&gt;</div>
+                <p>
+                    This mediator will evaluate the hash value of an incoming message as described
+                    in the optional hash generator implementation (which should be a class
+                    implementing the org.wso2.caching.digest.DigestGenerator interface). The default
+                    hash generator is 'org.wso2.caching.digest.DOMHashGenerator'. If the generated
+                    hash value has been found in the cache then the cache mediator will execute the
+                    onCacheHit sequence which can be specified inline or referenced. The cache
+                    mediator must be specified with an 'id' and two instances with this same 'id'
+                    that correlates the response message into the cache for the request message
+                    hash. The optional 'timeout' specifies the valid duration for cached elements,
+                    and the scope defines if mediator instances share a common cache per every host
+                    instance, or per every cache mediator pair (i.e. 'id') instance. 'collector'
+                    attribute value 'true' specifies that the mediator instance is a response
+                    collection instance, and 'false' specifies that its a cache serving instance.
+                    The maximum size of a message to be cached could be specified with the optional
+                    'maxMessageSize' attributes in bytes and defaults to unlimited. Finally,
+                    'implementation' element may define if the cache is disk or memory based, and
+                    'maxSize' attribute defines the maximum number of elements to be cached.
+                </p>
+            </subsection>
+            <subsection name="Callout Mediator" id="Callout">
+                <p>
+                    Callout mediator performs a blocking external service invocation during
+                    mediation. 'serviceURL' and optional 'action' attributes specify the parameters
+                    for the external service call. The source element specifies the payload for the
+                    request message using an XPath expression; or a registry key. The target element
+                    specifies a node, at which the response payload will be attached into the
+                    current message, or the name of a key/property using which the response would be
+                    attached to the current message context as a property.
+                </p>
+                <div class="xmlConf">&lt;callout serviceURL="string" [action="string"]&gt;
+    &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+    &lt;source xpath="expression" | key="string"&gt;
+    &lt;target xpath="expression" | key="string"/&gt;
+&lt;/callout&gt;</div>
+                <p>
+                    Since the callout mediator performs a blocking call, it cannot use the default
+                    non-blocking http/s transports based on Java NIO, and thus defaults to using the
+                    samples/axis2Client/client_repo/conf/axis2.xml as the Axis2 configuration, and
+                    samples/axis2Client/client_repo as the client repository unless these are
+                    specified otherwise inside the 'configuration' subelement.
+                </p>
+            </subsection>
+            <subsection name="Clone Mediator" id="Clone">
+                <p>
+                    Clone mediator can be used to create several clones or copies of a message. This
+                    mediator implements the Message Splitter EIP by splitting the message into
+                    number of identical messages which will be processed in parallel. They can also
+                    be set to process sequentially by setting the value of the optional 'sequential'
+                    attribute to 'true'.
+                </p>
+                <div class="xmlConf">&lt;clone [id="string"] [sequential=(true | false)] [continueParent=(true | false)]&gt;
+    &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"] [endpoint="endpoint_ref"]&gt;
+        &lt;sequence&gt;
+            (mediator)+
+        &lt;/sequence&gt;?
+        &lt;endpoint&gt;
+            endpoint
+        &lt;/endpoint&gt;?
+    &lt;/target&gt;+
+&lt;/clone&gt;</div>
+                <p>
+                    The original message can be continued or dropped depending on the boolean value
+                    of the optional 'continueParent' attribute. Optionally a custom 'To' address
+                    and/or a 'Action' may be specified for cloned messages. The optional 'id'
+                    attribute can be used to identify the clone mediator which created a particular
+                    split message when nested clone mediators are used. This is particularly useful
+                    when aggregating responses of messages that were created using nested clone
+                    mediators.
+                </p>
+            </subsection>
+            <subsection name="Iterate Mediator" id="Iterate">
+                <p>
+                    Iterate mediator splits the message into number of different messages
+                    derived from the parent message by finding matching elements for the XPath
+                    expression specified. New messages will be created for each matching element and
+                    processed in parallel (default behavior) using either the specified sequence or
+                    endpoint.
+                </p>
+                <div class="xmlConf">&lt;iterate [id="string"] [continueParent=(true | false)] [preservePayload=(true | false)] [sequential=(true | false)]
+        (attachPath="xpath")? expression="xpath"&gt;
+    &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"] [endpoint="endpoint_ref"]&gt;
+        &lt;sequence&gt;
+            (mediator)+
+        &lt;/sequence&gt;?
+        &lt;endpoint&gt;
+            endpoint
+        &lt;/endpoint&gt;?
+    &lt;/target&gt;+
+ &lt;/iterate&gt;</div>
+                <p>
+                    Created messages can also be set to process sequentially by setting the optional
+                    'sequential' attribute to 'true'. Parent message can be continued or dropped in
+                    the same way as in the clone mediator. The 'preservePayload' attribute specifies
+                    if the original message should be used as a template when creating the split
+                    messages, and defaults to 'false', in which case the split messages would
+                    contain the split elements as the SOAP body. The optional 'id' attribute can be
+                    used to identify the iterator which created a particular split message when
+                    nested iterate mediators are used. This is particularly useful when aggregating
+                    responses of messages that are created using nested iterate mediators.
+                </p>
+            </subsection>
+            <subsection name="Transaction Mediator" id="Transaction">
+                <p>
+                    Transaction mediator can provide transaction facility for a set of mediators
+                    defined as its child mediators. A transaction mediator with the action "new"
+                    indicates the entry point for the transaction. A transaction is marked completed
+                    by a transaction mediator with the action "commit". The suspend and resume
+                    actions are used to pause a transaction at some point and start it again later.
+                    Additionally, the transaction mediator supports three other actions, i.e.
+                    use-existing-or-new, fault-if-no-tx, rollback.
+                </p>
+                <div class="xmlConf">&lt;transaction action="new|use-existing-or-new|fault-if-no-tx|commit|rollback|suspend|resume"/&gt;</div>
+                <ul>
+                    <li>Commit transaction: End the transaction</li>
+                    <li>Fault if no transaction: Go to error handler if no transaction</li>
+                    <li>Initiate new transaction: Entry point for new transaction</li>
+                    <li>Resume transaction: Resume a puased transaction</li>
+                    <li>Suspend transaction: Puase a transaction</li>
+                    <li>Rollback transaction: Rollback a transaction</li>
+                    <li>Use existing or initiate transaction: If a transaction already exists
+                        continue it or create a new transaction</li>
+                </ul>
             </subsection>
         </section>
     </body>

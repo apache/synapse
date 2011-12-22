@@ -42,6 +42,16 @@ public class DerbyServerController implements BackEndServerController {
             server = new NetworkServerControl
                     (InetAddress.getByName("localhost"), 1527);
             server.start(null);
+
+            while (true) {
+                try {
+                    server.ping();
+                    break;
+                } catch (Exception ignored) {
+                    log.info("Waiting for Derby server to start...");
+                    Thread.sleep(2000);
+                }
+            }
             log.info("Derby is successfully started.");
 
         } catch (Exception e) {

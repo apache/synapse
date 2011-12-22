@@ -210,9 +210,9 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("360", Sample360.class);
         sampleClassRepo.put("361", Sample361.class);
         sampleClassRepo.put("362", Sample362.class);
-        //sampleClassRepo.put("370", Sample370.class);   // neethi 3.0.x and wso2throttle incompatibility
-        //sampleClassRepo.put("371", Sample371.class);
-        //sampleClassRepo.put("372", Sample372.class);
+        sampleClassRepo.put("370", Sample370.class);
+        sampleClassRepo.put("371", Sample371.class);
+        sampleClassRepo.put("372", Sample372.class);
         sampleClassRepo.put("380", Sample380.class);
         sampleClassRepo.put("390", Sample390.class);
         sampleClassRepo.put("391", Sample391.class);

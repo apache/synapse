@@ -7,6 +7,34 @@
             <ul>
                 <li><a href="#Intro">Introduction</a></li>
                 <li><a href="#Categories">Mediator Categories</a></li>
+                <li>
+                    <a href="#CoreMediators">Core Mediators</a>
+                    <ul>
+                        <li><a href="#Drop">Drop Mediator</a></li>
+                        <li><a href="#Log">Log Mediator</a></li>
+                        <li><a href="#Property">Property Mediator</a></li>
+                        <li><a href="#Send">Send Mediator</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#FilterMediators">Filter Mediators</a>
+                    <ul>
+                        <li><a href="#Filter">Filter Mediator</a></li>
+                        <li><a href="#InOut">In/Out Mediator</a></li>
+                        <li><a href="#Switch">Switch Mediator</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#FilterMediators">Transformation Mediators</a>
+                    <ul>
+                        <li><a href="#XSLT">XSLT Mediator</a></li>
+                        <li><a href="#XQuery">XQuery Mediator</a></li>
+                        <li><a href="#MakeFault">MakeFault Mediator</a></li>
+                        <li><a href="#Header">Header Mediator</a></li>
+                        <li><a href="#URLRewrite">URL Rewrite Mediator</a></li>
+                        <li><a href="#PayloadFactory">Payload Factory Mediator</a></li>
+                    </ul>
+                </li>
             </ul>
         </section>
         <section name="Introduction" id="Intro">
@@ -241,6 +269,303 @@
                     and release the calling thread as soon as possible. Synapse will asynchronously
                     handle the response from the endpoint while the giving the illusion that Synapse
                     is making blocking service calls.
+                </p>
+            </subsection>
+        </section>
+        <section name="Filter Mediators" id="Filter Mediators">
+            <subsection name="Filter Mediator" id="Filter">
+                <p>
+                    Filter mediator adds 'if-else' like semantics to the Synapse configuration language.
+                    It can be used to evaluate a condition on a message and take some action
+                    based on the outcome. The configuration of the filter mediator takes the
+                    following form.
+                </p>
+                <div class="xmlConf">&lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+    mediator+
+&lt;/filter&gt;</div>
+                <p>
+                    The filter mediator either tests the given XPath expression as a boolean
+                    expression, or matches the result of the source XPath expression as a string
+                    against the given regular expression. If the condition evaluates to true, the
+                    filter mediator will execute the enclosed child mediators.
+                </p>
+                <p>
+                    Alternatively one can use the following syntax to configure the filter mediator.
+                </p>
+                <div class="xmlConf">&lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+    &lt;then [sequence="string"]&gt;
+        mediator+
+    &lt;/then&gt;
+    &lt;else [sequence="string"]&gt;
+        mediator+
+    &lt;/else&gt;
+&lt;/filter&gt;</div>
+                <p>
+                    In this case too the filter condition is evaluated in the same manner as
+                    described above. Messages for which the condition evaluates to true will be
+                    mediated through the mediators enclosed by the 'then' element. Failed messages
+                    will be mediated through the mediators enclosed by the 'else' element.
+                </p>
+            </subsection>
+            <subsection name="In/Out Mediators" id="InOut">
+                <p>
+                    In mediator and Out mediator are used to filter out traffic based on the
+                    direction of the messages. As their names imply, In mediator processes only
+                    the requests (in messages) while ignoring the responses (out messages). The
+                    out mediator does the exact opposite by processing only the responses while
+                    ignoring the requests. In many occasions these two mediators are deployed
+                    together to create separate flows for requests and responses. The syntax
+                    outline for the two mediators is given below.
+                </p>
+                <div class="xmlConf">&lt;in&gt;
+    mediator+
+&lt;/in&gt;
+
+&lt;out&gt;
+    mediator+
+&lt;/out&gt;</div>
+                <p>
+                    In mediator will process requests through the child mediators anf the Out
+                    mediator will process responses through the child mediators.
+                </p>
+            </subsection>
+            <subsection name="Switch Mediator" id="Switch">
+                <p>
+                    Switch mediator provides switch-case semantics in the Synapse configuration
+                    language.
+                </p>
+                <div class="xmlConf">&lt;switch source="xpath"&gt;
+    &lt;case regex="string"&gt;
+        mediator+
+    &lt;/case&gt;+
+    &lt;default&gt;
+        mediator+
+    &lt;/default&gt;?
+&lt;/switch&gt;</div>
+                <p>
+                    The source XPath is executed on the messages. The resulting value is then
+                    tested against the regular expressions defined in each 'case' element. When
+                    a matching case is found the message will be mediated through its child
+                    mediators. If none of the cases match, the message will handed to the 'default'
+                    case (if available).
+                </p>
+            </subsection>
+        </section>
+        <section name="Transformation Mediators" id="TransformationMediators">
+            <subsection name="XSLT Mediator" id="XSLT">
+                <p>
+                    XSLT mediator applies the specified XSLT transformation to the selected
+                    element of the current message payload. 'source' attribute selects the source
+                    element to apply the transformation on. Where not specified, it defaults to the
+                    first child of the SOAP body. Output of the transformation replaces the source
+                    element when 'target' attribute is not specified. Otherwise, the output is
+                    stored in the property specified by the 'target' attribute.
+                </p>
+                <div class="xmlConf">&lt;xslt key="string" [source="xpath"] [target="string"]&gt;
+    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+    &lt;feature name="string" value="true | false" /&gt;*
+    &lt;attribute name="string" value="string" /&gt;*
+    &lt;resource location="..." key="..."/&gt;*
+&lt;/xslt&gt;</div>
+                <p>
+                    If the output method specified by the stylesheet is text (i.e. the stylesheet
+                    has the <tt>&lt;xsl:output method="text"/&gt;</tt> directive),
+                    then the output of the transformation is wrapped in an element with name
+                    <tt>{http://ws.apache.org/commons/ns/payload}text</tt>. Note that when an
+                    element with this name is present as the first child of the SOAP body of an
+                    outgoing message, JMS and VFS transports automatically unwrap the
+                    content and send it out as plain text. XSLT mediator can therefore be used for
+                    integration with systems relying on plain text messages.
+                </p>
+                <p>
+                    Usage of sub-elements of XSLT mediator configuration is as follows:
+                </p>
+                <ul>
+                    <li>
+                        property - Stylesheet parameters can be passed into the transformations
+                        using 'property' elements.
+                    </li>
+                    <li>
+                        feature - Defines any features which should be explicitly set to the
+                        TransformerFactory. For example,
+                        <tt>'http://ws.apache.org/ns/synapse/transform/feature/dom'</tt> feature
+                        enables DOM based transformations instead of serializing elements into byte
+                        streams and/or temporary files. Although enabling this feature could improve
+                        performance of the transformation, it might not work for all transformations.
+                    </li>
+                    <li>
+                        attribute - Defines attributes which should be explicitly set on the
+                        TransformerFactory.
+                    </li>
+                    <li>
+                        resource - Can be used to resolve XSLT imports and includes from the
+                        repository. It works in exactly the same way as the corresponding element in
+                        a &lt;proxy&gt; definition.
+                    </li>
+                </ul>
+            </subsection>
+            <subsection name="XQuery Mediator" id="XQuery">
+                <p>
+                    The XQuery mediator can be used to perform an XQuery transformation. 'key'
+                    attribute specifies the XQuery transformation, and the optional 'target'
+                    attribute specifies the node of the message that should be transformed.
+                    This defaults to the first child of the SOAP body of the payload. 'variable'
+                    element defines a variable that could be bound to the dynamic context of the
+                    XQuery engine in order to access those variables through the XQuery script.
+                </p>
+                <div class="xmlConf">&lt;xquery key="string" [target="xpath"]&gt;
+    &lt;variable name="string" type="string" [key="string"] [expression="xpath"] [value="string"]/&gt;?
+&lt;/xquery&gt;</div>
+                <p>
+                    It is possible to specify just a literal 'value', or an XPath expression
+                    over the payload, or even specify a registry key or a registry key
+                    combined with an XPath expression that selects the variable. The name of
+                    the variable corresponds to the name of variable declaration in the XQuery
+                    script. The 'type' of the variable must be a valid type defined by the
+                    JSR-000225 (XQJ API).
+                </p>
+                <p>
+                    The supported types are:
+                </p>
+                <ul>
+                    <li>
+                        XQItemType.XQBASETYPE_INT -&gt; INT
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_BYTE - &gt; BYTE
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_SHORT -&gt; SHORT
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_LONG -&gt; LONG
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_STRING -&gt; STRING
+                    </li>
+                    <li>
+                        XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT
+                    </li>
+                    <li>
+                        XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT
+                    </li>
+                    <li>
+                        XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT
+                    </li>
+                </ul>
+            </subsection>
+            <subsection name="MakeFault Mediator" id="MakeFault">
+                <p>
+                    MakeFault mediator mediator transforms the current message into a fault message.
+                    It should be noted that makeFault mediator does NOT send the message after
+                    transforming it. A &lt;send&gt; mediator needs to be invoked separately to send
+                    a fault message created by this mediator.
+                </p>
+                <div class="xmlConf">&lt;makefault [version="soap11|soap12|pox"] [response="true|false"]&gt;
+    &lt;code (value="literal" | expression="xpath")/&gt;
+    &lt;reason (value="literal" | expression="xpath")/&gt;
+    &lt;node&gt;...&lt;/node&gt;?
+    &lt;role&gt;...&lt;/role&gt;?
+   (&lt;detail expression="xpath"/&gt; | &lt;detail&gt;...&lt;/detail&gt;)?
+&lt;/makefault&gt;</div>
+                <p>
+                    The fault message "To" header is set to the "Fault-To" of the original message
+                    if such a header exists on the original message. Depending on the 'version'
+                    attribute, the fault message is created as a SOAP 1.1, SOAP 1.2
+                    or POX fault. If the optional response attribute value is set as 'true',
+                    makefault mediator marks the message as a response. Optional &lt;node&gt;,
+                    &lt;role&gt; and &lt;detail&gt; subelements in the mediator configuration can
+                    be used to set the corresponding elements in the resulting SOAP fault.
+                </p>
+            </subsection>
+            <subsection name="Header Mediator" id="Header">
+                <p>
+                    Header mediator sets or removes a specified header from the current SOAP
+                    infoset. The optional 'action' attribute specifies whether the mediator should
+                    set or remove the header. If omitted, it defaults to set action.
+                </p>
+                <div class="xmlConf">&lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
+&lt;header name="qname" action="remove"/&gt;</div>
+                <p>
+                    The value of the 'name' attribute must be one of the following aliases or
+                    a valid QName with a namespace prefix. In the latter case the namespace prefix
+                    must be mapped to a valid namespace URI using the standard xmlns attribute.
+                </p>
+                <ul>
+                    <li>To</li>
+                    <li>From</li>
+                    <li>Action</li>
+                    <li>FaultTo</li>
+                    <li>ReplyTo</li>
+                    <li>RelatesTo</li>
+                </ul>
+            </subsection>
+            <subsection name="URL Rewrite Mediator" id="URLRewrite">
+                <p>
+                    URL Rewrite mediator can be used to modify and transform the URL values
+                    available in the message. By default, this mediator takes the 'To' header of the
+                    message and apples the provided rewrite rules on it. Alternatively, one can
+                    specify a property name in the 'inProperty' attribute, in which case the
+                    mediator takes the value of the specified property as the input URL.
+                </p>
+                <p>
+                    Similarly the mediator by default sets the transformed URL as the 'To' header of
+                    the message and alternatively you can use the 'outProperty' attribute to
+                    instruct the mediator to set the resulting URL as a property.
+                </p>
+                <div class="xmlConf">&lt;rewrite [inProperty="string"] [outProperty="string"]&gt;
+    &lt;rewriterule&gt;
+        &lt;condition&gt;
+        ...
+        &lt;/condition&gt;?
+        &lt;action [type="append|prepend|replace|remove|set"] [value="string"]
+          [xpath="xpath"] [fragment="protocol|host|port|path|query|ref|user|full"] [regex="regex"]&gt;+
+    &lt;/rewriterule&gt;+
+&lt;/rewrite&gt;</div>
+                <p>
+                    The mediator applies URL transformations by evaluating a set of rules on
+                    the message. Rules are specified using the 'rewriterule' element. Rules are
+                    evaluated in the order in which they are specified. A rule can consist of an
+                    optional condition and one or more rewrite actions. If the condition is provided,
+                    it is evaluated first and specified rewrite actions are executed only if the
+                    condition evaluates to true. If no condition is specified, the provided rewrite
+                    actions will be always executed. The condition should be wrapped in a 'condition'
+                    element within the 'rewriterule' element. Rewrite actions are specified using
+                    'action' elements.
+                </p>
+            </subsection>
+            <subsection name="Payload Factory Mediator" id="PayloadFactory">
+                <p>
+                    Payload-factory mediator creates a new SOAP payload for the message, replacing
+                    the existing one. <tt>printf()</tt> style formatting is used to configure the
+                    transformation performed by this mediator.
+                </p>
+                <div class="xmlConf">&lt;payloadFactory&gt;
+    &lt;format&gt;&quot;xmlstring&quot;&lt;/format&gt;
+    &lt;args&gt;
+        &lt;arg (value=&quot;literal&quot; | expression=&quot;xpath&quot;)/&gt;*
+    &lt;/args&gt;
+&lt;/payloadFactory&gt;</div>
+
+                <p>
+                    'format' sub-element of the mediator configuration specifies the format of the
+                    new payload. All $n occurrences in the format will be replaced by the value of
+                    the n th argument at runtime. Each argument in the mediator configuration could
+                    be a static value or an XPath expression. When an expression is used, value is
+                    fetched at runtime by evaluating the provided XPath expression against the
+                    existing SOAP message/message context.
                 </p>
             </subsection>
         </section>

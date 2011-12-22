@@ -57,7 +57,12 @@
                         <li><a href="#Cache">Cache Mediator</a></li>
                         <li><a href="#Callout">Callout Mediator</a></li>
                         <li><a href="#Clone">Clone Mediator</a></li>
+                        <li><a href="#DBLookup">DBLookup Mediator</a></li>
+                        <li><a href="#DBReport">DBReport Mediator</a></li>
                         <li><a href="#Iterate">Iterate Mediator</a></li>
+                        <li><a href="#RMSequence">RMSequence Mediator</a></li>
+                        <li><a href="#Store">Store Mediator</a></li>
+                        <li><a href="#Throttle">Throttle Mediator</a></li>
                         <li><a href="#Transaction">Transaction Mediator</a></li>
                     </ul>
                 </li>
@@ -817,7 +822,7 @@
                     non-blocking http/s transports based on Java NIO, and thus defaults to using the
                     samples/axis2Client/client_repo/conf/axis2.xml as the Axis2 configuration, and
                     samples/axis2Client/client_repo as the client repository unless these are
-                    specified otherwise inside the 'configuration' subelement.
+                    specified otherwise inside the 'configuration' sub-element.
                 </p>
             </subsection>
             <subsection name="Clone Mediator" id="Clone">
@@ -846,6 +851,125 @@
                     split message when nested clone mediators are used. This is particularly useful
                     when aggregating responses of messages that were created using nested clone
                     mediators.
+                </p>
+            </subsection>
+            <subsection name="DBLookup" id="DBLookup">
+                <p>
+                    DB Lookup mediator is capable of executing an arbitrary SQL SELECT statement,
+                    and then set some resulting values as local message properties on the message
+                    context. The DB connection used maybe looked up from an external DataSource or
+                    specified in-line, in which case an Apache DBCP connection pool is established
+                    and used.
+                </p>
+                <div class="xmlConf">&lt;dblookup&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+        (
+            &lt;driver/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+            &lt;property name="name" value="value"/&gt;*
+        |
+            &lt;dsName/&gt;
+            &lt;inClass/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+        )
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;statement&gt;
+        &lt;sql&gt;SELECT something FROM table WHERE something_else = ?&lt;/sql&gt;
+        &lt;parameter [value="" | expression=""] type="CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP"/&gt;*
+        &lt;result name="string" column="int|string"/&gt;*
+    &lt;/statement&gt;+
+&lt;/dblookup&gt;</div>
+                <p>
+                    For in-lined data sources the following parameters have to be specified.
+                </p>
+                <ul>
+                    <li>driver: Fully qualified class name of the database driver.</li>
+                    <li>url: Database URL.</li>
+                    <li>user: Username for database access.</li>
+                    <li>password: Password for database access.</li>
+                </ul>
+                <p>
+                    This new data source is based on Apache DBCP connection pools. This connection
+                    pool support the following configuration properties:
+                </p>
+                <ul>
+                    <li>autocommit = true | false</li>
+                    <li>isolation = Connection.TRANSACTION_NONE | Connection.TRANSACTION_READ_COMMITTED | Connection.TRANSACTION_READ_UNCOMMITTED |
+                        Connection.TRANSACTION_REPEATABLE_READ | Connection.TRANSACTION_SERIALIZABLE</li>
+                    <li>initialsize = int</li>
+                    <li>maxactive = int</li>
+                    <li>maxidle = int</li>
+                    <li>maxopenstatements = int</li>
+                    <li>maxwait = long</li>
+                    <li>minidle = int</li>
+                    <li>poolstatements = true | false</li>
+                    <li>testonborrow = true | false</li>
+                    <li>testonreturn = true | false</li>
+                    <li>testwhileidle = true | false</li>
+                    <li>validationquery = String</li>
+                </ul>
+                <p/>
+                <p>
+                    When an external data source is used the following parameters have to be
+                    specified.
+                </p>
+                <ul>
+                    <li>dsName: The name of the data source to be looked up.</li>
+                    <li>icClass: Initial context factory class. The corresponding Java environment property is java.naming.factory.initial</li>
+                    <li>url: The naming service provider URL. The corresponding Java environment property is java.naming.provider.url</li>
+                    <li>user: Username corresponding to the Java environment property java.naming.security.principal</li>
+                    <li>password: Password corresponding to the Java environment property java.naming.security.credentials</li>
+                </ul>
+                <p>
+                    More than one statement can be included in the mediator configuration. SQL
+                    statement may specify parameters which could be specified as values or XPath
+                    expressions. The type of a parameter could be any valid SQL type. 'result'
+                    sub-element contains 'name' and 'column' attributes which define the name
+                    under which the result is stored in the Synapse message context, and a column
+                    number or name respectively.
+                </p>
+            </subsection>
+            <subsection name="DBReport" id="DBReport">
+                <p>
+                    DB Report mediator is quite similar to the
+                    <a href="#DBReport">DB Lookup</a>
+                    mediator, but writes data into a database instead of reading data from a
+                    database.
+                </p>
+                <div class="xmlConf">&lt;dbreport useTransaction=(true|false)&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+        (
+            &lt;driver/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+            &lt;property name="name" value="value"/&gt;*
+        |
+            &lt;dsName/&gt;
+            &lt;icClass/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+        )
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;statement&gt;
+        &lt;sql&gt;INSERT INTO table VALUES (?, ?, ?, ?)&lt;/sql&gt;
+        &lt;parameter [value="" | expression=""] type="CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP"/&gt;*
+    &lt;/statement&gt;+
+&lt;/dblreport&gt;</div>
+
+                <p>
+                    This mediator executes the specified SQL INSERT on the database specified
+                    in-line or as an external data source. For information on configuring database
+                    related mediators, refer<a href="#DBReport">DB Lookup mediator guide</a>.
                 </p>
             </subsection>
             <subsection name="Iterate Mediator" id="Iterate">
@@ -879,6 +1003,58 @@
                     responses of messages that are created using nested iterate mediators.
                 </p>
             </subsection>
+            <subsection name="RMSequence" id="RMSequence">
+                <p>
+                    RM Sequence mediator can be used to create a sequence of messages to communicate
+                    via WS-Reliable Messaging with a WS-RM enabled endpoint.
+                </p>
+                <div class="xmlConf">&lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</div>
+                <p>
+                    The simplest use case of this mediator sets 'single' attribute to "true",
+                    which means that only one message is involved in the same sequence. However, if
+                    multiple messages should be sent in the same sequence, 'correlation' attribute
+                    should be used with an XPath expression that selects a unique element value from
+                    the incoming message. With the result of the XPath expression, Synapse can group
+                    messages together that belong to the same sequence. To close the sequence
+                    neatly, an XPath expression should be specified for the last message of the
+                    sequence as well. The optional 'version' attribute, which specifies the WS-RM
+                    specification version as 1.0 or 1.1, defaults to 1.0.
+                </p>
+            </subsection>
+            <subsection name="Store" id="Store">
+                <p>
+                    Store mediator can be used to store the current message in a specific message
+                    store.
+                </p>
+                <div class="xmlConf">&lt;store messageStore="string" [sequence="sequence-ref"]&gt;</div>
+                <p>
+                    In the mediator configuration 'messageStore' attribute is used to specify the
+                    message store to store the message in. The optional 'sequence' attribute
+                    specifies a sequence through which the message is sent before storing it.
+                </p>
+            </subsection>
+            <subsection name="Throttle Mediator" id="Throttle">
+                 <p>
+                     Throttle mediator can be used for rate limiting as well as concurrency based
+                     limiting. A WS-Policy dictates the throttling configuration and can be
+                     specified inline or loaded from the registry. Please refer to the samples
+                     document for sample throttling policies.
+                 </p>
+                <div class="xmlConf">&lt;throttle [onReject="string"] [onAccept="string"] id="string"&gt;
+    (&lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;)
+    &lt;onReject&gt;..&lt;/onReject&gt;?
+    &lt;onAccept&gt;..&lt;/onAccept&gt;?
+&lt;/throttle&gt;</div>
+                 <p>
+                     The throttle mediator could be used in the request path for rate limiting and
+                     concurrent access limiting. When it's used for concurrent access limitation,
+                     the same throttle mediator 'id' must be triggered on the response flow so that
+                     completed responses are deducted from the available limit. (i.e. two instances
+                     of the throttle mediator with the same 'id' attribute in the request and
+                     response flows). 'onReject' and 'onAccept' sequence references or inline
+                     sequences define how accepted and rejected messages are handled.
+                 </p>
+            </subsection>
             <subsection name="Transaction Mediator" id="Transaction">
                 <p>
                     Transaction mediator can provide transaction facility for a set of mediators
@@ -891,14 +1067,14 @@
                 </p>
                 <div class="xmlConf">&lt;transaction action="new|use-existing-or-new|fault-if-no-tx|commit|rollback|suspend|resume"/&gt;</div>
                 <ul>
-                    <li>Commit transaction: End the transaction</li>
-                    <li>Fault if no transaction: Go to error handler if no transaction</li>
-                    <li>Initiate new transaction: Entry point for new transaction</li>
-                    <li>Resume transaction: Resume a puased transaction</li>
-                    <li>Suspend transaction: Puase a transaction</li>
-                    <li>Rollback transaction: Rollback a transaction</li>
-                    <li>Use existing or initiate transaction: If a transaction already exists
-                        continue it or create a new transaction</li>
+                    <li>new: Initiate a new transaction.</li>
+                    <li>use-existing-or-new: If a transaction already exists
+                        continue it, otherwise create a new transaction.</li>
+                    <li>fault-if-no-tx: Go to the error handler if no transaction exists.</li>
+                    <li>commit: End the transaction.</li>
+                    <li>rollback: Rollback a transaction.</li>
+                    <li>suspend: Pause a transaction.</li>
+                    <li>resume: Resume a paused transaction.</li>
                 </ul>
             </subsection>
         </section>

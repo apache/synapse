@@ -107,7 +107,7 @@
                 diagram illustrates different functional components of Synapse and how they interact
                 with each other.
             </p>
-            <!-- Image goes here -->
+            <img src="../images/synapse-flow.png"/>
             <p>
                 All the functional components of the Synapse configuration are configured through
                 XML files. The Synapse configuration language governs the XML syntax used to define

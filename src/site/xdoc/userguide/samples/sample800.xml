@@ -23,11 +23,8 @@
         <title>Apache Synapse - Sample 800</title>
     </properties>
     <body>
-        <section name="Sample 800: Introduction to REST API">
+        <section name="Sample 800: Introduction to REST APIs">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- You can add any flat sequences, endpoints, etc.. to this synapse.xml file if you do
-    *not* want to keep the artifacts in several files --&gt;
 &lt;api name="StockQuoteAPI" context="/stockquote"&gt;
    &lt;resource uri-template="/view/{symbol}" methods="GET"&gt;
       &lt;inSequence&gt;
@@ -68,7 +65,11 @@
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-                    Objective: Introduction to REST API
+                    APIs in Synapse provide a convenient approach for receiving and processing
+                    REST traffic through the service bus. APIs can be used to receive specific
+                    types of RESTful invocations and then process them through a set of user
+                    defined resources. This sample is aimed at introducing the basic capabilities
+                    of APIs and how they are configured to front existing services.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">

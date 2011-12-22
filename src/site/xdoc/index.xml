@@ -37,25 +37,37 @@
             <p>
                 Apache Synapse is free and open source software distributed under the
                 <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
-                The latest version of Synaspe is <a href="download/2.0/download.cgi">v2.0</a>.
+                The latest version of Synaspe is <a href="download/2.1/download.cgi">v2.1</a>.
                 This release comes with a horde of new features, bug fixes, performance and
                 stability improvements.
             </p>
         </section>
-        <section name="New in Version 2.0">
+        <section name="New in Version 2.1">
             <ul>
-                <li>New, fine-grained configuration model</li>
-                <li>Hot deployment and hot update support for configuration artifacts</li>
-                <li>Priority based mediation support</li>
-                <li>Comprehensive eventing capabilities with WS-Eventing support</li>
-                <li>Secure vault for encrypting passwords in configuration files</li>
-                <li>File locking support in the VFS transport for concurrent polling</li>
-                <li>URLRewrite medaitor for fast and simple URL rewriting</li>
-                <li>Synapse configuration observer API</li>
-                <li>Multiple identity support in the HTTPS transport</li>
-                <li>Enhanced JMX monitoring support for the NHTTP transport</li>
-                <li>Dead letter channel implementation (experimental)</li>
-                <li>Synapse XAR Maven plugin for generating configuration artifacts</li>
+                <li>
+                    Support for creating and managing REST APIs with URL patterns and URI templates
+                </li>
+                <li>
+                    Define sequences and endpoints as templates and reuse seamlessly across the
+                    whole configuration
+                </li>
+                <li>
+                    Payload factory mediator for constructing custom XML payloads
+                </li>
+                <li>
+                    Recipient list endpoint
+                </li>
+                <li>
+                    HTTPD like access logging capability in the NHTTP transport
+                </li>
+                <li>
+                    Message stores and message processors for implementing complex integration
+                    patterns and advanced messaging scenarios
+                </li>
+                <li>
+                    Receiving sequence support in the send mediator to make service chaining
+                    easier
+                </li>
             </ul>
         </section>
         <section name="Key Features">
@@ -87,6 +99,35 @@
                 <li>Easily extendable with Java, Spring, or BSF Scripting languages (Javascript,
                     Ruby, Groovy, etc.)</li>
             </ul>
+        </section>
+        <section name="High Level Architecture">
+            <p>
+                Apache Synapse is designed to be lightweight and fast. The non-blocking HTTP
+                transport, the multi-threaded mediation engine and the streaming XML infoset combine
+                to ensure that Synapse can mediate very high volumes of messages through the service
+                bus with minimum delay and resource usage. Synapse also comes with comprehensive
+                logging capabilities, statistics collection and JMX monitoring support which are
+                crucial in production deployments.
+            </p>
+            <img src="images/synapse-arch.png"/>
+            <p>
+                Synapse uses the Apache Axis2 as the underlying Web Services engine. Therefore it
+                has outstanding support for Web Services and related standards such as SOAP and
+                WSDL. Tried and tested Axis2 modules like Apache Rampart and Apache Sandesha2 can be
+                used with Synapse with no configuration overhead. Using such external modules,
+                Apache Synapse supports a range of Web Services standards including WS-Security and
+                WS-Reliable Messaging. Synapse also makes use of the Axis2 clustering framework to
+                provide enterprise grade clustering support.
+            </p>
+            <p>
+                Synapse is configured using a simple, XML-based configuration language. The
+                configuration language and the related functional components are designed with SOA
+                best practices in mind. It is trivial to store configuration fragments in an external
+                SOA registry and import them to the mediation engine on demand. Synapse ships with a
+                large collection of mediators that can be used to implement even the most complex
+                enterprise integration scenarios. If necessary, the mediation engine can be extended
+                by developing custom mediators using Java or your favorite scripting language.
+            </p>
         </section>
     </body>
 </document>

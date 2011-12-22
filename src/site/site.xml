@@ -52,7 +52,7 @@
         <menu name="Developer Resources">
             <item name="Developer Guide " href="dev/developer-guide.html"/>
             <item name="Developer Best Practices"/>
-            <item name="Release Process"/>
+            <item name="Release Process" href="dev/release-process.html"/>
             <item name="How to Contribute"/>
         </menu>
         <menu name="Project Details">

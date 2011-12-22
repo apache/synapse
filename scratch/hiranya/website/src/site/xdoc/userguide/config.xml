@@ -24,9 +24,53 @@
     </properties>
     <body>
         <section name="Contents">
-            
+            <ul>
+                <li><a href="#Intro">Introduction</a></li>
+                <li>
+                    <a href="#SynapseConfig">Synapse Configuration</a>
+                    <ul>
+                        <li><a href="#ServiceMediation">Service Mediation (Proxy Services)</a></li>
+                        <li><a href="#MessageMediation">Message Mediation</a></li>
+                        <li><a href="#TaskScheduling">Task Scheduling</a></li>
+                        <li><a href="#Eventing">Eventing</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#OverView">Functional Components Overview</a>
+                    <ul>
+                        <li><a href="#MediatorsAndSequences">Mediators and Sequences</a></li>
+                        <li><a href="#Endpoints">Endpoints</a></li>
+                        <li><a href="#ProxyServices">Proxy Services</a></li>
+                        <li><a href="#ScheduledTasks">Scheduled Tasks</a></li>
+                        <li><a href="#Registry">Remote Registry and Local Registry</a></li>
+                        <li><a href="#API">APIs</a></li>
+                        <li><a href="#PriorityExecutors">Priority Executors</a></li>
+                    </ul>
+                </li>
+                <li><a href="#ConfigFiles">Synapse Configuration Files</a></li>
+                <li><a href="#Syntax">Configuration Syntax</a></li>
+                <li><a href="#RegistryConfig">Registry Configuration</a></li>
+                <li><a href="#LocalEntryConfig">Local Entry (Local Registry) Configuration</a></li>
+                <li><a href="#SequenceConfig">Sequence Configuration</a></li>
+                <li>
+                    <a href="#EndpointConfig">Endpoint Configuration</a>
+                    <ul>
+                        <li><a href="#AddressEndpointConfig">Address Endpoint</a></li>
+                        <li><a href="#DefaultEndpointConfig">Default Endpoint</a></li>
+                        <li><a href="#WSDLEndpointConfig">WSDL Endpoint</a></li>
+                        <li><a href="#LBEndpointConfig">Load Balance Endpoint</a></li>
+                        <li><a href="#DLBEndpointConfig">Dynamic Load Balance Endpoint</a></li>
+                        <li><a href="#FOEndpointConfig">Fail-Over Endpoint</a></li>
+                    </ul>
+                </li>
+                <li><a href="#ProxyServiceConfig">Proxy Service Configuration</a></li>
+                <li><a href="#TaskConfig">Scheduled Task Configuration</a></li>
+                <li><a href="#EventSourceConfig">Event Source Configuration</a></li>
+                <li><a href="#APIConfig">API Configuration</a></li>
+                <li><a href="#ExecutorConfig">Priority Executor Configuration</a></li>
+            </ul>
         </section>
-        <section name="Introduction">
+        <section name="Introduction" id="Intro">
             <p>
                 Apache Synapse loads its configuration from a set of XML files. This enables the
                 user to easily hand edit the configuration, maintain backups and even include the
@@ -48,7 +92,7 @@
                 syntax used to configure various elements in Synapse.
             </p>
         </section>
-        <section name="The Synapse Configuration">
+        <section name="The Synapse Configuration" id="SynapseConfig">
             <p>
                 A typical Synapse configuration is comprised of sequences, endpoints, proxy services
                 and local entries. In certain advanced scenarios, Synapse configuration may also
@@ -83,7 +127,7 @@
                 Depending on how functional components are used in the Synapse configuration, Synapse
                 can execute in one or more of the following operational modes.
             </p>
-            <subsection name="Service Mediation (Proxy Services)">
+            <subsection name="Service Mediation (Proxy Services)" id="ServiceMediation">
                 <p>
                     In service mediation, the Synapse ESB exposes a service endpoint on the ESB, which
                     accepts messages from clients. Typically these services acts as proxies for existing
@@ -98,7 +142,7 @@
                     and VFS file systems.
                 </p>
             </subsection>
-            <subsection name="Message Mediation">
+            <subsection name="Message Mediation" id="MessageMediation">
                 <p>
                     In message mediation, Synapse acts as a transparent proxy for clients. This way,
                     Synapse could be configured to filter all the messages on a network for logging,
@@ -109,7 +153,7 @@
                     the name 'main'.
                 </p>
             </subsection>
-            <subsection name="Task Scheduling">
+            <subsection name="Task Scheduling" id="TaskScheduling">
                 <p>
                     In task scheduling, Synapse can execute a predefined task (job) based on a user
                     specified schedule. This way a task can be configured to run exactly once or
@@ -120,7 +164,7 @@
                     service, poll databases and execute other periodic maintenance activities.
                 </p>
             </subsection>
-            <subsection name="Eventing">
+            <subsection name="Eventing" id="Eventing">
                 <p>
                     In eventing mode, Synapse can be used as an event source and users or systems can
                     subscribe to receive events from Synapse. Synapse can also act as an event broker
@@ -131,7 +175,7 @@
                 </p>
             </subsection>
         </section>
-        <section name="Functional Components Overview">
+        <section name="Functional Components Overview" id="Overview">
             <p>
                 As described in the previous section, Synapse engine is comprised of a range of
                 functional components. Synapse configuration language is used to define, configure
@@ -161,7 +205,7 @@
                     <li>Message stores and processors</li>
                 </ul>
             </p>
-            <subsection name="Mediators and Sequences">
+            <subsection name="Mediators and Sequences" id="MediatorsAndSequences">
                 <p>
                     The Synapse ESB defines a 'mediator' as a component which performs a predefined
                     action on a message during a message flow. It is the most fundamental message
@@ -206,7 +250,7 @@
                     error is encountered during the execution of the initial sequence.
                 </p>
             </subsection>
-            <subsection name="Endpoints">
+            <subsection name="Endpoints" id="Endpoints">
                 <p>
                     An Endpoint definition within Synapse defines an external service endpoint and
                     any attributes or semantics that should be followed when communicating with that
@@ -224,7 +268,7 @@
                     case the 'send' mediator would forward the message to the specified endpoint.
                 </p>
             </subsection>
-            <subsection name="Proxy Services">
+            <subsection name="Proxy Services" id="ProxyServices">
                 <p>
                     A proxy service is a virtual service exposed on Synapse. For the external
                     clients, a proxy service looks like a full fledged web service which has a
@@ -264,7 +308,7 @@
                     parameters.
                 </p>
             </subsection>
-            <subsection name="Scheduled Tasks">
+            <subsection name="Scheduled Tasks" id="ScheduledTasks">
                 <p>
                     A scheduled task is a job deployed in the Synapse runtime for periodic execution.
                     Users can program the jobs using the task API (Java) provided by Synapse. Once
@@ -273,7 +317,7 @@
                     the Unix Cron syntax.
                 </p>
             </subsection>
-            <subsection name="Remote Registry and Local Registry (Local Entries)">
+            <subsection name="Remote Registry and Local Registry (Local Entries)" id="Registry">
                 <p>
                     Synapse configuration can refer to an external registry/repository for resources
                     such as WSDLs, schemas, scripts, XSLT and XQuery transformations etc. One or
@@ -297,7 +341,7 @@
                     interface to suit the actual registry being used.
                 </p>
             </subsection>
-            <subsection name="APIs">
+            <subsection name="APIs" id="API">
                 <p>
                     An API is similar to a web application deployed in Synapse. It provides a
                     convenient approach for filtering and processing HTTP traffic (specially RESTful
@@ -326,7 +370,7 @@
                     not be based on REST.
                 </p>
             </subsection>
-            <subsection name="Priority Executors">
+            <subsection name="Priority Executors" id="PriorityExecutors">
                 <p>
                     Priority executors can be used to execute sequences with a given priority.
                     Priority executors are used in high load scenarios where user wants to execute
@@ -339,7 +383,7 @@
                 </p>
             </subsection>
         </section>
-        <section name="Synapse Configuration Files">
+        <section name="Synapse Configuration Files" id="ConfigFiles">
             <p>
                 All the XML files pertaining to the Synapse configuration are available in the
                 repository/conf/synapse-config directory of the Synapse installation. This file
@@ -399,7 +443,12 @@
     |   `-- task1.xml
     `-- templates</div>
         </section>
-        <section name="Configuration Syntax">
+        <section name="Configuration Syntax" id="Syntax">
+            <p>
+                Synapse ESB is configured using an XML based configuration language. This is a
+                Domain Specific Language (DSL) created and maintained by the Synapse community.
+                The language is designed to be simple, intuitive and easy to learn.
+            </p>
             <p>
                 As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.
                 All these different configuration items should be wrapped in a top level 'definitions'
@@ -432,7 +481,7 @@
                 types of components in the Synapse configuration.
             </p>
         </section>
-        <section name="Registry" id="registry">
+        <section name="Registry Configuration" id="RegistryConfig">
             <p>
                 The &lt;registry&gt; element is used to define the registry adapter used by the
                 Synapse runtime. The registry provider specifies an implementation class for the
@@ -455,8 +504,8 @@
                 'SimpleURLRegistry' and this can be configured as follows:
             </p>
             <div class="xmlConf">&lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
-  &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
-  &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+    &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
+    &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
 &lt;/registry&gt;</div>
             <p>
                 The 'root' parameter specifies the root URL of the registry for loaded resources. The
@@ -468,7 +517,7 @@
                 expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)
             </p>
         </section>
-        <section name="Local Entries (Local Registry)">
+        <section name="Local Entry (Local Registry) Configuration" id="LocalEntryConfig">
             <p>
                 Local entries provide a convenient way to import various external configuration
                 artifacts into the Synapse runtime. This includes WSDLs, policies, XSLT files,
@@ -493,7 +542,7 @@
 
 &lt;localEntry key="validate_schema"&gt;
     &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-     ...
+        ...
     &lt;/xs:schema&gt;
 &lt;/localEntry&gt;</div>
             <p>
@@ -518,14 +567,14 @@
                 Synapse reloads configuration artifacts as soon as the cache period expires.
             </p>
         </section>
-        <section name="Sequences" id="sequences">
+        <section name="Sequence Configuration" id="SequenceConfig">
             <p>
                 As explained earlier a sequence resembles a message flow in Synapse and consists
                 of an array of mediators. The &lt;sequence&gt; element is used to define a sequence
                 in the Synapse configuration.  Sequences can be defined with names so they can be
                 reused across the Synapse configuration. The sequences named 'main' and 'fault' have
                 special significance in a Synapse configuration. The 'main' sequence handles any message
-                that is accepted for '<a href="#message_mediation">Message Mediation</a>'. The
+                that is accepted for '<a href="#MessageMediation">Message Mediation</a>'. The
                 'fault' sequence is invoked if Synapse encounters a fault, and a custom fault handler
                 is not specified for the sequence via its 'onError' attribute. If the 'main' or
                 'fault' sequences are not defined locally or not found in the Registry, Synapse
@@ -544,7 +593,7 @@
             </p>
             <div class="xmlConf">&lt;sequence name="string" [onError="string"] [key="string"] [trace="enable"] [statistics="enable"]&gt;
     mediator*
- &lt;/sequence&gt;</div>
+&lt;/sequence&gt;</div>
             <p>
                 The 'onError' attribute can be used to define a custom error handler sequence.
                 Statistics collection can be activated by setting the 'statistics' attribute to
@@ -580,7 +629,7 @@
                 local entry or a remote registry entry.
             </p>
         </section>
-        <section name="Endpoints" id="endpoints">
+        <section name="Endpoint Configuration" id="EndpointConfig">
             <p>
                 An &lt;endpoint&gt; element defines a destination for an outgoing message. There
                 are several types of endpoints that can be defined in a Synapse configuration.
@@ -599,9 +648,8 @@
                 takes the following form.
             </p>
             <div class="xmlConf">&lt;endpoint [name="string"] [key="string"]&gt;
-    <a href="#address-endpoint">address-endpoint</a> | <a href="#default-endpoint">default-endpoint</a> | <a href="#wsdl-endpoint">wsdl-endpoint</a> |
-    <a href="#load-balanced-endpoint">load-balanced-endpoint</a> | <a href="#fail-over-endpoint">fail-over-endpoint</a> |
-    <a href="#recipient-list-endpoint">recipient-list-endpoint</a>
+    <a href="#AddressEndpointConfig">address-endpoint</a> | <a href="#DefaultEndpointConfig">default-endpoint</a> | <a href="#WSDLEndpointConfig">wsdl-endpoint</a> |
+    <a href="#LBEndpointConfig">load-balanced-endpoint</a> | <a href="#FOEndpointConfig">fail-over-endpoint</a> | <a href="#recipient-list-endpoint">recipient-list-endpoint</a>
 &lt;/endpoint&gt;</div>
             <p>
                 Note how the endpoint definitions always start with an 'endpoint' element. The
@@ -621,26 +669,26 @@
                 to the endpoint. These will be available in the 'trace.log' file configured via the
                 log4j.properties file.
             </p>
-            <subsection name="Address Endpoint">
+            <subsection name="Address Endpoint" id="AddressEndpointConfig">
                 <div class="xmlConf">&lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
          [encoding="<em>charset encoding</em>"]
          [statistics="enable|disable"] [trace="enable|disable"]&gt;
-  &lt;enableRM [policy="<em>key</em>"]/&gt;?
-  &lt;enableSec [policy="<em>key</em>"]/&gt;?
-  &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+    &lt;enableRM [policy="<em>key</em>"]/&gt;?
+    &lt;enableSec [policy="<em>key</em>"]/&gt;?
+    &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
 
-  &lt;timeout&gt;
-    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
-    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
-  &lt;/timeout&gt;?
+    &lt;timeout&gt;
+        &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
+        &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
+    &lt;/timeout&gt;?
 
-  &lt;markForSuspension&gt;
+    &lt;markForSuspension&gt;
         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
         &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
         &lt;retryDelay&gt;d&lt;/retryDelay&gt;
     &lt;/markForSuspension&gt;
 
-  &lt;suspendOnFailure&gt;
+    &lt;suspendOnFailure&gt;
         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
         &lt;initialDuration&gt;n&lt;/initialDuration&gt;
         &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
@@ -727,7 +775,7 @@
                     </tbody>
                 </table>
             </subsection>
-            <subsection name="Default Endpoint">
+            <subsection name="Default Endpoint" id="DefaultEndpointConfig">
                 <p>
                     Default endpoint is an endpoint defined for adding QoS and other configurations
                     to the endpoint which is resolved from the 'To' address of the message context.
@@ -741,22 +789,22 @@
                 <div class="xmlConf">&lt;default [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
          [encoding="<em>charset encoding</em>"]
          [statistics="enable|disable"] [trace="enable|disable"]&gt;
-  &lt;enableRM [policy="<em>key</em>"]/&gt;?
-  &lt;enableSec [policy="<em>key</em>"]/&gt;?
-  &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+    &lt;enableRM [policy="<em>key</em>"]/&gt;?
+    &lt;enableSec [policy="<em>key</em>"]/&gt;?
+    &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
 
-  &lt;timeout&gt;
-    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
-    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
-  &lt;/timeout&gt;?
+    &lt;timeout&gt;
+        &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;
+        &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
+    &lt;/timeout&gt;?
 
-   &lt;markForSuspension&gt;
+    &lt;markForSuspension&gt;
         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
         &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
         &lt;retryDelay&gt;d&lt;/retryDelay&gt;
     &lt;/markForSuspension&gt;
 
-  &lt;suspendOnFailure&gt;
+    &lt;suspendOnFailure&gt;
         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
         &lt;initialDuration&gt;n&lt;/initialDuration&gt;
         &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
@@ -764,7 +812,7 @@
     &lt;/suspendOnFailure&gt;
 &lt;/default&gt;</div>
             </subsection>
-            <subsection name="WSDL Endpoint">
+            <subsection name="WSDL Endpoint" id="WSDLEndpointConfig">
                 <p>
                     WSDL endpoint is an endpoint definition based on a specified WSDL document. The
                     WSDL document can be specified either as a URI or as an inline definition within
@@ -774,32 +822,32 @@
                     'timeout' are same as for an Address endpoint.
                 </p>
                 <div class="xmlConf">&lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
-      &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
-      &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
-      &lt;enableRM [policy="key"]/&gt;?
-      &lt;enableSec [policy="key"]/&gt;?
-      &lt;enableAddressing/&gt;?
+    &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+    &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+    &lt;enableRM [policy="key"]/&gt;?
+    &lt;enableSec [policy="key"]/&gt;?
+    &lt;enableAddressing/&gt;?
 
-      &lt;timeout&gt;
+    &lt;timeout&gt;
         &lt;duration&gt;timeout duration in milliseconds&lt;/duration&gt;
         &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;
-      &lt;/timeout&gt;?
-      &lt;markForSuspension&gt;
-            [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
-            &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
-            &lt;retryDelay&gt;d&lt;/retryDelay&gt;
-        &lt;/markForSuspension&gt;
+    &lt;/timeout&gt;?
+    &lt;markForSuspension&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;
+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;
+    &lt;/markForSuspension&gt;
 
-      &lt;suspendOnFailure&gt;
-            [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
-            &lt;initialDuration&gt;n&lt;/initialDuration&gt;
-            &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
-            &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
-        &lt;/suspendOnFailure&gt;
+    &lt;suspendOnFailure&gt;
+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]
+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;
+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;
+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;
+    &lt;/suspendOnFailure&gt;
 
-    &lt;/wsdl&gt;</div>
+&lt;/wsdl&gt;</div>
             </subsection>
-            <subsection name="Load Balance Endpoint">
+            <subsection name="Load Balance Endpoint" id="LBEndpointConfig">
                 <p>
                     A Load balanced endpoint distributes the messages (load) among a set of listed
                     endpoints or static members by evaluating the load balancing policy and any other
@@ -832,12 +880,12 @@
                 </p>
                 <div class="xmlConf">&lt;loadBalance [policy="roundRobin"] [algorithm="impl of org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm"]
                         [failover="true|false"]&gt;
-        &lt;endpoint .../&gt;+
-        &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+
-    &lt;/loadBalance&gt;
-    &lt;session type="http|simpleClientSession"/&gt;?</div>
+    &lt;endpoint .../&gt;+
+    &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+
+&lt;/loadBalance&gt;
+&lt;session type="http|simpleClientSession"/&gt;?</div>
             </subsection>
-            <subsection name="Dynamic Load Balance Endpoint">
+            <subsection name="Dynamic Load Balance Endpoint" id="DLBEndpointConfig">
                 <p>
                     This is a special variation of the load balance endpoint where instead of
                     having to specify the child endpoints explicitly, the endpoint automatically
@@ -854,18 +902,17 @@
                     selected once the currently selected member has failed, and defaults to true.
                 </p>
                 <div class="xmlConf">&lt;dynamicLoadBalance [policy="roundRobin"] [failover="true|false"]&gt;
-    &lt;membershipHandler
-            class="impl of org.apache.synapse.core.LoadBalanceMembershipHandler"&gt;
-            &lt;property name="name" value="value"/&gt;+
+    &lt;membershipHandler class="impl of org.apache.synapse.core.LoadBalanceMembershipHandler"&gt;
+        &lt;property name="name" value="value"/&gt;+
     &lt;/membershipHandler&gt;
-    &lt;/dynamicLoadBalance&gt;</div>
+&lt;/dynamicLoadBalance&gt;</div>
                 <p>
                     Currently Synapse ships with one implementation of the LoadBalanceMembershipHandler
                     interface. This class is named 'Axis2LoadBalanceMembershipHandler' and its
                     usage is demonstrated in sample 57.
                 </p>
             </subsection>
-            <subsection name="Fail-Over Endpoint">
+            <subsection name="Fail-Over Endpoint" id="FOEndpointConfig">
                 <p>
                     Failover endpoints send messages to the listed endpoints with the following
                     failover behavior. At the start, the first listed endpoint is selected as the
@@ -881,34 +928,34 @@
                     It is possible to disable this behavior by setting the 'dynamic' attribute to false.
                 </p>
                 <div class="xmlConf">&lt;failover [dynamic="true|false"]&gt;
-  &lt;endpoint .../&gt;+
+    &lt;endpoint .../&gt;+
 &lt;/failover&gt;</div>
 
             </subsection>
         </section>
-        <section name="Proxy Services">
+        <section name="Proxy Service Configuration" id="ProxyServiceConfig">
             <p>
                 A &lt;proxy&gt; element is used to define a Synapse Proxy service.
             </p>
             <div class="xmlConf">&lt;proxy name="string" [transports="(http |https |jms |.. )+|all"] [pinnedServers="(serverName )+"] [serviceGroup="string"]&gt;
-   &lt;description&gt;...&lt;/description&gt;?
-   &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
-      &lt;inSequence&gt;...&lt;/inSequence&gt;?
-      &lt;outSequence&gt;...&lt;/outSequence&gt;?
-      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
-      &lt;endpoint&gt;...&lt;/endpoint&gt;?
-   &lt;/target&gt;?
-   &lt;publishWSDL key="string" uri="string"&gt;
-      ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?
-      &lt;resource location="..." key="..."/&gt;*
-   &lt;/publishWSDL&gt;?
-   &lt;enableAddressing/&gt;?
-   &lt;enableSec/&gt;?
-   &lt;enableRM/&gt;?
-   &lt;policy key="string" [type="(in | out)"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)
-   &lt;parameter name="string"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)
-      string | xml
-   &lt;/parameter&gt;
+    &lt;description&gt;...&lt;/description&gt;?
+    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
+        &lt;inSequence&gt;...&lt;/inSequence&gt;?
+        &lt;outSequence&gt;...&lt;/outSequence&gt;?
+        &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
+        &lt;endpoint&gt;...&lt;/endpoint&gt;?
+    &lt;/target&gt;?
+    &lt;publishWSDL key="string" uri="string"&gt;
+        ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?
+        &lt;resource location="..." key="..."/&gt;*
+    &lt;/publishWSDL&gt;?
+    &lt;enableAddressing/&gt;?
+    &lt;enableSec/&gt;?
+    &lt;enableRM/&gt;?
+    &lt;policy key="string" [type="(in | out)"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)
+    &lt;parameter name="string"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)
+        string | xml
+    &lt;/parameter&gt;
 &lt;/proxy&gt;</div>
             <p>
                 A proxy service is created and exposed on the specified transports through the
@@ -1134,16 +1181,16 @@
                 </tbody>
             </table>
         </section>
-        <section name="Scheduled Tasks">
+        <section name="Scheduled Task Configuration" id="TaskConfig">
             <p>
                 A &lt;task&gt; element is used to define a Synapse task (aka startup).
             </p>
             <div class="xmlConf">&lt;task class="mypackage.MyTask" name="string" [pinnedServers="(serverName)+"]&gt;
-   &lt;property name="stringProp" value="String"/&gt;
-   &lt;property name="xmlProp"&gt;
-     &lt;somexml&gt;config&lt;/somexml&gt;
-   &lt;/property&gt;
-   &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"] | [once=(true | false)])/&gt;
+    &lt;property name="stringProp" value="String"/&gt;
+    &lt;property name="xmlProp"&gt;
+        &lt;somexml&gt;config&lt;/somexml&gt;
+    &lt;/property&gt;
+    &lt;trigger ([[count="10"]? interval="1000"] | [cron="0 * 1 * * ?"] | [once=(true | false)])/&gt;
 &lt;/task&gt;</div>
             <p>
                 A task is created and scheduled to run at specified time intervals or as specified
@@ -1176,15 +1223,15 @@
                 or not.
             </p>
         </section>
-        <section name="Event Sources">
+        <section name="Event Source Configuration" id="EventSourceConfig">
             <p>
                 Event sources enable the user to run Synapse in the eventing mode of operation.
                 Synapse can act as an event source as well as an event broker. An event source
                 is defined using the &lt;eventSource&gt; configuration element.
             </p>
             <div class="xmlConf">&lt;eventSource name="string"&gt;
-	&lt;subscriptionManager class="mypackage.MyClass"&gt;
-		   &lt;parameter name="string"/&gt;
+    &lt;subscriptionManager class="mypackage.MyClass"&gt;
+        &lt;parameter name="string"/&gt;
 	&lt;/subscriptionManager&gt;
 &lt;/eventSource&gt;</div>
             <p>
@@ -1202,20 +1249,21 @@
                 can be specified using the 'parameter' elements.
             </p>
         </section>
-        <section name="APIs">
+        <section name="API Configuration" id="APIConfig">
             <p>
                 APIs provide a flexible and powerful approach for defining full fledged REST APIs
                 in Synapse. An API definition starts with the &lt;api&gt; element.
             </p>
             <div class="xmlConf">&lt;api name="string" context="string" [hostname="string"][port="int"]&gt;
-   &lt;resource [methods="http-method-list"][inSequence="string"][outSequence="string"]
+    &lt;resource [methods="http-method-list"][inSequence="string"][outSequence="string"]
    		[faultSequence="string"][content-type="string"][user-agent="str"]&gt;
-      &lt;inSequence&gt;...&lt;/inSequence&gt;?
-      &lt;outSequence&gt;...&lt;/outSequence&gt;?
-      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
+
+        &lt;inSequence&gt;...&lt;/inSequence&gt;?
+        &lt;outSequence&gt;...&lt;/outSequence&gt;?
+        &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
    &lt;/resource&gt;+
    &lt;handlers&gt;
-      &lt;handler class="name"/&gt;+
+        &lt;handler class="name"/&gt;+
    &lt;/handlers&gt;?
 &lt;/api&gt;</div>
             <p>
@@ -1241,7 +1289,7 @@
                 ful qualified names of the handler implementation classes.
             </p>
         </section>
-        <section name="Priority Executors">
+        <section name="Priority Executor Configuration" id="ExecutorConfig">
             <p>
                 The priority executor configuration syntax takes the following general form.
             </p>

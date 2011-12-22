@@ -49,9 +49,10 @@
             <item name="FAQ" href="apidocs/"/>
         </menu>
         <menu name="Developer Resources">
-            <item name="Building Synapse"/>
+            <item name="Developer Guide " href="developer-guide.html"/>
             <item name="Developer Guidelines"/>
             <item name="Release Process"/>
+            <item name="How to Contribute"/>
         </menu>
         <menu name="Project Details">
             <item name="Overview" href="project-details.html"/>

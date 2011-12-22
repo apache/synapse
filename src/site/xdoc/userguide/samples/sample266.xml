@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 266</title>
+    </properties>
+    <body>
+        <section name="Sample 266: Switching from UDP to HTTP/S">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="StockQuoteProxy" transports="udp"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;property name="OUT_ONLY" value="true"/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+        &lt;parameter name="transport.udp.port"&gt;9999&lt;/parameter&gt;
+        &lt;parameter name="transport.udp.contentType"&gt;text/xml&lt;/parameter&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Showcase the ability of Synapse to receive and process raw UDP messages
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Enable the UDP transport receiver for Synapse (refer
+                            <a href="setup/tcp_udp.html#udp">UDP transport setup guide</a>).
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 266 (repository/conf/sample/synapse_sample_266.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 266<br/>
+                                Windows: synapse.bat -sample 266
+                            </div>
+                        </li>
+                        <li>
+                            Enable the UDP transport sender for the sample Axis2 client (refer
+                            <a href="setup/tcp_udp.html#udp">UDP transport setup guide</a> for
+                            details).
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This sample is similar to <a href="sample265.html">Sample 265</a>. Only difference
+                    is instead of the TCP transport we will be using the UDP transport to receive
+                    messages.
+                </p>
+                <p>
+                    Invoke the stockquote client using the following command. Note the UDP URL in the
+                    command.
+                </p>
+                <div class="command">ant stockquote -Daddurl=udp://localhost:9999?contentType=text/xml -Dmode=placeorder</div>
+                <p>
+                    Since we have configured the content type as text/xml for the proxy service,
+                    incoming messages will be processed as SOAP 1.1 messages.
+                </p>
+                <p>
+                    When the proxy service forwards the message to the sample Axis2 server over HTTP,
+                    sample server will print the following entry to confirm that the request has
+                    been received.
+                </p>
+                <div class="consoleOutput">Thu May 20 12:25:01 IST 2010 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 17621 stocks of IBM at $ 73.48068475255796</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

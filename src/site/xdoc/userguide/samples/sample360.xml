@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 360</title>
+    </properties>
+    <body>
+        <section name="Sample 360: Introduction to DBLookup Mediator">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="myFaultHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+        &lt;drop/&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="main" onError="myFaultHandler"&gt;
+        &lt;in&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="text" value="** Looking up from the Database **"/&gt;
+            &lt;/log&gt;
+            &lt;dblookup&gt;
+                &lt;connection&gt;
+                    &lt;pool&gt;
+                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
+                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
+                        &lt;user&gt;synapse&lt;/user&gt;
+                        &lt;password&gt;synapse&lt;/password&gt;
+                    &lt;/pool&gt;
+                &lt;/connection&gt;
+                &lt;statement&gt;
+                    &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
+                    &lt;parameter xmlns:m0="http://services.samples"
+                               expression="//m0:getQuote/m0:request/m0:symbol" type="VARCHAR"/&gt;
+                    &lt;result name="company_id" column="id"/&gt;
+                &lt;/statement&gt;
+            &lt;/dblookup&gt;
+
+            &lt;switch source="get-property('company_id')"&gt;
+                &lt;case regex="c1"&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="c2"&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="c3"&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;default&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault response="true"&gt;
+                        &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope"
+                              value="tns:Receiver"/&gt;
+                        &lt;reason value="** Unrecognized Company ID **"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/default&gt;
+            &lt;/switch&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrating how to perform database lookups during mediation using the dblookup
+                    mediator
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Setup a Derby database as described in the <a href="setup/db.html">database setup guide</a>
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 360 (repository/conf/sample/synapse_sample_360.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 360<br/>
+                                Windows: synapse.bat -sample 360
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This sample demonstrates simple database read operations through Synapse. When a
+                    message arrives at dblookup mediator, it opens a connection to the database and
+                    executes the given SQL query. The SQL query uses '?' character for attributes that
+                    will be filled at runtime. The parameters define how to calculate the value of
+                    those attributes at runtime. In this sample a dblookup mediator has been used to
+                    extract 'id' of the company from the company database using the symbol which is
+                    extracted from the SOAP envelope by evaluating an XPath. Then 'id' bases switching
+                    will be done by a switch mediator.
+                </p>
+                <p>
+                    To try this out, first request a stock quote for the symbol 'IBM' as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</div>
+                <p>
+                    Synapse console will display the following message.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Looking up from the Database **
+    INFO LogMediator text = Company ID &#x2013; c1</div>
+                <p>
+                    Now request a quote for the symbol 'SUN'.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=SUN</div>
+                <p>
+                    Synapse will display the following output.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Looking up from the Database **
+INFO LogMediator text = Company ID &#x2013; c2</div>
+                <p>
+                    Finally send a stock quote request for the symbol 'MSFT'.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=MSFT</div>
+                <p>
+                    In this case Synapse will display the following output.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Looking up from the Database **
+INFO LogMediator text = Company ID &#x2013; c2</div>
+                <p>
+                    If you send any requests with different symbols, dblookup mediator will return
+                    an empty result set, since those symbols are not stored in the Derby database.
+                    So as a result Synapse will not be able to determine the company ID, which will
+                    result in the following log entry (from the default case in the switch mediator).
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Unrecognized Company ID **</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

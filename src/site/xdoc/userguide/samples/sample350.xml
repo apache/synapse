@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 350</title>
+    </properties>
+    <body>
+        <section name="Sample 350: Introduction to the Script Mediator using JavaScript">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name="root"&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;localEntry key="stockquoteScript"
+                src="file:repository/conf/sample/resources/script/stockquoteTransformRequest.js"/&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
+            &lt;script language="js" key="stockquoteScript" function="transformRequest"/&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+            &lt;script language="js" key="script/stockquoteTransformResponse.js"
+                    function="transformResponse"/&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <p>
+                The JavaScript resource file referenced by the configuration looks like this.
+            </p>
+            <div class="xmlConf">&lt;x&gt;&lt;![CDATA[
+  function transformRequest(mc) {
+     var symbol = mc.getPayloadXML()..*::Code.toString();
+     mc.setPayloadXML(
+        &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
+           &lt;m:request&gt;
+              &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+           &lt;/m:request&gt;
+        &lt;/m:getQuote&gt;);
+  }
+
+  function transformResponse(mc) {
+     var symbol = mc.getPayloadXML()..*::symbol.toString();
+     var price = mc.getPayloadXML()..*::last.toString();
+     mc.setPayloadXML(
+        &lt;m:CheckPriceResponse xmlns:m=&quot;http://www.apache-synapse.org/test&quot;&gt;
+           &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
+           &lt;m:Price&gt;{price}&lt;/m:Price&gt;
+        &lt;/m:CheckPriceResponse&gt;);
+  }
+]]&gt;&lt;/x&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Showcase the ability to configure the Synapse runtime using common scripting
+                    languages such as JavaScript
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 350 (repository/conf/sample/synapse_sample_350.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 350<br/>
+                                Windows: synapse.bat -sample 350
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This sample is similar to <a href="sample8.html">sample 8</a> but instead of using
+                    XSLT, the transformation is done using JavaScript and E4X. Note that the script
+                    source is loaded from a resource in the file system which must be wrapped in
+                    CDATA tags within an XML element. The script used in this example has two functions, 
+                    'transformRequest' and 'transformResponse'. The Synapse configuration uses the
+                    'function' attribute to specify which function should be invoked. Use the stock
+                    quote client to send a custom quote request as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</div>
+                <p>
+                    Synapse uses the script mediator and the specified JavaScript function to convert
+                    the custom request to a standard quote request. Subsequently the response received
+                    is transformed and sent back to the client.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

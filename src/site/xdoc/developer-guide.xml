@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Developer Guide</title>
+    </properties>
+    <body>
+        <section name="Apache Synapse Development Guide">
+            <p>
+                Welcome to Apache Synapse Developer Guide. This guide have following contents,
+            </p>
+            <ul>
+                <li>
+                    <a href="#intro">Introduction</a>
+                </li>
+                <li>
+                    <a href="#subversion">Using Subversion (SVN)</a>
+                </li>
+                <li>
+                    <a href="#checkout">Checking Out Synapse Codebase</a>
+                </li>
+                <li>
+                    <a href="#maven2">Installing Maven 2</a>
+                </li>
+                <li>
+                    <a href="#config_ide">Configuring your IDE</a>
+                </li>
+            </ul>
+        </section>
+
+        <section name="Introduction" id="intro">
+            <p>This document provides information on how to use Subversion(SVN) to checkout/update/commits
+                to codebase, etc, in persepective of contributing to Apache Synapse. We have described
+                Instructions on configuring IDEs for development and using Maven as build and project
+                management tool .
+            </p>
+        </section>
+        <section name="Using Subversion (SVN)" id="subversion">
+            <p> Synapse uses Subversion (SVN) for source control. Subversion has been the popular
+                versioning system preferred over  CVS . It is  also licensed under a Apache compatible
+                license.
+                To learn more about Subversion or to download the latest distribution, visit the
+                <a class="externalLink" href="http:///subversion.tigris.org">Subversion project
+                site</a>. A guide on setting up and installing Subversion, is available at ASF
+                <a class="externalLink" href="http://www.apache.org/dev/version-control.html"/> Source
+                Code Repositories page</p>
+        </section>
+        <section name="Checking Out Synapse Codebase" id="checkout">
+            <p>To check out the latest version of Synapse from project SVN repository, you must use
+                one of the following URLs depending on your level of access to the Synapse source code:
+                ie:- a committer or non committer</p>
+
+            <ul>
+                <li><b>If you are not a committer:</b> <a class="externalLink" href="http://svn.apache.org/repos/asf/synapse/trunk/java/">http://svn.apache.org/repos/asf/synapse/trunk/java/</a></li>
+
+                <li><b>If you are a committer:</b> <a class="externalLink" href="https://svn.apache.org/repos/asf/synapse/trunk/java/">https://svn.apache.org/repos/asf/synapse/trunk/java/</a></li>
+            </ul>
+            <p>
+                If you are a committer,you have to have a svn password at hand. To get more info
+                on credentials you must log into svn.apache.org. Please read the ASF
+                <a class="externalLink" href="http://www.apache.org/dev/version-control.html">
+                    Source Code Repositories page</a>.
+            </p>
+            <p>
+                Use following commands to manage Synapse code at subversion :
+            </p>
+            <ol>
+                <li>Run <b>svn co &lt;repository URL&gt; synapse</b> where
+                    the repository URL is one of the URLs from the previous list.</li>
+                <li>To update your working copy to the latest version  ,execute the <b>svn update</b>
+                    or <b>svn up</b>command.</li>
+                <li>to submit a patch, execute <b>svn diff</b> to create a unified diff for
+                    submission to the SYNAPSE JIRA issue tracker.</li>
+            </ol>
+        </section>
+        <section name="Installing Maven 2" id="maven2">
+            <p>
+                Synapse build is based on Maven 2. For information about downloading, installing, and
+                configuring Maven 2, please go through <a class="externalLink"
+                                                      href="http://maven.apache.org">Maven project
+                page</a>.
+                To use Maven to build the Synapse project, Please install
+                <a class="externalLink" href="http://maven.apache.org/download.html">Maven2</a>
+            </p>
+             <p>
+                Use following commands to build from Synapse source code using maven2 :
+            </p>
+            <ol>
+                <li>Go to top level synapse folder Run <b>mvn clean install </b>. This will build all
+                synapse modules from the top. Maven will use online repositories . You can build from
+                    individual modules as well. Go to module/{module_name} and run the above command</li>
+
+                <li>To build Synapse offline use -o option ie:- <b>mvn clean install -o </b> </li>
+                <li>To build Synapse without tests use  <b>mvn clean install -Dmaven.test.skip=true
+                </b> </li>
+            </ol>
+
+        </section>
+        <section name="Configuring your IDE" id="config_ide">
+            <p>The Synapse development can be based on variety of development tools
+                from vim, emacs, Netbeans to Eclipse to Intellij/IDEA. Having said that we recommend
+                users to use Eclipse or IDEA and there's direct development support for these IDE's
+                from maven2.</p>
+
+            <p> Type <b>mvn idea:idea</b>. Generates the necessary IDEA .ipr, .iml and .iws project
+                files. </p>
+
+            <p>Type <b>mvn eclipse:eclipse</b>. Generates the necessary  eclipse project files. </p>
+        </section>
+
+
+    </body>
+</document>

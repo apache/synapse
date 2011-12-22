@@ -20,10 +20,10 @@
 
 <document>
     <properties>
-        <title>Apache Synapse - Sample 440</title>
+        <title>Apache Synapse - Sample 158</title>
     </properties>
     <body>
-        <section name="Sample 440: Exposing a SOAP service over JSON">
+        <section name="Sample 156: Exposing a SOAP service over JSON">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="JSONProxy" transports="http https"&gt;
@@ -86,10 +86,10 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Start Synapse using the configuration numbered 440 (repository/conf/sample/synapse_sample_440.xml)
+                            Start Synapse using the configuration numbered 158 (repository/conf/sample/synapse_sample_158.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 440<br/>
-                                Windows: synapse.bat -sample 440
+                                Unix/Linux: sh synapse.sh -sample 158<br/>
+                                Windows: synapse.bat -sample 158
                             </div>
                         </li>
                     </ul>

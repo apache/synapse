@@ -78,6 +78,9 @@
 						<a class="externalLink" href="http://jettison.codehaus.org/Download">jettison.jar</a>
 					</li>
 				</ul>
+                <p>
+                    Jettison 1.1 is recommended.
+                </p>
 				<p>
       			Having deployed the necessary libraries you should now register the JSON message
       			builder and formatter with Synapse. Open up 'repository/conf/axis2.xml' file

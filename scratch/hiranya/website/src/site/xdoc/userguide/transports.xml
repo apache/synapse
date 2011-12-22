@@ -24,7 +24,7 @@
         <title>Apache Synapse - Transports Catalog</title>
     </properties>
 	<body>
-		<section name="Introduction" id="Introduction">
+		<section name="Transports Catalog" id="Introduction">
 			<p>
                 The Synapse project has developed a set of transport implementations that provide
                 protocol support and/or features that go beyond what is provided out of the box by

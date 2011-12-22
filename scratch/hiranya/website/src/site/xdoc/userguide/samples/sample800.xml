@@ -24,8 +24,7 @@
     </properties>
     <body>
         <section name="Sample 800: Introduction to REST API">
-            <div class="xmlConf">&lt;!-- An empty flat synapse configuration shipped with the WSO2 ESB --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- You can add any flat sequences, endpoints, etc.. to this synapse.xml file if you do
     *not* want to keep the artifacts in several files --&gt;

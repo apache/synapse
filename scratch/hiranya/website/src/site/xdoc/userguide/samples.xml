@@ -86,6 +86,9 @@
                         <li><a href="samples/sample153.html">Sample 153: Routing the messages without processing the security headers</a></li>
                         <li><a href="samples/sample154.html">Sample 154: Load Balancing with proxy services</a></li>
                         <li><a href="samples/sample155.html">Sample 155: Dual channel invocation on client side and server side</a></li>
+                        <li><a href="samples/sample156.html">Sample 156: Service integration with specifying the receiving sequence</a></li>
+                        <li><a href="samples/sample157.html">Sample 157: Conditional router mediator for implementing complex routing scenarios</a></li>
+                        <li><a href="samples/sample158.html">Sample 158: Exposing a SOAP service over JSON</a></li>
                     </ul>
                 </p>
             </subsection>
@@ -238,14 +241,6 @@
                 <p>
                     <ul>
                         <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse message store </a></li>
-                    </ul>
-                </p>
-            </subsection>
-            <subsection name="Mediating JSON Messages">
-                <p>
-                    <ul>
-                        <!-- This sample should be renamed -->
-                        <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
                     </ul>
                 </p>
             </subsection>

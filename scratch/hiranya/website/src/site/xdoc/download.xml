@@ -35,11 +35,11 @@
                     <th>Release Date</th>
                     <th>Release Note</th>
                 </tr>
-                <th>
+                <tr>
                     <td><a href="download/2.1/download.cgi">2.1</a></td>
                     <td>22-Dec-2011</td>
                     <td>View</td>
-                </th>
+                </tr>
             </table>
         </section>
         <section name="Download Previous Releases">
@@ -48,26 +48,26 @@
                     <th>Version</th>
                     <th>Release Date</th>
                 </tr>
-                <th>
+                <tr>
                     <td><a href="download/2.0.0/download.cgi">2.0.0</a></td>
                     <td>30-Nov-2010</td>
-                </th>
-                <th>
+                </tr>
+                <tr>
                     <td><a href="download/1.2/download.cgi">1.2</a></td>
                     <td>9-Jun-2008</td>
-                </th>
-                <th>
+                </tr>
+                <tr>
                     <td><a href="download/1.1.1/download.cgi">1.1.1</a></td>
                     <td>28-Jan-2008</td>
-                </th>
-                <th>
+                </tr>
+                <tr>
                     <td><a href="download/1.1/download.cgi">1.1</a></td>
                     <td>12-Nov-2007</td>
-                </th>
-                <th>
+                </tr>
+                <tr>
                     <td><a href="download/2.0.0/download.cgi">1.0</a></td>
                     <td>08-Jun-2007</td>
-                </th>
+                </tr>
             </table>
         </section>
     </body>

@@ -3,6 +3,12 @@
         <title>Apache Synapse - Mediators Catalog</title>
     </properties>
     <body>
+        <section name="Mediators Catalog">
+            <p>
+                This document lists all the built-in mediators of Synapse and describes their
+                usage, functionality and configuration syntax.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
                 <li><a href="#Intro">Introduction</a></li>

@@ -20,6 +20,9 @@
   -->
 
 <document>
+    <properties>
+        <title>Apache Synapse - Upgrading to the Latest Version</title>
+    </properties>
 	<body>
 		<section name="Content">
 				<ul>
@@ -27,7 +30,7 @@
 						<a href="#General_comments">General comments</a>
 					</li>
 					<li>
-						<a href="#Upgrading_from_1.2_to_2.0.0">Upgrading from 1.2 to 2.0.0</a>
+						<a href="#Upgrading_from_1.2_to_2.1">Upgrading from 1.2 to 2.1</a>
 						<ul>
 							<li>
 								<a href="#Configuration_file_vs_multi_XML_configuration">Configuration file vs multi XML configuration</a>
@@ -89,14 +92,14 @@
 			</p>
 		</section>
 		
-		<section name="Upgrading from 1.2 to 2.0.0" id="Upgrading_from_1.2_to_2.0.0">
+		<section name="Upgrading from 1.2 to 2.1" id="Upgrading_from_1.2_to_2.1">
 			<subsection name="Configuration file vs multi XML configuration" id="Configuration_file_vs_multi_XML_configuration">
 				<p>
                     In 1.2 you have been using a single synapse.xml file which resides on the
-                    repository/conf directory of the distribution, where as on 2.0.0 we have structured
+                    repository/conf directory of the distribution, where as on 2.1 we have structured
                     this into a configuration repository with multiple directories to have different
                     artifact types and each and every artifact configuration to reside on a different
-                    files inside the desired repository directory. This repository directory on the 2.0.0
+                    files inside the desired repository directory. This repository directory on the 2.1
 					release resides in the repository/conf directory too, and named as synapse-config.
 					The repository directory structure inside the synapse-config directory
 					looks like follows;
@@ -132,7 +135,7 @@
 			</subsection>
 			<subsection name="Endpoint URLs for proxy services" id="Endpoint_URLs_for_proxy_services">
 				<p>
-					In release 2.0.0 the endpoint URLs for proxy services have changed from
+					In release 2.1 the endpoint URLs for proxy services have changed from
 					<tt>/soap</tt> to <tt>/services</tt>. E.g. <tt>http://localhost:8280/services/StockQuote</tt>
 					should be used instead of <tt>http://localhost:8280/soap/StockQuote</tt>.
 				</p>
@@ -148,22 +151,21 @@
 					configuration file. In 1.2 the deployer was configured as follows:
 				</p>
 				<div class="xmlConf">&lt;deployer extension=&quot;jar&quot; directory=&quot;mediators&quot;
-    class=&quot;org.apache.synapse.core.axis2.MediatorDeployer&quot;/&gt;</div>
+        class=&quot;org.apache.synapse.core.axis2.MediatorDeployer&quot;/&gt;</div>
 				<p>
-                    In 2.0.0 the suggested configuration is:
+                    In 2.1 the suggested configuration is:
                 </p>
 				<div class="xmlConf">&lt;deployer extension=&quot;xar&quot; directory=&quot;extensions&quot;
-    class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt; </div>
+        class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt; </div>
 				<p>
                     It is possible to have multiple configuration entries for the extension deployer
                     with different settings. For example, if you used the deployer in 1.2 you might
                     want to have the following configuration:
 				</p>
 				<div class="xmlConf">&lt;deployer extension=&quot;jar&quot; directory=&quot;mediators&quot;
-    class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;
-&lt;deployer extension=&quot;xar&quot;
-    directory=&quot;extensions&quot;
-	class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;</div>
+        class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;
+&lt;deployer extension=&quot;xar&quot; directory=&quot;extensions&quot;
+	    class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;</div>
 			</subsection>
 			<subsection name="JMS transport" id="JMS_transport">
 				<p>
@@ -182,7 +184,7 @@
                     top level mediators and a main sequence leading the synapse to fail to start on
                     2.x Synapse configuration builder simply ignores the top level mediators. So you
                     need to wrap the top level mediators, if there are any, with the sequence named
-					<strong>main</strong> on the new 2.0.0 version.
+					<strong>main</strong> on the new 2.1 version.
 				</p>
 				<p>
 					To further explain this lets have a look at the following valid configuration bit
@@ -194,7 +196,7 @@
     &lt;!-- Send the message to implicit destination --&gt;
     &lt;send/&gt;
 &lt;/definitions&gt;</div>
-					which needs to be changed to the following configuration on 2.0.0
+					which needs to be changed to the following configuration on 2.1
 					<div class="xmlConf">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
 
     &lt;sequence name=&quot;main&quot;&gt;
@@ -210,7 +212,7 @@
 			</subsection>
 			<subsection name="Filter Mediator" id="Filter_Mediator">
 				<p>
-                    From 2.0.0 onwards Synapse filter mediator supports the else close as well, and hence
+                    From 2.1 onwards Synapse filter mediator supports the else close as well, and hence
 					the filter matching set of mediators has to be enclosed within a &lt;then&gt; element.
                 </p>
 				<p>
@@ -223,7 +225,7 @@
     &lt;/send&gt;
     &lt;drop/&gt;
 &lt;/filter&gt;</div>
-					the equivalent configuration for the 2.0.0 release is going to be;
+					the equivalent configuration for the 2.1 release is going to be;
 					<div class="xmlConf">&lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;
     &lt;then&gt;
         &lt;send&gt;
@@ -255,12 +257,12 @@
 				<p>
                     In general it is recommended to run the configuration through the migration tool
 					provided with the Synapse 2.x release, on your synapse 1.2 configuration before
-                    using it with the 2.0.0.
+                    using it with the 2.1.
 				</p>
 				<p>
 					To run the migration tool execute the synapse-config-migrator.sh by passing the
 					synapse.xml file location of the
-					1.2 configuration. Which will create the 2.0.0
+					1.2 configuration. Which will create the 2.1
 					compatible configuration with the .new suffix. For example;
 					<pre>sh bin/synapse-config-migrator.sh synapse-i1.2/repository/conf/synapse.xml</pre>
 				</p>
@@ -288,7 +290,7 @@
 						<td>
 							This was the method that you have been overwriting on the 1.2 version to
 							implement a new custom mediator factory to build the mediator by looking at
-							the XML configuration. On the 2.0.0 version you should be extending the
+							the XML configuration. On the 2.1 version you should be extending the
 							<a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html#createSpecificMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">createSpecificMediator(OMElement, Properties)</a>
 							. Note that in the process of changing the method to be extended, the method
 							<a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html#createMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">createMediator</a>
@@ -305,7 +307,7 @@
 						<td>
 							This was the method that you have been overwriting on the 1.2 version to
 							implement a new custom mediator serializer to serialize to the XML
-                            Configuration by walking through the mediator properties. On the 2.0.0
+                            Configuration by walking through the mediator properties. On the 2.1
                             version you should be extending the
 							<a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html#serializeSpecificMediator(org.apache.synapse.Mediator)">serializeSpecificMediator(Mediator)</a>
 							. Note that in the process of changing the method to be extended, the method

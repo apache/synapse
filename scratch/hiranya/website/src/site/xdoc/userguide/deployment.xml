@@ -19,6 +19,9 @@
   -->
 
 <document>
+    <properties>
+        <title>Apache Synapse - Deployment Guide</title>
+    </properties>
     <body>
         <section name="Contents">
             <ul>

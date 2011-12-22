@@ -20,6 +20,9 @@
   -->
 
 <document>
+    <properties>
+        <title>Apache Synapse - Transports Catalog</title>
+    </properties>
 	<body>
 		<section name="Introduction" id="Introduction">
 			<p>

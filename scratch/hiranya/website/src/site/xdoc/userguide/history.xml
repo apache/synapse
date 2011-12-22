@@ -19,6 +19,9 @@
   -->
 
 <document>
+    <properties>
+        <title>Apache Synapse - Down the Memory Lane</title>
+    </properties>
     <body>
         <section name="History of Synapse">
             <p>

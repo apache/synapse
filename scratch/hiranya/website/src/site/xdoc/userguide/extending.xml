@@ -21,11 +21,11 @@
 
 <document>
 	<properties>
-		<title>Apache Synapse - Extending the Service Bus</title>
+		<title>Apache Synapse - Extending Synapse</title>
 	</properties>
 	<body>
 			<div id="contentBox">
-				   <section name="Apache Synapse ESB - Extending the Service Bus">
+				   <section name="Apache Synapse ESB - Extending Synapse">
 					<p>
 						Apache Synapse provides a number of extension points so that
 						users can plug-in custom developed code to extend the
@@ -69,7 +69,6 @@
 							Interface
 						</a>
 					</h4>
-					<p></p>
 					<div class="xmlConf">package org.apache.synapse;
 
 import ...
@@ -365,7 +364,6 @@ public interface MediatorFactory {
      */
     public QName getTagQName();
 }</div>
-					<p></p>
 					<h4>
 						<a class="externalLink"
 							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The

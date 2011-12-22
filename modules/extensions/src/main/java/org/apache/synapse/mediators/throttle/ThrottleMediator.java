@@ -149,8 +149,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                         }
                         try {
                             // process the policy
-                            throttle = ThrottleFactory.createMediatorThrottle(
-                                    PolicyEngine.getPolicy(inLinePolicy));
+                            throttle = ThrottleFactory.createMediatorThrottle(inLinePolicy);
 
                             //At this point concurrent access controller definitely 'null'
                             // f the clustering is disable.
@@ -213,8 +212,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
 
                                     try {
                                         // Creates the throttle from the policy
-                                        throttle = ThrottleFactory.createMediatorThrottle(
-                                                PolicyEngine.getPolicy((OMElement) entryValue));
+                                        throttle = ThrottleFactory.createMediatorThrottle((OMElement) entryValue);
 
                                         //For non-clustered  environment , must re-initiates
                                         //For  clustered  environment,

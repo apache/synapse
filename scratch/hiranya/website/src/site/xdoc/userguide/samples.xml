@@ -249,6 +249,13 @@
                     </ul>
                 </p>
             </subsection>
+            <subsection name="REST API">
+                <p>
+                    <ul>
+                        <li><a href="samples/sample800.html">Sample 800: Introduction to REST API</a></li>
+                    </ul>
+                </p>
+            </subsection>
         </section>
     </body>
 </document>

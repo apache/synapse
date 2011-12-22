@@ -61,6 +61,7 @@
                         <li><a href="#LBEndpointConfig">Load Balance Endpoint</a></li>
                         <li><a href="#DLBEndpointConfig">Dynamic Load Balance Endpoint</a></li>
                         <li><a href="#FOEndpointConfig">Fail-Over Endpoint</a></li>
+                        <li><a href="#RecipientListEndpointConfig">Recipient List Endpoint"</a></li>
                     </ul>
                 </li>
                 <li><a href="#ProxyServiceConfig">Proxy Service Configuration</a></li>
@@ -649,7 +650,7 @@
             </p>
             <div class="xmlConf">&lt;endpoint [name="string"] [key="string"]&gt;
     <a href="#AddressEndpointConfig">address-endpoint</a> | <a href="#DefaultEndpointConfig">default-endpoint</a> | <a href="#WSDLEndpointConfig">wsdl-endpoint</a> |
-    <a href="#LBEndpointConfig">load-balanced-endpoint</a> | <a href="#FOEndpointConfig">fail-over-endpoint</a> | <a href="#recipient-list-endpoint">recipient-list-endpoint</a>
+    <a href="#LBEndpointConfig">load-balanced-endpoint</a> | <a href="#FOEndpointConfig">fail-over-endpoint</a> | <a href="#RecipientListEndpointConfig">recipient-list-endpoint</a>
 &lt;/endpoint&gt;</div>
             <p>
                 Note how the endpoint definitions always start with an 'endpoint' element. The
@@ -931,6 +932,26 @@
     &lt;endpoint .../&gt;+
 &lt;/failover&gt;</div>
 
+            </subsection>
+            <subsection name="Recipient List Endpoint" id="RecipientListEndpointConfig">
+                <p>
+                    A recipient list endpoint can be used to send a single message to a list of
+                    recipients (child endpoints). This is used to implement the well-known
+                    integration pattern named 'recipient list'. The same functionality can
+                    be achieved using the 'clone' mediator, but the recipient list provides
+                    a more natural and intuitive way of implementing such a scenario. Configuration
+                    of the recipient list endpoint takes the following general form.
+                </p>
+                <div class="xmlConf">&lt;recipientList name="string"&gt;
+    &lt;endpoint&gt;+
+    &lt;member hostName="host" [httpPort="port"] [httpsPort="port2"]&gt;+
+&lt;/recipientList&gt;</div>
+                <p>
+                    A recipient list can be named by setting the 'name' attribute on the 'recipientList'
+                    element. Similar to a load balance endpoint, the recipient list endpoint also
+                    wraps a set of endpoint definitions or a set of member definitions. At runtime
+                    messages will be sent to all the child endpoints or members.
+                </p>
             </subsection>
         </section>
         <section name="Proxy Service Configuration" id="ProxyServiceConfig">

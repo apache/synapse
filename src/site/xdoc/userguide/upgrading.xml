@@ -24,7 +24,15 @@
         <title>Apache Synapse - Upgrading to the Latest Version</title>
     </properties>
 	<body>
-		<section name="Content">
+        <section name="Upgrading to the Latest Version">
+            <p>
+                If you are using an older version of Synapse (1.x) and now looking to migrate to
+                the latest versions (2.x) this document would be a good starting point. This
+                article provides information on steps that need to be carried out to smoothly
+                migrate from an older release of Synapse to the latest version.
+            </p>
+        </section>
+		<section name="Contents">
 				<ul>
 					<li>
 						<a href="#General_comments">General comments</a>

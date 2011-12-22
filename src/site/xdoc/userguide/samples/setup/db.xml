@@ -23,6 +23,13 @@
         <title>Apache Synapse - Database Setup Guide</title>
     </properties>
     <body>
+        <section name="Database Setup Guide">
+            <p>
+                This document explains how to setup a database and some data sources as required
+                by the samples. Most samples require an Apache Derby installation whereas a few
+                would require a MySQL setup.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
                 <li><a href="#intro">Introduction</a></li>

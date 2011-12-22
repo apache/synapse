@@ -16,7 +16,14 @@
 		<title>Apache Synapse - Script Setup Guide</title>
 	</properties>
 	<body>
-
+        <section name="Script Setup Guide">
+            <p>
+                Apache Synapse ships with a set of scripting samples. This document explains
+                how to setup the necessary script engines for these samples. In addition this
+                guide describes how to setup the JSON message builder and formatter for JSON
+                mediation samples.
+            </p>
+        </section>
 		<section name="Contents">
 			<ul>
 				<li>

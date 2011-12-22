@@ -23,6 +23,14 @@
         <title>Apache Synapse - Deployment Guide</title>
     </properties>
     <body>
+        <section name="Deployment Guide">
+            <p>
+                This article explains the various approaches that can be taken to deploy an
+                Apache Synapse server instance. It provides information on each deployment
+                option along with their software requirements and steps that need to be carried
+                out.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
                 <li>

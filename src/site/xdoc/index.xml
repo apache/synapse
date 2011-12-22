@@ -111,7 +111,7 @@
             </p>
             <img src="images/synapse-arch.png"/>
             <p>
-                Synapse uses the Apache Axis2 as the underlying Web Services engine. Therefore it
+                Synapse uses Apache Axis2 as the underlying Web Services engine. Therefore it
                 has outstanding support for Web Services and related standards such as SOAP and
                 WSDL. Tried and tested Axis2 modules like Apache Rampart and Apache Sandesha2 can be
                 used with Synapse with no configuration overhead. Using such external modules,

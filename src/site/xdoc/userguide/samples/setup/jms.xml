@@ -23,6 +23,13 @@
         <title>Apache Synapse - JMS Setup Guide</title>
     </properties>
     <body>
+        <section name="JMS Setup Guide">
+            <p>
+                This document explains how to setup the JMS transport sender and listener
+                as required by the samples. An Apache ActiveMQ instance is used as the JMS
+                provider for the samples.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
                 <li><a href="#intro">Introduction</a></li>

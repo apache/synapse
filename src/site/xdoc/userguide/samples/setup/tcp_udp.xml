@@ -23,6 +23,12 @@
         <title>Apache Synapse - TCP/UDP Setup Guide</title>
     </properties>
     <body>
+        <section name="TCP/UDP Setup Guide">
+            <p>
+                This document explains how to setup the transport sender and listener
+                for TCP/UDP transports required by the samples.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
                 <li><a href="#intro">Introduction</a></li>

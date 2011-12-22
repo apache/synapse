@@ -13,10 +13,15 @@
 
 <document>
 	<properties>
-		<title>Apache Synapse - Script Setup Guide</title>
+		<title>Apache Synapse - E-Mail Setup Guide</title>
 	</properties>
 	<body>
-
+        <section name="E-Mail Setup Guide">
+            <p>
+                This document explains how to setup the mail transport sender and listener
+                as required by the samples.
+            </p>
+        </section>
 		<section name="Contents">
 			<ul>
 				<li>

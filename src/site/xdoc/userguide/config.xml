@@ -23,9 +23,30 @@
         <title>Apache Synapse - Configuration Language Guide</title>
     </properties>
     <body>
+        <section name="Introduction" id="Intro">
+            <p>
+                Apache Synapse loads its configuration from a set of XML files. This enables the
+                user to easily hand edit the configuration, maintain backups and even include the
+                entire configuration in a version control system for easier management and control.
+                For an example one may check-in all Synapse configuration files into a version
+                control system such as Subversion and easily move the configuration files from
+                development, through QA, staging and into production.
+            </p>
+            <p>
+                All the configuration files related to Synapse are housed in the repository/conf/synapse-config
+                directory of the Synapse installation. Synapse is also capable of loading certain
+                configuration elements (eg: sequences, endpoints) from an external SOA registry.
+                When using a registry to store fragments of the configuration, some configuration
+                elements such as endpoints can be updated dynamically while Synapse is executing.
+            </p>
+            <p>
+                This article describes the hierarchy of XML files from which Synapse reads its
+                configuration. It describes the high level structure of the file set and the XML
+                syntax used to configure various elements in Synapse.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
-                <li><a href="#Intro">Introduction</a></li>
                 <li>
                     <a href="#SynapseConfig">Synapse Configuration</a>
                     <ul>
@@ -74,28 +95,6 @@
                 <li><a href="#ExecutorConfig">Priority Executor Configuration</a></li>
                 <li><a href="#StoresConfig">Message Stores and Processors Configuration</a></li>
             </ul>
-        </section>
-        <section name="Introduction" id="Intro">
-            <p>
-                Apache Synapse loads its configuration from a set of XML files. This enables the
-                user to easily hand edit the configuration, maintain backups and even include the
-                entire configuration in a version control system for easier management and control.
-                For an example one may check-in all Synapse configuration files into a version
-                control system such as Subversion and easily move the configuration files from
-                development, through QA, staging and into production.
-            </p>
-            <p>
-                All the configuration files related to Synapse are housed in the repository/conf/synapse-config
-                directory of the Synapse installation. Synapse is also capable of loading certain
-                configuration elements (eg: sequences, endpoints) from an external SOA registry.
-                When using a registry to store fragments of the configuration, some configuration
-                elements such as endpoints can be updated dynamically while Synapse is executing.
-            </p>
-            <p>
-                This article describes the hierarchy of XML files from which Synapse reads its
-                configuration. It describes the high level structure of the file set and the XML
-                syntax used to configure various elements in Synapse.
-            </p>
         </section>
         <section name="The Synapse Configuration" id="SynapseConfig">
             <p>

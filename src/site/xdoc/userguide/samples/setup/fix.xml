@@ -23,6 +23,14 @@
         <title>Apache Synapse - FIX Setup Guide</title>
     </properties>
     <body>
+        <section name="FIX Setup Guide">
+            <p>
+                This document explains how to setup the FIX transport sender and listener
+                in Synapse as required by the samples. Further it describes how to setup the
+                sample FIX applications (Executor and Banzai) which are essential for trying
+                out the FIX samples.
+            </p>
+        </section>
         <section name="Contents">
             <ul>
                 <li><a href="#intro">Introduction</a></li>

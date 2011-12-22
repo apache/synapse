@@ -23,7 +23,7 @@
         <title>Apache Synapse - Quick Start Guide</title>
     </properties>
     <body>
-        <section name="Apache Synapse Quick Start Guide">
+        <section name="Quick Start Guide">
             <p>
                 Welcome to Apache Synapse quick start guide. This tutorial demonstrates two
                 sample applications covering the fundamental usage scenarios of Synapse, namely

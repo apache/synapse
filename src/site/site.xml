@@ -50,8 +50,8 @@
             <item name="FAQ" href="userguide/faq.html"/>
         </menu>
         <menu name="Developer Resources">
-            <item name="Developer Guide " href="developer-guide.html"/>
-            <item name="Developer Guidelines"/>
+            <item name="Developer Guide " href="dev/developer-guide.html"/>
+            <item name="Developer Best Practices"/>
             <item name="Release Process"/>
             <item name="How to Contribute"/>
         </menu>

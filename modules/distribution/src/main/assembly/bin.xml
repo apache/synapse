@@ -266,7 +266,6 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
             <includes>
-                <include>xml-apis:xml-apis:jar</include>
                 <include>xerces:xercesImpl:jar</include>
             </includes>
         </dependencySet>

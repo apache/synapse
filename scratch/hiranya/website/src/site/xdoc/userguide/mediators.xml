@@ -1,0 +1,55 @@
+<document>
+    <properties>
+        <title>Apache Synapse - Mediators Catalog</title>
+    </properties>
+    <body>
+        <section name="Contents">
+            <ul>
+                <li><a href="#Intro">Introduction</a></li>
+                <li><a href="#Categories">Mediator Categories</a></li>
+            </ul>
+        </section>
+        <section name="Introduction" id="Intro">
+            <p>
+                Mediator is the basic message processing unit in Synapse. A mediator takes an
+                input message, carries out some processing on it, and provides an output message.
+                Mediators can be linked up and arranged into chains to implement complex message
+                flows (sequences). Mediators can manipulate message content (payload), properties,
+                headers and if needed can also execute additional tasks such as database lookup,
+                service invocation and script execution.
+            </p>
+            <p>
+                Apache Synapse ships with an array of useful mediators that can be used out of the
+                box to implement message flows, services and integration patterns. Rest of this
+                article describes these mediators in detail, along with their use cases and
+                configuration syntax.
+            </p>
+        </section>
+        <section name="Mediator Categories" id="Categories">
+            <p>
+                Built-in mediators of Synapse can be classified into several groups depending
+                on the nature of their functionality and use cases.
+            </p>
+            <ul>
+                <li>
+                    Core mediators - Utility mediators that are useful in a variety of scenarios
+                </li>
+                <li>
+                    Filter mediators - Mediators used to filter out messages
+                </li>
+                <li>
+                    Transform mediators - Mediators used to transform message content, headers and
+                    attributes
+                </li>
+                <li>
+                    Extension mediators - Mediators used to extend the Synapse mediation engine by
+                    plugging in custom developed code
+                </li>
+                <li>
+                    Advanced mediators - Mediators used to implement advanced integration scenarios
+                    and patterns
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

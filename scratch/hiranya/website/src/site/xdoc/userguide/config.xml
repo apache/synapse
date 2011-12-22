@@ -448,7 +448,9 @@
             <p>
                 Synapse ESB is configured using an XML based configuration language. This is a
                 Domain Specific Language (DSL) created and maintained by the Synapse community.
-                The language is designed to be simple, intuitive and easy to learn.
+                The language is designed to be simple, intuitive and easy to learn. All XML
+                elements (tags) in this language must be namespace qualified with the namespace
+                URL <strong>http://ws.apache.org/ns/synapse</strong>.
             </p>
             <p>
                 As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.

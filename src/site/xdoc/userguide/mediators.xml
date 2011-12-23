@@ -303,7 +303,7 @@
                 </p>
             </subsection>
         </section>
-        <section name="Filter Mediators" id="Filter Mediators">
+        <section name="Filter Mediators" id="FilterMediators">
             <subsection name="Filter Mediator" id="Filter">
                 <p>
                     Filter mediator adds 'if-else' like semantics to the Synapse configuration language.

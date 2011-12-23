@@ -46,12 +46,12 @@
 						wrapped within a MessageContext instance, and the message context
 						is set with the references to the SynapseConfiguration and
 						SynapseEnvironment objects. The
-						<a href="apidocs/org/apache/synapse/config/SynapseConfiguration.html">SynapseConfiguration</a>
+						<a href="../apidocs/org/apache/synapse/config/SynapseConfiguration.html">SynapseConfiguration</a>
 
 						object holds the global configuration model that defines
 						mediation rules, local registry entries and other and configuration, while
 						the
-						<a href="apidocs/org/apache/synapse/core/SynapseEnvironment.html">SynapseEnvironment</a>
+						<a href="../apidocs/org/apache/synapse/core/SynapseEnvironment.html">SynapseEnvironment</a>
 
 						object gives access to the underlying SOAP implementation used -
 						Axis2. A typical mediator would need to manipulate the

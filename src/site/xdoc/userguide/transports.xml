@@ -366,7 +366,7 @@
                         hostname of the server matches the names stored inside the X.509 certificate
                         presented by the server. Possible values are <tt>Strict</tt>, <tt>AllowAll</tt>
                         and <tt>DefaultAndLocalhost</tt>. See the
-						<a href="apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier Javadoc</a>
+						<a href="../apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier Javadoc</a>
 						for more details.
 					</dd>
 				</dl>

@@ -292,7 +292,7 @@
 					</tr>
 					<tr class="b">
 						<td>
-							<a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html">AbstractMediatorFactory</a>
+							<a href="../apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html">AbstractMediatorFactory</a>
 						</td>
 						<td>createMediator(OMElement)</td>
 						<td>
@@ -309,7 +309,7 @@
 					</tr>
 					<tr class="a">
 						<td>
-							<a href="apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html">AbstractMediatorSerializer</a>
+							<a href="../apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html">AbstractMediatorSerializer</a>
 						</td>
 						<td>serializeMediator(Mediator)</td>
 						<td>
@@ -328,7 +328,7 @@
 				</table>
 				<p>
 					Further to that if you have been using
-					<a href="apidocs/org/apache/synapse/ServerManager.html">ServerManager</a>
+					<a href="../apidocs/org/apache/synapse/ServerManager.html">ServerManager</a>
 					class you may have noticed that the class is no more a singleton and doesn't have
                     the static getInstance method. Also note that the common utilities like data
                     sources JMX and RMI registration stuff have been moved to a new module with
@@ -339,9 +339,9 @@
                     construct its instance and that has been used to pass in any additional information
                     required like RESOLVE_ROOT, or SYNAPSE_HOME startup parameters. For example if you
                     look at the
-					<a href="apidocs/org/apache/synapse/config/xml/MediatorFactoryFinder.html">MediatorFactoryFinder</a>
+					<a href="../apidocs/org/apache/synapse/config/xml/MediatorFactoryFinder.html">MediatorFactoryFinder</a>
 					class the
-					<a href="apidocs/org/apache/synapse/config/xml/MediatorFactoryFinder.html#getMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">getMediator</a>
+					<a href="../apidocs/org/apache/synapse/config/xml/MediatorFactoryFinder.html#getMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)">getMediator</a>
 					method is expecting a properties map apart from the OMElement argument.
 					It is safe to pass in a empty properties map if you are using these methods for
                     any testing purposes or even in cases where you do not resolve dependencies.

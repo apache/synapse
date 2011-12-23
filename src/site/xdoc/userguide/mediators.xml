@@ -713,7 +713,7 @@
                 </p>
                 <p>
                     The complete list of available methods can be found in the
-                    <a href="apidocs/org/apache/synapse/mediators/bsf/ScriptMessageContext.html">
+                    <a href="../apidocs/org/apache/synapse/mediators/bsf/ScriptMessageContext.html">
                         ScriptMessageContext Javadoc</a>.
                 </p>
             </subsection>

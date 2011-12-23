@@ -51,9 +51,8 @@
         </menu>
         <menu name="Developer Resources">
             <item name="Developer Guide " href="dev/developer-guide.html"/>
-            <item name="Developer Best Practices"/>
+            <item name="Development Best Practices" href="dev/best-practices.html"/>
             <item name="Release Process" href="dev/release-process.html"/>
-            <item name="How to Contribute"/>
         </menu>
         <menu name="Project Details">
             <item name="Overview" href="project-info.html"/>

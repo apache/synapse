@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Development Best Practices</title>
+    </properties>
+    <body>
+        <section name="Development Best Practices">
+            <p>
+                This document explains the best practices and conventions that should be followed
+                when writing code, documentation and samples for Apache Synapse. It is mainly
+                intended for Synapse committers who directly commit code into the Synapse code base.
+                It is also a useful resource for potential contributors who are willing to
+                write code for Synapse.
+            </p>
+            <p>
+                Committers are highly encouraged to follow the guidelines mentioned in this document
+                whenever adding a new source file to the code base or when modifying an existing source
+                file. Same best practices should be followed when committing a patch provided by
+                a contributor.
+            </p>
+            <p>
+                This document is a work in progress. We will continue to make this more detailed
+                and comprehensive as we go along. So stay tuned for updates.
+            </p>
+            <subsection name="Contents">
+                <ul>
+                    <li><a href="#Code">Writing Code</a></li>
+                    <li><a href="#Docs">Writing Samples and Documentation</a></li>
+                </ul>
+            </subsection>
+        </section>
+        <section name="Writing Code" id="Code">
+            <ul>
+                <li>
+                    We follow the standard
+                    <a href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html">Java coding conventions</a>
+                    published by Sun/Oracle. Please stick to these standards whenever writing code
+                    for Synapse.
+                </li>
+                <li>
+                    The maximum number of characters in a single line should not exceed 100. Please
+                    configure your IDE to properly enforce this restriction on all source files.
+                </li>
+                <li>
+                    All source files should contain the following license header at the top.<br/>
+                    <div class="xmlConf">/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */</div>
+                </li>
+                <li>
+                    Pay attention to indentation and proper spacing between code blocks.
+                </li>
+                <li>
+                    Each Java source file should have a introductory Javadoc comment describing its
+                    main purposes and features.
+                </li>
+                <li>
+                    Every public method should have a Javadoc comment describing its purpose and
+                    behavior. When writing Javadoc comments for methods, input arguments, return
+                    values and checked exceptions should also be clearly explained.
+                </li>
+                <li>
+                    Use meaningful names for all classes, interfaces, methods and variables. Pay
+                    attention to spellings. Code should be easier to follow and understand.
+                </li>
+                <li>
+                    Feel free to include comments within the code to explain non-trivial logic.
+                </li>
+                <li>
+                    When removing a public method or an API, first deprecate the relevant operations
+                    by applying the proper Javadoc annotations. Actual removal of the operation
+                    should be done after some time, in a future release.
+                </li>
+                <li>
+                    Write test cases for each new feature and bug fix implemented in the code base.
+                    Test cases make it easier to check for regressions and keep the code base
+                    healthy at all times.
+                </li>
+            </ul>
+        </section>
+        <section name="Writing Samples and Documentation" id="Docs">
+            <ul>
+                <li>
+                    All documentation files and samples should we well-formed XML documents.
+                </li>
+                <li>
+                    We use the <a href="http://maven.apache.org/maven-1.x/plugins/xdoc/">Maven XDoc plugin</a>
+                    to generate Synapse documentation and website. Please take some time to go through
+                    the documentation of the XDoc plugin and learn and its features. In pariculay,
+                    you should learn the <a href="http://maven.apache.org/doxia/references/xdoc-format.html">XDoc documentation format</a>
+                    and use the standard XDoc tags over HTML whenever possible.
+                </li>
+                <li>
+                    Any XML code samples included in the documentation should be properly HTML
+                    encoded and indented. Such code samples should go in a HTML 'div' section withe
+                    the class 'xmlConf'.
+                    <div class="xmlConf">&lt;div class="xmlConf"&gt;
+    ... Encoded XML content ...
+&lt;/div&gt;</div>
+                </li>
+                <li>
+                    Attempt to keep each line shorter than 100 characters. This is bit tricky to
+                    enforce when writing XML/HTML content. But try to stick to the rule whenever
+                    possible.
+                </li>
+                <li>
+                    Add navigation links wherever possible. When describing a particular feature
+                    add a link to the relevant sample.
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

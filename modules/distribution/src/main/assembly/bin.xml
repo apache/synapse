@@ -213,8 +213,8 @@
                 <exclude>javax.servlet:servlet-api:jar</exclude>
                 <exclude>xml-apis:xml-apis:jar</exclude>
                 <exclude>xerces:xercesImpl:jar</exclude>
-		<exclude>org.apache.xerces:xercesImpl</exclude>
-		<exclude>org.apache.xerces:xml-apis</exclude>
+		        <exclude>org.apache.xerces:xercesImpl</exclude>
+		        <exclude>org.apache.xerces:xml-apis</exclude>
                 <exclude>junit:junit:jar</exclude>
                 <exclude>org.apache.mina:mina-core:jar</exclude>
                 <exclude>org.slf4j:slf4j-api:jar</exclude>
@@ -222,7 +222,8 @@
                 <exclude>org.slf4j:jcl-over-slf4j:jar</exclude>
                 <exclude>org.slf4j:log4j-over-slf4j:jar</exclude>
                 <exclude>com.oopsconsultancy:xmltask:jar</exclude>
-		<exclude>xalan:xalan:jar</exclude>
+	    	    <exclude>xalan:xalan:jar</exclude>
+                <exclude>quickfixj:quickfixj-all:jar</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>

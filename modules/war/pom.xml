@@ -204,15 +204,8 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>../../src/site/resources</directory>
-                            <targetPath>docs</targetPath>
-                            <includes>
-                                <include>Synapse_Configuration_Language.html</include>
-                                <include>Synapse_Samples.html</include>
-                                <include>Synapse_Samples_Setup.html</include>
-                                <include>Synapse_QuickStart.html</include>
-                                <include>Synapse_Extending.html</include>
-                            </includes>
+                            <directory>../../target/site</directory>
+                            <targetPath>docs</targetPath>                            
                         </resource>
                         <!--<resource>-->
                             <!--<directory>modules/samples/services</directory>-->

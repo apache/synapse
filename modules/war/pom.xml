@@ -74,6 +74,12 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-vfs-transport</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>documentation</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+
         
         <!-- The patches -->
         <dependency>
@@ -204,15 +210,15 @@
                             </includes>
                         </resource>
                         <resource>
-                            <directory>../../src/site/resources</directory>
+                            <directory>../../modules/documentation/target/site</directory>
                             <targetPath>docs</targetPath>
-                            <includes>
+                            <!--includes>
                                 <include>Synapse_Configuration_Language.html</include>
                                 <include>Synapse_Samples.html</include>
                                 <include>Synapse_Samples_Setup.html</include>
                                 <include>Synapse_QuickStart.html</include>
                                 <include>Synapse_Extending.html</include>
-                            </includes>
+                            </includes-->
                         </resource>
                         <!--<resource>-->
                             <!--<directory>modules/samples/services</directory>-->

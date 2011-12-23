@@ -24,8 +24,7 @@
     </properties>
     <body>
         <section name="Sample 750: Stereotyping XSLT Transformations with Templates">
-            <div class="xmlConf">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-    &lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            <div class="xmlConf">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
 
         &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
             &lt;target&gt;
@@ -68,7 +67,7 @@
 
         &lt;localEntry key=&quot;xslt-key-req&quot; src=&quot;file:repository/samples/resources/transform/transform.xslt&quot;/&gt;
         &lt;localEntry key=&quot;xslt-key-back&quot; src=&quot;file:repository/samples/resources/transform/transform_back.xslt&quot;/&gt;
-    &lt;/definitions&gt;</div>
+&lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
                     Introduction to Apache Synapse Sequence Templates

@@ -1,4 +1,4 @@
-Apache Synapse Enterprise Service Bus (ESB) - 1.2 Release Notes - June 2008
+Apache Synapse Enterprise Service Bus (ESB) - 2.1 Release Notes - December 2011
 
 1. Overview
     The Apache Synapse ESB is a robust, lightweight and highly scalable and distributed
@@ -31,31 +31,11 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.2 Release Notes - June 2008
     
 7. Known Issues and limitations
 
-  * SYNAPSE-180 Does not support throttling by concurrency within a cluster
-  * SYNAPSE-186 Does not support HTTP some of the REST operations (such as put/delete etc)
-  * SYNAPSE-181 Does not yet support JTA transactions
-  * SYNAPSE-330 Does not yet support load balancing with session affinity using SOAP sessions
-  * SYNAPSE-280 Does not preserve CDATA sections within payloads
-  * SYNAPSE-307 The XSLT mediator will not report errors encountered in a provided stylesheet
-
-  * The Synapse JMS implementation supports JMS 1.0.2b, however due to licensing issues we include
-    the JMS 1.1 spec JAR from Apache Geronimo (geronimo-jms_1.1_spec-1.1.jar) instead. If you have
-    any issues with JMS 1.0.x, please download the Sun JMS 1.0.2b JAR and replace supplied JAR from
-    Geronimo.
+  * All the know issues are reported in https://issues.apache.org/jira/browse/SYNAPSE
 
 8. Frequently asked questions
 
-  * How can I change the default logging level of Synapse?
-    Edit the lib/log4j.properties and set the line "log4j.category.org.apache.synapse=INFO" to
-    "log4j.category.org.apache.synapse=DEBUG" and restart Synapse.
-
-  * If you get an error related to WS-Security or when using it, check to ensure that your JDK
-    uses the "Unlimited Strength Jurisdiction Policy Files". These could be downloaded from
-    http://java.sun.com/javase/downloads/index_jdk5.jsp Refer to the associated documentation
-    for instructions on how to install it to your JDK.
-
-  * If you encounter issues with your JDK related to XML processing, try placing the Xerces jar
-    files xercesImpl-2.8.0.jar and xml-apis-1.3.03.jar in your <JDK>/jre/lib/endorsed/ directory.
+  * Please refer the FAQ section. (http://synapse.apache.org/faq.html)
 
 9. Reporting Problems
 
@@ -65,6 +45,33 @@ Apache Synapse Enterprise Service Bus (ESB) - 1.2 Release Notes - June 2008
         synapse-user mailing list by sending email to user-subscribe@synapse.apache.org
 
 10. New features
+
+    The 2.1 release
+        * Support for creating and managing REST APIs with URL patterns and URI templates
+        * Define sequences and endpoints as templates and reuse seamlessly across the whole configuration
+        * Payload factory mediator for constructing custom XML payloads
+        * Recipient list endpoint
+        * HTTPD like access logging capability in the NHTTP transport
+        * Message stores and message processors for implementing complex integration patterns and advanced messaging scenarios
+        * Receiving sequence support in the send mediator to make service chaining easier
+        * Conditional Router mediator
+
+
+    The 2.0 release
+        * New, fine-grained configuration model
+        * Hot deployment and hot update support for configuration artifacts
+        * Priority based mediation support
+        * Comprehensive eventing capabilities with WS-Eventing support
+        * Secure vault for encrypting passwords in configuration files
+        * File locking support in the VFS transport for concurrent polling
+        * URLRewrite medaitor for fast and simple URL rewriting
+        * Synapse configuration observer API
+        * Multiple identity support in the HTTPS transport
+        * Enhanced JMX monitoring support for the NHTTP transport
+        * Dead letter channel implementation (experimental)
+        * Synapse XAR Maven plugin for generating configuration artifacts
+
+
     The 1.2 release
         * Support for Hessian binary messages
         * FIX (Financial Information eXchange) protocol transport

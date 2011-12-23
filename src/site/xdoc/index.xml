@@ -68,6 +68,10 @@
                     Receiving sequence support in the send mediator to make service chaining
                     easier
                 </li>
+                <li>
+                    Conditional router mediator for implementing complex routing scenarios with
+                    many conditions and rules
+                </li>
             </ul>
         </section>
         <section name="Key Features">

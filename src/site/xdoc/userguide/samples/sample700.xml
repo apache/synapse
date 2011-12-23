@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 700</title>
     </properties>
     <body>
-        <section name="Sample 700: Introduction to Synapse Message Store">
+        <section name="Sample 700: Introduction to Synapse Message Stores">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;!--Simple in Memory Message Store with name foo --&gt;
     &lt;messageStore name="foo" sequence="bar"&gt;

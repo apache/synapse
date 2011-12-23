@@ -113,10 +113,10 @@
                         <li><a href="samples/sample257.html">Sample 257: Proxy services with the FIX transport</a></li>
                         <li><a href="samples/sample258.html">Sample 258: Switching from HTTP to FIX </a></li>
                         <li><a href="samples/sample259.html">Sample 259: Switching from FIX to HTTP </a></li>
-                        <li><a href="">Sample 260: Switching from FIX to AMQP </a></li>
+                        <li><a href="samples/sample260.html">Sample 260: Switching from FIX to AMQP </a></li>
                         <li><a href="samples/sample261.html">Sample 261: Switch between different FIX versions </a></li>
                         <li><a href="samples/sample262.html">Sample 262: Content Based Routing of FIX messages </a></li>
-                        <li><a href="">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
+                        <li><a href="samples/sample263.html">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
                         <li><a href="samples/sample264.html">Sample 264: Request-response invocations with the JMS transport</a></li>
                         <li><a href="samples/sample265.html">Sample 265: Switching from TCP to HTTP/S</a></li>
                         <li><a href="samples/sample266.html">Sample 266: Switching from UDP to HTTP/S</a></li>
@@ -240,7 +240,7 @@
             <subsection name="Message Store and Dead Letter Channel">
                 <p>
                     <ul>
-                        <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse message store </a></li>
+                        <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse message stores</a></li>
                     </ul>
                 </p>
             </subsection>

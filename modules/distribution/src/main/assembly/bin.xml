@@ -131,14 +131,14 @@
             <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>
             <fileMode>755</fileMode>
         </fileSet>      
-        <!--fileSet>
+        <fileSet>
             <directory>../../src/site/resources/images</directory>
             <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../../src/site/resources/logos</directory>
             <outputDirectory>synapse-${synapse.version}/docs/logos</outputDirectory>
-        </fileSet-->
+        </fileSet>
         <fileSet>
             <directory>../../modules/samples/services</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
@@ -166,11 +166,6 @@
             </includes>
             <fileMode>755</fileMode>
         </fileSet>
-        <fileSet>
-            <directory>../../modules/documentation/target/site/</directory>
-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
-
-        </fileSet>
 
         <!--<fileSet>-->
         <!--<directory>target/javadoc</directory>-->
@@ -195,7 +190,7 @@
         <!--</fileSet>-->
     </fileSets>
     <files>
-        <!--file>
+        <file>
             <source>../../src/site/xdoc/Synapse_Configuration_Language.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Configuration_Language.html</destName>
@@ -219,7 +214,7 @@
             <source>../../src/site/xdoc/Synapse_Extending.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Extending.html</destName>
-        </file-->
+        </file>
         <file>
             <source>.empty</source>
             <outputDirectory>synapse-${synapse.version}/work/temp/sampleClient</outputDirectory>

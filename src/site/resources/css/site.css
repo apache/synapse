@@ -187,7 +187,7 @@ table.bodyTable tr:nth-child(odd) {background: #FFF}
     font-size: 11px;
     font-family: Courier;
     margin: 10px;
-    line-height: 13px;
+    line-height: 25px;
     background-color: #f0f0f0;
     border-bottom: 1px dashed #3c78b5;
     padding: 3px;
@@ -204,4 +204,9 @@ table.bodyTable tr:nth-child(odd) {background: #FFF}
     font-family: Courier;
     margin: 10px;
     line-height: 13px;
+}
+.xmlConf a {
+    font-size:13px;
+    line-height:20px;
+    font-family: Courier;
 }

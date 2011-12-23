@@ -28,13 +28,13 @@
             </p>
         </section>
         <section name="General(GeneralApache Synapse questions - Non technical)">
-
             <ol>
                 <li>
                     What is Apache Synapse?
                     <ul>
                         <li>
-                            Apache Synapse is a lightweight and high-performance Enterprise Service Bus (ESB).
+                            Apache Synapse is a lightweight and high-performance Enterprise Service
+                            Bus (ESB).
                         </li>
                     </ul>
                 </li>
@@ -44,19 +44,246 @@
                     What makes Apache Synapse unique?
                     <ul>
                         <li>
-                            Apache Synapse is fast and able to handle thousands of concurrent connections
+                            Apache Synapse is fast and able to handle thousands of concurrent
+                            connections
                             with constant memory usage. It comes with a rich set of mediators to
-                            support almost any integration scenario out of the box. It is also easily
+                            support almost any integration scenario out of the box. It is also
+                            easily
                             extensible and highly customizable.
                         </li>
                     </ul>
                 </li>
                 <p/>
-
+                <li>
+                    What is the license?
+                    <ul>
+                        <li>
+                            Apache Synapse comes with Apache 2.0 licence.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
             </ol>
         </section>
 
+        <section name="Mediation(Questions related to sequences, endpoints, proxies etc)">
+            <ol>
+                <li>
+                    What is a proxy service?
+                    <ul>
+                        <li>
+                            A proxy service is a virtual service hosted on the ESB. It can accept
+                            requests from service clients, just like a real Web Service. A proxy
+                            service can process requests and forward them to an actual Web Service
+                            (back end service) to be further processed. The responses coming back
+                            from
+                            the back end service can be routed back to the original client. Proxy
+                            services are mostly used to expose an existing service over a different
+                            transport, format or QoS configuration.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
 
+                <li>
+                    What is a mediator?
+                    <ul>
+                        <li>
+                            A mediator is the basic message processing unit in the ESB. A mediator
+                            can take a message, carry out some predefined actions on it and output
+                            the modified message. Apache Synapse ships with a range of mediators capable
+                            of carrying out various tasks on input messages.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is a sequence?
+                    <ul>
+                        <li>
+                            A sequence is an ordered list of mediators (a mediator chain). When a
+                            sequence is given a message, it will go through all the mediators in the
+                            sequence. A sequence can also handover messages to other sequences.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is an Endpoint?
+                    <ul>
+                        <li>
+                            A logical representation of an actual endpoint or a group of endpoints
+                            (i.e. Load Balancing and Fail Over).
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What are Local Entries?
+                    <ul>
+                        <li>
+                            Local entries can be used to hold various configuration elements
+                            required by sequences and proxy services. Usually they are used to hold
+                            WSDLs, XSDs, XSLT files etc. A local entry can contain XML content as
+                            well
+                            as plain text content. A local entry can be configured to load content
+                            from a remote file too.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+
+                <li>
+                    What is a Message Mediation?
+                    <ul>
+                        <li>
+                            Managing and transforming the messages flowing between the client and a
+                            service in an enterprise.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+
+                <li>
+                    What is Message Mediation?
+                    <ul>
+                        <li>
+                            Mediating messages coming into a specific service by specifying the
+                            target URI as a Synapse mediation service.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is Service Mediation?
+                    <ul>
+                        <li>
+                            Mediating messages coming into a specific service by specifying the
+                            target URI as a Synapse mediation service.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is a Message Store?
+                    <ul>
+                        <li>
+                            Message Store is the storage for ESB messages. It can be an in-memory
+                            store
+                            or can be JMS store with an external Message Broker. You can always plug
+                            your
+                            own message store implementations as well.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is a Message Processor?
+                    <ul>
+                        <li>
+                            Message processor can be used to implement different messaging and
+                            integration patters along with Message stores. Message processors will
+                            consume
+                            the messages in message stores and do the processing of them.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is a Template?
+                    <ul>
+                        <li>
+                            ESB Templates try to minimize this redundancy by creating prototypes
+                            that
+                            users can re-use and utilize as and when needed. This is very much
+                            analogous
+                            to classes and instances of classes where-as, a template is a class that
+                            can be used to wield instance objects such as templates and endpoints.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is the REST Api?
+                    <ul>
+                        <li>
+                            REST Api can be used to mediate HTTP POST, GET, PUT and DELETE request
+                            through Synapse and to integrate various RESTful services.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    Can Endpoint perform error handling?
+                    <ul>
+                        <li>
+                            Yes. Endpoints can do error handling. User can configure the behavior
+                            of an endpoints when it faced to a erroneous situation.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+            </ol>
+        </section>
+        <section name="Transports(Transport related questions)">
+            <ol>
+                <li>
+                    What are the transports supported by the Apache Synapse?
+                    <ul>
+                        <li>
+                            HTTP, HTTPS, VFS based file transport, FIX, Hessian, HL7,UDP, JMS, Mail,
+                            TCP, XMPP
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+
+                <li>
+                    Do I need an external JMS broker for the JMS transport?
+                    <ul>
+                        <li>
+                            Yes, Apache Synapse requires an external JMS broker like Apache ActiveMQ
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    Does Apache Synapse support two way JMS scenario (request/response) ?
+                    <ul>
+                        <li>
+                            Yes, you can refer sample 264 which demonstrates exactly the JMS
+                            request/response scenario.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is the NHTTP transport?
+                    <ul>
+                        <li>
+                           This is the default HTTP transport used by Apache Synapse. NHTTP stands for
+                            non-blocking HTTP. NHTTP transport uses the Java Non-blocking I/O API.
+                            This allows the NHTTP transport to scale into handling hundreds of connections
+                            without blocking the threads. The server worker threads used by the NHTTP
+                            transport do not get blocked on I/O until the Synapse receives responses
+                            for the already forwarded requests. Therefore Apache Synapse can accept
+                            more concurrent connections and requests than most HTTP server products.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
+                    What is the underlying HTTP library used by the NHTTP transport?
+                    <ul>
+                        <li>
+                           NHTTP transport uses the Apache Http Core NIO library underneath. This
+                           library provides low level I/O handling and HTTP level detail handling.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+            </ol>
+        </section>
 
     </body>
 </document>

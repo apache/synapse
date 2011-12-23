@@ -244,6 +244,13 @@
                     </ul>
                 </p>
             </subsection>
+            <subsection name="Templates">
+                <p>
+                    <ul>
+                        <li><a href="samples/sample750.html">Sample 750: Introduction to Synapse Templates</a></li>
+                    </ul>
+                </p>
+            </subsection>
             <subsection name="REST API">
                 <p>
                     <ul>

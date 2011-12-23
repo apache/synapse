@@ -18,16 +18,16 @@ Apache Synapse Enterprise Service Bus (ESB) - 2.1 Release Notes - December 2011
     JDK 1.5.x, and Apache Maven 2.0.6 or later
 
 3. Quick start
-    Please see the docs/Synapse_Quickstart.html guide
+    Please see the docs/quick_start.html guide
 
 4. Building the Samples
-    Please see the documents docs/Synapse_Samples.html and docs/Synapse_Samples_Setup.html
+    Please see the documents docs/samples.html
 
 5. Synapse configuration language
-    Please see the document docs/Synapse_Configuration_Language.html
+    Please see the document docs/config.html
 
 6. Extending Synapse
-    Please see the document docs/Synapse_Extending.html
+    Please see the document docs/extending.html
     
 7. Known Issues and limitations
 
@@ -64,7 +64,7 @@ Apache Synapse Enterprise Service Bus (ESB) - 2.1 Release Notes - December 2011
         * Comprehensive eventing capabilities with WS-Eventing support
         * Secure vault for encrypting passwords in configuration files
         * File locking support in the VFS transport for concurrent polling
-        * URLRewrite medaitor for fast and simple URL rewriting
+        * URLRewrite mediator for fast and simple URL rewriting
         * Synapse configuration observer API
         * Multiple identity support in the HTTPS transport
         * Enhanced JMX monitoring support for the NHTTP transport
@@ -80,7 +80,7 @@ Apache Synapse Enterprise Service Bus (ESB) - 2.1 Release Notes - December 2011
         * Support for GZip encoding and HTTP 100 continue
         * Natural support for dual channel messaging with WS-Addressing
         * Cluster aware sticky load balancing support
-        * Non-blocking streaming of large messages at high concurreny with constant memory usage
+        * Non-blocking streaming of large messages at high concurrency with constant memory usage
         * Support for an ELSE clause for the Filter mediator
         * Ability to specify XPath expressions relative to the envelope or body
         * Support for separate policies for incoming/outgoing messages
@@ -119,6 +119,6 @@ Apache Synapse Enterprise Service Bus (ESB) - 2.1 Release Notes - December 2011
     The 0.90 release adds support for:
         * WS-Security termination and initiation
         * WS-ReliableMessaging termination and initiation
-        * Support for dynamic reloading and remote reigstries
+        * Support for dynamic reloading and remote registries
         * Scripting mediators based on Apache BSF
         * Refactored and cleaner synapse configuration xml

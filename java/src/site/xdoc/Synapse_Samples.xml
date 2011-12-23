@@ -2837,7 +2837,7 @@ out sequence as the receiving sequence is specified in the send mediator.</p>
         <p>
         Condition II : Matching HTTP Header AND Url<br/>
         </p>
-        <pre xml:space="preserve">curl -d @stockQuoteReq.xml -H "Content-Type: application/soap+xml;charset=UTF-8" -H "my_custom_header1:foo1" "http://localhost:8280/services/StockQuoteProxy"</pre>
+            <pre xml:space="preserve">curl -d @stockQuoteReq.xml -H "Content-Type: application/soap+xml;charset=UTF-8" -H "my_custom_header1:foo1" "http://localhost:8280/services/StockQuoteProxy"</pre>
 
         <p>
         Condition III : Complex conditions with AND, OR and NOT<br/>

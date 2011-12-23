@@ -163,6 +163,11 @@
             <classifier>jars</classifier>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>documentation</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
     </dependencies>
 
     <repositories>

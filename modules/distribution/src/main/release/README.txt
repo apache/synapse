@@ -61,20 +61,18 @@ Documentation
 Documentation can be found in the 'docs' directory included with the binary distribution 
 and in the 'src/site/resources' directory in the source distribution. 
 
-For Synapse mediation samples please see the Synapse_Quickstart.html, Synapse_Samples.html 
-and Synapse_Samples_Setup.html
+For Synapse mediation samples please see the quick_start.html and samples.html.
 
 For more information on the Synapse Configuration language syntax and usage refer to
-Synapse_Configuration_Language.html
+config.html
 
 -------------------
 Getting Started
 ===================
 
-Refer to the Synapse_Quickstart.html document to get started with Synapse in just a couple of minutes.
+Refer to the quick_start.html document to get started with Synapse in just a couple of minutes.
 
-More indepth samples could be found in Synapse_Samples_Setup.html and Synapse_Samples.html found in
-the docs directory.
+More in-depth samples could be found in samples.html found in the docs directory.
 
 The actual sample Synapse configurations could be found at <SYNAPSE>/respository/conf/sample.
 The resources sub-directory contains the sample XSLT transformations, XSD schemas, WS policies

@@ -24,7 +24,6 @@ import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -52,7 +51,6 @@ public class ThrottleMediatorTest extends TestCase {
     private static final String POLICY = " <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\"\n" +
             "                xmlns:throttle=\"http://www.wso2.org/products/wso2commons/throttle\">\n" +
             "        <throttle:ThrottleAssertion>\n" +
-            "            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\n" +
             "            <wsp:All>\n" +
             "                <throttle:ID throttle:type=\"IP\">other</throttle:ID>\n" +
             "                <wsp:ExactlyOne>\n" +
@@ -61,7 +59,6 @@ public class ThrottleMediatorTest extends TestCase {
             "                        <throttle:UnitTime>800000</throttle:UnitTime>\n" +
             "                        <throttle:ProhibitTimePeriod wsp:Optional=\"true\">10</throttle:ProhibitTimePeriod>\n" +
             "                    </wsp:All>\n" +
-            "                    <throttle:IsAllow>true</throttle:IsAllow>\n" +
             "                </wsp:ExactlyOne>\n" +
             "            </wsp:All>\n" +
             "            <wsp:All>\n" +
@@ -72,7 +69,6 @@ public class ThrottleMediatorTest extends TestCase {
             "                        <throttle:UnitTime>800000</throttle:UnitTime>\n" +
             "                        <throttle:ProhibitTimePeriod wsp:Optional=\"true\">10000</throttle:ProhibitTimePeriod>\n" +
             "                    </wsp:All>\n" +
-            "                    <throttle:IsAllow>true</throttle:IsAllow>\n" +
             "                </wsp:ExactlyOne>\n" +
             "            </wsp:All>\n" +
             "            <wsp:All>\n" +
@@ -83,7 +79,6 @@ public class ThrottleMediatorTest extends TestCase {
             "                        <throttle:UnitTime>600000</throttle:UnitTime>\n" +
             "                        <throttle:ProhibitTimePeriod wsp:Optional=\"true\"></throttle:ProhibitTimePeriod>\n" +
             "                    </wsp:All>\n" +
-            "                    <throttle:IsAllow>true</throttle:IsAllow>\n" +
             "                </wsp:ExactlyOne>\n" +
             "            </wsp:All>\n" +
             "            <wsp:All>\n" +
@@ -94,7 +89,6 @@ public class ThrottleMediatorTest extends TestCase {
             "                        <throttle:UnitTime>500000</throttle:UnitTime>\n" +
             "                        <throttle:ProhibitTimePeriod wsp:Optional=\"true\"></throttle:ProhibitTimePeriod>\n" +
             "                    </wsp:All>\n" +
-            "                    <throttle:IsAllow>true</throttle:IsAllow>\n" +
             "                </wsp:ExactlyOne>\n" +
             "            </wsp:All>\n" +
             "        </throttle:ThrottleAssertion>\n" +
@@ -194,7 +188,7 @@ public class ThrottleMediatorTest extends TestCase {
 
     public void testMediate() throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
-        StAXOMBuilder builde = new StAXOMBuilder(in);
+        StAXOMBuilder builder = new StAXOMBuilder(in);
         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
         throttleMediator.setPolicyKey("throttlepolicy");
         MessageContext synCtx = createLightweightSynapseMessageContext("<empty/>");
@@ -203,7 +197,7 @@ public class ThrottleMediatorTest extends TestCase {
         Entry prop = new Entry();
         prop.setKey("throttlepolicy");
         prop.setType(Entry.INLINE_XML);
-        prop.setValue(builde.getDocumentElement());
+        prop.setValue(builder.getDocumentElement());
         synCfg.addEntry("throttlepolicy", prop);
         synCtx.setConfiguration(synCfg);
         for (int i = 0; i < 6; i++) {
@@ -228,7 +222,7 @@ public class ThrottleMediatorTest extends TestCase {
     }
 
     public void testMediateWithInLineXML() throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(NEW_POLICY.getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
         StAXOMBuilder build = new StAXOMBuilder(in);
         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
         throttleMediator.setInLinePolicy(build.getDocumentElement());
@@ -268,7 +262,7 @@ public class ThrottleMediatorTest extends TestCase {
 
             init(synCtx);
             try {
-                return canAcess(synCtx);
+                return canAccess(synCtx);
             }
             catch (
                     ThrottleException e) {
@@ -277,7 +271,7 @@ public class ThrottleMediatorTest extends TestCase {
 
         }
 
-        protected boolean canAcess(MessageContext synContext)
+        protected boolean canAccess(MessageContext synContext)
                 throws SynapseException, ThrottleException {
 
             if (throttle == null) {
@@ -289,20 +283,20 @@ public class ThrottleMediatorTest extends TestCase {
             if (remoteIP == null) {
                 throw new ThrottleException("IP address of the caller can not find - " +
                         "Currently only support caller-IP base access control" +
-                        "- Thottling will not happen ");
+                        "- Throttling will not happen ");
 
             } else {
                 ThrottleContext throttleContext
                         = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
                 if (throttleContext == null) {
-                    throw new ThrottleException("Can not find a configuartion for " +
+                    throw new ThrottleException("Can not find a configuration for " +
                             "IP Based Throttle");
 
                 }
-                AccessRateController accessControler;
+                AccessRateController accessController;
                 try {
-                    accessControler = new AccessRateController();
-                    boolean canAccess = accessControler.canAccess(
+                    accessController = new AccessRateController();
+                    boolean canAccess = accessController.canAccess(
                             throttleContext, remoteIP, ThrottleConstants.IP_BASE).isAccessAllowed();
                     if (!canAccess) {
                         throw new SynapseException("Access has currently been denied by" +
@@ -356,8 +350,7 @@ public class ThrottleMediatorTest extends TestCase {
         protected void createThrottleMetaData(OMElement policyOmElement) {
 
             try {
-                throttle = ThrottleFactory.createMediatorThrottle(
-                        PolicyEngine.getPolicy(policyOmElement));
+                throttle = ThrottleFactory.createMediatorThrottle(policyOmElement);
             }
             catch (ThrottleException e) {
 

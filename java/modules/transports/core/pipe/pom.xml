@@ -41,7 +41,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -58,6 +57,4 @@
         </plugins>
     </build>
 
-    <dependencies>
-    </dependencies>
 </project>

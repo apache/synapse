@@ -33,8 +33,8 @@
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-tasks</artifactId>
 
-    <name>Apache Synapse - Tasks classes</name>
-    <description>Apache Synapse - Tasks classes</description>
+    <name>Apache Synapse - Tasks</name>
+    <description>Apache Synapse - Scheduled Tasks Core</description>
     <packaging>bundle</packaging>
 
     <build>
@@ -43,13 +43,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.2</version>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -66,7 +63,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
@@ -74,28 +70,14 @@
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-commons</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opensymphony</groupId>
             <artifactId>quartz</artifactId>
-            <version>${quartz.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.1_spec</artifactId>
-            <version>${geronimo-spec.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>${commons-collections.version}</version>
         </dependency>
     </dependencies>
-    <properties>
-        <!-- startup, quartz -->
-        <commons-collections.version>3.1</commons-collections.version>
-        <quartz.version>1.6.0</quartz.version>
-        <geronimo-spec.version>1.1</geronimo-spec.version>
-    </properties>
 </project>

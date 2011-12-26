@@ -18,6 +18,7 @@
   ~  under the License.
   -->
 <assembly>
+    <id>skeleton</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
         <format>zip</format>

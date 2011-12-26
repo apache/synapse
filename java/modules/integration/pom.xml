@@ -39,11 +39,9 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
                 <executions>
                     <execution>
                         <id>create_repo</id>
@@ -241,7 +239,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.3</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -259,7 +256,6 @@
                                     <outputDirectory>target/test_repos/axis2Server/modules
                                     </outputDirectory>
                                 </artifactItem>
-
                                 <artifactItem>
                                     <groupId>org.apache.rampart</groupId>
                                     <artifactId>rampart</artifactId>
@@ -292,7 +288,6 @@
                                     <outputDirectory>target/test_repos/axis2Client/modules
                                     </outputDirectory>
                                 </artifactItem>
-
                                 <artifactItem>
                                     <groupId>org.apache.axis2</groupId>
                                     <artifactId>addressing</artifactId>
@@ -323,11 +318,9 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.9</version>
                 <configuration>
                     <systemPropertyVariables>
                         <property>
@@ -354,7 +347,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.7.2</version>
                 <configuration>
                     <outputName>sample_automation</outputName>
                 </configuration>
@@ -380,14 +372,12 @@
             <artifactId>synapse-samples</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-fix-transport</artifactId>
-            <version>${synapse.version}</version>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-adb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
-            <version>${rampart.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -397,82 +387,74 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-base</artifactId>
-            <version>${axis2.transport.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-jms</artifactId>
-            <version>${axis2.transport.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-udp</artifactId>
-            <version>${axis2.transport.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-tcp</artifactId>
-            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-complete</artifactId>
-            <version>${jruby.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>5.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
-            <version>10.8.1.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbynet</artifactId>
-            <version>10.8.1.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.8.1.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.neethi</groupId>
-            <artifactId>neethi</artifactId>
-            <version>3.0.1</version>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+             <groupId>net.sf.saxon</groupId>
+             <artifactId>saxon</artifactId>
+             <scope>test</scope>
+        </dependency>
+        <dependency>
+             <groupId>net.sf.saxon</groupId>
+             <artifactId>saxon-xqj</artifactId>
+             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.caching</groupId>
+            <artifactId>wso2caching-core</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

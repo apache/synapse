@@ -33,23 +33,18 @@
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-commons</artifactId>
     
-    <name>Apache Synapse - Commons classes</name>
-    <description>Apache Synapse - Commons classes</description>
+    <name>Apache Synapse - Commons</name>
+    <description>Apache Synapse - Common Utilities</description>
     <packaging>bundle</packaging>
 
     <build>
         <plugins>
-
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.2</version>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -66,7 +61,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
@@ -74,17 +68,26 @@
         <dependency>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
-          <version>1.1</version>
         </dependency>
         <dependency>
           <groupId>org.apache.axis2</groupId>
           <artifactId>axis2-transport-base</artifactId>
-          <version>${axis2.transport.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.synapse</groupId>
           <artifactId>synapse-securevault</artifactId>
-          <version>2.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
         </dependency>
     </dependencies>
 </project>

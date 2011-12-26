@@ -45,7 +45,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.1</version>
                         <executions>
                             <execution>
                                 <id>create_repo</id>
@@ -249,7 +248,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.0-alpha-1</version>
                         <executions>
                             <execution>
                                 <id>copy</id>
@@ -351,7 +349,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.3</version>
                         <configuration>
                             <forkMode>pertest</forkMode>
                             <includes>
@@ -392,7 +389,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -419,20 +415,13 @@
             <artifactId>synapse-extensions</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>${jruby.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>${jms-1.1-spec.version}</version>
         </dependency>
         <!-- Rampart -->
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
-            <version>${rampart.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.woden</groupId>

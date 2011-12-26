@@ -29,7 +29,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.StringReader;
 
-public class AbstractMediatorTestCase extends TestCase {
+public abstract class AbstractMediatorTestCase extends TestCase {
 
     protected static OMElement createOMElement(String xml) {
         return SynapseConfigUtils.stringToOM(xml);

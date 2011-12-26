@@ -939,6 +939,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
+		<version>2.2</version>
                 <configuration>
                     <!-- These features are disabled since they cause "mvn site" to hang -->
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>

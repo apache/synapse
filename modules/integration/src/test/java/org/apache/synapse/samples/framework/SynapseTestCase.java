@@ -436,7 +436,7 @@ public abstract class SynapseTestCase extends TestCase {
     private boolean configureClustering() {
         try {
             String ip = SynapseTestUtils.getIPAddress();
-            if (ip == null || ip.isEmpty()) {
+            if (ip == null || ip.length() == 0) {
                 log.fatal("Could not detect an active IP address");
                 return false;
             }

@@ -51,7 +51,7 @@ public class SynapseTestUtils {
             NetworkInterface ni = (NetworkInterface) e.nextElement();
             // Clustering doesn't work for loop-back addresses, so we are not interested
             // we are not interested in inactive interfaces either
-            if (ni.isLoopback() || !ni.isUp()) continue;
+            // if (ni.isLoopback() || !ni.isUp()) continue; TODO: Find Java 5 alternative
 
             Enumeration e2 = ni.getInetAddresses();
             while (e2.hasMoreElements()) {

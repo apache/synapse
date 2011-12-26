@@ -41,7 +41,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -107,17 +106,11 @@
         <dependency>
             <groupId>quickfixj</groupId>
             <artifactId>quickfixj-all</artifactId>
-            <version>${qfj.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
-            <scope>test</scope>            
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
         </dependency>
     </dependencies>
-
-    <properties>
-        <qfj.version>1.4.0</qfj.version>
-    </properties>
 
 </project>

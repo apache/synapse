@@ -38,7 +38,6 @@
                                         <throttle:ProhibitTimePeriod wsp:Optional="true">10000
                                         </throttle:ProhibitTimePeriod>
                                     </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
                                 </wsp:ExactlyOne>
                             </wsp:All>
                             <wsp:All>
@@ -51,7 +50,6 @@
                                         <throttle:ProhibitTimePeriod wsp:Optional="true">10
                                         </throttle:ProhibitTimePeriod>
                                     </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
                                 </wsp:ExactlyOne>
                             </wsp:All>
                             <wsp:All>
@@ -62,7 +60,6 @@
                                         <throttle:UnitTime>600000</throttle:UnitTime>
                                         <throttle:ProhibitTimePeriod wsp:Optional="true"/>
                                     </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
                                 </wsp:ExactlyOne>
                             </wsp:All>
                             <wsp:All>
@@ -73,7 +70,6 @@
                                         <throttle:UnitTime>500000</throttle:UnitTime>
                                         <throttle:ProhibitTimePeriod wsp:Optional="true"/>
                                     </wsp:All>
-                                    <throttle:IsAllow>true</throttle:IsAllow>
                                 </wsp:ExactlyOne>
                             </wsp:All>
                         </throttle:ThrottleAssertion>

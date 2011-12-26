@@ -15,7 +15,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 /**
  * Preperation of the split mediator test cases 
  */
-public class AbstractSplitMediatorTestCase extends AbstractMediatorTestCase {
+public abstract class AbstractSplitMediatorTestCase extends AbstractMediatorTestCase {
 
     SplitTestHelperMediator helperMediator;
     MessageContext testCtx;

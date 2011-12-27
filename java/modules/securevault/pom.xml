@@ -26,11 +26,11 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>2.2.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>synapse-securevault</artifactId>
-    <name>Apache Synapse - Secure vault</name>
+    <name>Apache Synapse - Secure Vault</name>
     <description>Apache Synapse - Secure vault</description>
     <packaging>bundle</packaging>
     <build>

@@ -23,18 +23,24 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!-- TODO: shouldn't this be a Synapse specific parent-POM??? -->
     <parent>
-        <groupId>org.apache</groupId>
-        <artifactId>apache</artifactId>
-        <version>7</version>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>Apache-Synapse</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-securevault</artifactId>
-    <version>2.1.0</version>
-    <name>Apache Synapse - Secure vault</name>
+    <name>Apache Synapse - Secure Vault</name>
     <description>Apache Synapse - Secure vault</description>
     <packaging>bundle</packaging>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/branches/2.1/modules/securevault</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/branches/2.1/modules/securevault</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/branches/2.1/modules/securevault</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

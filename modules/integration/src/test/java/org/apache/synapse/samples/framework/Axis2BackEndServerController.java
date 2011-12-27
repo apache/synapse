@@ -92,7 +92,7 @@ public class Axis2BackEndServerController implements BackEndServerController {
                 TransportInDescription httpTrsIn = configContext.getAxisConfiguration().
                         getTransportsIn().get("http");
                 String httpPort = configuration.getHttpPort();
-                if (httpPort != null && !httpPort.isEmpty()) {
+                if (httpPort != null && httpPort.length() > 0) {
                     try {
                         new Integer(httpPort);
                         httpTrsIn.getParameter("port").setValue(httpPort);
@@ -104,7 +104,7 @@ public class Axis2BackEndServerController implements BackEndServerController {
                 TransportInDescription httpsTrsIn = configContext.getAxisConfiguration().
                         getTransportsIn().get("https");
                 String httpsPort = configuration.getHttpsPort();
-                if (httpsPort != null && !httpsPort.isEmpty()) {
+                if (httpsPort != null && httpsPort.length() > 0) {
                     try {
                         new Integer(httpsPort);
                         httpsTrsIn.getParameter("port").setValue(httpsPort);

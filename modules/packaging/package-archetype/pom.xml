@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>2.1.0</version>
+        <version>2.1.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>synapse-package-archetype</artifactId>
@@ -35,6 +35,13 @@
         This archetype can be used to create Maven projects that bundle a mediation
         into a standalone distribution ready to be executed
     </description>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/branches/2.1/modules/packaging/package-archetype</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/branches/2.1/modules/packaging/package-archetype</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/branches/2.1/modules/packaging/package-archetype</url>
+    </scm>
+
     <build>
         <resources>
             <resource>

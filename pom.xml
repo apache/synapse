@@ -32,7 +32,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.2.0-SNAPSHOT</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -1027,7 +1027,7 @@
         <!-- Sets the source encoding to UTF-8 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <synapse.version>2.1.0-SNAPSHOT</synapse.version>
+        <synapse.version>2.2.0-SNAPSHOT</synapse.version>
 
         <!-- Apache Commons -->
         <commons.dbcp.version>1.3</commons.dbcp.version> <!-- We need this version to support JDK 5 -->

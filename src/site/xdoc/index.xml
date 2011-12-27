@@ -41,6 +41,11 @@
                 This release comes with a horde of new features, bug fixes, performance and
                 stability improvements.
             </p>
+            <p>
+                Apache Synapse, Synapse, Apache, the Apache feather logo, and the Apache Synapse
+                project logo are trademarks of The <a href="http://www.apache.org">Apache Software
+                Foundation</a>
+            </p>
         </section>
         <section name="New in Version 2.1">
             <ul>

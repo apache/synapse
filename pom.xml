@@ -239,7 +239,7 @@
                 <inherited>false</inherited>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>site</goal>
                         </goals>

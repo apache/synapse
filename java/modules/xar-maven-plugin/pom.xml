@@ -32,6 +32,12 @@
     <packaging>maven-plugin</packaging>
     <name>Apache Synapse - XAR Maven Plugin</name>
     <description>Maven 2 plugin to create Synapse extension archives</description>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/xar-maven-plugin</url>
+    </scm>
     
     <dependencies>
         <dependency>

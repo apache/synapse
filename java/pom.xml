@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <groupId>org.apache.synapse</groupId>
@@ -59,7 +59,7 @@
             <post>user@synapse.apache.org</post>
             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>
         </mailingList>
-	<mailingList>
+	    <mailingList>
             <name>Apache Synapse Commits List</name>
             <subscribe>commits-subscribe@synapse.apache.org</subscribe>
             <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>
@@ -79,10 +79,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java
-        </connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java
-        </developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
         <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
     </scm>
 
@@ -959,18 +957,8 @@
     </reporting>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>apache-snapshots</id>
-            <name>Apache Development Repository</name>
-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
-        </snapshotRepository>
-        <repository>
-            <id>apache-releases</id>
-            <name>Apache Ibiblio rsync Repository</name>
-            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
-        </repository>
         <site>
-            <id>website</id>
+            <id>apache.website</id>
             <url>scpexe://people.apache.org/www/synapse.apache.org/</url>
         </site>
     </distributionManagement>
@@ -1082,7 +1070,7 @@
         <truezip.version>6.6</truezip.version>
         <jsch.version>0.1.31</jsch.version>
         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
-        <httpcore.nio.version>4.1</httpcore.nio.version>
+        <httpcore.nio.version>4.1.4</httpcore.nio.version>
         <http.client.version>4.1</http.client.version>
         <aspectj.version>1.6.1</aspectj.version>
         <qfj.version>1.4.0</qfj.version>

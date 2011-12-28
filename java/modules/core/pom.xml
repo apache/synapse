@@ -38,6 +38,12 @@
     <packaging>bundle</packaging>
     <url>http://synapse.apache.org</url>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/core</url>
+    </scm>
+
     <build>
         <plugins>
 

@@ -36,6 +36,12 @@
     <description>Apache Synapse - Transports</description>
     <packaging>pom</packaging>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports</url>
+    </scm>
+
     <modules>
         <module>core/nhttp</module>
         <module>core/pipe</module>

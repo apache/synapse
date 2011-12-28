@@ -36,6 +36,12 @@
     <description>Apache Synapse - VFS Transport</description>
     <packaging>bundle</packaging>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/vfs</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

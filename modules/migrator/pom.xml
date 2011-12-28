@@ -39,6 +39,12 @@
         compatible version
     </description>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/migrator</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

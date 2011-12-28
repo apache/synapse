@@ -36,6 +36,12 @@
     <description>Apache Synapse - PIPE Transport</description>
     <packaging>bundle</packaging>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/pipe</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

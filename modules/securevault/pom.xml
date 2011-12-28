@@ -33,6 +33,13 @@
     <name>Apache Synapse - Secure Vault</name>
     <description>Apache Synapse - Secure vault</description>
     <packaging>bundle</packaging>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/securevault</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

@@ -35,6 +35,13 @@
     <name>Apache Synapse - Distribution</name>
     <description>Apache Synapse - Distribution</description>
     <packaging>pom</packaging>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/distribution</url>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>

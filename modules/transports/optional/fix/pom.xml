@@ -36,6 +36,12 @@
     <description>Apache Synapse - FIX Transport</description>
     <packaging>bundle</packaging>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

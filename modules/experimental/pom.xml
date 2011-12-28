@@ -37,6 +37,12 @@
     <description>Apache Synapse - Experimental code (use at your own risk!)</description>
     <packaging>bundle</packaging>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/experimental</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

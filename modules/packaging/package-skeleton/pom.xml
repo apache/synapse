@@ -36,6 +36,13 @@
         configuration files to run Synapse. It can be used as a basis to bundle a mediation
         into a standalone distribution ready to be executed.
     </description>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-skeleton</url>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>

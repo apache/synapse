@@ -37,6 +37,12 @@
     <description>Apache Synapse - Sample Automation Framework</description>
     <!--<packaging>bundle</packaging>-->
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/integration</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -49,7 +55,6 @@
                         <configuration>
                             <tasks>
                                 <echo message="*** Creating testing repositories for synapse samples"/>
-
                                 <mkdir dir="target/test_repos"/>
                                 <mkdir dir="target/test_repos/axis2Server"/>
                                 <mkdir dir="target/test_repos/axis2Client"/>

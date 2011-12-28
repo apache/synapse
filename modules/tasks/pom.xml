@@ -32,14 +32,18 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-tasks</artifactId>
-
     <name>Apache Synapse - Tasks</name>
     <description>Apache Synapse - Scheduled Tasks Core</description>
     <packaging>bundle</packaging>
 
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/tasks</url>
+    </scm>
+
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

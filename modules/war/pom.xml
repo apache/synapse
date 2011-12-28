@@ -32,10 +32,15 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-war</artifactId>
-
     <name>Apache Synapse - Web Application</name>
     <description>Apache Synapse - Web Application</description>
     <packaging>war</packaging>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/war</url>
+    </scm>
 
     <dependencies>
         <dependency>

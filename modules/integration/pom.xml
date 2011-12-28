@@ -386,11 +386,6 @@
             <artifactId>synapse-samples</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-fix-transport</artifactId>
-            <version>${synapse.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
             <version>${rampart.version}</version>

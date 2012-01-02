@@ -18,39 +18,41 @@
   ~  under the License.
   -->
 
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-tasks</artifactId>
-    <name>Apache Synapse - Tasks</name>
-    <description>Apache Synapse - Scheduled Tasks Core</description>
+
+    <name>Apache Synapse - Tasks classes</name>
+    <description>Apache Synapse - Tasks classes</description>
     <packaging>bundle</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/tasks</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/2.1.0/modules/tasks</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/2.1.0/modules/tasks</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/tags/2.1.0/modules/tasks</url>
     </scm>
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.2</version>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -67,6 +69,7 @@
                     </instructions>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
@@ -74,14 +77,28 @@
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-commons</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opensymphony</groupId>
             <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <version>${geronimo-spec.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
+            <version>${commons-collections.version}</version>
         </dependency>
     </dependencies>
+    <properties>
+        <!-- startup, quartz -->
+        <commons-collections.version>3.1</commons-collections.version>
+        <quartz.version>1.6.0</quartz.version>
+        <geronimo-spec.version>1.1</geronimo-spec.version>
+    </properties>
 </project>

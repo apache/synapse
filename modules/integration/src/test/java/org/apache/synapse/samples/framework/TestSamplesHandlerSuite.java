@@ -188,7 +188,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("59", Sample59.class);
 
         //QoS
-        //sampleClassRepo.put("100", Sample100.class);
+        sampleClassRepo.put("100", Sample100.class);
         sampleClassRepo.put("101", Sample101.class);
 
         //Proxy Service
@@ -198,7 +198,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         //sampleClassRepo.put("153", Sample153.class); // unable to load the JKS files
         sampleClassRepo.put("154", Sample154.class);
         sampleClassRepo.put("155", Sample155.class);
-        //sampleClassRepo.put("156", Sample156.class);
+        sampleClassRepo.put("156", Sample156.class);
         sampleClassRepo.put("157", Sample157.class);
 
         //Advanced
@@ -210,7 +210,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("360", Sample360.class);
         sampleClassRepo.put("361", Sample361.class);
         sampleClassRepo.put("362", Sample362.class);
-        sampleClassRepo.put("370", Sample370.class);   // neethi 3.0.x and wso2throttle incompatibility
+        sampleClassRepo.put("370", Sample370.class);
         sampleClassRepo.put("371", Sample371.class);
         sampleClassRepo.put("372", Sample372.class);
         sampleClassRepo.put("380", Sample380.class);

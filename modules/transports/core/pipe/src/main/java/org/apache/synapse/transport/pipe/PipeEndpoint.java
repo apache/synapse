@@ -57,7 +57,7 @@ public class PipeEndpoint extends DatagramEndpoint {
     }
 
     @Override
-	public EndpointReference[] getEndpointReferences(AxisService service, String ip) {
+	public EndpointReference[] getEndpointReferences(String ip) {
 		return new EndpointReference[] { new EndpointReference("pipe://" + pipe.getAbsolutePath()
 		        + "?contentType=" + getContentType()) };
 	}

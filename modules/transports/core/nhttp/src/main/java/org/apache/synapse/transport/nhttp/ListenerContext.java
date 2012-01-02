@@ -27,8 +27,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.TransportListener;
-import org.apache.axis2.transport.base.endpoint.URLEndpointsConfiguration;
-import org.apache.axis2.transport.base.endpoint.config.URLEndpointsConfigurationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.params.NIOReactorPNames;
@@ -82,9 +80,6 @@ public class ListenerContext {
     private String bindAddress = null;
 
     private HttpParams params = null;
-
-    /** Endpoints configuration for specific HTTP Urls */
-    private URLEndpointsConfiguration endpoints = null;
 
     public ListenerContext(ConfigurationContext cfgCtx,
                            TransportInDescription transportIn,
@@ -153,12 +148,6 @@ public class ListenerContext {
         }
 
         params = getListenerParameters();
-
-
-        param = transportIn.getParameter(NhttpConstants.ENDPOINTS_CONFIGURATION);
-        if (param != null && param.getValue() != null) {
-            endpoints = new URLEndpointsConfigurationFactory().create(param.getValue().toString());
-        }
     }
 
 /**
@@ -311,10 +300,6 @@ public class ListenerContext {
 
     public HttpParams getParams() {
         return params;
-    }
-
-    public URLEndpointsConfiguration getEndpoints() {
-        return endpoints;
     }
 
     private void handleException(String msg, Exception e) throws AxisFault {

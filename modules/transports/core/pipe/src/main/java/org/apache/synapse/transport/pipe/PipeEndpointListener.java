@@ -104,7 +104,7 @@ public class PipeEndpointListener implements Runnable {
                         readBuffer.rewind();
                     }
                     byte[] message = decoder.getNext();
-                    callback.receive(endpoint, message, message.length, null);
+                    callback.receive(endpoint, message, message.length);
                 }
             }
         }

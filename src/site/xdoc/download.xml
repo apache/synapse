@@ -19,58 +19,54 @@
   -->
 
 <document>
-
-  <properties>
-    <title>Release Downloads</title>
-  </properties>
-
-<body>
-
-<section name="Releases">
-
-    <p>The Apache Synapse team is proud to announce the availability of the 1.2 release on the
-        9th of June 2008. As of December 2007, Apache Synapse has moved on to become a Top Level Project
-        (TLP) of the Apache Software Foundation, moving out from Web Services project.
-    </p>
-
-<table class="bodyTable">
-  <tbody>
-    <tr class="a">
-      <th>Version</th>
-      <th>Date</th>
-      <th>Description</th>
-    </tr>
-    <tr class="b">
-      <td><a
-        href="download/1.2/download.cgi">1.2</a></td>
-      <td>9-Jun-2008</td>
-      <td>1.2 Release (Mirrored)</td>
-    </tr>
-    <tr class="b">
-      <td><a
-        href="download/1.1.1/download.cgi">1.1.1</a></td>
-      <td>28-Jan-2008</td>
-      <td>1.1.1 Release (Mirrored)</td>
-    </tr>
-    <tr class="b">
-      <td><a
-        href="download/1.1/download.cgi">1.1</a></td>
-      <td>12-Nov-2007</td>
-      <td>1.1 Release (Mirrored)</td>
-    </tr>
-    <tr class="b">
-      <td><a
-        href="download/1.0/download.cgi">1.0</a></td>
-      <td>08-Jun-2007</td>
-      <td>1.0 Release (Mirrored)</td>
-    </tr>
-  </tbody>
-</table>
-
-    <p>Note that if you are upgrading from an older release, you should carefully read the
-    <a href="upgrading.html">upgrade guide</a> before starting to use a new release.</p>
-
-</section>
-
-</body>
+    <properties>
+        <title>Apache Synapse - Downloads</title>
+    </properties>
+    <body>
+        <section name="Download Latest Stable Release">
+            <p>
+                The latest stable release of Apache Synapse is 2.1. It is highly recommended
+                to use the latest stable release so that you can use our newest features
+                while benefiting from all the recent bug fixes and improvements.
+            </p>
+            <table>
+                <tr>
+                    <th>Version</th>
+                    <th>Release Date</th>
+                </tr>
+                <tr>
+                    <td><a href="download/2.1/download.cgi">2.1</a></td>
+                    <td>22-Dec-2011</td>
+                </tr>
+            </table>
+        </section>
+        <section name="Download Previous Releases">
+            <table>
+                <tr>
+                    <th>Version</th>
+                    <th>Release Date</th>
+                </tr>
+                <tr>
+                    <td><a href="download/2.0.0/download.cgi">2.0.0</a></td>
+                    <td>30-Nov-2010</td>
+                </tr>
+                <tr>
+                    <td><a href="download/1.2/download.cgi">1.2</a></td>
+                    <td>9-Jun-2008</td>
+                </tr>
+                <tr>
+                    <td><a href="download/1.1.1/download.cgi">1.1.1</a></td>
+                    <td>28-Jan-2008</td>
+                </tr>
+                <tr>
+                    <td><a href="download/1.1/download.cgi">1.1</a></td>
+                    <td>12-Nov-2007</td>
+                </tr>
+                <tr>
+                    <td><a href="download/2.0.0/download.cgi">1.0</a></td>
+                    <td>08-Jun-2007</td>
+                </tr>
+            </table>
+        </section>
+    </body>
 </document>

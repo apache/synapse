@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 100</title>
+    </properties>
+    <body>
+        <section name="Sample 100: Using WS-Security for Outgoing Messages">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint name="secure"&gt;
+                    &lt;address uri="http://localhost:9000/services/SecureStockQuoteService"&gt;
+                        &lt;enableSec policy="sec_policy"/&gt;
+                    &lt;/address&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Showcase the ability of Synapse to connect to secured endpoints using WS-Security
+                    standards
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Download and install the Java Cryptography Extension (JCE) unlimited
+                            strength policy files for your JDK
+                        </li>
+                        <li>
+                            Deploy the SecureStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 100 (repository/conf/sample/synapse_sample_100.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 100<br/>
+                                Windows: synapse.bat -sample 100
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Use the stock quote client to send a request without WS-Security. Synapse is
+                    configured to enable WS-Security as per the policy specified by 'policy_3.xml'
+                    for the outgoing messages to the SecureStockQuoteService endpoint.
+                    The debug log messages on Synapse shows the encrypted message flowing to the
+                    service and the encrypted response being received by Synapse. The wsse:Security
+                    header is then removed from the decrypted message and the response is delivered
+                    back to the client, as expected. You may execute the client as follows:
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280/</div>
+                <p>
+                    The message sent by Synapse to the secure service can be seen as follows, when
+                    TCPMon is used.
+                </p>
+                <div class="consoleOutput">POST http://localhost:9001/services/SecureStockQuoteService HTTP/1.1
+Host: 127.0.0.1
+SOAPAction: urn:getQuote
+Content-Type: text/xml; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: Keep-Alive
+User-Agent: Synapse-HttpComponents-NIO
+
+800
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;soapenv:Envelope xmlns:xenc=&quot;http://www.w3.org/2001/04/xmlenc#&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot; ..&gt;
+  &lt;soapenv:Header&gt;
+     &lt;wsse:Security ..&gt;
+        &lt;wsu:Timestamp ..&gt;
+           ...
+        &lt;/wsu:Timestamp&gt;
+        &lt;xenc:EncryptedKey..&gt;
+           ...
+        &lt;/xenc:EncryptedKey&gt;
+        &lt;wsse:BinarySecurityToken ...&gt;
+           &lt;ds:SignedInfo&gt;
+           ...
+           &lt;/ds:SignedInfo&gt;
+           &lt;ds:SignatureValue&gt;
+           ...
+           &lt;/ds:SignatureValue&gt;
+           &lt;ds:KeyInfo Id=&quot;KeyId-29551621&quot;&gt;
+              ...
+           &lt;/ds:KeyInfo&gt;
+        &lt;/ds:Signature&gt;
+     &lt;/wsse:Security&gt;
+     &lt;wsa:To&gt;http://localhost:9001/services/SecureStockQuoteService&lt;/wsa:To&gt;
+     &lt;wsa:MessageID&gt;urn:uuid:1C4CE88B8A1A9C09D91177500753443&lt;/wsa:MessageID&gt;
+     &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+  &lt;/soapenv:Header&gt;
+  &lt;soapenv:Body xmlns:wsu=&quot;http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd&quot; wsu:Id=&quot;Id-3789605&quot;&gt;
+     &lt;xenc:EncryptedData Id=&quot;EncDataId-3789605&quot; Type=&quot;http://www.w3.org/2001/04/xmlenc#Content&quot;&gt;
+        &lt;xenc:EncryptionMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#aes256-cbc&quot; /&gt;
+        &lt;xenc:CipherData&gt;
+            &lt;xenc:CipherValue&gt;Layg0xQcnH....6UKm5nKU6Qqr&lt;/xenc:CipherValue&gt;
+        &lt;/xenc:CipherData&gt;
+     &lt;/xenc:EncryptedData&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;0</div>
+                <p>
+                    Note the WS-Security headers and the encrypted payload added by Synapse.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

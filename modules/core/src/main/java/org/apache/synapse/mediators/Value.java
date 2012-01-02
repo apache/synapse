@@ -19,6 +19,8 @@
 
 package org.apache.synapse.mediators;
 
+import org.apache.axiom.om.OMContainer;
+import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
@@ -155,11 +157,37 @@ public class Value {
     }
 
     public void setNamespaces(OMElement elem){
-        Iterator namespaces = elem.getNamespacesInScope();
+        OMElement currentElem = elem;
+
+        while (currentElem != null) {
+            Iterator it = currentElem.getAllDeclaredNamespaces();
+            while (it.hasNext()) {
+                OMNamespace n = (OMNamespace) it.next();
+                // Exclude the default namespace as explained in the Javadoc above
+                if (n != null && !"".equals(n.getPrefix())) {
+                    namespaceList.add(n);
+                }
+            }
+
+            OMContainer parent = currentElem.getParent();
+            //if the parent is a document element or parent is null ,then return
+            if (parent == null || parent instanceof OMDocument) {
+                return;
+            }
+            if (parent instanceof OMElement) {
+                currentElem = (OMElement) parent;
+            }
+        }
+
+
+        Iterator namespaces = elem.getAllDeclaredNamespaces();
         while (namespaces.hasNext()){
             OMNamespace ns = (OMNamespace) namespaces.next();
             namespaceList.add(ns);
         }
+
+
+
     }
 
     @Override

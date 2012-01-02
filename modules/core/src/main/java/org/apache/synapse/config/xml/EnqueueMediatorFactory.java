@@ -43,7 +43,7 @@ public class EnqueueMediatorFactory extends AbstractMediatorFactory{
         if (seqAtt != null && !"".equals(seqAtt.getAttributeValue())) {
             mediator.setSequenceName(seqAtt.getAttributeValue());
         } else {
-            handleException("sequence is a required attribute");
+            handleException("sequence is a required attribue");
         }
 
         OMAttribute priorityAtt = elem.getAttribute(PRIORITY_ATT);
@@ -55,7 +55,7 @@ public class EnqueueMediatorFactory extends AbstractMediatorFactory{
         if (queueAtt != null && !"".equals(queueAtt.getAttributeValue())) {
             mediator.setExecutorName(queueAtt.getAttributeValue());
         } else {
-            handleException("Queue is a required attribute");
+            handleException("Queue is a required attribue");
         }
 
         return mediator;

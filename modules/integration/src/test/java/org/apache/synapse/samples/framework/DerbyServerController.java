@@ -42,6 +42,7 @@ public class DerbyServerController implements BackEndServerController {
             server = new NetworkServerControl
                     (InetAddress.getByName("localhost"), 1527);
             server.start(null);
+
             while (true) {
                 try {
                     server.ping();

@@ -17,15 +17,12 @@
   ~  under the License.
   -->
 
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -37,45 +34,38 @@
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/distribution</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/2.1.0/modules/distribution</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/2.1.0/modules/distribution</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/tags/2.1.0/modules/distribution</url>
     </scm>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-extensions</artifactId>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-samples</artifactId>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-experimental</artifactId>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-config-migrator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-fix-transport</artifactId>
+            <version>${pom.version}</version>
         </dependency>
 
         <!-- Wrapper jars -->
         <dependency>
             <groupId>wrapper</groupId>
             <artifactId>wrapper</artifactId>
+            <version>${wrapper.version}</version>
         </dependency>
 
         <!-- The distribution is configured for log4j. Normally, log4j should not
@@ -89,21 +79,57 @@
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
+            <version>${rampart.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
             <type>mar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2</artifactId>
+            <version>${sandesha2.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+            </exclusions>
             <type>mar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-policy</artifactId>
+            <version>${sandesha2.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
+            <version>${addressing.version}</version>
             <type>mar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required
@@ -126,6 +152,11 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-vfs-transport</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-fix-transport</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.oopsconsultancy</groupId>
@@ -137,17 +168,10 @@
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-patches</artifactId>
+            <version>${pom.version}</version>
             <classifier>jars</classifier>
             <type>zip</type>
         </dependency>
-        <dependency>
-            <groupId>org.apache.woden</groupId>
-            <artifactId>woden-api</artifactId>
-        </dependency>
-        <!--dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency-->
     </dependencies>
 
     <repositories>
@@ -168,7 +192,9 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-2</version>
                 <executions>
                     <execution>
                         <id>distribution-package</id>
@@ -179,7 +205,7 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
-                                <!--<descriptor>src/main/assembly/src.xml</descriptor>-->
+                                <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
                             <finalName>synapse-${synapse.version}</finalName>
                         </configuration>

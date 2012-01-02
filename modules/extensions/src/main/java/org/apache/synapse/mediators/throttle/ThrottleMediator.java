@@ -132,7 +132,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
 
             // Throttle only will be created ,if the massage flow is IN
             if (!isResponse) {
-                //check the availability of the ConcurrentAccessController
+                //check the availability of the ConcurrentAccessControler
                 //if this is a clustered environment
                 if (isClusteringEnable) {
                     concurrentAccessController =
@@ -212,8 +212,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
 
                                     try {
                                         // Creates the throttle from the policy
-                                        throttle = ThrottleFactory.createMediatorThrottle(
-                                                (OMElement) entryValue);
+                                        throttle = ThrottleFactory.createMediatorThrottle((OMElement) entryValue);
 
                                         //For non-clustered  environment , must re-initiates
                                         //For  clustered  environment,

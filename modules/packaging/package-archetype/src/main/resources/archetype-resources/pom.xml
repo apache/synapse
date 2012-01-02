@@ -34,7 +34,7 @@
             <activation>
                 <property>
                     <name>synapse.version</name>
-                    <value>2.2.0-SNAPSHOT</value>
+                    <value>2.1.0</value>
                 </property>
             </activation>
             <repositories>

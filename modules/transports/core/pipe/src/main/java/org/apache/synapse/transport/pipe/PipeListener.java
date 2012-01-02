@@ -26,6 +26,8 @@ import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axis2.transport.base.datagram.AbstractDatagramTransportListener;
 import org.apache.axis2.transport.base.datagram.DatagramDispatcherCallback;
+import org.apache.axis2.context.ConfigurationContext;
+
 
 /**
  * Transport listener for UNIX pipes.
@@ -53,10 +55,10 @@ import org.apache.axis2.transport.base.datagram.DatagramDispatcherCallback;
  */
 public class PipeListener extends AbstractDatagramTransportListener<PipeEndpoint> implements ManagementSupport {
     private Protocol protocol;
-    
+
     @Override
-    protected void doInit() throws AxisFault {
-        TransportInDescription transportIn = getTransportInDescription();
+    public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn) throws AxisFault {
+        super.init(cfgCtx, transportIn);
         String protocolClassName = ParamUtils.getRequiredParam(transportIn, "protocol");
         Class<? extends Protocol> protocolClass;
         try {

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 253</title>
+    </properties>
+    <body>
+        <section name="Sample 253: One-way Bridging from JMS to HTTP and Replying with a 202 Accepted Response">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="JMStoHTTPStockQuoteProxy" transports="jms"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;/inSequence&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+    &lt;proxy name="OneWayProxy" transports="http"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+            &lt;/inSequence&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    This sample demonstrates the ability of Synapse to perform transport switching
+                    between JMS and HTTP. It also shows how to configure a one-way HTTP proxy in
+                    Synapse.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Setup and start a JMS broker (Apache ActiveMQ can be used as the
+                            JMS broker for this scenario. Refer <a href="setup/jms.html#pre">JMS setup guide</a>
+                            for information on how to run ActiveMQ.)
+                        </li>
+                        <li>
+                            Enable the JMS transport receiver of Synapse (Refer
+                            <a href="setup/jms.html#listener">JMS setup guide</a> for more details)
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 253 (repository/conf/sample/synapse_sample_253.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 253<br/>
+                                Windows: synapse.bat -sample 253
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This example invokes the one-way 'placeOrder' operation on the SimpleStockQuoteService
+                    using the Axis2 ServiceClient.fireAndForget() API at the client. To test this,
+                    run the sample client as follows and you will notice the one-way JMS message
+                    flowing through Synapse into the sample Axis2 server instance over HTTP, and Axis2
+                    acknowledging it with a HTTP 202 Accepted response.
+                </p>
+                <div class="command">ant stockquote -Dmode=placeorder -Dtrpurl=&quot;jms:/JMStoHTTPStockQuoteProxy?\
+transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory\
+&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory\
+&amp;java.naming.provider.url=tcp://localhost:61616\
+&amp;transport.jms.ContentTypeProperty=Content-Type&amp;transport.jms.DestinationType=queue&quot;</div>
+                <p>
+                    The second example shows how Synapse could be made to respond with a HTTP 202
+                    Accepted response to a request received. The proxy service simply logs the message
+                    received and acknowledges it. To try this out, run the sample client as follows.
+                </p>
+                <div class="command">ant stockquote -Dmode=placeorder -Dtrpurl=http://localhost:8280/services/OneWayProxy</div>
+                <p>
+                    On the Synapse console you could see the logged message, and if TCPMon was used
+                    at the client, you would see the 202 Accepted response sent back to the client
+                    from Synapse.
+                </p>
+                <div class="consoleOutput">HTTP/1.1 202 Accepted
+Content-Type: text/xml; charset=UTF-8
+Host: 127.0.0.1
+SOAPAction: &quot;urn:placeOrder&quot;
+Date: Sun, 06 May 2007 17:20:19 GMT
+Server: Synapse-HttpComponents-NIO
+Transfer-Encoding: chunked
+
+0</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

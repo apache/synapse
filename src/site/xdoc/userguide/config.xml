@@ -57,7 +57,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#OverView">Functional Components Overview</a>
+                    <a href="#Overview">Functional Components Overview</a>
                     <ul>
                         <li><a href="#MediatorsAndSequences">Mediators and Sequences</a></li>
                         <li><a href="#Endpoints">Endpoints</a></li>
@@ -528,7 +528,7 @@
    &lt;<a href="#ExecutorConfig">executor</a> name="string" ...&gt;...&lt;/executor&gt;?
    &lt;<a href="#APIConfig">api</a> name="string" ...&gt;...&lt;/api&gt;?
    &lt;<a href="#TemplateConfig">template</a> name="string" ...&gt;...&lt;/template&gt;?
-   &lt;<a href="#store">messageStore</a> name="string" ...&gt;...&lt;/messageStore&gt;?
+   &lt;<a href="#StoresConfig">messageStore</a> name="string" ...&gt;...&lt;/messageStore&gt;?
 &lt;/definitions&gt;</div>
             <p>
                 The registry adapter definition is defined under the &lt;registry&gt; element. Similarly

@@ -160,6 +160,31 @@
                 </repository>
             </repositories>
         </profile>
+        <profile>
+            <id>apache-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- Override the execution defined in org.apache:apache
+                                so that the source-release assembly is not built.
+                                We define our own source distribution in modules/distribution. -->
+                                <id>source-release-assembly</id>
+                                <configuration>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>single</goal>
+                                    </goals>
+                                    <skipAssembly>true</skipAssembly>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <pluginRepositories>

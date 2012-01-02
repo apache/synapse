@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>2.1.0</version>
+        <version>2.1.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>synapse-patches</artifactId>
@@ -35,9 +35,9 @@
     </description>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/2.1.0/modules/patches</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/2.1.0/modules/patches</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/tags/2.1.0/modules/patches</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/branches/2.1/modules/patches</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/branches/2.1/modules/patches</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/branches/2.1/modules/patches</url>
     </scm>
 
     <build>

@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.jaxen.JaxenException;
@@ -33,7 +34,7 @@ import java.util.Properties;
  * Factory for {@link CalloutMediator} instances.
  * 
  * <pre>
- * &lt;callout serviceURL="string" [action="string"]&gt;
+ * &lt;callout serviceURL="string" [action="string"][passHeaders="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
@@ -48,6 +49,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_ACTION = new QName("action");
     private static final QName ATT_AXIS2XML = new QName("axis2xml");
     private static final QName ATT_REPOSITORY = new QName("repository");
+    private static final QName ATT_PASS_HEADERS = new QName("passHeaders");
     private static final QName Q_CONFIG
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "configuration");
     private static final QName Q_SOURCE
@@ -61,6 +63,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         OMAttribute attServiceURL = elem.getAttribute(ATT_URL);
         OMAttribute attAction     = elem.getAttribute(ATT_ACTION);
+        OMAttribute attPassHeaders = elem.getAttribute(ATT_PASS_HEADERS);
         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
         OMElement   sourceElt     = elem.getFirstChildWithName(Q_SOURCE);
         OMElement   targetElt     = elem.getFirstChildWithName(Q_TARGET);
@@ -73,6 +76,11 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         if (attAction != null) {
             callout.setAction(attAction.getAttributeValue());
+        }
+
+        if (attPassHeaders != null &&
+                JavaUtils.isTrueExplicitly(attPassHeaders.getAttributeValue())) {
+            callout.setPassHeaders(true);
         }
 
         if (configElt != null) {

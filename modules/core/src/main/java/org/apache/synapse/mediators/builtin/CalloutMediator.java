@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -39,10 +40,11 @@ import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
- * <callout serviceURL="string" [action="string"]>
+ * <callout serviceURL="string" [action="string"][passHeaders="true|false"]>
  *      <configuration [axis2xml="string"] [repository="string"]/>?
  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
  *      <target xpath="expression" | key="string"/>
@@ -59,6 +61,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     private String targetKey = null;
     private String clientRepository = null;
     private String axis2xml = null;
+    private boolean passHeaders = false;
     public final static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
     public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
 
@@ -90,6 +93,16 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                             axis2smc.getAxis2MessageContext();
                     axis2MessageCtx.getTransportOut().addParameter(
                             new Parameter(HTTPConstants.OMIT_SOAP_12_ACTION, true));
+                }
+            }
+
+            if (passHeaders) {
+                SOAPHeader header = synCtx.getEnvelope().getHeader();
+                if (header != null) {
+                    Iterator headerElements = header.cloneOMElement().getChildElements();
+                    while (headerElements.hasNext()) {
+                        sc.addHeader((OMElement) headerElements.next());
+                    }
                 }
             }
 
@@ -298,5 +311,13 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void setAxis2xml(String axis2xml) {
         this.axis2xml = axis2xml;
+    }
+
+    public boolean isPassHeaders() {
+        return passHeaders;
+    }
+
+    public void setPassHeaders(boolean passHeaders) {
+        this.passHeaders = passHeaders;
     }
 }

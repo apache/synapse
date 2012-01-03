@@ -25,7 +25,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
 
 /**
  * <pre>
- * &lt;callout serviceURL="string" [action="string"]&gt;
+ * &lt;callout serviceURL="string" [action="string"][passHeaders="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
@@ -60,6 +60,10 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
                         "axis2xml", nullNS, mediator.getAxis2xml()));
             }
             callout.addChild(config);
+        }
+
+        if (mediator.isPassHeaders()) {
+            callout.addAttribute(fac.createOMAttribute("passHeaders", nullNS, "true"));
         }
 
         OMElement source = fac.createOMElement("source", synNS, callout);

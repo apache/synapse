@@ -144,6 +144,7 @@ public abstract class AbstractMessageStore implements MessageStore {
 
 
     public void destroy() {
+        MBeanRegistrar.getInstance().unRegisterMBean("MessageStore", this.name);
     }
 
     public void setDescription(String description) {

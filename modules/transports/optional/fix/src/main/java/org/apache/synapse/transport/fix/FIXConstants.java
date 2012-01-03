@@ -107,6 +107,14 @@ public class FIXConstants {
     public static final String FIX_ACCEPTOR_EVENT_HANDLER = "transport.fix.AcceptorSessionEventHandler";
     public static final String FIX_INITIATOR_EVENT_HANDLER = "transport.fix.InitiatorSessionEventHandler";
 
+    public static final String FIX_PROCESS_SINGLE_THREADED = "transport.fix.ProcessSingleThreaded";
+    public static final String FIX_ACCEPTOR_SINGLE_THREADED = "transport.fix.AcceptorSingleThreaded";
+    public static final String FIX_INITIATOR_SINGLE_THREADED = "transport.fix.InitiatorSingleThreaded";
+
+    public static final String FIX_USE_THREADED_CONNECTORS = "transport.fix.UseThreadedConnectors";
+    public static final String FIX_USE_THREADED_ACCEPTOR = "transport.fix.UseThreadedAcceptor";
+    public static final String FIX_USE_THREADED_INITIATOR = "transport.fix.UseThreadedInitiator";
+
     //--------------------------- Message level properties -----------------------------------
 
     public static final String FIX_IGNORE_ORDER = "transport.fix.IgnoreOrder";

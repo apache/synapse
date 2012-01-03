@@ -21,6 +21,7 @@ package org.apache.synapse.transport.fix;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -70,9 +71,10 @@ public class FIXIncomingMessageHandler implements Application {
     private boolean dropExtraResponses = false;
     private Semaphore semaphore;
     private SessionEventHandler eventHandler;
+    private boolean singleThreaded;
 
     public FIXIncomingMessageHandler(ConfigurationContext cfgCtx, WorkerPool workerPool,
-                             AxisService service, boolean acceptor) {
+                                     AxisService service, boolean acceptor) {
         this.cfgCtx = cfgCtx;
         this.workerPool = workerPool;
         this.service = service;
@@ -104,6 +106,8 @@ public class FIXIncomingMessageHandler implements Application {
                         eventHandlerParam.getValue(), e);
             }
         }
+
+        singleThreaded = isSingleThreaded();
     }
 
     private void getResponseHandlingApproach() {
@@ -117,6 +121,35 @@ public class FIXIncomingMessageHandler implements Application {
             dropExtraResponses = true;
         }
     }
+
+    private boolean isSingleThreaded() {
+        Parameter singleThreadParam = service.getParameter(
+                FIXConstants.FIX_ACCEPTOR_SINGLE_THREADED);
+        if (acceptor && singleThreadParam != null &&
+                JavaUtils.isTrueExplicitly(singleThreadParam.getValue())) {
+            log.info("FIX acceptor for service: " + service.getName() + " is single threaded");
+            return true;
+        }
+
+        singleThreadParam = service.getParameter(
+                FIXConstants.FIX_INITIATOR_SINGLE_THREADED);
+        if (!acceptor && singleThreadParam != null &&
+                JavaUtils.isTrueExplicitly(singleThreadParam.getValue())) {
+            log.info("FIX initiator for service: " + service.getName() + " is single threaded");
+            return true;
+        }
+
+        singleThreadParam = service.getParameter(
+                FIXConstants.FIX_PROCESS_SINGLE_THREADED);
+        if (singleThreadParam != null &&
+                JavaUtils.isTrueExplicitly(singleThreadParam.getValue())) {
+            log.info("FIX processor for service: " + service.getName() + " is single threaded");
+            return true;
+        }
+
+        return false;
+    }
+
 
     public void setOutgoingMessageContext(MessageContext msgCtx) {
         if (!allNewApproach) {
@@ -260,7 +293,7 @@ public class FIXIncomingMessageHandler implements Application {
      * @throws DoNotSend This exception aborts message transmission
      */
     public void toApp(Message message, SessionID sessionID) throws DoNotSend {
-          if (log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer();
             try {
                 sb.append("Sending application level FIX message to ").append(message.getHeader().getField(new TargetCompID()).getValue());
@@ -314,7 +347,108 @@ public class FIXIncomingMessageHandler implements Application {
         if (rolled && log.isDebugEnabled()) {
             log.debug("Incoming request counter rolled over for the session: " + sessionID);
         }
-        workerPool.execute(new FIXWorkerThread(message, sessionID, counter));
+        if (singleThreaded) {
+            processMessage(message, sessionID, counter);
+        } else {
+            workerPool.execute(new FIXWorkerThread(message, sessionID, counter));
+        }
+    }
+
+    public void processMessage(Message message, SessionID sessionID, int counter) {
+        if (allNewApproach) {
+            //treat all messages (including responses) as new messages
+            handleIncomingRequest(message, sessionID, counter);
+        } else {
+            if (acceptor) {
+                //treat messages coming from an acceptor as new request messages
+                handleIncomingRequest(message, sessionID, counter);
+            } else {
+                MessageContext outMsgCtx = outgoingMessages.poll();
+                if (outMsgCtx != null) {
+                    //handle as a response to an outgoing message
+                    handleIncomingResponse(outMsgCtx, message, sessionID, counter);
+                } else if (!dropExtraResponses) {
+                    //handle as a new request message
+                    handleIncomingRequest(message, sessionID, counter);
+                } else {
+                    log.debug("Dropping additional FIX response");
+                }
+            }
+        }
+    }
+
+    private void handleIncomingRequest(Message message, SessionID sessionID, int counter) {
+        if (log.isDebugEnabled()) {
+            log.debug("Source session: " + sessionID + " - Received message with sequence " +
+                    "number " + counter);
+        }
+
+        //Create message context for the incoming message
+        AbstractTransportListener trpListener = (AbstractTransportListener) cfgCtx.getAxisConfiguration().
+                getTransportIn(FIXConstants.TRANSPORT_NAME).getReceiver();
+
+        MessageContext msgCtx = trpListener.createMessageContext();
+        msgCtx.setProperty(Constants.OUT_TRANSPORT_INFO, new FIXOutTransportInfo(sessionID));
+
+        if (service != null) {
+            // Set the service for which the message is intended to
+            msgCtx.setAxisService(service);
+            // find the operation for the message, or default to one
+            Parameter operationParam = service.getParameter(BaseConstants.OPERATION_PARAM);
+            QName operationQName = (
+                    operationParam != null ?
+                            BaseUtils.getQNameFromString(operationParam.getValue()) :
+                            BaseConstants.DEFAULT_OPERATION);
+
+            AxisOperation operation = service.getOperation(operationQName);
+            if (operation != null) {
+                msgCtx.setAxisOperation(operation);
+                msgCtx.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
+                msgCtx.setSoapAction("urn:" + operation.getName().getLocalPart());
+            }
+        }
+
+        String fixApplication = FIXConstants.FIX_INITIATOR;
+        if (acceptor) {
+            fixApplication = FIXConstants.FIX_ACCEPTOR;
+        } else {
+            msgCtx.setProperty("synapse.isresponse", true);
+        }
+
+        try {
+            //Put the FIX message in a SOAPEnvelope
+            FIXUtils.getInstance().setSOAPEnvelope(message, counter, sessionID.toString(), msgCtx);
+            trpListener.handleIncomingMessage(
+                    msgCtx,
+                    FIXUtils.getTransportHeaders(service.getName(), fixApplication),
+                    null,
+                    FIXConstants.FIX_DEFAULT_CONTENT_TYPE
+            );
+        } catch (AxisFault e) {
+            handleException("Error while processing FIX message", e);
+        }
+    }
+
+    private void handleIncomingResponse(MessageContext outMsgCtx, Message message,
+                                        SessionID sessionID, int counter) {
+        AbstractTransportSender trpSender = (AbstractTransportSender) cfgCtx.getAxisConfiguration().
+                getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
+
+        MessageContext msgCtx = trpSender.createResponseMessageContext(outMsgCtx);
+
+        try {
+            //Put the FIX message in a SOAPEnvelope
+            FIXUtils.getInstance().setSOAPEnvelope(message, counter, sessionID.toString(), msgCtx);
+            msgCtx.setServerSide(true);
+            trpSender.handleIncomingMessage(
+                    msgCtx,
+                    FIXUtils.getTransportHeaders(service.getName(), FIXConstants.FIX_INITIATOR),
+                    null,
+                    FIXConstants.FIX_DEFAULT_CONTENT_TYPE
+            );
+        } catch (AxisFault e) {
+            handleException("Error while processing response FIX message", e);
+        }
     }
 
     /**
@@ -333,105 +467,9 @@ public class FIXIncomingMessageHandler implements Application {
             this.counter = counter;
         }
 
-        private void handleIncomingRequest() {
-            if (log.isDebugEnabled()) {
-                log.debug("Source session: " + sessionID + " - Received message with sequence " +
-                        "number " + counter);
-            }
-
-            //Create message context for the incoming message
-            AbstractTransportListener trpListener = (AbstractTransportListener) cfgCtx.getAxisConfiguration().
-                    getTransportIn(FIXConstants.TRANSPORT_NAME).getReceiver();
-
-            MessageContext msgCtx = trpListener.createMessageContext();
-            msgCtx.setProperty(Constants.OUT_TRANSPORT_INFO, new FIXOutTransportInfo(sessionID));
-
-            if (service != null) {
-                // Set the service for which the message is intended to
-                msgCtx.setAxisService(service);
-                // find the operation for the message, or default to one
-                Parameter operationParam = service.getParameter(BaseConstants.OPERATION_PARAM);
-                QName operationQName = (
-                    operationParam != null ?
-                        BaseUtils.getQNameFromString(operationParam.getValue()) :
-                        BaseConstants.DEFAULT_OPERATION);
-
-                AxisOperation operation = service.getOperation(operationQName);
-                if (operation != null) {
-                    msgCtx.setAxisOperation(operation);
-                    msgCtx.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
-                    msgCtx.setSoapAction("urn:" + operation.getName().getLocalPart());
-                }
-            }
-
-            String fixApplication = FIXConstants.FIX_INITIATOR;
-            if (acceptor) {
-                fixApplication = FIXConstants.FIX_ACCEPTOR;
-            } else {
-                msgCtx.setProperty("synapse.isresponse", true);
-            }
-
-            try {
-                //Put the FIX message in a SOAPEnvelope
-                FIXUtils.getInstance().setSOAPEnvelope(message, counter, sessionID.toString(), msgCtx);
-                trpListener.handleIncomingMessage(
-                        msgCtx,
-                        FIXUtils.getTransportHeaders(service.getName(), fixApplication),
-                        null,
-                        FIXConstants.FIX_DEFAULT_CONTENT_TYPE
-                );
-            } catch (AxisFault e) {
-                handleException("Error while processing FIX message", e);
-            }
-        }
-
-        private void handleIncomingResponse(MessageContext outMsgCtx) {
-            AbstractTransportSender trpSender = (AbstractTransportSender) cfgCtx.getAxisConfiguration().
-                        getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
-
-            MessageContext msgCtx = trpSender.createResponseMessageContext(outMsgCtx);
-
-            try {
-                //Put the FIX message in a SOAPEnvelope
-                FIXUtils.getInstance().setSOAPEnvelope(message, counter, sessionID.toString(), msgCtx);
-                msgCtx.setServerSide(true);
-                trpSender.handleIncomingMessage(
-                        msgCtx,
-                        FIXUtils.getTransportHeaders(service.getName(), FIXConstants.FIX_INITIATOR),
-                        null,
-                        FIXConstants.FIX_DEFAULT_CONTENT_TYPE
-                );
-            } catch (AxisFault e) {
-                handleException("Error while processing response FIX message", e);
-            }
-        }
-
         public void run() {
-
-            if (allNewApproach) {
-                //treat all messages (including responses) as new messages
-                handleIncomingRequest();
-            }
-            else {
-                if (acceptor) {
-                    //treat messages coming from an acceptor as new request messages
-                    handleIncomingRequest();
-                }
-                else {
-                    MessageContext outMsgCtx = outgoingMessages.poll();
-                    if (outMsgCtx != null) {
-                        //handle as a response to an outgoing message
-                        handleIncomingResponse(outMsgCtx);
-                    } else if (!dropExtraResponses) {
-                        //handle as a new request message
-                        handleIncomingRequest();
-                    } else {
-                        log.debug("Dropping additional FIX response");
-                    }
-                }
-            }
+            processMessage(message, sessionID, counter);
         }
-
     }
 
 }

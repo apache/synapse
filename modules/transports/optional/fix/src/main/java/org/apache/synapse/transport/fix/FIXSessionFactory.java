@@ -24,6 +24,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.threads.WorkerPool;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quickfixj.jmx.JmxExporter;
@@ -120,13 +121,24 @@ public class FIXSessionFactory {
                 //Get a new FIX Application
                 Application messageHandler = applicationFactory.getFIXApplication(service,
                         listenerThreadPool, true);
+                boolean threadedConnector = useThreadedConnector(service, true);
                 //Create a new FIX Acceptor
-                Acceptor acceptor = new SocketAcceptor(
-                        messageHandler,
-                        storeFactory,
-                        settings,
-                        logFactory,
-                        messageFactory);
+                Acceptor acceptor;
+                if (threadedConnector) {
+                    acceptor = new ThreadedSocketAcceptor(
+                            messageHandler,
+                            storeFactory,
+                            settings,
+                            logFactory,
+                            messageFactory);
+                } else {
+                    acceptor = new SocketAcceptor(
+                            messageHandler,
+                            storeFactory,
+                            settings,
+                            logFactory,
+                            messageFactory);
+                }
 
                 acceptor.start();
                 initJMX(acceptor, service.getName());
@@ -197,15 +209,26 @@ public class FIXSessionFactory {
         //Get a new FIX application
         Application messageHandler = applicationFactory.getFIXApplication(service,
                 senderThreadPool, false);
+        boolean threadedConnector = useThreadedConnector(service, false);
 
         try {
            //Create a new FIX initiator
-            Initiator initiator = new SocketInitiator(
-                    messageHandler,
-                    storeFactory,
-                    settings,
-                    logFactory,
-                    messageFactory);
+            Initiator initiator;
+            if (threadedConnector) {
+                initiator = new ThreadedSocketInitiator(
+                        messageHandler,
+                        storeFactory,
+                        settings,
+                        logFactory,
+                        messageFactory);
+            } else {
+                initiator = new SocketInitiator(
+                        messageHandler,
+                        storeFactory,
+                        settings,
+                        logFactory,
+                        messageFactory);
+            }
 
             initiator.start();
             initJMX(initiator, service.getName());
@@ -242,12 +265,23 @@ public class FIXSessionFactory {
                 Application messageHandler = applicationFactory.getFIXApplication(service,
                         senderThreadPool, false);
 
-                Initiator initiator = new SocketInitiator(
-                    messageHandler,
-                    storeFactory,
-                    settings,
-                    logFactory,
-                    messageFactory);
+                boolean threadedConnector = useThreadedConnector(service, false);
+                Initiator initiator;
+                if (threadedConnector) {
+                    initiator = new ThreadedSocketInitiator(
+                            messageHandler,
+                            storeFactory,
+                            settings,
+                            logFactory,
+                            messageFactory);
+                } else {
+                    initiator = new SocketInitiator(
+                            messageHandler,
+                            storeFactory,
+                            settings,
+                            logFactory,
+                            messageFactory);
+                }
 
                 initiator.start();
                 initJMX(initiator, service.getName());
@@ -510,6 +544,25 @@ public class FIXSessionFactory {
         } catch (JMException e) {
             log.error("Error while initializing JMX support for the service: " + service, e);
         }
+    }
+
+    private boolean useThreadedConnector(AxisService service, boolean acceptor) {
+	    Parameter param = service.getParameter(FIXConstants.FIX_USE_THREADED_ACCEPTOR);
+        if (acceptor && param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
+            return true;
+        }
+
+        param = service.getParameter(FIXConstants.FIX_USE_THREADED_INITIATOR);
+        if (!acceptor && param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
+            return true;
+        }
+
+        param = service.getParameter(FIXConstants.FIX_USE_THREADED_CONNECTORS);
+        if (param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
+            return true;
+        }
+
+        return false;
     }
 }
 

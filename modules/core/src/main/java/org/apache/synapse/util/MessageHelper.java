@@ -35,13 +35,13 @@ public class MessageHelper {
      * This method will simulate cloning the message context and creating an exact copy of the
      * passed message. One should use this method with care; that is because, inside the new MC,
      * most of the attributes of the MC like opCtx and so on are still kept as references inside
-     * the axis2 MessageContext for performance improvements. (Note: U dont have to worrie
+     * the axis2 MessageContext for performance improvements. (Note: You don't have to worry
      * about the SOAPEnvelope, it is a cloned copy and not a reference from any other MC)
      *
      * @param synCtx - this will be cloned 
      * @return cloned Synapse MessageContext
      * @throws AxisFault if there is a failure in creating the new Synapse MC or in a failure in
-     *          clonning the underlying axis2 MessageContext
+     *          cloning the underlying axis2 MessageContext
      * 
      * @see MessageHelper#cloneAxis2MessageContext 
      */
@@ -68,6 +68,7 @@ public class MessageHelper {
         newCtx.setSoapAction(synCtx.getSoapAction());
         newCtx.setWSAAction(synCtx.getWSAAction());
         newCtx.setResponse(synCtx.isResponse());
+        newCtx.setTracingState(synCtx.getTracingState());
 
         // copy all the synapse level properties to the newCtx
         for (Object o : synCtx.getPropertyKeySet()) {
@@ -103,7 +104,7 @@ public class MessageHelper {
      * This method will simulate cloning the message context and creating an exact copy of the
      * passed message. One should use this method with care; that is because, inside the new MC,
      * most of the attributes of the MC like opCtx and so on are still kept as references. Otherwise
-     * there will be perf issues. But ..... this may reveal in some conflicts in the cloned message
+     * there will be performance issues. But ..... this may reveal in some conflicts in the cloned message
      * if you try to do advanced mediations with the cloned message, in which case you should
      * manually get a clone of the changing part of the MC and set that cloned part to your MC.
      * Changing the MC after doing that will solve most of the issues. (Note: You don't have to worry

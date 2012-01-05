@@ -24,8 +24,7 @@
     </properties>
     <body>
         <section name="Sample 700: Introduction to Synapse Message Stores">
-            <div class="xmlConf">
-                &lt;!-- Introduction to the Message Store --&gt;
+            <div class="xmlConf">&lt;!-- Introduction to the Message Store --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;sequence name="fault"&gt;
         &lt;log level="full"&gt;
@@ -50,8 +49,7 @@
         &lt;description&gt;The main sequence for the message mediation&lt;/description&gt;
     &lt;/sequence&gt;
     &lt;messageStore name="MyStore"/&gt;
-&lt;/definitions&gt;
-            </div>
+&lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
                     Introduction to Message Stores
@@ -61,11 +59,9 @@
                 <p>
                     <ul>
                         <li>
-                            Start Synapse using the configuration numbered 700
-                            (repository/conf/sample/synapse_sample_700.xml)
+                            Start Synapse using the configuration numbered 700 (repository/conf/sample/synapse_sample_700.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 700
-                                <br/>
+                                Unix/Linux: sh synapse.sh -sample 700<br/>
                                 Windows: synapse.bat -sample 700
                             </div>
                         </li>
@@ -76,34 +72,29 @@
                 <p>
                     First execute the sample client as follows.
                 </p>
-                <div class="command">ant stockquote
-                    -Daddurl=http://localhost:9000/services/SimpleStockQuoteService
-                    -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
                 </div>
                 <p>
                     When you execute the client the message will be dispatched to the main sequence.
                     In the Main sequence store mediator will store the placeOrder request message in
-                    the "MyStore" Message Store
+                    the 'MyStore' Message Store.
                 </p>
                 <p>
-                    Now you can use the JMX view of the Synapse message store to see the message
-                    stored in the dead letter channel and manually retry on them.
+                    Now you can use the JMX view of the Synapse message store to see the messages
+                    stored in the dead letter channel and manually perform retries on them.
                 </p>
-                <p>Before Storing the message store mediator will invoke the sequence
-                    :onStoreSequence. See the log
+                <p>
+                    Before storing the message, store mediator will invoke the sequence named
+                    'onStoreSequence'. You should see something similar to the following in the
+                    log.
                 </p>
-                <p>INFO - LogMediator To: http://localhost:9000/services/SimpleStockQuoteService,
+                <div class="command">
+                    INFO - LogMediator To: http://localhost:9000/services/SimpleStockQuoteService,
                     WSAction: urn:placeOrder, SOAPAction: urn:placeOrder, ReplyTo:
                     http://www.w3.org/2005/08/addressing/none, MessageID:
                     urn:uuid:54f0e7c6-7b43-437c-837e-a825d819688c, Direction: request, On-Store =
                     Storing message
-                </p>
-
-
-                <p>You can then use the JMX view of Synapse Message Store by using the jconsole and
-                    view the stored
-                    Messages and delete them.
-                </p>
+                </div>
             </subsection>
         </section>
         <p>

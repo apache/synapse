@@ -24,8 +24,7 @@
     </properties>
     <body>
         <section name="Sample 702: Introduction to Message Forwarding Processor">
-            <div class="xmlConf">
-                &lt;!-- Introduction to Scheduled Message Forwarding Processor --&gt;
+            <div class="xmlConf">&lt;!-- Introduction to Scheduled Message Forwarding Processor --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;endpoint name="StockQuoteServiceEp"&gt;
@@ -71,11 +70,9 @@
                 <p>
                     <ul>
                         <li>
-                            Start Synapse using the configuration numbered 702
-                            (repository/conf/sample/synapse_sample_702.xml)
+                            Start Synapse using the configuration numbered 702 (repository/conf/sample/synapse_sample_702.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 702
-                                <br/>
+                                Unix/Linux: sh synapse.sh -sample 702<br/>
                                 Windows: synapse.bat -sample 702
                             </div>
                         </li>
@@ -84,29 +81,26 @@
             </subsection>
             <subsection name="Executing the Client">
                 <p>
-                    Execute the Client few times with command :
+                    Execute the sample client a few times with the following command. Note that
+                    we still haven't started the sample Axis2 server.
                 </p>
-                <div class="command">ant stockquote
-                    -Daddurl=http://localhost:9000/services/SimpleStockQuoteService
-                    -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
+                <div class="command">
+                    ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
                 </div>
 
-                <p>Now Start the SimpleStockQuoteService</p>
-                <p>When you Start the service you will see message getting delivered to the service.
-                    Even
-                    though service is down when we invoke it from the client
+                <p>
+                    Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2.
                 </p>
-                <p>Here in the Main sequence store mediator will store the placeOrder request
-                    message in the
-                    "MyStore" Message Store
+                <p>
+                    When you start the service you will see messages getting delivered to the service,
+                    even though the service was actually down when we invoked the sample client.
                 </p>
-                <p>Message Processor will send the message to the endpoint configured as a message
-                    context
-                    property.
-                </p>
-                <p>Message processor will remove the message from the store only if message
-                    delivered
-                    successfully
+                <p>
+                    Here in the 'main' sequence store mediator will store the placeOrder request
+                    message in the 'MyStore' message store. Message processor will send the message
+                    to the endpoint which is configured as a message context property. Message
+                    processor will remove the message from the store only if the message is delivered
+                    successfully.
                 </p>
             </subsection>
         </section>

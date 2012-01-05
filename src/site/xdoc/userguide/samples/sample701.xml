@@ -20,53 +20,61 @@
 
 <document>
     <properties>
-        <title>Apache Synapse - Sample 700</title>
+        <title>Apache Synapse - Sample 701</title>
     </properties>
     <body>
-        <section name="Sample 700: Introduction to Synapse Message Stores">
+        <section name="Sample 701: Introduction to Message Sampling Processor">
             <div class="xmlConf">
-                &lt;!-- Introduction to the Message Store --&gt;
+              &lt;!-- Introduction to Message Sampling Processor --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;sequence name="fault"&gt;
-        &lt;log level="full"&gt;
-            &lt;property name="MESSAGE" value="Executing default 'fault' sequence"/&gt;
-            &lt;property name="ERROR_CODE" expression="get-property('ERROR_CODE')"/&gt;
-            &lt;property name="ERROR_MESSAGE"
-                      expression="get-property('ERROR_MESSAGE')"/&gt;
-        &lt;/log&gt;
-        &lt;drop/&gt;
-    &lt;/sequence&gt;
-    &lt;sequence name="onStoreSequence"&gt;
-        &lt;log&gt;
-            &lt;property name="On-Store" value="Storing message"/&gt;
-        &lt;/log&gt;
+    &lt;sequence name="send_seq"&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"&gt;
+                    &lt;suspendOnFailure&gt;
+                        &lt;errorCodes&gt;-1&lt;/errorCodes&gt;
+                        &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                    &lt;/suspendOnFailure&gt;
+                &lt;/address&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
     &lt;/sequence&gt;
     &lt;sequence name="main"&gt;
         &lt;in&gt;
             &lt;log level="full"/&gt;
             &lt;property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/&gt;
-            &lt;store messageStore="MyStore" sequence="onStoreSequence"/&gt;
+            &lt;property name="OUT_ONLY" value="true"/&gt;
+            &lt;store messageStore="MyStore"/&gt;
         &lt;/in&gt;
         &lt;description&gt;The main sequence for the message mediation&lt;/description&gt;
     &lt;/sequence&gt;
     &lt;messageStore name="MyStore"/&gt;
+    &lt;messageProcessor
+            class="org.apache.synapse.message.processors.sampler.SamplingProcessor"
+            name="SamplingProcessor" messageStore="MyStore"&gt;
+        &lt;parameter name="interval"&gt;20000&lt;/parameter&gt;
+        &lt;parameter name="sequence"&gt;send_seq&lt;/parameter&gt;
+    &lt;/messageProcessor&gt;
 &lt;/definitions&gt;
             </div>
             <subsection name="Objective">
                 <p>
-                    Introduction to Message Stores
+                    Introduction to Message Sampling Processor
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            Start Synapse using the configuration numbered 700
-                            (repository/conf/sample/synapse_sample_700.xml)
+                            Start the SimpleStockQuoteService if its not already started
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 701
+                            (repository/conf/sample/synapse_sample_701.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 700
+                                Unix/Linux: sh synapse.sh -sample 701
                                 <br/>
-                                Windows: synapse.bat -sample 700
+                                Windows: synapse.bat -sample 701
                             </div>
                         </li>
                     </ul>
@@ -74,35 +82,26 @@
             </subsection>
             <subsection name="Executing the Client">
                 <p>
-                    First execute the sample client as follows.
+                    Execute the Client few times with command :
                 </p>
                 <div class="command">ant stockquote
                     -Daddurl=http://localhost:9000/services/SimpleStockQuoteService
                     -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
                 </div>
-                <p>
-                    When you execute the client the message will be dispatched to the main sequence.
+
+                <p>When you execute the client the message will be dispatched to the main sequence.
                     In the Main sequence store mediator will store the placeOrder request message in
-                    the "MyStore" Message Store
-                </p>
-                <p>
-                    Now you can use the JMX view of the Synapse message store to see the message
-                    stored in the dead letter channel and manually retry on them.
-                </p>
-                <p>Before Storing the message store mediator will invoke the sequence
-                    :onStoreSequence. See the log
-                </p>
-                <p>INFO - LogMediator To: http://localhost:9000/services/SimpleStockQuoteService,
-                    WSAction: urn:placeOrder, SOAPAction: urn:placeOrder, ReplyTo:
-                    http://www.w3.org/2005/08/addressing/none, MessageID:
-                    urn:uuid:54f0e7c6-7b43-437c-837e-a825d819688c, Direction: request, On-Store =
-                    Storing message
+                    the
+                    "MyStore" Message Store
                 </p>
 
-
-                <p>You can then use the JMX view of Synapse Message Store by using the jconsole and
-                    view the stored
-                    Messages and delete them.
+                <p>Message Processor will consume the messages and forward to the send_seq sequence
+                    in
+                    configured rate.
+                </p>
+                <p>You will observe that service invocation rate is not changing when increasing the
+                    rate we
+                    execute the client.
                 </p>
             </subsection>
         </section>

@@ -79,8 +79,8 @@
     </licenses>
 
     <scm>
-        <connection>http://svn.apache.org/repos/asf/synapse/branches/2.1</connection>
-        <developerConnection>https://svn.apache.org/repos/asf/synapse/branches/2.1</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/branches/2.1</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/branches/2.1</developerConnection>
         <url>http://svn.apache.org/viewvc/synapse/branches/2.1</url>
     </scm>
 

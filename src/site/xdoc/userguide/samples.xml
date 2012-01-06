@@ -126,7 +126,7 @@
             <subsection name="Scheduled Tasks">
                 <p>
                     <ul>
-                        <li><a href="#Sample300">Sample 300: Introduction to tasks with simple trigger</a></li>
+                        <li><a href="samples/sample300.html">Sample 300: Introduction to tasks with simple trigger</a></li>
                     </ul>
                 </p>
             </subsection>
@@ -237,10 +237,12 @@
                     </ul>
                 </p>
             </subsection>
-            <subsection name="Message Store and Dead Letter Channel">
+            <subsection name="Message Stores and Message Processors">
                 <p>
                     <ul>
-                        <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse message stores</a></li>
+                        <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse Message Stores</a></li>
+                        <li><a href="samples/sample701.html">Sample 701: Introduction to Message Sampling Processor</a></li>
+                        <li><a href="samples/sample702.html">Sample 702: Introduction to Message Forwarding Processor</a></li>
                     </ul>
                 </p>
             </subsection>

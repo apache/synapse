@@ -79,9 +79,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
+        <connection>http://svn.apache.org/repos/asf/synapse/branches/2.1</connection>
+        <developerConnection>https://svn.apache.org/repos/asf/synapse/branches/2.1</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/branches/2.1</url>
     </scm>
 
     <organization>

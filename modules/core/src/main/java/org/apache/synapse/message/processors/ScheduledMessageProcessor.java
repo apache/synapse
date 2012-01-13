@@ -186,6 +186,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
     public void destroy() {
         try {
             scheduler.deleteJob(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+            scheduler.shutdown(true);
         } catch (SchedulerException e) {
             log.error("Error while destroying the task " + e);
         }

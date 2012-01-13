@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Redelivery processor is the Message processor which implements the Dead letter channel EIP
  * It will Time to time Redeliver the Messages to a given target.
  */
-public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor{
+public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor {
 
     public static final String BLOCKING_SENDER = "blocking.sender";
 
@@ -131,8 +131,9 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
     @Override
     public void destroy() {
          try {
-            scheduler.deleteJob(name + "-forward job",
+             scheduler.deleteJob(name + "-forward job",
                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+             scheduler.shutdown(true);
         } catch (SchedulerException e) {
             log.error("Error while destroying the task " + e);
         }

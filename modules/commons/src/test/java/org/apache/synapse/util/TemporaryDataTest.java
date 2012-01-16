@@ -27,8 +27,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.commons.io.IOUtils;
-import org.apache.synapse.commons.util.TemporaryData;
 
 import junit.framework.TestCase;
 
@@ -38,7 +38,7 @@ public class TemporaryDataTest extends TestCase {
     private void doTestRandomReadWrite(int size) throws IOException {
         byte[] data = new byte[size];
         random.nextBytes(data);
-        TemporaryData tmp = new TemporaryData(16, 1024, "test", ".dat");
+        OverflowBlob tmp = new OverflowBlob(16, 1024, "test", ".dat");
         try {
             OutputStream out = tmp.getOutputStream();
             // Write the test data in chunks with random size
@@ -89,7 +89,7 @@ public class TemporaryDataTest extends TestCase {
         byte[] sourceData2 = new byte[2000];
         random.nextBytes(sourceData1);
         random.nextBytes(sourceData2);
-        TemporaryData tmp = new TemporaryData(16, 512, "test", ".dat");
+        OverflowBlob tmp = new OverflowBlob(16, 512, "test", ".dat");
         OutputStream out = tmp.getOutputStream();
         out.write(sourceData1);
         out.write(sourceData2);
@@ -109,9 +109,9 @@ public class TemporaryDataTest extends TestCase {
     private void testReadFrom(int size) throws IOException {
         byte[] data = new byte[size];
         random.nextBytes(data);
-        TemporaryData tmp = new TemporaryData(16, 1024, "test", ".dat");
+        OverflowBlob tmp = new OverflowBlob(16, 1024, "test", ".dat");
         try {
-            tmp.readFrom(new ByteArrayInputStream(data));
+            tmp.readFrom(new ByteArrayInputStream(data), -1);
             InputStream in = tmp.getInputStream();
             try {
                 assertTrue(Arrays.equals(data, IOUtils.toByteArray(in)));

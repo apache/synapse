@@ -19,6 +19,7 @@
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -36,7 +37,6 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.MetricsCollector;
 import org.apache.axis2.transport.base.TransportMBeanSupport;
-import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
@@ -61,7 +61,6 @@ import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
-import org.apache.synapse.commons.util.TemporaryData;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -624,7 +623,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private void setStreamAsTempData(BasicHttpEntity entity, MessageFormatter messageFormatter,
                                      MessageContext msgContext, OMOutputFormat format)
             throws IOException {
-        TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
+        OverflowBlob serialized = new OverflowBlob(256, 4096, "http-nio_", ".dat");
         OutputStream out = serialized.getOutputStream();
         try {
             messageFormatter.writeTo(msgContext, format, out, true);
@@ -643,8 +642,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     private void writeMessageFromTempData(OutputStream out, MessageContext msgContext)
             throws IOException {
-        TemporaryData serialized =
-                (TemporaryData) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
+        OverflowBlob serialized =
+                (OverflowBlob) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
         try {
             serialized.writeTo(out);
         } finally {
@@ -653,7 +652,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     }
 
     /**
-     * Determine the HttpStatusCodedepending on the message type processed <br>
+     * Determine the HttpStatusCode depending on the message type processed <br>
      * (normal response versus fault response) as well as Axis2 message context properties set
      * via Synapse configuration or MessageBuilders.
      * 

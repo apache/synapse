@@ -151,8 +151,6 @@ public abstract class AbstractRegistry implements Registry {
                 SequenceMediator seq = (SequenceMediator) entry.getValue();
                 seq.setDynamic(true);
                 seq.setRegistryKey(entry.getKey());
-            } else if (entry.getValue() instanceof Endpoint) {
-                Endpoint ep = (Endpoint) entry.getValue();
             }
 
         } else {

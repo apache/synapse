@@ -241,7 +241,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
             }
 
         } else {
-            throw new Exception("Error! Cant send Message Context : " + messageContext);
+            throw new Exception("MessageContext must not be null");
         }
     }
 

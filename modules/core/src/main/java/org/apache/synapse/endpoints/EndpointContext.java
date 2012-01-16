@@ -212,10 +212,9 @@ public class EndpointContext {
                     break;
                 }
                 case ST_OFF: {
-                    // mark as in maintenence, and reset all other information
+                    // mark as in maintenance, and reset all other information
                     Replicator.setAndReplicateState(REMAINING_RETRIES_KEY,
-                            definition == null ? -1 :
-                                    definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);
+                            definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);
                     Replicator.setAndReplicateState(LAST_SUSPEND_DURATION_KEY, null, cfgCtx);
                     break;
                 }
@@ -260,9 +259,8 @@ public class EndpointContext {
                     break;
                 }
                 case ST_OFF: {
-                    // mark as in maintenence, and reset all other information
-                    localRemainingRetries = definition == null ?
-                            -1 : definition.getRetriesOnTimeoutBeforeSuspend();
+                    // mark as in maintenance, and reset all other information
+                    localRemainingRetries = definition.getRetriesOnTimeoutBeforeSuspend();
                     localLastSuspendDuration = -1;
                     break;
                 }

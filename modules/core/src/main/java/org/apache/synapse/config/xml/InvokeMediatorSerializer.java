@@ -23,7 +23,6 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.template.InvokeMediator;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -43,6 +42,7 @@ public class InvokeMediatorSerializer extends AbstractMediatorSerializer {
     protected OMElement serializeSpecificMediator(Mediator m) {
         if (!(m instanceof InvokeMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
+            return null;
         }
         InvokeMediator mediator = (InvokeMediator) m;
         OMElement invokeElem = fac.createOMElement(INVOKE_N, synNS);
@@ -60,16 +60,13 @@ public class InvokeMediatorSerializer extends AbstractMediatorSerializer {
 
     private void serializeParams(OMElement invokeElem, InvokeMediator mediator) {
         Map<String, Value> paramsMap = mediator.getpName2ExpressionMap();
-        Iterator<String> paramIterator = paramsMap.keySet().iterator();
-        while (paramIterator.hasNext()) {
-            String paramName = paramIterator.next();
-            if (!"".equals(paramName)) {
+        for (Map.Entry<String,Value> entry : paramsMap.entrySet()) {
+            if (!"".equals(entry.getKey())) {
                 OMElement paramEl = fac.createOMElement(InvokeMediatorFactory.WITH_PARAM_Q.getLocalPart(),
                                                         synNS);
-                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, paramName));
+                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, entry.getKey()));
                 //serialize value attribute
-                Value value = paramsMap.get(paramName);
-                new ValueSerializer().serializeValue(value, "value", paramEl);
+                new ValueSerializer().serializeValue(entry.getValue(), "value", paramEl);
                 invokeElem.addChild(paramEl);
             }
         }

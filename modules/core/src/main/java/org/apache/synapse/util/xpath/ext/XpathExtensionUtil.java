@@ -173,11 +173,10 @@ public class XpathExtensionUtil {
             return null;
         }
 
-        Set<QName> qNames = extensionMap.keySet();
-        for (QName qName : qNames) {
+        for (Map.Entry<QName,T> entry : extensionMap.entrySet()) {
             //check for a match for the given combination for QName registered
-            if (subject.equals(qName)) {
-                return extensionMap.get(qName);
+            if (subject.equals(entry.getKey())) {
+                return entry.getValue();
             }
         }
         //no match found

@@ -375,9 +375,9 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
     }
 
     private String getSupportedMethods() {
-        String value = "";
+        StringBuilder value = new StringBuilder("");
         if (methods.isEmpty()) {
-            value = RESTConstants.REST_ALL_SUPPORTED_METHODS;
+            value.append(RESTConstants.REST_ALL_SUPPORTED_METHODS);
         } else {
             for (String method : methods) {
                 if (RESTConstants.METHOD_OPTIONS.equals(method)) {
@@ -385,12 +385,12 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
                 }
 
                 if (value.length() > 0) {
-                    value += ", ";
+                    value.append(", ");
                 }
-                value += method;
+                value.append(method);
             }
         }
-        return value;
+        return value.toString();
     }
 
     public void init(SynapseEnvironment se) {

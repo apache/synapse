@@ -38,11 +38,11 @@ public class ResourceSerializer {
         OMElement resourceElt = fac.createOMElement("resource", SynapseConstants.SYNAPSE_OMNAMESPACE);
         String[] methods = resource.getMethods();
         if (methods.length > 0) {
-            String value = "";
+            StringBuilder value = new StringBuilder("");
             for (String method : methods) {
-                value += method + " ";
+                value.append(method).append(" ");
             }
-            resourceElt.addAttribute("methods", value.trim(), null);
+            resourceElt.addAttribute("methods", value.toString().trim(), null);
         }
 
         if (resource.getContentType() != null) {

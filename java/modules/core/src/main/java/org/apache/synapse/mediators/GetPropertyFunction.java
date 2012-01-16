@@ -39,7 +39,6 @@ import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
 
 import javax.activation.DataHandler;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -330,12 +329,12 @@ public class GetPropertyFunction implements Function {
                             try {
                                 InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());
                                 BufferedReader stringReader = new BufferedReader(streamReader);
-                                String omTextString = NULL_STRING;
+                                StringBuilder omTextString = new StringBuilder(NULL_STRING);
                                 String tempStr;
                                 while ((tempStr = stringReader.readLine()) != null) {
-                                    omTextString = omTextString + tempStr;
+                                    omTextString.append(tempStr);
                                 }
-                                return omTextString;
+                                return omTextString.toString();
                             } catch (IOException e) {
                                 return NULL_STRING;
                             }

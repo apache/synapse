@@ -248,7 +248,7 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
             }
         } catch (Exception e) {
             handleSynapseArtifactDeploymentError(
-                    "Template Undeployement of template named : " + artifactName + " : Failed", e);
+                    "Template Undeployment of template named : " + artifactName + " : Failed", e);
         }
     }
 
@@ -283,7 +283,7 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                     if (mt.getFileName() != null) {
                         String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
                                 + File.separator + MultiXMLConfigurationBuilder.TEMPLATES_DIR
-                                + File.separator + st.getFileName();
+                                + File.separator + mt.getFileName();
                         writeToFile(stElem, fileName);
                         if (log.isDebugEnabled()) {
                             log.debug("Restoring the Sequence Template with name : " +

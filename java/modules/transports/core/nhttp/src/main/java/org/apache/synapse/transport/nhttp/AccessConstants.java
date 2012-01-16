@@ -39,21 +39,21 @@ public class AccessConstants {
     /**
      * The directory in which log files are created.
      */
-    public static String DIRECTORY = "logs";
+    public static final String DIRECTORY = "logs";
 
     /**
      * Gives the format of the date to be appended to the name of the access log file.
      */
-    public static String FILE_FORMAT = "yyyy-MM-dd";
+    public static final String FILE_FORMAT = "yyyy-MM-dd";
 
     /**
      * The prefix that is added to log file file names.
      */
-    public static String PREFIX = "http_access_";
+    public static final String PREFIX = "http_access_";
 
     /**
      * The suffix that is added to log file file names.
      */
-    public static String SUFFIX = ".log";
+    public static final String SUFFIX = ".log";
 
 }

@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class TemplateEndpointSerializer extends EndpointSerializer {
 
-    protected static OMNamespace nullNS;
+    private OMNamespace nullNS;
 
     public TemplateEndpointSerializer() {
         fac = OMAbstractFactory.getOMFactory();

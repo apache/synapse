@@ -328,7 +328,7 @@ public class Access {
     /**
      * write date and time, in Common Log Format - %t
      */
-    protected class DateAndTimeElement implements AccessLogElement {
+    protected static class DateAndTimeElement implements AccessLogElement {
 
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {

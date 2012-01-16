@@ -23,19 +23,15 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.message.processors.MessageProcessorConsents;
-import org.apache.synapse.message.store.AbstractMessageStore;
 import org.apache.synapse.message.store.MessageStore;
 import org.quartz.*;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Redelivery Job will replay all the Messages in the Message Store when executed
@@ -50,7 +46,7 @@ public class ForwardingJob implements StatefulJob {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
 
         /**
-         * Get the Globle Objects from DataMap
+         * Get the Global Objects from DataMap
          */
         MessageStore messageStore = (MessageStore) jdm.get(
                 MessageProcessorConsents.MESSAGE_STORE);
@@ -58,14 +54,14 @@ public class ForwardingJob implements StatefulJob {
                 MessageProcessorConsents.PARAMETERS);
         BlockingMessageSender sender =
                 (BlockingMessageSender) jdm.get(ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
-
         ScheduledMessageForwardingProcessor processor =
                 (ScheduledMessageForwardingProcessor) jdm.get(ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
 
-
         int maxDeliverAttempts = -1;
-        String mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);
-
+        String mdaParam = null;
+        if (parameters != null) {
+            mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);
+        }
 
         if (mdaParam != null) {
             maxDeliverAttempts = Integer.parseInt(mdaParam);

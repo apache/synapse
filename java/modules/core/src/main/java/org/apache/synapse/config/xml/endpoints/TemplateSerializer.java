@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TemplateSerializer {
-    protected static OMFactory fac = OMAbstractFactory.getOMFactory();
+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
 
     protected static final OMNamespace nullNS
             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");

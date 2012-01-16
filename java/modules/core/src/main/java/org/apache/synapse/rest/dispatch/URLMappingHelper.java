@@ -83,11 +83,11 @@ public class URLMappingHelper implements DispatcherHelper {
 
     public String getString() {
         if (pathSegments != null) {
-            String str = "";
+            StringBuilder str = new StringBuilder("");
             for (String segment : pathSegments) {
-                str += "/" + segment;
+                str.append("/").append(segment);
             }
-            return str + "/*";
+            return str.append("/*").toString();
         } else if (extension != null) {
             return "*." + extension;
         } else {

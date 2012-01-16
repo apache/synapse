@@ -514,7 +514,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
 
             worker.getServiceHandler().commitResponse(worker.getConn(), response);
-            lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());
+            if (lstMetrics != null) {
+                lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());
+            }
             OutputStream out = worker.getOutputStream();
 
             /*

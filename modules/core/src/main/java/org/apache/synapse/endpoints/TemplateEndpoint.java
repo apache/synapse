@@ -119,7 +119,7 @@ public class TemplateEndpoint extends AbstractEndpoint {
                 // this endpoint is static -->
                 // since template-endpoint is static, should ONLY be loaded at initialization to prevent
                 // reloading every single time this endpoint is executed..
-                // incase tempalate config has changed this endpoint should be redeployed
+                // in case template config has changed this endpoint should be redeployed
                 reLoad = false;
             }
         }

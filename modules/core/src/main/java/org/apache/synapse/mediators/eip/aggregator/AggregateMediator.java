@@ -135,7 +135,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
             Aggregate aggregate = null;
             String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + "." + id :
                     EIPConstants.AGGREGATE_CORRELATION);
-            // if a correlateExpression is provided and there is a coresponding
+            // if a correlateExpression is provided and there is a corresponding
             // element in the current message prepare to correlate the messages on that
             if (correlateExpression != null
                     && correlateExpression.evaluate(synCtx) != null) {
@@ -180,7 +180,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
                 }
 
             } else if (synCtx.getProperty(correlationIdName) != null) {
-                // if the correlattion cannot be found using the correlateExpression then
+                // if the correlation cannot be found using the correlateExpression then
                 // try the default which is through the AGGREGATE_CORRELATION message property
                 // which is the unique original message id of a split or iterate operation and
                 // which thus can be used to uniquely group messages into aggregates

@@ -63,6 +63,10 @@ public class URLMappingHelper implements DispatcherHelper {
             }
 
             url = RESTUtils.trimSlashes(url);
+            int index = url.indexOf('?');
+            if (index != -1) {
+                url = url.substring(0, index);
+            }
             String[] segments = url.split("/");
             int matchingLength = 0;
             for (int i = 0; i < pathSegments.length; i++) {

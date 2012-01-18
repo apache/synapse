@@ -71,6 +71,22 @@ public class URLMappingBasedDispatcherTest extends RESTMediationTestCase {
         handler.process(synCtx);
         assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
 
+        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar?a=b", "GET");
+        handler.process(synCtx);
+        assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
+
+        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar/baz?a=b", "GET");
+        handler.process(synCtx);
+        assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
+
+        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar/?a=b", "GET");
+        handler.process(synCtx);
+        assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
+
+        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bars?a=b", "GET");
+        handler.process(synCtx);
+        assertNull(synCtx.getProperty(PROP_NAME));
+
         synCtx = getMessageContext(synapseConfig, false, "/test/foo/", "GET");
         handler.process(synCtx);
         assertNull(synCtx.getProperty(PROP_NAME));

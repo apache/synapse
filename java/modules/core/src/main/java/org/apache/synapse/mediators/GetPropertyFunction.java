@@ -41,6 +41,7 @@ import org.jaxen.function.StringFunction;
 import javax.activation.DataHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -326,8 +327,10 @@ public class GetPropertyFunction implements Function {
                         OMText omText = (OMText) propEntry.getValue();
                         DataHandler dh = (DataHandler) omText.getDataHandler();
                         if (omText.getDataHandler() != null) {
+                            InputStream in = null;
                             try {
-                                InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());
+                                in = dh.getInputStream();
+                                InputStreamReader streamReader = new InputStreamReader(in);
                                 BufferedReader stringReader = new BufferedReader(streamReader);
                                 StringBuilder omTextString = new StringBuilder(NULL_STRING);
                                 String tempStr;
@@ -337,6 +340,12 @@ public class GetPropertyFunction implements Function {
                                 return omTextString.toString();
                             } catch (IOException e) {
                                 return NULL_STRING;
+                            } finally {
+                                if (in != null) {
+                                    try {
+                                        in.close();
+                                    } catch (IOException ignore) { }
+                                }
                             }
                         } else {
                             omText.getText();

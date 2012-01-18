@@ -319,9 +319,10 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
     }
 
-    public static void defineAPI(SynapseConfiguration config, OMElement elem) {
+    public static API defineAPI(SynapseConfiguration config, OMElement elem) {
         API api = APIFactory.createAPI(elem);
         config.addAPI(api.getName(), api);
+        return api;
     }
 
     private static void handleException(String msg) {

@@ -41,6 +41,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.API;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -130,7 +131,8 @@ public class MultiXMLConfigurationBuilder {
         createEventSources(synapseConfig, root, properties);
         createExecutors(synapseConfig, root, properties);
         createMessageStores(synapseConfig, root, properties);
-        createMessageProcessors(synapseConfig,root,properties);
+        createMessageProcessors(synapseConfig, root, properties);
+        createAPIs(synapseConfig, root, properties);
 
         return synapseConfig;
     }
@@ -414,7 +416,6 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
-
     private static void createMessageProcessors(SynapseConfiguration synapseConfig,
                                             String rootDirPath, Properties properties) {
 
@@ -439,6 +440,28 @@ public class MultiXMLConfigurationBuilder {
         }
     }
 
+    private static void createAPIs(SynapseConfiguration synapseConfig,
+                                            String rootDirPath, Properties properties) {
+
+        File apiDir = new File(rootDirPath, REST_API_DIR);
+        if (apiDir.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading APIs from :" + apiDir.getPath());
+            }
+
+            Iterator apiIterator = FileUtils.iterateFiles(apiDir, extensions, false);
+            while (apiIterator.hasNext()) {
+                File file = (File) apiIterator.next();
+                OMElement document = getOMElement(file);
+                API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document);
+                if (api != null) {
+                    api.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                            api.getName());
+                }
+            }
+        }
+    }
 
     private static OMElement getOMElement(File file) {
         FileInputStream is;

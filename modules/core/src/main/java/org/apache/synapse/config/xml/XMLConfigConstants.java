@@ -66,6 +66,7 @@ public class XMLConfigConstants {
     public static final QName DESCRIPTION_ELT = new QName(SYNAPSE_NAMESPACE, "description");
     public static final QName SEQUENCE_ELT    = new QName(SYNAPSE_NAMESPACE, "sequence");
     public static final QName TEMPLATE_ELT    = new QName(SYNAPSE_NAMESPACE, "template");
+    public static final QName IMPORT_ELT    = new QName(SYNAPSE_NAMESPACE, "import");
     public static final QName ENDPOINT_ELT    = new QName(SYNAPSE_NAMESPACE, "endpoint");
     public static final QName ENTRY_ELT       = new QName(SYNAPSE_NAMESPACE, "localEntry");
     public static final QName REGISTRY_ELT    = new QName(SYNAPSE_NAMESPACE, "registry");

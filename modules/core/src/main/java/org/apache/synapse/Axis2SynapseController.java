@@ -31,11 +31,17 @@ import org.apache.axis2.format.BinaryBuilder;
 import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.phaseresolver.PhaseMetadata;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.config.*;
+import org.apache.synapse.libraries.imports.SynapseImport;
+import org.apache.synapse.libraries.model.Library;
+import org.apache.synapse.libraries.util.LibDeployerConstants;
+import org.apache.synapse.libraries.util.LibDeployerUtils;
 import org.apache.synapse.securevault.SecurityConstants;
 import org.apache.synapse.securevault.secret.SecretCallbackHandler;
 import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
@@ -51,6 +57,7 @@ import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;
 import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
 import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -201,6 +208,42 @@ public class Axis2SynapseController implements SynapseController {
                 XpathExtensionUtil.getRegisteredVariableExtensions();
         for (SynapseXpathVariableResolver variableExtension : variableExtensions) {
             axis2SynapseEnvironment.setXpathVariableExtensions(variableExtension);
+        }
+
+    }
+
+    private void initSynapseLibraries(SynapseConfiguration synapseConfig, String root) {
+        File synLibDir = new File(root, "repository" + File.separator +"conf" +
+                                        File.separator +"synapse-libs");
+        if (synLibDir.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading Synapse Libraries from :" + synLibDir.getPath());
+            }
+
+            Iterator synLibFile = FileUtils.iterateFiles(synLibDir, new String[]{LibDeployerConstants.SYNAPSE_LIB_FORMAT}, false);
+            while (synLibFile.hasNext()) {
+                File file = (File) synLibFile.next();
+                Library lib = LibDeployerUtils.createSynapseLibrary(FilenameUtils.normalize(file.getAbsolutePath()));
+                String libArtifactName = lib.getQName().toString();
+                //add the library to synapse Config
+                synapseConfig.addSynapseLibrary(lib.toString(), lib);
+                synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                           libArtifactName);
+                if (log.isDebugEnabled()) {
+                    log.debug("Synapse Library Deployment for lib: " + libArtifactName + " Completed");
+                }
+
+                //each time a library is deployed we check with available imports  and
+                //if necessary (ie:- relevant import is available) load the libraries
+                SynapseImport synImport = synapseConfig.getSynapseImports().get(libArtifactName);
+                if (synImport != null) {
+                    LibDeployerUtils.loadLibArtifacts(synImport, lib);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Loading Synapse Library: " + libArtifactName + " into memory for Import");
+                    }
+
+                }
+            }
         }
 
     }
@@ -470,6 +513,7 @@ public class Axis2SynapseController implements SynapseController {
             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
+        initSynapseLibraries(synapseConfiguration, serverConfigurationInformation.getSynapseHome());
         Enumeration keys = properties.keys();
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();

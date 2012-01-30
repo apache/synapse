@@ -29,6 +29,9 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.libraries.imports.SynapseImport;
+import org.apache.synapse.libraries.model.Library;
+import org.apache.synapse.libraries.util.LibDeployerUtils;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
@@ -79,6 +82,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     }
                 } else if (XMLConfigConstants.TEMPLATE_ELT.equals(elt.getQName())) {
                     defineTemplate(config, elt, properties);
+                } else if (XMLConfigConstants.IMPORT_ELT.equals(elt.getQName())) {
+                    defineImport(config, elt, properties);
                 } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
                     defineEndpoint(config, elt, properties);
                 } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
@@ -284,6 +289,19 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         MessageProcessor processor  = MessageProcessorFactory.createMessageProcessor(elem);
         config.addMessageProcessor(processor.getName() , processor);
         return processor;
+    }
+
+    public static SynapseImport defineImport(SynapseConfiguration config, OMElement elt, Properties properties) {
+        SynapseImport synImport = SynapseImportFactory.createImport(elt, properties);
+        String libIndexString = LibDeployerUtils.getQualifiedName(synImport);
+        config.addSynapseImport(libIndexString, synImport);
+
+        //get corresponding library for loading imports if available
+        Library synLib = config.getSynapseLibraries().get(libIndexString);
+        if (synLib != null) {
+            LibDeployerUtils.loadLibArtifacts(synImport, synLib);
+        }
+        return synImport;
     }
 
     public static Template defineEndpointTemplate(SynapseConfiguration config,

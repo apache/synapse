@@ -28,7 +28,10 @@ import org.apache.synapse.*;
 import org.apache.synapse.config.xml.TemplateMediatorFactory;
 import org.apache.synapse.config.xml.XMLToTemplateMapper;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+import org.apache.synapse.libraries.imports.SynapseImport;
+import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.libraries.util.LibDeployerUtils;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
@@ -161,6 +164,15 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      */
     private SynapseArtifactDeploymentStore artifactDeploymentStore = new SynapseArtifactDeploymentStore();
 
+    /**
+     * Holds synapse Libraries indexed by library qualified name
+     */
+    Map<String,Library> synapseLibraries = new ConcurrentHashMap<String,Library>();
+
+    /**
+     * Holds the library imports  currently being included into Synapse engine
+     */
+    Map<String,SynapseImport> synapseImports = new ConcurrentHashMap<String,SynapseImport>();
     private boolean allowHotUpdate = true;
 
     /**
@@ -405,6 +417,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             }
         }
 
+        //load from available libraries
+        TemplateMediator templateFromLib = LibDeployerUtils.getLibArtifact(synapseLibraries, key, TemplateMediator.class);
+        if (templateFromLib != null) {
+            return templateFromLib;
+        }
         return null;
     }
 
@@ -1596,6 +1613,75 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     }
 
     /**
+     * Add Synapse library to configuration with given name
+     *
+     * @param name      of synapse lib
+     * @param library instance
+     */
+    public void addSynapseLibrary(String name, Library library) {
+        if (!(synapseLibraries.containsKey(name))) {
+            synapseLibraries.put(name, library);
+        } else {
+            handleException("Duplicate Synapse Library " + name);
+        }
+    }
+
+    /**
+     * Get all Synapse libraries in the Synapse configuration
+     *
+     * @return Return Map that contains all the Synapse libraries
+     */
+    public Map<String, Library> getSynapseLibraries() {
+        return synapseLibraries;
+    }
+
+    /**
+     * remove the Synapse library from the synapse configuration
+     *
+     * @param name of the lib
+     * @return Removed Synapse library instance
+     */
+    public Library removeSynapseLibrary(String name) {
+        return synapseLibraries.remove(name);
+    }
+
+
+
+    /**
+     * Add Synapse Import to a configuration with given name
+     *
+     * @param name      of synapse lib
+     * @param synImport instance
+     */
+    public void addSynapseImport(String name, SynapseImport synImport) {
+        if (!(synapseImports.containsKey(name))) {
+            synapseImports.put(name, synImport);
+        } else {
+            handleException("Duplicate Synapse Library " + name);
+        }
+    }
+
+    /**
+     * Get all Synapse libraries in the Synapse configuration
+     *
+     * @return Return Map that contains all the Synapse libraries
+     */
+    public Map<String, SynapseImport> getSynapseImports() {
+        return synapseImports;
+    }
+
+    /**
+     * remove the Synapse library from the synapse configuration
+     *
+     * @param name of the lib
+     * @return Removed Synapse library instance
+     */
+    public SynapseImport removeSynapseImport(String name) {
+        return synapseImports.remove(name);
+    }
+
+
+    /**
      * Sets the description of the configuration
      *
      * @param description tobe set to the artifact
@@ -1708,6 +1794,11 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
                     return (Template) object;
                 }
             }
+        }
+         //load from available libraries
+        Template templateFromLib = LibDeployerUtils.getLibArtifact(synapseLibraries, key, Template.class);
+        if (templateFromLib != null) {
+            return templateFromLib;
         }
 
         return null;

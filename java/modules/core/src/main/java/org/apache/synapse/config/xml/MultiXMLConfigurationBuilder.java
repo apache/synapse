@@ -29,6 +29,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.processors.MessageProcessor;
@@ -89,6 +90,7 @@ public class MultiXMLConfigurationBuilder {
     public static final String MESSAGE_STORE_DIR        = "message-stores";
     public static final String MESSAGE_PROCESSOR_DIR    = "message-processors";
     public static final String REST_API_DIR             = "api";
+    public static final String SYNAPSE_IMPORTS_DIR   = "imports";
 
     public static final String REGISTRY_FILE       = "registry.xml";
 
@@ -132,6 +134,7 @@ public class MultiXMLConfigurationBuilder {
         createExecutors(synapseConfig, root, properties);
         createMessageStores(synapseConfig, root, properties);
         createMessageProcessors(synapseConfig, root, properties);
+        createSynapseImports(synapseConfig, root, properties);
         createAPIs(synapseConfig, root, properties);
 
         return synapseConfig;
@@ -439,6 +442,29 @@ public class MultiXMLConfigurationBuilder {
             }
         }
     }
+
+    private static void createSynapseImports(SynapseConfiguration synapseConfig, String root, Properties properties) {
+        File synImportsDir = new File(root, SYNAPSE_IMPORTS_DIR);
+        if (synImportsDir.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loading Synapse Imports from :" + synImportsDir.getPath());
+            }
+            Iterator synImports = FileUtils.iterateFiles(synImportsDir, extensions, false);
+            while (synImports.hasNext()) {
+                File file = (File) synImports.next();
+                OMElement document = getOMElement(file);
+                SynapseImport synImp = SynapseXMLConfigurationFactory.defineImport(
+                        synapseConfig, document, properties);
+                if (synImp != null) {
+                    synImp.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                           synImp.getName());
+                }
+            }
+        }
+
+    }
+
 
     private static void createAPIs(SynapseConfiguration synapseConfig,
                                             String rootDirPath, Properties properties) {

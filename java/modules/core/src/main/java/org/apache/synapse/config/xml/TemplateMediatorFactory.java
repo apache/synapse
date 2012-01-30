@@ -77,7 +77,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
                 if (paramNameAttr != null) {
                     paramNames.add(paramNameAttr.getAttributeValue());
                 }
-                child.detach();
+//                child.detach();
             }
         }
         templateMediator.setParameters(paramNames);

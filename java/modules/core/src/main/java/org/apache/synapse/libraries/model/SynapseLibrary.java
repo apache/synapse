@@ -44,6 +44,8 @@ public class SynapseLibrary implements Library {
 
     private boolean isLoaded = false;
 
+    private ClassLoader libClassLoader = null ;
+
     public SynapseLibrary(String name, String packageName) {
         this.packageN = packageName;
         if (packageName != null && !"".equals(packageName)) {
@@ -144,6 +146,10 @@ public class SynapseLibrary implements Library {
         return true;
     }
 
+    public ClassLoader getLibClassLoader() {
+        return libClassLoader;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public void clear() {
         depNameToArtifactIndex.clear();
         libArtifactDetails.clear();
@@ -177,5 +183,9 @@ public class SynapseLibrary implements Library {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setLibClassLoader(ClassLoader libClassLoader) {
+        this.libClassLoader = libClassLoader;
     }
 }

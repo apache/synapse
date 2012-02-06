@@ -68,5 +68,11 @@ public interface Library extends SynapseArtifact {
      */
     public boolean unLoadLibrary();
 
+    /**
+     *
+     * @return the Class loader that can be used to load classes/resources under this library
+     */
+    public ClassLoader getLibClassLoader();
+
 
 }

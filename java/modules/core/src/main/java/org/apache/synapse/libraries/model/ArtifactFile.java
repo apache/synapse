@@ -27,6 +27,7 @@ import org.apache.synapse.deployers.SynapseArtifactDeploymentException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.util.Properties;
 
 public abstract class ArtifactFile {
 
@@ -37,6 +38,8 @@ public abstract class ArtifactFile {
     protected OMElement configurationElement;
 
     public abstract Object build();
+
+    protected Properties properties;
 
     public ArtifactFile(String fileXmlPath){
         fileName = fileXmlPath;
@@ -63,5 +66,11 @@ public abstract class ArtifactFile {
         }
     }
 
+    public OMElement getConfigurationElement(){
+        return configurationElement;
+    }
 
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
 }

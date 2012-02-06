@@ -95,6 +95,7 @@ public class LibraryArtifact implements SynapseArtifact{
         for (String artifactName : subArtifacts.keySet()) {
             LibraryArtifact artifact = subArtifacts.get(artifactName);
             if (artifact.isLeafArtifact()) {
+                delegateClassLoading(artifact, library);
                 //this is where actual artifact is constructed to it's ture form
                 Object template = artifact.file.build();
                 if (artifact.file instanceof TemplateArtifactFile) {
@@ -118,6 +119,12 @@ public class LibraryArtifact implements SynapseArtifact{
                 artifact.loadComponentsInto(library);
             }
         }
+    }
+
+    private void delegateClassLoading(LibraryArtifact artifact, SynapseLibrary library) {
+        Properties classLoadingProperties = new Properties();
+        classLoadingProperties.put(SynapseConstants.SYNAPSE_LIB_LOADER, library.getLibClassLoader());
+        artifact.file.setProperties(classLoadingProperties);
     }
 
     private String getQualifiedName(String aPackage, String templateName) {
@@ -168,7 +175,7 @@ public class LibraryArtifact implements SynapseArtifact{
             if (element != null) {
                 String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
                 try {
-                    templateObject = MediatorFactoryFinder.getInstance().getMediator(configurationElement, new Properties());
+                    templateObject = MediatorFactoryFinder.getInstance().getMediator(configurationElement, properties);
                 } catch (Exception e) {
                     String msg = "Template configuration : " + name + " cannot be built" +
                             "for Synapse Library artifact : " + LibraryArtifact.this.name;;
@@ -185,7 +192,7 @@ public class LibraryArtifact implements SynapseArtifact{
                                                                       "name"));
                     try {
                         templateObject = templateFactory.createEndpointTemplate(configurationElement,
-                                                                                new Properties());
+                                                                                properties);
                     } catch (Exception e) {
                         String msg = "Endpoint Template: " + name + "configuration cannot be built " +
                                      "for Synapse Library artifact : " + LibraryArtifact.this.name;
@@ -213,7 +220,7 @@ public class LibraryArtifact implements SynapseArtifact{
         }
 
         public boolean resolveWith(LibraryArtifact artifact) {
-            return markAsResolved == name.equals(artifact.name);
+            return markAsResolved = name.equals(artifact.name);
         }
 
         public boolean isResolved() {

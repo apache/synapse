@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.mediators.ext.ClassMediator;
@@ -59,7 +60,13 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
         Class clazz = null;
         Mediator m = null;
         try {
-            clazz = getClass().getClassLoader().loadClass(
+            ClassLoader classMediatorLoader = null;
+            if(properties != null){
+                classMediatorLoader = (ClassLoader) properties.get(SynapseConstants.SYNAPSE_LIB_LOADER);
+            }
+            classMediatorLoader = classMediatorLoader != null ? classMediatorLoader :
+                                  getClass().getClassLoader();
+            clazz = classMediatorLoader.loadClass(
                     name.getAttributeValue());
             m = (Mediator) clazz.newInstance();
         } catch (Exception e) {

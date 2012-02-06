@@ -18,7 +18,6 @@
 package org.apache.synapse.deployers;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMException;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.commons.io.FilenameUtils;
@@ -27,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerState;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
-import org.apache.synapse.libraries.model.SynapseLibrary;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
 
 import java.io.File;

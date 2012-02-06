@@ -21,6 +21,8 @@ package org.apache.synapse.libraries.util;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axis2.deployment.DeploymentException;
+import org.apache.axis2.deployment.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -58,7 +60,18 @@ public class LibDeployerUtils {
         //extract
         String extractPath = LibDeployerUtils.extractSynapseLib(libFilePath);
         //create synapse lib metadata
-        SynapseLibrary synapseLib = LibDeployerUtils.populateDependencies(extractPath + LibDeployerConstants.ARTIFACTS_XML);
+        SynapseLibrary synapseLib = LibDeployerUtils.populateDependencies(extractPath +
+                                                                          LibDeployerConstants.ARTIFACTS_XML);
+
+        //create a ClassLoader for loading this synapse lib classes/resources
+        try {
+            ClassLoader libLoader = Utils.getClassLoader(LibDeployerUtils.class.getClassLoader(),
+                                                         extractPath, false);
+            synapseLib.setLibClassLoader(libLoader);
+        } catch (DeploymentException e) {
+            throw new SynapseArtifactDeploymentException("Error setting up lib classpath for Synapse" +
+                                                         " Library  : " + libFilePath, e);
+        }
         //resolve synapse lib artifacts
         LibDeployerUtils.searchAndResolveDependencies(extractPath, synapseLib);
         return synapseLib;

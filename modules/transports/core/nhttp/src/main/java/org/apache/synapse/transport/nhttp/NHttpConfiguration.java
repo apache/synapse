@@ -37,7 +37,7 @@ public final class NHttpConfiguration {
     private static final int WORKERS_MAX_THREADS   = 100;
     private static final int WORKER_KEEP_ALIVE     = 5;
     private static final int BLOCKING_QUEUE_LENGTH = -1;
-    private static final int IO_WORKER_COUNT = 2;
+    private static final int IO_WORKER_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int BUFFER_SIZE           = 8192;
 
     // server listener

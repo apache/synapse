@@ -113,7 +113,7 @@ public class ClientHandler implements NHttpClientHandler {
     public static final String OUTGOING_MESSAGE_CONTEXT = "synapse.axis2_message_context";
     public static final String AXIS2_HTTP_REQUEST = "synapse.axis2-http-request";
     public static final String CLIENT_CONNECTION_DEBUG = "synapse.client-connection-debug";
-    public static final String CONNECTION_CREATION_TIME = "synapse.connectioCreationTime";
+    public static final String CONNECTION_CREATION_TIME = "synapse.connectionCreationTime";
 
     public static final String REQUEST_SOURCE_BUFFER = "synapse.request-source-buffer";
     public static final String RESPONSE_SINK_BUFFER = "synapse.response-sink-buffer";

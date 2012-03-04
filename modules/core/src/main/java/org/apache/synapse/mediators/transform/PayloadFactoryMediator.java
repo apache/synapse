@@ -43,11 +43,27 @@ import java.util.regex.Pattern;
  */
 public class PayloadFactoryMediator extends AbstractMediator {
 
+    /**
+     * Stores the new payload format.
+     */
     private String format;
+
+    /**
+     * Stores the argument list, argument values are computed dynamically at mediation time.
+     */
     private List<Argument> argumentList = new ArrayList<Argument>();
 
+    /**
+     * Pattern object used for regex processing. This finds occurrences of $n, where n is a positive
+     * number, to replace them with argument values.
+     */
     private Pattern pattern = Pattern.compile("\\$(\\d)+");
 
+    /**
+     * Replaces the existing payload with a new payload as defined by the format and the argument list
+     * @param synCtx the current message for mediation
+     * @return true if the transformation is successful, false otherwise.
+     */
     public boolean mediate(MessageContext synCtx) {
 
         SOAPBody soapBody = synCtx.getEnvelope().getBody();
@@ -78,7 +94,13 @@ public class PayloadFactoryMediator extends AbstractMediator {
         return true;
     }
 
+    /**
+     * Replaces occurrences of $n with argument values.
+     * @param result StringBuffer that stores the result.
+     * @param synCtx Current message under mediation.
+     */
     private void transformPayload(StringBuffer result, MessageContext synCtx) {
+
         Object[] argValues = getArgValues(synCtx);
         Matcher matcher = pattern.matcher("<dummy>" + format + "</dummy>");
         while (matcher.find()) {
@@ -89,6 +111,11 @@ public class PayloadFactoryMediator extends AbstractMediator {
         matcher.appendTail(result);
     }
 
+    /**
+     * Extracts argument values from the current message context.
+     * @param synCtx Current message under mediation.
+     * @return Extracted argument values.
+     */
     private Object[] getArgValues(MessageContext synCtx) {
 
         Object[] argValues = new Object[argumentList.size()];

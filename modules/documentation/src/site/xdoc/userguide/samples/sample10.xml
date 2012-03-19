@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 10</title>
+    </properties>
+    <body>
+        <section name="Sample 10: Introduction to Dynamic Endpoints with Registry">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+        &lt;parameter name="root"&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+        &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint key="endpoint/dynamic_endpt_1.xml"/&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrating the ability to load endpoint definitions dynamically from the
+                    remote registry.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start another Axis2 server instance on different ports (use the following command)
+                            <div class="command" >
+                                Unix/Linux: sh axis2server.sh -http 9001 -https 9003<br/>
+                                Windows: axis2server.bat  -http 9001 -https 9003
+                            </div>
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 10 (repository/conf/sample/synapse_sample_10.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 10<br/>
+                                Windows: synapse.bat -sample 10
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This example introduces dynamic endpoints, where the definition of the endpoint
+                    is stored in the registry. To follow this example execute the stock quote client
+                    as 'ant stockquote..' and see that the message is routed to the SimpleStockQuoteService
+                    on the default Axis2 instance on HTTP port 9000.
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280/</div>
+                <p>
+                    Repeat the above command immediately again, and notice that the endpoint is
+                    cached and reused by Synapse - similarly to <a href="sample8.html">sample 8</a>.
+                </p>
+                <p>
+                    Now edit the repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml file
+                    and update the address to 'http://localhost:9001/services/SimpleStockQuoteService'.
+                    After the cached value expires, the Registry loads the new definition of the
+                    endpoint, and then the messages are routed to the second sample Axis2 server on
+                    HTTP port 9001.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

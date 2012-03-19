@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+<document>
+    <properties>
+        <title>Apache Synapse - Installation Guide</title>
+    </properties>
+    <body>
+        <section name="Apache Synapse Installation Guide">
+            <p>
+                Welcome to Apache Synapse Installation Guide. This guide provides information on,
+            </p>
+            <ul>
+                <li>
+                    <a href="#Prerequisites">Prerequisites for Installing Apache Synapse</a>
+                </li>
+                <li>
+                    <a href="#Distribution">Distribution Packages</a>
+                </li>
+                <li>
+                    <a href="#Installing">Installing Synapse</a>
+                    <ul>
+                        <li>
+                            <a href="#InstallingLinux">Installing on Linux/Unix</a>
+                        </li>
+                        <li>
+                            <a href="#InstallingWin">Installing on MS Windows</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#Building">Building Synapse Using the Source Distribution</a>
+                </li>
+            </ul>
+        </section>
+
+        <section name="Prerequisites for Installing Apache Synapse" id="Prerequisites">
+            <p>
+                You should have following pre-requisites installed on your system to run Apache
+                Synapse.
+            </p>
+            <table border="2">
+                <tbody>
+                    <tr>
+                        <td>
+                            <a href="http://java.sun.com/javase/downloads/index.jsp">Java SE
+                                Development Kit
+                            </a>
+                        </td>
+                        <td>
+                            1.6.0_23 or higher (For instructions on setting up the JDK on different
+                            operating systems, visit<a
+                                href="http://www.oracle.com/technetwork/java/index.html">
+                            Java homepage.
+                        </a>)
+                            <p/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="http://ant.apache.org/">Apache Ant</a> - To run Synapse samples
+                        </td>
+                        <td>
+                            <p>
+                                To compile and run the sample clients, an Ant installation is
+                                required.
+                                Ant 1.7.0 version or higher is recommended.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="http://maven.apache.org/">Apache Maven</a> - To
+                            build Synapse from the source
+                        </td>
+                        <td>
+                            To build Apache Synapse from its source distribution, you will need
+                            Maven 2.2.0 or later.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Memory
+                        </td>
+                        <td>
+                            No minimum requirement - A heap size of 1GB is generally
+                            sufficient to process typical SOAP messages. Requirements may vary
+                            with larger message size and on the number of messages processed
+                            concurrently.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Disk
+                        </td>
+                        <td>
+                            No minimum requirement. The installation will require ~75 MB
+                            excluding space allocated for log files and databases.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Operating System
+                        </td>
+                        <td>
+                            Linux, Solaris, MS Windows - XP/2003/2008 (Not fully tested on Windows
+                            Vista or Windows 7). Since Apache Synapse is a Java application, it will
+                            generally be possible to run it on other operating systems with a
+                            JDK 1.6.x runtime. Linux/Solaris is recommended for production
+                            deployments.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section name="Distribution Packages" id="Distribution">
+            <p>
+                The following distribution packages are available for <a
+                    href="http://synapse.apache.org/download.html">download</a>.
+            </p>
+            <ol>
+                <li>
+                    Binary Distribution: Includes binary files for both Linux and
+                    MS Windows operating systems, compressed into a single a zip file. Recommended
+                    for normal users.
+                </li>
+                <p/>
+                <li>
+                    Source Distribution: Includes the source code for both Linux and MS Windows
+                    operating systems, compressed into a single zip file which can be used to build
+                    the binaries. Recommended for advanced users.
+                </li>
+            </ol>
+        </section>
+
+        <section name="Installing Synapse" id="Installing">
+            <p>
+                The following guide will take you through the binary distribution installation
+                on different platforms.
+            </p>
+            <subsection name="Installing on Linux/Unix" id="InstallingLinux">
+                <ol>
+                    <li>
+                        <a href="http://synapse.apache.org/download.html">Download</a> Apache
+                        Synapse binary distribution.
+                    </li>
+                    <li>
+                        Extract the downloaded zip archive to where you want Synapse installed
+                        (e.g. into /opt).
+                    </li>
+                    <li>
+                        Set the JAVA_HOME environment variable to your Java home using the export
+                        command or by editing /etc/profile, and add the JAVA_HOME/bin
+                        directory to your PATH.
+                    </li>
+                    <li>
+                        Execute the Synapse start script or the daemon script from the bin
+                        directory of your Synapse installation.
+                        <br/>
+                        i.e., ./synapse.sh OR ./synapse-daemon.sh start
+                    </li>
+                    <li>
+                        Synapse is now ready to accept messages for mediation.
+                    </li>
+                </ol>
+            </subsection>
+
+            <subsection name="Installing on MS Windows" id="InstallingWin">
+                <ol>
+                    <li>
+                        <a href="http://synapse.apache.org/download.html">Download</a> Apache
+                        Synapse binary distribution.
+                    </li>
+                    <li>
+                        Extract the downloaded zip archive to where you want Synapse installed
+                        (e.g. into C:\Synapse).
+                    </li>
+                    <li>
+                        Set the JAVA_HOME environment variable to your Java home using the set
+                        command or Windows System Properties dialog, and add the JAVA_HOME\bin
+                        directory to your PATH.
+                    </li>
+                    <li>
+                        Execute the Synapse start script or the service installation script from
+                        the bin directory of your Synapse installation.
+                        <br/>
+                        i.e., synapse.bat OR install-synapse-service.bat
+                    </li>
+                    <li>
+                        Synapse is now ready to accept messages for mediation.
+                    </li>
+                </ol>
+
+            </subsection>
+        </section>
+
+        <section name="Building Synapse Using the Source Distribution" id="Building">
+            <p>
+                Apache Synapse build is based on <a href="http://maven.apache.org/"> Apache
+                Maven 2</a>. Hence, it is a prerequisite to have Maven (version 2.2.0 or later)
+                installed in order to build Synapse from the source distribution. Instructions on
+                installing Maven 2 are available on the <a href="http://maven.apache.org/"> Maven
+                website</a>. Follow these steps to build Synapse after setting up Maven 2.
+            </p>
+            <ol>
+                <li>
+                    <a href="http://synapse.apache.org/download.html">Download</a>
+                    the source
+                    distribution, which is available as a zip archive. All the necessary
+                    build scripts are included with this distribution.
+                </li>
+                <li>
+                    Extract the source archive to a directory of your choice.
+                </li>
+                <li>
+                    Run <strong>mvn clean install</strong> command inside that directory to build
+                    Synapse. Note that you will require a connection to the Internet for the Maven
+                    build to download dependencies required for the build.
+                </li>
+            </ol>
+            <p>
+                This will create the complete set of release artifacts including the binary
+                distribution in the modules/distribution/target/ directory which can be installed
+                using the above instructions.
+            </p>
+        </section>
+    </body>
+</document>

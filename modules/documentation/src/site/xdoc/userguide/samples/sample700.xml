@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 700</title>
+    </properties>
+    <body>
+        <section name="Sample 700: Introduction to Synapse Message Stores">
+            <div class="xmlConf">&lt;!-- Introduction to the Message Store --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence name="fault"&gt;
+        &lt;log level="full"&gt;
+            &lt;property name="MESSAGE" value="Executing default 'fault' sequence"/&gt;
+            &lt;property name="ERROR_CODE" expression="get-property('ERROR_CODE')"/&gt;
+            &lt;property name="ERROR_MESSAGE"
+                      expression="get-property('ERROR_MESSAGE')"/&gt;
+        &lt;/log&gt;
+        &lt;drop/&gt;
+    &lt;/sequence&gt;
+    &lt;sequence name="onStoreSequence"&gt;
+        &lt;log&gt;
+            &lt;property name="On-Store" value="Storing message"/&gt;
+        &lt;/log&gt;
+    &lt;/sequence&gt;
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;log level="full"/&gt;
+            &lt;property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/&gt;
+            &lt;store messageStore="MyStore" sequence="onStoreSequence"/&gt;
+        &lt;/in&gt;
+        &lt;description&gt;The main sequence for the message mediation&lt;/description&gt;
+    &lt;/sequence&gt;
+    &lt;messageStore name="MyStore"/&gt;
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Introduction to Message Stores
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Start Synapse using the configuration numbered 700 (repository/conf/sample/synapse_sample_700.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 700<br/>
+                                Windows: synapse.bat -sample 700
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    First execute the sample client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
+                </div>
+                <p>
+                    When you execute the client the message will be dispatched to the main sequence.
+                    In the Main sequence store mediator will store the placeOrder request message in
+                    the 'MyStore' Message Store.
+                </p>
+                <p>
+                    Now you can use the JMX view of the Synapse message store to see the messages
+                    stored in the dead letter channel and manually perform retries on them.
+                </p>
+                <p>
+                    Before storing the message, store mediator will invoke the sequence named
+                    'onStoreSequence'. You should see something similar to the following in the
+                    log.
+                </p>
+                <div class="command">
+                    INFO - LogMediator To: http://localhost:9000/services/SimpleStockQuoteService,
+                    WSAction: urn:placeOrder, SOAPAction: urn:placeOrder, ReplyTo:
+                    http://www.w3.org/2005/08/addressing/none, MessageID:
+                    urn:uuid:54f0e7c6-7b43-437c-837e-a825d819688c, Direction: request, On-Store =
+                    Storing message
+                </div>
+            </subsection>
+        </section>
+        <p>
+            <a href="../samples.html">Back to Catalog</a>
+        </p>
+    </body>
+</document>

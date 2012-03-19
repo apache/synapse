@@ -131,14 +131,14 @@
             <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>
             <fileMode>755</fileMode>
         </fileSet>      
-        <fileSet>
+        <!--fileSet>
             <directory>../../src/site/resources/images</directory>
             <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../../src/site/resources/logos</directory>
             <outputDirectory>synapse-${synapse.version}/docs/logos</outputDirectory>
-        </fileSet>
+        </fileSet-->
         <fileSet>
             <directory>../../modules/samples/services</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
@@ -190,7 +190,7 @@
         <!--</fileSet>-->
     </fileSets>
     <files>
-        <file>
+        <!--file>
             <source>../../src/site/xdoc/Synapse_Configuration_Language.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Configuration_Language.html</destName>
@@ -214,7 +214,7 @@
             <source>../../src/site/xdoc/Synapse_Extending.xml</source>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <destName>Synapse_Extending.html</destName>
-        </file>
+        </file-->
         <file>
             <source>.empty</source>
             <outputDirectory>synapse-${synapse.version}/work/temp/sampleClient</outputDirectory>
@@ -234,6 +234,7 @@
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
                 <exclude>org.apache.synapse:synapse-patches:zip:jars</exclude>
+		<exclude>org.apache.synapse:synapse-documentation:zip</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
@@ -242,10 +243,18 @@
                 <exclude>xerces:xercesImpl:jar</exclude>
                 <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->
                 <exclude>org.apache.xerces:xml-apis</exclude>
-		        <exclude>xalan:xalan:jar</exclude>
+	        <exclude>xalan:xalan:jar</exclude>
                 <exclude>quickfixj:quickfixj-all:jar</exclude>
             </excludes>
         </dependencySet>
+	<dependencySet>
+	    <useProjectArtifact>false</useProjectArtifact>
+	    <outputDirectory>synapse-${synapse.version}</outputDirectory>
+            <unpack>true</unpack>
+            <includes>
+                <include>org.apache.synapse:synapse-documentation:zip:docs</include>
+            </includes>
+	</dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>

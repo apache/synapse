@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 257</title>
+    </properties>
+    <body>
+        <section name="Sample 257: Proxy Services with the FIX Transport">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="OrderProcesserProxy40" transports="fix"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address
+                        uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/&gt;
+            &lt;/endpoint&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+
+        &lt;parameter name="transport.fix.AcceptorConfigURL"&gt;
+            file:repository/conf/sample/resources/fix/fix-synapse.cfg
+        &lt;/parameter&gt;
+        &lt;parameter name="transport.fix.AcceptorMessageStore"&gt;file&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;
+            file:repository/conf/sample/resources/fix/synapse-sender.cfg
+        &lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    This sample demonstrates the FIX (Financial Information eXchange) transport of
+                    Synapse. FIX transport allows Synapse to connect to remote FIX acceptors and
+                    initiators and exchange finance data.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            You need a <a href="http://www.quickfixj.org">Quickfix/J</a> installation
+                            to try out FIX samples. Please download and extract a Quickfix/J distribution
+                            into your local machine.
+                        </li>
+                        <li>
+                            Configure the Executor sample FIX application (shipped with Quickfix/J)
+                            to receive messages from Synapse and start it (refer
+                            <a href="setup/fix.html#exec">FIX setup guide</a> for more details).
+                        </li>
+                        <li>
+                            Enable the FIX transport listener and sender for Synapse (refer
+                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details).
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 257 (repository/conf/sample/synapse_sample_257.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 257<br/>
+                                Windows: synapse.bat -sample 257
+                            </div>
+                            If Executor is properly configured, Synapse should establish a FIX session
+                            with the Executor upon startup. You should see some log entries confirming
+                            the session logon event on Synapse console as well as Executor console.
+                        </li>
+                        <li>
+                            Configure Banzai sample FIX application (shipped with Quickfix/J) to send
+                            messages to Synapse and start it (refer <a href="setup/fix.html#banzai">FIX setup guide</a>
+                            for more details). If Banzai was properly configured, it should establish
+                            a FIX session with Synapse upon startup. You should see some session
+                            logon messages on Synapse console and Banzai console.
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Send some FIX messages from Banzai to Synapse. Synapse will forward all requests
+                    to Executor and get them processes. Responses from Executor will be routed back
+                    to Banzai.
+                </p>
+                <p>
+                    Synapse converts all received FIX messages into SOAP format. You can view these
+                    SOAP messages from the Synapse log. When SOAP messages are sent to FIX endpoints,
+                    Synapse converts them back into valid FIX messages. While FIX messages are flowing
+                    through the service bus, you can perform various transformations and content based
+                    routing on the FIX messages using the existing mediators like XSLT, XQuery, Filter
+                    and Switch.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

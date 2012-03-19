@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 155</title>
+    </properties>
+    <body>
+        <section name="Sample 155: Dual Channel Invocation on Client Side and Server Side">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"&gt;
+                    &lt;enableAddressing separateListener="true"/&gt;
+                &lt;/address&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    <a href="sample13.html">Sample 13</a> show cased how to perform dual channel
+                    invocations on the client side. This sample demonstrates how to perform dual
+                    channel invocations on both client side and server side, using proxy services.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 155 (repository/conf/sample/synapse_sample_155.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 155<br/>
+                                Windows: synapse.bat -sample 155
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This sample will show the action of the dual channel invocation between client
+                    and Synapse as well as between Synapse and the Axis2 server. Note that if you
+                    want to enable dual channel invocation you need to set the separateListener
+                    attribute to true on the enableAddressing element of the endpoint.
+                </p>
+                <p>
+                    Execute the stock quote client in the dual channel mode as follows:
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:8280/services/StockQuoteProxy -Dmode=dualquote</div>
+                <p>
+                    In the above example, the request received is forwarded to the sample service
+                    hosted on Axis2 and the endpoint specifies to enable addressing and do the
+                    invocation in dual channel mode. If you observe the message flow using TCPmon,
+                    you will see that on the channel you send the request to Synapse, the response has 
+                    been written as HTTP 202 Accepted, where as the real response from Synapse
+                    comes over a different channel which cannot be obsesrved unless you use tcpdump
+                    to dump all the TCP level messages.
+                </p>
+                <p>
+                    At the same time you can observe the behaviour of the invocation between Synapse
+                    and the actual Axis2 service, where you can see a 202 Accepted message being
+                    delivered to Synapse as the response to the request. The actual response will be
+                    delivered to Synapse over a different channel.
+                </p>                
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

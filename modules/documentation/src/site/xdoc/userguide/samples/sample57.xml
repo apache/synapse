@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 57</title>
+    </properties>
+    <body>
+        <section name="Sample 57: Dynamic Load Balancing Between 3 Nodes">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint name="dynamicLB"&gt;
+                    &lt;dynamicLoadbalance failover="true"
+                                        algorithm="org.apache.synapse.endpoints.algorithms.RoundRobin"&gt;
+                        &lt;membershipHandler
+                                class="org.apache.synapse.core.axis2.Axis2LoadBalanceMembershipHandler"&gt;
+                            &lt;property name="applicationDomain" value="apache.axis2.app.domain"/&gt;
+                        &lt;/membershipHandler&gt;
+                    &lt;/dynamicLoadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate the ability of Synapse to perform dynamic load balancing. In
+                    dynamic load balancing, nodes can be added and removed from the pool dynamically.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the LoadbalanceFailoverService by switching to samples/axis2Server/src/LoadbalanceFailoverService
+                            directory and running 'ant'.
+                        </li>
+                        <li>
+                            Enable clustering for the sample Axis2 server. Edit the axis2.xml file at
+                            samples/axis2Server/repository/conf directory and set the 'enable' attribute
+                            on the 'clustering' element to 'true'. Specify the IP address of the
+                            machine as the values of 'mcastBindAddress' and 'localMemberHost'
+                            parameters.
+                        </li>
+                        <li>
+                            Enable clustering for Synapse by editing repository/conf/axis2.xml file.
+                            This should be done by setting the 'enable' attribute of the 'clustering'
+                            element to 'true'. Also provide the IP address of your machine as the
+                            values of the 'mcastBindAddress' and 'localMemberHost' parameters. In
+                            addition also set the 'enable' attribute on 'groupManagement' element
+                            to 'true'.
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 57 (repository/conf/sample/synapse_sample_57.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 57<br/>
+                                Windows: synapse.bat -sample 57
+                            </div>
+                        </li>
+                        <li>
+                            Start 3 instances of the sample Axis2 server as follows.
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1<br/>
+./axis2server.sh -http 9002 -https 9006 -name MyServer2<br/>
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Note that the Synapse configuration does not define any concrete addresses or
+                    URLs as targets. They are discovered dynamically by the dynamic load balance
+                    endpoint. To test this feature start the load balance and failover client using
+                    the following command:
+                </p>
+                <div class="command">ant loadbalancefailover -Di=100</div>
+                <p>
+                    This client sends 100 requests to the LoadbalanceFailoverService through Synapse.
+                    Synapse will distribute the load among the three nodes we have started 
+                    in round-robin manner. LoadbalanceFailoverService appends the name of the server
+                    to the response, so that client can determine which server has processed the message.
+                    If you examine the console output of the client, you can see that requests are
+                    processed by three servers as follows:
+                </p>
+                <div class="consoleOutput">[java] Request: 1 ==&gt; Response from server: MyServer1
+[java] Request: 2 ==&gt; Response from server: MyServer2
+[java] Request: 3 ==&gt; Response from server: MyServer3
+[java] Request: 4 ==&gt; Response from server: MyServer1
+[java] Request: 5 ==&gt; Response from server: MyServer2
+[java] Request: 6 ==&gt; Response from server: MyServer3
+[java] Request: 7 ==&gt; Response from server: MyServer1
+...</div>
+                <p>
+                    Now run the client without the -Di=100 parameter, to send infinite requests. While
+                    running the client shutdown the server named MyServer1. You can observe that
+                    requests are only distributed among MyServer2 and MyServer3 after shutting down
+                    MyServer1. Console output before and after shutting down MyServer1 is listed below
+                    (MyServer1 was shutdown after request 63):
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 61 ==&gt; Response from server: MyServer1
+[java] Request: 62 ==&gt; Response from server: MyServer2
+[java] Request: 63 ==&gt; Response from server: MyServer3
+[java] Request: 64 ==&gt; Response from server: MyServer2
+[java] Request: 65 ==&gt; Response from server: MyServer3
+[java] Request: 66 ==&gt; Response from server: MyServer2
+[java] Request: 67 ==&gt; Response from server: MyServer3
+...</div>
+                <p>
+                    Now restart MyServer1. You can observe that requests will be again sent to all
+                    three servers. If you start a new Axis2 instance (say MyServer4) that will also
+                    be added to the load balance pool dynamically.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

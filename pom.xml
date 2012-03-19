@@ -350,6 +350,13 @@
                 <artifactId>synapse-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+	    <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-documentation</artifactId>
+                <version>${project.version}</version>
+		<type>zip</type>
+		<classifier>docs</classifier>
+            </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>

@@ -234,7 +234,7 @@
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
                 <exclude>org.apache.synapse:synapse-patches:zip:jars</exclude>
-		<exclude>org.apache.synapse:synapse-documentation:zip</exclude>
+		<exclude>org.apache.synapse:synapse-documentation:zip:docs</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>

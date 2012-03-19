@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Developer Guide</title>
+    </properties>
+    <body>
+        <section name="Developer Guide">
+            <p>
+                Welcome to Apache Synapse Developer Guide. This document is a starting point for
+                anyone who's willing to write code for Synapse and make contributions. We welcome
+                several different types of contributions such as ideas, new features, bug fixes,
+                documentation and samples. This guide strives to provide information on how you can
+                get the Synapse source code, how to setup the development environment and how to
+                make contributions. Further it provides instructions on how to get in touch with the
+                other developers, how to report issues and how to keep track of development activities.
+            </p>
+            <p>
+                If you are an experienced Synapse developer or already a committer
+                for Synapse, this document might still contain useful information on setting up
+                your working copy of the source code and committing code changes. So feel free to
+                read all the way through.
+            </p>
+        </section>
+        <section name="Contents">
+            <ul>
+                <li>
+                    <a href="#subversion">Interacting with the Code Base Using Subversion</a>
+                    <ul>
+                        <li><a href="#checkout">Checking Out the Source</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#maven">Interacting with the Build System Using Apache Maven</a>
+                    <ul>
+                        <li><a href="#building">Building from Source</a></li>
+                        <li><a href="#environment">Setting Up the Development Environment</a></li>
+                        <li><a href="#integration">Integration Tests</a></li>
+                        <li><a href="#testdebug">Debugging Tests</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#debug">Debugging the Synapse Server</a>
+                </li>
+                <li>
+                    <a href="#issues">Reporting Issues</a>
+                </li>
+                <li>
+                    <a href="#contrib">Making Contributions</a>
+                </li>
+            </ul>
+        </section>
+        <section name="Interacting with the Code Base Using Subversion" id="subversion">
+            <p>
+                Synapse code base is maintained in a Subversion repository. Therefore anybody willing
+                to go through the Synapse source code in the development trunk and make contributions
+                should use a Subversion client to interact with the Synapse code base. To learn more
+                about using Subversion or to download the latest client distributions, please visit
+                the <a href="http://subversion.apache.org">Apache Subversion project website</a>.
+                Developers on Unix/Linux based systems may use the command line based SVN client,
+                while the developers on Windows platform can use an appropriate client application
+                like <a href="http://tortoisesvn.net/">TortoiseSVN</a>.
+            </p>
+            <p>
+                Some useful information on using the Apache Software Foundation's source code
+                repositories can be found among the ASF
+                <a href="http://www.apache.org/dev/version-control.html">developer documentation</a>.
+            </p>
+            <subsection name="Checking Out the Source" id="checkout">
+                <p>
+                    Synapse development trunk is where all the latest development work takes place.
+                    This is located at
+                    <a href="http://svn.apache.org/repos/asf/synapse/trunk/java/">http://svn.apache.org/repos/asf/synapse/trunk/java/</a>.
+                    Any developer with a Subversion client should be able to checkout the latest
+                    source from this SVN location but only Synapse committers are allowed to actually
+                    commit source code. Synapse committers should access the above SVN location over
+                    HTTPS and provide the ASF committer credentials to checkout and commit source
+                    code. Please refer the <a href="../source-repository.html">source repository guide</a>
+                    for more details on checking out the source code from the above repository.
+                </p>
+                <p>
+                    Once you have checked out the source code, you can update your working copy by
+                    running the 'svn update' command. This will checkout the modifications since the
+                    last checkout/update and bring your local working copy to the latest revision.
+                </p>
+                <p>
+                    If you want to browse the source code of an older release of Synapse or want
+                    to implement a patch for a past release, you may checkout the relevant source
+                    tree from one of the available SVN
+                    <a href="http://svn.apache.org/repos/asf/synapse/tags/">tags</a>.
+                </p>
+            </subsection>
+        </section>
+        <section name="Interacting with the Build System Using Apache Maven" id="maven">
+            <p>
+                Synapse build system is based on Apache Maven. Either Maven2 or Maven3 can be used to
+                build Apache Synapse from source. For information about downloading, installing, and
+                configuring Maven, please go through
+                <a class="externalLink" href="http://maven.apache.org">Maven project website</a>.
+            </p>
+            <subsection name="Building from Source" id="building">
+                <p>
+                    To build all the modules and the Synapse binary distribution, go to
+                    the root of the Synapse source tree and execute the following Maven command.
+                </p>
+                <div class="command">mvn clean install</div>
+                <p>
+                    This will fetch all the required dependencies, compile the source, run the tests
+                    and build the Synapse modules and the binary pack. Please note that building
+                    with tests takes time. To build without the tests, use the following Maven
+                    command.
+                </p>
+                <div class="command">mvn clean install -Dmaven.test.skip=true</div>
+                <p>
+                    Developers and committers making changes to the Synapse code base are highly
+                    recommended to always build the source 'WITH' the tests. This will ensure that
+                    changes do not introduce any obvious regression errors. However running all the
+                    tests does not guarantee that a particular change will not introduce any
+                    regressions. Therefore care must be exercised whenever making changes to the
+                    existing code.
+                </p>
+                <p>
+                    Synapse source tree is organized into several modules. If required you can build
+                    only a selected module by going into the appropriate module and executing one
+                    of the above build commands.
+                </p>
+            </subsection>
+            <subsection name="Setting Up the Development Environment" id="environment">
+                <p>
+                    Apache Synapse development can be based on a number of tools ranging from simple
+                    command line tools like Vim and Emacs to full fledged Java IDEs like Eclipse,
+                    IntelliJ Idea and Netbeans. If Eclipse or Idea is used to develop code for
+                    Synapse, Maven can be used to build the necessary project artifacts.
+                </p>
+                <p>
+                    Simply run the following commands to generate the project artifacts and then
+                    use your IDE to open up the Synapse code base as a Java project.
+                </p>
+                <div class="command">For Idea: mvn idea:idea
+For Eclipse: mvn eclipse:eclipse</div>
+            </subsection>
+            <subsection name="Integration Tests" id="integration">
+                <p>
+                    Starting from Synapse 2.1, a suite of integration tests are included in the
+                    Synapse code base. These tests automate various samples included in the Synapse
+                    binary distribution and provide a convenient way to sanity check a Synapse
+                    distribution and find any regressions. If you build the source tree from the root
+                    without skipping the test cases, these integration tests will be executed by
+                    Maven as a part of the build process. If you just need to run the integration
+                    tests simply go into the modules/integration directory in the source tree and
+                    run the usual Maven build command.
+                </p>
+                <p>
+                    Synapse integration test suite uses the Maven Surefire plugin. Therefore all
+                    tests will generate a report which will be available in the
+                    modules/integration/target/surefire-reports directory. If you ever encounter
+                    a failure while running the integration tests, this is the first place to check.
+                </p>
+                <p>
+                    You can pass additional parameters to the Synapse integration test framework and
+                    limit the number of tests executed by Maven. For an example if you simply want
+                    to run sample 10 in the integration test framework, run the following command.
+                </p>
+                <div class="command">mvn clean install -Dtests=10</div>
+                <p>
+                    You can also run a list of known samples as an integration test.
+                </p>
+                <div class="command">mvn clean install -Dtests=10,11,12</div>
+                <p>
+                    Synapse samples are categorized into several sections. If needed you can run all
+                    the samples in a particular section.
+                </p>
+                <div class="command">mvn clean install -Dsuite=proxy</div>
+                <div class="command">mvn clean install -Dsuite=endpoint</div>
+                <p>
+                    Following values can be passed in as the value of the 'suite' parameter.
+                </p>
+                <ul>
+                    <li>message</li>
+                    <li>endpoint</li>
+                    <li>qos</li>
+                    <li>proxy</li>
+                    <li>tasks</li>
+                    <li>advanced</li>
+                </ul>
+            </subsection>
+            <subsection name="Debugging Tests" id="testdebug">
+                <p>
+                    Maven allows you to remote debug tests at build time. To make use of this
+                    feature simply run the Maven build command with the -Dmaven.surefire.debug
+                    flag.
+                </p>
+                <div class="command">mvn clean install -Dmaven.surefire.debug</div>
+                <p>
+                    This will open up port 5005 for remote debugging and you can use your IDE to
+                    connect to that port and remote debug the test source (or even Synapse source).
+                </p>
+            </subsection>
+        </section>
+        <section name="Debugging the Synapse Server" id="debug">
+            <p>
+                If you are running the Synapse binary distribution and wants to debug the server
+                to fix some issue, simply start the server with the -xdebug option.
+            </p>
+            <div class="command">sh synapse.sh -xdebug</div>
+            <p>
+                This will open up port 8000 for remote debugging. Now you can connect to the server
+                from your IDE and remote debug it against the source code. If you want to debug a
+                message flow in Synapse, it's recommended to place some break points in the
+                org.apache.synapse.core.axis2.SynapseMessageReceiver and org.apache.synapse.core.axis2.ProxyServiceMessageReceiver
+                classes.
+            </p>
+        </section>
+        <section name="Reporting Issues" id="issues">
+            <p>
+                Please report all issues in the <a href="../issue-tracking.html">Synapse JIRA</a>.
+                You can also create JIRA issues for any suggestions, improvements and new features
+                you have in mind. If you wish to further discuss some idea with the rest of the
+                Synapse community, please write to the appropriate <a href="../mail-lists.html">mailing lists</a>.
+            </p>
+            <p>
+                You are also encouraged to comment on other issues in the Synapse JIRA, ask questions
+                and if possible make code/documentation contributions.
+            </p>
+        </section>
+        <section name="Making Contributions" id="contrib">
+            <p>
+                If you have implemented a new feature, fixed some bug in the code or written a new
+                sample, we'll be more than happy to review it and include it in the Synapse code
+                base for everyone's benefit. If you are interested in contributing your work to Synapse,
+                please create an issue in the JIRA system first. Then you can attach your workings to
+                the JIRA issue as a patch.
+            </p>
+            <p>
+                To create a patch file out of your work simply run the 'svn diff' command.
+            </p>
+            <div class="command">svn diff > FixForIssue123.patch</div>
+            <p>
+                If you added any new files as a part of your work you should first run the 'svn add'
+                command on them before creating the patch file. Otherwise they won't be included
+                in the generated patch.
+            </p>
+            <p>
+                Once the patch file has been created, attach it to the relevant JIRA issue and make
+                sure to grant the ASF permission to use your patch in ASF development activities.
+                One of the committers will review your work and provide feedback through the JIRA. If
+                all is well, the patch will eventually go into the Synapse development trunk.
+            </p>
+        </section>
+    </body>
+</document>

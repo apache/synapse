@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - TCP/UDP Setup Guide</title>
+    </properties>
+    <body>
+        <section name="TCP/UDP Setup Guide">
+            <p>
+                This document explains how to setup the transport sender and listener
+                for TCP/UDP transports required by the samples.
+            </p>
+        </section>
+        <section name="Contents">
+            <ul>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#tcp">Setting Up the TCP Transport</a></li>
+                <li><a href="#udp">Setting Up the UDP Transport</a></li>
+            </ul>
+        </section>
+        <section name="Introduction" id="intro">
+            <p>
+                Apache Synapse is capable of sending and receiving messages over raw TCP and UDP.
+                Any messages received over these transports can be mediated using the usual set of
+                mediators and can be forwarded over different protocols such as HTTP ans JMS. The
+                transport adapters for TCP and UDP are not available in the Synapse binary
+                distribution by default. This guide will help you to download and setup them in
+                Synapse ESB.
+            </p>
+        </section>
+        <section name="Setting Up the TCP Transport" id="tcp">
+            <p>
+                To enable the TCP transport for Synapse, first you need to download the Axis2 TCP
+                transport jar, and copy it to the 'lib' directory of Synapse. This library can be
+                downloaded from the <a href="http://ws.apache.org/commons/transport">WS-Commons Transports</a>
+                website. Then open up the axis2.xml file and uncomment the TCP transport receiver
+                and sender configurations.
+            </p>
+            <div class="xmlConf">&lt;transportReceiver name="tcp" class="org.apache.axis2.transport.tcp.TCPServer"&gt;
+    &lt;parameter name="port"&gt;6060&lt;/parameter&gt;
+&lt;/transportReceiver&gt;</div>
+            <div class="xmlConf">&lt;transportSender name="tcp" class="org.apache.axis2.transport.tcp.TCPTransportSender"/&gt;</div>
+            <p>
+                The above configuration enables Synapse to receive raw TCP messages on port 6060.
+                Since no application level headers are available on such requests, Synapse will be
+                solely depending on the addressing headers or the XML payload of the messages to
+                find the target service for TCP requests.
+            </p>
+            <p>
+                In some of the samples you will have to send raw TCP messages using the sample
+                Axis2 client. In that case you should enable the TCP transport sender for the
+                sample client. This can be done by uncommenting the following entry in the
+                samples/axis2Client/client_repo/conf/axis2.xml file.
+            </p>
+            <div class="xmlConf">&lt;transportSender name="tcp" class="org.apache.axis2.transport.tcp.TCPTransportSender"/&gt;</div>
+        </section>
+        <section name="Setting Up the UDP Transport" id="udp">
+            <p>
+                Enabling the UDP transport for Synapse is similar to enabling the TCP transport. You
+                should <a href="http://ws.apache.org/commons/transport">download</a> the Axis2 UDP
+                transport jar and copy it into 'lib' directory of Synapse. Then uncomment the
+                following entries in the repository/conf/axis2.xml file to enable the UDP listener
+                and sender.
+            </p>
+            <div class="xmlConf">&lt;transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/&gt;</div>
+            <div class="xmlConf">&lt;transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/&gt;</div>
+            <p>
+                To send UDP messages from the sample client, enable the UDP transport sender for the
+                client in samples/axis2Client/client_repo/conf/axis2.xml file.
+            </p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 800</title>
+    </properties>
+    <body>
+        <section name="Sample 800: Introduction to REST APIs">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+&lt;api name="StockQuoteAPI" context="/stockquote"&gt;
+   &lt;resource uri-template="/view/{symbol}" methods="GET"&gt;
+      &lt;inSequence&gt;
+         &lt;payloadFactory&gt;
+	    &lt;format&gt;
+		&lt;m0:getQuote xmlns:m0="http://services.samples"&gt;
+	            &lt;m0:request&gt;
+        	       &lt;m0:symbol&gt;$1&lt;/m0:symbol&gt;
+	            &lt;/m0:request&gt;
+        	 &lt;/m0:getQuote&gt;
+	    &lt;/format&gt;
+	    &lt;args&gt;
+		&lt;arg expression="get-property('uri.var.symbol')"/&gt;
+	    &lt;/args&gt;
+	 &lt;/payloadFactory&gt;
+	 &lt;send&gt;
+	    &lt;endpoint&gt;
+		&lt;address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/&gt;
+	    &lt;/endpoint&gt;
+	 &lt;/send&gt;
+      &lt;/inSequence&gt;
+      &lt;outSequence&gt;
+	 &lt;send/&gt;
+      &lt;/outSequence&gt;
+   &lt;/resource&gt;
+   &lt;resource url-pattern="/order/*" methods="POST"&gt;
+      &lt;inSequence&gt;
+        &lt;property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/&gt;
+	&lt;property name="OUT_ONLY" value="true"/&gt;
+	&lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/&gt;
+            &lt;/endpoint&gt;
+         &lt;/send&gt;
+      &lt;/inSequence&gt;
+   &lt;/resource&gt;
+&lt;/api&gt;
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    APIs in Synapse provide a convenient approach for receiving and processing
+                    REST traffic through the service bus. APIs can be used to receive specific
+                    types of RESTful invocations and then process them through a set of user
+                    defined resources. This sample is aimed at introducing the basic capabilities
+                    of APIs and how they are configured to front existing services.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2 Server
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 800 (repository/conf/sample/synapse_sample_800.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 800<br/>
+                                Windows: synapse.bat -sample 800
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the REST Client">
+                <p>
+                    You might need a REST client like curl to test this
+                </p>
+                <div class="command">curl -v http://127.0.0.1:8280/stockquote/view/IBM</div>
+                <div class="command">curl -v http://127.0.0.1:8280/stockquote/view/MSFT</div>
+
+                <p>
+                    The above GET calls will be handled by the first resource in the StockQuoteAPI.
+                    These REST calls will get converted into SOAP calls and will be sent to the Axis2
+                    server. Response will be sent to the client in POX format.
+                </p>
+                <p>
+                    The following command POSTs a simple XML to the ESB. Save following sample place
+                    order request as  "placeorder.xml" file in your local file system and execute the
+                    command. That is used to invoke a SOAP service. ESB returns the 202 response back to the client.
+                </p>
+                <div class="command">curl -v -d @placeorder.xml -H "Content-type: application/xml" http://127.0.0.1:8280/stockquote/order/</div>
+
+                <div class="xmlConf">&lt;placeOrder xmlns="http://services.samples"&gt;
+  &lt;order&gt;
+     &lt;price&gt;50&lt;/price&gt;
+     &lt;quantity&gt;10&lt;/quantity&gt;
+     &lt;symbol&gt;IBM&lt;/symbol&gt;
+  &lt;/order&gt;
+&lt;/placeOrder&gt;</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>
+    </body>
+</document>

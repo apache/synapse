@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 652</title>
+    </properties>
+    <body>
+        <section name="Sample 652: Distributed transaction management">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+&lt;sequence name="myFaultHandler"&gt;
+    &lt;log level="custom"&gt;
+        &lt;property name="text" value="** Rollback Transaction**"/&gt;
+    &lt;/log&gt;
+    &lt;transaction action="rollback"/&gt;
+    &lt;send/&gt;
+&lt;/sequence&gt;
+
+&lt;sequence name="main" onError="myFaultHandler"&gt;
+    &lt;in&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+
+    &lt;out&gt;
+        &lt;transaction action="new"/&gt;
+
+        &lt;log level="custom"&gt;
+            &lt;property name="text" value="** Reporting to the Database esbdb**"/&gt;
+        &lt;/log&gt;
+        &lt;dbreport useTransaction="true" xmlns="http://ws.apache.org/ns/synapse"&gt;
+            &lt;connection&gt;
+                &lt;pool&gt;
+                    &lt;dsName&gt;java:jdbc/XADerbyDS&lt;/dsName&gt;
+                    &lt;icClass&gt;org.jnp.interfaces.NamingContextFactory&lt;/icClass&gt;
+                    &lt;url&gt;localhost:1099&lt;/url&gt;
+                    &lt;user&gt;synapse&lt;/user&gt;
+                    &lt;password&gt;synapse&lt;/password&gt;
+                &lt;/pool&gt;
+            &lt;/connection&gt;
+            &lt;statement&gt;
+                &lt;sql&gt;delete from company where name =?&lt;/sql&gt;
+                &lt;parameter expression="//m0:return/m1:symbol/child::text()"
+                           xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd"
+                           type="VARCHAR"/&gt;
+            &lt;/statement&gt;
+        &lt;/dbreport&gt;
+
+        &lt;log level="custom"&gt;
+            &lt;property name="text" value="** Reporting to the Database esbdb1**"/&gt;
+        &lt;/log&gt;
+        &lt;dbreport useTransaction="true" xmlns="http://ws.apache.org/ns/synapse"&gt;
+            &lt;connection&gt;
+                &lt;pool&gt;
+                    &lt;dsName&gt;java:jdbc/XADerbyDS1&lt;/dsName&gt;
+                    &lt;icClass&gt;org.jnp.interfaces.NamingContextFactory&lt;/icClass&gt;
+                    &lt;url&gt;localhost:1099&lt;/url&gt;
+                    &lt;user&gt;synapse&lt;/user&gt;
+                    &lt;password&gt;synapse&lt;/password&gt;
+                &lt;/pool&gt;
+            &lt;/connection&gt;
+            &lt;statement&gt;
+                &lt;sql&gt; INSERT into company values ('IBM','c4',12.0)&lt;/sql&gt;
+            &lt;/statement&gt;
+        &lt;/dbreport&gt;
+        &lt;transaction action="commit"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/sequence&gt;
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+					Demonstrate the use of the transaction mediator in a distributed transaction
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                              Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                              <p>To run this sample it is required to deploy synpase on JBoss application server(This is only tested with JBoss application sever), you
+                              can use the war distribution to deploy synapse on JBoss application server. Use the synpase_sample_652.xml as the synapse confiuration
+                              file and start JBoss with that synpase configuration file. Also you need to define two XA datasources for above two datasources.
+                              You'll need to refer JBoss documentation to see how to do this.</p>
+                              <p>
+                                It also required to have two database instances, this will be used by the two XA datasources.
+                                Refer the <a href="setup/db.html#derby">Sample Setup Guide </a> to see how you can set up the derby database server.
+                              </p>
+                              <p>
+                                In this sample a record is delete from one database and it is added into the second database.
+                                If either of the operations(deleting from the 1st database and adding into the second database)
+                                fails everything will be roll backed. The records will be untoched.
+                              </p>
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 652 (repository/conf/sample/synapse_sample_652.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 652<br/>
+                                Windows: synapse.bat -sample 652
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
+
+                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+
+                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 254</title>
+    </properties>
+    <body>
+        <section name="Sample 254: Using File System as the Transport Medium (Reading/Writing Files)">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="StockQuoteProxy" transports="vfs"&gt;
+        &lt;parameter name="transport.vfs.FileURI"&gt;file:///home/user/test/in&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name="transport.vfs.ContentType"&gt;text/xml&lt;/parameter&gt;
+        &lt;parameter name="transport.vfs.FileNamePattern"&gt;.*\.xml&lt;/parameter&gt;
+        &lt;parameter name="transport.PollInterval"&gt;15&lt;/parameter&gt;
+        &lt;parameter name="transport.vfs.MoveAfterProcess"&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name="transport.vfs.MoveAfterFailure"&gt;file:///home/user/test/original&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name="transport.vfs.ActionAfterProcess"&gt;MOVE&lt;/parameter&gt;
+        &lt;parameter name="transport.vfs.ActionAfterFailure"&gt;MOVE&lt;/parameter&gt;
+
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address format="soap12"
+                         uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;property name="transport.vfs.ReplyFileName"
+                          expression="fn:concat(fn:substring-after(get-property('MessageID'), 'urn:uuid:'), '.xml')"
+                          scope="transport"/&gt;
+                &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="vfs:file:///home/user/test/out"/&gt; &lt;!--CHANGE--&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Synapse can access the local file system using its VFS (Virtual File System)
+                    transport receiver and sender. This way Synapse can read files in the local file
+                    system as well as write to the local file system. This sample show cases the
+                    Synapse VFS transport in action.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Create 3 new directories (folders) named 'in', 'out' and 'original' in a
+                            suitable location in the local file system (eg: /home/user/test). 
+                        </li>
+                        <li>
+                            Open the repository/conf/sample/synapse_sample_254.xml file in a text
+                            editor and. Then change the transport.vfs.FileURI, transport.vfs.MoveAfterProcess,
+                            transport.vfs.MoveAfterFailure parameter values to the above in, original
+                            and original directories respectively. Note that both 2nd and 3rd parameters
+                            are pointed to the 'original' directory.
+                        </li>
+                        <li>
+                            Change the endpoint in the out-sequence to point to the 'out' directory.
+                            The prefix 'vfs' in the endpoint URL must not be removed or changed.
+                        </li>
+                        <li>
+                            Enable the VFS transport receiver and sender for Synapse (refer VFS
+                            setup guide for more information)
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 254 (repository/conf/sample/synapse_sample_254.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 254<br/>
+                                Windows: synapse.bat -sample 254
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Copy the test.xml file in the repository/conf/sample/resources/vfs directory to
+                    the directory given in transport.vfs.FileURI above (i.e the 'in' directory). This
+                    file contains a simple stock quote request in XML/SOAP format.
+                </p>
+                <div class="consoleOutput">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;&gt;
+    &lt;soapenv:Body&gt;
+            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+                    &lt;m0:request&gt;
+                            &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+                    &lt;/m0:request&gt;
+            &lt;/m0:getQuote&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</div>
+                <p>
+                    VFS transport listener will pick the file from 'in' directory and send it to the
+                    Axis2 service over HTTP. The request XML file will be backed up in the 'original'
+                    directory. The response from the Axis2 server will be saved to the 'out' directory.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

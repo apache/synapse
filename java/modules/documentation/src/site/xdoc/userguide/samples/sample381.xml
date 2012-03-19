@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 381</title>
+    </properties>
+    <body>
+        <section name="Sample 381: Class Mediator for CBR of Binary Messages">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="JMSBinaryProxy" transports="jms"&gt;
+        &lt;target inSequence="BINARY_CBR_SEQ"/&gt;
+    &lt;/proxy&gt;
+
+    &lt;sequence name="BINARY_CBR_SEQ"&gt;
+        &lt;in&gt;
+            &lt;log level="full"/&gt;
+            &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;class name="samples.mediators.BinaryExtractMediator"&gt;
+                &lt;property name="offset" value="11"/&gt;
+                &lt;property name="length" value="4"/&gt;
+                &lt;property name="variableName" value="symbol"/&gt;
+                &lt;property name="binaryEncoding" value="utf-8"/&gt;
+            &lt;/class&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="symbol" expression="get-property('symbol')"/&gt;
+            &lt;/log&gt;
+            &lt;switch source="get-property('symbol')"&gt;
+                &lt;case regex="GOOG"&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address
+                                    uri="jms:/dynamicTopics/mdd.GOOG?transport.jms.ConnectionFactoryJNDIName=TopicConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=topic"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="MSFT"&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address
+                                    uri="jms:/dynamicTopics/mdd.MSFT?transport.jms.ConnectionFactoryJNDIName=TopicConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616&amp;transport.jms.DestinationType=topic"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;default/&gt;
+            &lt;/switch&gt;
+        &lt;/in&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate an advanced content based routing (CBR) scenario using a custom mediator
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>                
+                        <li>
+                            Setup and start a JMS broker (Apache ActiveMQ can be used as the
+                            JMS broker for this scenario.Refer <a href="setup/jms.html#intro">JMS setup guide</a> for information on
+                            how to run ActiveMQ.)
+                        </li>
+                        <li>
+                            Enable the JMS transport receiver and sender of Synapse (Refer JMS setup
+                            guide for more details)
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 381 (repository/conf/sample/synapse_sample_381.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 381<br/>
+                                Windows: synapse.bat -sample 381
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    In this configuration, a proxy service has been defined to accept incoming JMS 
+                    messages. JMS messages contain binary payloads. User configures the offset, length,
+                    and binary encoding of the text literal that Synapse should use for CBR. Configuration
+                    simply routes the messages based on this text to different endpoints.
+                </p>
+                <p>
+                    A JMS producer and two instances of a consumer used to demonstrate the CBR functionality.
+                </p>
+                <p>
+                    Now run the first consumer using the following command.
+                </p>
+                <div class="command">ant mddconsumer -Djms_topic=mdd.MSFT</div>
+                <p>
+                    Now run the second consumer using the following command.
+                </p>
+                <div class="command">ant mddconsumer -Djms_topic=mdd.GOOG</div>
+                <p>
+                    Now run the market data producer to genenrate market data for symbol 'MSFT' using
+                    the following command.
+                </p>
+                <div class="command">ant mddproducer -Dsymbol=MSFT</div>
+                <p>
+                    Now run the market data producer to genenrate market data for symbol 'GOOG' using
+                    the following command.
+                </p>
+                <div class="command">ant mddproducer -Dsymbol=GOOG</div>
+                <p>
+                    You will see the below output in the client console(s) based on the symbol.
+                </p>
+                <div class="consoleOutput">mddconsumer:
+     [java]  Market data recived for symbol : topic://mdd.MSFT
+     [java]  Market data recived for symbol : topic://mdd.MSFT</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

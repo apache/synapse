@@ -48,7 +48,7 @@
 	    <artifactId>maven-site-plugin</artifactId>
 	    <executions>
 	      <execution>
-		<phase>install</phase>
+		<phase>package</phase>
 		<goals>
 		  <goal>site</goal>
 		</goals>
@@ -57,15 +57,15 @@
 	  </plugin>
 	  <plugin>
 	    <artifactId>maven-assembly-plugin</artifactId>
-	    <executions>
+	    <executions>	     
 	      <execution>
-		<phase>install</phase>
+		<phase>package</phase>
 		<goals>
-		  <goal>assembly</goal>
+		  <goal>single</goal>
 		</goals>
 	      </execution>
 	    </executions>
-	    <configuration>
+	    <configuration>	      
 	      <descriptors>
 		<descriptor>src/main/assembly/docs.xml</descriptor>
 	      </descriptors>

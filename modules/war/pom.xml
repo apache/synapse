@@ -82,6 +82,12 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-patches</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-documentation</artifactId>
+            <type>zip</type>
+            <classifier>docs</classifier>
+        </dependency>
     </dependencies>
 
     <build>
@@ -135,6 +141,17 @@
                             <includeArtifactIds>synapse-patches</includeArtifactIds>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                             <excludes>META-INF/**/*</excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-docs</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>synapse-documentation</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -195,59 +212,16 @@
                             </includes>
                         </resource>
                         <resource>
+                            <directory>target/docs</directory>
+                            <targetPath>docs</targetPath>
+                        </resource>
+                        <resource>
                             <directory>../distribution/src/main/release/docs</directory>
                             <targetPath>docs</targetPath>
                             <includes>
                                 <include>release_notes.txt</include>
                             </includes>
                         </resource>
-                        <resource>
-                            <directory>../../src/site/resources</directory>
-                            <targetPath>docs</targetPath>
-                            <includes>
-                                <include>Synapse_Configuration_Language.html</include>
-                                <include>Synapse_Samples.html</include>
-                                <include>Synapse_Samples_Setup.html</include>
-                                <include>Synapse_QuickStart.html</include>
-                                <include>Synapse_Extending.html</include>
-                            </includes>
-                        </resource>
-                        <!--<resource>-->
-                            <!--<directory>modules/samples/services</directory>-->
-                            <!--<targetPath>samples/axis2Server/src</targetPath>-->
-                        <!--</resource>-->
-                        <!--<resource>-->
-                            <!--<directory>modules/samples/src/main/java</directory>-->
-                            <!--<targetPath>samples/axis2Client/src</targetPath>-->
-                            <!--<excludes>-->
-                                <!--<exclude>**/target</exclude>-->
-                                <!--<exclude>**/target/**/*</exclude>-->
-                            <!--</excludes>-->
-                        <!--</resource>-->
-                        <!--<resource>-->
-                            <!--<directory>modules/samples/src/main/scripts</directory>-->
-                            <!--<targetPath>samples/axis2Client</targetPath>-->
-                            <!--<excludes>-->
-                                <!--<exclude>custom.sh</exclude>-->
-                                <!--<exclude>custom.bat</exclude>-->
-                                <!--<exclude>axis2server.sh</exclude>-->
-                                <!--<exclude>axis2server.bat</exclude>-->
-                            <!--</excludes>-->
-                        <!--</resource>-->
-                        <!--<resource>-->
-                            <!--<directory>modules/samples/src/main/scripts</directory>-->
-                            <!--<targetPath>samples/axis2Server</targetPath>-->
-                            <!--<includes>-->
-                                <!--<include>axis2server.sh</include>-->
-                            <!--</includes>-->
-                        <!--</resource>-->
-                        <!--<resource>-->
-                            <!--<directory>modules/samples/src/main/scripts</directory>-->
-                            <!--<targetPath>samples/axis2Server</targetPath>-->
-                            <!--<includes>-->
-                                <!--<include>axis2server.bat</include>-->
-                            <!--</includes>-->
-                        <!--</resource>-->
                         <resource>
                             <directory>../../repository/conf</directory>
                             <targetPath>WEB-INF/conf</targetPath>

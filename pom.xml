@@ -1294,6 +1294,11 @@
             <organization>WSO2</organization>
 	    <url>http://heshans.blogspot.com/</url>
         </developer>
+        <developer>
+            <name>Rajika Kumarasiri</name>
+            <id>rajika</id>
+            <email>rajikak AT apache.org</email>
+        </developer>
 
     </developers>
 

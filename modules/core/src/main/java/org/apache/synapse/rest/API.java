@@ -27,6 +27,9 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
 import org.apache.synapse.rest.dispatch.RESTDispatcher;
+import org.apache.synapse.rest.version.DefaultStrategy;
+import org.apache.synapse.rest.version.VersionStrategy;
+import org.apache.synapse.config.xml.rest.VersionStrategyFactory;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.util.*;
@@ -39,6 +42,8 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
     private Map<String,Resource> resources = new LinkedHashMap<String,Resource>();
     private List<Handler> handlers = new ArrayList<Handler>();
 
+    private VersionStrategy versionStrategy = new DefaultStrategy(this);
+
     private String fileName;
 
     public API(String name, String context) {
@@ -49,7 +54,15 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         this.context = RESTUtils.trimTrailingSlashes(context);
     }
 
+    /**
+     * get Fully Qualified name of this API
+     * @return returns the key combiantion for API NAME + VERSION
+     */
     public String getName() {
+        //check if a versioning strategy exists
+        if (versionStrategy.getVersion() != null && !"".equals(versionStrategy.getVersion()) ) {
+            return name + ":v" +versionStrategy.getVersion();
+        }
         return name;
     }
 
@@ -131,7 +144,8 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
     boolean canProcess(MessageContext synCtx) {
         if (synCtx.isResponse()) {
             String apiName = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API);
-            if (!name.equals(apiName)) {
+            String version = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+            if (!name.equals(apiName) && !versionStrategy.getVersion().equals(version)) {
                 return false;
             }
         } else {
@@ -141,6 +155,10 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
                 if (log.isDebugEnabled()) {
                     log.debug("API context: " + context + " does not match request URI: " + path);
                 }
+                return false;
+            }
+
+            if(!versionStrategy.isMatchingVersion(synCtx)){
                 return false;
             }
 
@@ -183,6 +201,10 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
                     "API: " + name);
         }
 
+        synCtx.setProperty(RESTConstants.SYNAPSE_REST_API, getName());
+        synCtx.setProperty(RESTConstants.SYNAPSE_REST_API_VERSION, versionStrategy.getVersion());
+        synCtx.setProperty(RESTConstants.REST_API_CONTEXT, context);
+
         for (Handler handler : handlers) {
             if (log.isDebugEnabled()) {
                 log.debug("Processing message with ID: " + synCtx.getMessageID() + " through " +
@@ -215,10 +237,15 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         }
 
 
-        synCtx.setProperty(RESTConstants.SYNAPSE_REST_API, name);
-        synCtx.setProperty(RESTConstants.REST_API_CONTEXT, context);
         String path = RESTUtils.getFullRequestPath(synCtx);
-        String subPath = path.substring(context.length());
+        String subPath = null;
+        if (versionStrategy.getVersionType().equals(VersionStrategyFactory.TYPE_URL)) {
+            //for URL based
+            //request --> http://{host:port}/context/version/path/to/resource
+            subPath = path.substring(context.length() + versionStrategy.getVersion().length() + 1);
+        } else {
+            subPath = path.substring(context.length());
+        }
         if ("".equals(subPath)) {
             subPath = "/";
         }
@@ -307,5 +334,13 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         for (Resource resource : resources.values()) {
             resource.destroy();
         }
+    }
+
+    public VersionStrategy getVersionStrategy() {
+        return versionStrategy;
+    }
+
+    public void setVersionStrategy(VersionStrategy versionStrategy) {
+        this.versionStrategy = versionStrategy;
     }
 }

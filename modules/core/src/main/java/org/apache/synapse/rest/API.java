@@ -66,6 +66,10 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         return name;
     }
 
+    public String getVersion(){
+        return versionStrategy.getVersion();
+    }
+
     public String getContext() {
         return context;
     }

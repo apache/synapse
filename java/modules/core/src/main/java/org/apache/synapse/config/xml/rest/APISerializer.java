@@ -35,6 +35,8 @@ public class APISerializer {
         OMElement apiElt = fac.createOMElement("api", SynapseConstants.SYNAPSE_OMNAMESPACE);
         apiElt.addAttribute("name", api.getName(), null);
         apiElt.addAttribute("context", api.getContext(), null);
+
+        VersionStrategySerializer.serializeVersioningStrategy(api.getVersionStrategy(), apiElt) ;
         if (api.getHost() != null) {
             apiElt.addAttribute("hostname", api.getHost(), null);
         }

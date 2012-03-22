@@ -27,6 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.Handler;
+import org.apache.synapse.rest.version.VersionStrategy;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -52,6 +53,10 @@ public class APIFactory {
         if (hostAtt != null && !"".equals(hostAtt.getAttributeValue())) {
             api.setHost(hostAtt.getAttributeValue());
         }
+
+        VersionStrategy vStrategy = VersionStrategyFactory.createVersioningStrategy(api, apiElt);
+
+        api.setVersionStrategy(vStrategy);
 
         OMAttribute portAtt = apiElt.getAttribute(new QName("port"));
         if (portAtt != null && !"".equals(portAtt.getAttributeValue())) {

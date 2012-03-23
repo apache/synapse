@@ -33,7 +33,7 @@ public class APISerializer {
 
     public static OMElement serializeAPI(API api) {
         OMElement apiElt = fac.createOMElement("api", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        apiElt.addAttribute("name", api.getName(), null);
+        apiElt.addAttribute("name", api.getAPIName(), null);
         apiElt.addAttribute("context", api.getContext(), null);
 
         VersionStrategySerializer.serializeVersioningStrategy(api.getVersionStrategy(), apiElt) ;

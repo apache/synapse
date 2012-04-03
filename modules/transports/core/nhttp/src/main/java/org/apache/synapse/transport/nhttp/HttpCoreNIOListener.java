@@ -127,7 +127,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
         // register with JMX
         mbeanSupport
-            = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
+            = new TransportMBeanSupport(this, "nio-" + transportIn.getName());
         mbeanSupport.register();
     }
 

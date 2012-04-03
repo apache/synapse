@@ -90,9 +90,9 @@ public class LatencyView implements LatencyViewMBean {
     private String latencyMode;
     private String name;
 
-    public LatencyView(final String latencyMode, boolean isHttps) {
+    public LatencyView(final String latencyMode, String transportName) {
         this.latencyMode = latencyMode;
-        name = "nio-http" + (isHttps ? "s" : "");
+        this.name = "nio-" + transportName;
 
         scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             public Thread newThread(Runnable r) {

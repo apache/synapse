@@ -40,9 +40,9 @@ public class NhttpMetricsCollector extends MetricsCollector {
     private ConnectionsView view;
     private boolean listener;
 
-    public NhttpMetricsCollector(boolean listener, boolean isHttps) {
+    public NhttpMetricsCollector(boolean listener, String transportName) {
         this.listener = listener;
-        String name = "http" + (isHttps ? "s" : "") + "-" + (listener ? "listener" : "sender");
+        String name = transportName + "-" + (listener ? "listener" : "sender");
         this.view = new ConnectionsView(name);
     }
 

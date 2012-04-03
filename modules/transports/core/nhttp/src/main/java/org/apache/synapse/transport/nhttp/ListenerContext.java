@@ -126,7 +126,7 @@ public class ListenerContext {
             }
         }
 
-        metrics = new NhttpMetricsCollector(true, ssl);
+        metrics = new NhttpMetricsCollector(true, transportIn.getName());
 
         // create the priority based executor and parser
         param = transportIn.getParameter(NhttpConstants.PRIORITY_CONFIG_FILE_NAME);

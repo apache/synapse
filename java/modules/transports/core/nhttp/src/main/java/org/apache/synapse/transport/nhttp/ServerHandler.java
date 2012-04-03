@@ -136,8 +136,8 @@ public class ServerHandler implements NHttpServiceHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.allocator = new HeapByteBufferAllocator();
         this.activeConnections = new ArrayList<NHttpServerConnection>();
-        this.latencyView = new LatencyView("NHTTPLatencyView", isHttps);
-        this.s2sLatencyView = new LatencyView("NHTTPS2SLatencyView", isHttps);
+        this.latencyView = new LatencyView("NHTTPLatencyView", listenerContext.getTransportIn().getName());
+        this.s2sLatencyView = new LatencyView("NHTTPS2SLatencyView", listenerContext.getTransportIn().getName());
         this.threadingView = new ThreadingView("HttpServerWorker", true, 50);
         this.restDispatching = listenerContext.isRestDispatching();
 

@@ -185,7 +185,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             log.error("Error starting the IOReactor", e);
         }
 
-        metrics = new NhttpMetricsCollector(false, sslContext != null);
+        metrics = new NhttpMetricsCollector(false, transportOut.getName());
         handler = new ClientHandler(cfgCtx, params, metrics);
         final IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslIOSessionHandler, params, transportOut);

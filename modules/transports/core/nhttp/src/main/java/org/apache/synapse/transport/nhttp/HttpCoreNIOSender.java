@@ -208,7 +208,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // register with JMX
         mbeanSupport
-            = new TransportMBeanSupport(this, "nio-http" + (sslContext == null ? "" : "s"));
+            = new TransportMBeanSupport(this, "nio-" + transportOut.getName());
         mbeanSupport.register();
         
         state = BaseConstants.STARTED;

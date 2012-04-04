@@ -31,6 +31,7 @@
                 improving its documentation and test coverage. When the code base is in a satisfactory
                 state a release branch would be created under
                 <a href="https://svn.apache.org/repos/asf/synapse/branches">https://svn.apache.org/repos/asf/synapse/branches</a>.
+                .
             </p>
             <p>
                 From this point onwards all committers will switch to the newly created development
@@ -48,6 +49,37 @@
                 necessary number of votes, a release tag will be created and the release artifacts will
                 be uploaded to the appropriate servers for distribution.
             </p>
+            <p>
+                All the release artifacts must be compliant with
+                <a href="https://docs.sonatype.org/display/Repository/Central+Sync+Requirements">Maven central repository
+                    requirements</a> . Form synapse 2.1 release onwards, we follow the standard maven artifact releasing process.
+                Most part of the release process is automated and all the required steps are listed here.
+                <a href="http://www.apache.org/dev/publishing-maven-artifacts.html">http://www.apache.org/dev/publishing-maven-artifacts.html</a>
+            </p>
+            <p> The details on Nexus Repository Management can be found in <a href="http://www.sonatype.com/books/nexus-book/reference/staging.html">Repository Management with Nexus</a>.
+
+            </p>
+        </section>
+
+        <section name="Trouble Shooting and Best Practices">
+            <ul>
+                <li>
+                    <ul>
+                        <li>Cannot Close the Staging Repo : Make sure RM's public keys are upload to apache key servers</li>
+                    </ul>
+                    <ul>
+                        <li>Avoid .bck poms in source distribution.</li>
+                    </ul>
+                    <ul>
+                        <li>Always run a mvn release:prepare -DdryRun=true before the actual preparation</li>
+                    </ul>
+                    <ul>
+                        <li>Test the generated site with <a href="http://validator.w3.org/checklink">w3c validator</a>.</li>
+                    </ul>
+
+                </li>
+            </ul>
+
         </section>
     </body>
 </document>

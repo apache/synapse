@@ -986,6 +986,16 @@
                 <artifactId>xercesImpl</artifactId>
                 <version>${xerces.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.snmp4j</groupId>
+                <artifactId>snmp4j-agent</artifactId>
+                <version>${snmp4j.agent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.snmp4j</groupId>
+                <artifactId>snmp4j</artifactId>
+                <version>${snmp4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1041,6 +1051,17 @@
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>interval:10080</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>snmp4j-repo</id>
+            <name>SNMP4J Repository</name>
+            <url>https://server.oosnmp.net/dist/release/</url>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
     </repositories>
@@ -1123,6 +1144,8 @@
         <wso2uri-template.version>1.0.0</wso2uri-template.version>
         <woden.version>1.0M9</woden.version>
         <activemq.version>5.2.0</activemq.version>
+        <snmp4j.version>2.0.3</snmp4j.version>
+        <snmp4j.agent.version>2.0.5</snmp4j.agent.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

@@ -188,8 +188,10 @@
                 <exclude>xerces:xercesImpl:jar</exclude>
                 <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->
                 <exclude>org.apache.xerces:xml-apis</exclude>
-	        <exclude>xalan:xalan:jar</exclude>
+	            <exclude>xalan:xalan:jar</exclude>
                 <exclude>quickfixj:quickfixj-all:jar</exclude>
+                <exclude>org.snmp4j:snmp4j</exclude>
+                <exclude>org.snmp4j:snmp4j-agent</exclude>
             </excludes>
         </dependencySet>
 	<dependencySet>

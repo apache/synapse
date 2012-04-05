@@ -31,11 +31,14 @@ import org.apache.axis2.format.BinaryBuilder;
 import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.phaseresolver.PhaseMetadata;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
+import org.apache.synapse.commons.snmp.SNMPConstants;
+import org.apache.synapse.commons.snmp.SynapseSNMPAgent;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.config.*;
 import org.apache.synapse.libraries.imports.SynapseImport;
@@ -58,6 +61,7 @@ import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
 import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -94,6 +98,8 @@ public class Axis2SynapseController implements SynapseController {
 
     /** JMX Adapter */
     private JmxAdapter jmxAdapter;
+
+    private SynapseSNMPAgent snmpAgent;
 
     private TaskDescriptionRepository taskDescriptionRepository;
 
@@ -265,6 +271,9 @@ public class Axis2SynapseController implements SynapseController {
 
                 stopJmxAdapter();
                 RMIRegistryController.getInstance().shutDown();
+                if (snmpAgent != null) {
+                    snmpAgent.stop();
+                }
 
                 // we need to call this method to clean the temp files we created.
                 if (configurationContext != null) {
@@ -323,6 +332,17 @@ public class Axis2SynapseController implements SynapseController {
                 log.info("Management using JMX available via: "
                         + jmxAdapter.getJmxInformation().getJmxUrl());
             }
+        }
+
+        Properties properties = SynapsePropertiesLoader.loadSynapseProperties();
+        String enabled = properties.getProperty(SNMPConstants.SNMP_ENABLED);
+        try {
+            if (enabled != null && JavaUtils.isTrueExplicitly(enabled)) {
+                snmpAgent = new SynapseSNMPAgent(properties);
+                snmpAgent.start();
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing SNMP", e);
         }
     }
 

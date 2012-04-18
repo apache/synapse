@@ -352,7 +352,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     protected boolean isRetryDisabled(MessageContext synCtx) {
         Integer errorCode = (Integer) synCtx.getProperty(SynapseConstants.ERROR_CODE);
-        if (errorCode != null) {
+        if (errorCode != null && definition != null) {
             if (definition.getRetryDisabledErrorCodes().contains(errorCode)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Encountered a retry disabled error : " + errorCode

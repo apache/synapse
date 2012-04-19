@@ -1322,6 +1322,12 @@
             <id>rajika</id>
             <email>rajikak AT apache.org</email>
         </developer>
+        <developer>
+            <name>Miyuru Wanninayaka</name>
+            <id>miyuru</id>
+            <email>miyuru AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
 
     </developers>
 

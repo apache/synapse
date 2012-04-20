@@ -31,7 +31,7 @@ import java.net.URL;
  * Time: 4:54 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LibDeployerUtilsTest extends TestCase {
+public abstract class LibDeployerUtilsTest extends TestCase {
 
 /*
     String path;

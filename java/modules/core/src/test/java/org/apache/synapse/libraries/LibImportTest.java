@@ -31,7 +31,7 @@ import org.apache.synapse.libraries.util.LibDeployerUtilsTest;
  * Time: 4:38 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LibImportTest extends TestCase {
+public abstract class LibImportTest extends TestCase {
 
 
 /*

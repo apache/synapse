@@ -34,6 +34,7 @@ import org.apache.synapse.libraries.util.LibDeployerUtilsTest;
 public class LibImportTest extends TestCase {
 
 
+/*
     public void testValidImports() {
         Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
         SynapseImport validSynImport = new SynapseImport();
@@ -97,5 +98,6 @@ public class LibImportTest extends TestCase {
         assertEquals("org.apache.synapse.linkedin", library.getPackage());
         assertNull(library.getArtifact("org.apache.synapse.linkedin.post_status"));
     }
+*/
 
 }

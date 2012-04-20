@@ -33,6 +33,7 @@ import java.net.URL;
  */
 public class LibDeployerUtilsTest extends TestCase {
 
+/*
     String path;
 
     public void setUp() {
@@ -48,5 +49,6 @@ public class LibDeployerUtilsTest extends TestCase {
         assertEquals("org.apache.synapse.linkedin", library.getPackage());
         assertEquals("synapse library for Linkedin", library.getDescription());
     }
+*/
 
 }

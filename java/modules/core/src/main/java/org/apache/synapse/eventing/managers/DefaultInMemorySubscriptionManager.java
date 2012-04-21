@@ -21,6 +21,7 @@ package org.apache.synapse.eventing.managers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.eventing.SynapseEventingConstants;
@@ -58,7 +59,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
 
     public String subscribe(Subscription subscription) throws EventException {
         if (subscription.getId() == null) {
-            subscription.setId(org.apache.axiom.om.util.UUIDGenerator.getUUID());
+            subscription.setId(UIDGenerator.generateURNString());
         }
         store.put(subscription.getId(), subscription);
         return subscription.getId();

@@ -26,6 +26,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.registry.Registry;
+import org.custommonkey.xmlunit.XMLAssert;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -66,15 +67,15 @@ public class SimpleURLRegistryTest extends TestCase {
         prop.setKey(FILE);
 
         // initial load of file from registry
-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
 
         // sleep 1 sec
         Thread.sleep(1000);
-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
 
         // sleep another 1 sec, has expired in cache, but content hasnt changed
         Thread.sleep(1000);
-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
 
         // the renewed cache should be valid for another 1.5 secs
         // change the file now and change next cache duration
@@ -82,15 +83,15 @@ public class SimpleURLRegistryTest extends TestCase {
         props.put("cachableDuration", "100");
         reg.init(props);
         // still cached content should be available and valid
-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
 
         // now sleep ~1 sec, still cache should be valid
         Thread.sleep(800);
-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
 
         // sleep another 1 sec.. cache should expire and new content should be loaded
         Thread.sleep(1000);
-        assertEquals(TEXT_2, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_2, reg.getResource(prop, new Properties()).toString());
 
         // change content back to original
         writeToFile(TEXT_1);
@@ -98,7 +99,7 @@ public class SimpleURLRegistryTest extends TestCase {
         // sleep for .5 sec, now the new content should be loaded as new expiry time
         // is .1 sec
         Thread.sleep(500);
-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());
+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
     }
     
     public void testLargeFile() throws Exception {

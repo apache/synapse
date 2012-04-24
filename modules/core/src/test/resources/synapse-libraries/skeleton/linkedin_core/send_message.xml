@@ -1,0 +1,12 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="send_message">
+        <parameter name="idList"/>
+        <parameter name="subject"/>
+        <parameter name="message"/>
+        <sequence>
+            	<log level="full">
+			<property name="Linkedin sample operation" expression="$func:idList" />
+		</log>
+		<!--use a Log mediator just for testing for the Test Lib -->
+		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
+        </sequence>
+    </template>	

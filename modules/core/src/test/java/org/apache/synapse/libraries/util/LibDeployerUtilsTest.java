@@ -18,11 +18,10 @@
  */
 package org.apache.synapse.libraries.util;
 
-import junit.framework.TestCase;
+import org.apache.synapse.libraries.AbstractLibTestCase;
 import org.apache.synapse.libraries.model.Library;
 
 import javax.xml.namespace.QName;
-import java.net.URL;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,14 +30,12 @@ import java.net.URL;
  * Time: 4:54 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class LibDeployerUtilsTest extends TestCase {
+public class LibDeployerUtilsTest extends AbstractLibTestCase {
 
-/*
     String path;
 
     public void setUp() {
-        URL resource = LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip");
-        path = resource.getPath();
+        path = getResourcePath();
     }
 
     public void testCreateSynapseLibrary() {
@@ -49,6 +46,5 @@ public abstract class LibDeployerUtilsTest extends TestCase {
         assertEquals("org.apache.synapse.linkedin", library.getPackage());
         assertEquals("synapse library for Linkedin", library.getDescription());
     }
-*/
 
 }

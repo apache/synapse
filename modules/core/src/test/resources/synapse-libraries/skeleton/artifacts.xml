@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifacts>
+    <artifact name="SynapseLinkedinLib" package="org.apache.synapse.linkedin" >
+        <dependency artifact="linkedin_core" />
+        <description>synapse library for Linkedin</description>
+    </artifact>
+</artifacts>

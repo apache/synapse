@@ -24,6 +24,9 @@ import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
 import org.apache.synapse.libraries.util.LibDeployerUtilsTest;
 
+import java.io.File;
+import java.net.URISyntaxException;
+
 /**
  * Created by IntelliJ IDEA.
  * User: charitha
@@ -31,12 +34,11 @@ import org.apache.synapse.libraries.util.LibDeployerUtilsTest;
  * Time: 4:38 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class LibImportTest extends TestCase {
+public class LibImportTest extends AbstractLibTestCase {
 
 
-/*
-    public void testValidImports() {
-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
+    public void testValidImports() throws URISyntaxException {
+        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
         SynapseImport validSynImport = new SynapseImport();
         validSynImport.setLibName("SynapseLinkedinLib");
         validSynImport.setLibPackage("org.apache.synapse.linkedin");
@@ -61,7 +63,7 @@ public abstract class LibImportTest extends TestCase {
     }
 
     public void testInValidImportsCaseOne() {
-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
+        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
         SynapseImport invalidSynImport = new SynapseImport();
         invalidSynImport.setLibName("testSynapseLinkedinLib");
         invalidSynImport.setLibPackage("org.apache.synapse.linkedin");
@@ -74,7 +76,7 @@ public abstract class LibImportTest extends TestCase {
     }
 
     public void testInValidImportsCaseTwo() {
-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
+        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
         SynapseImport invalidSynImport = new SynapseImport();
         invalidSynImport.setLibName("SynapseLinkedinLib");
         invalidSynImport.setLibPackage("test.org.apache.synapse.linkedin");
@@ -87,7 +89,7 @@ public abstract class LibImportTest extends TestCase {
     }
 
     public void testInValidImportsCaseThree() {
-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
+        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
         SynapseImport invalidSynImport = new SynapseImport();
         invalidSynImport.setLibName("testSynapseLinkedinLib");
         invalidSynImport.setLibPackage("test.org.apache.synapse.linkedin");
@@ -98,6 +100,5 @@ public abstract class LibImportTest extends TestCase {
         assertEquals("org.apache.synapse.linkedin", library.getPackage());
         assertNull(library.getArtifact("org.apache.synapse.linkedin.post_status"));
     }
-*/
 
 }

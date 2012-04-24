@@ -75,6 +75,32 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>test-library-assembly</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>synapse-test-lib</finalName>	
+                            <filters>
+                                <filter>
+                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
+                                </filter>
+                            </filters>
+                            <descriptors>
+                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-lib.xml
+                                </descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -87,6 +113,20 @@
                                 <mkdir dir="target/test_repos/synapse/modules"/>
                                 <mkdir dir="target/test_repos/synapse/services"/>
                                 <mkdir dir="target/test_repos/client/modules"/>
+                                <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
+                                <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>remove_test_lib</id>
+                        <phase>install</phase>
+                        <configuration>
+                            <tasks>
+                                <delete file="target/synapse-test-lib.zip"/>
                             </tasks>
                         </configuration>
                         <goals>

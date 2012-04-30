@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.exception.XMLComparisonException;
 import org.apache.synapse.registry.Registry;
 
 import java.util.Properties;

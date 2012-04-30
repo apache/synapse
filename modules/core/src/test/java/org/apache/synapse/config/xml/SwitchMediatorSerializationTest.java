@@ -19,8 +19,6 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.impl.exception.XMLComparisonException;
-
 public class SwitchMediatorSerializationTest extends AbstractTestCase {
 
     private SwitchMediatorFactory switchMediatorFactory = null;

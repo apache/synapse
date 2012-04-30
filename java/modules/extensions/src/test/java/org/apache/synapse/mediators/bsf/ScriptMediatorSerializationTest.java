@@ -18,7 +18,6 @@
  */
 package org.apache.synapse.mediators.bsf;
 
-import org.apache.axiom.om.impl.exception.XMLComparisonException;
 import org.apache.synapse.mediators.AbstractTestCase;
 
 public class ScriptMediatorSerializationTest extends AbstractTestCase {
@@ -31,19 +30,19 @@ public class ScriptMediatorSerializationTest extends AbstractTestCase {
         scriptMediatorSerializer = new ScriptMediatorSerializer();
     }
 
-    public void testScriptMediatorSerializationScenarioOne() throws XMLComparisonException {
+    public void testScriptMediatorSerializationScenarioOne() {
         String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" key=\"script-key\" function=\"funOne\" language=\"js\"></script> ";
         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }
 
-    public void testScriptMediatorSerializationScenarioTwo() throws XMLComparisonException {
+    public void testScriptMediatorSerializationScenarioTwo() {
         String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" language=\"js\" key=\"script-key\" ></script> ";
         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }
 
-    public void testInlineScriptMediatorSerializationScenarioOne() throws XMLComparisonException {
+    public void testInlineScriptMediatorSerializationScenarioOne() {
         String inputXml = "<syn:script xmlns:syn=\"http://ws.apache.org/ns/synapse\" language='js'>" +
                 "<![CDATA[var symbol = mc.getPayloadXML()..*::Code.toString();mc.setPayloadXML(<m:getQuote xmlns:m=\"http://services.samples/xsd\">\n" +
                 "<m:request><m:symbol>{symbol}</m:symbol></m:request></m:getQuote>);]]></syn:script> ";
@@ -51,7 +50,7 @@ public class ScriptMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }
 
-    public void testInlineScriptMediatorSerializationScenarioTwo() throws XMLComparisonException {
+    public void testInlineScriptMediatorSerializationScenarioTwo() {
         String inputXml = "<syn:script xmlns:syn=\"http://ws.apache.org/ns/synapse\" language='rb'>" +
                 "<![CDATA[" +
                 "require 'rexml/document'\n" +

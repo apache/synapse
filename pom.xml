@@ -124,17 +124,6 @@
             </activation>
             <repositories>
                 <repository>
-                    <id>apache-snapshots</id>
-                    <name>Apache Maven 2 Snapshot Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-                    <releases>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <updatePolicy>interval:60</updatePolicy>
-                    </snapshots>
-                </repository>
-                <repository>
                     <id>wso2-m2</id>
                     <name>WSO2 Maven 2 Repository</name>
                     <url>http://dist.wso2.org/maven2/</url>
@@ -185,20 +174,6 @@
             </build>
         </profile>
     </profiles>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache-snapshots</id>
-            <name>Apache Snapshot repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
     
     <build>
         <pluginManagement>
@@ -1019,17 +994,6 @@
     </reporting>
 
     <repositories>
-        <repository>
-            <id>apache-snapshots</id>
-            <name>Apache Maven 2 Snapshot Repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:10080</updatePolicy> <!-- i.e. refresh weekly -->
-            </snapshots>
-        </repository>
         <repository>
             <id>wso2-m2</id>
             <name>WSO2 Maven 2 Repository</name>

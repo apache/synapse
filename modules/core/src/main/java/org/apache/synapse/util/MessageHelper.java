@@ -1,6 +1,5 @@
 package org.apache.synapse.util;
 
-import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -195,18 +194,11 @@ public class MessageHelper {
         newMC.setDoingMTOM(ori.isDoingMTOM());
         newMC.setDoingSwA(ori.isDoingSwA());
 
-        // if the original request carries any attachments, copy them to the clone
-        // as well, except for the soap part if any
-        Attachments attachments = ori.getAttachmentMap();
-        if (attachments != null && attachments.getAllContentIDs().length > 0) {
-            String[] cIDs = attachments.getAllContentIDs();
-            String soapPart = attachments.getSOAPPartContentID();
-            for (String cID : cIDs) {
-                if (!cID.equals(soapPart)) {
-                    newMC.addAttachment(cID, attachments.getDataHandler(cID));
-                }
-            }
-        }
+        // If the original request carries any attachments, copy them to the clone
+        // as well. Note that with the change introduced by AXIS2-5308 we can simply
+        // copy the reference to the original Attachments object. This should also enable
+        // streaming of MIME parts in certain scenarios.
+        newMC.setAttachmentMap(ori.getAttachmentMap());
 
         Iterator itr = ori.getPropertyNames();
         while (itr.hasNext()) {

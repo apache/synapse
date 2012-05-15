@@ -97,7 +97,7 @@ public class ResponseMessageBuilder {
                 EventingConstants.WSE_EN_SUBSCRIBE_RESPONSE, eventingNamespace);
         try {
             OMElement subscriptionManagerElement = EndpointReferenceHelper.toOM(
-                    subscribeResponseElement.getOMFactory(),
+                    subscribeResponseElement.getOMFactory().getMetaFactory().getOMFactory(),
                     subscriptionManagerEPR,
                     new QName(EventingConstants.WSE_EVENTING_NS,
                             EventingConstants.WSE_EN_SUBSCRIPTION_MANAGER,

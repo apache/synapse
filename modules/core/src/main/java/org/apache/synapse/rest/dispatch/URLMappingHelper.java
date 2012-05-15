@@ -45,6 +45,10 @@ public class URLMappingHelper implements DispatcherHelper {
         if (!"/".equals(url)) {
             url = RESTUtils.trimTrailingSlashes(url);
         }
+        int index = url.indexOf('?');
+        if (index != -1) {
+            url = url.substring(0, index);
+        }
         return exactMatch != null && exactMatch.equals(url);
     }
 

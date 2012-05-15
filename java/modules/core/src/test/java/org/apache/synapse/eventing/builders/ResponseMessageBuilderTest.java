@@ -34,7 +34,7 @@ import java.util.Calendar;
 
 public class ResponseMessageBuilderTest extends AbstractTestCase {
 
-    public void testSubscriptionResponse() {
+    public void testSubscriptionResponse() throws Exception {
         String id = UIDGenerator.generateURNString();
         String addressUrl = "http://synapse.test.com/eventing/sunscriptions";
 
@@ -52,21 +52,16 @@ public class ResponseMessageBuilderTest extends AbstractTestCase {
                 "</wse:SubscriptionManager>" +
                 "</wse:SubscribeResponse>";
 
-        try {
-            MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
-                    getAxis2MessageContext();
-            ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
-            SOAPEnvelope env = builder.genSubscriptionResponse(sub);
-            OMElement resultOm = env.getBody().getFirstElement();
-            OMElement expectedOm = AXIOMUtil.stringToOM(expected);
-            assertTrue(compare(expectedOm, resultOm));
-
-        } catch (Exception e) {
-            fail("Error while constructing the test message context: " + e.getMessage());
-        }
+        MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
+                getAxis2MessageContext();
+        ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
+        SOAPEnvelope env = builder.genSubscriptionResponse(sub);
+        OMElement resultOm = env.getBody().getFirstElement();
+        OMElement expectedOm = AXIOMUtil.stringToOM(expected);
+        assertTrue(compare(expectedOm, resultOm));
     }
 
-    public void testUnsubscriptionResponse() {
+    public void testUnsubscriptionResponse() throws Exception {
         String id = UIDGenerator.generateURNString();
         String addressUrl = "http://synapse.test.com/eventing/sunscriptions";
 
@@ -77,21 +72,16 @@ public class ResponseMessageBuilderTest extends AbstractTestCase {
         String expected =
                 "<wse:UnsubscribeResponse xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\"/>";
 
-        try {
-            MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
-                    getAxis2MessageContext();
-            ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
-            SOAPEnvelope env = builder.genUnSubscribeResponse(sub);
-            OMElement resultOm = env.getBody().getFirstElement();
-            OMElement expectedOm = AXIOMUtil.stringToOM(expected);
-            assertTrue(compare(expectedOm, resultOm));
-
-        } catch (Exception e) {
-            fail("Error while constructing the test message context: " + e.getMessage());
-        }
+        MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
+                getAxis2MessageContext();
+        ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
+        SOAPEnvelope env = builder.genUnSubscribeResponse(sub);
+        OMElement resultOm = env.getBody().getFirstElement();
+        OMElement expectedOm = AXIOMUtil.stringToOM(expected);
+        assertTrue(compare(expectedOm, resultOm));
     }
 
-    public void testRenewResponse() {
+    public void testRenewResponse() throws Exception {
         String id = UIDGenerator.generateURNString();
         String addressUrl = "http://synapse.test.com/eventing/sunscriptions";
         Date date = new Date(System.currentTimeMillis() + 3600000);
@@ -108,21 +98,16 @@ public class ResponseMessageBuilderTest extends AbstractTestCase {
                         "<wse:Expires>" + ConverterUtil.convertToString(cal) + "</wse:Expires>" +
                         "</wse:RenewResponse>";
 
-        try {
-            MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
-                    getAxis2MessageContext();
-            ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
-            SOAPEnvelope env = builder.genRenewSubscriptionResponse(sub);
-            OMElement resultOm = env.getBody().getFirstElement();
-            OMElement expectedOm = AXIOMUtil.stringToOM(expected);
-            assertTrue(compare(expectedOm, resultOm));
-
-        } catch (Exception e) {
-            fail("Error while constructing the test message context: " + e.getMessage());
-        }
+        MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
+                getAxis2MessageContext();
+        ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
+        SOAPEnvelope env = builder.genRenewSubscriptionResponse(sub);
+        OMElement resultOm = env.getBody().getFirstElement();
+        OMElement expectedOm = AXIOMUtil.stringToOM(expected);
+        assertTrue(compare(expectedOm, resultOm));
     }
 
-    public void testGetStatusResponse() {
+    public void testGetStatusResponse() throws Exception {
         String id = UIDGenerator.generateURNString();
         String addressUrl = "http://synapse.test.com/eventing/sunscriptions";
         Date date = new Date(System.currentTimeMillis() + 3600000);
@@ -139,17 +124,12 @@ public class ResponseMessageBuilderTest extends AbstractTestCase {
                         "<wse:Expires>" + ConverterUtil.convertToString(cal) + "</wse:Expires>" +
                         "</wse:GetStatusResponse>";
 
-        try {
-            MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
-                    getAxis2MessageContext();
-            ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
-            SOAPEnvelope env = builder.genGetStatusResponse(sub);
-            OMElement resultOm = env.getBody().getFirstElement();
-            OMElement expectedOm = AXIOMUtil.stringToOM(expected);
-            assertTrue(compare(expectedOm, resultOm));
-
-        } catch (Exception e) {
-            fail("Error while constructing the test message context: " + e.getMessage());
-        }
+        MessageContext msgCtx = TestUtils.getAxis2MessageContext("<empty/>", null).
+                getAxis2MessageContext();
+        ResponseMessageBuilder builder = new ResponseMessageBuilder(msgCtx);
+        SOAPEnvelope env = builder.genGetStatusResponse(sub);
+        OMElement resultOm = env.getBody().getFirstElement();
+        OMElement expectedOm = AXIOMUtil.stringToOM(expected);
+        assertTrue(compare(expectedOm, resultOm));
     }
 }

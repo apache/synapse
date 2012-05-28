@@ -109,6 +109,7 @@ public class ListenerContext {
         }
 
         port = port + portOffset;
+        System.setProperty(transportIn.getName() + ".nio.port", String.valueOf(port));
 
         param = transportIn.getParameter(NhttpConstants.BIND_ADDRESS);
         if (param != null) {

@@ -335,12 +335,24 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         for (Resource resource : resources.values()) {
             resource.init(se);
         }
+        
+        for (Handler handler : handlers) {
+            if (handler instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) handler).init(se);
+            }
+        }
     }
 
     public void destroy() {
         log.info("Destroying API: " + name);
         for (Resource resource : resources.values()) {
             resource.destroy();
+        }
+
+        for (Handler handler : handlers) {
+            if (handler instanceof ManagedLifecycle) {
+                ((ManagedLifecycle) handler).destroy();
+            }
         }
     }
 

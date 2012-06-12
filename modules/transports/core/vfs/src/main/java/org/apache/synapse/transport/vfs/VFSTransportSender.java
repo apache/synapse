@@ -26,6 +26,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.AbstractTransportSender;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.ManagementSupport;
@@ -225,14 +226,14 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     private void populateResponseFile(FileObject responseFile, MessageContext msgContext,
                                       boolean append, boolean lockingEnabled) throws AxisFault {
         
-        MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);
+        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
         
         try {
             CountingOutputStream os = new CountingOutputStream(
                     responseFile.getContent().getOutputStream(append));
             try {
-                messageFormatter.writeTo(msgContext, format, os, true);
+                messageFormatter.writeTo(msgContext, format, os, false);
             } finally {
                 os.close();
             }

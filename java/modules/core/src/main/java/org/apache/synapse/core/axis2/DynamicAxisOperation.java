@@ -26,7 +26,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
@@ -82,13 +81,6 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 		 */
 		public MessageContext getMessageContext(String messageLabel) throws AxisFault {
 			return oc.getMessageContext(messageLabel);
-		}
-
-        /**
-         * same as OutInAxisOperationClient
-         */
-        public void setCallback(Callback callback) {
-			this.callback = callback;
 		}
 
 		public void executeImpl(boolean block) throws AxisFault {

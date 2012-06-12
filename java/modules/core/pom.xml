@@ -283,6 +283,10 @@
             <artifactId>synapse-vfs-transport</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-dom</artifactId>
+        </dependency>
 	    <dependency>
 	        <!-- Required for validate mediator tests on JDK 5 -->
             <groupId>xerces</groupId>

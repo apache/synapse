@@ -78,7 +78,7 @@
 
     <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
-        <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+        <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
     </deployer>
 
     <!-- Following parameter will set the host name for the epr-->

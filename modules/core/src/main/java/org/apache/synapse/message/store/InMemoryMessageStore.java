@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,7 +36,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     private static final Log log = LogFactory.getLog(InMemoryMessageStore.class);
 
     /** The map that keeps the stored messages */
-    private Map<String, MessageContext> messageList = new ConcurrentHashMap<String, MessageContext>();
+    private Queue<MessageContext> messageList = new ConcurrentLinkedQueue<MessageContext>();
 
     private Lock lock = new ReentrantLock();
 
@@ -45,12 +45,11 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         try {
             if (messageContext != null) {
                 messageContext.getEnvelope().build();
-                messageList.put(messageContext.getMessageID(), messageContext);
-                /** Notify observers */
+                messageList.offer(messageContext);
+                // Notify observers
                 notifyMessageAddition(messageContext.getMessageID());
                 if (log.isDebugEnabled()) {
-                    log.debug("Message with id " + messageContext.getMessageID() +
-                            " stored");
+                    log.debug("Message with id " + messageContext.getMessageID() + " stored");
                 }
             }
         } finally {
@@ -62,54 +61,68 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
     public MessageContext poll() {
         lock.lock();
-        MessageContext context;
         try {
-            context = peek();
-            if(context !=null) {
-                messageList.remove(context.getMessageID());
-                /** Notify observers */
+            MessageContext context = messageList.poll();
+            if (context != null) {
+                // notify observers
                 notifyMessageRemoval(context.getMessageID());
             }
+            return context;
         } finally {
             lock.unlock();
         }
-        return context;
     }
 
     public MessageContext peek() {
-        if (messageList.size() > 0) {
-            return (MessageContext) messageList.values().toArray()[0];
-        }
-
-        return null;
+        return messageList.peek();        
     }
 
     public MessageContext remove() throws NoSuchElementException {
-        MessageContext context = poll();
-        if(context == null) {
-            throw  new NoSuchElementException();
+        lock.lock();
+        try {
+            MessageContext msgCtx = messageList.remove();
+            if (msgCtx != null) {
+                notifyMessageRemoval(msgCtx.getMessageID());
+            }
+            return msgCtx;
+        } finally {
+            lock.unlock();
         }
-
-        return context;
-
     }
 
     public MessageContext get(int index) {
-        if(index >=0 && index < messageList.size()) {
-            return (MessageContext) messageList.values().toArray()[index];
+        lock.lock();
+        try {
+            if (index >= 0 && index < messageList.size()) {
+                int i = 0;
+                for (MessageContext msgCtx : messageList) {
+                    if (index == i) {
+                        return msgCtx;
+                    }
+                    i++;
+                }
+            }
+            return null;
+        } finally {
+            lock.unlock();
         }
-        return null;
     }
 
     public MessageContext remove(String messageID) {
         lock.lock();
         try {
             if (messageID != null) {
-               if(messageList.remove(messageID) != null) {
-                   /** Notify observers */
-                    notifyMessageRemoval(messageID);
-               }
+                MessageContext removable = null;
+                for (MessageContext msgCtx : messageList) {
+                    if (msgCtx.getMessageID().equals(messageID)) {
+                        removable = msgCtx;
+                        break;
+                    }
+                }
 
+                if (removable != null && messageList.remove(removable)) {
+                    notifyMessageRemoval(messageID);
+                }
             }
         } finally {
             lock.unlock();
@@ -120,11 +133,10 @@ public class InMemoryMessageStore extends AbstractMessageStore {
     public void clear() {
         lock.lock();
         try {
-
-            for (String k : messageList.keySet()) {
-                messageList.remove(k);
-                /** Notify observers */
-                notifyMessageRemoval(k);
+            while (!messageList.isEmpty()) {
+                // We need to call remove() here because we need the notifications
+                // to get fired properly for each removal
+                remove();
             }
         } finally {
             lock.unlock();
@@ -135,9 +147,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         lock.lock();
         try {
             List<MessageContext> returnList = new ArrayList<MessageContext>();
-            for (Map.Entry<String, MessageContext> entry : messageList.entrySet()) {
-                returnList.add(entry.getValue());
-            }
+            returnList.addAll(messageList);
             return returnList;
         } finally {
             lock.unlock();
@@ -148,14 +158,17 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         lock.lock();
         try {
             if (messageId != null) {
-                return messageList.get(messageId);
+                for (MessageContext msgCtx : messageList) {
+                    if (msgCtx.getMessageID().equals(messageId)) {
+                        return msgCtx;
+                    }
+                }
             }
         } finally {
             lock.unlock();
         }
         return null;
     }
-
 
     public int size() {
         return messageList.size();

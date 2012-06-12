@@ -20,11 +20,11 @@ package org.apache.synapse.mediators.xquery;
 
 import net.sf.saxon.javax.xml.xquery.*;
 import net.sf.saxon.xqj.SaxonXQDataSource;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -611,8 +611,8 @@ public class XQueryMediator extends AbstractMediator {
                 xqDynamicContext.
                         bindObject(name,
                                 new DOMSource(((Element) ElementHelper.
-                                        importOMElement(variableValue,
-                                                DOOMAbstractFactory.getOMFactory())).
+                                        importOMElement(variableValue, OMAbstractFactory.getMetaFactory(
+                                                OMAbstractFactory.FEATURE_DOM).getOMFactory())).
                                         getOwnerDocument()), null);
             } else {
                 xqDynamicContext.bindDocument(name,

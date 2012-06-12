@@ -19,6 +19,7 @@
 package org.apache.synapse.mediators.bsf;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
@@ -61,9 +62,8 @@ public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
             }
         } else {
             script.addAttribute(fac.createOMAttribute("language", nullNS, language));
-            OMTextImpl textData = (OMTextImpl) fac.createOMText(
-                    scriptMediator.getScriptSrc().trim());
-            textData.setType(XMLStreamConstants.CDATA);
+            OMText textData = fac.createOMText(scriptMediator.getScriptSrc().trim(),
+                    XMLStreamConstants.CDATA);
             script.addChild(textData);
         }
 

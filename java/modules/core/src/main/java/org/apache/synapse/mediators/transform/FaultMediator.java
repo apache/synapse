@@ -110,26 +110,23 @@ public class FaultMediator extends AbstractMediator {
             default : {
                 // if this is a POX or REST message then make a POX fault
                 if (synCtx.isDoingPOX() || synCtx.isDoingGET()) {
-                    
+
                     makePOXFault(synCtx, synLog);
 
                 } else {
-                    
+
                     // determine from current message's SOAP envelope namespace
                     SOAPEnvelope envelop = synCtx.getEnvelope();
                     if (envelop != null) {
-                        
+
                         if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
                             envelop.getNamespace().getNamespaceURI())) {
-
-                            soapVersion = SOAP12;
                             makeSOAPFault(synCtx, SOAP12, synLog);
 
                         } else {
-                            soapVersion = SOAP11;
                             makeSOAPFault(synCtx, SOAP11, synLog);
                         }
-                        
+
                     } else {
                         // default to SOAP 11
                         makeSOAPFault(synCtx, SOAP11, synLog);
@@ -245,8 +242,8 @@ public class FaultMediator extends AbstractMediator {
         }
 
         // populate it
-        setFaultCode(synCtx, factory, fault);
-        setFaultResaon(synCtx, factory, fault);
+        setFaultCode(synCtx, factory, fault, soapVersion);
+        setFaultReason(synCtx, factory, fault, soapVersion);
         setFaultNode(factory, fault);
         setFaultRole(factory, fault);
         setFaultDetail(synCtx, factory, fault);
@@ -305,7 +302,7 @@ public class FaultMediator extends AbstractMediator {
         synLog.traceOrDebug("End : Fault mediator");
     }
 
-    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
+    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault, int soapVersion) {
 
         QName fault_code = null;
 
@@ -319,7 +316,7 @@ public class FaultMediator extends AbstractMediator {
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
-        switch(soapVersion) {
+        switch (soapVersion) {
             case SOAP11:
                 code.setText(fault_code);
                 break;
@@ -331,7 +328,7 @@ public class FaultMediator extends AbstractMediator {
         fault.setCode(code);
     }
 
-    private void setFaultResaon(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
+    private void setFaultReason(MessageContext synCtx, SOAPFactory factory, SOAPFault fault, int soapVersion) {
         String reasonString = null;
 
         if (faultReasonValue == null && faultReasonExpr == null) {

@@ -22,6 +22,7 @@ package org.apache.synapse.rest;
 import org.apache.axis2.Constants;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -286,8 +287,15 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
             }
         }
 
-        if (!processed && log.isDebugEnabled()) {
-            log.debug("No matching resource was found for the request: " + synCtx.getMessageID());
+        if (!processed) {
+            if (log.isDebugEnabled()) {
+                log.debug("No matching resource was found for the request: " + synCtx.getMessageID());
+            }
+
+            Mediator sequence = synCtx.getSequence(RESTConstants.NO_MATCHING_RESOURCE_HANDLER);
+            if (sequence != null) {
+                sequence.mediate(synCtx);
+            }
         }
     }
 

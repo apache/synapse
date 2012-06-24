@@ -46,6 +46,6 @@ public class RESTConstants {
 
     public static final String DEFAULT_ENCODING = "UTF-8";
 
-    public static final String NO_MATCHING_RESOURCE_HANDLER = "NO_MATCHING_RESOURCE_HANDLER";
+    public static final String NO_MATCHING_RESOURCE_HANDLER = "_resource_mismatch_handler_";
 
 }

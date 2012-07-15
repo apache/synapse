@@ -36,6 +36,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
 import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
 import org.apache.synapse.commons.snmp.SNMPConstants;
 import org.apache.synapse.commons.snmp.SynapseSNMPAgent;
@@ -187,6 +189,7 @@ public class Axis2SynapseController implements SynapseController {
         deployMediatorExtensions();
         initDataSourceHelper(serverContextInformation);
         initSharedSecretCallbackHandlerCache(serverContextInformation);
+        initEnterpriseBeanstalkManager(serverContextInformation);
         initialized = true;
     }
 
@@ -395,6 +398,15 @@ public class Axis2SynapseController implements SynapseController {
             SynapseTaskManager synapseTaskManager = synapseEnvironment.getTaskManager();
             if (synapseTaskManager.isInitialized()) {
                 synapseTaskManager.cleanup();
+            }
+
+            // destroy beanstalks.
+            EnterpriseBeanstalkManager manager = (EnterpriseBeanstalkManager)
+                    serverContextInformation.getProperty(
+                            EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
+
+            if (manager != null) {
+                manager.destroy();
             }
 
             // stop the listener manager
@@ -861,6 +873,28 @@ public class Axis2SynapseController implements SynapseController {
                         SecurityConstants.PROP_SECRET_CALLBACK_HANDLER);
         if (handler instanceof SecretCallbackHandler) {
             cache.setSecretCallbackHandler((SecretCallbackHandler) handler);
+        }
+    }
+
+    private synchronized void initEnterpriseBeanstalkManager(ServerContextInformation serverInfo) {
+
+        if (serverInfo.getProperty(
+                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME) == null) {
+
+            EnterpriseBeanstalkManager beanstalkManager = new EnterpriseBeanstalkManager();
+
+            Object configProps = serverInfo.getProperty(
+                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME);
+
+            if (configProps instanceof Properties) {
+                beanstalkManager.init((Properties) configProps);
+            } else {
+                Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
+                beanstalkManager.init(synapseProperties);
+            }
+            serverInfo.addProperty(
+                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME,
+                    beanstalkManager);
         }
     }
 

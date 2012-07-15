@@ -69,7 +69,9 @@ public class MediatorSerializerFinder {
         InvokeMediatorSerializer.class,
         MessageStoreMediatorSerializer.class,
         URLRewriteMediatorSerializer.class,
-        PayloadFactoryMediatorSerializer.class
+        PayloadFactoryMediatorSerializer.class,
+        BeanMediatorSerializer.class,
+        EJBMediatorSerializer.class
     };
 
     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();

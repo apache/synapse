@@ -19,8 +19,7 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -126,6 +125,38 @@ public class Value {
 
     }
 
+    public Object evaluateObjectValue(MessageContext synCtx) {
+        if (keyValue != null) {
+            return keyValue;
+        } else if (expression != null) {
+            return getObjectValue(synCtx);
+        } else {
+            handleException("Unable to resolve the value: " + toString());
+            return null;
+        }
+    }
+
+    private Object getObjectValue(MessageContext synCtx) {
+        try {
+            Object result = expression.selectSingleNode(synCtx);
+
+            if (result instanceof OMText) {
+                return ((OMText) result).getText();
+            } else if (result instanceof OMElement) {
+                return ((OMElement) result).getText();
+            } else if (result instanceof OMDocument) {
+                return ((OMDocument) result).getOMDocumentElement().toString();
+            } else if (result instanceof OMAttribute) {
+                return ((OMAttribute) result).getAttributeValue();
+            } else {
+                return result;
+            }
+        } catch (JaxenException e) {
+            handleException("Failed to evaluate the XPath expression: " + expression, e);
+        }
+        return null;
+    }
+
     /**
      * Get the name of the value attribute
      *
@@ -145,6 +176,10 @@ public class Value {
         throw new SynapseException(msg);
     }
 
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
 
     /**
      * checks whether key returned by #getKeyValue() is a string of an expression type.

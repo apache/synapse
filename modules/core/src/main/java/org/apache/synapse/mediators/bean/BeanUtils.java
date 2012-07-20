@@ -60,12 +60,7 @@ public class BeanUtils {
             if (args[i] == null || paramTypes[i].isAssignableFrom(args[i].getClass())) {
                 processedArgs[i] = args[i];
             } else if (SimpleTypeMapper.isSimpleType(paramTypes[i])) {
-                try {
-                    // Workaround for https://issues.apache.org/jira/browse/AXIS2-5212
-                    processedArgs[i] = SimpleTypeMapper.getSimpleTypeObject(paramTypes[i],
-                            AXIOMUtil.stringToOM("<a>" + args[i].toString() + "</a>"));
-                } catch (XMLStreamException ignored) {
-                }
+                processedArgs[i] = SimpleTypeMapper.getSimpleTypeObject(paramTypes[i], args[i].toString());
             } else {
                 throw new SynapseException("Incompatible argument found in argument " + i +
                         " for '" + method.getName() + "' method.");

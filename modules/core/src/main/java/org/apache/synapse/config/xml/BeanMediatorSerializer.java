@@ -63,6 +63,8 @@ public class BeanMediatorSerializer extends AbstractMediatorSerializer {
             case CREATE:
                 serializeCreateBeanCase(mediatorElem, mediator);
                 break;
+            case REMOVE:
+                break;
             case SET_PROPERTY:
                 serializeSetPropertyCase(mediatorElem, mediator);
                 break;

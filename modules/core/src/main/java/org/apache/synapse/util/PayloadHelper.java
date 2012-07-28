@@ -19,8 +19,6 @@
 
 package org.apache.synapse.util;
 
-import java.util.Iterator;
-
 import javax.activation.DataHandler;
 
 import javax.xml.namespace.QName;
@@ -114,10 +112,7 @@ public class PayloadHelper {
 				envelope.addChild(body);
 			}
 		} else {
-			for (Iterator it = body.getChildren(); it.hasNext();) {
-				OMNode node = (OMNode) it.next();
-				node.discard();
-			}
+		    body.removeChildren();
 		}
 		body.addChild(element);
 	}

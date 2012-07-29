@@ -24,10 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -36,7 +33,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class EndpointView implements EndpointViewMBean, MessageLevelMetricsCollector {
 
     private static final Log log = LogFactory.getLog(EndpointView.class);
-    private static final Long ONE = (long) 1;
+    private static final Long ONE = 1L;
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20,
+        new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "endpoint-jmx-stat-collector");
+            }
+        }
+    );
 
     /** The name of the endpoint */
     private String endpointName = null;
@@ -79,7 +83,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     private long lastResetTime = System.currentTimeMillis();
 
-    private ScheduledExecutorService scheduler;
+    private ScheduledFuture future;
 
     private Queue<Integer> suspensionCounts = new LinkedList<Integer>();
     private Queue<Integer> timeoutCounts = new LinkedList<Integer>();
@@ -93,13 +97,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         this.endpointName = endpointName;
         this.endpoint = endpoint;
 
-        scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                return new Thread(r, endpointName + "-endpoint-stat-collector");
-            }
-        });
-
-        scheduler.scheduleAtFixedRate(new Runnable() {
+        this.future = scheduler.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 if (suspensionCounts.size() == 15) {
                     suspensionCounts.remove();
@@ -115,12 +113,12 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     }
 
     public void destroy() {
-        scheduler.shutdownNow();
+        future.cancel(true);
     }
 
     // --- endpoint control ---
     /**
-     * Switch on a leaf endpoint, or all endpoints on a group - from maintenence
+     * Switch on a leaf endpoint, or all endpoints on a group - from maintenance
      * @throws Exception
      */
     public void switchOn() throws Exception {
@@ -138,7 +136,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     }
 
     /**
-     * Switch off a leaf endpoint, or all endpoints of a group - for maintenence
+     * Switch off a leaf endpoint, or all endpoints of a group - for maintenance
      *
      * @throws Exception
      */
@@ -173,7 +171,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     /**
      * Is this leaf level endpoint in timeout state? For a group, has all endpoints timed out?
-     * @return true if a leaf level endpoint has timedout, For a group, has all endpoints timed out?
+     * @return true if a leaf level endpoint has timed out, For a group, has all endpoints timed out?
      * @throws Exception
      */
     public boolean isTimedout() throws Exception {
@@ -466,7 +464,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     /**
      * Number of bytes received, receiving replies
-     * @return # of byted received, receiving replies
+     * @return # of bytes received, receiving replies
      */
     public long getBytesReceived() {
         if (endpoint.getChildren() != null) {

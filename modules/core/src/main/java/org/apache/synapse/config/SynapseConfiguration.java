@@ -739,10 +739,15 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         if (o == null || o instanceof Entry) {
             if (o == null) {
                 // this is not a local definition
-                Entry entry = new Entry(key);
-                entry.setType(Entry.REMOTE_ENTRY);
-                addEntry(key, entry);
-                return entry;
+                synchronized (this) {
+                    o = localRegistry.get(key);
+                    if (o == null) {
+                        Entry entry = new Entry(key);
+                        entry.setType(Entry.REMOTE_ENTRY);
+                        addEntry(key, entry);
+                        return entry;
+                    }
+                }
             }
             return (Entry) o;
         } else {

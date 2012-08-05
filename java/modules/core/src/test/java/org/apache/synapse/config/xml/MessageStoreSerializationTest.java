@@ -30,18 +30,14 @@ import java.util.Properties;
  */
 public class MessageStoreSerializationTest extends AbstractTestCase {
 
-    MessageStoreSerializer messageStoreSerializer;
-
     public MessageStoreSerializationTest() {
         super(MessageStoreSerializationTest.class.getName());
-        this.messageStoreSerializer = new MessageStoreSerializer();
     }
 
     /**
-     * Test case for InMemory Message Store Configuration Factory and serializer.
-     * @throws Exception in case of a error while creating or in the serialize process.
+     * Test case for InMemory Message Store Configuration Factory and serializer with no parameters.
      */
-    public void testMessageStoreSerialization() throws Exception {
+    public void testMessageStoreSerialization() {
         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
                 "http://ws.apache.org/ns/synapse\"" +
                 " name=\"foo\" >" +
@@ -53,7 +49,7 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
         OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,
                 messageStore);
 
-            assertTrue(compare(messageStoreElement, serializedElement));
+        assertTrue(compare(messageStoreElement, serializedElement));
 
     }
 

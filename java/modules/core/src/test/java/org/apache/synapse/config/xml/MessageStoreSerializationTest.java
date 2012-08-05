@@ -24,9 +24,11 @@ import org.apache.synapse.message.store.MessageStore;
 
 import java.util.Properties;
 
+/**
+ * Class <code>MessageStoreSerializationTest</code> implements the test cases for XML serialization
+ * scenarios for the synapse message store
+ */
 public class MessageStoreSerializationTest extends AbstractTestCase {
-
-    MessageStoreFactory messageStoreFactory;
 
     MessageStoreSerializer messageStoreSerializer;
 
@@ -35,6 +37,10 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
         this.messageStoreSerializer = new MessageStoreSerializer();
     }
 
+    /**
+     * Test case for InMemory Message Store Configuration Factory and serializer.
+     * @throws Exception in case of a error while creating or in the serialize process.
+     */
     public void testMessageStoreSerialization() throws Exception {
         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
                 "http://ws.apache.org/ns/synapse\"" +
@@ -47,12 +53,8 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
         OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,
                 messageStore);
 
-        try {
             assertTrue(compare(messageStoreElement, serializedElement));
-        } catch (Exception e) {
-            fail("Exception in test.");
-        }
-        
+
     }
 
    

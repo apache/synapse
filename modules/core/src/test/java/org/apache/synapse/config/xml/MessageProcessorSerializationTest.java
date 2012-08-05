@@ -52,8 +52,30 @@ public class MessageProcessorSerializationTest extends AbstractTestCase {
     }
 
     /**
+     * Test the Message Processor Creation and Serialization
+     * For a Basic Message processor with parameters.
+     */
+    public void testMesssageProcessorSerializationWithParameters() {
+        String messageProcessorConfig = "<syn:messageProcessor xmlns:syn=\"" +
+                "http://ws.apache.org/ns/synapse\"" +
+                " name=\"foo\" " +
+                "class=\"org.apache.synapse.config.xml.MessageProcessorSerializationTest$TestMessageProcessor\" messageStore=\"bar\">" +
+                "<syn:parameter name=\"testName1\">testValue1</syn:parameter>" +
+                "<syn:parameter name=\"testName2\">testValue2</syn:parameter>" +
+                "</syn:messageProcessor>";
+
+        OMElement messageProcessorElement = createOMElement(messageProcessorConfig);
+        MessageProcessor messageProcessor = MessageProcessorFactory.createMessageProcessor(messageProcessorElement);
+        OMElement serializedElement = MessageProcessorSerializer.serializeMessageProcessor(null,
+                messageProcessor);
+
+        assertTrue(compare(messageProcessorElement, serializedElement));
+    }
+
+    /**
      * This is a Test Message Processor implementation used only to test the XML Serialization
      */
+    @SuppressWarnings("unused")
     public static class TestMessageProcessor extends AbstractMessageProcessor {
 
 

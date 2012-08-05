@@ -53,6 +53,27 @@ public class MessageStoreSerializationTest extends AbstractTestCase {
 
     }
 
-   
+    /**
+     * Test case for InMemory Message Store configuration Factory and serializer with parameters
+     */
+    public void testMessageStoreSerializationWithParameters() {
+        String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
+                "http://ws.apache.org/ns/synapse\"" +
+                " name=\"foo\" >" +
+                "<syn:parameter name=\"testName1\">testValue1</syn:parameter>" +
+                "<syn:parameter name=\"testName2\">testValue2</syn:parameter>" +
+                "</syn:messageStore>";
+
+        OMElement messageStoreElement = createOMElement(messageStoreConfiguration);
+        MessageStore messageStore = MessageStoreFactory.createMessageStore(messageStoreElement,
+                new Properties());
+        OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,
+                messageStore);
+
+        assertTrue(compare(messageStoreElement, serializedElement));
+
+    }
+
+
 
 }

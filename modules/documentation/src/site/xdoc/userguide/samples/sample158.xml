@@ -23,7 +23,7 @@
         <title>Apache Synapse - Sample 158</title>
     </properties>
     <body>
-        <section name="Sample 156: Exposing a SOAP service over JSON">
+        <section name="Sample 158: Exposing a SOAP service over JSON">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="JSONProxy" transports="http https"&gt;

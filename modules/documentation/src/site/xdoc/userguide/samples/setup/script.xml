@@ -100,7 +100,7 @@
 &lt;messageFormatter contentType=&quot;application/json&quot;
     class=&quot;org.apache.axis2.json.JSONMessageFormatter&quot;/&gt;</div>
     			<p>
-                    If you are planning to run sample 440, you should also add the above two entries
+                    If you are planning to run <a href="../sample158.html">sample 158</a>, you should also add the above two entries
                     to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.
     			</p>
 			</subsection>

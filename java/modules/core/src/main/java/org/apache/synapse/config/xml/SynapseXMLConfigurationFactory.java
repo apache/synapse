@@ -109,7 +109,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 } else {
                     handleException("Invalid configuration element at the top level, one of \'sequence\', " +
                             "\'endpoint\', \'proxy\', \'eventSource\', \'localEntry\', \'priorityExecutor\' " +
-                            "or \'registry\' is expected");
+                            "or \'registry\' is expected. Found '" + elt.getQName() + "'.");
                 }
             }
         }

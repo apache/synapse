@@ -23,17 +23,15 @@
     <proxy name="JSONProxy" transports="http https">
         <target>
             <endpoint>
-                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
             </endpoint>
             <inSequence>
                 <log level="full"/>
                 <xslt key="in_transform"/>
-                <property name="messageType" scope="axis2" value="text/xml"/>
             </inSequence>
             <outSequence>
                 <log level="full"/>
                 <xslt key="out_transform"/>
-                <property name="messageType" scope="axis2" value="application/json"/>
                 <send/>
             </outSequence>
         </target>

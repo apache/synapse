@@ -23,6 +23,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.mediators.TemplateParameter;
 
 import javax.sound.midi.Sequence;
 import java.util.Collection;
@@ -37,19 +38,19 @@ import java.util.Stack;
  */
 public class TemplateMediator extends AbstractListMediator {
 
-    private Collection<String> paramNames;
+    private Collection<TemplateParameter> parameters;
 
     private String eipPatternName;
     private String fileName;
     /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
     private boolean initialized = false;
 
-    public void setParameters(Collection<String> paramNames) {
-        this.paramNames = paramNames;
+    public void setParameters(Collection<TemplateParameter> paramNames) {
+        this.parameters = paramNames;
     }
 
-    public Collection<String> getParameters() {
-        return paramNames;
+    public Collection<TemplateParameter> getParameters() {
+        return parameters;
     }
 
     public void setName(String name) {
@@ -64,7 +65,7 @@ public class TemplateMediator extends AbstractListMediator {
         SynapseLog synLog = getLog(synCtx);
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("Start : EIP Sequence " + "paramNames : " + paramNames);
+            synLog.traceOrDebug("Start : EIP Sequence " + "paramNames : " + parameters);
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
@@ -86,7 +87,7 @@ public class TemplateMediator extends AbstractListMediator {
      * @param synCtx  Synapse Message context
      */
     private void pushFuncContextTo(MessageContext synCtx) {
-        TemplateContext funcContext = new TemplateContext(eipPatternName, paramNames);
+        TemplateContext funcContext = new TemplateContext(eipPatternName, parameters);
         //process the raw parameters parsed in
         funcContext.setupParams(synCtx);
         //if a function stack has not already been created for this message flow create new one

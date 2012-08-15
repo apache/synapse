@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.TemplateParameter;
 import org.apache.synapse.mediators.template.TemplateMediator;
 
 import javax.xml.namespace.QName;
@@ -32,8 +33,8 @@ import java.util.Properties;
 /**
  * Factory class for Template configuration as follows
  * <template name="simple_func">
-	    <parameter name="p1"/>
-        <parameter name="p2"/>*
+	    <parameter name="p1" [default="value|expression"] [optional=(true|false)]/>
+        <parameter name="p2" [default="value|expression"] [optional=(true|false)]/>*
         <mediator/>+
     </template>
  */
@@ -43,20 +44,14 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName TEMPLATE_BODY_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
 
-    /**
-     * Element  QName Definitions
-     */
-    public static final QName PARAMETER_Q = new QName(
-            XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
-
-
     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
         TemplateMediator templateTemplateMediator = new TemplateMediator();
         OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
         if (nameAttr != null) {
             templateTemplateMediator.setName(nameAttr.getAttributeValue());
             processAuditStatus(templateTemplateMediator, elem);
-            initParameters(elem, templateTemplateMediator);
+            //set template parameters
+            templateTemplateMediator.setParameters(TemplateParameterFactory.getTemplateParameters(elem));
             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
             addChildren(templateBodyElem, templateTemplateMediator, properties);
         } else {
@@ -65,22 +60,6 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
             throw new SynapseException(msg);
         }
         return templateTemplateMediator;
-    }
-
-    private void initParameters(OMElement templateElem, TemplateMediator templateMediator) {
-        Iterator subElements = templateElem.getChildElements();
-        Collection<String> paramNames = new ArrayList<String>();
-        while (subElements.hasNext()) {
-            OMElement child = (OMElement) subElements.next();
-            if (child.getQName().equals(PARAMETER_Q)) {
-                OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
-                if (paramNameAttr != null) {
-                    paramNames.add(paramNameAttr.getAttributeValue());
-                }
-//                child.detach();
-            }
-        }
-        templateMediator.setParameters(paramNames);
     }
 
     public QName getTagQName() {

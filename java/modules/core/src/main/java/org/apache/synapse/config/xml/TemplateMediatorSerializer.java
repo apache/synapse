@@ -20,17 +20,17 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.TemplateParameter;
 import org.apache.synapse.mediators.template.TemplateMediator;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  *  Serializer class for Template to serialize into a  configuration as follows
  * <template name="simple_func">
-	    <parameter name="p1"/>
-        <parameter name="p2"/>*
+	    <parameter name="p1" [default="value|expression"] [optional=(true|false)]/>
+        <parameter name="p2" [default="value|expression"] [optional=(true|false)]/>*
         <mediator/>+
     </template>
  */
@@ -47,6 +47,7 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
         if (mediator.getName() != null) {
             templateElem.addAttribute(fac.createOMAttribute(
                     "name", nullNS, mediator.getName()));
+            //serialize parameters
             serializeParams(templateElem,mediator);
             serializeBody(templateElem, mediator.getList());
             saveTracingState(templateElem, mediator);
@@ -55,14 +56,16 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
         return templateElem;
     }
 
+     /**
+     * Serialize parameters for the template mediator specified
+     *
+     * @param templateElem the OMElement that specifies the template configuration
+     * @param mediator the TemplateMediator
+     */
     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
-        Collection<String> params = mediator.getParameters();
-        for (String param : params) {
-            if (param != null && !"".equals(param)) {
-                OMElement paramEl = fac.createOMElement("parameter", synNS);
-                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, param));
-                templateElem.addChild(paramEl);
-            }
+        Collection<TemplateParameter> params = mediator.getParameters();
+        if (params != null && params.size() > 0) {
+               TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
         }
     }
 

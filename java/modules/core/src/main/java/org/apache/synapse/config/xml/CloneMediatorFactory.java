@@ -73,7 +73,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      */
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
     	
-    	boolean asynchronousExe = true;
+    	boolean asynchronousExe = false;
         
     	CloneMediator mediator = new CloneMediator();
         processAuditStatus(mediator, elem);
@@ -94,8 +94,6 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
         if (synchronousExeAttr != null && synchronousExeAttr.getAttributeValue().equals("true")) {
         	asynchronousExe = false;
         }
-
-        mediator.setSequential(!asynchronousExe);
         
         Iterator targetElements = elem.getChildrenWithName(TARGET_Q);
         while (targetElements.hasNext()) {

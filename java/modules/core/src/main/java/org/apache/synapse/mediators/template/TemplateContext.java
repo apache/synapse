@@ -18,7 +18,10 @@
  */
 package org.apache.synapse.mediators.template;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.TemplateParameter;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.eip.EIPUtils;
 import org.jaxen.JaxenException;
@@ -30,6 +33,7 @@ import java.util.*;
  * a context will be populated with function parameters.
  */
 public class TemplateContext {
+    private static final Log log = LogFactory.getLog(TemplateContext.class);
     /**
      * refers to the function-template name this context is binded to
      */
@@ -37,31 +41,40 @@ public class TemplateContext {
     /**
      * refers to the parameter names of the function
      */
-    private Collection<String> parameters;
+    private Collection<TemplateParameter> parameters;
     /**
      * contains a map for parameterNames to evaluated values
      */
     private Map mappedValues;
 
-    TemplateContext(String name, Collection<String> parameters) {
+    TemplateContext(String name, Collection<TemplateParameter> parameters) {
         this.fName = name;
         this.parameters = parameters;
         mappedValues = new HashMap();
     }
 
     /**
-     * evaluate raw parameters passed from an invoke medaiator and store them in this context
+     * evaluate raw parameters passed from an invoke mediator and store them in this context
      * @param synCtxt Synapse MessageContext
      */
     public void setupParams(MessageContext synCtxt) {
-        Iterator<String> paramNames = parameters.iterator();
+        Iterator<TemplateParameter> paramNames = parameters.iterator();
         while (paramNames.hasNext()) {
-            String parameter = paramNames.next();
-            String mapping = EIPUtils.getTemplatePropertyMapping(fName, parameter);
+            TemplateParameter parameter = paramNames.next();
+            String mapping = EIPUtils.getTemplatePropertyMapping(fName, parameter.getName());
             Object propertyValue = synCtxt.getProperty(mapping);
-            Object paramValue = getEvaluatedParamValue(synCtxt, parameter, (Value) propertyValue);
+            //If property value is not provided assign default value
+            if (propertyValue == null && parameter.getDefaultValue() != null) {
+                propertyValue = parameter.getDefaultValue();
+            }
+            //If this parameter is a required one give an error
+            if (!parameter.isOptional() && propertyValue == null) {
+                String msg = parameter.getName() + " is a required parameter for " + fName + " template";
+                log.error(msg);
+            }
+            Object paramValue = getEvaluatedParamValue(synCtxt, parameter.getName(), (Value) propertyValue);
             if (paramValue != null) {
-                mappedValues.put(parameter, paramValue);
+                mappedValues.put(parameter.getName(), paramValue);
                 //remove temp property from the context
                 removeProperty(synCtxt, mapping);
             }

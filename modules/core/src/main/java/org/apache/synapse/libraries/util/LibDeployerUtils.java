@@ -56,6 +56,8 @@ public class LibDeployerUtils {
 
 
     public static Library createSynapseLibrary(String libPath) {
+        createDir(APP_UNZIP_DIR);
+
         String libFilePath = LibDeployerUtils.formatPath(libPath);
         //extract
         String extractPath = LibDeployerUtils.extractSynapseLib(libFilePath);

@@ -96,6 +96,25 @@
                             </descriptors>
                         </configuration>
                     </execution>
+                     <execution>
+                        <id>eip-library-assembly</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>synapse-eip-lib</finalName>
+                            <filters>
+                                <filter>
+                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
+                                </filter>
+                            </filters>
+                            <descriptors>
+                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml
+                                </descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -115,6 +134,7 @@
                                 <mkdir dir="target/test_repos/client/modules"/>
                                 <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
                                 <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+                                <copy file="target/synapse-eip-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -127,6 +147,7 @@
                         <configuration>
                             <tasks>
                                 <delete file="target/synapse-test-lib.zip"/>
+                                <delete file="target/synapse-eip-lib.zip"/>
                             </tasks>
                         </configuration>
                         <goals>

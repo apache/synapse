@@ -85,8 +85,8 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Missing expression of the IterateMediator which is required.");
         }
 
-        if (itrMed.getTarget() != null && !itrMed.getTarget().isAsynchronous()) {
-            itrElem.addAttribute("sequential", "true", nullNS);
+        if (itrMed.getTarget() != null && itrMed.getTarget().isAsynchronous()) {
+            itrElem.addAttribute("sequential", "false", nullNS);
         }
 
         itrElem.addChild(TargetSerializer.serializeTarget(itrMed.getTarget()));

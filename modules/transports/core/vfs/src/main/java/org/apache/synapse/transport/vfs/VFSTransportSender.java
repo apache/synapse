@@ -270,7 +270,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
             } else {
                 
                 log.warn("Couldn't get the lock for the file : "
-                        + responseFile.getName() + ", retry : " + tryNum
+                        + VFSUtils.maskURLPassword(responseFile.getName().getURI()) + ", retry : " + tryNum
                         + " scheduled after : " + vfsOutInfo.getReconnectTimeout());
                 try {
                     Thread.sleep(vfsOutInfo.getReconnectTimeout());

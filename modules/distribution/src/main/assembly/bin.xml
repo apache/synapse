@@ -179,7 +179,7 @@
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
                 <exclude>org.apache.synapse:synapse-patches:zip:jars</exclude>
-		        <exclude>org.apache.synapse:synapse-documentation:zip:docs</exclude>
+                <exclude>org.apache.synapse:synapse-documentation:zip:docs</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
@@ -188,20 +188,20 @@
                 <exclude>xerces:xercesImpl:jar</exclude>
                 <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->
                 <exclude>org.apache.xerces:xml-apis</exclude>
-	            <exclude>xalan:xalan:jar</exclude>
+                <exclude>xalan:xalan:jar</exclude>
                 <exclude>quickfixj:quickfixj-all:jar</exclude>
                 <exclude>org.snmp4j:snmp4j</exclude>
                 <exclude>org.snmp4j:snmp4j-agent</exclude>
             </excludes>
         </dependencySet>
-	<dependencySet>
-	    <useProjectArtifact>false</useProjectArtifact>
-	    <outputDirectory>synapse-${synapse.version}</outputDirectory>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>synapse-${synapse.version}</outputDirectory>
             <unpack>true</unpack>
             <includes>
                 <include>org.apache.synapse:synapse-documentation:zip:docs</include>
             </includes>
-	</dependencySet>
+        </dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>

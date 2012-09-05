@@ -71,11 +71,11 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-fix-transport</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-documentation</artifactId>
-	    <type>zip</type>
-	    <classifier>docs</classifier>
+            <type>zip</type>
+            <classifier>docs</classifier>
         </dependency>
 
         <!-- Wrapper jars -->

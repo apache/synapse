@@ -80,6 +80,9 @@
         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
         <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
     </deployer>
+    
+    <deployer extension=".jar" directory="servicejars"
+              class="org.apache.axis2.jaxws.framework.JAXWSDeployer"/>
 
     <!-- Following parameter will set the host name for the epr-->
     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->

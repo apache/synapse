@@ -154,6 +154,12 @@
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency-->
+        
+        <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-jaxws</artifactId>
+        </dependency>
     </dependencies>
 
     <repositories>

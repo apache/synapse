@@ -192,7 +192,29 @@
                 <exclude>quickfixj:quickfixj-all:jar</exclude>
                 <exclude>org.snmp4j:snmp4j</exclude>
                 <exclude>org.snmp4j:snmp4j-agent</exclude>
+                
+                <!-- Dependencies that are only used by the Axis2 sample server -->
+                <exclude>org.apache.axis2:axis2-jaxws:jar</exclude>
+                <exclude>org.apache.axis2:axis2-metadata:jar</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-annotation_1.0_spec:jar</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-jaxws_2.2_spec:jar</exclude>
+                <exclude>javax.xml.bind:jaxb-api:jar</exclude>
+                <exclude>com.sun.xml.bind:jaxb-impl:jar</exclude>
+                <exclude>com.sun.xml.bind:jaxb-xjc:jar</exclude>
             </excludes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/lib</outputDirectory>
+            <includes>
+                <include>org.apache.axis2:axis2-jaxws:jar</include>
+                <include>org.apache.axis2:axis2-metadata:jar</include>
+                <include>org.apache.geronimo.specs:geronimo-annotation_1.0_spec:jar</include>
+                <include>org.apache.geronimo.specs:geronimo-jaxws_2.2_spec:jar</include>
+                <include>javax.xml.bind:jaxb-api:jar</include>
+                <include>com.sun.xml.bind:jaxb-impl:jar</include>
+                <include>com.sun.xml.bind:jaxb-xjc:jar</include>
+            </includes>
         </dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>

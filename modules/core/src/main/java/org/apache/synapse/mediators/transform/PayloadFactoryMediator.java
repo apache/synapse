@@ -81,10 +81,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
         }
 
         // replace the existing payload with the new payload
-        for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {
-            itr.next();
-            itr.remove();
-        }
+        soapBody.removeChildren();
 
         for (Iterator itr = resultElement.getChildElements(); itr.hasNext();) {
             OMElement child = (OMElement) itr.next();

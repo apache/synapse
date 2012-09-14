@@ -18,13 +18,13 @@
   -->
 
 <serviceGroup>
-<service name="SimpleStockQuoteService" scope="application">
-	<messageReceivers>
-		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-only" 
-				class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />
-		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
-				class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
-		</messageReceivers>
-		<parameter locked="false" name="ServiceClass">samples.services.SimpleStockQuoteService</parameter>
-</service>
+    <service name="SimpleStockQuoteService" scope="application">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only" 
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
+        </messageReceivers>
+        <parameter locked="false" name="ServiceClass">samples.services.SimpleStockQuoteService</parameter>
+    </service>
 </serviceGroup>

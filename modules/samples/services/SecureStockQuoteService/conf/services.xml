@@ -21,6 +21,10 @@
 <service name="SecureStockQuoteService" scope="application">
 	<module ref="rampart"/>
 	
+    <schema> 
+        <mapping package="samples.services" namespace="http://services.samples"/> 
+    </schema>
+     
     <messageReceivers>
     <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />

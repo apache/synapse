@@ -46,8 +46,8 @@
 
 
     <sequence name="SimpleServiceSeq">
-        <property name="SECURE_SER_AMT" expression="//ns:getQuoteResponse/ns:return/ax21:last"
-                xmlns:ns="http://services.samples" xmlns:ax21="http://services.samples/xsd"/>
+        <property name="SECURE_SER_AMT" expression="//ns:getQuoteResponse/ns:return/ns:last"
+                xmlns:ns="http://services.samples"/>
         <log level="custom">
             <property name="SecureStockQuoteService-Amount" expression="get-property('SECURE_SER_AMT')"/>
         </log>
@@ -67,8 +67,8 @@
     </sequence>
 
     <sequence name="ClientOutSeq">
-        <property name="SIMPLE_SER_AMT" expression="//ns:getQuoteResponse/ns:return/ax21:last"
-                       xmlns:ns="http://services.samples" xmlns:ax21="http://services.samples/xsd"/>
+        <property name="SIMPLE_SER_AMT" expression="//ns:getQuoteResponse/ns:return/ns:last"
+                       xmlns:ns="http://services.samples"/>
         <log level="custom">
             <property name="SimpleStockQuoteService-Amount" expression="get-property('SIMPLE_SER_AMT')"/>
         </log>

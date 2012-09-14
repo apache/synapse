@@ -28,7 +28,7 @@
             var args = mc.getPayloadXML().toString().split(" ");
             mc.setPayloadXML(
             &lt;placeOrder xmlns="http://services.samples"&gt;
-            &lt;order xmlns="http://services.samples/xsd"&gt;
+            &lt;order&gt;
             &lt;price&gt;{args[0]}&lt;/price&gt;
             &lt;quantity&gt;{args[1]}&lt;/quantity&gt;
             &lt;symbol&gt;{args[2]}&lt;/symbol&gt;

@@ -53,9 +53,8 @@
             <header xmlns:urn="http://synapse.apache.org" name="urn:lastTradeTimestamp" value="foo"/>
             <enrich>
                 <source type="custom"
-                        xpath="//ns:getQuoteResponse/ns:return/ax21:lastTradeTimestamp"
-                        xmlns:ns="http://services.samples"
-                        xmlns:ax21="http://services.samples/xsd"/>
+                        xpath="//ns:getQuoteResponse/ns:return/ns:lastTradeTimestamp"
+                        xmlns:ns="http://services.samples"/>
                 <target xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                         xmlns:urn="http://synapse.apache.org"
                         xpath="/soapenv:Envelope/soapenv:Header/urn:lastTradeTimestamp"/>

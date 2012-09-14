@@ -16,25 +16,26 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package samples.services.wrapper;
+package samples.services;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import samples.services.GetQuote;
+import samples.services.GetQuoteResponse;
 
-@XmlRootElement(name="getQuote")
+@XmlRootElement(name="getQuoteResponse")
 @XmlType(name="")
-public class GetQuoteWrapper {
-    private GetQuote request;
+public class GetQuoteResponseWrapper {
+    // TODO: using _return as field name triggers a bug in Axis2!!!!
+    private GetQuoteResponse fReturn;
 
     @XmlElement(required=true)
-    public GetQuote getRequest() {
-        return request;
+    public GetQuoteResponse getReturn() {
+        return fReturn;
     }
 
-    public void setRequest(GetQuote request) {
-        this.request = request;
+    public void setReturn(GetQuoteResponse _return) {
+        this.fReturn = _return;
     }
 }

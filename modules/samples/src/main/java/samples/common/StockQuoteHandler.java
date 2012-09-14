@@ -181,7 +181,7 @@ public class StockQuoteHandler {
     public static String parseStandardQuoteResponse(OMElement result) throws Exception {
 
         AXIOMXPath xPath = new AXIOMXPath("//ns:last");
-        xPath.addNamespace("ns","http://services.samples/xsd");
+        xPath.addNamespace("ns","http://services.samples");
         OMElement last = (OMElement) xPath.selectSingleNode(result);
         if (last != null) {
             return last.getText();

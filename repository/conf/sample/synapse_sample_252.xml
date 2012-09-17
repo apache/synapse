@@ -77,7 +77,7 @@
                 <bytesMessage>application/octet-stream</bytesMessage>
             </rules>
         </parameter>
-        <parameter name="Wrapper">{http://services.samples/xsd}element</parameter>
+        <parameter name="Wrapper">{http://synapse.apache.org/userguide/samples/}element</parameter>
     </proxy>
 
     <proxy name="JMSTextProxy" transports="jms">
@@ -87,7 +87,7 @@
                 <textMessage>text/plain</textMessage>
             </rules>
         </parameter>
-        <parameter name="Wrapper">{http://services.samples/xsd}text</parameter>
+        <parameter name="Wrapper">{http://synapse.apache.org/userguide/samples/}text</parameter>
     </proxy>
 
     <proxy name="JMSPoxProxy" transports="jms">

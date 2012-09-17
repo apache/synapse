@@ -26,5 +26,8 @@
                              class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
         </messageReceivers>
         <parameter locked="false" name="ServiceClass">samples.services.MTOMSwASampleService</parameter>
+        <operation name="oneWayUploadUsingMTOM">
+            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+        </operation>
     </service>
 </serviceGroup>

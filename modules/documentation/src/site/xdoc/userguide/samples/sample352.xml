@@ -24,26 +24,26 @@
     </properties>
     <body>
         <section name="Sample 352: Accessing the Synapse MessageContext API Through Scripts">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;!-- change the MessageContext into a response and set a response payload --&gt;
-            &lt;script language="js"&gt;
+    <sequence name="main">
+        <in>
+            <!-- change the MessageContext into a response and set a response payload -->
+            <script language="js">
                 mc.setTo(mc.getReplyTo());
                 mc.setProperty("RESPONSE", "true");
                 mc.setPayloadXML(
-                &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
-                    &lt;ns:return&gt;
-                        &lt;ns:last&gt;99.9&lt;/ns:last&gt;
-                    &lt;/ns:return&gt;
+                &lt;ns:getQuoteResponse xmlns:ns="http://services.samples"&gt;
+                &lt;ns:return&gt;
+                &lt;ns:last&gt;99.9&lt;/ns:last&gt;
+                &lt;/ns:return&gt;
                 &lt;/ns:getQuoteResponse&gt;);
-            &lt;/script&gt;
-        &lt;/in&gt;
-        &lt;send/&gt;
-    &lt;/sequence&gt;
+            </script>
+        </in>
+        <send/>
+    </sequence>
 
-&lt;/definitions&gt;</div>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
                     Demonstrate how to access various methods on the Synapse MessageContext API

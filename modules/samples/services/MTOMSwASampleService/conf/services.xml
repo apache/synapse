@@ -18,13 +18,16 @@
   -->
 
 <serviceGroup>
-<service name="MTOMSwASampleService">
-	<messageReceivers>
-		<messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
-				class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
-		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
-				class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
-		</messageReceivers>
-		<parameter locked="false" name="ServiceClass">samples.services.MTOMSwASampleService</parameter>
-</service>
+    <service name="MTOMSwASampleService">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
+                             class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                             class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+        </messageReceivers>
+        <parameter locked="false" name="ServiceClass">samples.services.MTOMSwASampleService</parameter>
+        <operation name="oneWayUploadUsingMTOM">
+            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+        </operation>
+    </service>
 </serviceGroup>

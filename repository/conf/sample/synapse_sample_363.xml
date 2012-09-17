@@ -112,11 +112,9 @@
                 <statement>
                     <sql>update company set price=? where name =?</sql>
                     <parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:last/child::text()" type="DOUBLE"/>
+                               expression="//m0:return/m0:last/child::text()" type="DOUBLE"/>
                     <parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/>
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
                 </statement>
             </dbreport>
             <log level="custom">
@@ -131,8 +129,7 @@
                 <statement>
                     <sql>select * from company where name =?</sql>
                     <parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/>
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
                     <result name="stock_price" column="price"/>
                 </statement>
             </dblookup>

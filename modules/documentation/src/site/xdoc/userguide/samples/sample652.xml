@@ -24,71 +24,71 @@
     </properties>
     <body>
         <section name="Sample 652: Distributed transaction management">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-&lt;sequence name="myFaultHandler"&gt;
-    &lt;log level="custom"&gt;
-        &lt;property name="text" value="** Rollback Transaction**"/&gt;
-    &lt;/log&gt;
-    &lt;transaction action="rollback"/&gt;
-    &lt;send/&gt;
-&lt;/sequence&gt;
+<sequence name="myFaultHandler">
+    <log level="custom">
+        <property name="text" value="** Rollback Transaction**"/>
+    </log>
+    <transaction action="rollback"/>
+    <send/>
+</sequence>
 
-&lt;sequence name="main" onError="myFaultHandler"&gt;
-    &lt;in&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/in&gt;
+<sequence name="main" onError="myFaultHandler">
+    <in>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </in>
 
-    &lt;out&gt;
-        &lt;transaction action="new"/&gt;
+    <out>
+        <transaction action="new"/>
 
-        &lt;log level="custom"&gt;
-            &lt;property name="text" value="** Reporting to the Database esbdb**"/&gt;
-        &lt;/log&gt;
-        &lt;dbreport useTransaction="true" xmlns="http://ws.apache.org/ns/synapse"&gt;
-            &lt;connection&gt;
-                &lt;pool&gt;
-                    &lt;dsName&gt;java:jdbc/XADerbyDS&lt;/dsName&gt;
-                    &lt;icClass&gt;org.jnp.interfaces.NamingContextFactory&lt;/icClass&gt;
-                    &lt;url&gt;localhost:1099&lt;/url&gt;
-                    &lt;user&gt;synapse&lt;/user&gt;
-                    &lt;password&gt;synapse&lt;/password&gt;
-                &lt;/pool&gt;
-            &lt;/connection&gt;
-            &lt;statement&gt;
-                &lt;sql&gt;delete from company where name =?&lt;/sql&gt;
-                &lt;parameter expression="//m0:return/m1:symbol/child::text()"
-                           xmlns:m0="http://services.samples" xmlns:m1="http://services.samples/xsd"
-                           type="VARCHAR"/&gt;
-            &lt;/statement&gt;
-        &lt;/dbreport&gt;
+        <log level="custom">
+            <property name="text" value="** Reporting to the Database esbdb**"/>
+        </log>
+        <dbreport useTransaction="true" xmlns="http://ws.apache.org/ns/synapse">
+            <connection>
+                <pool>
+                    <dsName>java:jdbc/XADerbyDS</dsName>
+                    <icClass>org.jnp.interfaces.NamingContextFactory</icClass>
+                    <url>localhost:1099</url>
+                    <user>synapse</user>
+                    <password>synapse</password>
+                </pool>
+            </connection>
+            <statement>
+                <sql>delete from company where name =?</sql>
+                <parameter expression="//m0:return/m0:symbol/child::text()"
+                           xmlns:m0="http://services.samples"
+                           type="VARCHAR"/>
+            </statement>
+        </dbreport>
 
-        &lt;log level="custom"&gt;
-            &lt;property name="text" value="** Reporting to the Database esbdb1**"/&gt;
-        &lt;/log&gt;
-        &lt;dbreport useTransaction="true" xmlns="http://ws.apache.org/ns/synapse"&gt;
-            &lt;connection&gt;
-                &lt;pool&gt;
-                    &lt;dsName&gt;java:jdbc/XADerbyDS1&lt;/dsName&gt;
-                    &lt;icClass&gt;org.jnp.interfaces.NamingContextFactory&lt;/icClass&gt;
-                    &lt;url&gt;localhost:1099&lt;/url&gt;
-                    &lt;user&gt;synapse&lt;/user&gt;
-                    &lt;password&gt;synapse&lt;/password&gt;
-                &lt;/pool&gt;
-            &lt;/connection&gt;
-            &lt;statement&gt;
-                &lt;sql&gt; INSERT into company values ('IBM','c4',12.0)&lt;/sql&gt;
-            &lt;/statement&gt;
-        &lt;/dbreport&gt;
-        &lt;transaction action="commit"/&gt;
-        &lt;send/&gt;
-    &lt;/out&gt;
-&lt;/sequence&gt;
-&lt;/definitions&gt;</div>
+        <log level="custom">
+            <property name="text" value="** Reporting to the Database esbdb1**"/>
+        </log>
+        <dbreport useTransaction="true" xmlns="http://ws.apache.org/ns/synapse">
+            <connection>
+                <pool>
+                    <dsName>java:jdbc/XADerbyDS1</dsName>
+                    <icClass>org.jnp.interfaces.NamingContextFactory</icClass>
+                    <url>localhost:1099</url>
+                    <user>synapse</user>
+                    <password>synapse</password>
+                </pool>
+            </connection>
+            <statement>
+                <sql> INSERT into company values ('IBM','c4',12.0)</sql>
+            </statement>
+        </dbreport>
+        <transaction action="commit"/>
+        <send/>
+    </out>
+</sequence>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
 					Demonstrate the use of the transaction mediator in a distributed transaction

@@ -172,7 +172,7 @@
         &lt;/wsrm:SequenceAcknowledgement&gt;
     &lt;/soapenv:Header&gt;
     &lt;soapenv:Body&gt;
-        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples/xsd&quot;&gt;
+        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
 ...</div>
                 <p>
                     Now both Synapse and the server are done with the actual message exchange. Then

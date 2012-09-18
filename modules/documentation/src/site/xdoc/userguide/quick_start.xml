@@ -254,51 +254,46 @@ Transfer-Encoding: chunked
                     as "DEBUG" instead of INFO, you will see even more information as follows after
                     a restart and on replay of the above scenario.
                 </p>
-                <div class="consoleOutput">2010-11-26 01:39:42,958 [-] [HttpServerWorker-1] DEBUG SynapseMessageReceiver Synapse received a new message for message mediation...
-2010-11-26 01:39:42,959 [-] [HttpServerWorker-1] DEBUG SynapseMessageReceiver Received To: http://localhost:9000/services/SimpleStockQuoteService
-2010-11-26 01:39:42,959 [-] [HttpServerWorker-1] DEBUG SynapseMessageReceiver SOAPAction: urn:getQuote
-2010-11-26 01:39:42,959 [-] [HttpServerWorker-1] DEBUG SynapseMessageReceiver WSA-Action: urn:getQuote
-2010-11-26 01:39:42,960 [-] [HttpServerWorker-1] DEBUG Axis2SynapseEnvironment Injecting MessageContext
-2010-11-26 01:39:42,960 [-] [HttpServerWorker-1] DEBUG Axis2SynapseEnvironment Using Main Sequence for injected message
-2010-11-26 01:39:42,961 [-] [HttpServerWorker-1] DEBUG SequenceMediator Start : Sequence &lt;main&gt;
-2010-11-26 01:39:42,961 [-] [HttpServerWorker-1] DEBUG SequenceMediator Sequence &lt;SequenceMediator&gt; :: mediate()
-2010-11-26 01:39:42,961 [-] [HttpServerWorker-1] DEBUG LogMediator Start : Log mediator
-2010-11-26 01:39:42,989 [-] [HttpServerWorker-1]  INFO LogMediator To: http://localhost:9000/services/SimpleStockQuoteService, WSAction: urn:getQuote, SOAPAction: urn:getQuote, ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:881AF81981B97048961290715782743, Direction: request, Envelope: &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Header xmlns:wsa="http://www.w3.org/2005/08/addressing"&gt;&lt;wsa:To&gt;http://localhost:9000/services/SimpleStockQuoteService&lt;/wsa:To&gt;&lt;wsa:MessageID&gt;urn:uuid:881AF81981B97048961290715782743&lt;/wsa:MessageID&gt;&lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;&lt;/soapenv:Header&gt;&lt;soapenv:Body&gt;&lt;m0:getQuote xmlns:m0="http://services.samples"&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;&lt;/m0:getQuote&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-2010-11-26 01:39:42,990 [-] [HttpServerWorker-1] DEBUG LogMediator End : Log mediator
-2010-11-26 01:39:42,990 [-] [HttpServerWorker-1] DEBUG SendMediator Start : Send mediator
-2010-11-26 01:39:42,990 [-] [HttpServerWorker-1] DEBUG SendMediator Sending request message using implicit message properties..
+                <div class="consoleOutput"><![CDATA[2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG SynapseMessageReceiver Synapse received a new message for message mediation...
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG SynapseMessageReceiver Received To: http://localhost:9000/services/SimpleStockQuoteService
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG SynapseMessageReceiver SOAPAction: urn:getQuote
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG SynapseMessageReceiver WSA-Action: urn:getQuote
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG Axis2SynapseEnvironment Injecting MessageContext
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG Axis2SynapseEnvironment Using Main Sequence for injected message
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG SequenceMediator Start : Sequence <main>
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG SequenceMediator Sequence <SequenceMediator> :: mediate()
+2012-09-18 09:46:57,909 [-] [HttpServerWorker-2] DEBUG LogMediator Start : Log mediator
+2012-09-18 09:46:57,910 [-] [HttpServerWorker-2]  INFO LogMediator To: http://localhost:9000/services/SimpleStockQuoteService, WSAction: urn:getQuote, SOAPAction: urn:getQuote, ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:754cc296-ff58-4875-a999-3a33ec94c8a1, Direction: request, Envelope: <?xml version='1.0' encoding='utf-8'?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header xmlns:wsa="http://www.w3.org/2005/08/addressing"><wsa:To>http://localhost:9000/services/SimpleStockQuoteService</wsa:To><wsa:MessageID>urn:uuid:754cc296-ff58-4875-a999-3a33ec94c8a1</wsa:MessageID><wsa:Action>urn:getQuote</wsa:Action></soapenv:Header><soapenv:Body><m0:getQuote xmlns:m0="http://services.samples"><m0:request><m0:symbol>IBM</m0:symbol></m0:request></m0:getQuote></soapenv:Body></soapenv:Envelope>
+2012-09-18 09:46:57,910 [-] [HttpServerWorker-2] DEBUG LogMediator End : Log mediator
+2012-09-18 09:46:57,910 [-] [HttpServerWorker-2] DEBUG SendMediator Start : Send mediator
+2012-09-18 09:46:57,910 [-] [HttpServerWorker-2] DEBUG SendMediator Sending request message using implicit message properties..
 Sending To: http://localhost:9000/services/SimpleStockQuoteService
 SOAPAction: urn:getQuote
-2010-11-26 01:39:42,993 [-] [HttpServerWorker-1] DEBUG Axis2FlexibleMEPClient Sending [add = false] [sec = false] [rm = false] [to=Address: http://localhost:9000/services/SimpleStockQuoteService]
-2010-11-26 01:39:42,997 [-] [HttpServerWorker-1] DEBUG Axis2FlexibleMEPClient Message [Original Request Message ID : urn:uuid:881AF81981B97048961290715782743] [New Cloned Request Message ID : urn:uuid:5e919190-98a9-4441-8bb0-d09271c2758a]
-2010-11-26 01:39:43,003 [-] [HttpServerWorker-1] DEBUG SynapsePropertiesLoader Retrieving synapse properties from the cache
-2010-11-26 01:39:43,003 [-] [HttpServerWorker-1] DEBUG MiscellaneousUtil The name with 'synapse.global_timeout_interval' cannot be found. Using default value : 86400000
-2010-11-26 01:39:43,004 [-] [HttpServerWorker-1]  INFO TimeoutHandler This engine will expire all callbacks after : 86400 seconds, irrespective of the timeout action, after the specified or optional timeout
-2010-11-26 01:39:43,004 [-] [HttpServerWorker-1] DEBUG SynapsePropertiesLoader Retrieving synapse properties from the cache
-2010-11-26 01:39:43,004 [-] [HttpServerWorker-1] DEBUG MiscellaneousUtil The name with 'synapse.timeout_handler_interval' cannot be found. Using default value : 15000
-2010-11-26 01:39:43,039 [-] [HttpServerWorker-1] DEBUG SynapseCallbackReceiver Callback added. Total callbacks waiting for : 1
-2010-11-26 01:39:43,144 [-] [HttpServerWorker-1] DEBUG SendMediator End : Send mediator
-2010-11-26 01:39:43,145 [-] [HttpServerWorker-1] DEBUG SequenceMediator End : Sequence &lt;main&gt;
-2010-11-26 01:39:43,271 [-] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Callback removed for request message id : urn:uuid:5e919190-98a9-4441-8bb0-d09271c2758a. Pending callbacks count : 0
-2010-11-26 01:39:43,271 [-] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Synapse received an asynchronous response message
-2010-11-26 01:39:43,271 [-] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Received To: null
-2010-11-26 01:39:43,271 [-] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver SOAPAction:
-2010-11-26 01:39:43,271 [-] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver WSA-Action:
-2010-11-26 01:39:43,272 [-] [HttpClientWorker-1] DEBUG SynapseCallbackReceiver Body :
-&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;ns:getQuoteResponse xmlns:ns="http://services.samples"&gt;&lt;ns:return xmlns:ax21="http://services.samples/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ax21:GetQuoteResponse"&gt;&lt;ax21:change&gt;-2.533440547346707&lt;/ax21:change&gt;&lt;ax21:earnings&gt;12.865664096815566&lt;/ax21:earnings&gt;&lt;ax21:high&gt;-62.37116432061533&lt;/ax21:high&gt;&lt;ax21:last&gt;63.140427676860845&lt;/ax21:last&gt;&lt;ax21:lastTradeTimestamp&gt;Fri Nov 26 01:39:43 IST 2010&lt;/ax21:lastTradeTimestamp&gt;&lt;ax21:low&gt;65.32586424659065&lt;/ax21:low&gt;&lt;ax21:marketCap&gt;3.6215661345786005E7&lt;/ax21:marketCap&gt;&lt;ax21:name&gt;IBM Company&lt;/ax21:name&gt;&lt;ax21:open&gt;64.94029146457328&lt;/ax21:open&gt;&lt;ax21:peRatio&gt;23.84144924463005&lt;/ax21:peRatio&gt;&lt;ax21:percentageChange&gt;-3.6037604984655096&lt;/ax21:percentageChange&gt;&lt;ax21:prevClose&gt;70.29991444840613&lt;/ax21:prevClose&gt;&lt;ax21:symbol&gt;IBM&lt;/ax21:symbol&gt;&lt;ax21:volume&gt;9723&lt;/ax21:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-2010-11-26 01:39:43,274 [-] [HttpClientWorker-1] DEBUG Axis2SynapseEnvironment Injecting MessageContext
-2010-11-26 01:39:43,274 [-] [HttpClientWorker-1] DEBUG Axis2SynapseEnvironment Using Main Sequence for injected message
-2010-11-26 01:39:43,274 [-] [HttpClientWorker-1] DEBUG SequenceMediator Start : Sequence &lt;main&gt;
-2010-11-26 01:39:43,275 [-] [HttpClientWorker-1] DEBUG SequenceMediator Sequence &lt;SequenceMediator&gt; :: mediate()
-2010-11-26 01:39:43,275 [-] [HttpClientWorker-1] DEBUG LogMediator Start : Log mediator
-2010-11-26 01:39:43,275 [-] [HttpClientWorker-1]  INFO LogMediator To: http://www.w3.org/2005/08/addressing/anonymous, WSAction: , SOAPAction: , ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:5e919190-98a9-4441-8bb0-d09271c2758a, Direction: response, Envelope: &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;ns:getQuoteResponse xmlns:ns="http://services.samples"&gt;&lt;ns:return xmlns:ax21="http://services.samples/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ax21:GetQuoteResponse"&gt;&lt;ax21:change&gt;-2.533440547346707&lt;/ax21:change&gt;&lt;ax21:earnings&gt;12.865664096815566&lt;/ax21:earnings&gt;&lt;ax21:high&gt;-62.37116432061533&lt;/ax21:high&gt;&lt;ax21:last&gt;63.140427676860845&lt;/ax21:last&gt;&lt;ax21:lastTradeTimestamp&gt;Fri Nov 26 01:39:43 IST 2010&lt;/ax21:lastTradeTimestamp&gt;&lt;ax21:low&gt;65.32586424659065&lt;/ax21:low&gt;&lt;ax21:marketCap&gt;3.6215661345786005E7&lt;/ax21:marketCap&gt;&lt;ax21:name&gt;IBM Company&lt;/ax21:name&gt;&lt;ax21:open&gt;64.94029146457328&lt;/ax21:open&gt;&lt;ax21:peRatio&gt;23.84144924463005&lt;/ax21:peRatio&gt;&lt;ax21:percentageChange&gt;-3.6037604984655096&lt;/ax21:percentageChange&gt;&lt;ax21:prevClose&gt;70.29991444840613&lt;/ax21:prevClose&gt;&lt;ax21:symbol&gt;IBM&lt;/ax21:symbol&gt;&lt;ax21:volume&gt;9723&lt;/ax21:volume&gt;&lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-2010-11-26 01:39:43,275 [-] [HttpClientWorker-1] DEBUG LogMediator End : Log mediator
-2010-11-26 01:39:43,275 [-] [HttpClientWorker-1] DEBUG SendMediator Start : Send mediator
-2010-11-26 01:39:43,275 [-] [HttpClientWorker-1] DEBUG SendMediator Sending response message using implicit message properties..
+2012-09-18 09:46:57,910 [-] [HttpServerWorker-2] DEBUG Axis2FlexibleMEPClient Sending [add = false] [sec = false] [rm = false] [to=Address: http://localhost:9000/services/SimpleStockQuoteService]
+2012-09-18 09:46:57,910 [-] [HttpServerWorker-2] DEBUG Axis2FlexibleMEPClient Message [Original Request Message ID : urn:uuid:754cc296-ff58-4875-a999-3a33ec94c8a1] [New Cloned Request Message ID : urn:uuid:835c68a7-0645-496d-9acc-1d84a03ccb09]
+2012-09-18 09:46:57,911 [-] [HttpServerWorker-2] DEBUG SynapseCallbackReceiver Callback added. Total callbacks waiting for : 1
+2012-09-18 09:46:57,912 [-] [HttpServerWorker-2] DEBUG SendMediator End : Send mediator
+2012-09-18 09:46:57,912 [-] [HttpServerWorker-2] DEBUG SequenceMediator End : Sequence <main>
+2012-09-18 09:46:58,035 [-] [HttpClientWorker-2] DEBUG SynapseCallbackReceiver Callback removed for request message id : urn:uuid:835c68a7-0645-496d-9acc-1d84a03ccb09. Pending callbacks count : 0
+2012-09-18 09:46:58,035 [-] [HttpClientWorker-2] DEBUG SynapseCallbackReceiver Synapse received an asynchronous response message
+2012-09-18 09:46:58,035 [-] [HttpClientWorker-2] DEBUG SynapseCallbackReceiver Received To: null
+2012-09-18 09:46:58,035 [-] [HttpClientWorker-2] DEBUG SynapseCallbackReceiver SOAPAction: 
+2012-09-18 09:46:58,035 [-] [HttpClientWorker-2] DEBUG SynapseCallbackReceiver WSA-Action: 
+2012-09-18 09:46:58,036 [-] [HttpClientWorker-2] DEBUG SynapseCallbackReceiver Body : 
+<?xml version='1.0' encoding='utf-8'?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><ns:getQuoteResponse xmlns:ns="http://services.samples"><ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns:GetQuoteResponse"><ns:change>4.158253518011668</ns:change><ns:earnings>13.000214652478554</ns:earnings><ns:high>176.07121446241788</ns:high><ns:last>171.44223855674258</ns:last><ns:lastTradeTimestamp>Tue Sep 18 09:46:57 CEST 2012</ns:lastTradeTimestamp><ns:low>-169.3791832231285</ns:low><ns:marketCap>3.844340450887613E7</ns:marketCap><ns:name>IBM Company</ns:name><ns:open>-167.9098655007073</ns:open><ns:peRatio>-17.815829214870217</ns:peRatio><ns:percentageChange>-2.4400099237243</ns:percentageChange><ns:prevClose>-170.41953303471544</ns:prevClose><ns:symbol>IBM</ns:symbol><ns:volume>16090</ns:volume></ns:return></ns:getQuoteResponse></soapenv:Body></soapenv:Envelope>
+2012-09-18 09:46:58,036 [-] [HttpClientWorker-2] DEBUG Axis2SynapseEnvironment Injecting MessageContext
+2012-09-18 09:46:58,036 [-] [HttpClientWorker-2] DEBUG Axis2SynapseEnvironment Using Main Sequence for injected message
+2012-09-18 09:46:58,036 [-] [HttpClientWorker-2] DEBUG SequenceMediator Start : Sequence <main>
+2012-09-18 09:46:58,036 [-] [HttpClientWorker-2] DEBUG SequenceMediator Sequence <SequenceMediator> :: mediate()
+2012-09-18 09:46:58,036 [-] [HttpClientWorker-2] DEBUG LogMediator Start : Log mediator
+2012-09-18 09:46:58,037 [-] [HttpClientWorker-2]  INFO LogMediator To: http://www.w3.org/2005/08/addressing/anonymous, WSAction: , SOAPAction: , ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:835c68a7-0645-496d-9acc-1d84a03ccb09, Direction: response, Envelope: <?xml version='1.0' encoding='utf-8'?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><ns:getQuoteResponse xmlns:ns="http://services.samples"><ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns:GetQuoteResponse"><ns:change>4.158253518011668</ns:change><ns:earnings>13.000214652478554</ns:earnings><ns:high>176.07121446241788</ns:high><ns:last>171.44223855674258</ns:last><ns:lastTradeTimestamp>Tue Sep 18 09:46:57 CEST 2012</ns:lastTradeTimestamp><ns:low>-169.3791832231285</ns:low><ns:marketCap>3.844340450887613E7</ns:marketCap><ns:name>IBM Company</ns:name><ns:open>-167.9098655007073</ns:open><ns:peRatio>-17.815829214870217</ns:peRatio><ns:percentageChange>-2.4400099237243</ns:percentageChange><ns:prevClose>-170.41953303471544</ns:prevClose><ns:symbol>IBM</ns:symbol><ns:volume>16090</ns:volume></ns:return></ns:getQuoteResponse></soapenv:Body></soapenv:Envelope>
+2012-09-18 09:46:58,037 [-] [HttpClientWorker-2] DEBUG LogMediator End : Log mediator
+2012-09-18 09:46:58,037 [-] [HttpClientWorker-2] DEBUG SendMediator Start : Send mediator
+2012-09-18 09:46:58,037 [-] [HttpClientWorker-2] DEBUG SendMediator Sending response message using implicit message properties..
 Sending To: http://www.w3.org/2005/08/addressing/anonymous
-SOAPAction:
-2010-11-26 01:39:43,282 [-] [HttpClientWorker-1] DEBUG SendMediator End : Send mediator
-2010-11-26 01:39:43,282 [-] [HttpClientWorker-1] DEBUG SequenceMediator End : Sequence &lt;main&gt;</div>
+SOAPAction: 
+2012-09-18 09:46:58,038 [-] [HttpClientWorker-2] DEBUG SendMediator End : Send mediator
+2012-09-18 09:46:58,038 [-] [HttpClientWorker-2] DEBUG SequenceMediator End : Sequence <main>]]></div>
                 <p>
                     And with that you have successfully completed the first part of this guide. Now let's
                     look at the next scenario, service mediation with proxy services.

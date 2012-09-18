@@ -260,6 +260,20 @@
                     </ul>
                 </p>
             </subsection>
+            <subsection name="Synapse EIP Library">
+                <p>
+                    <ul>
+                        <li><a href="samples/sample850.html">Sample 850: Introduction to Synapse Callout Block function template</a></li>
+                        <li><a href="samples/sample851.html">Sample 851: Introduction to Synapse Splitter and Aggregator eip function templates</a></li>
+                        <li><a href="samples/sample852.html">Sample 852: Introduction to Synapse Splitter-Agrregator combined function template</a></li>
+                        <li><a href="samples/sample853.html">Sample 853: Introduction to Synapse Scatter-Gather eip function template</a></li>
+<li><a href="samples/sample854.html">Sample 854: Introduction to Synapse Wire Tap eip function template</a></li>
+<li><a href="samples/sample855.html">Sample 855: Introduction to Synapse Content Based Router eip function template</a></li>
+<li><a href="samples/sample856.html">Sample 856: Introduction to Synapse Dynamic Router eip function template</a></li>
+<li><a href="samples/sample857.html">Sample 857: Introduction to Synapse Recipient List eip function template</a></li>
+                    </ul>
+                </p>
+            </subsection>
         </section>
     </body>
 </document>

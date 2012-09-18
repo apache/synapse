@@ -43,6 +43,7 @@
             <item name="Mediators Catalog" href="userguide/mediators.html"/>
             <item name="Transports Catalog" href="userguide/transports.html"/>
             <item name="Extending Synapse" href="userguide/extending.html"/>
+            <item name="Synapse Template Libraries" href="userguide/template_library.html"/>
             <item name="Upgrading" href="userguide/upgrading.html"/>
             <item name="Deployment" href="userguide/deployment.html"/>
             <item name="Javadocs" href="apidocs/"/>

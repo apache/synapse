@@ -44,6 +44,8 @@ import org.apache.rampart.RampartMessageData;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
 
+import samples.common.StockQuoteHandler;
+
 import javax.xml.namespace.QName;
 import java.net.URL;
 import java.util.HashMap;

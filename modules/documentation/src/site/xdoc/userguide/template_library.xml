@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Synapse Template Libraries</title>
+    </properties>
+    <body>
+        <section name="Synapse Template Libraries">
+            <p>
+                Synapse template libraries are a mechanism to group synapse templates and automatically
+                expose it as a self contained set of function modules. It can be considered as a container
+                consisting a set of templates grouped in a particular order. Currently a synapse template
+                library is shipped as a ".zip" file and should be deployed inside
+                {$SYNAPSE_HOME}/repository/conf/synapse-libs .
+                If a given template container is successfully deployed, all
+                templates within the library will be accessible to any Synapse user.
+            </p>
+            <p>Following is a sample skeleton structure of a template library</p>
+            <div class="xmlConf">|-- artifacts.xml
+|-- com
+| `-- synapse
+| `-- sample
+| `-- SynapseLibTestMediator.class
+|-- lib
+| `-- test-mediator-1.0.0.jar
+|-- template_dir-1
+| |-- artifact.xml
+| |-- templ1_ns1.xml
+| `-- templ2_ns1.xml
+`-- template_dir-2
+  |-- artifact.xml
+  |-- templ1_ns2.xml
+  `-- templ2_ns2.xml</div>
+            <p>Following are these components at an overview.</p>
+            <p>
+                <ul>
+                    <li>artifacts.xml
+                        <br/>
+                        This contains synapse library name , package name information and template groupings.
+            <div class="xmlConf">&lt;artifacts&gt;
+    &lt;artifact name="synapse.lib.name" package="synapse.lib.package.name"&gt;
+        &lt;dependency artifact="template.group.name"/&gt;*
+            &lt;description&gt;sample synapse library&lt;/description&gt;?
+    &lt;/artifact&gt;
+&lt;/artifacts&gt;</div></li>
+                    <li>artifact.xml
+                        <br/>
+                        This contains information about each individual template group.
+                        <br/>
+                        ie: - names of the templates in the group , corresponding configuration file ,etc.
+            <div class="xmlConf">&lt;artifact name="template.group.name" type="synapse/template"&gt;
+    &lt;subArtifacts&gt;
+        &lt;artifact name="template.name"&gt;
+            &lt;file&gt;template_file.xml&lt;/file&gt;
+            &lt;description&gt;a sample synapse library function&lt;/description&gt;?
+        &lt;/artifact&gt;*
+    &lt;/subArtifacts&gt;
+&lt;/artifact&gt;</div>
+                    </li>
+                    <li>template_file.xml
+                        <br/>
+                        This contains the implementation of each individual template configuration
+                    </li>
+                    <li>./lib
+                       <br/>
+                       This is the directory to add any classes for class loading or can contain the .class files from
+                       the root
+                       level.
+                   </li>
+               </ul>
+            </p>
+            <p>Also utilizing a synapse library is a three step process.</p>
+            <p>
+                <ul>
+                    <li>Create and deploy the library</li>
+                    <li>Importing the library into synapse
+                        Users should deploy a import_lib_name.xml into
+                        {$SYNAPSE_HOME}/repository/conf/synapse-config/imports
+            <div class="xmlConf">&lt;import xmlns="http://ws.apache.org/ns/synapse" name="SampleLibrary" package="synapse.lib"/&gt;</div>
+                    </li>
+                    <li>Execute functions of library using a template invoker. Target template is a
+                        combination of the package of synapse library and the target template name
+                        target == {synapse_lib_package}.{template name}
+
+                        <div class="xmlConf">&lt;call-template target="synapse.lib.pkg.name.template_name"&gt;
+    &lt;with-param name="..." value="..."/&gt;*
+&lt;/call-template&gt;</div>
+                    </li>
+                </ul>
+            </p>
+        </section>
+        <section name="Synapse Enterprise Integration Patterns library">
+            <p>Synapse Enterprise Integration Patterns library is a container consisting a set of
+                templates grouped in a particular order by implementing commonly used
+                <a href="http://www.eaipatterns.com">Enterprise
+                    Integration Patterns
+                </a>
+                from the set of patterns introduced by Gregor Hohpe and Bobby Woolf.
+                Users can design their solutions using these well-known patterns and then simply configure
+                and use these same patterns in Apache Synapse by calling up the function as required.
+                So this will greatly reduce the effort required when building integrations.
+            </p>
+            <p>Following lists all the built-in patterns of Synapse EIP library currently supports and
+                describes their usage, functionality and configuration syntax.
+                This excludes all generic EIP patterns supported by synapse out of the box.
+            </p>
+            <p>
+                <ul>
+                    <li>
+                        <a href="#CalloutBlock">Callout Block</a>
+                    </li>
+                    <li>
+                        <a href="#Splitter">Splitter</a>
+                    </li>
+                    <li>
+                        <a href="#Aggregator">Aggregator</a>
+                    </li>
+                    <li>
+                        <a href="#SplitterAggregator">Splitter-Aggregator</a>
+                    </li>
+                    <li>
+                        <a href="#ScatterGather">Scatter-Gather</a>
+                    </li>
+                    <li>
+                        <a href="#WireTap">Wire Tap</a>
+                    </li>
+                    <li>
+                        <a href="#ContentBasedRouter">Content-Based Router</a>
+                    </li>
+                    <li>
+                        <a href="#DynamicRouter">Dynamic Router</a>
+                    </li>
+                    <li>
+                        <a href="#RecipientList">Recipient List</a>
+                    </li>
+                </ul>
+            </p>
+            <subsection name="Callout Block" id="CalloutBlock">
+                <p>
+                    This pattern is pretty much identical to the
+                    <a href="http://www.eaipatterns.com/RoutingTable.html">Routing slip pattern</a>
+                    and this blocks
+                    external service invocation during mediation. And useful in scenarios such as service chaining.
+                    As default values are assigned to source and target xpaths,
+                    one can simply utilize this pattern by just defining serviceURL.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.callout_block</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>service_URL</b>
+                    - URL of the service
+                    <br/>
+                    <b>[action]</b>
+                    - SOAP action(Optional)
+                    <br/>
+                    <b>[source_xpath | source_key]</b>
+                    - Payload of the message( either Xpath or key and Optional)
+                    <br/>
+                    <b>[target_xpath | target_key]</b>
+                    - A node to attach the response element ( either Xpath or key and optional)
+                    <br/>
+                    <br/>
+                    Related Sample - <a href="samples/sample850.html">Sample 850</a>
+                </p>
+            </subsection>
+            <subsection name="Splitter" id="Splitter">
+                <p>
+                    The
+                    <a href="http://www.eaipatterns.com/Sequencer.html">Splitter pattern</a>
+                    breaks out the composite message into a series of individual messages by
+                    finding matching elements for the XPath expression specified and then redirected to the given
+                    endpoint.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.splitter</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>iterate_exp</b>
+                    - Xpath expression from which element you want to split the message.
+                    <br/>
+                    <b>[attach_path]</b>
+                    - Xpath expression to specify which elements needs to be attached to form new messages.( Optional)
+                    <br/>
+                    <b>endpoint_url</b>
+                    - Endpoint which newly created messages are redirected to.
+                    <br/>
+                    <b>[attach_path_enabled]</b>
+                    - Boolean value to enable attach path. Optional and by default this is false.
+                    <br/>
+                     <br/>
+                    Related Sample - <a href="samples/sample851.html">Sample 851</a>
+                </p>
+            </subsection>
+
+            <subsection name="Aggregator" id="Aggregator">
+                <p>
+                    The
+                    <a href="http://www.eaipatterns.com/Aggregator.html">Aggregator pattern</a>
+                    builds a single message distilled from the individual messages.
+                    And messages will be merged by using the XPath expression specified for aggregator_exp.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.aggregator</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>aggregator_exp</b>
+                    - An XPath expression specifying based on which elements to aggregate.
+                    <br/>
+                    <b>[sequence_ref]</b>
+                    - target sequence which message should be mediated after aggregation. (Optional and if this is not
+                    specified aggregator will send the aggregated message to the client).
+                    <br/>
+                    <b>[oncomplete_seq_enabled]</b>
+                    - Boolean value to enable target sequence. (Optional and by default this is false)
+                    <br/>
+                     <br/>
+                    Related Sample - <a href="samples/sample851.html">Sample 851</a>
+                </p>
+            </subsection>
+
+            <subsection name="Splitter-Aggregator" id="SplitterAggregator">
+                <p>
+                    This pattern provides the combined functionality of Splitter and Aggregator patterns.
+                    Which is when you specified following parameters this pattern will split the message and
+                    does a synchronized call for the given endpoint and aggregates replies then send back to
+                    client or mediates to the defined target sequence.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.splitter_aggregator</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>iterate_exp</b>
+                    - An Xpath expression from which element you want to split the message.
+                    <br/>
+                    <b>[attach_path]</b>
+                    - An Xpath expression to specify which elements needs to be attached to form new messages.(
+                    Optional)
+                    <br/>
+                    <b>endpoint_url</b>
+                    - Endpoint which newly created messages are redirected to.
+                    <br/>
+                    <b>[attach_path_enabled]</b>
+                    - Boolean value to enable attach path. Optional and by default this is false.
+                    <br/>
+                    <b>aggregator_exp</b>
+                    - An XPath expression specifying based on which elements to aggregate.
+                    <br/>
+                    <b>[sequence_ref]</b>
+                    - Target sequence which message should be mediated after aggregation. (Optional and if this is not
+                    specified aggregator will send the aggregated message to the client).
+                    <br/>
+                    <b>[oncomplete_seq_enabled]</b>
+                    - Boolean value to enable target sequence. (Optional and by default this is false)
+                    <br/>
+                     <br/>
+                    Related Sample - <a href="samples/sample852.html">Sample 852</a>
+                </p>
+            </subsection>
+
+            <subsection name="Scatter-Gather" id="ScatterGather">
+                <p>
+                    The
+                    <a href="http://www.eaipatterns.com/BroadcastAggregate.html">Scatter-Gather pattern</a>
+                    broadcasts a message to multiple recipients and re-aggregates the
+                    responses back into a single message and send back to client or mediates to the defined
+                    target sequence.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.scatter_gather</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>aggregator_exp</b>
+                    - An XPath expression specifying based on which elements to aggregate.
+                    <br/>
+                    <b>[sequence_ref]</b>
+                    - Target sequence which message should be mediated after aggregation. (Optional and if this is not
+                    specified aggregator will send the aggregated message to the client).
+                    <br/>
+                    <b>[oncomplete_seq_enabled]</b>
+                    - Boolean value to enable target sequence. (Optional and by default this is false)
+                    <br/>
+                    <b>recipient_list</b>
+                    - Set of recipient endpoints , which should be specified as comma separated values
+                    <br/>
+                     <br/>
+                    Related Sample - <a href="samples/sample853.html">Sample 853</a>
+                </p>
+            </subsection>
+
+            <subsection name="Wire Tap" id="WireTap">
+                <p>
+                    <a href="http://www.eaipatterns.com/WireTap.html">Wire Tap pattern</a>
+                    enables route messages to a secondary channel while they are being forwarded to the main channel.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.wire_tap</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>destination_uri</b>
+                    - Endpoint of main channel
+                    <br/>
+                    <b>wiretap_uri</b>
+                    - Endpoint of secondary channel
+                    <br/>
+                    <br/>
+                    Related Sample - <a href="samples/sample854.html">Sample 854</a>
+                </p>
+            </subsection>
+
+            <subsection name="Content-Based Router" id="ContentBasedRouter">
+                <p>
+                    The
+                    <a href="http://www.eaipatterns.com/ContentBasedRouter.html">Content Based Router pattern</a>
+                    route messages to the appropriate sequence, according to the message contents.
+                    Routing decision is taken by matching given Xpath expression and Regular Expression.
+                    User can define multiple matching elements as regular expressions and a target sequence where
+                    if any of matching element evaluates to true then it mediates using the target sequence.
+                    If none of the case statements are matching and default case is specified, it will be executed.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.content_base_router</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>routing_exp</b>
+                    - Here you can specify the source xpath to be evaluated
+                    <br/>
+                    <b>match_content</b>
+                    - This is a String which contains the matching conditions. Following is the syntax of it
+                    <b>"IBM:cnd1_seq,MSFT:cnd2_seq;cnd3_seq"</b>
+                    <br/>
+                    User can define multiple matching conditions using "," splitter. regular expressions and
+                    target sequence should be separated by inserting":". And finally default sequence needs to be
+                    defined
+                    after inserting ";". If there is no any target sequence
+                    defined for a particular regular expression , default it will be mediated to the main sequence.
+                    <br/>
+                    <br/>
+                    Related Sample - <a href="samples/sample855.html">Sample 855</a>
+                </p>
+            </subsection>
+
+            <subsection name="Dynamic Router" id="DynamicRouter">
+                <p>
+                    The
+                    <a href="http://www.eaipatterns.com/DynamicRouter.html">Dynamic Router pattern</a>
+                    route a message consecutively through a series of condition steps,
+                    which is parsed by the “conditions” parameter. The list of sequences through which the message
+                    should pass is decided dynamically at run time.
+                    It checks whether the route condition evaluates to true and mediates using the given sequence and
+                    user can define
+                    routing decision based on the message contents such as HTTP url,HTTP headers or combination of both.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.dynamic_router</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>conditions</b>
+                    - This is a String which contains the routing rules. Following is the syntax of it.
+                    <br/>
+                    <b>
+                        "header=foo:bar.*{AND}url=/services/;seq=seq1,header=header1:bar.*{OR}header=header1:foo.*;seq=seq2,header=header2:foo.*;seq=seq3"
+                    </b>
+                    <br/>
+                    User can define multiple routing rules by using "," splitter. Routing rule contains following
+                    format,
+                    <br/>
+                    To match HTTP headers , use
+                    <b>header=regEx:seqRef</b>
+                    <br/>
+                    header source and regular expression should be separated by inserting ":"
+                    <br/>
+                    To match HTTP url, use
+                    <b>url=/url</b>
+                    <br/>
+                    Then target sequence needs to be defined after inserting ";"
+                    <br/>
+
+                    Also you can use<b>"{AND}"</b>as to specify logical AND ,
+                    <b>"{OR}"</b>
+                    as to specify logical OR to match
+                    multiple headers and url in your expression.
+                    <br/>
+                    <br/>
+                    Related Sample - <a href="samples/sample856.html">Sample 856</a>
+                </p>
+            </subsection>
+
+            <subsection name="Recipient List" id="RecipientList">
+                <p>
+                    The
+                    <a href="http://www.eaipatterns.com/RecipientList.html">Recipient List pattern</a>
+                    forward the message to all channels associated with the defined set of recipients.
+                    <br/>
+                    <br/>
+
+                    Call template target -
+                    <b>synapse.lang.eip.recipient_list</b>
+                    <br/>
+                    Parameters
+                    <br/>
+                    <b>recipient_list</b>
+                    - set of recipient endpoints , which should be specified as comma separated values
+                    <br/>
+                    <br/>
+                    Related Sample - <a href="samples/sample857.html">Sample 857</a>
+                </p>
+            </subsection>
+        </section>
+    </body>
+</document>

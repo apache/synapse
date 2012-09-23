@@ -253,7 +253,7 @@ public class Axis2HttpRequest {
         }
 
         if (msgContext.isSOAP11() && soapAction != null &&
-                soapAction.length() > 0) {
+                soapAction.length() >= 0) {
             Header existingHeader =
                     httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
             if (existingHeader != null) {

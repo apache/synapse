@@ -28,6 +28,7 @@
 
     &lt;sequence name="main"&gt;
         &lt;!-- filtering of messages with XPath and regex matches --&gt;
+        &lt;header name="Action" value="urn:getQuote"/&gt;
         &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
             &lt;then&gt;
                 &lt;send&gt;

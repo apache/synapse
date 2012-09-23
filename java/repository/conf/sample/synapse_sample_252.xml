@@ -28,7 +28,7 @@
             var args = mc.getPayloadXML().toString().split(" ");
             mc.setPayloadXML(
             &lt;placeOrder xmlns="http://services.samples"&gt;
-            &lt;order xmlns="http://services.samples/xsd"&gt;
+            &lt;order&gt;
             &lt;price&gt;{args[0]}&lt;/price&gt;
             &lt;quantity&gt;{args[1]}&lt;/quantity&gt;
             &lt;symbol&gt;{args[2]}&lt;/symbol&gt;
@@ -77,7 +77,7 @@
                 <bytesMessage>application/octet-stream</bytesMessage>
             </rules>
         </parameter>
-        <parameter name="Wrapper">{http://services.samples/xsd}element</parameter>
+        <parameter name="Wrapper">{http://synapse.apache.org/userguide/samples/}element</parameter>
     </proxy>
 
     <proxy name="JMSTextProxy" transports="jms">
@@ -87,7 +87,7 @@
                 <textMessage>text/plain</textMessage>
             </rules>
         </parameter>
-        <parameter name="Wrapper">{http://services.samples/xsd}text</parameter>
+        <parameter name="Wrapper">{http://synapse.apache.org/userguide/samples/}text</parameter>
     </proxy>
 
     <proxy name="JMSPoxProxy" transports="jms">

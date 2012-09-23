@@ -24,83 +24,83 @@
     </properties>
     <body>
         <section name="Sample 252: Pure Text, Binary and POX Message Support with JMS">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    &lt;sequence name="text_proxy"&gt;
-        &lt;log level="full"/&gt;
-        &lt;header name="Action" value="urn:placeOrder"/&gt;
-        &lt;script language="js"&gt;
+    <sequence name="text_proxy">
+        <log level="full"/>
+        <header name="Action" value="urn:placeOrder"/>
+        <script language="js">
             var args = mc.getPayloadXML().toString().split(" ");
             mc.setPayloadXML(
             &lt;placeOrder xmlns="http://services.samples"&gt;
-            &lt;order xmlns="http://services.samples/xsd"&gt;
+            &lt;order&gt;
             &lt;price&gt;{args[0]}&lt;/price&gt;
             &lt;quantity&gt;{args[1]}&lt;/quantity&gt;
             &lt;symbol&gt;{args[2]}&lt;/symbol&gt;
             &lt;/order&gt;
             &lt;/placeOrder&gt;);
-        &lt;/script&gt;
-        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
-        &lt;log level="full"/&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/sequence&gt;
+        </script>
+        <property action="set" name="OUT_ONLY" value="true"/>
+        <log level="full"/>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </sequence>
 
-    &lt;sequence name="mtom_proxy"&gt;
-        &lt;log level="full"/&gt;
-        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
-        &lt;header name="Action" value="urn:oneWayUploadUsingMTOM"/&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/services/MTOMSwASampleService" optimize="mtom"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/sequence&gt;
+    <sequence name="mtom_proxy">
+        <log level="full"/>
+        <property action="set" name="OUT_ONLY" value="true"/>
+        <header name="Action" value="urn:oneWayUploadUsingMTOM"/>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/services/MTOMSwASampleService" optimize="mtom"/>
+            </endpoint>
+        </send>
+    </sequence>
 
-    &lt;sequence name="pox_proxy"&gt;
-        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
-        &lt;header name="Action" value="urn:placeOrder"/&gt;
-        &lt;send&gt;
-            &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"
-                         format="soap11"/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/sequence&gt;
+    <sequence name="pox_proxy">
+        <property action="set" name="OUT_ONLY" value="true"/>
+        <header name="Action" value="urn:placeOrder"/>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"
+                         format="soap11"/>
+            </endpoint>
+        </send>
+    </sequence>
 
-    &lt;sequence name="out"&gt;
-        &lt;send/&gt;
-    &lt;/sequence&gt;
+    <sequence name="out">
+        <send/>
+    </sequence>
 
-    &lt;proxy name="JMSFileUploadProxy" transports="jms"&gt;
-        &lt;target inSequence="mtom_proxy" outSequence="out"/&gt;
-        &lt;parameter name="transport.jms.ContentType"&gt;
-            &lt;rules&gt;
-                &lt;bytesMessage&gt;application/octet-stream&lt;/bytesMessage&gt;
-            &lt;/rules&gt;
-        &lt;/parameter&gt;
-        &lt;parameter name="Wrapper"&gt;{http://services.samples/xsd}element&lt;/parameter&gt;
-    &lt;/proxy&gt;
+    <proxy name="JMSFileUploadProxy" transports="jms">
+        <target inSequence="mtom_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <bytesMessage>application/octet-stream</bytesMessage>
+            </rules>
+        </parameter>
+        <parameter name="Wrapper">{http://synapse.apache.org/userguide/samples/}element</parameter>
+    </proxy>
 
-    &lt;proxy name="JMSTextProxy" transports="jms"&gt;
-        &lt;target inSequence="text_proxy" outSequence="out"/&gt;
-        &lt;parameter name="transport.jms.ContentType"&gt;
-            &lt;rules&gt;
-                &lt;textMessage&gt;text/plain&lt;/textMessage&gt;
-            &lt;/rules&gt;
-        &lt;/parameter&gt;
-        &lt;parameter name="Wrapper"&gt;{http://services.samples/xsd}text&lt;/parameter&gt;
-    &lt;/proxy&gt;
+    <proxy name="JMSTextProxy" transports="jms">
+        <target inSequence="text_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">
+            <rules>
+                <textMessage>text/plain</textMessage>
+            </rules>
+        </parameter>
+        <parameter name="Wrapper">{http://synapse.apache.org/userguide/samples/}text</parameter>
+    </proxy>
 
-    &lt;proxy name="JMSPoxProxy" transports="jms"&gt;
-        &lt;target inSequence="pox_proxy" outSequence="out"/&gt;
-        &lt;parameter name="transport.jms.ContentType"&gt;application/xml&lt;/parameter&gt;
-    &lt;/proxy&gt;
+    <proxy name="JMSPoxProxy" transports="jms">
+        <target inSequence="pox_proxy" outSequence="out"/>
+        <parameter name="transport.jms.ContentType">application/xml</parameter>
+    </proxy>
 
-&lt;/definitions&gt;</div>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
                     Demonstrate the ability of Synapse to receive and mediate plain text, binary and
@@ -154,7 +154,7 @@
                 <p>
                     Following the logs, you will notice that Synapse received the JMS text message
                     and transformed it into a SOAP payload as follows. Notice that the wrapper element
-                    '{http://services.samples/xsd}text' has been used to wrap the text message 
+                    '{http://synapse.apache.org/userguide/samples/}text' has been used to wrap the text message 
                     content.
                 </p>
                 <div class="consoleOutput">[jms-Worker-1] INFO LogMediator To: , WSAction: urn:mediate, SOAPAction: urn:mediate, MessageID: ID:orcus.veithen.net-50631-1225235276233-1:0:1:1:1, Direction: request,
@@ -162,7 +162,7 @@ Envelope:
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
   &lt;soapenv:Body&gt;
-    &lt;axis2ns1:text xmlns:axis2ns1=&quot;http://services.samples/xsd&quot;&gt;12.33 1000 ACP&lt;/axis2ns1:text&gt;
+    &lt;axis2ns1:text xmlns:axis2ns1=&quot;http://synapse.apache.org/userguide/samples/&quot;&gt;12.33 1000 ACP&lt;/axis2ns1:text&gt;
   &lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</div>
                 <p>
@@ -175,7 +175,7 @@ Envelope:
 &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
   &lt;soapenv:Body&gt;
     &lt;placeOrder xmlns=&quot;http://services.samples&quot;&gt;
-      &lt;order xmlns=&quot;http://services.samples/xsd&quot;&gt;
+      &lt;order&gt;
         &lt;price&gt;12.33&lt;/price&gt;
         &lt;quantity&gt;1000&lt;/quantity&gt;
         &lt;symbol&gt;ACP&lt;/symbol&gt;
@@ -193,7 +193,7 @@ Envelope:
                     The next section of this example demonstrates how a pure binary JMS message can
                     be received and processed through Synapse. The configuration creates a proxy
                     service named 'JMSFileUploadProxy' that accepts binary messages and wraps them
-                    into a custom element '{http://services.samples/xsd}element'. The received
+                    into a custom element '{http://synapse.apache.org/userguide/samples/}element'. The received
                     message is then forwarded to the MTOMSwASampleService using the SOAP action
                     'urn:oneWayUploadUsingMTOM' while optimizing binary content using MTOM. To execute
                     this sample, use the JMS client to publish a pure binary JMS message containing
@@ -211,7 +211,7 @@ Envelope:
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
   &lt;soapenv:Body&gt;
-    &lt;axis2ns1:element xmlns:axis2ns1=&quot;http://services.samples/xsd&quot;&gt;R0lGODlhgw...AAOw==&lt;/axis2ns1:element&gt;
+    &lt;axis2ns1:element xmlns:axis2ns1=&quot;http://synapse.apache.org/userguide/samples/&quot;&gt;R0lGODlhgw...AAOw==&lt;/axis2ns1:element&gt;
   &lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</div>
                 <p>

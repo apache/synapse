@@ -19,7 +19,9 @@
 package samples.services;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -30,6 +32,8 @@ import javax.xml.ws.ResponseWrapper;
 
 @WebService(targetNamespace="http://services.samples", serviceName="JAXWSStockQuoteService")
 public class StockQuoteService {
+    private final AtomicInteger orderCount = new AtomicInteger();
+    
     private static double getRandom(double base, double varience, boolean onlypositive) {
         double rand = Math.random();
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
@@ -38,9 +42,9 @@ public class StockQuoteService {
     
     @WebMethod(action="urn:getQuote")
     @WebResult(name="return", targetNamespace="http://services.samples")
-    @RequestWrapper(className="samples.services.wrapper.GetQuoteWrapper",
+    @RequestWrapper(className="samples.services.GetQuoteWrapper",
                     localName="getQuote", targetNamespace="http://services.samples")
-    @ResponseWrapper(className="samples.services.wrapper.GetQuoteResponseWrapper",
+    @ResponseWrapper(className="samples.services.GetQuoteResponseWrapper",
                      localName="getQuoteResponse", targetNamespace="http://services.samples")
     public GetQuoteResponse getQuote(
             @WebParam(name="request", targetNamespace="http://services.samples") GetQuote request) {
@@ -69,6 +73,18 @@ public class StockQuoteService {
         return response;
     }
 
+    @Oneway
+    @WebMethod(action="urn:placeOrder")
+    @RequestWrapper(className="samples.services.PlaceOrderWrapper",
+                    localName="placeOrder", targetNamespace="http://services.samples")
+    public void placeOrder(
+            @WebParam(name="order", targetNamespace="http://services.samples") PlaceOrder order) {
+        System.out.println(new Date() + " " + this.getClass().getName() +
+            "  :: Accepted order #" + orderCount.incrementAndGet() + " for : " +
+            order.getQuantity() + " stocks of " + order.getSymbol() + " at $ " +
+            order.getPrice());
+    }
+    
     public static void main(String[] args) {
         Endpoint.publish("http://localhost:7777/stock", new StockQuoteService());
     }

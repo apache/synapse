@@ -24,70 +24,67 @@
     </properties>
     <body>
         <section name="Sample 364: Executing Database Stored Procedures">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
+    <sequence name="main">
+        <in>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
 
-        &lt;out&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Reporting to the Database **"/&gt;
-            &lt;/log&gt;
+        <out>
+            <log level="custom">
+                <property name="text" value="** Reporting to the Database **"/>
+            </log>
 
-            &lt;dbreport&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;
-                        &lt;url&gt;jdbc:mysql://localhost:3306/synapsedb&lt;/url&gt;
-                        &lt;user&gt;user&lt;/user&gt;
-                        &lt;password&gt;password&lt;/password&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;call updateCompany(?,?)&lt;/sql&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:last/child::text()" type="DOUBLE"/&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/&gt;
-                &lt;/statement&gt;
-            &lt;/dbreport&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Looking up from the Database **"/&gt;
-            &lt;/log&gt;
-            &lt;dblookup&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;
-                        &lt;url&gt;jdbc:mysql://localhost:3306/synapsedb&lt;/url&gt;
-                        &lt;user&gt;user&lt;/user&gt;
-                        &lt;password&gt;password&lt;/password&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;call getCompany(?)&lt;/sql&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/&gt;
-                    &lt;result name="stock_prize" column="price"/&gt;
-                &lt;/statement&gt;
-            &lt;/dblookup&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text"
-                          expression="fn:concat('Stock Prize - ',get-property('stock_prize'))"/&gt;
-            &lt;/log&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
+            <dbreport>
+                <connection>
+                    <pool>
+                        <driver>com.mysql.jdbc.Driver</driver>
+                        <url>jdbc:mysql://localhost:3306/synapsedb</url>
+                        <user>user</user>
+                        <password>password</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>call updateCompany(?,?)</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:last/child::text()" type="DOUBLE"/>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <driver>com.mysql.jdbc.Driver</driver>
+                        <url>jdbc:mysql://localhost:3306/synapsedb</url>
+                        <user>user</user>
+                        <password>password</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>call getCompany(?)</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                    <result name="stock_prize" column="price"/>
+                </statement>
+            </dblookup>
+            <log level="custom">
+                <property name="text"
+                          expression="fn:concat('Stock Prize - ',get-property('stock_prize'))"/>
+            </log>
+            <send/>
+        </out>
+    </sequence>
 
-&lt;/definitions&gt;</div>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
                     Demonstrate how to invoke a database stored procedure from Synapse

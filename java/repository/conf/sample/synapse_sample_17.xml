@@ -47,8 +47,8 @@
                     </m:CheckPriceResponse>
                 </format>
                 <args>
-                    <arg xmlns:m0="http://services.samples/xsd" expression="//m0:symbol"/>
-                    <arg xmlns:m0="http://services.samples/xsd" expression="//m0:last"/>
+                    <arg xmlns:m0="http://services.samples" expression="//m0:symbol"/>
+                    <arg xmlns:m0="http://services.samples" expression="//m0:last"/>
                 </args>
             </payloadFactory>
         </out>

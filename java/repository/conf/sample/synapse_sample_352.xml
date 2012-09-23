@@ -28,7 +28,7 @@
                 mc.setTo(mc.getReplyTo());
                 mc.setProperty("RESPONSE", "true");
                 mc.setPayloadXML(
-                &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
+                &lt;ns:getQuoteResponse xmlns:ns="http://services.samples"&gt;
                 &lt;ns:return&gt;
                 &lt;ns:last&gt;99.9&lt;/ns:last&gt;
                 &lt;/ns:return&gt;

@@ -16,8 +16,25 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace="http://services.samples",
-        elementFormDefault=javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-@javax.xml.bind.annotation.XmlAccessorOrder(javax.xml.bind.annotation.XmlAccessOrder.ALPHABETICAL)
 package samples.services;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+import samples.services.GetQuote;
+
+@XmlRootElement(name="getQuote")
+@XmlType(name="")
+public class GetQuoteWrapper {
+    private GetQuote request;
+
+    @XmlElement(required=true)
+    public GetQuote getRequest() {
+        return request;
+    }
+
+    public void setRequest(GetQuote request) {
+        this.request = request;
+    }
+}

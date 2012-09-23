@@ -24,70 +24,67 @@
     </properties>
     <body>
         <section name="Sample 362: Perform Database Lookups and Updates in the Same Mediation Sequence">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    &lt;sequence name="main"&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
+    <sequence name="main">
+        <in>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
 
-        &lt;out&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Reporting to the Database **"/&gt;
-            &lt;/log&gt;
+        <out>
+            <log level="custom">
+                <property name="text" value="** Reporting to the Database **"/>
+            </log>
 
-            &lt;dbreport&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
-                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
-                        &lt;user&gt;synapse&lt;/user&gt;
-                        &lt;password&gt;synapse&lt;/password&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt;
-                    &lt;parameter xmlns:m1="http://services.samples/xsd"
-                               xmlns:m0="http://services.samples"
-                               expression="//m0:return/m1:last/child::text()" type="DOUBLE"/&gt;
-                    &lt;parameter xmlns:m1="http://services.samples/xsd"
-                               xmlns:m0="http://services.samples"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/&gt;
-                &lt;/statement&gt;
-            &lt;/dbreport&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Looking up from the Database **"/&gt;
-            &lt;/log&gt;
-            &lt;dblookup&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
-                        &lt;url&gt;jdbc:derby://localhost:1527/synapsedb;create=false&lt;/url&gt;
-                        &lt;user&gt;synapse&lt;/user&gt;
-                        &lt;password&gt;synapse&lt;/password&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
-                    &lt;parameter xmlns:m1="http://services.samples/xsd"
-                               xmlns:m0="http://services.samples"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/&gt;
-                    &lt;result name="stock_price" column="price"/&gt;
-                &lt;/statement&gt;
-            &lt;/dblookup&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text"
-                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/&gt;
-            &lt;/log&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/sequence&gt;
+            <dbreport>
+                <connection>
+                    <pool>
+                        <driver>org.apache.derby.jdbc.ClientDriver</driver>
+                        <url>jdbc:derby://localhost:1527/synapsedb;create=false</url>
+                        <user>synapse</user>
+                        <password>synapse</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>update company set price=? where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:last/child::text()" type="DOUBLE"/>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <driver>org.apache.derby.jdbc.ClientDriver</driver>
+                        <url>jdbc:derby://localhost:1527/synapsedb;create=false</url>
+                        <user>synapse</user>
+                        <password>synapse</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>select * from company where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                    <result name="stock_price" column="price"/>
+                </statement>
+            </dblookup>
+            <log level="custom">
+                <property name="text"
+                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/>
+            </log>
+            <send/>
+        </out>
+    </sequence>
 
-&lt;/definitions&gt;</div>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
                     <a href="sample360.html">Sample 360</a> and <a href="sample361.html">sample 361</a>

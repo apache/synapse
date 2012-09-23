@@ -18,13 +18,10 @@
  */
 package samples.services;
 
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name="GetQuoteResponse")
-@XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
 public class GetQuoteResponse {
     private double change;
     private double earnings;

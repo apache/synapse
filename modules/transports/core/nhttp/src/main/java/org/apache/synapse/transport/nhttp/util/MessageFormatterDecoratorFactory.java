@@ -21,7 +21,7 @@ package org.apache.synapse.transport.nhttp.util;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
@@ -46,7 +46,7 @@ public class MessageFormatterDecoratorFactory {
 
         try {
             // Get message formatter based on the content type
-            MessageFormatter formatter = TransportUtils.getMessageFormatter(msgContext);
+            MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);
 
             Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
             if (o != null && o instanceof Map) {

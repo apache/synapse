@@ -135,12 +135,12 @@
                     First create a sample input file named stockQuoteReq.xml with the following
                     content.
                 </p>
-                <div class="xmlConf">&lt;soap:Envelope xmlns:soap=&quot;http://www.w3.org/2003/05/soap-envelope&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+                <div class="xmlConf">&lt;soap:Envelope xmlns:soap=&quot;http://www.w3.org/2003/05/soap-envelope&quot; xmlns:ser=&quot;http://services.samples&quot;&gt;
    &lt;soap:Header/&gt;
    &lt;soap:Body&gt;
       &lt;ser:getQuote&gt;
          &lt;ser:request&gt;
-            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+            &lt;ser:symbol&gt;IBM&lt;/ser:symbol&gt;
          &lt;/ser:request&gt;
       &lt;/ser:getQuote&gt;
    &lt;/soap:Body&gt;

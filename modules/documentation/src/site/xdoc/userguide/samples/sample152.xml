@@ -106,7 +106,7 @@ Transfer-Encoding: chunked
 Connection: Keep-Alive
 
 2b3
-&lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples/xsd&quot;&gt;
+&lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
    &lt;ns:return&gt;
       &lt;ns:change&gt;3.7730036841862384&lt;/ns:change&gt;
       &lt;ns:earnings&gt;-9.950236235550818&lt;/ns:earnings&gt;

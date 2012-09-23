@@ -16,5 +16,39 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace="http://services.samples", elementFormDefault=javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package samples.services.wrapper;
+package samples.services;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType(name="PlaceOrder")
+public class PlaceOrder {
+    private String symbol;
+    private int quantity;
+    private double price;
+
+    @XmlElement(required=true)
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+}

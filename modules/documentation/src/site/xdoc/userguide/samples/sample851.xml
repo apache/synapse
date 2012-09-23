@@ -24,43 +24,42 @@
     </properties>
     <body>
         <section name="Sample 851: Introduction to Synapse Splitter and Aggregator eip function templates">
-            <div class="xmlConf">&lt;!-- Introduction to Synapse Splitter and Aggregator eip function templates --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-&lt;import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" /&gt;
- &lt;proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable"&gt;
-        &lt;target&gt;
-        &lt;inSequence&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="splitterAggrigator"/&gt;
-            &lt;/log&gt;
-            &lt;call-template target="synapse.lang.eip.splitter"&gt;
-                &lt;with-param xmlns:m0="http://services.samples" name="iterate_exp" value="{{//m0:getQuote/m0:request}}"/&gt;
-                &lt;with-param xmlns:m0="http://services.samples" name="attach_path" value="{{//m0:getQuote}}"/&gt;
-                &lt;with-param name="attach_path_enabled" value="true"/&gt;
-                &lt;with-param name="endpoint_uri" value="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-            &lt;/call-template&gt;
-        &lt;/inSequence&gt;
-        &lt;outSequence&gt;
-            &lt;call-template target="synapse.lang.eip.aggregator"&gt;
-                &lt;with-param name="sequence_ref" value="enr"/&gt;
-                &lt;with-param xmlns:m0="http://services.samples" name="aggregator_exp" value="{{//m0:return}}"/&gt;
-                &lt;with-param name="oncomplete_seq_enabled" value="true"/&gt;
-            &lt;/call-template&gt;
-        &lt;/outSequence&gt;
-    &lt;/target&gt;
-    &lt;/proxy&gt;
-&lt;sequence xmlns="http://ws.apache.org/ns/synapse" name="enr"&gt;
-    &lt;log level="custom"&gt;
-        &lt;property name="text" value="seqhit"/&gt;
-    &lt;/log&gt;
-    &lt;enrich&gt;
-        &lt;source xmlns:m1="http://services.samples/xsd" xmlns:m0="http://services.samples" clone="true"
-                xpath="//m0:return[not(preceding-sibling::m0:return/m1:last &lt;= m1:last) and not(following-sibling::m0:return/m1:last &lt; m1:last)]"/&gt;
-        &lt;target type="body"/&gt;
-    &lt;/enrich&gt;
-    &lt;send/&gt;
-&lt;/sequence&gt;
-&lt;/definitions&gt;</div>
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
+ <proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable">
+        <target>
+        <inSequence>
+            <log level="custom">
+                <property name="text" value="splitterAggrigator"/>
+            </log>
+            <call-template target="synapse.lang.eip.splitter">
+                <with-param xmlns:m0="http://services.samples" name="iterate_exp" value="{{//m0:getQuote/m0:request}}"/>
+                <with-param xmlns:m0="http://services.samples" name="attach_path" value="{{//m0:getQuote}}"/>
+                <with-param name="attach_path_enabled" value="true"/>
+                <with-param name="endpoint_uri" value="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </call-template>
+        </inSequence>
+        <outSequence>
+            <call-template target="synapse.lang.eip.aggregator">
+                <with-param name="sequence_ref" value="enr"/>
+                <with-param xmlns:m0="http://services.samples" name="aggregator_exp" value="{{//m0:return}}"/>
+                <with-param name="oncomplete_seq_enabled" value="true"/>
+            </call-template>
+        </outSequence>
+    </target>
+    </proxy>
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="enr">
+    <log level="custom">
+        <property name="text" value="seqhit"/>
+    </log>
+    <enrich>
+        <source xmlns:m0="http://services.samples" clone="true"
+                xpath="//m0:return[not(preceding-sibling::m0:return/m0:last &lt;= m0:last) and not(following-sibling::m0:return/m0:last &lt; m0:last)]"/>
+        <target type="body"/>
+    </enrich>
+    <send/>
+</sequence>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
 This sample is an introduction to Synapse Splitter and Aggregator eip function templates. This showcase the combined functionality of Splitter and Aggregator patterns.

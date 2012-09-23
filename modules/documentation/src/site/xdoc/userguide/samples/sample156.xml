@@ -24,81 +24,86 @@
     </properties>
     <body>
         <section name="Sample 156: Service Integration with Specifying the Receiving Sequence">
-            <div class="xmlConf">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
-    &lt;localEntry key=&quot;sec_policy&quot; src=&quot;file:repository/conf/sample/resources/policy/policy_3.xml&quot;/&gt;
-    &lt;proxy name=&quot;StockQuoteProxy&quot;&gt;
-        &lt;target&gt;
-            &lt;inSequence&gt;
-                &lt;enrich&gt;
-                    &lt;source type=&quot;body&quot;/&gt;
-                    &lt;target type=&quot;property&quot; property=&quot;REQUEST&quot;/&gt;
-                &lt;/enrich&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-                &lt;send receive=&quot;SimpleServiceSeq&quot;&gt;
-                    &lt;endpoint name=&quot;secure&quot;&gt;
-                        &lt;address uri=&quot;http://localhost:9000/services/SecureStockQuoteService&quot;&gt;
-                            &lt;enableSec policy=&quot;sec_policy&quot;/&gt;
-                        &lt;/address&gt;
-                    &lt;/endpoint&gt;
-                &lt;/send&gt;
-            &lt;/inSequence&gt;
-            &lt;outSequence&gt;
-                &lt;drop/&gt;
-            &lt;/outSequence&gt;
-        &lt;/target&gt;
-    &lt;/proxy&gt;
+    <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 
-    &lt;sequence name=&quot;SimpleServiceSeq&quot;&gt;
-        &lt;property name=&quot;SECURE_SER_AMT&quot; expression=&quot;//ns:getQuoteResponse/ns:return/ax21:last&quot;
-                  xmlns:ns=&quot;http://services.samples&quot; xmlns:ax21=&quot;http://services.samples/xsd&quot;/&gt;
-        &lt;log level=&quot;custom&quot;&gt;
-            &lt;property name=&quot;SecureStockQuoteService-Amount&quot; expression=&quot;get-property(&#39;SECURE_SER_AMT&#39;)&quot;/&gt;
-        &lt;/log&gt;
-        &lt;enrich&gt;
-            &lt;source type=&quot;body&quot;/&gt;
-            &lt;target type=&quot;property&quot; property=&quot;SecureService_Res&quot;/&gt;
-        &lt;/enrich&gt;
-        &lt;enrich&gt;
-            &lt;source type=&quot;property&quot; property=&quot;REQUEST&quot;/&gt;
-            &lt;target type=&quot;body&quot;/&gt;
-        &lt;/enrich&gt;
-        &lt;send receive=&quot;ClientOutSeq&quot;&gt;
-            &lt;endpoint name=&quot;SimpleStockQuoteService&quot;&gt;
-                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
-            &lt;/endpoint&gt;
-        &lt;/send&gt;
-    &lt;/sequence&gt;
+    <proxy name="StockQuoteProxy">
+        <target>
+            <inSequence>
+                <enrich>
+                    <source type="body"/>
+                    <target type="property" property="REQUEST"/>
+                </enrich>
 
-    &lt;sequence name=&quot;ClientOutSeq&quot;&gt;
-        &lt;property name=&quot;SIMPLE_SER_AMT&quot; expression=&quot;//ns:getQuoteResponse/ns:return/ax21:last&quot;
-                  xmlns:ns=&quot;http://services.samples&quot; xmlns:ax21=&quot;http://services.samples/xsd&quot;/&gt;
-        &lt;log level=&quot;custom&quot;&gt;
-            &lt;property name=&quot;SimpleStockQuoteService-Amount&quot; expression=&quot;get-property(&#39;SIMPLE_SER_AMT&#39;)&quot;/&gt;
-        &lt;/log&gt;
-        &lt;enrich&gt;
-            &lt;source type=&quot;body&quot;/&gt;
-            &lt;target type=&quot;property&quot; property=&quot;SimpleService_Res&quot;/&gt;
-        &lt;/enrich&gt;
+                <send receive="SimpleServiceSeq">
+                    <endpoint name="secure">
+                        <address uri="http://localhost:9000/services/SecureStockQuoteService">
+                            <enableSec policy="sec_policy"/>
+                        </address>
+                    </endpoint>
+                </send>
+            </inSequence>
+            <outSequence>
+                <drop/>
+            </outSequence>
+        </target>
+    </proxy>
 
-        &lt;filter xpath=&quot;fn:number(get-property(&#39;SIMPLE_SER_AMT&#39;)) &gt; fn:number(get-property(&#39;SECURE_SER_AMT&#39;))&quot;&gt;
-            &lt;then&gt;
-                &lt;log&gt;
-                    &lt;property name=&quot;StockQuote&quot; value=&quot;SecureStockQuoteService&quot;/&gt;
-                &lt;/log&gt;
-                &lt;enrich&gt;
-                    &lt;source type=&quot;property&quot; property=&quot;SecureService_Res&quot;/&gt;
-                    &lt;target type=&quot;body&quot;/&gt;
-                &lt;/enrich&gt;
-            &lt;/then&gt;
-            &lt;else&gt;
-                &lt;log&gt;
-                    &lt;property name=&quot;StockQuote&quot; value=&quot;SimpleStockQuoteService&quot;/&gt;
-                &lt;/log&gt;
-            &lt;/else&gt;
-        &lt;/filter&gt;
-        &lt;send/&gt;
-    &lt;/sequence&gt;
-&lt;/definitions&gt;</div>
+
+    <sequence name="SimpleServiceSeq">
+        <property name="SECURE_SER_AMT" expression="//ns:getQuoteResponse/ns:return/ns:last"
+                xmlns:ns="http://services.samples"/>
+        <log level="custom">
+            <property name="SecureStockQuoteService-Amount" expression="get-property('SECURE_SER_AMT')"/>
+        </log>
+        <enrich>
+            <source type="body"/>
+            <target type="property" property="SecureService_Res"/>
+        </enrich>
+        <enrich>
+            <source type="property" property="REQUEST"/>
+            <target type="body"/>
+        </enrich>
+        <send receive="ClientOutSeq">
+            <endpoint name="SimpleStockQuoteService">
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </sequence>
+
+    <sequence name="ClientOutSeq">
+        <property name="SIMPLE_SER_AMT" expression="//ns:getQuoteResponse/ns:return/ns:last"
+                       xmlns:ns="http://services.samples"/>
+        <log level="custom">
+            <property name="SimpleStockQuoteService-Amount" expression="get-property('SIMPLE_SER_AMT')"/>
+        </log>
+        <enrich>
+            <source type="body"/>
+            <target type="property" property="SimpleService_Res"/>
+        </enrich>
+
+        <filter xpath="fn:number(get-property('SIMPLE_SER_AMT')) > fn:number(get-property('SECURE_SER_AMT'))">
+            <then>
+                <log>
+                    <property name="StockQuote" value="SecureStockQuoteService"/>
+                </log>
+                <enrich>
+                    <source type="property" property="SecureService_Res"/>
+                    <target type="body"/>
+                </enrich>
+            </then>
+            <else>
+                <log>
+                    <property name="StockQuote" value="SimpleStockQuoteService"/>
+                </log>
+            </else>
+        </filter>
+
+        <send/>
+    </sequence>
+
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
                     Synapse is capable of mediating requests among multiple services and managing

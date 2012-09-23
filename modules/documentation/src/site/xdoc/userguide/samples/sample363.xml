@@ -24,134 +24,131 @@
     </properties>
     <body>
         <section name="Sample 363: Reusable Database Connection Pools">
-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    &lt;sequence name="myFaultHandler"&gt;
-        &lt;makefault response="true"&gt;
-            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
-            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
-        &lt;/makefault&gt;
-        &lt;send/&gt;
-        &lt;drop/&gt;
-    &lt;/sequence&gt;
+    <sequence name="myFaultHandler">
+        <makefault response="true">
+            <code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/>
+            <reason expression="get-property('ERROR_MESSAGE')"/>
+        </makefault>
+        <send/>
+        <drop/>
+    </sequence>
 
-    &lt;sequence name="main" onError="myFaultHandler"&gt;
-        &lt;in&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Looking up from the Database **"/&gt;
-            &lt;/log&gt;
-            &lt;dblookup&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;dsName&gt;lookupdb&lt;/dsName&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               expression="//m0:getQuote/m0:request/m0:symbol" type="VARCHAR"/&gt;
-                    &lt;result name="company_id" column="id"/&gt;
-                &lt;/statement&gt;
-            &lt;/dblookup&gt;
+    <sequence name="main" onError="myFaultHandler">
+        <in>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <dsName>lookupdb</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>select * from company where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:getQuote/m0:request/m0:symbol" type="VARCHAR"/>
+                    <result name="company_id" column="id"/>
+                </statement>
+            </dblookup>
 
-            &lt;switch source="get-property('company_id')"&gt;
-                &lt;case regex="c1"&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/case&gt;
-                &lt;case regex="c2"&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/case&gt;
-                &lt;case regex="c3"&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text"
-                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/&gt;
-                    &lt;/log&gt;
-                    &lt;send&gt;
-                        &lt;endpoint&gt;
-                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-                        &lt;/endpoint&gt;
-                    &lt;/send&gt;
-                &lt;/case&gt;
-                &lt;default&gt;
-                    &lt;log level="custom"&gt;
-                        &lt;property name="text" value="** Unrecognized Company ID **"/&gt;
-                    &lt;/log&gt;
-                    &lt;makefault response="true"&gt;
-                        &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope"
-                              value="tns:Receiver"/&gt;
-                        &lt;reason value="** Unrecognized Company ID **"/&gt;
-                    &lt;/makefault&gt;
-                    &lt;send/&gt;
-                    &lt;drop/&gt;
-                &lt;/default&gt;
-            &lt;/switch&gt;
-            &lt;drop/&gt;
-        &lt;/in&gt;
+            <switch source="get-property('company_id')">
+                <case regex="c1">
+                    <log level="custom">
+                        <property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <case regex="c2">
+                    <log level="custom">
+                        <property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <case regex="c3">
+                    <log level="custom">
+                        <property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <default>
+                    <log level="custom">
+                        <property name="text" value="** Unrecognized Company ID **"/>
+                    </log>
+                    <makefault response="true">
+                        <code xmlns:tns="http://www.w3.org/2003/05/soap-envelope"
+                              value="tns:Receiver"/>
+                        <reason value="** Unrecognized Company ID **"/>
+                    </makefault>
+                    <send/>
+                    <drop/>
+                </default>
+            </switch>
+            <drop/>
+        </in>
 
-        &lt;out&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Reporting to the Database **"/&gt;
-            &lt;/log&gt;
-            &lt;dbreport&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;dsName&gt;reportdb&lt;/dsName&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;update company set price=? where name =?&lt;/sql&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:last/child::text()" type="DOUBLE"/&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/&gt;
-                &lt;/statement&gt;
-            &lt;/dbreport&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="** Looking up from the Database **"/&gt;
-            &lt;/log&gt;
-            &lt;dblookup&gt;
-                &lt;connection&gt;
-                    &lt;pool&gt;
-                        &lt;dsName&gt;reportdb&lt;/dsName&gt;
-                    &lt;/pool&gt;
-                &lt;/connection&gt;
-                &lt;statement&gt;
-                    &lt;sql&gt;select * from company where name =?&lt;/sql&gt;
-                    &lt;parameter xmlns:m0="http://services.samples"
-                               xmlns:m1="http://services.samples/xsd"
-                               expression="//m0:return/m1:symbol/child::text()" type="VARCHAR"/&gt;
-                    &lt;result name="stock_price" column="price"/&gt;
-                &lt;/statement&gt;
-            &lt;/dblookup&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text"
-                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/&gt;
-            &lt;/log&gt;
-            &lt;send/&gt;
+        <out>
+            <log level="custom">
+                <property name="text" value="** Reporting to the Database **"/>
+            </log>
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>reportdb</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>update company set price=? where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:last/child::text()" type="DOUBLE"/>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <dsName>reportdb</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>select * from company where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                    <result name="stock_price" column="price"/>
+                </statement>
+            </dblookup>
+            <log level="custom">
+                <property name="text"
+                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/>
+            </log>
+            <send/>
 
-        &lt;/out&gt;
+        </out>
 
-    &lt;/sequence&gt;
+    </sequence>
 
-&lt;/definitions&gt;</div>
+</definitions>]]></div>
             <subsection name="Objective">
                 <p>
                     Demonstrate how to setup reusable connection pools for the dblookup and dbreport

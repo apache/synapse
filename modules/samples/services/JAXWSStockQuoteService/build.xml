@@ -36,7 +36,7 @@
             <src path="src"/>
             <classpath>
                 <fileset dir="../../lib">
-                   	<include name="*.jar"/>
+                    <include name="*.jar"/>
                 </fileset>
             </classpath>
         </javac>

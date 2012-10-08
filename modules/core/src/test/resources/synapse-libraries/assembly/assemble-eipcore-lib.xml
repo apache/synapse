@@ -6,18 +6,16 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>src/test/resources/synapse-libraries/synapse-eip-lib</directory>
+            <directory>src/test/resources/synapse-libraries/synapse-eipcore-lib</directory>
             <outputDirectory></outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>target/classes</directory>
-            <outputDirectory></outputDirectory>
+            <directory>target/classes/org/apache/synapse/libraries/eip</directory>
+            <outputDirectory>org/apache/synapse/libraries/eip</outputDirectory>
             <excludes>
                 <exclude>**/metrics_module.xml</exclude>
                 <exclude>**/META-INF/*</exclude>
             </excludes>
         </fileSet>
     </fileSets>
-    
-    
 </assembly>

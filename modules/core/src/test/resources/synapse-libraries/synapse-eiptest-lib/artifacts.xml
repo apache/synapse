@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifacts>
+    <artifact name="EipLibrary" package="synapse.lang.eip" >
+        <dependency artifact="systemManagement" />
+        <description>eip synapse library</description>
+    </artifact>
+</artifacts>

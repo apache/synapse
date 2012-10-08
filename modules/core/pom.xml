@@ -103,14 +103,33 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <finalName>synapse-eip-lib</finalName>
+                            <finalName>synapse-eiptest-lib</finalName>
                             <filters>
                                 <filter>
                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
                                 </filter>
                             </filters>
                             <descriptors>
-                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml
+                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eiptest-lib.xml
+                                </descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                     <execution>
+                        <id>eipcore-library-assembly</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>synapse-eipcore-lib</finalName>
+                            <filters>
+                                <filter>
+                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
+                                </filter>
+                            </filters>
+                            <descriptors>
+                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml
                                 </descriptor>
                             </descriptors>
                         </configuration>
@@ -133,8 +152,10 @@
                                 <mkdir dir="target/test_repos/synapse/services"/>
                                 <mkdir dir="target/test_repos/client/modules"/>
                                 <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
+                                <mkdir dir="target/library_repos"/>
                                 <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
-                                <copy file="target/synapse-eip-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+                                <copy file="target/synapse-eiptest-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+                                <copy file="target/synapse-eipcore-lib.zip" todir="target/library_repos"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -147,7 +168,8 @@
                         <configuration>
                             <tasks>
                                 <delete file="target/synapse-test-lib.zip"/>
-                                <delete file="target/synapse-eip-lib.zip"/>
+                                <delete file="target/synapse-eiptest-lib.zip"/>
+                                <delete file="target/synapse-eipcore-lib.zip"/>
                             </tasks>
                         </configuration>
                         <goals>

@@ -15,7 +15,7 @@ public abstract class AbstractEipLibTestCase extends TestCase {
     protected String getResourcePath() {
         try {
             if (path == null) {
-                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eip-lib.zip").getAbsolutePath();
+                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eiptest-lib.zip").getAbsolutePath();
             }
         } catch (Exception e) {
             return null;

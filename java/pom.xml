@@ -1072,7 +1072,7 @@
         <!-- Axis2 and its dependencies -->
         <axis2.version>1.7.0-SNAPSHOT</axis2.version>
         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>
-        <axiom.version>1.2.14-SNAPSHOT</axiom.version>
+        <axiom.version>1.2.15-SNAPSHOT</axiom.version>
         <xml_schema.version>1.4.3</xml_schema.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
 

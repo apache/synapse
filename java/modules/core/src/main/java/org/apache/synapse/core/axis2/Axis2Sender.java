@@ -19,8 +19,6 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -144,11 +142,8 @@ public class Axis2Sender {
             }
 
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
-            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME) &&
-                messageContext.getEnvelope().getHeader() == null) {
-                SOAPFactory fac = messageContext.isSOAP11() ?
-                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
-                fac.createSOAPHeader(messageContext.getEnvelope());
+            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME)) {
+                messageContext.getEnvelope().getOrCreateHeader();
             }
 
             Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());

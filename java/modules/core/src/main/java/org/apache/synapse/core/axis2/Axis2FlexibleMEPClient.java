@@ -19,9 +19,7 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -383,11 +381,7 @@ public class Axis2FlexibleMEPClient {
                 }
             }
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
-            if (axisOutMsgCtx.getEnvelope().getHeader() == null) {
-                SOAPFactory fac = axisOutMsgCtx.isSOAP11() ?
-                        OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
-                fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());
-            }
+            axisOutMsgCtx.getEnvelope().getOrCreateHeader();
         }
 
         OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);

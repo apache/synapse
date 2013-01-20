@@ -159,10 +159,7 @@ public class HeaderMediator extends AbstractMediator {
             return;
         }
         SOAPFactory fac = (SOAPFactory) env.getOMFactory();
-        SOAPHeader header = env.getHeader();
-        if (header == null) {
-            header = fac.createSOAPHeader(env);
-        }
+        SOAPHeader header = env.getOrCreateHeader();
         SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
                 fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
         hb.setText(value);

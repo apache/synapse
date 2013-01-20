@@ -20,9 +20,7 @@
 package org.apache.synapse.mediators.elementary;
 
 import org.apache.axiom.om.*;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.util.MessageHelper;
@@ -123,20 +121,7 @@ public class Source {
                     if (node instanceof OMElement) {
                         if (node instanceof SOAPEnvelope) {
                             SOAPEnvelope soapEnvelope = (SOAPEnvelope) node;
-                            String soapNamespace = null;
-
-                            if (soapEnvelope.getNamespace() != null) {
-                                soapNamespace = soapEnvelope.getNamespace().getNamespaceURI();
-                            }
-                            if (soapEnvelope.getHeader() == null && soapNamespace != null) {
-                                SOAPFactory soapFactory;
-                                if (soapNamespace.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-                                    soapFactory = OMAbstractFactory.getSOAP12Factory();
-                                } else {
-                                    soapFactory = OMAbstractFactory.getSOAP11Factory();
-                                }
-                                soapFactory.createSOAPHeader(soapEnvelope);
-                            }
+                            soapEnvelope.getOrCreateHeader();
                             sourceNodeList.add(soapEnvelope);
                         } else {
                             OMElement ele = (OMElement) node;

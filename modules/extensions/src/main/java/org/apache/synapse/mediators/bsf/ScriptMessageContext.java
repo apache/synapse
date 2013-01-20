@@ -32,7 +32,6 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
@@ -106,12 +105,7 @@ public class ScriptMessageContext implements MessageContext {
      * @throws ScriptException if an error occurs when converting the XML to OM
      */
     public void addHeader(boolean mustUnderstand, Object content) throws ScriptException {
-        SOAPEnvelope envelope = mc.getEnvelope();
-        SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
-        SOAPHeader header = envelope.getHeader();
-        if (header == null) {
-            header = factory.createSOAPHeader(envelope);
-        }
+        SOAPHeader header = mc.getEnvelope().getOrCreateHeader();
         OMElement element = xmlHelper.toOMElement(content);
         // We can't add the element directly to the SOAPHeader. Instead, we need to copy the
         // information over to a SOAPHeaderBlock.

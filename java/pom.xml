@@ -1021,7 +1021,7 @@
         <repository>
             <id>snmp4j-repo</id>
             <name>SNMP4J Repository</name>
-            <url>https://server.oosnmp.net/dist/release/</url>
+            <url>https://oosnmp.net/dist/release/</url>
             <releases>
                 <updatePolicy>never</updatePolicy>
             </releases>

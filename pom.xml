@@ -1288,6 +1288,17 @@
             <email>rajikak AT apache.org</email>
         </developer>
         <developer>
+            <name>Kasun Indrasiri</name>
+            <id>kasun</id>
+            <email>kasun AT apache.org</email>
+	    <organization>WSO2</organization>
+        </developer> 
+	<developer>
+            <name>Udayanga Wickramasinghe</name>
+            <id>uswick</id>
+            <email>uswick AT apache.org</email>
+        </developer>
+        <developer>
             <name>Miyuru Wanninayaka</name>
             <id>miyuru</id>
             <email>miyuru AT apache.org</email>

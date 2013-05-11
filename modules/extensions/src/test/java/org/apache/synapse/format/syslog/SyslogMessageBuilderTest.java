@@ -30,7 +30,6 @@ import javax.xml.validation.Validator;
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.jaxp.OMSource;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.lang.ObjectUtils;
 import org.xml.sax.ErrorHandler;
@@ -94,7 +93,7 @@ public class SyslogMessageBuilderTest extends TestCase {
                 throw exception;
             }
         });
-        validator.validate(new OMSource(element));
+        validator.validate(element.getSAXSource(true));
         String pidString = element.getAttributeValue(new QName(SyslogConstants.PID));
         return new SyslogMessage(element.getAttributeValue(new QName(SyslogConstants.FACILITY)),
                                  element.getAttributeValue(new QName(SyslogConstants.SEVERITY)),

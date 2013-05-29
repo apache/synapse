@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.processors.MessageProcessor;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import java.util.Iterator;
  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+ * &lt;parameter name="string" expression="string"&gt;
  * .
  * .
  * &lt;/messageProcessor&gt;
@@ -55,15 +57,17 @@ public class MessageProcessorSerializer {
 
     /**
      * Serialize a give Message processor instance to XML configuration
-     * @param parent parent configuration
+     *
+     * @param parent    parent configuration
      * @param processor message processor instance
-     * @return  created XML configuration
+     * @return created XML configuration
      */
-    public static OMElement serializeMessageProcessor(OMElement parent, MessageProcessor processor) {
+    public static OMElement serializeMessageProcessor(OMElement parent,
+                                                      MessageProcessor processor) {
         OMElement processorElem = fac.createOMElement("messageProcessor", synNS);
         if (processor != null) {
             processorElem.addAttribute(fac.createOMAttribute("class", nullNS,
-                    processor.getClass().getName()));
+                                                             processor.getClass().getName()));
         } else {
             handleException("Invalid processor. Provider is required");
         }
@@ -74,21 +78,32 @@ public class MessageProcessorSerializer {
             handleException("Message store Name not specified");
         }
 
-        if(processor.getMessageStoreName() != null) {
+        if (processor.getMessageStoreName() != null) {
             processorElem.addAttribute(fac.createOMAttribute(
-                    "messageStore",nullNS,processor.getMessageStoreName()));
+                    "messageStore", nullNS, processor.getMessageStoreName()));
         }
 
         if (processor.getParameters() != null) {
             Iterator iterator = processor.getParameters().keySet().iterator();
             while (iterator.hasNext()) {
                 String name = (String) iterator.next();
-                String value = (String) processor.getParameters().get(name);
+                Object object = processor.getParameters().get(name);
                 OMElement property = fac.createOMElement("parameter", synNS);
                 property.addAttribute(fac.createOMAttribute(
                         "name", nullNS, name));
-                property.setText(value.trim());
+
+                if (object instanceof String) {
+                    String value = (String) object;
+                    property.setText(value.trim());
+
+                } else if (object instanceof SynapseXPath) {
+                    SynapseXPath expression = (SynapseXPath) object;
+                    SynapseXPathSerializer.serializeXPath(expression,property,"expression");
+
+                }
+
                 processorElem.addChild(property);
+
             }
         }
 

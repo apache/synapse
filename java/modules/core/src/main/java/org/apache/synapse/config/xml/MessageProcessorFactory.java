@@ -25,6 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.processors.MessageProcessor;
+import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.HashMap;
@@ -47,24 +49,26 @@ public class MessageProcessorFactory {
     private static final Log log = LogFactory.getLog(MessageProcessorFactory.class);
     public static final QName CLASS_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
     public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
+    public static final QName EXPRESSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
-            "parameter");
-    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE ,
-            "messageStore");
+                                                      "parameter");
+    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE,
+                                                          "messageStore");
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
 
     /**
      * Creates a Message processor instance from given xml configuration element
+     *
      * @param elem OMElement of that contain the Message processor configuration
-     * @return  created message processor instance
+     * @return created message processor instance
      */
     public static MessageProcessor createMessageProcessor(OMElement elem) {
         MessageProcessor processor = null;
         OMAttribute clssAtt = elem.getAttribute(CLASS_Q);
 
-        if(clssAtt != null) {
+        if (clssAtt != null) {
             try {
                 Class cls = Class.forName(clssAtt.getAttributeValue());
                 processor = (MessageProcessor) cls.newInstance();
@@ -86,7 +90,7 @@ public class MessageProcessorFactory {
 
         OMAttribute storeAtt = elem.getAttribute(MESSAGE_STORE_Q);
 
-        if(storeAtt != null) {
+        if (storeAtt != null) {
             assert processor != null;
             processor.setMessageStoreName(storeAtt.getAttributeValue());
         } else {
@@ -115,9 +119,19 @@ public class MessageProcessorFactory {
                 OMElement prop = (OMElement) o;
                 OMAttribute paramName = prop.getAttribute(NAME_Q);
                 String paramValue = prop.getText();
+                OMAttribute paramExpression = prop.getAttribute(EXPRESSION_Q);
                 if (paramName != null) {
-                    if (paramValue != null) {
+                    if (paramExpression != null) {
+                        try {
+                            SynapseXPath expression = SynapseXPathFactory.getSynapseXPath(prop, paramExpression.getAttributeValue());
+                            parameters.put(paramName.getAttributeValue(), expression);
+                        } catch (JaxenException e) {
+                            handleException("Error while creating expression " + e.getMessage());
+                        }
+                    } else if (paramValue != null) {
                         parameters.put(paramName.getAttributeValue(), paramValue);
+                    } else {
+                        handleException("Invalid MessageStore parameter - Parameter must have a value or an expression ");
                     }
                 } else {
                     handleException("Invalid MessageStore parameter - Parameter must have a name ");

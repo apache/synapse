@@ -243,6 +243,7 @@
                         <li><a href="samples/sample700.html">Sample 700: Introduction to Synapse Message Stores</a></li>
                         <li><a href="samples/sample701.html">Sample 701: Introduction to Message Sampling Processor</a></li>
                         <li><a href="samples/sample702.html">Sample 702: Introduction to Message Forwarding Processor</a></li>
+                        <li><a href="samples/sample703.html">Sample 703: Introduction to Message Resequencing Processor</a></li>
                     </ul>
                 </p>
             </subsection>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 703</title>
+    </properties>
+    <body>
+        <section name="Sample 703: Introduction to Message Resequencing Processor">
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+
+    <sequence name="next_seq">
+      <send>
+		  <endpoint>
+			  <address uri="http://localhost:9000/services/SimpleStockQuoteService">
+				  <suspendOnFailure>
+					  <errorCodes>-1</errorCodes>
+					  <progressionFactor>1.0</progressionFactor>
+				  </suspendOnFailure>
+			  </address>
+		  </endpoint>
+      </send>
+    </sequence>
+
+	<sequence name="main">
+        <in>
+			<log level="full"/>
+			<property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/>
+			<property name="OUT_ONLY" value="true"/>
+			<store messageStore="MyStore"/>
+        </in>
+		<out>
+		    <send />
+		</out>
+        <description>The main sequence for the message mediation</description>
+	</sequence>
+
+    <messageStore name="MyStore"/>
+
+	<messageProcessor 
+            class="org.apache.synapse.message.processors.resequence.ResequencingProcessor" 
+            name="ResequencingProcessor" messageStore="MyStore"> 
+
+		<parameter name="interval">10000</parameter>
+		<parameter name="seqNumXpath" xmlns:m0="http://services.samples" expression="substring-after(//m0:placeOrder/m0:order/m0:symbol,'-')"/>
+		<parameter name="nextEsbSequence">next_seq</parameter> 
+
+	</messageProcessor>
+
+</definitions>]]></div>
+            <subsection name="Objective">
+                <p>
+                    Introduction to Message Resequencing Processor
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 703 (repository/conf/sample/synapse_sample_703.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 703<br/>
+                                Windows: synapse.bat -sample 703
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Execute the Client with commands :
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280/ -Dmode=placeorder -Dsymbol=WSO2-2<br/>
+									ant stockquote -Dtrpurl=http://localhost:8280/ -Dmode=placeorder -Dsymbol=WSO2-3<br/>
+									ant stockquote -Dtrpurl=http://localhost:8280/ -Dmode=placeorder -Dsymbol=WSO2-1
+                </div>
+				<p>
+                    You have to use different sequence numbers for WSO2-#. According to configuration 
+					sequence number should be seperated with a hyphen mark.
+                </p>
+                <p>
+                    When you execute the client the message will be dispatched to the main sequence.
+                    In the Main sequence store mediator will store the placeOrder request message in
+                    the 'MyStore' message store.
+                </p>
+                <p>
+                    Message Processor will consume the messages and forward to the 'next_seq' sequence
+                    according to sequence number order.
+                </p>
+				<p>
+                    You will see that the Axis2 server has recieved the messages in sequence number order
+                </p>
+                <p>
+                    Following logic is used to decide the initial sequence number.
+					<ol>
+						<li>When starting Synapse Resequencing Processor checks the attached message store for any messages. 
+						If any messages found, select the minimum sequence number as the initial sequence number. Else continue without selecting initial sequence number.</li>
+						<li>If initial sequence number is selected at the start up, continue sending messages to the given sequence. 
+						Otherwise waits for required number of messages to come with in a certain timeout.</li>
+						<li>If the required number of messages are received, select initial sequence number from those and do further resequencing. 
+						If required number of messages are not received with in timeout, select the initial sequence number from available messages in the store.</li>
+					</ol>
+                </p>
+            </subsection>
+        </section>
+        <p>
+            <a href="../samples.html">Back to Catalog</a>
+        </p>
+    </body>
+</document>

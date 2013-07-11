@@ -42,7 +42,7 @@ public class Sample155 extends SynapseTestCase {
         log.info("Running test: Dual channel invocation on both client side and server " +
                 "side of Synapse with Proxy Services");
         SampleClientResult result = client.requestDualQuote(addUrl, null, null, "IBM");
-        assertTrue("Client did not get run successfully ", result.responseReceived());
+        assertTrue("Client did not run successfully ", result.responseReceived());
     }
 
 }

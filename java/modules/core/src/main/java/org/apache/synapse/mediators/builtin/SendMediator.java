@@ -119,4 +119,9 @@ public class SendMediator extends AbstractMediator implements ManagedLifecycle {
             endpoint.destroy();
         }
     }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

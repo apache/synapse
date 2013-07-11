@@ -59,6 +59,7 @@
             <source type="property" property="REQUEST"/>
             <target type="body"/>
         </enrich>
+        <header name="Action" value="urn:getQuote"/>
         <send receive="ClientOutSeq">
             <endpoint name="SimpleStockQuoteService">
                 <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>

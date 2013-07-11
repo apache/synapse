@@ -327,4 +327,8 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
     public AspectConfiguration getAspectConfiguration() {
         return aspectConfiguration;
     }
+
+    public boolean isContentAware() {
+        return true;
+    }
 }

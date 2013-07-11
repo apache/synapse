@@ -60,4 +60,9 @@ public class DropMediator extends AbstractMediator {
 
         return false;
     }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

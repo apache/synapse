@@ -156,4 +156,8 @@ public class TransactionMediator extends AbstractMediator {
         }
     }
 
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

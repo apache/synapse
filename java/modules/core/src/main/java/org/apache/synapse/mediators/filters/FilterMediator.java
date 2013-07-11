@@ -256,4 +256,14 @@ public class FilterMediator extends AbstractListMediator implements
     public void setElseKey(String elseKey) {
         this.elseKey = elseKey;
     }
+
+    @Override
+    public boolean isContentAware() {
+        if (xpath != null) {
+            return xpath.isContentAware();
+        } else if (source != null) {
+            return source.isContentAware();
+        }
+        return false;
+    }
 }

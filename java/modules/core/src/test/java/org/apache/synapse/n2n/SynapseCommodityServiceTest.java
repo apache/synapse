@@ -63,6 +63,11 @@ public class SynapseCommodityServiceTest extends TestCase {
             new File("./target/test_repos/axis2.xml"),
             "lib/", "./../../modules/distribution/src/main/conf/");
 
+        findAndReplace(
+            new File("./../../repository/conf/axis2_server.xml"),
+            new File("./target/test_repos/axis2_server.xml"),
+            "lib/", "./../../modules/distribution/src/main/conf/");
+
         System.setProperty("jmx.agent.name", "synapse");
         ConfigurationContext synapseConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
@@ -92,7 +97,7 @@ public class SynapseCommodityServiceTest extends TestCase {
         ConfigurationContext businessConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "./target/test_repos/synapse",
-                        "./target/test_repos/axis2.xml");
+                        "./target/test_repos/axis2_server.xml");
 
         HashMap messageReciverMap = new HashMap();
         Class inOnlyMessageReceiver = org.apache.axis2.util.Loader.loadClass(

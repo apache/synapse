@@ -125,4 +125,9 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
     public Map getProperties() {
         return this.properties;
     }
+
+    @Override
+    public boolean isContentAware() {
+        return mediator.isContentAware();
+    }
 }

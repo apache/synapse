@@ -72,4 +72,9 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
     public boolean test(MessageContext synCtx) {
         return !synCtx.isResponse();
     }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

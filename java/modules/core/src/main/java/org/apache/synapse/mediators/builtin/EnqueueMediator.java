@@ -104,4 +104,9 @@ public class EnqueueMediator extends AbstractMediator {
     public void setSequenceName(String sequenceName) {
         this.sequenceName = sequenceName;
     }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

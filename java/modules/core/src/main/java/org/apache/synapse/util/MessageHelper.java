@@ -1,9 +1,7 @@
 package org.apache.synapse.util;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.attachments.Attachments;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.*;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
@@ -12,13 +10,21 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.nio.NHttpServerConnection;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.statistics.StatisticsRecord;
+import org.apache.synapse.aspects.statistics.StatisticsRecordFactory;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.eip.EIPConstants;
+import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.transport.passthru.ServerWorker;
+import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 
 import java.util.*;
 
@@ -137,7 +143,19 @@ public class MessageHelper {
 
         newMC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
             getClonedTransportHeaders(mc));
-
+        
+        
+        if(newMC.getProperty(PassThroughConstants.PASS_THROUGH_PIPE) != null){
+        	//clone passthrough pipe here..writer...
+        	 NHttpServerConnection conn = (NHttpServerConnection) newMC.getProperty("pass-through.Source-Connection");
+        	 if(conn != null){
+        		  SourceConfiguration sourceConfiguration = (SourceConfiguration) newMC.getProperty(
+                          "PASS_THROUGH_SOURCE_CONFIGURATION");
+        		  Pipe pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
+        		  newMC.setProperty(PassThroughConstants.PASS_THROUGH_PIPE,pipe);
+        	 }
+        }
+        
         return newMC;
     }
 

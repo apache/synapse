@@ -213,6 +213,10 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
 
     private String serviceGroup;
 
+    private boolean moduleEngaged;
+
+    private boolean wsdlPublished;
+
     /**
      * Constructor
      *
@@ -625,6 +629,9 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                         + name, axisFault);
             }
         }
+
+        moduleEngaged = wsSecEnabled || wsRMEnabled || wsAddrEnabled;
+        wsdlPublished = wsdlFound;
 
         auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
         return proxyService;
@@ -1055,9 +1062,17 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         this.serviceGroup = serviceGroup;
     }
 
+    public boolean isModuleEngaged() {
+        return moduleEngaged;
+    }
+
+    public boolean isWsdlPublished() {
+        return wsdlPublished;
+    }
+
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[ Proxy Service [ Name : ").append(name).append(" ] ]");
         return sb.toString();
     }

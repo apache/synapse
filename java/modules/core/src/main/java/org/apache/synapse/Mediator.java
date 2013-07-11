@@ -62,4 +62,6 @@ public interface Mediator extends SynapseArtifact {
      * @param traceState Set whether the tracing is enabled or not
      */
     public void setTraceState(int traceState);
+
+    public boolean isContentAware();
 }

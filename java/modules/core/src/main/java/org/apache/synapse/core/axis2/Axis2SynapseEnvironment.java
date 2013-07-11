@@ -26,13 +26,12 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.rest.RESTConstants;
+import org.apache.synapse.core.relay.RelayUtils;
 import org.apache.synapse.rest.RESTRequestHandler;
-import org.apache.synapse.rest.Resource;
 import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -131,7 +130,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         }
         synCtx.setEnvironment(this);
         Mediator mandatorySeq = synCtx.getConfiguration().getMandatorySequence();
-        // the mandatory sequence is optional and hence check for the existance before mediation
+        // the mandatory sequence is optional and hence check for the existence before mediation
         if (mandatorySeq != null) {
 
             if (log.isDebugEnabled()) {
@@ -191,14 +190,13 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
         ProxyService proxyService = synCtx.getConfiguration().getProxyService(proxyName);
         if (proxyService != null) {
-
             if (proxyService.getTargetFaultSequence() != null) {
                 Mediator faultSequence = synCtx.getSequence(proxyService.getTargetFaultSequence());
                 if (faultSequence != null) {
                     synCtx.pushFaultHandler(new MediatorFaultHandler(faultSequence));
                 } else {
                     log.warn("Cloud not find any fault-sequence named :" +
-                                proxyService.getTargetFaultSequence() + "; Setting the deafault" +
+                                proxyService.getTargetFaultSequence() + "; Setting the default" +
                                 " fault sequence for out path");
                     synCtx.pushFaultHandler(new MediatorFaultHandler(synCtx.getFaultSequence()));
                 }
@@ -262,6 +260,17 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             if (endpoint != null) {
                 Axis2Sender.sendOn(endpoint, synCtx);
             } else {
+                String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
+                if (proxyName != null) {
+                    ProxyService proxyService = synapseConfig.getProxyService(proxyName);
+                    if (proxyService.isModuleEngaged()) {
+                        try {
+                            RelayUtils.buildMessage(synCtx);
+                        } catch (Exception e) {
+                            handleException("Error building message", e);
+                        }
+                    }
+                }
                 Axis2Sender.sendBack(synCtx);
             }
         } else {
@@ -277,14 +286,20 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
             // This is only for stats collection
             synCtx.setProperty(SynapseConstants.SENDING_REQUEST, true);
-
+            if (endpoint == null) {
+                try {
+                    RelayUtils.buildMessage(synCtx);
+                } catch (Exception e) {
+                    handleException("Error while building message", e);
+                }
+            }
             Axis2Sender.sendOn(endpoint, synCtx);
         }
     }
 
     /**
      * This method will be used to create a new MessageContext in the Axis2 environment for
-     * Synapse. This will set all the relevant parts to the messagecontext, but for this message
+     * Synapse. This will set all the relevant parts to the MessageContext, but for this message
      * context to be useful creator has to fill in the data like envelope and operation context
      * and so on. This will set a default envelope of type soap12 and a new messageID for the
      * created message along with the ConfigurationContext is being set in to the message
@@ -321,7 +336,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /**
      * Factory method to create the TemporaryData object as per on the parameters specified in the
-     * synapse.properties file, so that the TemporaryData parameters like threashold chunk size
+     * synapse.properties file, so that the TemporaryData parameters like threshold chunk size
      * can be customized by using the properties file. This can be extended to enforce further
      * policies if required in the future.
      *
@@ -330,7 +345,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public OverflowBlob createOverflowBlob() {
 
         String chkSize = synapseConfig.getProperty(SynapseConstants.CHUNK_SIZE);
-        String chukNumber = synapseConfig.getProperty(SynapseConstants.THRESHOLD_CHUNKS);
+        String chunkNumber = synapseConfig.getProperty(SynapseConstants.THRESHOLD_CHUNKS);
         int numberOfChunks = SynapseConstants.DEFAULT_THRESHOLD_CHUNKS;
         int chunkSize = SynapseConstants.DEFAULT_CHUNK_SIZE;
 
@@ -338,8 +353,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             chunkSize = Integer.parseInt(chkSize);
         }
 
-        if (chukNumber != null) {
-            numberOfChunks = Integer.parseInt(chukNumber);
+        if (chunkNumber != null) {
+            numberOfChunks = Integer.parseInt(chunkNumber);
         }
 
         String tempPrefix = synapseConfig.getProperty(SynapseConstants.TEMP_FILE_PREFIX,
@@ -401,15 +416,15 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     /**
      * Retrieves the {@link SynapseConfiguration} from the <code>environment</code>
      *
-     * @return synapseConfig associated with the enviorenment
+     * @return synapseConfig associated with the environment
      */
     public SynapseConfiguration getSynapseConfiguration() {
         return this.synapseConfig;
     }
 
     /**
-     * Retrive the {@link org.apache.synapse.task.SynapseTaskManager} from the
-     * <code>envioronment</code>.
+     * Retrieve the {@link org.apache.synapse.task.SynapseTaskManager} from the
+     * <code>environment</code>.
      *
      * @return SynapseTaskManager of this synapse environment
      */
@@ -437,7 +452,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /**
      * Returns all declared xpath Function Extensions
-     * @return Hash Map Contatining Function Extensions with supported QName keys
+     * @return Hash Map Containing Function Extensions with supported QName keys
      */
     public Map<QName, SynapseXpathFunctionContextProvider> getXpathFunctionExtensions() {
         return xpathFunctionExtensions;
@@ -445,7 +460,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     /**
      * Returns all declared xpath Variable Extensions
-     * @return Hash Map Contatining Variable Extensions with supported QName keys
+     * @return Hash Map Containing Variable Extensions with supported QName keys
      */
     public Map<QName, SynapseXpathVariableResolver> getXpathVariableExtensions() {
         return xpathVariableExtensions;

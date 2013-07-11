@@ -130,11 +130,20 @@
     <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->
     <messageFormatters>
         <messageFormatter contentType="application/x-www-form-urlencoded"
+                          class="org.apache.synapse.core.relay.ExpandingMessageFormatter"/>
+        <messageFormatter contentType="multipart/form-data"
+                          class="org.apache.synapse.core.relay.ExpandingMessageFormatter"/>
+        <messageFormatter contentType="application/xml"
+                          class="org.apache.synapse.core.relay.ExpandingMessageFormatter"/>
+        <messageFormatter contentType="text/xml"
+                          class="org.apache.synapse.core.relay.ExpandingMessageFormatter"/>
+
+        <!--messageFormatter contentType="application/x-www-form-urlencoded"
                          class="org.apache.axis2.transport.http.XFormURLEncodedFormatter"/>
         <messageFormatter contentType="multipart/form-data"
                          class="org.apache.axis2.transport.http.MultipartFormDataFormatter"/>
         <messageFormatter contentType="application/xml"
-                         class="org.apache.axis2.transport.http.ApplicationXMLFormatter"/>
+                         class="org.apache.axis2.transport.http.ApplicationXMLFormatter"/-->
         <!--<messageFormatter contentType="x-application/hessian"
                          class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
         <!--<messageFormatter contentType=""
@@ -151,11 +160,20 @@
     <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->
     <messageBuilders>
         <messageBuilder contentType="application/xml"
+                        class="org.apache.synapse.core.relay.BinaryRelayBuilder"/>
+        <messageBuilder contentType="application/x-www-form-urlencoded"
+                        class="org.apache.synapse.core.relay.BinaryRelayBuilder"/>
+        <messageBuilder contentType="multipart/form-data"
+                        class="org.apache.synapse.core.relay.BinaryRelayBuilder"/>
+        <messageBuilder contentType="text/xml"
+                        class="org.apache.synapse.core.relay.BinaryRelayBuilder"/>
+
+        <!--messageBuilder contentType="application/xml"
                          class="org.apache.axis2.builder.ApplicationXMLBuilder"/>
         <messageBuilder contentType="application/x-www-form-urlencoded"
                          class="org.apache.axis2.builder.XFormURLEncodedBuilder"/>
         <messageBuilder contentType="multipart/form-data"
-                         class="org.apache.axis2.builder.MultipartFormDataBuilder"/>
+                         class="org.apache.axis2.builder.MultipartFormDataBuilder"/-->
         <!--<messageBuilder contentType="x-application/hessian"
                          class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
         <!--<messageBuilder contentType=""
@@ -168,9 +186,9 @@
     <!-- Transport Ins -->
     <!-- ================================================= -->
     <!-- the non blocking http transport based on HttpCore + NIO extensions -->
-    <transportReceiver name="http" class="org.apache.synapse.transport.nhttp.HttpCoreNIOListener">
-    	<parameter name="port">8280</parameter>
-    	<parameter name="non-blocking">true</parameter>
+    <transportReceiver name="http" class="org.apache.synapse.transport.passthru.PassThroughHttpListener">
+        <parameter name="port">8280</parameter>
+        <parameter name="non-blocking">true</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
         <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
         <!-- paramter name="priorityConfigFile" locked="false">location of priority configuration file<parameter-->
@@ -178,7 +196,7 @@
 
     <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->
     <transportReceiver name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLListener">
-    	<parameter name="port" locked="false">8243</parameter>
+        <parameter name="port" locked="false">8243</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
         <!--parameter name="WSDLEPRPrefix" locked="false">http://apachehost:port/somepath</parameter-->
         <parameter name="non-blocking" locked="false">true</parameter>
@@ -232,7 +250,7 @@
         check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
     </transportReceiver>
 
-     <!--Uncomment this for FIX transport support
+    <!--Uncomment this for FIX transport support
     <transportReceiver name="fix" class="org.apache.synapse.transport.fix.FIXTransportListener">
         <parameter name="non-blocking">true</parameter>
     </transportReceiver>-->
@@ -243,13 +261,13 @@
     </transportReceiver>-->
 
     <!--Uncomment this for UDP transport support
-    <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>-->        
+    <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>-->
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
     <!-- ================================================= -->
 
-    <transportSender name="http"  class="org.apache.synapse.transport.nhttp.HttpCoreNIOSender">
+    <transportSender name="http"  class="org.apache.synapse.transport.passthru.PassThroughHttpSender">
         <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="warnOnHTTP500" locked="false">*</parameter>
         <!--parameter name="http.proxyHost" locked="false">localhost</parameter>
@@ -277,10 +295,10 @@
         <!--<parameter name="HostnameVerifier">DefaultAndLocalhost</parameter>
             supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
     </transportSender>
-   
+
     <!-- Uncomment Transport sender for the non blocking local transport-->
     <!--transportSender name="local" class="org.apache.axis2.transport.local.NonBlockingLocalTransportSender"/-->
- 
+
     <transportSender name="jms" class="org.apache.axis2.transport.jms.JMSSender">
         <!-- uncomment this and configure to use connection pools for sending messages
         <parameter name="myTopicConnectionFactory">
@@ -301,7 +319,7 @@
             <parameter name="transport.jms.ConnectionFactoryJNDIName">QueueConnectionFactory</parameter> 
         </parameter> -->
     </transportSender>
-    
+
     <transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender"/>
 
     <!-- Uncomment and configure the SMTP server information
@@ -442,7 +460,7 @@
                                description="Axis2 group"
                                agent="org.apache.axis2.clustering.management.DefaultGroupManagementAgent"/>
         </groupManagement>
-            
+
         <!--
            This interface is responsible for handling context replication. The property changes in
            the Axis2 context hierarchy in this node, are propagated to all other nodes in the cluster.
@@ -454,7 +472,7 @@
             The "enable" attribute indicates whether context replication has been enabled
         -->
         <contextManager class="org.apache.axis2.clustering.context.DefaultContextManager"
-                         enable="false">
+                        enable="false">
             <listener class="org.apache.axis2.clustering.context.DefaultContextManagerListener"/>
             <replication>
                 <defaults>
@@ -489,11 +507,12 @@
                      class="org.apache.axis2.dispatchers.SOAPActionBasedDispatcher">
                 <order phase="Transport"/>
             </handler>
+            <handler name="EarlyBuilder" class="org.apache.synapse.core.relay.ServiceRequestEarlyBuilder"/>
         </phase>
         <phase name="Addressing">
-             <handler name="AddressingBasedDispatcher"
+            <handler name="AddressingBasedDispatcher"
                      class="org.apache.axis2.dispatchers.AddressingBasedDispatcher">
-                 <order phase="Addressing"/>
+                <order phase="Addressing"/>
             </handler>
         </phase>
         <phase name="Security"/>
@@ -532,9 +551,9 @@
     </phaseOrder>
     <phaseOrder type="InFaultFlow">
         <phase name="Addressing">
-             <handler name="AddressingBasedDispatcher"
+            <handler name="AddressingBasedDispatcher"
                      class="org.apache.axis2.dispatchers.AddressingBasedDispatcher">
-                 <order phase="Addressing"/>
+                <order phase="Addressing"/>
             </handler>
         </phase>
         <phase name="Security"/>

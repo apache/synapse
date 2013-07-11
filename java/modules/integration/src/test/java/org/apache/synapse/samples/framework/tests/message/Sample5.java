@@ -41,8 +41,8 @@ public class Sample5 extends SynapseTestCase {
     public void testCreateFaultAndChangeDirection() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280";
-        String expectedError_MSFT = "bogus";
-        String expectedError_SUN = "Connection refused";
+        String expectedError_MSFT = "Error connecting to the back end";
+        String expectedError_SUN = "Error connecting to the back end";
 
         log.info("Running test: Creating SOAP fault messages and changing the direction of a message");
         SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);

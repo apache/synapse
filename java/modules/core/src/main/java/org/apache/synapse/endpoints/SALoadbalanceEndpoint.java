@@ -24,11 +24,15 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.relay.RelayUtils;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.endpoints.dispatch.SessionInformation;
 import org.apache.synapse.mediators.MediatorProperty;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +105,14 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
 
         List<Endpoint> endpoints = (List<Endpoint>) synCtx.getProperty(
                 SynapseConstants.PROP_SAL_ENDPOINT_CURRENT_ENDPOINT_LIST);
+
+        if (!(dispatcher instanceof HttpSessionDispatcher)) {
+            try {
+                RelayUtils.buildMessage(synCtx);
+            } catch (Exception e) {
+                handleException("Error while building message", e);
+            }
+        }
 
         // evaluate the properties
         evaluateProperties(synCtx);

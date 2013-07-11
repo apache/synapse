@@ -188,8 +188,8 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("59", Sample59.class);
 
         //QoS
-        //sampleClassRepo.put("100", Sample100.class);
-        sampleClassRepo.put("101", Sample101.class);
+        sampleClassRepo.put("100", Sample100.class);
+        //sampleClassRepo.put("101", Sample101.class);
 
         //Proxy Service
         sampleClassRepo.put("150", Sample150.class);
@@ -198,7 +198,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         //sampleClassRepo.put("153", Sample153.class); // unable to load the JKS files
         sampleClassRepo.put("154", Sample154.class);
         sampleClassRepo.put("155", Sample155.class);
-        //sampleClassRepo.put("156", Sample156.class);
+        sampleClassRepo.put("156", Sample156.class);
         sampleClassRepo.put("157", Sample157.class);
 
         //Advanced

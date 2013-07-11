@@ -25,7 +25,6 @@ import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.clustering.state.Replicator;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.ManagedLifecycle;
@@ -57,11 +56,11 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
     private String onAcceptSeqKey = null;
     /* The in-line sequence which will execute when access is allowed */
     private Mediator onAcceptMediator = null;
-    /* The concurrect access control group id */
+    /* The concurrent access control group id */
     private String id;
     /* Access rate controller - limit the remote caller access*/
     private AccessRateController accessControler;
-    /* ConcurrentAccessController - limit the remote calleres concurrent access */
+    /* ConcurrentAccessController - limit the remote callers concurrent access */
     private ConcurrentAccessController concurrentAccessController = null;
     /* The property key that used when the ConcurrentAccessController
        look up from ConfigurationContext */
@@ -314,7 +313,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
     private boolean doThrottleByConcurrency(boolean isResponse, SynapseLog synLog) {
         boolean canAcess = true;
         if (concurrentAccessController != null) {
-            // do the concurrecy throttling
+            // do the concurrency throttling
             int concurrentLimit = concurrentAccessController.getLimit();
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Concurrent access controller for ID : " + id +
@@ -380,7 +379,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                     callerId = config.getConfigurationKeyOfCaller(domainName);
                     if (callerId != null) {  // there is configuration for this domain name
 
-                        //If this is a clusterred env.
+                        //If this is a clustered env.
                         if (isClusteringEnable) {
                             context.setConfigurationContext(cc);
                             context.setThrottleId(id);
@@ -409,7 +408,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                                 }
                             }
                         } catch (ThrottleException e) {
-                            handleException("Error occurd during throttling", e, synCtx);
+                            handleException("Error occurred during throttling", e, synCtx);
                         }
                     }
                 }
@@ -476,7 +475,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
                         }
                     }
                 } catch (ThrottleException e) {
-                    handleException("Error occurd during throttling", e, synCtx);
+                    handleException("Error occurred during throttling", e, synCtx);
                 }
             }
         }
@@ -559,5 +558,10 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
     public void setId(String id) {
         this.id = id;
         this.key = ThrottleConstants.THROTTLE_PROPERTY_PREFIX + id + ThrottleConstants.CAC_SUFFIX;
+    }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
     }
 }

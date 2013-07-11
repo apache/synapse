@@ -151,6 +151,8 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.setDoingREST(true);
                 axisOutMsgCtx.setProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,
                         org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
+                axisOutMsgCtx.setProperty(Constants.Configuration.CONTENT_TYPE,
+                        org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
 
             } else if (SynapseConstants.FORMAT_GET.equals(endpoint.getFormat())) {
                 axisOutMsgCtx.setDoingREST(true);

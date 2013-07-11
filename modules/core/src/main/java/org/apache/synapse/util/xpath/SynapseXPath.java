@@ -80,6 +80,8 @@ public class SynapseXPath extends AXIOMXPath {
 
     private static final Log log = LogFactory.getLog(SynapseXPath.class);
 
+    private boolean contentAware;
+
     /**
      * <p>Initializes the <code>SynapseXPath</code> with the given <code>xpathString</code> as the
      * XPath</p>
@@ -89,6 +91,17 @@ public class SynapseXPath extends AXIOMXPath {
      */
     public SynapseXPath(String xpathString) throws JaxenException {
         super(xpathString);
+
+        // TODO: Improve this
+        if (xpathString.contains("/")) {
+            contentAware = true;
+        } else if (xpathString.contains("get-property('To')") ||
+                xpathString.contains("get-property('From'") ||
+                xpathString.contains("get-property('FAULT')")) {
+            contentAware = true;
+        } else {
+            contentAware = false;
+        }
     }
 
     /**
@@ -318,6 +331,10 @@ public class SynapseXPath extends AXIOMXPath {
         } else {
             return super.getContext(obj);
         }
+    }
+
+    public boolean isContentAware() {
+        return contentAware;
     }
 
     private void handleException(String msg, Throwable e) {

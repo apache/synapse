@@ -295,4 +295,9 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
     public boolean isInitialized() {
         return initialized;
     }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

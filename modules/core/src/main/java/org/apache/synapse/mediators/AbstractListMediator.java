@@ -24,6 +24,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.relay.RelayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,8 @@ public abstract class AbstractListMediator extends AbstractMediator
     /** the list of child mediators held. These are executed sequentially */
     protected final List<Mediator> mediators = new ArrayList<Mediator>();
 
+    private boolean contentAware = false;
+
     public boolean mediate(MessageContext synCtx) {
 
         int parentsEffectiveTraceState = synCtx.getTracingState();
@@ -53,8 +56,15 @@ public abstract class AbstractListMediator extends AbstractMediator
                 synLog.traceOrDebug("Sequence <" + getType() + "> :: mediate()");
             }
 
-            for (Mediator mediator : mediators) {
+            if (contentAware) {
+                try {
+                    RelayUtils.buildMessage(synCtx);
+                } catch (Exception e) {
+                    handleException("Error while building message", e, synCtx);
+                }
+            }
 
+            for (Mediator mediator : mediators) {
                 // ensure correct trace state after each invocation of a mediator
                 synCtx.setTracingState(myEffectiveTraceState);
                 if (!mediator.mediate(synCtx)) {
@@ -96,7 +106,6 @@ public abstract class AbstractListMediator extends AbstractMediator
      * @param se synapse environment
      */
     public void init(SynapseEnvironment se) {
-
         if (log.isDebugEnabled()) {
             log.debug("Initializing child mediators of mediator : " + getType());
         }
@@ -104,6 +113,10 @@ public abstract class AbstractListMediator extends AbstractMediator
         for (Mediator mediator : mediators) {
             if (mediator instanceof ManagedLifecycle) {
                 ((ManagedLifecycle) mediator).init(se);
+            }
+
+            if (mediator.isContentAware()) {
+                contentAware = true;
             }
         }
     }
@@ -117,10 +130,14 @@ public abstract class AbstractListMediator extends AbstractMediator
         }
 
         for (Mediator mediator : mediators) {
-
             if (mediator instanceof ManagedLifecycle) {
                 ((ManagedLifecycle) mediator).destroy();
             }
         }
+    }
+
+    @Override
+    public boolean isContentAware() {
+        return contentAware;
     }
 }

@@ -356,4 +356,9 @@ public class PropertyMediator extends AbstractMediator {
         
         return matchedValue;
     }
+
+    @Override
+    public boolean isContentAware() {
+        return expression != null;
+    }
 }

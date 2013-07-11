@@ -245,4 +245,17 @@ public class LogMediator extends AbstractMediator {
             return retStr;
         }
     }
+
+    @Override
+    public boolean isContentAware() {
+        if (logLevel == CUSTOM) {
+            for (MediatorProperty property : properties) {
+                if (property.getExpression() != null && property.getExpression().isContentAware()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
 }

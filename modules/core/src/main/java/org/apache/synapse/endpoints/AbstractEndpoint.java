@@ -34,6 +34,8 @@ import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.relay.RelayConstants;
+import org.apache.synapse.core.relay.RelayUtils;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.MediatorProperty;
 
@@ -87,6 +89,8 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     protected String errorHandler = null;
 
     private boolean enableMBeanStats = true;
+
+    private boolean contentAware = false;
 
     protected AbstractEndpoint() {
         log = LogFactory.getLog(this.getClass());
@@ -180,7 +184,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     }
 
     /**
-     * set whether this endpoint needs to be registered for JMX Mbeans. some endpoints may not need
+     * set whether this endpoint needs to be registered for JMX MBeans. some endpoints may not need
      * to register under MBean and setting false will cut the additional overhead.
      * @param flag set true/false
      */
@@ -212,6 +216,10 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                 e.init(synapseEnvironment);
             }
         }
+
+        contentAware = definition != null && (definition.getFormat() != null ||
+                definition.isSecurityOn() || definition.isReliableMessagingOn() ||
+                definition.isAddressingOn());
     }
 
     public boolean readyToSend() {
@@ -276,8 +284,17 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         // add this as the last endpoint to process this message - used by statistics counting code
         synCtx.setProperty(SynapseConstants.LAST_ENDPOINT, this);
         // set message level metrics collector
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
-            BaseConstants.METRICS_COLLECTOR, metricsMBean);
+        org.apache.axis2.context.MessageContext axis2Ctx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        axis2Ctx.setProperty(BaseConstants.METRICS_COLLECTOR, metricsMBean);
+
+        if (contentAware) {
+            try {
+                RelayUtils.buildMessage(synCtx);
+                axis2Ctx.setProperty(RelayConstants.FORCE_RESPONSE_EARLY_BUILD, Boolean.TRUE);
+            } catch (Exception e) {
+                handleException("Error while building message", e);
+            }
+        }
 
         evaluateProperties(synCtx);
 

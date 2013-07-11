@@ -40,13 +40,13 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
 
     private static final Log log = LogFactory.getLog(HttpCoreRequestResponseTransport.class);
     // TODO: the proper value of the status field has to be RequestResponseTransportStatus.INITIAL
-    // TODO: as per the axis2 dosumentaiton, but this is a workaround to get Sandesha2 to work
+    // TODO: as per the axis2 documentation, but this is a workaround to get Sandesha2 to work
     // TODO: synapse nhttp transport. see : https://issues.apache.org/jira/browse/SYNAPSE-493
     private RequestResponseTransportStatus status = RequestResponseTransportStatus.WAITING;
     private MessageContext msgContext = null;
     private boolean responseWritten = false;
 
-    HttpCoreRequestResponseTransport(MessageContext msgContext) {
+    public HttpCoreRequestResponseTransport(MessageContext msgContext) {
         this.msgContext = msgContext;
     }
 

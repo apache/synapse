@@ -72,4 +72,9 @@ public class OutMediator extends AbstractListMediator implements org.apache.syna
     public boolean test(MessageContext synCtx) {
         return synCtx.isResponse();
     }
+
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
 }

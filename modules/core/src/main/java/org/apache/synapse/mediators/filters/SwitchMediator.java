@@ -167,7 +167,7 @@ public class SwitchMediator extends AbstractMediator implements ManagedLifecycle
     /**
      * Get default case
      *
-     * @return the default csae
+     * @return the default case
      */
     public SwitchCase getDefaultCase() {
         return defaultCase;

@@ -170,6 +170,7 @@ public class StockQuoteSampleClient {
             payload = StockQuoteHandler.createStandardQuoteRequest(
                     symbol, 1);
             serviceClient.getOptions().setAction("urn:getQuote");
+            serviceClient.getOptions().setUseSeparateListener(true);
             setCompleted(false);
             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback(this));
 

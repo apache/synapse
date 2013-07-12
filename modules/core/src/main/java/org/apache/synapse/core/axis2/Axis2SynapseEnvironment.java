@@ -30,9 +30,9 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.core.relay.RelayUtils;
 import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.task.SynapseTaskManager;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -265,7 +265,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                     ProxyService proxyService = synapseConfig.getProxyService(proxyName);
                     if (proxyService.isModuleEngaged()) {
                         try {
-                            RelayUtils.buildMessage(synCtx);
+                        	 RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
                         } catch (Exception e) {
                             handleException("Error building message", e);
                         }
@@ -288,7 +288,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             synCtx.setProperty(SynapseConstants.SENDING_REQUEST, true);
             if (endpoint == null) {
                 try {
-                    RelayUtils.buildMessage(synCtx);
+                	RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
                 } catch (Exception e) {
                     handleException("Error while building message", e);
                 }

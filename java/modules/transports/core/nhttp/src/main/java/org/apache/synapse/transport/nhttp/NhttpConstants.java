@@ -153,4 +153,14 @@ public class NhttpConstants {
      */
     public static final String SO_TIMEOUT_RECEIVER = "http.socket.timeout.receiver";
     public static final String SO_TIMEOUT_SENDER = "http.socket.timeout.sender";
+    
+    /** This property can be used to set the HOST header sent from the client to synapse */
+    public static final String REQUEST_HOST_HEADER = "REQUEST_HOST_HEADER";
+    
+
+    /** The name of the system property used to specify/override the nhttp properties location */
+    public static final String NHTTP_PROPERTIES = "nhttp.properties";
+
+    //property name of nhttp log directory
+    public static final String NHTTP_LOG_DIRECTORY = "nhttp.log.directory";
 }

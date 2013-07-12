@@ -23,13 +23,14 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.core.relay.RelayUtils;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.dispatch.SALSessions;
 import org.apache.synapse.endpoints.dispatch.SessionInformation;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -108,7 +109,7 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
 
         if (!(dispatcher instanceof HttpSessionDispatcher)) {
             try {
-                RelayUtils.buildMessage(synCtx);
+            	RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
             } catch (Exception e) {
                 handleException("Error while building message", e);
             }

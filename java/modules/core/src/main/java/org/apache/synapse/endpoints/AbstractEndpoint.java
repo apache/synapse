@@ -34,10 +34,10 @@ import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.core.relay.RelayConstants;
-import org.apache.synapse.core.relay.RelayUtils;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.transport.passthru.util.RelayConstants;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 
 import java.util.*;
 
@@ -289,7 +289,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
         if (contentAware) {
             try {
-                RelayUtils.buildMessage(synCtx);
+            	RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
                 axis2Ctx.setProperty(RelayConstants.FORCE_RESPONSE_EARLY_BUILD, Boolean.TRUE);
             } catch (Exception e) {
                 handleException("Error while building message", e);

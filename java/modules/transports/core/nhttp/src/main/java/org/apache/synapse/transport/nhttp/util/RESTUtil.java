@@ -22,13 +22,19 @@ package org.apache.synapse.transport.nhttp.util;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisBindingOperation;
+import org.apache.axis2.description.AxisEndpoint;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.WSDL20DefaultValueHolder;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.dispatchers.HTTPLocationBasedDispatcher;
 import org.apache.axis2.dispatchers.RequestURIBasedDispatcher;
+import org.apache.axis2.dispatchers.RequestURIOperationDispatcher;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
@@ -285,6 +291,34 @@ public class RESTUtil {
                         .getAxisConfiguration().getService(defaultSvcName);
             }
             msgContext.setAxisService(axisService);
+        }
+    }
+    
+    public static void dispatchAndVerify(MessageContext msgContext) throws AxisFault {
+        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
+        requestDispatcher.invoke(msgContext);
+        AxisService axisService = msgContext.getAxisService();
+        if (axisService != null) {
+            HTTPLocationBasedDispatcher httpLocationBasedDispatcher =
+                    new HTTPLocationBasedDispatcher();
+            httpLocationBasedDispatcher.invoke(msgContext);
+            if (msgContext.getAxisOperation() == null) {
+                RequestURIOperationDispatcher requestURIOperationDispatcher =
+                        new RequestURIOperationDispatcher();
+                requestURIOperationDispatcher.invoke(msgContext);
+            }
+
+            AxisOperation axisOperation;
+            if ((axisOperation = msgContext.getAxisOperation()) != null) {
+                AxisEndpoint axisEndpoint =
+                        (AxisEndpoint) msgContext.getProperty(WSDL2Constants.ENDPOINT_LOCAL_NAME);
+                if (axisEndpoint != null) {
+                    AxisBindingOperation axisBindingOperation = (AxisBindingOperation) axisEndpoint
+                            .getBinding().getChild(axisOperation.getName());
+                    msgContext.setProperty(Constants.AXIS_BINDING_OPERATION, axisBindingOperation);
+                }
+                msgContext.setAxisOperation(axisOperation);
+            }
         }
     }
 }

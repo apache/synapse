@@ -22,6 +22,9 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="myFaultHandler">
+        <log level="custom">
+            <property name="******ERROR" expression="get-property('ERROR_MESSAGE')"/>
+        </log>
         <makefault response="true">
             <code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/>
             <reason expression="get-property('ERROR_MESSAGE')"/>

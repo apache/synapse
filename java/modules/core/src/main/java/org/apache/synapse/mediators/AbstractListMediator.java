@@ -24,7 +24,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.core.relay.RelayUtils;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,7 @@ public abstract class AbstractListMediator extends AbstractMediator
 
             if (contentAware) {
                 try {
-                    RelayUtils.buildMessage(synCtx);
+                    RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
                 } catch (Exception e) {
                     handleException("Error while building message", e, synCtx);
                 }

@@ -177,7 +177,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
 
         //Endpoint
         sampleClassRepo.put("50", Sample50.class);
-        //sampleClassRepo.put("51", Sample51.class);
+        sampleClassRepo.put("51", Sample51.class);
         sampleClassRepo.put("52", Sample52.class);
         sampleClassRepo.put("53", Sample53.class);
         sampleClassRepo.put("54", Sample54.class);

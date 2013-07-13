@@ -22,6 +22,7 @@ package org.apache.synapse.transport.passthru;
  * Error codes exposed by this transport. 
  */
 public class ErrorCodes {
+
     public static final int SND_IO_ERROR       = 101500;
 
     public static final int SND_HTTP_ERROR     = 102510;
@@ -38,5 +39,6 @@ public class ErrorCodes {
 
     public static final int CONNECT_CANCEL     = 101507;
 
-    public static final int CONNECT_TIMEOUT    = 101508;    
+    public static final int CONNECT_TIMEOUT    = 101508;
+
 }

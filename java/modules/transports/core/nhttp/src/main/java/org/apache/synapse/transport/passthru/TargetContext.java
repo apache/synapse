@@ -30,19 +30,26 @@ import java.nio.ByteBuffer;
  * It is used as a holder for information required during the life-cycle of this connection.
  */
 public class TargetContext {
+
     private TargetConfiguration targetConfiguration = null;
 
     public static final String CONNECTION_INFORMATION = "CONNECTION_INFORMATION";
+
     /** The request for this connection */
     private TargetRequest request;
+
     /** The response for this connection */
     private TargetResponse response;
+
     /** State of the connection */
     private ProtocolState state;
+
     /** The request message context */
     private MessageContext requestMsgCtx;
+
     /** The current reader */
     private Pipe reader;
+
     /** The current writer */
     private Pipe writer;
 
@@ -131,14 +138,6 @@ public class TargetContext {
         }  else {
             throw new IllegalStateException("Connection information should be present");
         }
-    }
-
-    public static boolean assertState(NHttpConnection conn, ProtocolState state) {
-        TargetContext info = (TargetContext)
-                conn.getContext().getAttribute(CONNECTION_INFORMATION);
-
-        return info != null && info.getState() == state;
-
     }
 
     public static ProtocolState getState(NHttpConnection conn) {

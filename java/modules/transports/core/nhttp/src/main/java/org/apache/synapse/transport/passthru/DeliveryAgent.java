@@ -63,9 +63,6 @@ public class DeliveryAgent {
     /** Configuration of the sender */
     private TargetConfiguration targetConfiguration;
 
-    /** The maximum number of messages that can wait for a connection */
-    private int maxWaitingMessages = Integer.MAX_VALUE;
-
     private TargetErrorHandler targetErrorHandler;
 
     /** Lock for synchronizing access */
@@ -121,9 +118,8 @@ public class DeliveryAgent {
                     queue = new ConcurrentLinkedQueue<MessageContext>();
                     waitingMessages.put(key, queue);
                 }
-                if (queue.size() == maxWaitingMessages) {
+                if (queue.size() == Integer.MAX_VALUE) {
                     MessageContext msgCtx = queue.poll();
-
                     targetErrorHandler.handleError(msgCtx,
                             ErrorCodes.CONNECTION_TIMEOUT,
                             "Error connecting to the back end",
@@ -160,11 +156,12 @@ public class DeliveryAgent {
             MessageContext msgCtx = queue.poll();
 
             if (msgCtx != null) {
-                targetErrorHandler.handleError(msgCtx,
-                        errorCode,
-                        "Error connecting to the back end",
-                        null,
-                        ProtocolState.REQUEST_READY);
+                String errorMessage = "Error while connecting to the endpoint";
+                if (message != null) {
+                    errorMessage += " (" + message + ")";
+                }
+                targetErrorHandler.handleError(msgCtx, errorCode, errorMessage,
+                        null, ProtocolState.REQUEST_READY);
             }
         } else {
             throw new IllegalStateException("Queue cannot be null for: " + key);
@@ -225,7 +222,8 @@ public class DeliveryAgent {
         if (pipe != null) {
             pipe.attachConsumer(conn);
             request.connect(pipe);
-            if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+            if (Boolean.TRUE.equals(msgContext.getProperty(
+                    PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
                 synchronized (msgContext) {
                     OutputStream out = pipe.getOutputStream();
                     msgContext.setProperty("GET_ME_OUT", out);

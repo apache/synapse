@@ -49,10 +49,6 @@ public class Pipe {
 
     private boolean producerCompleted = false;
 
-    public boolean isProducerCompleted() {
-		return producerCompleted;
-	}
-
 	/** Lock to synchronize the producers and consumers */
     private Lock lock = new ReentrantLock();
 
@@ -267,31 +263,6 @@ public class Pipe {
         }
         return outputStream;
     }
-    
-    
-    /**
-     * Creates a separate ByteBuffer for the output data and returns an OutputStream
-     * on top of it.
-     *
-     * @return An OutputStream object
-     */
-    public synchronized OutputStream resetOutputStream() {
-    	outputBuffer = baseConfig.getBufferFactory().getBuffer();
-        outBufferInputMode = new AtomicBoolean(true);
-        outputStream = new ByteBufferOutputStream();
-        return outputStream;
-    }
-    
-    
-    public synchronized void resetBufferPossition() {
-    	if(buffer != null){
-    		buffer.rewind();
-    	}
-    	
-    	if(outputBuffer != null){
-    		outputBuffer.rewind();
-    	}
-    }
 
     public synchronized void setSerializationComplete(boolean serializationComplete) {
         if (!this.serializationComplete) {
@@ -312,26 +283,9 @@ public class Pipe {
     public void setRawSerializationComplete(boolean rawSerializationComplete) {
     	this.rawSerializationComplete = rawSerializationComplete;
     }
-    
-    public void forceSetSerializationRest(){
-    	if(this.serializationComplete){
-    		this.serializationComplete = false;
-    	}
-    }
-
-    
-    
-
-    public boolean isSerializationComplete() {
-		return serializationComplete;
-	}
 
 	public ByteBuffer getBuffer() {
         return buffer;
-    }
-
-    public boolean hasHttpProducer() {
-        return hasHttpProducer;
     }
 
     private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {

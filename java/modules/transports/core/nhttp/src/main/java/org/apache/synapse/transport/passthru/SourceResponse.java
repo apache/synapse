@@ -35,23 +35,29 @@ import java.util.Map;
 import java.util.Set;
 
 public class SourceResponse {
+
     private Pipe pipe = null;
+
     /** Transport headers */
     private Map<String, String> headers = new HashMap<String, String>();
+
     /** Status of the response */
     private int status = HttpStatus.SC_OK;
+
     /** Status line */
     private String statusLine = null;
+
     /** Actual response submitted */
     private HttpResponse response = null;
+
     /** Configuration of the receiver */
     private SourceConfiguration sourceConfiguration;
+
     /** Version of the response */
     private ProtocolVersion version = HttpVersion.HTTP_1_1;
+
     /** Connection strategy */
     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
-    /** Chunk response or not */
-    // private boolean chunk = true;
 
     private SourceRequest request = null;
 

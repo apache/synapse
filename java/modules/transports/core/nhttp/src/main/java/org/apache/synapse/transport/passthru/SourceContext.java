@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * In a Single TCP Connection there can be multiple HTTP Requests.
  */
 public class SourceContext {
+
     public static final String CONNECTION_INFORMATION = "CONNECTION_INFORMATION";
 
     private SourceConfiguration sourceConfiguration;
@@ -194,12 +195,5 @@ public class SourceContext {
 
     public static SourceContext get(NHttpConnection conn) {
         return (SourceContext) conn.getContext().getAttribute(CONNECTION_INFORMATION);
-    }
-
-    public static Lock getLock(NHttpConnection conn) {
-        SourceContext info = (SourceContext)
-                conn.getContext().getAttribute(CONNECTION_INFORMATION);
-
-        return info != null ? info.getLock() : null;
     }
 }

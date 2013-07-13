@@ -43,6 +43,6 @@ public enum ProtocolState {
     CLOSING,
     /** The connection is closed */
     CLOSED,
-    
+    /** WSDL response has been sent */
     WSDL_RESPONSE_DONE
 }

@@ -34,39 +34,47 @@ import java.util.Map;
  * This class represents a response coming from the target server.
  */
 public class TargetResponse {
-    // private Log log = LogFactory.getLog(TargetResponse.class);
+
     /** To pipe the incoming data through */
     private Pipe pipe = null;
+
     /** Headers of the response */
     private Map<String, String> headers = new HashMap<String, String>();
+
     /** The status of the response */
     private int status = HttpStatus.SC_OK;
+
     /** Http status line */
     private String statusLine = "OK";
+
     /** The Http response */
     private HttpResponse response = null;
+
     /** Configuration of the sender */
     private TargetConfiguration targetConfiguration;
+
     /** Protocol version */
     private ProtocolVersion version = HttpVersion.HTTP_1_1;
+
     /** This utility class is used for determining weather we need to close the connection
      * after submitting the response */
     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
+
     /** The connection */
     private NHttpClientConnection connection;
-    /** Weather this response has a body */
+
+    /** Whether this response has a body */
     private boolean expectResponseBody = true;
 
     public TargetResponse(TargetConfiguration targetConfiguration,
                           HttpResponse response,
                           NHttpClientConnection conn,
                           boolean expectResponseBody) {
+
         this.targetConfiguration = targetConfiguration;
         this.response = response;
         this.connection = conn;
-
         this.version = response.getProtocolVersion();
-
         this.status = response.getStatusLine().getStatusCode();
         this.statusLine = response.getStatusLine().getReasonPhrase();
 
@@ -88,11 +96,9 @@ public class TargetResponse {
         TargetContext.updateState(conn, ProtocolState.RESPONSE_HEAD);
         
         if (expectResponseBody) {
-            pipe
-                = new Pipe(conn, targetConfiguration.getBufferFactory().getBuffer(), "target", targetConfiguration);
-
+            pipe = new Pipe(conn, targetConfiguration.getBufferFactory().getBuffer(),
+                    "target", targetConfiguration);
             TargetContext.get(conn).setReader(pipe);
-
             BasicHttpEntity entity = new BasicHttpEntity();
             if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
                 entity.setChunked(true);
@@ -125,21 +131,18 @@ public class TargetResponse {
     public int read(NHttpClientConnection conn, ContentDecoder decoder) throws IOException {
     	
     	int bytes=0;
-    	
-    	if(pipe != null){
+    	if (pipe != null) {
     		bytes = pipe.produce(decoder);
     	}
 
         // Update connection state
         if (decoder.isCompleted()) {
             TargetContext.updateState(conn, ProtocolState.RESPONSE_DONE);
-
             targetConfiguration.getMetrics().notifyReceivedMessageSize(
                     conn.getMetrics().getReceivedBytesCount());
 
             if (!this.connStrategy.keepAlive(response, conn.getContext())) {
                 TargetContext.updateState(conn, ProtocolState.CLOSED);
-
                 targetConfiguration.getConnections().shutdownConnection(conn);
             } else {
                 targetConfiguration.getConnections().releaseConnection(conn);

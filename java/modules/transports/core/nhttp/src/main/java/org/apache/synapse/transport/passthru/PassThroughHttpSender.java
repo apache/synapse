@@ -277,7 +277,6 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         }
     }
 
-
 	private void sendRequestContent(final MessageContext msgContext) throws AxisFault {
 		if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
 			synchronized (msgContext) {
@@ -308,10 +307,10 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 					formatter.writeTo(msgContext, format, _out, false);
 					try {
 	                    IOUtils.write(_out.toByteArray(),out);
-	                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,new Long(_out.toByteArray().length));
+	                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,
+                                _out.toByteArray().length);
                     } catch (IOException e) {
-	                    // TODO Auto-generated catch block
-                    	 handleException("IO while building message", e);
+                    	 handleException("IO error while building message", e);
                     }
                 	pipe.setSerializationComplete(true);
 				}else {

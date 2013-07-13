@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru;
 
 import org.apache.axiom.om.OMElement;
@@ -112,7 +113,7 @@ public class PassThroughHttpListener implements TransportListener {
         namePrefix = (sslContext == null) ? "HTTP" : "HTTPS";
 
         sourceConfiguration = new SourceConfiguration(cfgCtx, transportInDescription, workerPool);
-        sourceConfiguration.setSsl((sslContext == null) ? false :true);
+        sourceConfiguration.setSsl(sslContext != null);
         sourceConfiguration.build();
 
         // register to receive updates on services for lifetime management
@@ -132,12 +133,10 @@ public class PassThroughHttpListener implements TransportListener {
     }
 
     public void start() throws AxisFault {
-
         log.info("Starting Pass-through " + namePrefix + " Listener...");
 
         try {
             String prefix = namePrefix + "-Listener I/O dispatcher";
-
             ioReactor = new DefaultListeningIOReactor(
                             sourceConfiguration.getIOThreadsPerReactor(),
                             new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix),
@@ -196,7 +195,6 @@ public class PassThroughHttpListener implements TransportListener {
         }
 
         state = BaseConstants.STARTED;
-
         log.info("Pass-through " + namePrefix + " Listener " + "started on port : " +
                 sourceConfiguration.getPort());
     }
@@ -204,29 +202,6 @@ public class PassThroughHttpListener implements TransportListener {
     private void handleException(String s, Exception e) throws AxisFault {
         log.error(s, e);
         throw new AxisFault(s, e);
-    }
-
-    public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
-        String trailer = "";
-        //Strip out the operation name
-        if (serviceName.indexOf('/') != -1) {
-            trailer += serviceName.substring(serviceName.indexOf("/"));
-            serviceName = serviceName.substring(0, serviceName.indexOf('/'));
-        }
-        // strip out the endpoint name if present
-        if (serviceName.indexOf('.') != -1) {
-            trailer += serviceName.substring(serviceName.indexOf("."));
-            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
-        }
-
-        if (serviceNameToEPRMap.containsKey(serviceName)) {
-            return new EndpointReference(
-                    sourceConfiguration.getCustomEPRPrefix() +
-                            serviceNameToEPRMap.get(serviceName) + trailer);
-        } else {
-            return new EndpointReference(sourceConfiguration.getServiceEPRPrefix() +
-                    serviceName + trailer);
-        }
     }
 
     /**
@@ -354,13 +329,13 @@ public class PassThroughHttpListener implements TransportListener {
                         addToServiceURIMap(service);
                         break;
                     case AxisEvent.SERVICE_REMOVE :
-                        removeServiceFfromURIMap(service);
+                        removeServiceFromURIMap(service);
                         break;
                     case AxisEvent.SERVICE_START  :
                         addToServiceURIMap(service);
                         break;
                     case AxisEvent.SERVICE_STOP   :
-                        removeServiceFfromURIMap(service);
+                        removeServiceFromURIMap(service);
                         break;
                 }
             }
@@ -394,7 +369,7 @@ public class PassThroughHttpListener implements TransportListener {
         }
     }
 
-    private void removeServiceFfromURIMap(AxisService service) {
+    private void removeServiceFromURIMap(AxisService service) {
         eprToServiceNameMap.remove(serviceNameToEPRMap.get(service.getName()));
         serviceNameToEPRMap.remove(service.getName());
     }
@@ -418,7 +393,7 @@ public class PassThroughHttpListener implements TransportListener {
 
     /**
      * Create the SSL IO Session handler to be used by this listener
-     * @param transportIn transport in descritption
+     * @param transportIn transport in description
      * @return always null
      * @throws AxisFault never thrown
      */

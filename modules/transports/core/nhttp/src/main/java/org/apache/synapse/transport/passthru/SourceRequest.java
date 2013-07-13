@@ -35,27 +35,34 @@ import java.util.TreeMap;
  * Represents a Http Request.
  */
 public class SourceRequest {
-    // private Log log = LogFactory.getLog(SourceRequest.class);
 
     private Pipe pipe = null;
+
     /** HTTP Headers */
     private Map<String, String> headers =  new TreeMap<String, String>(new Comparator<String>() {
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);
         }
     });
+
     /** HTTP URL */
     private String url;
+
     /** HTTP Method */
     private String method;
-    /** Weather reqyest has a body */
+
+    /** Whether the request has a body */
     private boolean entityEnclosing;
+
     /** The http request */
     private HttpRequest request = null;
+
     /** Configuration of the receiver */
     private SourceConfiguration sourceConfiguration;
+
     /** HTTP Version */
     private ProtocolVersion version = null;
+
     /** The connection from the client */
     private NHttpServerConnection connection = null;
 
@@ -93,7 +100,8 @@ public class SourceRequest {
      */
     public void start(NHttpServerConnection conn) throws IOException, HttpException {
         if (entityEnclosing) {
-            pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
+            pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(),
+                    "source", sourceConfiguration);
 
             SourceContext.get(conn).setReader(pipe);
 

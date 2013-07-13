@@ -30,7 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
 public class TargetErrorHandler {
-    private Log log = LogFactory.getLog(TargetErrorHandler.class);
+
+    private static final Log log = LogFactory.getLog(TargetErrorHandler.class);
 
     private TargetConfiguration targetConfiguration = null;
 
@@ -61,10 +62,6 @@ public class TargetErrorHandler {
                 mc.getAxisOperation().getMessageReceiver() == null) {
             return;
         }
-
-//        if (mc.getOperationContext().isComplete()) {
-//            return;
-//        } ? why we ignoring this..
 
         targetConfiguration.getWorkerPool().execute(new Runnable() {
             public void run() {

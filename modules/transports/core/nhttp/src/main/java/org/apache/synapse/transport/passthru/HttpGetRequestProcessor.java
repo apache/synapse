@@ -28,8 +28,8 @@ import org.apache.http.nio.NHttpServerConnection;
 import java.io.OutputStream;
 
 /**
- * This Passthrough transport level interface is used for plugging in different implementations for special processing of some
- * HTTP GET requests.
+ * This PassThrough transport level interface is used for plugging in different implementations
+ * for special processing of some HTTP GET requests.
  * <p/>
  * e.g. ?wsdl, ?wsdl2 etc.
  * <p/>
@@ -39,8 +39,10 @@ import java.io.OutputStream;
 public interface HttpGetRequestProcessor {
     /**
      * Initialize the HttpGetProcessor
+     *
      * @param cfgCtx servers configuration context
-     * @param serverHandler dispatching handler
+     * @param handler dispatching handler
+     *
      * @throws AxisFault if an error occurs
      */
     void init(ConfigurationContext cfgCtx, SourceHandler handler) throws AxisFault;

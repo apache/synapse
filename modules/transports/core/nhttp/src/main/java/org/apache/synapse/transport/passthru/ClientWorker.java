@@ -32,7 +32,6 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axiom.soap.*;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,13 +46,18 @@ import java.util.TreeMap;
 import java.util.Comparator;
 
 public class ClientWorker implements Runnable {
-    private Log log = LogFactory.getLog(ClientWorker.class);
+
+    private static final Log log = LogFactory.getLog(ClientWorker.class);
+
     /** the Axis2 configuration context */
     private ConfigurationContext cfgCtx = null;
+
     /** the response message context that would be created */
     private org.apache.axis2.context.MessageContext responseMsgCtx = null;
+
     /** the HttpResponse received */
     private TargetResponse response = null;
+
     /** weather a body is expected or not */
     private boolean expectEntityBody = true;
 
@@ -71,7 +75,7 @@ public class ClientWorker implements Runnable {
 		// Special casing 302 scenario in following section. Not sure whether it's the correct fix,
 		// but this fix makes it possible to do http --> https redirection.
 		if (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY) {
-			URL url = null;
+			URL url;
 			try {
 				url = new URL(oriURL);
 			} catch (MalformedURLException e) {
@@ -80,11 +84,11 @@ public class ClientWorker implements Runnable {
 			}
 
 			headers.remove(PassThroughConstants.LOCATION);
-			String prfix =  (String) outMsgCtx.getProperty(PassThroughConstants.SERVICE_PREFIX);
-			if (prfix != null) {
-				headers.put(PassThroughConstants.LOCATION, prfix + url.getFile());
+			String prefix =  (String) outMsgCtx.getProperty(
+                    PassThroughConstants.SERVICE_PREFIX);
+			if (prefix != null) {
+				headers.put(PassThroughConstants.LOCATION, prefix + url.getFile());
 			}
-
 		}
         
         try {
@@ -192,14 +196,14 @@ public class ClientWorker implements Runnable {
                 try {
                     responseMsgCtx.setEnvelope(envelope);
                 } catch (AxisFault axisFault) {
-                    log.error("Error setting SOAP envelope", axisFault);
+                    log.error("Error setting the SOAP envelope", axisFault);
                 }
 
                 responseMsgCtx.setServerSide(true);
             } else {
                 // there is no response entity-body
                 responseMsgCtx.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
-                responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                responseMsgCtx.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
             }
 
             // copy the HTTP status code as a message context property with the key HTTP_SC to be
@@ -209,10 +213,7 @@ public class ClientWorker implements Runnable {
             if (statusCode >= 400) {
                 responseMsgCtx.setProperty(PassThroughConstants.FAULT_MESSAGE,
                         PassThroughConstants.TRUE);
-            } /*else if (statusCode == 202 && responseMsgCtx.getOperationContext().isComplete()) {
-                // Handle out-only invocation scenario
-                responseMsgCtx.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
-            }*/
+            }
             responseMsgCtx.setProperty(PassThroughConstants.NON_BLOCKING_TRANSPORT, true);
 
             // process response received
@@ -221,7 +222,6 @@ public class ClientWorker implements Runnable {
             } catch (AxisFault af) {
                 log.error("Fault processing response message through Axis2", af);
             }
-
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);            
         } catch (IOException e) {

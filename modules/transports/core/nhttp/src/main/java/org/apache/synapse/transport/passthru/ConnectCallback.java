@@ -32,13 +32,6 @@ public class ConnectCallback implements SessionRequestCallback {
     /** The agent used for delivering requests */
     private DeliveryAgent deliveryAgent;
 
-    /**
-     * Create the callback for the handling events on a given connection     
-     */
-    public ConnectCallback() {
-
-    }
-
     public void completed(SessionRequest request) {
         HostConnections pool = (HostConnections) request.getAttachment();
         pool.pendingConnectionSucceeded();

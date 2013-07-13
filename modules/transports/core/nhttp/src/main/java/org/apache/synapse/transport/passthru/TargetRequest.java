@@ -21,7 +21,6 @@
 package org.apache.synapse.transport.passthru;
 
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -56,28 +55,39 @@ import javax.xml.stream.XMLStreamException;
  * This is a class for representing a request to be sent to a target.
  */
 public class TargetRequest {
+
     /** Configuration of the sender */
     private TargetConfiguration targetConfiguration;
 
     private Pipe pipe = null;
+
     /** Headers map */
     private Map<String, String> headers = new HashMap<String, String>();
+
     /** URL */
     private URL url;
+
     /** HTTP Method */
     private String method;
+
     /** HTTP request created for sending the message */
     private HttpRequest request = null;
-    /** Weather chunk encoding should be used */
+
+    /** Whether chunk encoding should be used */
     private boolean chunk = true;
+
     /** HTTP version that should be used */
     private ProtocolVersion version = null;
+
     /** Weather full url is used for the request */
     private boolean fullUrl = false;
+
     /** Port to be used for the request */
     private int port = 80;
+
     /** Weather this request has a body */
     private boolean hasEntityBody = true;
+
     /** Keep alive request */
     private boolean keepAlive = true;
     
@@ -123,12 +133,12 @@ public class TargetRequest {
         }
         
         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
-        
-        if(requestMsgCtx.getProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH) != null){
-        	contentLength = (Long)requestMsgCtx.getProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH);
+        Long lengthValue = (Long) requestMsgCtx.getProperty(
+                PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH);
+        if (lengthValue != null){
+        	contentLength = lengthValue;
         }
-        
-       
+
         //fix for  POST_TO_URI
         if (requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){
         	path = url.toString();
@@ -233,19 +243,20 @@ public class TargetRequest {
     }
 
 	/**
-	 * Handles the chuking messages in Passthough context, create a temporary buffer and calculate the message
-	 * size before writing to the external buffer, which is required the context of handling DISABLED chunking 
-	 * messages
+	 * Handles the chunking messages in PassThough context, create a temporary buffer and
+     * calculate the message size before writing to the external buffer, which is required the
+     * context of handling DISABLED chunking messages.
 	 * 
-	 * @param conn
-	 * @param requestMsgCtx
+	 * @param conn Client HTTP connection
+	 * @param requestMsgCtx Current request message context
 
 	 * @throws IOException
-	 * @throws AxisFault
 	 */
-	private void processChunking(NHttpClientConnection conn, MessageContext requestMsgCtx) throws IOException,
-	                                                                                                        AxisFault {
-		String disableChunking = (String) requestMsgCtx.getProperty(PassThroughConstants.DISABLE_CHUNKING);
+	private void processChunking(NHttpClientConnection conn,
+                                 MessageContext requestMsgCtx) throws IOException {
+
+		String disableChunking = (String) requestMsgCtx.getProperty(
+                PassThroughConstants.DISABLE_CHUNKING);
 		String forceHttp10 = (String) requestMsgCtx.getProperty(PassThroughConstants.FORCE_HTTP_1_0);
 	    if ("true".equals(disableChunking) || "true".equals(forceHttp10)) {
 	    	if (requestMsgCtx.getEnvelope().getBody().getFirstElement() == null) {
@@ -265,7 +276,7 @@ public class TargetRequest {
 							OutputStream _out = pipe.getOutputStream();
 							IOUtils.write(out.toByteArray(), _out);
 						
-							entity.setContentLength(new Long(out.toByteArray().length));
+							entity.setContentLength(out.toByteArray().length);
 							entity.setChunked(false);
 						}
 					}
@@ -307,11 +318,6 @@ public class TargetRequest {
     public boolean hasEntityBody() {
         return hasEntityBody;
     }
-    
-    
-    public void setHasEntityBody(boolean hasEntityBody) {
-		this.hasEntityBody = hasEntityBody;
-	}
 
 	public void addHeader(String name, String value) {
         headers.put(name, value);
@@ -344,6 +350,5 @@ public class TargetRequest {
 	public HttpRequest getRequest() {
 		return request;
 	}
-    
-    
+
 }

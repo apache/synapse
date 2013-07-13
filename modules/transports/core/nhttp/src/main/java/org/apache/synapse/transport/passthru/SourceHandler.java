@@ -23,12 +23,10 @@ import org.apache.http.nio.*;
 import org.apache.http.nio.entity.ContentOutputStream;
 import org.apache.http.nio.util.ContentOutputBuffer;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.http.nio.util.SharedOutputBuffer;
 import org.apache.http.nio.util.SimpleOutputBuffer;
 import org.apache.http.*;
 import org.apache.http.protocol.*;
 import org.apache.http.params.DefaultedHttpParams;
-import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
@@ -46,7 +44,8 @@ import java.io.OutputStream;
  * about the message and its various states.
  */
 public class SourceHandler implements NHttpServiceHandler {
-    private static Log log = LogFactory.getLog(SourceHandler.class);
+
+    private static final Log log = LogFactory.getLog(SourceHandler.class);
 
     private final SourceConfiguration sourceConfiguration;
 
@@ -67,7 +66,7 @@ public class SourceHandler implements NHttpServiceHandler {
 				this.s2sLatencyView = new LatencyView(sourceConfiguration.isSsl());
 			}
 		} catch (AxisFault e) {
-			log.error(e.getMessage(), e);
+			log.error("Error while initializing latency view calculators", e);
 		}
     }
 
@@ -75,17 +74,16 @@ public class SourceHandler implements NHttpServiceHandler {
         // we have to have these two operations in order
         sourceConfiguration.getSourceConnections().addConnection(conn);
         SourceContext.create(conn, ProtocolState.REQUEST_READY, sourceConfiguration);
-
         metrics.connected();
     }
 
     public void requestReceived(NHttpServerConnection conn) {
         try {
-        	
-        	HttpContext _context = conn.getContext();
-        	_context.setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());
+            conn.getContext().setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME,
+                    System.currentTimeMillis());
         	 
-            if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) && !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {
+            if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) &&
+                    !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {
                 handleInvalidState(conn, "Request received");
                 return;
             }
@@ -94,50 +92,40 @@ public class SourceHandler implements NHttpServiceHandler {
 
             // at this point we have read the HTTP Headers
             SourceContext.updateState(conn, ProtocolState.REQUEST_HEAD);
-
             SourceRequest request = new SourceRequest(
                     sourceConfiguration, conn.getHttpRequest(), conn);
-
             SourceContext.setRequest(conn, request);
-
             request.start(conn);
-
             metrics.incrementMessagesReceived();
-            
-            /******/
-            String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase():"";
+
+            String method = request.getRequest() != null ?
+                    request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
             OutputStream os = null;
 			if ("GET".equals(method)) {
 				HttpContext context = request.getConnection().getContext();
-				ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,	new HeapByteBufferAllocator());
-				// ContentOutputBuffer outputBuffer
-				// = new SharedOutputBuffer(8192, conn, new
-				// HeapByteBufferAllocator());
+				ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,
+                        new HeapByteBufferAllocator());
 				context.setAttribute("synapse.response-source-buffer",outputBuffer);
 				os = new ContentOutputStream(outputBuffer);
 			} 
 
             sourceConfiguration.getWorkerPool().execute(
                     new ServerWorker(request, sourceConfiguration,os));
+
         } catch (HttpException e) {
-            log.error(e.getMessage(), e);
-
+            log.error("HTTP exception while processing request", e);
             informReaderError(conn);
-
             SourceContext.updateState(conn, ProtocolState.CLOSED);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
         } catch (IOException e) {
             logIOException(e);
-
             informReaderError(conn);
-
             SourceContext.updateState(conn, ProtocolState.CLOSED);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
         }
     }
 
-    public void inputReady(NHttpServerConnection conn,
-                           ContentDecoder decoder) {
+    public void inputReady(NHttpServerConnection conn, ContentDecoder decoder) {
         try {
             ProtocolState protocolState = SourceContext.getState(conn);
 
@@ -148,18 +136,15 @@ public class SourceHandler implements NHttpServiceHandler {
             }
 
             SourceContext.updateState(conn, ProtocolState.REQUEST_BODY);
-
             SourceRequest request = SourceContext.getRequest(conn);
-
             int readBytes = request.read(conn, decoder);
             if (readBytes > 0) {
                 metrics.incrementBytesReceived(readBytes);
             }
+
         } catch (IOException e) {
             logIOException(e);
-
             informReaderError(conn);
-
             SourceContext.updateState(conn, ProtocolState.CLOSED);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
         }
@@ -185,21 +170,17 @@ public class SourceHandler implements NHttpServiceHandler {
             SourceResponse response = SourceContext.getResponse(conn);
             if (response != null) {
                 response.start(conn);
-
                 metrics.incrementMessagesSent();
             }
+
         } catch (IOException e) {
             logIOException(e);
-
             informWriterError(conn);
-
             SourceContext.updateState(conn, ProtocolState.CLOSING);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
         } catch (HttpException e) {
             log.error(e.getMessage(), e);
-
             informWriterError(conn);
-
             SourceContext.updateState(conn, ProtocolState.CLOSING);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
         }
@@ -312,12 +293,11 @@ public class SourceHandler implements NHttpServiceHandler {
                 e.getMessage().toLowerCase().contains("connection reset by peer") ||
                 e.getMessage().toLowerCase().contains("forcibly closed")))) {
             if (log.isDebugEnabled()) {
-                log.debug("I/O error (Probably the keepalive connection " +
-                        "was closed):" + e.getMessage());
+                log.debug("I/O error (Probably a keepalive connection was closed):" + e.getMessage());
             }
         } else if (e.getMessage() != null) {
             String msg = e.getMessage().toLowerCase();
-            if (msg.indexOf("broken") != -1) {
+            if (msg.contains("broken")) {
                 log.warn("I/O error (Probably the connection " +
                         "was closed by the remote party):" + e.getMessage());
             } else {
@@ -442,37 +422,16 @@ public class SourceHandler implements NHttpServiceHandler {
         }
     }
     
-    
-    /**
-     * Commit the response to the connection. Processes the response through the configured
-     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted
-     * for non critical (i.e. browser requests etc) requests, which are not core messages
-     * @param conn the connection being processed
-     * @param response the response to commit over the connection
-     */
-    public void commitResponseHideExceptions(
-            final NHttpServerConnection conn, final HttpResponse response) {
-        try {
-            conn.suspendInput();
-            sourceConfiguration.getHttpProcessor().process(response, conn.getContext());
-            conn.submitResponse(response);
-        } catch (HttpException e) {
-            handleException("Unexpected HTTP protocol error : " + e.getMessage(), e, conn);
-        } catch (IOException e) {
-            handleException("IO error submiting response : " + e.getMessage(), e, conn);
-        }
-    }
-    
-    
     // ----------- utility methods -----------
 
     private void handleException(String msg, Exception e, NHttpServerConnection conn) {
-        log.error(msg, e);
+        String errorMessage;
         if (conn != null) {
-            //shutdownConnection(conn);
+            errorMessage = "[" + conn + "] " + msg;
+        } else {
+            errorMessage = "[" + conn + "] " + msg;
         }
+        log.error(errorMessage, e);
     }
-    
-    
-    
+
 }

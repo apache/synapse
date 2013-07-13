@@ -17,7 +17,6 @@
  *  under the License.
  */
 
-
 package org.apache.synapse.transport.passthru;
 
 import java.io.IOException;
@@ -43,12 +42,12 @@ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.connections.HostConnections;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
 
-
 /**
  * This class is handling events from the transport -- > client.
  */
 public class TargetHandler implements NHttpClientHandler {
-    private static Log log = LogFactory.getLog(TargetHandler.class);
+
+    private static final Log log = LogFactory.getLog(TargetHandler.class);
 
     /** Delivery agent */
     private final DeliveryAgent deliveryAgent;
@@ -75,7 +74,6 @@ public class TargetHandler implements NHttpClientHandler {
         HostConnections pool = (HostConnections) o;
         conn.getContext().setAttribute(PassThroughConstants.CONNECTION_POOL, pool);
 
-          
         // create the connection information and set it to request ready
         TargetContext.create(conn, ProtocolState.REQUEST_READY, targetConfiguration);
 
@@ -85,7 +83,8 @@ public class TargetHandler implements NHttpClientHandler {
         // notify about the new connection
         deliveryAgent.connected(pool.getHost(), pool.getPort());
         
-        conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME, System.currentTimeMillis());
+        conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
+                System.currentTimeMillis());
 
         metrics.connected();
     }
@@ -109,7 +108,8 @@ public class TargetHandler implements NHttpClientHandler {
                 request.start(conn);
                 targetConfiguration.getMetrics().incrementMessagesSent();
             }
-            conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME, System.currentTimeMillis());
+            conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
+                    System.currentTimeMillis());
         } catch (IOException e) {
             logIOException(conn, e);
             TargetContext.updateState(conn, ProtocolState.CLOSED);
@@ -381,7 +381,7 @@ public class TargetHandler implements NHttpClientHandler {
             }
         } else if (e.getMessage() != null) {
             String msg = e.getMessage().toLowerCase();
-            if (msg.indexOf("broken") != -1) {
+            if (msg.contains("broken")) {
                 log.warn("I/O error (Probably the connection " +
                         "was closed by the remote party):" + e.getMessage());
             } else {

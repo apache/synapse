@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.passthru;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.Comparator;
@@ -28,14 +27,12 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -68,7 +65,6 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
-import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
 
 /**
@@ -77,10 +73,13 @@ import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
 public class ServerWorker implements Runnable {
 
   	private static final Log log = LogFactory.getLog(ServerWorker.class);
+
     /** the incoming message to be processed */
     private org.apache.axis2.context.MessageContext msgContext = null;
+
     /** the http request */
     private SourceRequest request = null;
+
     /** The configuration of the receiver */
     private SourceConfiguration sourceConfiguration = null;
 
@@ -89,29 +88,20 @@ public class ServerWorker implements Runnable {
     /** WSDL processor for Get requests */
     private HttpGetRequestProcessor httpGetRequestProcessor = null;
     
-    /** Weather we should do rest dispatching or not */
-    private boolean isRestDispatching = true;
-    
     private boolean isHttps = false;
     
     
     private OutputStream os; //only used for WSDL  requests..
   
     public ServerWorker(final SourceRequest request,
-                        final SourceConfiguration sourceConfiguration,final OutputStream os) {
+                        final SourceConfiguration sourceConfiguration, final OutputStream os) {
         this.request = request;
         this.sourceConfiguration = sourceConfiguration;
-
         this.isHttps = sourceConfiguration.isSsl();
-        
         this.msgContext = createMessageContext(request);
-        
         this.httpGetRequestProcessor = sourceConfiguration.getHttpGetRequestProcessor();
-        
         this.os = os;
-        
-      
-        
+
         // set these properties to be accessed by the engine
         msgContext.setProperty(
                 PassThroughConstants.PASS_THROUGH_SOURCE_REQUEST, request);
@@ -119,7 +109,6 @@ public class ServerWorker implements Runnable {
                 PassThroughConstants.PASS_THROUGH_SOURCE_CONFIGURATION, sourceConfiguration);
         msgContext.setProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION,
                 request.getConnection());
-        
     }
 
     public void run() {
@@ -129,7 +118,8 @@ public class ServerWorker implements Runnable {
         ConfigurationContext cfgCtx = sourceConfiguration.getConfigurationContext();        
         msgContext.setProperty(Constants.Configuration.HTTP_METHOD, request.getMethod());
 
-        String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase():"";
+        String method = request.getRequest() != null ?
+                request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
         
         String uri = request.getUri();
         String oriUri = uri;
@@ -161,15 +151,14 @@ public class ServerWorker implements Runnable {
                 }
             }
         }
-        
-        
+
         String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));
-        if (servicePrefix.indexOf("://") == -1) {
-            HttpInetConnection inetConn = (HttpInetConnection) request.getConnection();
-            InetAddress localAddr = inetConn.getLocalAddress();
-            if (localAddr != null) {
+        if (!servicePrefix.contains("://")) {
+            HttpInetConnection conn = (HttpInetConnection) request.getConnection();
+            InetAddress localAddress = conn.getLocalAddress();
+            if (localAddress != null) {
                 servicePrefix = (sourceConfiguration.isSsl() ? "https://" : "http://") +
-                        localAddr.getHostAddress() + ":" + inetConn.getLocalPort() + servicePrefix;
+                        localAddress.getHostAddress() + ":" + conn.getLocalPort() + servicePrefix;
             }
         }
        
@@ -179,7 +168,6 @@ public class ServerWorker implements Runnable {
         msgContext.setProperty(PassThroughConstants.REST_URL_POSTFIX, uri);
 
 		if ("GET".equals(method) || "DELETE".equals(method)) {
-			
 			HttpResponse response = sourceConfiguration.getResponseFactory().newHttpResponse(
 		                request.getVersion(), HttpStatus.SC_OK,
 		                request.getConnection().getContext());
@@ -192,27 +180,29 @@ public class ServerWorker implements Runnable {
             response.setEntity(entity);
             
 			httpGetRequestProcessor.process(request.getRequest(), response,msgContext,
-					request.getConnection(), os, isRestDispatching);
+					request.getConnection(), os, true);
 		} 
 		
 		//need special case to handle REST
 		boolean restHandle =false;
-		if(msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null && (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
+		if (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
+                (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
 			msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
 	        msgContext.setServerSide(true);
 	        msgContext.setDoingREST(true);
 	        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-	        //String contentType = contentTypeHeader != null ?TransportUtils.getContentType(contentTypeHeader, msgContext):null;
 	        SOAPEnvelope soapEnvelope = this.handleRESTUrlPost(contentTypeHeader);
 	        processNonEntityEnclosingRESTHandler(soapEnvelope);
-			restHandle =true;
+			restHandle = true;
 		}
 		
 		//if WSDL done then moved out rather than hand over to entity handle methods.
-		SourceContext info = (SourceContext) request.getConnection().getContext().getAttribute(SourceContext.CONNECTION_INFORMATION);
+		SourceContext info = (SourceContext) request.getConnection().getContext().
+                getAttribute(SourceContext.CONNECTION_INFORMATION);
 		if (info != null &&
 		    info.getState().equals(ProtocolState.WSDL_RESPONSE_DONE) ||
-		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null && Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
+		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null &&
+                    Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
 			return;
 		}
 		
@@ -224,9 +214,6 @@ public class ServerWorker implements Runnable {
 				processNonEntityEnclosingRESTHandler(null);
 			}
 		}
-	
-		
-		
 
         sendAck();
     }
@@ -234,35 +221,34 @@ public class ServerWorker implements Runnable {
 	/**
 	 * Method will setup the necessary parameters for the rest url post action
 	 * 
-	 * @param contentType
-	 * @return
+	 * @param contentTypeHdr Content-type header value
+	 * @return a SOAPEnvelope
 	 * @throws FactoryConfigurationError
 	 */
 	private SOAPEnvelope handleRESTUrlPost(String contentTypeHdr) throws FactoryConfigurationError {
 	    SOAPEnvelope soapEnvelope = null;
-	    String contentType = contentTypeHdr!=null?TransportUtils.getContentType(contentTypeHdr, msgContext):null;
-	    if (contentType == null || "".equals(contentType) || HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(contentType)) {
-	        contentType = contentTypeHdr != null ? contentTypeHdr:HTTPConstants.MEDIA_TYPE_X_WWW_FORM;
+	    String contentType = contentTypeHdr!=null ?
+                TransportUtils.getContentType(contentTypeHdr, msgContext) : null;
+
+	    if (contentType == null || "".equals(contentType) ||
+                HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(contentType)) {
+
+	        contentType = contentTypeHdr != null ?
+                    contentTypeHdr : HTTPConstants.MEDIA_TYPE_X_WWW_FORM;
 	        msgContext.setTo(new EndpointReference(request.getRequest().getRequestLine().getUri()));
 	        msgContext.setProperty(Constants.Configuration.CONTENT_TYPE,contentType);
 	        String charSetEncoding = BuilderUtil.getCharSetEncoding(contentType);
 		    msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
-	        try {
+
+            try {
 	            RESTUtil.dispatchAndVerify(msgContext);
 	        } catch (AxisFault e1) {
 	        	log.error("Error while building message for REST_URL request",e1);
 	        }
 	        
 	        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
-	       
 			try {
-				String requestURI = request.getRequest().getRequestLine().getUri();
 				AxisService axisService = requestDispatcher.findService(msgContext);
-
-				boolean isCustomRESTDispatcher = false;
-				if (requestURI.startsWith("/t/") || requestURI.startsWith("/services/t/")) {
-					isCustomRESTDispatcher = true;
-				}
 
 				// the logic determines which service dispatcher to get invoke,
 				// this will be determine
@@ -272,26 +258,24 @@ public class ServerWorker implements Runnable {
 				// Dispatcher Service.
 
 				if (axisService == null) {
-					String defaultSvcName = NHttpConfiguration.getInstance().getStringValue("nhttp.default.service",
-					                                                                        "__SynapseService");
-
+					String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
+                            "nhttp.default.service", "__SynapseService");
 					axisService =  msgContext.getConfigurationContext().getAxisConfiguration()
 					                        .getService(defaultSvcName);
 					msgContext.setAxisService(axisService);
-
 				}
 			} catch (AxisFault e) {
-				handleException("Error processing " + request.getMethod() + " request for : " + request.getUri(), e);
+				handleException("Error processing " + request.getMethod() + " request for : " +
+                        request.getUri(), e);
 			}
-			
-			
+
 	        try {
 	        	 soapEnvelope = TransportUtils.createSOAPMessage(msgContext, null, contentType);
 	           } catch (Exception e) {
 	        	log.error("Error while building message for REST_URL request");
 	        }
-	       //msgContext.setProperty(Constants.Configuration.CONTENT_TYPE,"application/xml");  
-	       msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE,HTTPConstants.MEDIA_TYPE_APPLICATION_XML);   
+	        msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE,
+                    HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
 	    }
 	    return soapEnvelope;
     }
@@ -303,7 +287,7 @@ public class ServerWorker implements Runnable {
                     Constants.RESPONSE_WRITTEN);
         }
         
-        if(msgContext.getProperty(PassThroughConstants.FORCE_SOAP_FAULT) != null){
+        if (msgContext.getProperty(PassThroughConstants.FORCE_SOAP_FAULT) != null) {
         	respWritten ="SKIP";
         }
         
@@ -355,17 +339,16 @@ public class ServerWorker implements Runnable {
         msgContext.setTo(new EndpointReference(request.getUri()));
         msgContext.setServerSide(true);
         msgContext.setDoingREST(true);
-        if(!request.isEntityEnclosing()){
+        if (!request.isEntityEnclosing()) {
         	msgContext.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
         }
         
         try {
-        	if(soapEnvelope == null){
-        		 msgContext.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
-        	}else{
+        	if (soapEnvelope == null) {
+        		 msgContext.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
+        	} else {
         		 msgContext.setEnvelope(soapEnvelope);
         	}
-         
 
             AxisEngine.receive(msgContext);
         } catch (AxisFault axisFault) {
@@ -440,15 +423,12 @@ public class ServerWorker implements Runnable {
                 " request for : " + request.getUri(), axisFault);
         } 
     }
-    
-    
+
     private boolean isRest(String contentType) {
         return contentType != null &&
-                contentType.indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) == -1 &&
-                contentType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) == -1;
+                !contentType.contains(SOAP11Constants.SOAP_11_CONTENT_TYPE) &&
+                !contentType.contains(SOAP12Constants.SOAP_12_CONTENT_TYPE);
     }
-
-
 
     /**
      * Create an Axis2 message context for the given http request. The request may be in the
@@ -463,19 +443,11 @@ public class ServerWorker implements Runnable {
                 new MessageContext();
         msgContext.setMessageID(UIDGenerator.generateURNString());
 
-        // Axis2 spawns a new threads to send a message if this is TRUE - and it has to
+        // Axis2 spawns a new thread to send a message if this is TRUE - and it has to
         // be the other way
         msgContext.setProperty(MessageContext.CLIENT_API_NON_BLOCKING,
                 Boolean.FALSE);
         msgContext.setConfigurationContext(cfgCtx);
-
-//        msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
-//                .getTransportOut(Constants.TRANSPORT_HTTP));
-//        msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
-//                .getTransportIn(Constants.TRANSPORT_HTTP));
-//        msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
-//        msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
-        
         NHttpServerConnection conn = request.getConnection();
         
         if (isHttps) {

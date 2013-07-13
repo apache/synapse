@@ -27,7 +27,6 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.SOAPMessageFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.passthru.util.DeferredMessageBuilder;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;

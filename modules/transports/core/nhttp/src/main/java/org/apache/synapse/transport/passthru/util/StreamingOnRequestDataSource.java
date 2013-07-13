@@ -74,7 +74,7 @@ public class StreamingOnRequestDataSource implements DataSource {
      * need to cache it if it has not
      * already cached.
      *
-     * @param lastUse
+     * @param lastUse Boolean value to set
      */
     public void setLastUse(boolean lastUse) {
         this.lastUse = lastUse;

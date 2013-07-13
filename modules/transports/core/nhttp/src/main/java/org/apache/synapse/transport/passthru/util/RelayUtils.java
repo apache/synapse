@@ -58,15 +58,15 @@ public class RelayUtils {
     private static boolean noAddressingHandler = false;
     
     private static Boolean forcePTBuild = null;
-    
 
-    static{
-    	if(forcePTBuild == null){
-           forcePTBuild =PassThroughConfiguration.getInstance().getBooleanProperty(PassThroughConstants.FORCE_PASS_THROUGH_BUILDER);
-           if(forcePTBuild ==null){
-             forcePTBuild =true;
+    static {
+    	if (forcePTBuild == null){
+           forcePTBuild = PassThroughConfiguration.getInstance().getBooleanProperty(
+                   PassThroughConstants.FORCE_PASS_THROUGH_BUILDER);
+           if (forcePTBuild == null){
+             forcePTBuild = true;
            }
-        //this to keep track ignore the builder operation eventhough content level is enable.
+            //this to keep track ignore the builder operation even though content level is enable.
         }
     }
 
@@ -80,12 +80,10 @@ public class RelayUtils {
             XMLStreamException {
 
         final Pipe pipe = (Pipe) messageContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
-		if (pipe != null &&
-		    !Boolean.TRUE.equals(messageContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) &&
-		    forcePTBuild) {
+		if (pipe != null && forcePTBuild &&
+                !PassThroughTransportUtils.builderInvoked(messageContext)) {
 			InputStream in = pipe.getInputStream();
-        	
-        	builldMessage(messageContext, earlyBuild, in);
+        	buildMessage(messageContext, earlyBuild, in);
             return;
         }
 
@@ -95,7 +93,6 @@ public class RelayUtils {
 
         if (contentEle != null) {
             OMNode node = contentEle.getFirstOMChild();
-
             if (node != null && (node instanceof OMText)) {
                 OMText binaryDataNode = (OMText) node;
                 DataHandler dh = (DataHandler) binaryDataNode.getDataHandler();
@@ -124,42 +121,42 @@ public class RelayUtils {
         }
     }
 
-	public static void builldMessage(MessageContext messageContext, boolean earlyBuild, InputStream in) throws IOException, AxisFault {
-	    //
-	    BufferedInputStream bufferedInputStream= (BufferedInputStream) messageContext.getProperty(PassThroughConstants.BUFFERED_INPUT_STREAM);
-	    if(bufferedInputStream != null){
-	    	try{
+	public static void buildMessage(MessageContext messageContext,
+                                    boolean earlyBuild, InputStream in) throws IOException {
+
+	    BufferedInputStream bufferedInputStream = (BufferedInputStream) messageContext.getProperty(
+                PassThroughConstants.BUFFERED_INPUT_STREAM);
+	    if (bufferedInputStream != null){
+	    	try {
 	    	  bufferedInputStream.reset();
 	    	  bufferedInputStream.mark(0);
-	    	}catch (Exception e) {
+	    	} catch (Exception e) {
 	    		//just ignore the error
 			}
-          
-	    }else{
-	    		bufferedInputStream =new BufferedInputStream(in);
-		    	 //TODO: need to handle properly for the moment lets use around 100k buffer.
+	    } else {
+	    		bufferedInputStream = new BufferedInputStream(in);
+		    	 //TODO: need to handle properly; for the moment lets use around 100k buffer.
 			    bufferedInputStream.mark(128 * 1024);
-		    	messageContext.setProperty(PassThroughConstants.BUFFERED_INPUT_STREAM, bufferedInputStream);
-		  }
+		    	messageContext.setProperty(PassThroughConstants.BUFFERED_INPUT_STREAM,
+                        bufferedInputStream);
+		}
 	   
 	    OMElement element = null;
 	    try{
-	     element = messageBuilder.getDocument(messageContext, bufferedInputStream != null?bufferedInputStream:in);
+	        element = messageBuilder.getDocument(messageContext, bufferedInputStream);
 	    }catch (Exception e) {
-	    	log.error("Error while building Passthrough stream",e);
+	    	log.error("Error while building PassThrough stream",e);
 	    }
+
 	    if (element != null) {
 	        messageContext.setEnvelope(TransportUtils.createSOAPEnvelope(element));
 	        messageContext.setProperty(DeferredMessageBuilder.RELAY_FORMATTERS_MAP,
 	                messageBuilder.getFormatters());
-	        messageContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED,
-	                Boolean.TRUE);
-
+	        messageContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
 	        if (!earlyBuild) {
 	            processAddressing(messageContext);
 	        }
 	    }
-	    return;
     }
 
     private static void processAddressing(MessageContext messageContext) throws AxisFault {
@@ -197,14 +194,15 @@ public class RelayUtils {
         messageContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_IN_MESSAGES, "false");
         
         Object disableAddressingForOutGoing = null;
-        if(messageContext.getProperty(
-                    AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES) != null){
-        	disableAddressingForOutGoing = messageContext.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
+        if (messageContext.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES) != null){
+        	disableAddressingForOutGoing = messageContext.getProperty(
+                    AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
         }
         addressingInHandler.invoke(messageContext);
         
-        if(disableAddressingForOutGoing !=null){
-        	messageContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, disableAddressingForOutGoing);
+        if (disableAddressingForOutGoing !=null){
+        	messageContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
+                    disableAddressingForOutGoing);
         }
 
         if (messageContext.getAxisOperation() == null) {
@@ -214,30 +212,32 @@ public class RelayUtils {
         String mepString = messageContext.getAxisOperation().getMessageExchangePattern();
 
         if (isOneWay(mepString)) {
-            Object requestResponseTransport = messageContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+            Object requestResponseTransport = messageContext.getProperty(
+                    RequestResponseTransport.TRANSPORT_CONTROL);
             if (requestResponseTransport != null) {
-
                 Boolean disableAck = getDisableAck(messageContext);
-                if (disableAck == null || disableAck.booleanValue() == false) {
-                    ((RequestResponseTransport) requestResponseTransport).acknowledgeMessage(messageContext);
+                if (disableAck == null || !disableAck) {
+                    ((RequestResponseTransport) requestResponseTransport).acknowledgeMessage(
+                            messageContext);
                 }
             }
-        } else if (AddressingHelper.isReplyRedirected(messageContext) && AddressingHelper.isFaultRedirected(messageContext)) {
-            if (mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)
-                    || mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)
-                    || mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)) {
-                // OR, if 2 way operation but the response is intended to not use the response channel of a 2-way transport
-                // then we don't need to keep the transport waiting.
-
-                Object requestResponseTransport = messageContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+        } else if (AddressingHelper.isReplyRedirected(messageContext) &&
+                AddressingHelper.isFaultRedirected(messageContext)) {
+            if (mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)) {
+                // OR, if 2 way operation but the response is intended to not use the
+                // response channel of a 2-way transport  then we don't need to keep the
+                // transport waiting.
+                Object requestResponseTransport = messageContext.getProperty(
+                        RequestResponseTransport.TRANSPORT_CONTROL);
                 if (requestResponseTransport != null) {
 
-                    // We should send an early ack to the transport whenever possible, but some modules need
-                    // to use the back channel, so we need to check if they have disabled this code.
+                    // We should send an early ack to the transport whenever possible, but
+                    // some modules need to use the back channel, so we need to check if they
+                    // have disabled this code.
                     Boolean disableAck = getDisableAck(messageContext);
-
-                    if (disableAck == null || disableAck.booleanValue() == false) {
-                        ((RequestResponseTransport) requestResponseTransport).acknowledgeMessage(messageContext);
+                    if (disableAck == null || !disableAck) {
+                        ((RequestResponseTransport) requestResponseTransport).acknowledgeMessage(
+                                messageContext);
                     }
 
                 }
@@ -248,17 +248,18 @@ public class RelayUtils {
     private static Boolean getDisableAck(MessageContext msgContext) throws AxisFault {
        // We should send an early ack to the transport whenever possible, but some modules need
        // to use the back channel, so we need to check if they have disabled this code.
-       Boolean disableAck = (Boolean) msgContext.getProperty(Constants.Configuration.DISABLE_RESPONSE_ACK);
-       if(disableAck == null) {
-          disableAck = (Boolean) (msgContext.getAxisService() != null ? msgContext.getAxisService().getParameterValue(Constants.Configuration.DISABLE_RESPONSE_ACK) : null);
+       Boolean disableAck = (Boolean) msgContext.getProperty(
+               Constants.Configuration.DISABLE_RESPONSE_ACK);
+       if (disableAck == null) {
+          disableAck = (Boolean) (msgContext.getAxisService() != null ?
+                  msgContext.getAxisService().getParameterValue(
+                          Constants.Configuration.DISABLE_RESPONSE_ACK) : null);
        }
 
        return disableAck;
     }
 
     private static boolean isOneWay(String mepString) {
-        return (mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY)
-                || mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY)
-                || mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY));
+        return mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY);
     }
 }

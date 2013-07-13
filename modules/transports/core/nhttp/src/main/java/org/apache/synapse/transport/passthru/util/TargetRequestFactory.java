@@ -22,11 +22,9 @@ package org.apache.synapse.transport.passthru.util;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-//import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
-import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.SOAPMessageFormatter;
 import org.apache.axis2.util.MessageProcessorSelector;
@@ -45,7 +43,7 @@ import java.util.Map;
 
 public class TargetRequestFactory {
     
-	private static Log log = LogFactory.getLog(TargetRequestFactory.class);
+	private static final Log log = LogFactory.getLog(TargetRequestFactory.class);
 
     public static TargetRequest create(MessageContext msgContext,
                                        TargetConfiguration configuration) throws AxisFault {
@@ -57,10 +55,10 @@ public class TargetRequestFactory {
             }
 
             // basic request
-            Boolean noEntityBody = (Boolean) msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);
-            
-            if(msgContext.getEnvelope().getBody().getFirstElement() != null){
-            	noEntityBody  =false;
+            Boolean noEntityBody = (Boolean) msgContext.getProperty(
+                    PassThroughConstants.NO_ENTITY_BODY);
+            if (msgContext.getEnvelope().getBody().getFirstElement() != null){
+            	noEntityBody  = false;
             }
 
             EndpointReference epr = PassThroughTransportUtils.getDestinationEPR(msgContext);
@@ -73,7 +71,6 @@ public class TargetRequestFactory {
                     configuration.isPreserveServerHeader(),
                     configuration.isPreserveUserAgentHeader());
 
-
             Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
             if (o != null && o instanceof Map) {
                 Map headers = (Map) o;
@@ -84,10 +81,11 @@ public class TargetRequestFactory {
                             entry.getValue() instanceof String) {
                         if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())) {
                             request.addHeader((String) entry.getKey(), (String) entry.getValue());
-                        }else {
-                            if(msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                            	request.addHeader((String) (String) entry.getKey(),
-                                        (String)msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
+                        } else {
+                            if( msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
+                            	request.addHeader((String) entry.getKey(),
+                                        (String) msgContext.getProperty(
+                                                NhttpConstants.REQUEST_HOST_HEADER));
                             }
                         }
                     }
@@ -100,7 +98,8 @@ public class TargetRequestFactory {
             }
 
             // version
-            String forceHttp10 = (String) msgContext.getProperty(PassThroughConstants.FORCE_HTTP_1_0);
+            String forceHttp10 = (String) msgContext.getProperty(
+                    PassThroughConstants.FORCE_HTTP_1_0);
             if ("true".equals(forceHttp10)) {
                 request.setVersion(HttpVersion.HTTP_1_0);
             }
@@ -142,7 +141,8 @@ public class TargetRequestFactory {
         
         if (formatter != null) {
             String contentType= formatter.getContentType(msgCtx, format, msgCtx.getSoapAction());
-          //keep the formatter information to prevent multipart boundary override (this will be the content writing to header)
+              //keep the formatter information to prevent multipart boundary override
+              // (this will be the content writing to header)
             msgCtx.setProperty(PassThroughConstants.MESSAGE_OUTPUT_FORMAT, format);
             return contentType;
             

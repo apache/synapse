@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru.util;
 
 import org.apache.axiom.om.OMElement;
@@ -41,7 +42,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class DeferredMessageBuilder {
@@ -76,56 +76,42 @@ public class DeferredMessageBuilder {
         return builders;
     }
 
-    public void addBuilder(String contentType, Builder builder) {
-        builders.put(contentType, builder);
-    }
-
-    public void addFormatter(String contentType, MessageFormatter messageFormatter) {
-        formatters.put(contentType, messageFormatter);
-    }
-
     public Map<String, MessageFormatter> getFormatters() {
         return formatters;
     }
 
     public OMElement getDocument(MessageContext msgCtx, InputStream in) throws
             XMLStreamException, IOException {
-   	  
-    	
-    	String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
-    	String _contentType =contentType;
- 	    in = HTTPTransportUtils.handleGZip(msgCtx, in);
- 		if (contentType != null) {
- 			int j = contentType.indexOf(";");
- 			if (j > 0) {
- 				_contentType = contentType.substring(0, j);
- 			}
- 		}
-    	
-    	
-    	AxisConfiguration configuration =
-    		  msgCtx.getConfigurationContext().getAxisConfiguration();
-      Parameter useFallbackParameter = configuration.getParameter(Constants.Configuration.USE_DEFAULT_FALLBACK_BUILDER);
-     
-      boolean useFallbackBuilder = false;
-      
-      if (useFallbackParameter !=null){
-      	useFallbackBuilder = JavaUtils.isTrueExplicitly(useFallbackParameter.getValue(),useFallbackBuilder);
-      }
-    	
-    	OMElement element = null;
+
+
+        String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
+        String _contentType = contentType;
+        in = HTTPTransportUtils.handleGZip(msgCtx, in);
+        if (contentType != null) {
+            int j = contentType.indexOf(";");
+            if (j > 0) {
+                _contentType = contentType.substring(0, j);
+            }
+        }
+
+        AxisConfiguration configuration =
+                msgCtx.getConfigurationContext().getAxisConfiguration();
+        Parameter useFallbackParameter = configuration.getParameter(Constants.Configuration.USE_DEFAULT_FALLBACK_BUILDER);
+
+        boolean useFallbackBuilder = false;
+
+        if (useFallbackParameter != null) {
+            useFallbackBuilder = JavaUtils.isTrueExplicitly(useFallbackParameter.getValue(), useFallbackBuilder);
+        }
+
+        OMElement element = null;
         Builder builder;
         if (contentType != null) {
             // loading builder from externally..
-            builder = configuration.getMessageBuilder(_contentType,useFallbackBuilder);
+            builder = configuration.getMessageBuilder(_contentType, useFallbackBuilder);
             if (builder != null) {
                 try {
-                    /*try {
-                        throw new Exception("Building message");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*/
-                    element = builder.processDocument(in,contentType, msgCtx);
+                    element = builder.processDocument(in, contentType, msgCtx);
                 } catch (AxisFault axisFault) {
                     log.error("Error building message", axisFault);
                     throw axisFault;
@@ -135,12 +121,7 @@ public class DeferredMessageBuilder {
 
         if (element == null) {
             if (msgCtx.isDoingREST()) {
-                try {
-                    element = BuilderUtil.getPOXBuilder(in, null).getDocumentElement();
-                } catch (XMLStreamException e) {
-                    log.error("Error building message using POX Builder", e);
-                    throw e;
-                }
+                element = BuilderUtil.createPOXBuilder(in, null).getDocumentElement();
             } else {
                 // switch to default
                 builder = new SOAPBuilder();
@@ -160,82 +141,9 @@ public class DeferredMessageBuilder {
         }
 
         //setting up original contentType (resetting the content type)
-        if(contentType != null && !contentType.isEmpty()){
-         msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
+        if (contentType != null && !contentType.isEmpty()) {
+            msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
         }
         return element;
-    }
-
-    private Builder getBuilderForContentType(String contentType) {
-        String type;
-        int index = contentType.indexOf(';');
-        if (index > 0) {
-            type = contentType.substring(0, index);
-        } else {
-            type = contentType;
-        }
-
-        Builder builder = builders.get(type);
-
-        if (builder == null) {
-            builder = builders.get(type.toLowerCase());
-        }
-
-        if (builder == null) {
-            Iterator<Map.Entry<String, Builder>> iterator = builders.entrySet().iterator();
-            while (iterator.hasNext() && builder == null) {
-                Map.Entry<String, Builder> entry = iterator.next();
-                String key = entry.getKey();
-                if (contentType.matches(key)) {
-                    builder = entry.getValue();
-                }
-            }
-        }
-        return builder;
-    }
-
-    public static Builder createBuilder(String className) throws AxisFault {
-        try {
-            Class c = Class.forName(className);
-            Object o = c.newInstance();
-            if (o instanceof Builder) {
-                return (Builder) o;
-            }
-        } catch (ClassNotFoundException e) {
-            handleException("Builder class not found :" +
-                    className, e);
-        } catch (IllegalAccessException e) {
-            handleException("Cannot initiate Builder class :" +
-                    className, e);
-        } catch (InstantiationException e) {
-            handleException("Cannot initiate Builder class :" +
-                    className, e);
-        }
-        return null;
-    }
-
-    public static MessageFormatter createFormatter(String className) throws AxisFault {
-        try {
-            Class c = Class.forName(className);
-            Object o = c.newInstance();
-            if (o instanceof MessageFormatter) {
-                return (MessageFormatter) o;
-            }
-        } catch (ClassNotFoundException e) {
-            handleException("MessageFormatter class not found :" +
-                    className, e);
-        } catch (IllegalAccessException e) {
-            handleException("Cannot initiate MessageFormatter class :" +
-                    className, e);
-        } catch (InstantiationException e) {
-            handleException("Cannot initiate MessageFormatter class :" +
-                    className, e);
-        }
-        return null;
-    }
-
-    private static void handleException(String message, Exception e) throws AxisFault {
-        log.error(message, e);
-        throw new AxisFault(message, e);
     }
 }

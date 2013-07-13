@@ -73,7 +73,7 @@ public class RelaySecurityMessageBuilderDispatchHandler extends AbstractDispatch
 					String serviceOpPart = Utils.getServiceAndOperationPart(filePart,
 					                       messageContext.getConfigurationContext().getServiceContextPath());
 
-					AxisService axisService = null;
+					AxisService axisService;
 
 					// only service context path onwards values will be taken
 					if (messageContext.getConfigurationContext().getServiceContextPath() != null &&
@@ -121,19 +121,20 @@ public class RelaySecurityMessageBuilderDispatchHandler extends AbstractDispatch
 	    //if the request message is a POX and if authenticate enables, which means a custom security header added to the SOAP header
 	    //and in PT case, since the message is getting build forcefully we need to make sure the POX security headers added by POXSecurityHandler
 	    //is existing in the newly build soap envelope.
-	    if(_contentType != null && _contentType.equals(APPLICATION_XML) && header != null && header.getChildElements() != null || messageContext.isDoingREST()){
+	    if(_contentType != null && _contentType.equals(APPLICATION_XML) &&
+                header != null && header.getChildElements() != null || messageContext.isDoingREST()){
 	    	try {
 	            OMElement element =AXIOMUtil.stringToOM(header.toString());
 	            OMNamespace omNamespace =  
 	            OMAbstractFactory.getOMFactory().createOMNamespace(WSS_WSSECURITY_SECEXT_1_0_XSD, WSSE); 
-	            SOAPHeaderBlock soapBloackingHeader = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security",omNamespace);
+	            SOAPHeaderBlock soapBlockingHeader = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security",omNamespace);
 	            OMElement securityHeader = (OMElement) element.getFirstOMChild();
 	    		if (securityHeader != null) {
 	    			while (securityHeader.getChildElements().hasNext()) {
-	    				soapBloackingHeader.addChild((OMNode) securityHeader.getChildElements().next());
+	    				soapBlockingHeader.addChild((OMNode) securityHeader.getChildElements().next());
 	    			}
 
-	    			messageContext.getEnvelope().getHeader().addChild(soapBloackingHeader);
+	    			messageContext.getEnvelope().getHeader().addChild(soapBlockingHeader);
 	    		}
 	        } catch (Exception e) {
 	               log.error("Error while executing the message at relaySecurity handler", e);

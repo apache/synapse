@@ -16,38 +16,30 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru.util;
 
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.util.JavaUtils;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.NetworkInterface;
 import java.util.Map;
 import java.util.Iterator;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
 /**
  * Utility methods used by the transport.
  */
 public class PassThroughTransportUtils {
-    private static Log log = LogFactory.getLog(PassThroughTransportUtils.class);
+
+    private static final Log log = LogFactory.getLog(PassThroughTransportUtils.class);
 
     /**
      * This method tries to determine the hostname of the given InetAddress without
@@ -61,7 +53,7 @@ public class PassThroughTransportUtils {
      * the value of {@link java.net.InetAddress#getHostAddress()} is returned.
      *
      * @param address The InetAddress whose hostname has to be determined
-     * @return hostsname, if it can be determined. hostaddress, if not.          
+     * @return hostname, if it can be determined. host address, if not.
      */
     public static String getHostName(InetAddress address) {
         String result;
@@ -87,8 +79,7 @@ public class PassThroughTransportUtils {
      * @return the destination EPR
      */
     public static EndpointReference getDestinationEPR(MessageContext msgContext) {
-
-        // Trasnport URL can be different from the WSA-To
+        // Transport URL can be different from the WSA-To
         String transportURL = (String) msgContext.getProperty(
             Constants.Configuration.TRANSPORT_URL);
 
@@ -162,8 +153,8 @@ public class PassThroughTransportUtils {
             httpStatus = HttpStatus.SC_ACCEPTED;
         } else {
             // is this a fault message
-            boolean handleFault = msgContext.getEnvelope() != null ?
-                (msgContext.getEnvelope().getBody().hasFault() || msgContext.isProcessingFault()):false;
+            boolean handleFault = msgContext.getEnvelope() != null &&
+                    (msgContext.getEnvelope().getBody().hasFault() || msgContext.isProcessingFault());
 
             // shall faults be transmitted with HTTP 200
             boolean faultsAsHttp200 =
@@ -192,111 +183,8 @@ public class PassThroughTransportUtils {
         return httpStatus;
     }
 
-    /**
-     * Whatever this method returns as the IP is ignored by the actual http/s listener when
-     * its getServiceEPR is invoked. This was originally copied from axis2
-     *
-     * @return Returns String.
-     * @throws java.net.SocketException if the socket can not be accessed
-     */
-    public static String getIpAddress() throws SocketException {
-        Enumeration e = NetworkInterface.getNetworkInterfaces();
-        String address = "127.0.0.1";
-
-        while (e.hasMoreElements()) {
-            NetworkInterface netface = (NetworkInterface) e.nextElement();
-            Enumeration addresses = netface.getInetAddresses();
-
-            while (addresses.hasMoreElements()) {
-                InetAddress ip = (InetAddress) addresses.nextElement();
-                if (!ip.isLoopbackAddress() && isIP(ip.getHostAddress())) {
-                    return ip.getHostAddress();
-                }
-            }
-        }
-        return address;
-    }
-
-    private static boolean isIP(String hostAddress) {
-        return hostAddress.split("[.]").length == 4;
-    }
-
-
-    /**
-     * Returns the HTML text for the list of services deployed.
-     * This can be delegated to another Class as well
-     * where it will handle more options of GET messages.
-     *
-     * @param prefix to be used for the Service names
-     * @param cfgCtx axis2 configuration context
-     * @return the HTML to be displayed as a String
-     */
-    public String getServicesHTML(String prefix, ConfigurationContext cfgCtx) {
-
-        Map services = cfgCtx.getAxisConfiguration().getServices();
-        Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
-        boolean servicesFound = false;
-
-        StringBuffer resultBuf = new StringBuffer();
-        resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
-
-        if ((services != null) && !services.isEmpty()) {
-
-            servicesFound = true;
-            resultBuf.append("<h2>" + "Deployed services" + "</h2>");
-
-            for (Object service : services.values()) {
-
-                AxisService axisService = (AxisService) service;
-                Parameter parameter = axisService.getParameter(
-                        PassThroughConstants.HIDDEN_SERVICE_PARAM_NAME);
-                if (axisService.getName().startsWith("__") ||
-                        (parameter != null && JavaUtils.isTrueExplicitly(parameter.getValue()))) {
-                    continue;    // skip private services
-                }
-
-                Iterator iterator = axisService.getOperations();
-                resultBuf.append("<h3><a href=\"").append(prefix).append(axisService.getName()).append(
-                        "?wsdl\">").append(axisService.getName()).append("</a></h3>");
-
-                if (iterator.hasNext()) {
-                    resultBuf.append("Available operations <ul>");
-
-                    for (; iterator.hasNext();) {
-                        AxisOperation axisOperation = (AxisOperation) iterator.next();
-                        resultBuf.append("<li>").append(
-                                axisOperation.getName().getLocalPart()).append("</li>");
-                    }
-                    resultBuf.append("</ul>");
-                } else {
-                    resultBuf.append("No operations specified for this service");
-                }
-            }
-        }
-
-        if ((erroneousServices != null) && !erroneousServices.isEmpty()) {
-            servicesFound = true;
-            resultBuf.append("<hr><h2><font color=\"blue\">Faulty Services</font></h2>");
-            Enumeration faultyservices = erroneousServices.keys();
-
-            while (faultyservices.hasMoreElements()) {
-                String faultyserviceName = (String) faultyservices.nextElement();
-                resultBuf.append("<h3><font color=\"blue\">").append(
-                        faultyserviceName).append("</font></h3>");
-            }
-        }
-
-        if (!servicesFound) {
-            resultBuf.append("<h2>There are no services deployed</h2>");
-        }
-
-        resultBuf.append("</body></html>");
-        return resultBuf.toString();
-    }
-
     public static OMOutputFormat getOMOutputFormat(MessageContext msgContext) {
-
-    	OMOutputFormat format = null;
+    	OMOutputFormat format;
     	if(msgContext.getProperty(PassThroughConstants.MESSAGE_OUTPUT_FORMAT) != null){
     		format = (OMOutputFormat) msgContext.getProperty(PassThroughConstants.MESSAGE_OUTPUT_FORMAT);
     	}else{
@@ -317,6 +205,11 @@ public class PassThroughTransportUtils {
         }
 
         return format;
+    }
+
+    public static boolean builderInvoked(MessageContext messageContext) {
+        return Boolean.TRUE.equals(messageContext.getProperty(
+                PassThroughConstants.MESSAGE_BUILDER_INVOKED));
     }
 
 }

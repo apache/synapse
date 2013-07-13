@@ -50,13 +50,11 @@ public class BufferFactory {
 
     public ByteBuffer getBuffer() {
         if (marker == -1) {
-            //System.out.println("allocating marker -1");
             return allocator.allocate(bufferSize);
         } else {
             lock.lock();
             try {
                 if (marker >= 0) {
-                    // System.out.println("Returning buffer");
                     ByteBuffer b = buffers[marker];
                     buffers[marker] = null;
                     marker--;

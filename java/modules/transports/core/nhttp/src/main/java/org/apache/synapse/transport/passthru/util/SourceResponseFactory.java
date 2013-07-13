@@ -32,37 +32,35 @@ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class SourceResponseFactory {
 
     public static SourceResponse create(MessageContext msgContext,
                                         SourceRequest sourceRequest,
                                         SourceConfiguration sourceConfiguration) {
+
         // determine the status code to be sent
         int statusCode = PassThroughTransportUtils.determineHttpStatusCode(msgContext);
-
-        SourceResponse sourceResponse =
-                new SourceResponse(sourceConfiguration, statusCode, sourceRequest);
+        SourceResponse sourceResponse = new SourceResponse(sourceConfiguration,
+                statusCode, sourceRequest);
 
         // set any transport headers
         Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-
         if (transportHeaders != null) {
             addResponseHeader(sourceResponse, transportHeaders);
-        }else{
-        	  Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
+        } else {
+        	 Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
         	 if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
         		 OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
         		 transportHeaders = new HashMap();
             	 MessageFormatter messageFormatter =
                      MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
-            	 transportHeaders.put(HTTP.CONTENT_TYPE, messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+            	 transportHeaders.put(HTTP.CONTENT_TYPE, messageFormatter.getContentType(
+                         msgContext, format, msgContext.getSoapAction()));
             	 addResponseHeader(sourceResponse, transportHeaders);
              }
         	 
         }
-
         return sourceResponse;
     }
 

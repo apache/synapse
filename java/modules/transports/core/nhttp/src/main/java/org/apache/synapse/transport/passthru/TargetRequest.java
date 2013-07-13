@@ -130,8 +130,22 @@ public class TargetRequest {
         
        
         //fix for  POST_TO_URI
-        if(requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){
+        if (requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){
         	path = url.toString();
+        }
+
+        Object o = requestMsgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (o != null && o instanceof Map) {
+            Map _headers = (Map) o;
+            String trpContentType = (String) _headers.get(HTTP.CONTENT_TYPE);
+            if (trpContentType != null && !trpContentType.equals("")) {
+                if (trpContentType.contains(PassThroughConstants.CONTENT_TYPE_MULTIPART_RELATED) &&
+                    !requestMsgCtx.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) {
+                    // If the message is multipart/related but it hasn't been built
+                    // we can copy the content-type header of the request
+                    headers.put(HTTP.CONTENT_TYPE, trpContentType);
+                }
+            }
         }
                                                             
         if (hasEntityBody) {
@@ -159,7 +173,7 @@ public class TargetRequest {
         }
         
         //setup wsa action..
-        if(request != null){
+        if (request != null){
         	
     		String soapAction = requestMsgCtx.getSoapAction();
             if (soapAction == null) {
@@ -225,7 +239,7 @@ public class TargetRequest {
 	 * 
 	 * @param conn
 	 * @param requestMsgCtx
-	 * @param disableChunking
+
 	 * @throws IOException
 	 * @throws AxisFault
 	 */

@@ -53,6 +53,7 @@ public class PassThroughConstants {
     public static final String CONTENT_TYPE = "CONTENT_TYPE";
 
     public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
+    public static final String CONTENT_TYPE_MULTIPART_RELATED = "multipart/related";
 
     public static final String HIDDEN_SERVICE_PARAM_NAME = "hiddenService";
 

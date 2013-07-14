@@ -36,6 +36,8 @@ public class URLMappingHelper implements DispatcherHelper {
             }
         } else if (urlMapping.startsWith("*.")) {
             extension = urlMapping.substring(1);
+        } else if (urlMapping.length() > 1 && urlMapping.endsWith("/")){
+            exactMatch = urlMapping.substring(0, urlMapping.length() - 1);
         } else {
             exactMatch = urlMapping;
         }

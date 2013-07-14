@@ -39,14 +39,14 @@ public class URLBasedVersionStrategy extends AbstractVersionStrategy {
         String pathStringAfterContext = path.substring(context.length());
 
         //check if context can be invalid for path url and avoid matching a false version string
-        if (pathStringAfterContext != null && !pathStringAfterContext.startsWith("/")) {
+        if (pathStringAfterContext == null || !pathStringAfterContext.startsWith("/")) {
             return false;
         }
 
         //path after context will be starting from a "/" and compute index for next immediate "/"
         int indexOfNextSlash = pathStringAfterContext.substring(1).indexOf("/");
 
-        String incomingVersionStr = null;
+        String incomingVersionStr;
         if (indexOfNextSlash != -1) {
             incomingVersionStr = pathStringAfterContext.substring(1, indexOfNextSlash + 1);
         } else {
@@ -65,31 +65,4 @@ public class URLBasedVersionStrategy extends AbstractVersionStrategy {
     public String getVersionParam() {
         return versionParam;
     }
-
-/*
-    public static void main(String[] args) {
-        String version = "1.0.0";
-//        String version = "1.0.1";
-
-//        String path = "/test/1.0.1/foo/abc/";
-//        String path = "/test/1.0/foo/abc/";
-//        String path = "/test/1.0/foo/abc/abc='asasa'";
-        String path = "/test11.0.0/1.0/foo/abc/abc='asasa'";
-
-//        String context = "/test";
-//        String context = "/test123";
-        String context = "/test";
-        String pathStringAfterContext = path.substring(context.length());
-
-        System.out.println("pathStringAfterContext : " + pathStringAfterContext);
-
-        int indexOfNextSlash = pathStringAfterContext.substring(1).indexOf("/");
-        System.out.println(indexOfNextSlash);
-        String incomingVersionStr = pathStringAfterContext.substring(1, indexOfNextSlash + 1);
-        System.out.println("incomingVersionStr : " + incomingVersionStr);
-
-        System.out.println(version.equals(incomingVersionStr));
-    }
-*/
-
 }

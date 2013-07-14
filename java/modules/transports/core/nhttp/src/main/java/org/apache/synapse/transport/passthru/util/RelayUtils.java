@@ -66,7 +66,7 @@ public class RelayUtils {
            if (forcePTBuild == null){
              forcePTBuild = true;
            }
-            //this to keep track ignore the builder operation even though content level is enable.
+           //this to keep track ignore the builder operation even though content level is enable.
         }
     }
 
@@ -223,7 +223,7 @@ public class RelayUtils {
             }
         } else if (AddressingHelper.isReplyRedirected(messageContext) &&
                 AddressingHelper.isFaultRedirected(messageContext)) {
-            if (mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)) {
+            if (WSDL2Constants.MEP_URI_IN_OUT.equals(mepString)) {
                 // OR, if 2 way operation but the response is intended to not use the
                 // response channel of a 2-way transport  then we don't need to keep the
                 // transport waiting.
@@ -260,6 +260,6 @@ public class RelayUtils {
     }
 
     private static boolean isOneWay(String mepString) {
-        return mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY);
+        return WSDL2Constants.MEP_URI_IN_ONLY.equals(mepString);
     }
 }

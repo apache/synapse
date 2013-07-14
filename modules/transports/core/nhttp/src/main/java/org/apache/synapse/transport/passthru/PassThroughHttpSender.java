@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import javax.net.ssl.SSLContext;
 
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -42,7 +43,6 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.util.MessageProcessorSelector;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
@@ -306,9 +306,9 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 					OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
 					formatter.writeTo(msgContext, format, _out, false);
 					try {
-	                    IOUtils.write(_out.toByteArray(),out);
-	                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,
-                                _out.toByteArray().length);
+                        long messageSize = setStreamAsTempData(formatter,msgContext,format);
+                        msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,messageSize);
+                        formatter.writeTo(msgContext, format, out, false);
                     } catch (IOException e) {
                     	 handleException("IO error while building message", e);
                     }
@@ -491,6 +491,29 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         } catch (IOException e) {
             handleException("Error shutting down the IOReactor for maintenence", e);
         }
+    }
+
+    /**
+     * Write the stream to a temporary storage and calculate the content length
+     *
+     * @param messageFormatter Formatter used to serialize the message
+     * @param msgContext Message to be serialized
+     * @param format Output format
+     *
+     * @throws IOException if an exception occurred while writing data
+     */
+    private long setStreamAsTempData(MessageFormatter messageFormatter,
+                                     MessageContext msgContext,
+                                     OMOutputFormat format) throws IOException {
+
+        OverflowBlob serialized = new OverflowBlob(256, 4096, "http-nio_", ".dat");
+        OutputStream out = serialized.getOutputStream();
+        try {
+            messageFormatter.writeTo(msgContext, format, out, true);
+        } finally {
+            out.close();
+        }
+        return serialized.getLength();
     }
 
     private void handleException(String s, Exception e) throws AxisFault {

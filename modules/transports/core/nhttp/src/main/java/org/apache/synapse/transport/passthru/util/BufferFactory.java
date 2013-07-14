@@ -52,10 +52,11 @@ public class BufferFactory {
         if (marker == -1) {
             return allocator.allocate(bufferSize);
         } else {
-            lock.lock();
             try {
+                lock.lock();
                 if (marker >= 0) {
                     ByteBuffer b = buffers[marker];
+                    b.clear();
                     buffers[marker] = null;
                     marker--;
                     return b;
@@ -64,14 +65,14 @@ public class BufferFactory {
                 lock.unlock();
             }
         }
-
         return allocator.allocate(bufferSize);
     }
 
     public void release(ByteBuffer buffer) {
-        lock.lock();
         try {
+            lock.lock();
             if (marker < buffers.length - 1) {
+                buffer.clear();
                 buffers[++marker] = buffer;
             }
         } finally {

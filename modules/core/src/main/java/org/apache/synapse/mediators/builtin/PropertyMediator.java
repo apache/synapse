@@ -19,6 +19,7 @@
 
 package org.apache.synapse.mediators.builtin;
 
+import org.apache.http.protocol.HTTP;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.SynapseException;
@@ -64,7 +65,7 @@ public class PropertyMediator extends AbstractMediator {
     /** Set the property (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
     private int action = ACTION_SET;
 
-    /** Regualar expresion pattern to be evaluated over the property value.
+    /** Regular expression pattern to be evaluated over the property value.
      * Resulting match string will be applied to the property */
     private Pattern pattern;
 
@@ -359,6 +360,23 @@ public class PropertyMediator extends AbstractMediator {
 
     @Override
     public boolean isContentAware() {
-        return expression != null;
+        if (expression != null) {
+            return expression.isContentAware();
+        }
+
+        boolean contentAware = false;
+        if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)) {
+            //the logic will determine the content-aware true
+            if (org.apache.axis2.Constants.Configuration.MESSAGE_TYPE.equals(name)) {
+                contentAware = true;
+            }
+
+        } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)) {
+            //the logic will determine the content-aware true
+            if (HTTP.CONTENT_ENCODING.equals(name)) {
+                contentAware = true;
+            }
+        }
+        return contentAware;
     }
 }

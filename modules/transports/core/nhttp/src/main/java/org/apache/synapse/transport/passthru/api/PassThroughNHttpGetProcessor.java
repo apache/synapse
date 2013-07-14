@@ -102,14 +102,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 		}
 
 		if (isServiceListBlocked(uri)) {
-			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
-			sourceHandler.commitResponseHideExceptions(conn, response);
-            closeOutputStream(os);
+            sendResponseAndFinish(response, HttpStatus.SC_FORBIDDEN, conn, os, msgContext);
 		} else if (uri.equals("/favicon.ico")) {
-			response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
 			response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
-			sourceHandler.commitResponseHideExceptions(conn, response);
-            closeOutputStream(os);
+            sendResponseAndFinish(response, HttpStatus.SC_MOVED_PERMANENTLY, conn, os, msgContext);
 		} else if (serviceName != null && parameters.containsKey("wsdl")) {
 			generateWsdl(response, msgContext, conn, os, serviceName, parameters);
 		} else if (serviceName != null && parameters.containsKey("wsdl2")) {
@@ -120,6 +116,26 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 			msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
 		}
 	}
+
+    private void sendResponseAndFinish(HttpResponse response, int status,
+                                       NHttpServerConnection conn, OutputStream os,
+                                       MessageContext msgContext) {
+        response.setStatusCode(status);
+        SourceContext.updateState(conn, ProtocolState.GET_REQUEST_COMPLETE);
+        sourceHandler.commitResponseHideExceptions(conn, response);
+        closeOutputStream(os);
+        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+    }
+
+    private void sendResponseAndFinish(HttpResponse response, byte[] data,
+                                       NHttpServerConnection conn, OutputStream os,
+                                       MessageContext msgContext) throws IOException {
+        SourceContext.updateState(conn, ProtocolState.GET_REQUEST_COMPLETE);
+        sourceHandler.commitResponseHideExceptions(conn, response);
+        os.write(data);
+        closeOutputStream(os);
+        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+    }
 
 	private void closeOutputStream(OutputStream os) {
 		try {
@@ -161,11 +177,9 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					// here the parameter value should be the wsdl file name
 					service.printUserWSDL(baos, parameterValue);
 				}
-				SourceContext.updateState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE);
-				response.addHeader(CONTENT_TYPE, TEXT_XML);
-				sourceHandler.commitResponseHideExceptions(conn, response);
-				os.write(baos.toByteArray());
-				closeOutputStream(os);
+
+                response.addHeader(CONTENT_TYPE, TEXT_XML);
+                sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
 
 			} catch (Exception e) {
 				handleBrowserException(response, conn, os,
@@ -209,11 +223,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				service.printWSDL2(baos, getIpAddress());
 				response.addHeader(CONTENT_TYPE, TEXT_XML);
-				SourceContext.updateState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE);
-				sourceHandler.commitResponseHideExceptions(conn, response);
-				os.write(baos.toByteArray());
-				closeOutputStream(os);
-
+                sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
 			} catch (Exception e) {
 				handleBrowserException(response, conn, os,
 						"Error generating ?wsdl2 output for service : "
@@ -280,7 +290,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 	 *
 	 * @param response
 	 *            HttpResponse
-	 * @param messageCtx
+	 * @param msgContext
 	 *            Current MessageContext
 	 * @param conn
 	 *            NHttpServerConnection
@@ -292,7 +302,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 	 *            url parameters
 	 */
 	protected void generateXsd(HttpResponse response,
-			MessageContext messageCtx, NHttpServerConnection conn,
+			MessageContext msgContext, NHttpServerConnection conn,
 			OutputStream os, String serviceName,
 			Map<String, String> parameters) {
 		if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
@@ -303,19 +313,14 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					service.printSchema(baos);
 					response.addHeader(CONTENT_TYPE, TEXT_XML);
-					SourceContext.updateState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE);
-					sourceHandler.commitResponseHideExceptions(conn, response);
-					os.write(baos.toByteArray());
-					closeOutputStream(os);
-
+                    sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
 				} catch (Exception e) {
 					handleBrowserException(response, conn, os,
 							"Error generating ?xsd output for service : "
 									+ serviceName, e);
 				}
 			} else {
-				messageCtx.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE,
-						true);
+				msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
 			}
 
 		} else {
@@ -347,6 +352,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 								response);
 						os.write(baos.toByteArray());
 						closeOutputStream(os);
+                        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
 					} catch (Exception e) {
 						handleBrowserException(response, conn, os,
 								"Error generating named ?xsd output for service : "
@@ -357,10 +363,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					// no schema available by that name - send 404
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 					closeOutputStream(os);
+                    msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
 				}
 			} else {
-				messageCtx.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE,
-						true);
+				msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
 			}
 		}
 	}

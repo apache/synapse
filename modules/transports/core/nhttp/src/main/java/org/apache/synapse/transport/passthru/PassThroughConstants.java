@@ -124,6 +124,6 @@ public class PassThroughConstants {
 	
 	public static final String FORCE_PASS_THROUGH_BUILDER = "force.passthrough.builder";
 	
-	public static final String WSDL_GEN_HANDLED = "WSDL_GEN_HANDLED";
+	public static final String GET_REQUEST_HANDLED = "GET_REQUEST_HANDLED";
 
 }

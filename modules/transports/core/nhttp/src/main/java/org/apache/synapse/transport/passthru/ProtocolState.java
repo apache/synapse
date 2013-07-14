@@ -35,7 +35,7 @@ public enum ProtocolState {
     REQUEST_DONE,
     /** The connection is reading the response headers */
     RESPONSE_HEAD,
-    /** The connection si reading the response body */
+    /** The connection is reading the response body */
     RESPONSE_BODY,
     /** The response is completed */
     RESPONSE_DONE,
@@ -43,6 +43,6 @@ public enum ProtocolState {
     CLOSING,
     /** The connection is closed */
     CLOSED,
-    /** WSDL response has been sent */
-    WSDL_XSD_RESPONSE_DONE
+    /** GET request has been responded to */
+    GET_REQUEST_COMPLETE
 }

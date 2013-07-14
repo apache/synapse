@@ -83,7 +83,7 @@ public class SourceHandler implements NHttpServiceHandler {
                     System.currentTimeMillis());
         	 
             if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) &&
-                    !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {
+                    !SourceContext.assertState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE)) {
                 handleInvalidState(conn, "Request received");
                 return;
             }
@@ -192,7 +192,7 @@ public class SourceHandler implements NHttpServiceHandler {
             ProtocolState protocolState = SourceContext.getState(conn);
             
             //special case to handle WSDLs
-            if(protocolState == ProtocolState.WSDL_RESPONSE_DONE){
+            if(protocolState == ProtocolState.WSDL_XSD_RESPONSE_DONE){
             	// we need to shut down if the shutdown flag is set
             	 HttpContext context = conn.getContext();
             	 ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(
@@ -432,6 +432,27 @@ public class SourceHandler implements NHttpServiceHandler {
             errorMessage = "[" + conn + "] " + msg;
         }
         log.error(errorMessage, e);
+    }
+    
+    
+    /**
+     * Commit the response to the connection. Processes the response through the configured
+     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted
+     * for non critical (i.e. browser requests etc) requests, which are not core messages
+     * @param conn the connection being processed
+     * @param response the response to commit over the connection
+     */
+    public void commitResponseHideExceptions(
+            final NHttpServerConnection conn, final HttpResponse response) {
+        try {
+            conn.suspendInput();
+            sourceConfiguration.getHttpProcessor().process(response, conn.getContext());
+            conn.submitResponse(response);
+        } catch (HttpException e) {
+            handleException("Unexpected HTTP protocol error : " + e.getMessage(), e, conn);
+        } catch (IOException e) {
+            handleException("IO error submiting response : " + e.getMessage(), e, conn);
+        }
     }
 
 }

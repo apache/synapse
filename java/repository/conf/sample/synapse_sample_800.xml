@@ -14,6 +14,7 @@
                         <arg expression="get-property('uri.var.symbol')"/>
                     </args>
                 </payloadFactory>
+                <header name="Action" value="urn:getQuote"/>
                 <send>
                     <endpoint>
                         <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
@@ -28,6 +29,7 @@
             <inSequence>
                 <property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/>
                 <property name="OUT_ONLY" value="true"/>
+                <header name="Action" value="urn:placeOrder"/>
                 <send>
                     <endpoint>
                         <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>

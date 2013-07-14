@@ -33,7 +33,6 @@ import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.transport.nhttp.DefaultHttpGetProcessor;
 
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.HttpGetRequestProcessor;

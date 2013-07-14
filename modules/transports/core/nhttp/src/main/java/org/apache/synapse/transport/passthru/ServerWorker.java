@@ -200,7 +200,7 @@ public class ServerWorker implements Runnable {
 		SourceContext info = (SourceContext) request.getConnection().getContext().
                 getAttribute(SourceContext.CONNECTION_INFORMATION);
 		if (info != null &&
-		    info.getState().equals(ProtocolState.WSDL_RESPONSE_DONE) ||
+		    info.getState().equals(ProtocolState.WSDL_XSD_RESPONSE_DONE) ||
 		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null &&
                     Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
 			return;

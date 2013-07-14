@@ -118,12 +118,6 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
             response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
             response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
             serverHandler.commitResponseHideExceptions(conn, response);
-
-//        } else if (!uri.startsWith(servicePath)) {
-//            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-//            response.addHeader(LOCATION, servicePath + "/");
-//            serverHandler.commitResponseHideExceptions(conn, response);
-
         } else if (serviceName != null && parameters.containsKey("wsdl")) {
             generateWsdl(request, response, msgContext,
                     conn, os, serviceName, parameters, isRestDispatching);

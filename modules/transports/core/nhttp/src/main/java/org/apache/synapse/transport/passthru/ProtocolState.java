@@ -44,5 +44,5 @@ public enum ProtocolState {
     /** The connection is closed */
     CLOSED,
     /** WSDL response has been sent */
-    WSDL_RESPONSE_DONE
+    WSDL_XSD_RESPONSE_DONE
 }

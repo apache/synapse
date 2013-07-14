@@ -126,5 +126,4 @@ public class PassThroughConstants {
 	
 	public static final String WSDL_GEN_HANDLED = "WSDL_GEN_HANDLED";
 
-	
 }

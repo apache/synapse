@@ -76,6 +76,7 @@ import java.util.*;
  * @see org.apache.synapse.util.xpath.SynapseXPathVariableContext
  */
 public class SynapseXPath extends AXIOMXPath {
+
     private static final long serialVersionUID = 7639226137534334222L;
 
     private static final Log log = LogFactory.getLog(SynapseXPath.class);
@@ -95,11 +96,15 @@ public class SynapseXPath extends AXIOMXPath {
         // TODO: Improve this
         if (xpathString.contains("/")) {
             contentAware = true;
-        } else if (xpathString.contains("get-property('To')") ||
-                xpathString.contains("get-property('From'") ||
+        } else if (xpathString.contains("get-property('From'") ||
                 xpathString.contains("get-property('FAULT')")) {
             contentAware = true;
         } else {
+            contentAware = false;
+        }
+
+        if (xpathString.contains("$trp") || xpathString.contains("$ctx") ||
+                xpathString.contains("$axis2")) {
             contentAware = false;
         }
     }

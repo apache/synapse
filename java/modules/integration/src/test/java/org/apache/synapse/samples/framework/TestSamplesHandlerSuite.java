@@ -28,6 +28,7 @@ import org.apache.synapse.samples.framework.tests.message.*;
 import org.apache.synapse.samples.framework.tests.proxy.*;
 import org.apache.synapse.samples.framework.tests.qos.Sample100;
 import org.apache.synapse.samples.framework.tests.qos.Sample101;
+import org.apache.synapse.samples.framework.tests.rest.Sample800;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,7 +139,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
             }
         } else {
             suiteName = "AllSamplesSuite";
-            for (int i = 0; i <= 600; i++) {
+            for (int i = 0; i <= 1000; i++) {
                 Class testClass = (Class) sampleClassRepo.get(Integer.toString(i));
                 if (testClass != null) {
                     suiteClassesList.add(testClass);
@@ -222,5 +223,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("451", Sample451.class);
         sampleClassRepo.put("452", Sample452.class);
         sampleClassRepo.put("460", Sample460.class);
+
+        sampleClassRepo.put("800", Sample800.class);
     }
 }

@@ -18,10 +18,14 @@
  */
 package org.apache.synapse.samples.framework.tests.proxy;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
+import org.apache.synapse.samples.framework.clients.BasicHttpClient;
+import org.apache.synapse.samples.framework.clients.HttpResponse;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample150 extends SynapseTestCase {
@@ -35,12 +39,19 @@ public class Sample150 extends SynapseTestCase {
         client = getStockQuoteClient();
     }
 
-
     public void testBasicProxy() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
         log.info("Running test: Introduction to proxy services");
         SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());
+    }
+
+    public void testProxyWSDL() throws Exception {
+        BasicHttpClient client = new BasicHttpClient();
+        HttpResponse response = client.doGet("http://localhost:8280/services/StockQuoteProxy?wsdl");
+        assertEquals(response.getStatus(), HttpStatus.SC_OK);
+        OMElement element = response.getBodyAsXML();
+        assertEquals(element.getLocalName(), "definitions");
     }
 
 }

@@ -83,7 +83,7 @@ public class SourceHandler implements NHttpServiceHandler {
                     System.currentTimeMillis());
         	 
             if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) &&
-                    !SourceContext.assertState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE)) {
+                    !SourceContext.assertState(conn, ProtocolState.GET_REQUEST_COMPLETE)) {
                 handleInvalidState(conn, "Request received");
                 return;
             }
@@ -192,7 +192,7 @@ public class SourceHandler implements NHttpServiceHandler {
             ProtocolState protocolState = SourceContext.getState(conn);
             
             //special case to handle WSDLs
-            if(protocolState == ProtocolState.WSDL_XSD_RESPONSE_DONE){
+            if(protocolState == ProtocolState.GET_REQUEST_COMPLETE){
             	// we need to shut down if the shutdown flag is set
             	 HttpContext context = conn.getContext();
             	 ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(

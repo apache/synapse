@@ -184,9 +184,9 @@ public class ServerWorker implements Runnable {
 		} 
 		
 		//need special case to handle REST
-		boolean restHandle =false;
+		boolean restHandle = false;
 		if (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
-                (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
+                (Boolean) msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
 			msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
 	        msgContext.setServerSide(true);
 	        msgContext.setDoingREST(true);
@@ -196,13 +196,13 @@ public class ServerWorker implements Runnable {
 			restHandle = true;
 		}
 		
-		//if WSDL done then moved out rather than hand over to entity handle methods.
+		// If WSDL generation is done then move out rather than hand over to
+		// entity handle methods.
 		SourceContext info = (SourceContext) request.getConnection().getContext().
                 getAttribute(SourceContext.CONNECTION_INFORMATION);
-		if (info != null &&
-		    info.getState().equals(ProtocolState.WSDL_XSD_RESPONSE_DONE) ||
-		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null &&
-                    Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
+        Object getHandled = msgContext.getProperty(PassThroughConstants.GET_REQUEST_HANDLED);
+		if ((info != null && info.getState().equals(ProtocolState.GET_REQUEST_COMPLETE)) ||
+                Boolean.TRUE.equals(getHandled)) {
 			return;
 		}
 		

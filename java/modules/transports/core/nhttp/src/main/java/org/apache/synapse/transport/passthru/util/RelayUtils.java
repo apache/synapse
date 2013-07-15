@@ -76,12 +76,11 @@ public class RelayUtils {
         buildMessage(msgCtx, false);
     }
 
-    public static void buildMessage(MessageContext messageContext, boolean earlyBuild) throws IOException,
-            XMLStreamException {
+    public static void buildMessage(MessageContext messageContext,
+                                    boolean earlyBuild) throws IOException, XMLStreamException {
 
         final Pipe pipe = (Pipe) messageContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
-		if (pipe != null && forcePTBuild &&
-                !PassThroughTransportUtils.builderInvoked(messageContext)) {
+		if (pipe != null && forcePTBuild && !PassThroughTransportUtils.builderInvoked(messageContext)) {
 			InputStream in = pipe.getInputStream();
         	buildMessage(messageContext, earlyBuild, in);
             return;
@@ -121,7 +120,7 @@ public class RelayUtils {
         }
     }
 
-	public static void buildMessage(MessageContext messageContext,
+	private static void buildMessage(MessageContext messageContext,
                                     boolean earlyBuild, InputStream in) throws IOException {
 
 	    BufferedInputStream bufferedInputStream = (BufferedInputStream) messageContext.getProperty(

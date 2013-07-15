@@ -146,7 +146,7 @@ public class Axis2Sender {
                 messageContext.getEnvelope().getOrCreateHeader();
             }
 
-            Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
+            Axis2FlexibleMEPClient.clearSecurityProperties(messageContext.getOptions());
 
            // report stats for any component at response sending check point
             StatisticsReporter.reportForAllOnResponseSent(smc);

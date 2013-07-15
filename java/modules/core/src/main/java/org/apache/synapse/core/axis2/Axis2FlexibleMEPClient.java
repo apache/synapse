@@ -326,21 +326,21 @@ public class Axis2FlexibleMEPClient {
         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();
         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
 
-        AxisService anoymousService =
+        AxisService anonymousService =
             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),
                     axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
         // mark the anon services created to be used in the client side of synapse as hidden
         // from the server side of synapse point of view
-        anoymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+        anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
         ServiceGroupContext sgc = new ServiceGroupContext(
-                        axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
-        ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
+                        axisCfgCtx, (AxisServiceGroup) anonymousService.getParent());
+        ServiceContext serviceCtx = sgc.getServiceContext(anonymousService);
 
         boolean outOnlyMessage = "true".equals(synapseOutMessageContext.getProperty(
                 SynapseConstants.OUT_ONLY));
 
         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
-        AxisOperation axisAnonymousOperation = anoymousService.getOperation(
+        AxisOperation axisAnonymousOperation = anonymousService.getOperation(
                 outOnlyMessage ?
                         new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :
                         new QName(AnonymousServiceFactory.OUT_IN_OPERATION));
@@ -358,7 +358,7 @@ public class Axis2FlexibleMEPClient {
                     RMAssertionBuilder builder = new RMAssertionBuilder();
                     SandeshaPolicyBean sandeshaPolicyBean = (SandeshaPolicyBean) builder.build(policyOMElement, null);
                     Parameter policyParam = new Parameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN, sandeshaPolicyBean);
-                    anoymousService.addParameter(policyParam);
+                    anonymousService.addParameter(policyParam);
                 }
             }
         }
@@ -468,7 +468,7 @@ public class Axis2FlexibleMEPClient {
         return newMC;
     }
 
-    public static void clearSecurtityProperties(Options options) {
+    public static void clearSecurityProperties(Options options) {
 
         Options current = options;
         while (current != null && current.getProperty(SynapseConstants.RAMPART_POLICY) != null) {

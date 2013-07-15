@@ -20,19 +20,19 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axiom.util.UIDGenerator;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
-import org.apache.synapse.rest.RESTRequestHandler;
-import org.apache.synapse.task.SynapseTaskManager;
-import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.ServerContextInformation;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.statistics.StatisticsCollector;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -41,6 +41,9 @@ import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.MediatorWorker;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.RESTRequestHandler;
+import org.apache.synapse.task.SynapseTaskManager;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
 import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;
 import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
@@ -256,19 +259,17 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      */
     public void send(EndpointDefinition endpoint, MessageContext synCtx) {
         if (synCtx.isResponse()) {
-
             if (endpoint != null) {
+                if (isTransportSwitching(synCtx, endpoint)) {
+                    buildMessage(synCtx);
+                }
                 Axis2Sender.sendOn(endpoint, synCtx);
             } else {
                 String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
                 if (proxyName != null) {
                     ProxyService proxyService = synapseConfig.getProxyService(proxyName);
                     if (proxyService.isModuleEngaged()) {
-                        try {
-                        	 RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
-                        } catch (Exception e) {
-                            handleException("Error building message", e);
-                        }
+                        buildMessage(synCtx);
                     }
                 }
                 Axis2Sender.sendBack(synCtx);
@@ -286,14 +287,33 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
             // This is only for stats collection
             synCtx.setProperty(SynapseConstants.SENDING_REQUEST, true);
-            if (endpoint == null) {
-                try {
-                	RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);
-                } catch (Exception e) {
-                    handleException("Error while building message", e);
-                }
+
+            if (endpoint == null || isTransportSwitching(synCtx, endpoint)) {
+                buildMessage(synCtx);
             }
             Axis2Sender.sendOn(endpoint, synCtx);
+        }
+    }
+
+    private boolean isTransportSwitching(MessageContext synCtx, EndpointDefinition endpoint) {
+        if (endpoint.getAddress() != null) {
+            // If the message is sent to an explicit non-HTTP endpoint, build the message
+            return !endpoint.getAddress().startsWith("http");
+        } else {
+            String address = synCtx.getTo().getAddress();
+            if (address != null) {
+                // If the message is sent to an implicit non-HTTP endpoint, build the message
+                return !address.startsWith("http");
+            }
+        }
+        return false;
+    }
+
+    private void buildMessage(MessageContext synCtx) {
+        try {
+            RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(), false);
+        } catch (Exception e) {
+            handleException("Error while building message", e);
         }
     }
 

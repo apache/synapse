@@ -256,6 +256,8 @@ public class PassThroughHttpListener implements TransportListener {
         sourceConfiguration.getConfigurationContext().
                 getAxisConfiguration().getObserversList().remove(axisObserver);
 
+        MBeanRegistrar.getInstance().unRegisterMBean("Transport",
+                "passthru-" + namePrefix.toLowerCase() + "-receiver");
         sourceConfiguration.getMetrics().destroy();
     }
 

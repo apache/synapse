@@ -76,6 +76,7 @@ public class SynapseStartUpServlet extends HttpServlet {
             if (o != null && o instanceof ServerManager) {
                 ServerManager serverManager = (ServerManager) o;
                 serverManager.stop();
+                serverManager.shutdown();
                 getServletContext().removeAttribute(ALREADY_INITED);
             }
         } catch (Exception e) {

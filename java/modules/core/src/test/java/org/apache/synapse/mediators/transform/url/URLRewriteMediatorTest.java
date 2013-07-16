@@ -267,4 +267,22 @@ public class URLRewriteMediatorTest extends TestCase {
         assertEquals("https://test.com:9443/services/StockQuoteService#id",
                 msgCtx.getTo().getAddress());
     }
+
+    public void testNonExistingPropertyRewriteScenario() throws Exception {
+        URLRewriteMediator mediator = new URLRewriteMediator();
+        mediator.setOutputProperty("outURL");
+
+        RewriteAction action = new RewriteAction();
+        action.setXpath(new SynapseXPath("get-property('bogus')"));
+        action.setActionType(RewriteAction.ACTION_APPEND);
+        action.setFragmentIndex(URIFragments.PROTOCOL);
+
+        RewriteRule rule = new RewriteRule();
+        rule.addRewriteAction(action);
+        mediator.addRule(rule);
+
+        MessageContext msgCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>");
+        msgCtx.setTo(new EndpointReference("http://foo.com"));
+        mediator.mediate(msgCtx);
+    }
 }

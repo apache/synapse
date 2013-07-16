@@ -53,6 +53,9 @@ public class RewriteAction {
         String result;
         if (xpath != null) {
             result = xpath.stringValueOf(messageContext);
+            if (result == null) {
+                result = "";
+            }
         } else {
             result = value;
         }
@@ -68,7 +71,7 @@ public class RewriteAction {
                 uri = new URI("");
             }
 
-            // Since the entire URL has been rewritten we need to reinit all the fragments
+            // Since the entire URL has been rewritten we need to re-init all the fragments
             fragments.setFragments(uri);
 
         } else if (fragmentIndex == URIFragments.PORT) {

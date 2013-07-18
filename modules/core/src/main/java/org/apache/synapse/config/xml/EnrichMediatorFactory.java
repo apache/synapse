@@ -162,7 +162,7 @@ public class EnrichMediatorFactory extends AbstractMediatorFactory {
             if (propertyAttr != null && propertyAttr.getAttributeValue() != null) {
                 target.setProperty(propertyAttr.getAttributeValue());
             } else {
-                handleException("xpath attribute is required for CUSTOM type");
+                handleException("property attribute is required for property type");
             }
         }
     }

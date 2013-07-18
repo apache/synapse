@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.elementary;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
@@ -30,6 +31,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
+import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 
 /**
@@ -136,7 +138,24 @@ public class Target {
             }
         } else if (targetType == EnrichMediator.PROPERTY) {
             assert property != null : "Property cannot be null for PROPERTY type";
-            synContext.setProperty(property, sourceNodeList);  
+            Object propertyObj = synContext.getProperty(property);
+            if (propertyObj != null && ACTION_ADD_CHILD.equals(action)) {
+                OMElement documentElement;
+                if (propertyObj instanceof OMElement) {
+                    documentElement = (OMElement) propertyObj;
+                } else {
+                    try {
+                        documentElement = AXIOMUtil.stringToOM(propertyObj.toString());
+                    } catch (XMLStreamException e) {
+                        throw new SynapseException("Error while converting property value into" +
+                                " an OMElement");
+                    }
+                }
+                insertElement(sourceNodeList, documentElement, synLog);
+                synContext.setProperty(property, documentElement);
+            } else {
+                synContext.setProperty(property, sourceNodeList);
+            }
         }
     }
 

@@ -18,6 +18,7 @@
 */
 package org.apache.synapse.transport.vfs;
 
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.base.BaseUtils;
@@ -94,17 +95,22 @@ public class VFSUtils extends BaseUtils {
 
         // if none works.. use default
         if (fileName == null) {
-            fileName = VFSConstants.DEFAULT_RESPONSE_FILE;
+            String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
+            if (messageType != null && !messageType.contains("xml")) {
+                fileName = VFSConstants.DEFAULT_NON_XML_RESPONSE_FILE;
+            } else {
+                fileName = VFSConstants.DEFAULT_XML_RESPONSE_FILE;
+            }
         }
         return fileName;
     }
 
     /**
-     * Acquires a file item lock before processing the item, guaranteing that the file is not
+     * Acquires a file item lock before processing the item, guaranteeing that the file is not
      * processed while it is being uploaded and/or the item is not processed by two listeners
      *
      * @param fsManager used to resolve the processing file
-     * @param fo representing the processign file item
+     * @param fo representing the processing file item
      * @return boolean true if the lock has been acquired or false if not
      */
     public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {

@@ -51,7 +51,8 @@ public final class VFSConstants {
     public static final String TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT
             = "transport.vfs.MoveTimestampFormat";
 
-    public static final String DEFAULT_RESPONSE_FILE = "response.xml";
+    public static final String DEFAULT_XML_RESPONSE_FILE = "response.xml";
+    public static final String DEFAULT_NON_XML_RESPONSE_FILE = "response.dat";
     
     public static final String STREAMING = "transport.vfs.Streaming";
     

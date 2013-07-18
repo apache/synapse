@@ -288,35 +288,40 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                         if (entry.getMoveAfterMoveFailure() != null) {
                             isFailedRecord = isFailedRecord(child, entry);
                         }
-                        if (log.isDebugEnabled()) {
-                            log.debug("Matching file : " + child.getName().getBaseName());
-                        }
-                        if ((entry.getFileNamePattern() != null) && (
-                                child.getName().getBaseName().matches(entry.getFileNamePattern()))
-                                && (!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled()
-                                && VFSUtils.acquireLock(fsManager, child))) &&
-                                !isFailedRecord) {
-                            try {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Processing file :" + child);
-                                }
-                                processFile(entry, child);
-                                successCount++;
-                                // tell moveOrDeleteAfterProcessing() file was success
-                                entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
-                                metrics.incrementMessagesReceived();
 
-                            } catch (Exception e) {
-                                logException("Error processing File URI : " + child.getName(), e);
-                                failCount++;
-                                // tell moveOrDeleteAfterProcessing() file failed
-                                entry.setLastPollState(PollTableEntry.FAILED);
-                                metrics.incrementFaultsReceiving();
+                        if (entry.getFileNamePattern() != null &&
+                                child.getName().getBaseName().matches(entry.getFileNamePattern())){
+                            //child's file name matches the file name pattern
+                            //now we try to get the lock and process
+                            if (log.isDebugEnabled()) {
+                                log.debug("Matching file : " + child.getName().getBaseName());
                             }
 
-                              try {
+                            if ((!entry.isFileLockingEnabled()
+                                    || (entry.isFileLockingEnabled() && VFSUtils.acquireLock(fsManager, child)))
+                                    && !isFailedRecord){
+                                //process the file
+                                try {
+                                    if (log.isDebugEnabled()) {
+                                        log.debug("Processing file :" + child);
+                                    }
+                                    processFile(entry, child);
+                                    successCount++;
+                                    // tell moveOrDeleteAfterProcessing() file was success
+                                    entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
+                                    metrics.incrementMessagesReceived();
+
+                                } catch (Exception e) {
+                                    logException("Error processing File URI : " + child.getName(), e);
+                                    failCount++;
+                                    // tell moveOrDeleteAfterProcessing() file failed
+                                    entry.setLastPollState(PollTableEntry.FAILED);
+                                    metrics.incrementFaultsReceiving();
+                                }
+
+                                try {
                                     moveOrDeleteAfterProcessing(entry, child);
-                              } catch (AxisFault axisFault) {
+                                } catch (AxisFault axisFault) {
                                     logException("File object '" + child.getURL().toString() +
                                             "'cloud not be moved", axisFault);
                                     failCount++;
@@ -324,17 +329,22 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                     String timeStamp =
                                             VFSUtils.getSystemTime(entry.getFailedRecordTimestampFormat());
                                     addFailedRecord(entry, child, timeStamp);
-                              }
-                              if (entry.isFileLockingEnabled()) {
-                                VFSUtils.releaseLock(fsManager, child);
+                                } finally {
+                                    // if there is a failure or not we'll try to release the lock
+                                    if (entry.isFileLockingEnabled()) {
+                                        VFSUtils.releaseLock(fsManager, child);
+                                    }
+                                }
                             }
-                        } else if (!(!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled()
-                                && VFSUtils.acquireLock(fsManager, fileObject))) &&
-                                log.isDebugEnabled()) {
-                            log.debug("Couldn't get the lock for processing the file : "
-                                    + child.getName());
+                        } else if (entry.getFileNamePattern()!= null &&
+                                !child.getName().getBaseName().matches(entry.getFileNamePattern())){
+                            //child's file name does not match the file name pattern
+                            if (log.isDebugEnabled()) {
+                                log.debug("Non-Matching file : " + child.getName().getBaseName());
+                            }
                         } else if(isFailedRecord){
-                              if (entry.isFileLockingEnabled()) {
+                            //it is a failed record
+                            if (entry.isFileLockingEnabled()) {
                                 VFSUtils.releaseLock(fsManager, child);
                                 VFSUtils.releaseLock(fsManager, fileObject);
                             }
@@ -348,7 +358,6 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                         "process");
                             }
                         }
-
                     }
 
                     if (failCount == 0 && successCount > 0) {

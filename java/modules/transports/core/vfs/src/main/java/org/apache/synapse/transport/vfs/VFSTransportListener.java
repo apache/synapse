@@ -36,6 +36,7 @@ import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 
@@ -543,7 +544,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 dataSource = ManagedDataSourceFactory.create(
                         new FileObjectDataSource(file, contentType));
             } else {
-                in = content.getInputStream();
+                in = new AutoCloseInputStream(content.getInputStream());
                 dataSource = null;
             }
             
@@ -563,15 +564,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                     null, //* SOAP Action - not applicable *//
                     contentType
                 );
-            }
-            finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException ex) {
-                        handleException("Error closing stream", ex);
-                    }
-                } else {
+            } finally {
+                if (dataSource != null) {
                     dataSource.destroy();
                 }
             }
@@ -585,9 +579,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
             
         } finally {
             try {
+                // As per the Commons-VFS API docs, this will also close the underlying
+                // FileContent object and any open streams.
                 file.close();
-            } catch (FileSystemException warn) {
-                log.warn("Cannot close file after processing : " + file.getName().getPath(), warn);
+            } catch (FileSystemException ignored) {
             }
         }
     }

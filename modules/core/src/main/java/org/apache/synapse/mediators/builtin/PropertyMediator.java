@@ -353,6 +353,7 @@ public class PropertyMediator extends AbstractMediator {
                         pattern.toString() + " with the property value :" + value;
                 synLog.traceOrDebug(msg);
             }
+            matchedValue = ""; //if not matched ideally should return empty string
         }
         
         return matchedValue;

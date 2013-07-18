@@ -21,7 +21,6 @@ package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -30,6 +29,7 @@ import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.axiom.om.OMElement;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class PropertyMediatorTest extends TestCase {
 
@@ -142,7 +142,7 @@ public class PropertyMediatorTest extends TestCase {
         Object prop = synCtx.getProperty("nameOne");
         assertEquals(valueOne, prop);
 
-        // Test XML property retreival
+        // Test XML property retrieval
         String exprValue = new SynapseXPath("synapse:get-property('nameOne')").stringValueOf(synCtx);
         assertEquals(xml, exprValue);
 
@@ -207,6 +207,29 @@ public class PropertyMediatorTest extends TestCase {
 
         assertTrue(
             "value".equals(medProp.getEvaluatedExpression(synCtx)));
+    }
+
+    public void testPropertyRegexTest() throws Exception {
+        String outputProperty = "regexProperty";
+
+        PropertyMediator propMediator = new PropertyMediator();
+        propMediator.setName(outputProperty);
+        propMediator.setExpression(new SynapseXPath("get-property('testProperty')"));
+        propMediator.setPattern(Pattern.compile("([A-Z]+)([0-9]+)"));
+
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        synCtx.setProperty("testProperty", "HELLOWORLD123");
+        propMediator.mediate(synCtx);
+        assertEquals("HELLOWORLD123", synCtx.getProperty(outputProperty));
+
+        propMediator.setGroup(1);
+        propMediator.mediate(synCtx);
+        assertEquals("HELLOWORLD", synCtx.getProperty(outputProperty));
+
+        //testing the fix for SYNAPSE-890
+        synCtx.setProperty("testProperty", "HELLOWORLD");
+        propMediator.mediate(synCtx);
+        assertEquals("", synCtx.getProperty(outputProperty));
     }
 
 }

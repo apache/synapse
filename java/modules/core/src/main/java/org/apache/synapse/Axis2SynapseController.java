@@ -29,6 +29,7 @@ import org.apache.axis2.dispatchers.SOAPMessageBodyBasedDispatcher;
 import org.apache.axis2.engine.*;
 import org.apache.axis2.format.BinaryBuilder;
 import org.apache.axis2.format.PlainTextBuilder;
+import org.apache.axis2.format.PlainTextFormatter;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.axis2.util.JavaUtils;
@@ -904,6 +905,9 @@ public class Axis2SynapseController implements SynapseController {
         }
         if (axisConf.getMessageBuilder("application/octet-stream") == null) {
             axisConf.addMessageBuilder("application/octet-stream", new BinaryBuilder());
+        }
+        if (axisConf.getMessageFormatter("text/plain") == null) {
+            axisConf.addMessageFormatter("text/plain", new PlainTextFormatter());
         }
     }
 

@@ -382,6 +382,27 @@ public class XQueryMediator extends AbstractMediator {
                         ((OMElement) destination).setText(
                                 String.valueOf(xqItem.getItemAsString()));
                     }
+                } else if (target.getXPath() == null) {
+                    //In the case soap body doesn't have the first element --> Empty soap body
+                    destination = synCtx.getEnvelope().getBody();
+                    if (synLog.isTraceOrDebugEnabled()) {
+                        synLog.traceOrDebug("The target node " + destination);
+                    }
+
+                    //If the result is XML
+                    if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||
+                            XQItemType.XQITEMKIND_ELEMENT == itemKind ||
+                            XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
+                        StAXOMBuilder builder = new StAXOMBuilder(
+                                XMLInputFactory.newInstance().createXMLStreamReader(
+                                        new StringReader(xqItem.getItemAsString())));
+                        OMElement resultOM = builder.getDocumentElement();
+                        if (resultOM != null) {
+                            ((OMElement) destination).addChild(resultOM);
+                        }
+                    }
+                    //No else part since soap body could have only XML part not text values
+
                 }
                 break;   // Only take the *first* value of the result sequence
             }

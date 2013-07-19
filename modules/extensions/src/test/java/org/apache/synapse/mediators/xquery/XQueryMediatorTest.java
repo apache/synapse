@@ -19,6 +19,7 @@
 package org.apache.synapse.mediators.xquery;
 
 import junit.framework.TestCase;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.TestUtils;
@@ -254,5 +255,18 @@ public class XQueryMediatorTest extends TestCase {
         mediator.addAllVariables(list);
         assertTrue(mediator.mediate(mc));
         assertEquals("true", mc.getEnvelope().getBody().getFirstElement().getText());
+    }
+
+    public void testEmptyBodyQuery() throws Exception {
+        MessageContext mc = TestUtils.getTestContext(sampleXml3, null);
+        mc.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
+
+        XQueryMediator mediator = new XQueryMediator();
+        mediator.setQuerySource(" declare namespace m0=\"http://services.samples/xsd\";\n" +
+                " declare variable $payload as document-node() external;\n" +
+                " declare variable $commission as document-node() external;\n" +
+                " <testing/>");
+        assertTrue(mediator.mediate(mc));
+        assertEquals("testing", mc.getEnvelope().getBody().getFirstElement().getLocalName());
     }
 }

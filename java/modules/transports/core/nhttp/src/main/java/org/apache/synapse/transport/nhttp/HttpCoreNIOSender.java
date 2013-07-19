@@ -554,11 +554,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 lstMetrics.incrementFaultsSending();
             }
             log.warn("Connection closed by client : " + worker.getRemoteAddress());
-        } catch (IllegalStateException e) {
-            if (lstMetrics != null) {
-                lstMetrics.incrementFaultsSending();
-            }
-            log.warn("Connection closed by client : " + worker.getRemoteAddress());
         } catch (IOException e) {
             if (lstMetrics != null) {
                 lstMetrics.incrementFaultsSending();

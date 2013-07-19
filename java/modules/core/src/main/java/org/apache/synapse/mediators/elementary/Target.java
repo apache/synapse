@@ -18,6 +18,7 @@
  */
 package org.apache.synapse.mediators.elementary;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
@@ -101,9 +102,14 @@ public class Target {
                         ((OMElement)targetParent).addChild(sourceNodeList.get(0));
                     }
                 }
+            } else if (targetObj instanceof OMAttribute){
+                OMAttribute attribute = (OMAttribute)targetObj;
+                if (sourceNodeList.get(0) instanceof OMText){
+                    attribute.setAttributeValue(((OMText)sourceNodeList.get(0)).getText());
+                }
             } else {
-                synLog.error("Invalid Target object to be enrich.");
-                throw new SynapseException("Invalid Target object to be enrich.");
+                synLog.error("Invalid Target object to enrich.");
+                throw new SynapseException("Invalid Target object to enrich.");
             }
         } else if (targetType == EnrichMediator.BODY) {
             SOAPEnvelope env = synContext.getEnvelope();

@@ -16,11 +16,12 @@ public class MatchSerializer extends TextProcessingEvaluatorSerializer {
 
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof MatchEvaluator)) {
-            throw new IllegalArgumentException("Evalutor must be a NotEvalutor");
+            throw new IllegalArgumentException("Evaluator must be a NotEvaluator");
         }
 
         MatchEvaluator matchEvaluator = (MatchEvaluator) evaluator;
-        OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.MATCH));
+        OMElement matchElement  = fac.createOMElement(EvaluatorConstants.MATCH,
+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);
         serializeSourceTextRetriever(matchEvaluator.getTextRetriever(), matchElement);
 
         matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.REGEX, nullNS,

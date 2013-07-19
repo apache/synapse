@@ -30,8 +30,7 @@ public class EqualSerializerTest extends XMLTestCase {
     private EqualFactory fac = new EqualFactory();
 
     public void testHeaderEqualSerializer() {
-        String input = "<equal type=\"header\" source=\"foo\" value=\"bar\"/>";
-
+        String input = "<equal xmlns=\"http://ws.apache.org/ns/synapse\" type=\"header\" source=\"foo\" value=\"bar\"/>";
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
             OMElement output = serializer.serialize(null, eval);
@@ -42,7 +41,7 @@ public class EqualSerializerTest extends XMLTestCase {
     }
 
     public void testParameterEqualSerializer() {
-        String input = "<equal type=\"param\" source=\"foo\" value=\"bar\"/>";
+        String input = "<equal xmlns=\"http://ws.apache.org/ns/synapse\" type=\"param\" source=\"foo\" value=\"bar\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
@@ -54,7 +53,7 @@ public class EqualSerializerTest extends XMLTestCase {
     }
 
     public void testURLEqualSerializer() {
-        String input = "<equal type=\"url\" value=\"http://foo.org\"/>";
+        String input = "<equal xmlns=\"http://ws.apache.org/ns/synapse\" type=\"url\" value=\"http://foo.org\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
@@ -66,7 +65,7 @@ public class EqualSerializerTest extends XMLTestCase {
     }
 
     public void testURLEqualSerializer2() {
-        String input = "<equal type=\"url\" value=\"http://foo.org\" source=\"protocol\"/>";
+        String input = "<equal xmlns=\"http://ws.apache.org/ns/synapse\" type=\"url\" value=\"http://foo.org\" source=\"protocol\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));

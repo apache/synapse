@@ -33,11 +33,12 @@ public class EqualSerializer extends TextProcessingEvaluatorSerializer {
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
 
         if (!(evaluator instanceof EqualEvaluator)) {
-            throw new IllegalArgumentException("Evalutor must be an EqualEvalutor");
+            throw new IllegalArgumentException("Evaluator must be an EqualEvaluator");
         }
 
         EqualEvaluator equalEvaluator = (EqualEvaluator) evaluator;
-        OMElement equalElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));
+        OMElement equalElement  = fac.createOMElement(EvaluatorConstants.EQUAL,
+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);
         serializeSourceTextRetriever(equalEvaluator.getTextRetriever(), equalElement);
 
         equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,

@@ -34,12 +34,13 @@ import javax.xml.namespace.QName;
 public class OrSerializer extends AbstractEvaluatorSerializer {
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof OrEvaluator)) {
-            throw new IllegalArgumentException("Evalutor should be a OrEvalutor");
+            throw new IllegalArgumentException("Evaluator should be an OrEvaluator");
         }
 
         OrEvaluator orEvaluator = (OrEvaluator) evaluator;
 
-        OMElement orElement = fac.createOMElement(new QName((EvaluatorConstants.OR)));
+        OMElement orElement  = fac.createOMElement(EvaluatorConstants.OR,
+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);
         serializeChildren(orElement, orEvaluator.getEvaluators());
 
         if (parent != null) {

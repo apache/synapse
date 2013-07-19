@@ -6,6 +6,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
 
@@ -62,5 +63,26 @@ public class EnrichMediatorTest extends TestCase {
         OMElement result = (OMElement) msgContext.getProperty("foo");
         assertEquals("property", result.getLocalName());
         assertEquals("test", result.getFirstElement().getLocalName());
+    }
+
+    public void testEnrich3() throws Exception {
+        EnrichMediator mediator = new EnrichMediator();
+        Source source = new Source();
+        source.setSourceType(EnrichMediator.PROPERTY);
+        source.setProperty("gender");
+
+        Target target = new Target();
+        target.setTargetType(EnrichMediator.CUSTOM);
+        target.setXpath(new SynapseXPath("//student/@gender"));
+        mediator.setSource(source);
+        mediator.setTarget(target);
+
+        MessageContext msgContext = TestUtils.getTestContext("<student gender=\"female\"><name>John</name><age>15</age></student>");
+        msgContext.setProperty("gender", "male");
+
+        mediator.mediate(msgContext);
+        OMElement element = msgContext.getEnvelope().getBody().getFirstElement();
+        String result = element.getAttributeValue(new QName("gender"));
+        assertEquals("male", result);
     }
 }

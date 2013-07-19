@@ -46,6 +46,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.policy.builders.RMAssertionBuilder;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.MessageHelper;
 
@@ -526,7 +527,9 @@ public class Axis2FlexibleMEPClient {
                     Constants.Configuration.HTTP_METHOD);
 
             isRestRequest = Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)
-                    || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod);
+                    || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod)
+                    || Constants.Configuration.HTTP_METHOD_PUT.equals(httpMethod)
+                    || RESTConstants.METHOD_OPTIONS.equals(httpMethod);
 
             if (!isRestRequest) {
 

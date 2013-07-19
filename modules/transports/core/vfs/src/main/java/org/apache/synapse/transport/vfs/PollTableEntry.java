@@ -24,6 +24,8 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.AbstractPollTableEntry;
 import org.apache.axis2.transport.base.ParamUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,8 @@ import java.text.SimpleDateFormat;
  * VFS Transport Listener
  */
 public class PollTableEntry extends AbstractPollTableEntry {
+
+    private static final Log log = LogFactory.getLog(PollTableEntry.class);
 
     // operation after scan
     public static final int DELETE = 0;
@@ -205,6 +209,8 @@ public class PollTableEntry extends AbstractPollTableEntry {
         
         fileURI = ParamUtils.getOptionalParam(params, VFSConstants.TRANSPORT_FILE_FILE_URI);
         if (fileURI == null) {
+            log.warn("required parameter " + VFSConstants.TRANSPORT_FILE_FILE_URI +
+                    " is missing in the proxy service configuration");
             return false;
         } else {
             

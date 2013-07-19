@@ -1472,7 +1472,8 @@
             </p>
             <div class="xmlConf">&lt;api name="string" context="string" [hostname="string"][port="int"]&gt;
     &lt;resource [methods="http-method-list"][inSequence="string"][outSequence="string"]
-   		[faultSequence="string"][content-type="string"][user-agent="str"]&gt;
+                [faultSequence="string"][url-mapping="string"][uri-template="string"]
+                [content-type="string"][user-agent="str"]&gt;
 
         &lt;inSequence&gt;...&lt;/inSequence&gt;?
         &lt;outSequence&gt;...&lt;/outSequence&gt;?
@@ -1491,12 +1492,16 @@
             </p>
             <p>
                 An API must also contain one or more resources. Resources define how messages
-                are processed and mediated by the API. An API can be associated with a set of HTTP
+                are processed and mediated by the API. A resource can be associated with a set of HTTP
                 methods using the 'methods' attribute. This attribute can support a single method name
-                (eg: GET) or a space separated list of methods (eg: GET PUT DELETE). A resource
-                can also refer other sequences using the 'inSequence', 'outSequence' and 'faultSequence'
-                attributes. Alternatively these mediation sequences can be defined inline with the
-                resource using 'inSequence', 'outSequence' and 'faultSequence' tags.
+                (eg: GET) or a space separated list of methods (eg: GET PUT DELETE). The 'url-mapping'
+                and 'uri-template' attributes can be used to specify the type of URL requests that should
+                be handled by any particular resource. The 'url-mapping' attribute accepts any Java
+                servlet style URL mapping (eg: /test/*, *.jsp). The 'uri-template' attribute accepts
+                valid RFC6570 style expressions (eg: /orders/{orderId}). A resource can also refer
+                other sequences using the 'inSequence', 'outSequence' and 'faultSequence' attributes.
+                Alternatively these mediation sequences can be defined inline with the resource using
+                'inSequence', 'outSequence' and 'faultSequence' tags.
             </p>
             <p>
                 An API can also optionally define a set of handlers. These handlers are invoked

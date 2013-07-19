@@ -36,6 +36,7 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
 
         if (!(m instanceof HeaderMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
+            return null;
         }
 
         HeaderMediator mediator = (HeaderMediator) m;
@@ -75,6 +76,11 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
 
+        if (mediator.hasEmbeddedXml()) {
+            for (OMElement e : mediator.getEmbeddedXml()) {
+                header.addChild(e);
+            }
+        }
         return header;
     }
 

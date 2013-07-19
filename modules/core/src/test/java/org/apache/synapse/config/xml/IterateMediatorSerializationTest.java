@@ -35,7 +35,7 @@ public class IterateMediatorSerializationTest extends AbstractTestCase {
         iterateMediatorSerializer = new IterateMediatorSerializer();
     }
 
-    public void testIterateMediatorSerializationSenarioOne() throws Exception {
+    public void testIterateMediatorSerializationScenarioOne() throws Exception {
         String inputXml = "<iterate xmlns=\"http://ws.apache.org/ns/synapse\" " +
             "continueParent=\"true\" preservePayload=\"true\" expression=\".\" " +
             "attachPath=\"get-property('to')\"><target sequence=\"sequenceRef1\" " +

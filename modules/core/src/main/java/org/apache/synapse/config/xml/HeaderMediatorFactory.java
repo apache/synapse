@@ -28,6 +28,7 @@ import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 import java.util.Properties;
 
 /**
@@ -57,9 +58,11 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
         OMAttribute action = elem.getAttribute(ATT_ACTION);
 
         if (name == null || name.getAttributeValue() == null) {
-            String msg = "A valid name attribute is required for the header mediator";
-            log.error(msg);
-            throw new SynapseException(msg);
+            if (elem.getChildElements() == null || !elem.getChildElements().hasNext()) {
+                String msg = "A valid name attribute is required for the header mediator";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
         } else {
             String nameAtt = name.getAttributeValue();
             int colonPos = nameAtt.indexOf(":");
@@ -101,7 +104,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
         }
 
         if (headerMediator.getAction() == HeaderMediator.ACTION_SET &&
-            value == null && exprn == null) {
+                value == null && exprn == null && !headerMediator.isImplicit()) {
             handleException("A 'value' or 'expression' attribute is required for a [set] " +
                     "header mediator");
         }
@@ -115,8 +118,17 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
             } catch (JaxenException je) {
                 handleException("Invalid XPath expression : " + exprn.getAttributeValue());
             }
+        } else if (headerMediator.isImplicit()) { // we have an implicit, non standard header
+            Iterator i = elem.getChildElements();
+            if (i == null) {
+                handleException("A non standard header with both value and expression null must " +
+                        "contain an embedded XML definition.");
+                return null;
+            }
+            while (i.hasNext()) {
+                headerMediator.addEmbeddedXml((OMElement) i.next());
+            }
         }
-
         return headerMediator;
     }
 

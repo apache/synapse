@@ -23,6 +23,8 @@ import org.apache.synapse.aspects.ComponentType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Holds a record for statistics for current message
@@ -31,7 +33,7 @@ import java.util.List;
 public class StatisticsRecord {
 
     private String id;
-    private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();
+    private final Queue<StatisticsLog> statisticsLogs = new ConcurrentLinkedQueue<StatisticsLog>();
     private String clientIP;
     private String clientHost;
     private ComponentType owner;
@@ -118,7 +120,7 @@ public class StatisticsRecord {
     }
 
     public String toString() {
-        return new StringBuffer()
+        return new StringBuilder()
                 .append("[Message id : ").append(id).append(" ]")
                 .append("[Remote  IP : ").append(clientIP).append(" ]")
                 .append("[Remote host : ").append(clientHost).append(" ]")

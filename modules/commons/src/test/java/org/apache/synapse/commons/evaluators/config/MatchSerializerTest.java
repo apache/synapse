@@ -30,7 +30,7 @@ public class MatchSerializerTest extends XMLTestCase {
     private MatchFactory fac = new MatchFactory();
 
     public void testHeaderMatchSerializer() {
-        String input = "<match type=\"header\" source=\"foo\" regex=\"bar\"/>";
+        String input = "<match xmlns=\"http://ws.apache.org/ns/synapse\" type=\"header\" source=\"foo\" regex=\"bar\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
@@ -42,7 +42,7 @@ public class MatchSerializerTest extends XMLTestCase {
     }
 
     public void testParameterMatchSerializer() {
-        String input = "<match type=\"param\" source=\"foo\" regex=\"bar\"/>";
+        String input = "<match xmlns=\"http://ws.apache.org/ns/synapse\" type=\"param\" source=\"foo\" regex=\"bar\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
@@ -54,7 +54,7 @@ public class MatchSerializerTest extends XMLTestCase {
     }
 
     public void testURLMatchSerializer() {
-        String input = "<match type=\"url\" regex=\"http://foo.org\"/>";
+        String input = "<match xmlns=\"http://ws.apache.org/ns/synapse\" type=\"url\" regex=\"http://foo.org\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
@@ -66,7 +66,7 @@ public class MatchSerializerTest extends XMLTestCase {
     }
 
     public void testURLMatchSerializer2() {
-        String input = "<match type=\"url\" regex=\"http://foo.org\" source=\"protocol\"/>";
+        String input = "<match xmlns=\"http://ws.apache.org/ns/synapse\" type=\"url\" regex=\"http://foo.org\" source=\"protocol\"/>";
 
         try {
             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));

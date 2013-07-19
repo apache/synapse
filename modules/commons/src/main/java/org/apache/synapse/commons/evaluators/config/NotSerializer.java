@@ -35,12 +35,13 @@ public class NotSerializer extends AbstractEvaluatorSerializer {
 
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof NotEvaluator)) {
-            throw new IllegalArgumentException("Evalutor should be a NotEvalutor");
+            throw new IllegalArgumentException("Evaluator should be a NotEvaluator");
         }
 
         NotEvaluator notEvaluator = (NotEvaluator) evaluator;
 
-        OMElement notElement = fac.createOMElement(new QName(EvaluatorConstants.NOT));
+        OMElement notElement  = fac.createOMElement(EvaluatorConstants.NOT,
+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);
         serializeChild(notElement, notEvaluator.getEvaluator());
 
         if (parent != null) {

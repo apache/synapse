@@ -47,6 +47,9 @@ public class EvaluatorConstants {
     public static final String PRIORITY = "priority";
     public static final String DEFAULT_PRIORITY = "defaultPriority";
 
+    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+    public static final String EMPTY_PREFIX = "";
+
     public static enum URI_FRAGMENTS {
         protocol,
         user,

@@ -40,7 +40,7 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
 
     public void testSerializationScenario2() {
         String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\">" +
-                "<rewriterule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
+                "<rewriterule><condition><match type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/><action " +
                 "fragment=\"port\" value=\"9090\" type=\"set\"/><action fragment=\"path\" " +
@@ -52,12 +52,12 @@ public class URLRewriteMediatorSerializationTest extends AbstractTestCase {
     public void testSerializationScenario3() {
         String xml = "<rewrite xmlns=\"http://ws.apache.org/ns/synapse\"><rewriterule>" +
                 "<action fragment=\"full\" value=\"http://localhost:8080/synapse\" type=\"set\"/></rewriterule>" +
-                "<rewriterule><condition><match xmlns=\"\" type=\"url\" source=\"host\" regex=\"localhost\"/>" +
+                "<rewriterule><condition><match type=\"url\" source=\"host\" regex=\"localhost\"/>" +
                 "</condition><action fragment=\"protocol\" value=\"https\" type=\"set\"/>" +
                 "<action fragment=\"host\" value=\"www.test.com\" type=\"set\"/>" +
                 "<action fragment=\"port\" xpath=\"get-property('port')\" type=\"set\"/>" +
                 "<action fragment=\"path\" value=\"/services\" type=\"prepend\"/></rewriterule><rewriterule>" +
-                "<condition><and xmlns=\"\"><match type=\"url\" source=\"host\" regex=\"www.test.com\"/>" +
+                "<condition><and><match type=\"url\" source=\"host\" regex=\"www.test.com\"/>" +
                 "<equal type=\"url\" source=\"port\" value=\"9090\"/></and></condition>" +
                 "<action fragment=\"path\" regex=\".*/FooService\" type=\"replace\" " +
                 "value=\"/BarService\"/></rewriterule>" +

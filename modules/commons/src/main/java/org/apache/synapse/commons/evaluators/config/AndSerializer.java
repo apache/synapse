@@ -34,12 +34,13 @@ import javax.xml.namespace.QName;
 public class AndSerializer extends AbstractEvaluatorSerializer {    
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {        
         if (!(evaluator instanceof AndEvaluator)) {           
-            throw new IllegalArgumentException("Evalutor should be a AndEvalutor");
+            throw new IllegalArgumentException("Evaluator should be an AndEvaluator");
         }
 
         AndEvaluator andEvaluator = (AndEvaluator) evaluator;
 
-        OMElement andElement = fac.createOMElement(new QName((EvaluatorConstants.AND)));
+        OMElement andElement  = fac.createOMElement(EvaluatorConstants.AND,
+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);
         serializeChildren(andElement, andEvaluator.getEvaluators());
 
         if (parent != null) {

@@ -63,7 +63,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_CONTPAR = new QName("continueParent");
     private static final QName ATT_PREPLD = new QName("preservePayload");
     private static final QName ATT_ATTACHPATH = new QName("attachPath");
-    private static final QName ATT_SEQUENCIAL = new QName("sequential");
+    private static final QName ATT_SEQUENTIAL = new QName("sequential");
 
     private static final QName ID_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "id");
@@ -71,7 +71,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
     /**
      * This method will create the IterateMediator by parsing the given xml configuration
      *
-     * @param elem OMElement describing the configuration of the IterateMediaotr
+     * @param elem OMElement describing the configuration of the IterateMediator
      * @param properties properties passed
      * @return IterateMediator created from the given configuration
      */
@@ -128,9 +128,9 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
                 attachPathValue, e);
         }
 
-        boolean asynchronous = false;
-        OMAttribute asynchronousAttr = elem.getAttribute(ATT_SEQUENCIAL);
-        if (asynchronousAttr != null && asynchronousAttr.getAttributeValue().equals("true")) {
+        boolean asynchronous = true;
+        OMAttribute sequentialAttr = elem.getAttribute(ATT_SEQUENTIAL);
+        if (sequentialAttr != null && sequentialAttr.getAttributeValue().equals("true")) {
             asynchronous = false;
         }
 

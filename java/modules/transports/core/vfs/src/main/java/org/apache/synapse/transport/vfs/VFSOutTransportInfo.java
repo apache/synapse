@@ -53,7 +53,12 @@ public class VFSOutTransportInfo implements OutTransportInfo {
     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {
         
         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
-            this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
+            int qIndex = outFileURI.indexOf("?");
+            if (qIndex < 0) {
+                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
+            } else {
+                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length(), qIndex);
+            }
         } else {
             this.outFileURI = outFileURI;
         }

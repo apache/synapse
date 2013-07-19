@@ -42,6 +42,12 @@ public class ScriptMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }
 
+    public void testScriptMediatorSerializationScenarioThree() {
+        String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" language=\"js\" key=\"jsMaster\" function=\"functionFoo\"><include key=\"jschild1\"/><include key=\"jschild2\"/></script>";
+        assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
+        assertTrue(serialization(inputXml, scriptMediatorSerializer));
+    }
+
     public void testInlineScriptMediatorSerializationScenarioOne() {
         String inputXml = "<syn:script xmlns:syn=\"http://ws.apache.org/ns/synapse\" language='js'>" +
                 "<![CDATA[var symbol = mc.getPayloadXML()..*::Code.toString();mc.setPayloadXML(<m:getQuote xmlns:m=\"http://services.samples/xsd\">\n" +

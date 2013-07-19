@@ -124,7 +124,7 @@ public class VFSUtils extends BaseUtils {
             // check whether there is an existing lock for this item, if so it is assumed
             // to be processed by an another listener (downloading) or a sender (uploading)
             // lock file is derived by attaching the ".lock" second extension to the file name
-            String fullPath = fo.getURL().toString();
+            String fullPath = fo.getName().getURI();
             int pos = fullPath.indexOf("?");
             if (pos != -1) {
                 fullPath = fullPath.substring(0, pos);
@@ -183,7 +183,7 @@ public class VFSUtils extends BaseUtils {
      */
     public static void releaseLock(FileSystemManager fsManager, FileObject fo) {
         try {
-            String fullPath = fo.getURL().toString();
+            String fullPath = fo.getName().getURI();
             int pos = fullPath.indexOf("?");
             if (pos > -1) {
                 fullPath = fullPath.substring(0, pos);

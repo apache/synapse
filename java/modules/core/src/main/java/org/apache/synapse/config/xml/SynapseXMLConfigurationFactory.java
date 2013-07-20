@@ -216,7 +216,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             return mediator;
         } else {
             String msg = "Invalid mediation template definition without a name";
-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg);
         }
         return null;
     }
@@ -239,7 +239,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             return endpoint;
         } else {
             String msg = "Invalid endpoint definition without a name";
-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg);
         }
         return null;
     }

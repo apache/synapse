@@ -277,17 +277,29 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         return executor;
     }
 
-    public static MessageStore defineMessageStore(SynapseConfiguration config ,
+    public static MessageStore defineMessageStore(SynapseConfiguration config,
                                                   OMElement elem, Properties properties) {
-        MessageStore messageStore = MessageStoreFactory.createMessageStore(elem, properties);
-        config.addMessageStore(messageStore.getName(), messageStore);
+        MessageStore messageStore = null;
+        try {
+            messageStore = MessageStoreFactory.createMessageStore(elem, properties);
+            config.addMessageStore(messageStore.getName(), messageStore);
+        } catch (Exception e) {
+            String msg = "Message Store configuration cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_MESSAGE_STORES, msg, e);
+        }
         return messageStore;
     }
 
     public static MessageProcessor defineMessageProcessor(SynapseConfiguration config,
                                                           OMElement elem, Properties properties) {
-        MessageProcessor processor  = MessageProcessorFactory.createMessageProcessor(elem);
-        config.addMessageProcessor(processor.getName(), processor);
+        MessageProcessor processor = null;
+        try {
+            processor = MessageProcessorFactory.createMessageProcessor(elem);
+            config.addMessageProcessor(processor.getName(), processor);
+        } catch (Exception e) {
+            String msg = "Message Processor configuration cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_MESSAGE_PROCESSORS, msg, e);
+        }
         return processor;
     }
 

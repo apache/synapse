@@ -20,7 +20,6 @@ package org.apache.synapse.transport.passthru;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.NHttpClientConnection;
@@ -29,12 +28,10 @@ import org.apache.synapse.transport.passthru.connections.TargetConnections;
 import org.apache.synapse.transport.passthru.util.TargetRequestFactory;
 
 import java.io.OutputStream;
-import java.util.Queue;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.net.URL;
-import java.net.MalformedURLException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -89,23 +86,12 @@ public class DeliveryAgent {
      * system about the need for a connection.
      *
      * @param msgContext the message context to be sent
-     * @param epr the endpoint to which the message should be sent
+     * @param host host name of epr
+     * @param port port of the of epr
      * @throws AxisFault if an error occurs
      */
-    public void submit(MessageContext msgContext, EndpointReference epr)
+    public void submit(MessageContext msgContext, String host, int port)
             throws AxisFault {
-        try {
-            URL url = new URL(epr.getAddress());
-            String host = url.getHost();
-            int port = url.getPort();
-            if (port == -1) {
-                // use default
-                if ("http".equals(url.getProtocol())) {
-                    port = 80;
-                } else if ("https".equals(url.getProtocol())) {
-                    port = 443;
-                }
-            }
 
             String key = host + ":" + port;
 
@@ -142,10 +128,6 @@ public class DeliveryAgent {
                     tryNextMessage(messageContext, conn);
                 }
             }
-
-        } catch (MalformedURLException e) {
-            handleException("Malformed URL in the target EPR", e);
-        }
     }
 
     public void errorConnecting(String host, int port, int errorCode, String message) {
@@ -237,14 +219,4 @@ public class DeliveryAgent {
         conn.requestOutput();
     }    
 
-    /**
-     * Throws an AxisFault if an error occurs at this level
-     * @param s a message describing the error
-     * @param e original exception leads to the error condition
-     * @throws AxisFault wrapping the original exception
-     */
-    private void handleException(String s, Exception e) throws AxisFault {
-        log.error(s, e);
-        throw new AxisFault(s, e);
-    }
 }

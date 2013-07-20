@@ -19,12 +19,6 @@
 
 package org.apache.synapse.transport.passthru;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import javax.net.ssl.SSLContext;
-
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
@@ -34,6 +28,7 @@ import org.apache.axis2.addressing.AddressingHelper;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.MessageFormatter;
@@ -67,6 +62,16 @@ import org.apache.synapse.transport.passthru.jmx.TransportView;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
 
+import javax.net.ssl.SSLContext;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * PassThroughHttpSender for Synapse based on HttpCore and NIO extensions
  */
@@ -88,6 +93,21 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
     private String namePrefix;
 
+    /** The proxy host */
+    private String proxyHost = null;
+
+    /** The proxy port */
+    private int proxyPort = 80;
+
+    /** The list of hosts for which the proxy should be bypassed */
+    private String[] proxyBypassList = new String[0];
+
+    /** The list of known hosts to bypass proxy */
+    private List<String> knownDirectHosts = new ArrayList<String>();
+
+    /** The list of known hosts to go via proxy */
+    private List<String> knownProxyHosts = new ArrayList<String>();
+
     public PassThroughHttpSender() {
         log = LogFactory.getLog(this.getClass().getName());
     }
@@ -99,6 +119,36 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         // is this an SSL Sender?
         SSLContext sslContext = getSSLContext(transportOutDescription);
         SSLSetupHandler sslSetupHandler = getSSLSetupHandler(transportOutDescription);
+
+        // configure proxy settings
+        if (sslContext == null) {
+            Parameter proxyHostParam = transportOutDescription.getParameter("http.proxyHost");
+            if (proxyHostParam != null || System.getProperty("http.proxyHost") != null) {
+                if (proxyHostParam != null) {
+                    proxyHost = (String) proxyHostParam.getValue();
+                } else {
+                    proxyHost = System.getProperty("http.proxyHost");
+                }
+
+                Parameter proxyPortParam = transportOutDescription.getParameter("http.proxyPort");
+                if (proxyPortParam != null) {
+                    proxyPort = Integer.parseInt((String) proxyPortParam.getValue());
+                } else if (System.getProperty("http.proxyPort") != null) {
+                    proxyPort = Integer.parseInt(System.getProperty("http.proxyPort"));
+                }
+
+                Parameter bypassList = transportOutDescription.getParameter("http.nonProxyHosts");
+                if (bypassList != null) {
+                    proxyBypassList = ((String) bypassList.getValue()).split("\\|");
+                } else if (System.getProperty("http.nonProxyHosts") != null) {
+                    proxyBypassList = (System.getProperty("http.nonProxyHosts")).split("\\|");
+                }
+
+                log.info("HTTP Sender using Proxy : "
+                    + proxyHost + ":" + proxyPort + " bypassing : " + Arrays.toString(proxyBypassList));
+            }
+        }
+
         namePrefix = (sslContext == null) ? "HTTP" : "HTTPS";
 
         WorkerPool workerPool = null;
@@ -218,8 +268,40 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                     msgContext.setProperty(PassThroughConstants.PASS_THROUGH_PIPE, pipe);
                     msgContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
                 }
-                deliveryAgent.submit(msgContext, epr);
-                sendRequestContent(msgContext);
+                try {
+                    URL url = new URL(epr.getAddress());
+                    String host = url.getHost();
+                    int port = url.getPort();
+                    if (port == -1) {
+                        // use default
+                        if ("http".equals(url.getProtocol())) {
+                            port = 80;
+                        } else if ("https".equals(url.getProtocol())) {
+                            port = 443;
+                        }
+                    }
+
+                    if (proxyHost != null) {
+                        if (knownProxyHosts.contains(host)) {
+                            // this has already been found to be a proxy host
+                            host = proxyHost;
+                            port = proxyPort;
+                        } else if (knownDirectHosts.contains(host)) {
+                            // do nothing, let this request go directly bypassing proxy
+                        } else {
+                            // we are encountering this host:port pair for the first time
+                            if (!isBypass(host)) {
+                                host = proxyHost;
+                                port = proxyPort;
+                            }
+                        }
+                    }
+
+                    deliveryAgent.submit(msgContext, host, port);
+                    sendRequestContent(msgContext);
+                } catch (MalformedURLException e) {
+                    handleException("Malformed URL in the target EPR", e);
+                }
             } else {
                 handleException("Cannot send message to " + AddressingConstants.Final.WSA_NONE_URI);
             }
@@ -514,6 +596,17 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
             out.close();
         }
         return serialized.getLength();
+    }
+
+    private boolean isBypass(String hostName) {
+        for (String entry : proxyBypassList) {
+            if (hostName.matches(entry)) {
+                knownDirectHosts.add(hostName);
+                return true;
+            }
+        }
+        knownProxyHosts.add(hostName);
+        return false;
     }
 
     private void handleException(String s, Exception e) throws AxisFault {

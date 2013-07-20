@@ -287,7 +287,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     public static MessageProcessor defineMessageProcessor(SynapseConfiguration config,
                                                           OMElement elem, Properties properties) {
         MessageProcessor processor  = MessageProcessorFactory.createMessageProcessor(elem);
-        config.addMessageProcessor(processor.getName() , processor);
+        config.addMessageProcessor(processor.getName(), processor);
         return processor;
     }
 
@@ -338,8 +338,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     }
 
     public static API defineAPI(SynapseConfiguration config, OMElement elem) {
-        API api = APIFactory.createAPI(elem);
-        config.addAPI(api.getName(), api);
+        API api = null;
+        try {
+            api = APIFactory.createAPI(elem);
+            config.addAPI(api.getName(), api);
+        } catch (Exception e) {
+            String msg = "API configuration cannot be built";
+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_APIS, msg, e);
+        }
         return api;
     }
 

@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -135,7 +134,7 @@ public class MultiXMLConfigurationBuilder {
         createMessageStores(synapseConfig, root, properties);
         createMessageProcessors(synapseConfig, root, properties);
         createSynapseImports(synapseConfig, root, properties);
-        createAPIs(synapseConfig, root, properties);
+        createAPIs(synapseConfig, root);
 
         return synapseConfig;
     }
@@ -198,15 +197,25 @@ public class MultiXMLConfigurationBuilder {
             Iterator entryDefinitions = FileUtils.iterateFiles(localEntriesDir, extensions, false);
             while (entryDefinitions.hasNext()) {
                 File file = (File) entryDefinitions.next();
-                OMElement document = getOMElement(file);
-                Entry entry = SynapseXMLConfigurationFactory.defineEntry(synapseConfig, document,
-                        properties);
-                if (entry != null) {
-                    entry.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                            entry.getKey());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Local Entry from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_LOCALENTRIES, msg, e);
                 }
-             }
+
+                if (document != null) {
+                    Entry entry = SynapseXMLConfigurationFactory.defineEntry(synapseConfig, document,
+                                                                             properties);
+                    if (entry != null) {
+                        entry.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                               entry.getKey());
+                    }
+                }
+            }
         }
     }
 
@@ -222,15 +231,25 @@ public class MultiXMLConfigurationBuilder {
             Iterator proxyDefinitions = FileUtils.iterateFiles(proxyServicesDir, extensions, false);
             while (proxyDefinitions.hasNext()) {
                 File file = (File) proxyDefinitions.next();
-                OMElement document = getOMElement(file);
-                ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(synapseConfig,
-                        document, properties);
-                if (proxy != null) {
-                    proxy.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), proxy.getName());
-                 }
-             }
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Proxy service configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_PROXY_SERVICES, msg, e);
+                }
+
+                if (document != null) {
+                    ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(synapseConfig,
+                                                                                    document, properties);
+                    if (proxy != null) {
+                        proxy.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), proxy.getName());
+                    }
+                }
+            }
         }
     }
 
@@ -246,12 +265,22 @@ public class MultiXMLConfigurationBuilder {
             Iterator taskDefinitions = FileUtils.iterateFiles(tasksDir, extensions, false);
             while (taskDefinitions.hasNext()) {
                 File file = (File) taskDefinitions.next();
-                OMElement document = getOMElement(file);
-                Startup startup = SynapseXMLConfigurationFactory.defineStartup(synapseConfig,
-                        document, properties);
-                startup.setFileName(file.getName());
-                synapseConfig.getArtifactDeploymentStore().addArtifact(
-                        file.getAbsolutePath(), startup.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Task configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TASKS, msg, e);
+                }
+
+                if (document != null) {
+                    Startup startup = SynapseXMLConfigurationFactory.defineStartup(synapseConfig,
+                                                                                   document, properties);
+                    startup.setFileName(file.getName());
+                    synapseConfig.getArtifactDeploymentStore().addArtifact(
+                            file.getAbsolutePath(), startup.getName());
+                }
              }
         }
     }
@@ -268,15 +297,25 @@ public class MultiXMLConfigurationBuilder {
             Iterator sequences = FileUtils.iterateFiles(sequencesDir, extensions, false);
             while (sequences.hasNext()) {
                 File file = (File) sequences.next();
-                OMElement document = getOMElement(file);
-                Mediator seq = SynapseXMLConfigurationFactory.defineSequence(synapseConfig,
-                        document, properties);
-                if (seq != null && seq instanceof SequenceMediator) {
-                    SequenceMediator sequence = (SequenceMediator) seq;
-                    sequence.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), sequence.getName());
-                 }
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Sequence configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg, e);
+                }
+
+                if (document != null) {
+                    Mediator seq = SynapseXMLConfigurationFactory.defineSequence(synapseConfig,
+                                                                                 document, properties);
+                    if (seq != null && seq instanceof SequenceMediator) {
+                        SequenceMediator sequence = (SequenceMediator) seq;
+                        sequence.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), sequence.getName());
+                    }
+                }
              }
         }
     }
@@ -292,30 +331,40 @@ public class MultiXMLConfigurationBuilder {
             Iterator templates = FileUtils.iterateFiles(templatesDir, extensions, false);
             while (templates.hasNext()) {
                 File file = (File) templates.next();
-                OMElement document = getOMElement(file);
-                OMElement element = document.getFirstChildWithName(
-                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
-                if (element != null) {
-                    TemplateMediator mediator =
-                            (TemplateMediator) SynapseXMLConfigurationFactory.defineMediatorTemplate(
-                                    synapseConfig, document, properties);
-                    if (mediator != null) {
-                        mediator.setFileName(file.getName());
-                        synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                file.getAbsolutePath(), mediator.getName());
-                    }
 
-                } else {
-                    element = document.getFirstChildWithName(
-                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Template configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg, e);
+                }
+
+                if (document != null) {
+                    OMElement element = document.getFirstChildWithName(
+                            new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
                     if (element != null) {
-                        Template endpointTemplate =
-                                SynapseXMLConfigurationFactory.defineEndpointTemplate(
+                        TemplateMediator mediator =
+                                (TemplateMediator) SynapseXMLConfigurationFactory.defineMediatorTemplate(
                                         synapseConfig, document, properties);
-                        if (endpointTemplate != null) {
-                            endpointTemplate.setFileName(file.getName());
+                        if (mediator != null) {
+                            mediator.setFileName(file.getName());
                             synapseConfig.getArtifactDeploymentStore().addArtifact(
-                                    file.getAbsolutePath(), endpointTemplate.getName());
+                                    file.getAbsolutePath(), mediator.getName());
+                        }
+
+                    } else {
+                        element = document.getFirstChildWithName(
+                                new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
+                        if (element != null) {
+                            Template endpointTemplate =
+                                    SynapseXMLConfigurationFactory.defineEndpointTemplate(
+                                            synapseConfig, document, properties);
+                            if (endpointTemplate != null) {
+                                endpointTemplate.setFileName(file.getName());
+                                synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                        file.getAbsolutePath(), endpointTemplate.getName());
+                            }
                         }
                     }
                 }
@@ -335,13 +384,23 @@ public class MultiXMLConfigurationBuilder {
             Iterator endpoints = FileUtils.iterateFiles(endpointsDir, extensions, false);
             while (endpoints.hasNext()) {
                 File file = (File) endpoints.next();
-                OMElement document = getOMElement(file);
-                Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
-                        synapseConfig, document, properties);
-                if (endpoint != null) {
-                    endpoint.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), endpoint.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Endpoint configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg, e);
+                }
+
+                if (document != null) {
+                    Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
+                            synapseConfig, document, properties);
+                    if (endpoint != null) {
+                        endpoint.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), endpoint.getName());
+                    }
                 }
             }
         }
@@ -359,13 +418,23 @@ public class MultiXMLConfigurationBuilder {
             Iterator events = FileUtils.iterateFiles(eventsDir, extensions, false);
             while (events.hasNext()) {
                 File file = (File) events.next();
-                OMElement document = getOMElement(file);
-                SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
-                        defineEventSource(synapseConfig, document, properties);
-                if (eventSource != null) {
-                    eventSource.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), eventSource.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Event Source configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EVENT_SOURCE, msg, e);
+                }
+
+                if (document != null) {
+                    SynapseEventSource eventSource = SynapseXMLConfigurationFactory.
+                            defineEventSource(synapseConfig, document, properties);
+                    if (eventSource != null) {
+                        eventSource.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), eventSource.getName());
+                    }
                 }
             }
         }
@@ -383,13 +452,23 @@ public class MultiXMLConfigurationBuilder {
             Iterator executors = FileUtils.iterateFiles(executorsDir, extensions, false);
             while (executors.hasNext()) {
                 File file = (File) executors.next();
-                OMElement document = getOMElement(file);
-                PriorityExecutor executor = SynapseXMLConfigurationFactory.
-                        defineExecutor(synapseConfig, document, properties);
-                if (executor != null) {
-                    executor.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(
-                            file.getAbsolutePath(), executor.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Executor configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EXECUTORS, msg, e);
+                }
+
+                if (document != null) {
+                    PriorityExecutor executor = SynapseXMLConfigurationFactory.
+                            defineExecutor(synapseConfig, document, properties);
+                    if (executor != null) {
+                        executor.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(
+                                file.getAbsolutePath(), executor.getName());
+                    }
                 }
             }
         }
@@ -407,13 +486,23 @@ public class MultiXMLConfigurationBuilder {
             Iterator messageStores = FileUtils.iterateFiles(messageStoresDir, extensions, false);
             while (messageStores.hasNext()) {
                 File file = (File) messageStores.next();
-                OMElement document = getOMElement(file);
-                MessageStore messageStore = SynapseXMLConfigurationFactory.defineMessageStore(
-                        synapseConfig, document, properties);
-                if (messageStore != null) {
-                    messageStore.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                            messageStore.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Message Store configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_MESSAGE_STORES, msg, e);
+                }
+
+                if (document != null) {
+                    MessageStore messageStore = SynapseXMLConfigurationFactory.defineMessageStore(
+                            synapseConfig, document, properties);
+                    if (messageStore != null) {
+                        messageStore.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                               messageStore.getName());
+                    }
                 }
             }
         }
@@ -431,13 +520,23 @@ public class MultiXMLConfigurationBuilder {
             Iterator messageProcessors = FileUtils.iterateFiles(messageProcessorDir, extensions, false);
             while (messageProcessors.hasNext()) {
                 File file = (File) messageProcessors.next();
-                OMElement document = getOMElement(file);
-                MessageProcessor messageProcessor = SynapseXMLConfigurationFactory.defineMessageProcessor(
-                        synapseConfig, document, properties);
-                if (messageProcessor != null) {
-                    messageProcessor.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                            messageProcessor.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Message Processor configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_MESSAGE_PROCESSORS, msg, e);
+                }
+
+                if (document != null) {
+                    MessageProcessor messageProcessor = SynapseXMLConfigurationFactory.defineMessageProcessor(
+                            synapseConfig, document, properties);
+                    if (messageProcessor != null) {
+                        messageProcessor.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                               messageProcessor.getName());
+                    }
                 }
             }
         }
@@ -452,22 +551,30 @@ public class MultiXMLConfigurationBuilder {
             Iterator synImports = FileUtils.iterateFiles(synImportsDir, extensions, false);
             while (synImports.hasNext()) {
                 File file = (File) synImports.next();
-                OMElement document = getOMElement(file);
-                SynapseImport synImp = SynapseXMLConfigurationFactory.defineImport(
-                        synapseConfig, document, properties);
-                if (synImp != null) {
-                    synImp.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                                                                           synImp.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building Synapse Import configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_IMPORTS, msg, e);
+                }
+
+                if (document != null) {
+                    SynapseImport synImp = SynapseXMLConfigurationFactory.defineImport(
+                            synapseConfig, document, properties);
+                    if (synImp != null) {
+                        synImp.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                               synImp.getName());
+                    }
                 }
             }
         }
 
     }
 
-
-    private static void createAPIs(SynapseConfiguration synapseConfig,
-                                            String rootDirPath, Properties properties) {
+    private static void createAPIs(SynapseConfiguration synapseConfig, String rootDirPath) {
 
         File apiDir = new File(rootDirPath, REST_API_DIR);
         if (apiDir.exists()) {
@@ -478,12 +585,22 @@ public class MultiXMLConfigurationBuilder {
             Iterator apiIterator = FileUtils.iterateFiles(apiDir, extensions, false);
             while (apiIterator.hasNext()) {
                 File file = (File) apiIterator.next();
-                OMElement document = getOMElement(file);
-                API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document);
-                if (api != null) {
-                    api.setFileName(file.getName());
-                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
-                            api.getName());
+
+                OMElement document = null;
+                try {
+                    document = getOMElement(file);
+                } catch (Exception e) {
+                    String msg = "Error while building API configuration from file : " + file.getName();
+                    handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_APIS, msg, e);
+                }
+
+                if (document != null) {
+                    API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document);
+                    if (api != null) {
+                        api.setFileName(file.getName());
+                        synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
+                                                                               api.getName());
+                    }
                 }
             }
         }
@@ -491,8 +608,6 @@ public class MultiXMLConfigurationBuilder {
 
     private static OMElement getOMElement(File file) {
         FileInputStream is;
-        OMElement document = null;
-
         try {
             is = FileUtils.openInputStream(file);
         } catch (IOException e) {
@@ -500,12 +615,10 @@ public class MultiXMLConfigurationBuilder {
             return null;
         }
 
+        OMElement document = OMXMLBuilderFactory.createOMBuilder(is).getDocumentElement();
+        document.build();
         try {
-            document = OMXMLBuilderFactory.createOMBuilder(is).getDocumentElement();
-            document.build();
             is.close();
-        } catch (OMException e) {
-            handleException("Error while parsing the content of the file: " + file.getName(), e);
         } catch (IOException e) {
             log.warn("Error while closing the input stream from the file: " + file.getName(), e);
         }
@@ -516,5 +629,14 @@ public class MultiXMLConfigurationBuilder {
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    private static void handleConfigurationError(String componentType, String msg, Exception e) {
+        if (SynapseConfigUtils.isFailSafeEnabled(componentType)) {
+            log.warn(msg + " - Continue in fail-safe mode", e);
+        } else {
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
     }
 }

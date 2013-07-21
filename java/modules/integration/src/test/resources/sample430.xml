@@ -4,7 +4,7 @@
     <synapseConfig>
         <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
         <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-        <synapseXml>repository/conf/sample/synapse_sample_430.xml</synapseXml>
+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml</synapseXml>
     </synapseConfig>
     <backEndServerConfig>
         <axis2Server id='0'>

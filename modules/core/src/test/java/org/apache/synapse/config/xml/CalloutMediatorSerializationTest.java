@@ -61,5 +61,19 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
         assertTrue(serialization(inputXml, calloutMediatorSerializer));
     }
+
+    public void testCalloutMediatorSerializationScenarioThree() {
+        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
+                "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
+                "action=\"urn:getQuote\"><source xmlns:s11=\"http://schemas.xmlsoap.org/" +
+                "soap/envelope/\" xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" " +
+                "xpath=\"s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
+                "<target xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" xpath=\"s11:Body/" +
+                "child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
+                "<enableSec policy=\"sec_policy\"/></callout>";
+        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
+        assertTrue(serialization(inputXml, calloutMediatorSerializer));
+    }
 }
 

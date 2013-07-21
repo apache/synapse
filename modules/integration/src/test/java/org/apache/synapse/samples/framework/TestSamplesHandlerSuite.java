@@ -220,6 +220,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("391", Sample391.class);
         sampleClassRepo.put("420", Sample420.class);
         //sampleClassRepo.put("430", Sample430.class);  // Problem with repo path
+        sampleClassRepo.put("431", Sample431.class);
         sampleClassRepo.put("450", Sample450.class);
         sampleClassRepo.put("451", Sample451.class);
         sampleClassRepo.put("452", Sample452.class);

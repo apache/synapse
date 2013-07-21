@@ -38,6 +38,7 @@ import java.util.Properties;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
+ *      &lt;enableSec policy="string" /&gt;?
  * &lt;/callout&gt;
  * </pre>
  */
@@ -56,6 +57,10 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "source");
     private static final QName Q_TARGET
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
+    private static final QName Q_SEC
+                = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec");
+    private static final QName ATT_POLICY
+                = new QName(XMLConfigConstants.NULL_NAMESPACE, "policy");
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
@@ -67,6 +72,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
         OMElement   sourceElt     = elem.getFirstChildWithName(Q_SOURCE);
         OMElement   targetElt     = elem.getFirstChildWithName(Q_TARGET);
+        OMElement wsSec = elem.getFirstChildWithName(Q_SEC);
 
         if (attServiceURL != null) {
             callout.setServiceURL(attServiceURL.getAttributeValue());
@@ -143,6 +149,16 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
             }
         } else {
             handleException("The message 'target' must be specified for a Callout mediator");
+        }
+
+        if (wsSec != null) {
+            OMAttribute policyKey = wsSec.getAttribute(ATT_POLICY);
+            if (policyKey != null) {
+                callout.setSecurityOn(true);
+                callout.setWsSecPolicyKey(policyKey.getAttributeValue());
+            } else {
+                handleException("A policy key is required to enable security");
+            }
         }
 
         return callout;

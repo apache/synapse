@@ -48,6 +48,7 @@ import java.util.List;
  *      <configuration [axis2xml="string"] [repository="string"]/>?
  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
  *      <target xpath="expression" | key="string"/>
+ *      <enableSec policy="string"/>?
  * </callout>
  */
 public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
@@ -64,6 +65,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     private boolean passHeaders = false;
     public final static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
     public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
+    private boolean securityOn = false;  //Should messages be sent using WS-Security?
+    private String wsSecPolicyKey = null;
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -80,6 +83,22 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         try {
             ServiceClient sc = new ServiceClient(configCtx, null);
             Options options = new Options();
+
+            if (isSecurityOn()) {
+                if (synLog.isTraceOrDebugEnabled()) {
+                    synLog.traceOrDebug("Callout mediator: using security");
+                }
+                if (wsSecPolicyKey != null) {
+                    options.setProperty(
+                            SynapseConstants.RAMPART_POLICY,
+                            MessageHelper.getPolicy(synCtx, wsSecPolicyKey));
+                    sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
+                } else {
+                    handleException("Security policy not found", synCtx);
+                }
+
+            }
+
             options.setTo(new EndpointReference(serviceURL));
 
             if (action != null) {
@@ -146,7 +165,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                         tgtNode.detach();
                     } else {
                         handleException("Evaluation of target XPath expression : " +
-                            targetXPath.toString() + " did not yeild an OMNode", synCtx);
+                            targetXPath.toString() + " did not yield an OMNode", synCtx);
                     }
                 } if (targetKey != null) {
                     synCtx.setProperty(targetKey, result);
@@ -319,5 +338,41 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void setPassHeaders(boolean passHeaders) {
         this.passHeaders = passHeaders;
+    }
+
+    /**
+     * Is WS-Security turned on?
+     *
+     * @return true if on
+     */
+    public boolean isSecurityOn() {
+        return securityOn;
+    }
+
+    /**
+     * Request that WS-Sec be turned on/off
+     *
+     * @param securityOn a boolean flag indicating security is on or not
+     */
+    public void setSecurityOn(boolean securityOn) {
+        this.securityOn = securityOn;
+    }
+
+    /**
+     * Return the Rampart Security configuration policy's 'key' to be used
+     *
+     * @return the Rampart Security configuration policy's 'key' to be used
+     */
+    public String getWsSecPolicyKey() {
+        return wsSecPolicyKey;
+    }
+
+    /**
+     * Set the Rampart Security configuration policy's 'key' to be used
+     *
+     * @param wsSecPolicyKey the Rampart Security configuration policy's 'key' to be used
+     */
+    public void setWsSecPolicyKey(String wsSecPolicyKey) {
+        this.wsSecPolicyKey = wsSecPolicyKey;
     }
 }

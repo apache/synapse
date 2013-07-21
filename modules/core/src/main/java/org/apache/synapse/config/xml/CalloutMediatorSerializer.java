@@ -29,6 +29,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
+ *      &lt;enableSec policy="string"/&gt;?
  * &lt;/callout&gt;
  * </pre>
  */
@@ -38,6 +39,7 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
         if (!(m instanceof CalloutMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
+            return null;
         }
 
         CalloutMediator mediator = (CalloutMediator) m;
@@ -80,6 +82,12 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
         } else if (mediator.getTargetKey() != null) {
             target.addAttribute(fac.createOMAttribute(
                 "key", nullNS, mediator.getTargetKey()));
+        }
+
+        if (mediator.isSecurityOn() && mediator.getWsSecPolicyKey() != null) {
+            OMElement security = fac.createOMElement("enableSec", synNS, callout);
+            security.addAttribute(fac.createOMAttribute(
+                    "policy", nullNS, mediator.getWsSecPolicyKey()));
         }
 
         return callout;

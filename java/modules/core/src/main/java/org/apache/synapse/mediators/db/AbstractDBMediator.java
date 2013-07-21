@@ -200,12 +200,13 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
 
     /**
      * Return a Prepared statement for the given Statement object, which is ready to be executed
-     * @param stmnt SQL stataement to be executed
+     * @param stmnt SQL statement to be executed
+     * @param con The connection to be used
      * @param msgCtx Current message context
      * @return a PreparedStatement
      * @throws SQLException on error
      */
-    protected PreparedStatement getPreparedStatement(Statement stmnt,
+    protected PreparedStatement getPreparedStatement(Statement stmnt, Connection con,
                                                      MessageContext msgCtx) throws SQLException {
 
         SynapseLog synLog = getLog(msgCtx);
@@ -215,7 +216,6 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
                 " and preparing statement : " + stmnt.getRawStatement());
         }
 
-        Connection con = getDataSource().getConnection();
         if (con == null) {
             String msg = "Connection from DataSource " + getDSName() + " is null.";
             log.error(msg);

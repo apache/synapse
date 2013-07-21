@@ -508,24 +508,23 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
         ProtocolState state = SourceContext.getState(conn);
         if (state != null && state.compareTo(ProtocolState.REQUEST_DONE) <= 0) {
-            // start sending the response if we
-            if (msgContext.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED) && pipe != null) {
+            // start sending the response
+            if (noEntityBody != null && Boolean.TRUE == noEntityBody && pipe != null) {
+                OutputStream out = pipe.getOutputStream();
+                out.write(new byte[0]);
+                pipe.setRawSerializationComplete(true);
+                out.close();
+            } else if (msgContext.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED) &&
+                    pipe != null) {
                 OutputStream out = pipe.getOutputStream();
                 if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
                     out.write(new byte[0]);
-                }else {
+                } else {
                     MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);
                     OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
                     formatter.writeTo(msgContext, format, out, false);
                 }
                 pipe.setSerializationComplete(true);
-                out.close();
-            }
-            
-            if(noEntityBody != null && Boolean.TRUE == noEntityBody && pipe != null){
-                OutputStream out = pipe.getOutputStream();
-            	out.write(new byte[0]);
-            	pipe.setRawSerializationComplete(true);
                 out.close();
             }
             conn.requestOutput();

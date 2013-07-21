@@ -39,7 +39,6 @@ import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -124,8 +123,10 @@ public class IterateMediator extends AbstractMediator implements ManagedLifecycl
                 }
 
                 if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("Submitting " + (msgNumber+1) + " of " + msgNumber +
-                        " messages for processing in parallel");
+                    synLog.traceOrDebug("Submitting " + (msgNumber + 1) + " of " + msgNumber +
+                            (target.isAsynchronous() ?
+                                    " messages for processing in parallel" :
+                                    " messages for processing sequentially"));
                 }
 
                 target.mediate(

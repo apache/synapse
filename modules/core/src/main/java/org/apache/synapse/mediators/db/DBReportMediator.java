@@ -50,7 +50,8 @@ public class DBReportMediator extends AbstractDBMediator {
 
         Connection con = null;
         try {
-            PreparedStatement ps = getPreparedStatement(stmnt, msgCtx);
+            con = this.getDataSource().getConnection();
+            PreparedStatement ps = getPreparedStatement(stmnt, con, msgCtx);
             con = ps.getConnection();
             int count = ps.executeUpdate();
 

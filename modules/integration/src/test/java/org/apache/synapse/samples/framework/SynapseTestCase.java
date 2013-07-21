@@ -356,6 +356,8 @@ public abstract class SynapseTestCase extends TestCase {
                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT);
             String axis2HttpsPort = axis2Properties.getProperty(
                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT);
+            String counterEnabled = axis2Properties.getProperty(
+                    SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED);
 
             configuration.getAxis2Config(serverName).setServerName(serverName);
 
@@ -377,6 +379,9 @@ public abstract class SynapseTestCase extends TestCase {
 
             configuration.getAxis2Config(serverName).setHttpPort(axis2HttpPort);
             configuration.getAxis2Config(serverName).setHttpsPort(axis2HttpsPort);
+            if (Boolean.parseBoolean(counterEnabled)) {
+                configuration.getAxis2Config(serverName).setCounterEnabled(true);
+            }
 
             backendServerControllers.add(new Axis2BackEndServerController(serverName,
                     configuration.getAxis2Config(serverName)));

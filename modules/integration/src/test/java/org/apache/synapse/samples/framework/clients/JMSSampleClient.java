@@ -33,10 +33,9 @@ public class JMSSampleClient {
     private QueueSession session;
     private QueueSender sender;
 
-    public void connect(String destName) throws Exception {
+    public void connect(String destination) throws Exception {
 
         Properties env = new Properties();
-        //String factoryURL = System.getProperty("java.naming.factory.url.pkgs");
         String connectionFactoryName = "ConnectionFactory";
 
         if (System.getProperty("java.naming.provider.url") == null) {
@@ -46,15 +45,13 @@ public class JMSSampleClient {
             env.put("java.naming.factory.initial",
                 "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         }
-        if (connectionFactoryName != null) {
-            env.put("transport.jms.ConnectionFactoryJNDIName", connectionFactoryName);
-        }
-        
+        env.put("transport.jms.ConnectionFactoryJNDIName", connectionFactoryName);
+
         InitialContext ic = new InitialContext(env);
-        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup("ConnectionFactory");
+        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup(connectionFactoryName);
         connection = confac.createQueueConnection();
         session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
-        sender = session.createSender((Queue)ic.lookup(destName));
+        sender = session.createSender((Queue)ic.lookup(destination));
     }
 
     public void shutdown() throws Exception {
@@ -98,21 +95,21 @@ public class JMSSampleClient {
         return bytes;
     }
 
-    public static double getRandom(double base, double variance, boolean positiveOnly) {
+    private double getRandom(double base, double variance, boolean positiveOnly) {
         double rand = Math.random();
         return (base + ((rand > 0.5 ? 1 : -1) * variance * base * rand))
             * (positiveOnly ? 1 : (rand > 0.5 ? 1 : -1));
     }
 
-    public void sendAsPox(String param) throws Exception{
-                 sendTextMessage(
-                    "<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
-                    "    <m:order>\n" +
-                    "        <m:price>" + getRandom(100, 0.9, true) + "</m:price>\n" +
-                    "        <m:quantity>" + (int) getRandom(10000, 1.0, true) + "</m:quantity>\n" +
-                    "        <m:symbol>" + param + "</m:symbol>\n" +
-                    "    </m:order>\n" +
-                    "</m:placeOrder>");
+    public void sendAsPox(String symbol) throws Exception {
+        sendTextMessage(
+                "<m:placeOrder xmlns:m=\"http://services.samples\">\n" +
+                "    <m:order>\n" +
+                "        <m:price>" + getRandom(100, 0.9, true) + "</m:price>\n" +
+                "        <m:quantity>" + (int) getRandom(10000, 1.0, true) + "</m:quantity>\n" +
+                "        <m:symbol>" + symbol + "</m:symbol>\n" +
+                "    </m:order>\n" +
+                "</m:placeOrder>");
     }
 
 }

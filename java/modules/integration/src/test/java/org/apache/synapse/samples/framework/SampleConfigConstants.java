@@ -42,6 +42,7 @@ public class SampleConfigConstants {
     public static final String TAG_BE_SERVER_CONF_AXIS2_XML = "axis2Xml";
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT = "httpPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = "httpsPort";
+    public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = "counterEnabled";
 
     public static final String TAG_BE_SERVER_CONF_JMS_PROVIDER_URL = "providerURL";
     public static final String TAG_BE_SERVER_CONF_JMS_INITIAL_NAMING_FACTORY = "initialNamingFactory";

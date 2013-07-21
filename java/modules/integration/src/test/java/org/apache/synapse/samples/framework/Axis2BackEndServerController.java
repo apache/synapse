@@ -6,10 +6,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.engine.Phase;
+import org.apache.axis2.phaseresolver.PhaseMetadata;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -27,6 +30,7 @@ public class Axis2BackEndServerController implements BackEndServerController {
     private Axis2ServerConfiguration configuration;
     private CountDownLatch cdLatch;
     private Exception processException;
+    private MessageCounter counter;
 
     public Axis2BackEndServerController(String serverName,
                                         Axis2ServerConfiguration configuration) {
@@ -61,6 +65,7 @@ public class Axis2BackEndServerController implements BackEndServerController {
 
     public boolean stop() {
         if (serverThread.isRunning) {
+            counter = null;
             serverThread.isRunning = false;
             try {
                 cdLatch = new CountDownLatch(1);
@@ -70,6 +75,13 @@ public class Axis2BackEndServerController implements BackEndServerController {
             }
         }
         return true;
+    }
+
+    public int getMessageCount(String service, String operation) {
+        if (counter != null) {
+            return counter.getCount(service, operation);
+        }
+        return -1;
     }
 
     class BackEndServerThread extends Thread {
@@ -126,6 +138,17 @@ public class Axis2BackEndServerController implements BackEndServerController {
                     clusteringAgent.init();
                 }
 
+                if (configuration.isCounterEnabled()) {
+                    log.info("Engaging server side message counter");
+                    List<Phase> phases = configContext.getAxisConfiguration().getInFlowPhases();
+                    for (Phase phase : phases) {
+                        if (PhaseMetadata.PHASE_DISPATCH.equals(phase.getName())) {
+                            counter = new MessageCounter();
+                            phase.addHandler(counter);
+                            break;
+                        }
+                    }
+                }
 
                 listenerManager.startSystem(configContext);
                 isRunning = true;
@@ -135,7 +158,7 @@ public class Axis2BackEndServerController implements BackEndServerController {
             }
             cdLatch.countDown();
 
-            log.info("ServerThread: Wait until test are finished");
+            log.info("ServerThread: Wait until tests are finished");
             while (isRunning) {
                 //wait
                 try {

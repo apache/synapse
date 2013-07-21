@@ -27,6 +27,7 @@ public class Axis2ServerConfiguration {
     private String httpPort;
     private String httpsPort;
     private boolean clusteringEnabled;
+    private boolean counterEnabled;
 
     public String getServerName() {
         return serverName;
@@ -74,5 +75,13 @@ public class Axis2ServerConfiguration {
 
     public void setClusteringEnabled(boolean clusteringEnabled) {
         this.clusteringEnabled = clusteringEnabled;
+    }
+
+    public boolean isCounterEnabled() {
+        return counterEnabled;
+    }
+
+    public void setCounterEnabled(boolean counterEnabled) {
+        this.counterEnabled = counterEnabled;
     }
 }

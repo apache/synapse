@@ -28,6 +28,8 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
+import java.util.concurrent.RejectedExecutionException;
+
 /**
  * This mediator execute a given sequence with a given priority.
  *
@@ -61,8 +63,14 @@ public class EnqueueMediator extends AbstractMediator {
         Mediator m = synCtx.getSequence(sequenceName);
         if (m != null && m instanceof SequenceMediator) {
             MediatorWorker worker = new MediatorWorker(m, synCtx);
-            // execute with the given priority
-            executor.execute(worker, priority);
+            try {
+                // execute with the given priority
+                executor.execute(worker, priority);
+            } catch (RejectedExecutionException ex) {
+                //if RejectedExecutionException, jump to fault handler
+                handleException("Unable to process message in priority executor " + executorName + " with priority " +
+                        priority + ". Thread pool exhausted.", ex, synCtx);
+            }
 
             // with the nio transport, this causes the listener not to write a 202
             // Accepted response, as this implies that Synapse does not yet know if

@@ -20,16 +20,12 @@
 package org.apache.synapse.samples.framework.tests.rest;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.BasicHttpClient;
 import org.apache.synapse.samples.framework.clients.HttpResponse;
 
 public class Sample800 extends SynapseTestCase {
-
-    private static final Log log = LogFactory.getLog(Sample800.class);
 
     public Sample800() {
         super(800);

@@ -99,4 +99,25 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
         // the generated name should not show up in the serialization
         assertTrue(compare(serializedOut,inputElement));
     }
+
+    public void testAddressEndpointScenarioFive() throws Exception {
+        String inputXML =
+                "<endpoint name=\"EchoServiceEp\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                        "<address uri=\"http://10.200.3.190:8281/services/echo\"><timeout>" +
+                        "<duration>2000</duration></timeout><suspendOnFailure>" +
+                        "<initialDuration>60000</initialDuration><progressionFactor>2.0" +
+                        "</progressionFactor></suspendOnFailure><markForSuspension>" +
+                        "<errorCodes>101000,101500</errorCodes><retriesBeforeSuspension>3" +
+                        "</retriesBeforeSuspension></markForSuspension><retryConfig>" +
+                        "<disabledErrorCodes>101507,101509</disabledErrorCodes></retryConfig>" +
+                        "</address></endpoint>" ;
+
+        OMElement inputElement = createOMElement(inputXML);
+        AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(
+                inputElement, true, null);
+        assertNotNull(endpoint.getName()); // make sure we generate names for anonymous endpoints
+        OMElement serializedOut = AddressEndpointSerializer.getElementFromEndpoint(endpoint);
+        // the generated name should not show up in the serialization
+        assertTrue(compare(serializedOut,inputElement));
+    }
 }

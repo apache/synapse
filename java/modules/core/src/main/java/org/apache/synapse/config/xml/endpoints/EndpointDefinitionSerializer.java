@@ -118,14 +118,17 @@ public class EndpointDefinitionSerializer {
             duration.setText(Long.toString(endpointDefinition.getTimeoutDuration()));
             timeout.addChild(duration);
 
-            OMElement action = fac.createOMElement("responseAction", SynapseConstants.SYNAPSE_OMNAMESPACE);
-            if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
-                action.setText("discard");
-            } else if (endpointDefinition.getTimeoutAction()
-                    == SynapseConstants.DISCARD_AND_FAULT) {
-                action.setText("fault");
+            if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {
+                OMElement action = fac.createOMElement("responseAction",
+                        SynapseConstants.SYNAPSE_OMNAMESPACE);
+                if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
+                    action.setText("discard");
+                } else if (endpointDefinition.getTimeoutAction()
+                        == SynapseConstants.DISCARD_AND_FAULT) {
+                    action.setText("fault");
+                }
+                timeout.addChild(action);
             }
-            timeout.addChild(action);
         }
 
         if (endpointDefinition.getInitialSuspendDuration() != -1 ||

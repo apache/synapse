@@ -45,7 +45,12 @@ public class DataSourceFinder {
     public static DataSource find(String dsName, Properties jndiEnv) {
 
         try {
-            Context context = new InitialContext(jndiEnv);
+            Context context;
+            if (jndiEnv == null) {
+                context = new InitialContext();
+            } else {
+                context = new InitialContext(jndiEnv);
+            }
             return find(dsName, context);
 
         } catch (NamingException e) {

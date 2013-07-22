@@ -20,50 +20,47 @@
 package org.apache.synapse.samples.framework;
 
 import org.apache.activemq.broker.BrokerService;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.samples.framework.config.JMSBrokerConfiguration;
+import org.apache.synapse.samples.framework.config.SampleConfigConstants;
 
 /**
  * Responsible for starting up and shutting down
  * a JMS broker instance in order to run a sample test.
  */
-public class JMSBrokerController implements BackEndServerController {
+public class ActiveMQController extends AbstractBackEndServerController {
 
-    private static final Log log = LogFactory.getLog(JMSBrokerController.class);
+    private static final Log log = LogFactory.getLog(ActiveMQController.class);
 
-    private String serverName;
-    private JMSBrokerConfiguration configuration;
+    private String providerURL;
+
     private BrokerService broker;
 
-    public JMSBrokerController(String serverName, JMSBrokerConfiguration configuration) {
-        this.serverName = serverName;
-        this.configuration = configuration;
+    public ActiveMQController(OMElement element) {
+        super(element);
+        providerURL = SynapseTestUtils.getParameter(element,
+                SampleConfigConstants.TAG_BE_SERVER_CONF_JMS_PROVIDER_URL,
+                SampleConfigConstants.DEFAULT_BE_SERVER_CONF_JMS_PROVIDER_URL);
     }
 
-    public String getServerName() {
-        return serverName;
-    }
-
-    public boolean start() {
+    public boolean startProcess() {
         try {
-            log.info("JMSServerController: Preparing to start JMS Broker: " + serverName);
             //using embedded jms broker
             broker = new BrokerService();
             // configure the broker
             broker.setBrokerName("synapseSampleBroker");
-            broker.addConnector(configuration.getProviderURL());
+            broker.addConnector(providerURL);
             broker.start();
             log.info("JMSServerController: Broker is Successfully started. continuing tests");
             return true;
         } catch (Exception e) {
-            log.error("JMSServerController: There was an error starting JMS broker: " +
-                    serverName, e);
+            log.error("There was an error starting JMS broker: " + serverName, e);
             return false;
         }
     }
 
-    public boolean stop() {
+    public boolean stopProcess() {
         try {
             broker.stop();
             return true;

@@ -29,16 +29,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample150 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample150() {
         super(150);
-        client = getStockQuoteClient();
     }
 
     public void testBasicProxy() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
         log.info("Running test: Introduction to proxy services");
+        StockQuoteSampleClient client = getStockQuoteClient();
         SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());
     }

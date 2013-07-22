@@ -25,16 +25,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample15 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample15() {
         super(15);
-        client = getStockQuoteClient();
     }
 
 
     public void testMessageEnrichment() {
         String trpUrl = "http://localhost:8280/services/StockQuote";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Message Enrichment through Synapse");
         SampleClientResult result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);

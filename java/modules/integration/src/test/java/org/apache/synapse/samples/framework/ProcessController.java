@@ -29,4 +29,6 @@ public interface ProcessController {
 
     public boolean stopProcess();
 
+    public String getServerName();
+
 }

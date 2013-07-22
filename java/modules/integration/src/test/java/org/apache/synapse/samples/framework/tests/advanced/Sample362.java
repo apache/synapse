@@ -26,18 +26,16 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample362 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample362() {
         super(362);
-        client = getStockQuoteClient();
     }
 
 
     public void testDbLookupReport() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Action of dbreport and dblookup mediators together");
 
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);

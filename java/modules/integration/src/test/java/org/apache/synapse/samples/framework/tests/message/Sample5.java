@@ -26,11 +26,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample5 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample5() {
         super(5);
-        client = getStockQuoteClient();
     }
 
 
@@ -39,6 +36,8 @@ public class Sample5 extends SynapseTestCase {
         String trpUrl = "http://localhost:8280";
         String expectedError_MSFT = "Error while connecting to the endpoint (Connection Failed)";
         String expectedError_SUN = "Error while connecting to the endpoint (Connection Failed)";
+
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Creating SOAP fault messages and changing the direction of a message");
         SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);

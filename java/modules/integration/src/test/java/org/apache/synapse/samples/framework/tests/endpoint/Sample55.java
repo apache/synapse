@@ -26,16 +26,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample55 extends SynapseTestCase {
 
     private SampleClientResult result;
-    private StockQuoteSampleClient client;
 
     public Sample55() {
         super(55);
-        client = getStockQuoteClient();
     }
 
 
     public void testSessionFullLBFailOver() {
         final String addUrl = "http://localhost:8280/services/LBService1";
+        final StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Failover sending among 3 endpoints");
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -50,7 +49,7 @@ public class Sample55 extends SynapseTestCase {
 
         }
 
-        getBackendServerControllers().get(0).stop();
+        getBackendServerControllers().get(0).stopProcess();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {

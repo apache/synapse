@@ -28,11 +28,8 @@ import java.io.File;
 
 public class Sample51 extends SynapseTestCase {
 
-    private MTOMSwASampleClient client;
-
     public Sample51() {
         super(51);
-        client = getMTOMSwASampleClient();
     }
 
     public void testMTOMOptimization() {
@@ -40,18 +37,18 @@ public class Sample51 extends SynapseTestCase {
         String currentLocation = System.getProperty("user.dir") + File.separator;
         String filename = FilenameUtils.normalize(
                 currentLocation + "repository/conf/sample/resources/mtom/asf-logo.gif");
+        MTOMSwASampleClient client = getMTOMSwASampleClient();
         log.info("Running test: MTOM optimization and request/response correlation ");
         SampleClientResult result = client.sendUsingMTOM(filename, ep);
         assertResponseReceived(result);
     }
-
 
     public void testSWAOptimization() {
         String ep = "http://localhost:8280/services/MTOMSwASampleService";
         String currentLocation = System.getProperty("user.dir") + File.separator;
         String filename = FilenameUtils.normalize(
                 currentLocation + "repository/conf/sample/resources/mtom/asf-logo.gif");
-
+        MTOMSwASampleClient client = getMTOMSwASampleClient();
         log.info("Running test:SwA optimization and request/response correlation ");
         SampleClientResult result = client.sendUsingSWA(filename, ep);
         assertResponseReceived(result);

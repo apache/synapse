@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample50 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample50() {
         super(50);
-        client = getStockQuoteClient();
     }
 
 
     public void testRestToPox() {
         String trpUrl = "http://localhost:8280/services/StockQuote";
         log.info("Running test: HTTP REST request ");
+        StockQuoteSampleClient client = getStockQuoteClient();
         SampleClientResult result = client.requestRestQuote(null, trpUrl, null, "IBM");
         assertResponseReceived(result);
     }

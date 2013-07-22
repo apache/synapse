@@ -26,17 +26,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample370 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample370() {
         super(370);
-        client = getStockQuoteClient();
     }
 
 
     public void testThrottling() {
         String addUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Introduction to throttle mediator and concurrency throttling");
         result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

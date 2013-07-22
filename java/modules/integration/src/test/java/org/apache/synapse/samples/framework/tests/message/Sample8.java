@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample8 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample8() {
         super(8);
-        client = getStockQuoteClient();
     }
 
 
     public void testRegistryAndXSLTMediator() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations");
         SampleClientResult result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");

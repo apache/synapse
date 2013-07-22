@@ -26,11 +26,9 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample452 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample452() {
         super(452);
-        client = getStockQuoteClient();
     }
 
 
@@ -39,6 +37,7 @@ public class Sample452 extends SynapseTestCase {
 
         String addUrl = "https://localhost/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM", null);
         assertTrue("Client did not get run successfully ", result.responseReceived());
 

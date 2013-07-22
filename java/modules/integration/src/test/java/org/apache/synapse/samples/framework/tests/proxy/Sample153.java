@@ -25,11 +25,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample153 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample153() {
         super(153);
-        client = getStockQuoteClient();
     }
 
 
@@ -38,6 +35,7 @@ public class Sample153 extends SynapseTestCase {
         String policy = "./repository/conf/sample/resources/policy/client_policy_3.xml";
         log.info("Running test: Routing the messages arrived to a proxy service without " +
                 "processing the security headers");
+        StockQuoteSampleClient client = getStockQuoteClient();
         SampleClientResult  result = client.requestStandardQuote(null, url, null, "IBM", policy);
         assertTrue("Client did not a response with https ", result.responseReceived());
     }

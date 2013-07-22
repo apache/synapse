@@ -25,16 +25,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample10 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample10() {
         super(10);
-        client = getStockQuoteClient();
     }
 
 
     public void testDynamicEndPoints() {
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Dynamic EndPoints with Registry");
         SampleClientResult result = client.requestStandardQuote(null, trpUrl, null, "IBM", null);

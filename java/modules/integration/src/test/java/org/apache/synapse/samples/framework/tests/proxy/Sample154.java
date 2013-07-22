@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample154 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample154() {
         super(154);
-        client = getStockQuoteClient();
     }
 
 
     public void testSessionFullLB() {
         String trpUrl = "http://localhost:8280/services/LBProxy";
         log.info("Running test: Load Balancing with Proxy Services ");
+        StockQuoteSampleClient client = getStockQuoteClient();
         SampleClientResult result = client.statefulClient(null, trpUrl, 100);
         assertTrue("Client did not run successfully ", result.responseReceived());
     }

@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample156 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample156() {
         super(156);
-        client = getStockQuoteClient();
     }
 
 
     public void testServiceIntegration() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
         log.info("Running test: Service Integration with specifying the receiving sequence");
+        StockQuoteSampleClient client = getStockQuoteClient();
         SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());
     }

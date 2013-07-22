@@ -26,11 +26,9 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample450 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample450() {
         super(450);
-        client = getStockQuoteClient();
     }
 
 
@@ -38,7 +36,7 @@ public class Sample450 extends SynapseTestCase {
         //String repo = getConfiguration().getClientConfig().getClientRepo();
         String addUrl = "http://localhost:9000/soap/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Introduction to the URL Rewrite Mediator");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

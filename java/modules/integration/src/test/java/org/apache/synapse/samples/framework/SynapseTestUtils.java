@@ -19,6 +19,12 @@
 
 package org.apache.synapse.samples.framework;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.samples.framework.config.SampleConfigConstants;
+
+import javax.xml.namespace.QName;
+import java.io.File;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -76,6 +82,48 @@ public class SynapseTestUtils {
         }
 
         return ipAddress;
+    }
+
+    public static String getParameter(OMElement root, String name, String def) {
+        OMElement child = root.getFirstChildWithName(new QName(name));
+        if (child != null && !"".equals(child.getText())) {
+            return child.getText();
+        } else {
+            return def;
+        }
+    }
+
+    public static String getRequiredParameter(OMElement root, String name) {
+        OMElement child = root.getFirstChildWithName(new QName(name));
+        if (child != null && !"".equals(child.getText())) {
+            return child.getText();
+        } else {
+            throw new SynapseException("Required parameter: " + name + " unspecified");
+        }
+    }
+
+    public static String getAttribute(OMElement root, String name, String def) {
+        String value = root.getAttributeValue(new QName(name));
+        if (value != null && !"".equals(value)) {
+            return value;
+        } else {
+            return def;
+        }
+    }
+
+    public static ProcessController createController(OMElement root) {
+        if (SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_SERVER.equals(root.getLocalName())) {
+            return new Axis2BackEndServerController(root);
+        } else if (SampleConfigConstants.TAG_BE_SERVER_CONF_DERBY_SERVER.equals(root.getLocalName())) {
+            return new DerbyServerController(root);
+        } else if (SampleConfigConstants.TAG_BE_SERVER_CONF_JMS_BROKER.equals(root.getLocalName())) {
+            return new ActiveMQController(root);
+        }
+        return null;
+    }
+
+    public static String getCurrentDir() {
+        return System.getProperty("user.dir") + File.separator;
     }
 
 }

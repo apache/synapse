@@ -25,15 +25,13 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample6 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample6() {
         super(6);
-        client = getStockQuoteClient();
     }
 
     public void testManipulatingHeadersAndFiltering() {
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Dumb Client mode  ");
         SampleClientResult result = client.requestStandardQuote(null, trpUrl, null, null ,null);

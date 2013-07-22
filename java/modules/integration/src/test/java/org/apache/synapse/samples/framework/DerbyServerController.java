@@ -1,10 +1,11 @@
 package org.apache.synapse.samples.framework;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.derby.drda.NetworkServerControl;
-import org.apache.synapse.samples.framework.config.DerbyConfiguration;
+import org.apache.synapse.samples.framework.config.SampleConfigConstants;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -17,30 +18,26 @@ import java.sql.Statement;
  * Responsible for starting up and shutting down
  * a derby server instance in order to run a sample test.
  */
-public class DerbyServerController implements BackEndServerController {
+public class DerbyServerController extends AbstractBackEndServerController {
 
     private static final Log log = LogFactory.getLog(DerbyServerController.class);
 
-    private String serverName;
-    private DerbyConfiguration configuration;
     private NetworkServerControl server;
+    private int port;
 
-    public DerbyServerController(String serverName, DerbyConfiguration configuration) {
-        this.serverName = serverName;
-        this.configuration = configuration;
+    public DerbyServerController(OMElement element) {
+        super(element);
+        port = Integer.parseInt(SynapseTestUtils.getParameter(element,
+                SampleConfigConstants.TAG_BE_SERVER_CONF_DERBY_PORT,
+                SampleConfigConstants.DEFAULT_BE_SERVER_CONF_DERBY_PORT));
     }
 
-    public String getServerName() {
-        return serverName;
-    }
-
-    public boolean start() {
-        log.info("Preparing to start Derby server: " + serverName);
+    public boolean startProcess() {
         try {
             //server
             Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
             server = new NetworkServerControl
-                    (InetAddress.getByName("localhost"), 1527);
+                    (InetAddress.getByName("localhost"), port);
             server.start(null);
             while (true) {
                 try {
@@ -52,11 +49,16 @@ public class DerbyServerController implements BackEndServerController {
                 }
             }
             log.info("Derby is successfully started.");
-
+            initData();
+            return true;
         } catch (Exception e) {
-            log.warn("There was an error starting Derby server: " + serverName, e);
+            log.error("There was an error starting Derby server: " + serverName, e);
             return false;
         }
+    }
+
+    private void initData() throws Exception {
+        log.info("Creating the sample table and inserting values");
 
         //client
         String dbName = "synapsedb";
@@ -68,28 +70,28 @@ public class DerbyServerController implements BackEndServerController {
         props.put("password", "synapse");
         props.put("create", "true");
 
+        Connection conn = null;
         try {
             // on JDK 1.6 or higher, EmbeddedDriver get loaded automatically.
             Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-
-            log.info("Creating the sample database and connecting to server");
-            Connection conn = DriverManager.getConnection(connectionURL, props);
-
+            conn = DriverManager.getConnection(connectionURL, props);
             Statement s = conn.createStatement();
-            log.info("Creating the sample table and inserting values");
             s.execute(createTableQuery);
             s.execute("INSERT into company values ('IBM','c1',0.0)");
             s.execute(" INSERT into company values ('SUN','c2',0.0)");
             s.execute(" INSERT into company values ('MSFT','c3',0.0)");
             conn.commit();
-            return true;
-        } catch (Exception e) {
-            log.error("Error executing SQL queries", e);
-            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
     }
 
-    public boolean stop() {
+    public boolean stopProcess() {
         log.info("Shutting down Derby server...");
         try {
             try {

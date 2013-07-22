@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample16 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample16() {
         super(16);
-        client = getStockQuoteClient();
     }
 
 
     public void testDynamicStaticKeys() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Introduction to dynamic and static keys ");
         SampleClientResult result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");

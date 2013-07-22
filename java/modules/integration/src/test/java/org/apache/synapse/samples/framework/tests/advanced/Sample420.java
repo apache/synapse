@@ -26,16 +26,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample420 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample420() {
         super(420);
-        client = getStockQuoteClient();
     }
 
     public void testCache() {
         String trpUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Simple cache implemented on Synapse for the actual service");
         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

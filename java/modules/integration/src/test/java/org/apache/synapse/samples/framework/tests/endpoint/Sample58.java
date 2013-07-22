@@ -26,15 +26,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample58 extends SynapseTestCase {
 
     private SampleClientResult result;
-    private StockQuoteSampleClient client;
 
     public Sample58() {
         super(58);
-        client = getStockQuoteClient();
     }
 
     public void testStaticLB() {
         final String addUrl = "http://localhost:8280/services/LBService1";
+        final StockQuoteSampleClient client = getStockQuoteClient();
 
         new Thread(new Runnable() {
             public void run() {
@@ -46,7 +45,7 @@ public class Sample58 extends SynapseTestCase {
         } catch (InterruptedException e) {
 
         }
-        getBackendServerControllers().get(0).stop();
+        getBackendServerControllers().get(0).stopProcess();
 
         try {
             Thread.sleep(2000);

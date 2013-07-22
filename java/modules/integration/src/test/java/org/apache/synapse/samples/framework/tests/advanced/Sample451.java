@@ -26,17 +26,16 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample451 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample451() {
         super(451);
-        client = getStockQuoteClient();
     }
 
 
     public void testURLRewrite() {
         log.info("Running test: Conditional URL Rewriting");
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         String addUrl = "jms://localhost:9000/services/SimpleStockQuoteService";
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM", null);

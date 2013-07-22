@@ -27,16 +27,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample371 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample371() {
         super(371);
-        client = getStockQuoteClient();
     }
 
     public void testRestrictedThrottling() {
         String addUrl = "http://localhost:8280/";
         String expectedError = "Access Denied";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Restricting requests based on policies ");
         for (int i = 0; i < 4; i++) {

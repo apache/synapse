@@ -25,21 +25,19 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample2 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample2() {
         super(2);
-        client = getStockQuoteClient();
     }
 
     public void testCBR() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: CBR with the Switch-case mediator, using message properties");
-        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
+        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM", null);
         assertResponseReceived(result);
-        result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
+        result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT", null);
         assertResponseReceived(result);
     }
 

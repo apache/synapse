@@ -86,6 +86,10 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * Destroys the mediator. If we are using our custom DataSource, then shut down the connections
      */
     public void destroy() {
+        if (dataSourceName != null) {
+            // Don't touch the globally configured JNDI data sources
+            return;
+        }
         if (this.dataSource instanceof BasicDataSource) {
             try {
                 ((BasicDataSource) this.dataSource).close();

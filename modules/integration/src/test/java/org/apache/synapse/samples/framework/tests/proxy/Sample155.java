@@ -25,11 +25,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample155 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample155() {
         super(155);
-        client = getStockQuoteClient();
     }
 
 
@@ -38,6 +35,7 @@ public class Sample155 extends SynapseTestCase {
 
         log.info("Running test: Dual channel invocation on both client side and server " +
                 "side of Synapse with Proxy Services");
+        StockQuoteSampleClient client = getStockQuoteClient();
         SampleClientResult result = client.requestDualQuote(addUrl, null, null, "IBM");
         assertTrue("Client did not get run successfully ", result.responseReceived());
     }

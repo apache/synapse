@@ -26,16 +26,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample372 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample372() {
         super(372);
-        client = getStockQuoteClient();
     }
 
     public void testConcurrencyAndRateThrottling() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: concurrency throttling and request rate based throttling");
         result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

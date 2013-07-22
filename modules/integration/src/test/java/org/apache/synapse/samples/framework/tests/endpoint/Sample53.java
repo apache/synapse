@@ -27,12 +27,10 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample53 extends SynapseTestCase {
 
     private SampleClientResult result;
-    private StockQuoteSampleClient client;
     private String addUrl;
 
     public Sample53() {
         super(53);
-        client = getStockQuoteClient();
     }
 
 
@@ -40,6 +38,7 @@ public class Sample53 extends SynapseTestCase {
         String expectedError = "COULDN'T SEND THE MESSAGE TO THE SERVER";
         addUrl = "http://localhost:8280/services/LBService1";
         log.info("Running test: Failover sending among 3 endpoints");
+        final StockQuoteSampleClient client = getStockQuoteClient();
 
         // Send some messages and check
         Thread t = new Thread(new Runnable() {
@@ -56,7 +55,7 @@ public class Sample53 extends SynapseTestCase {
         assertResponseReceived(result);
 
         // Stop BE server 1
-        getBackendServerControllers().get(0).stop();
+        getBackendServerControllers().get(0).stopProcess();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -78,7 +77,7 @@ public class Sample53 extends SynapseTestCase {
         assertResponseReceived(result);
 
         // Stop BE server 2
-        getBackendServerControllers().get(1).stop();
+        getBackendServerControllers().get(1).stopProcess();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -100,7 +99,7 @@ public class Sample53 extends SynapseTestCase {
         assertResponseReceived(result);
 
         // Stop BE server 3
-        getBackendServerControllers().get(2).stop();
+        getBackendServerControllers().get(2).stopProcess();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {

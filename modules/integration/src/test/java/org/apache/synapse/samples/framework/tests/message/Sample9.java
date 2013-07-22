@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample9 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample9() {
         super(9);
-        client = getStockQuoteClient();
     }
 
 
     public void testDynamicSequences() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Dynamic Sequences with Registry");
         SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);

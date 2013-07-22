@@ -25,17 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample13 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample13() {
         super(13);
-        client = getStockQuoteClient();
     }
 
 
     public void testDualQuote() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Dual channel invocation through Synapse");
         SampleClientResult result = client.requestDualQuote(addUrl, trpUrl, null, "IBM");

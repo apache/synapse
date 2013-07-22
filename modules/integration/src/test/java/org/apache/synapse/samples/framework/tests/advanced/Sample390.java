@@ -26,17 +26,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample390 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample390() {
         super(390);
-        client = getStockQuoteClient();
     }
 
 
     public void testXQuery() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Introduction to the XQuery mediator");
         result = client.requestCustomQuote(addUrl, null, null, "IBM");
         assertTrue("Client did not get run successfully ", result.responseReceived());

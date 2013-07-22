@@ -26,17 +26,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample380 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample380() {
         super(380);
-        client = getStockQuoteClient();
     }
 
 
     public void testCustomMediator() {
         String addUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Demonstrate the use of Class mediator to extend the mediation functionality");
         result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

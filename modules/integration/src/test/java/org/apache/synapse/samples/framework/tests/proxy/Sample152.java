@@ -26,11 +26,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample152 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample152() {
         super(152);
-        client = getStockQuoteClient();
     }
 
 
@@ -39,7 +36,7 @@ public class Sample152 extends SynapseTestCase {
         String trustStore = FilenameUtils.normalize(System.getProperty("user.dir") +
                 "/modules/integration/src/test/resources/trust.jks");
         System.setProperty("javax.net.ssl.trustStore", trustStore);
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Switching transports and message format from SOAP to REST/POX");
 
         SampleClientResult result2 = client.requestStandardQuote(null, url2, null, "IBM" ,null);

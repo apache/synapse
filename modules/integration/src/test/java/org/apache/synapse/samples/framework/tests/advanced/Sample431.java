@@ -25,16 +25,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample431 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample431() {
         super(431);
-        client = getStockQuoteClient();
     }
 
     public void testCallOutSecurity() {
         log.info("Running test: Callout Mediator with security");
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
         assertTrue("Client did not run successfully ", result.responseReceived());
     }

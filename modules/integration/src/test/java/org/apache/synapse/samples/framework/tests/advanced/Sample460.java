@@ -26,17 +26,16 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample460 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample460() {
         super(460);
-        client = getStockQuoteClient();
     }
 
 
     public void testSpringBeanAsAMediator() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Spring Bean as a Mediator");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);

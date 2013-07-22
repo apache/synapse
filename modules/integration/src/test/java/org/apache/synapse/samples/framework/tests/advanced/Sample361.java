@@ -26,17 +26,16 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample361 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample361() {
         super(361);
-        client = getStockQuoteClient();
     }
 
 
     public void testDbReport() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Introduction to dbreport mediator");
 

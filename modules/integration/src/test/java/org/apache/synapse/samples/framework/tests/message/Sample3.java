@@ -25,20 +25,19 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample3 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample3() {
         super(3);
-        client = getStockQuoteClient();
     }
 
 
     public void testLocalEntriesReusableEndPointsSequences() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Local Registry entry definitions, reusable endpoints and sequences");
-        SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
+        SampleClientResult result = client.requestStandardQuote(
+                addUrl, trpUrl, null, "IBM", null);
         assertResponseReceived(result);
     }
 

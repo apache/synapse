@@ -18,13 +18,12 @@
  */
 package org.apache.synapse.samples.framework;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.ServerManager;
-import org.apache.synapse.samples.framework.config.SynapseServerConfiguration;
-
-import java.util.concurrent.CountDownLatch;
+import org.apache.synapse.samples.framework.config.SampleConfigConstants;
 
 /**
  * Responsible for starting up and shutting down
@@ -34,90 +33,147 @@ public class SynapseProcessController implements ProcessController {
 
     private static final Log log = LogFactory.getLog(SynapseProcessController.class);
 
-    private ServerThread serverThread;
-    private SynapseServerConfiguration configuration;
+    private static final int UNDEFINED      = 1;
+    private static final int STARTING_UP    = 2;
+    private static final int SERVER_ACTIVE  = 3;
+    private static final int STARTUP_FAILED = 4;
+    private static final int SHUTTING_DOWN  = 5;
+
     private ServerConfigurationInformation information;
-    private ServerManager manager;
-    private CountDownLatch cdLatch;
+    private boolean clusteringEnabled;
+
+    private int serverState = UNDEFINED;
+
+    private final SynapseServer synapseServer;
     private Exception processException;
 
-    public SynapseProcessController(SynapseServerConfiguration configuration) {
-        this.configuration = configuration;
+    public SynapseProcessController(int sampleId, OMElement element) {
+        String synapseHome = SynapseTestUtils.getCurrentDir();
+        String synapseXml = SynapseTestUtils.getRequiredParameter(element,
+                SampleConfigConstants.TAG_SYNAPSE_CONF_XML);
+        String repoPath = SynapseTestUtils.getParameter(element,
+                SampleConfigConstants.TAG_SYNAPSE_CONF_AXIS2_REPO,
+                SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
+        String axis2Xml = SynapseTestUtils.getParameter(element,
+                SampleConfigConstants.TAG_SYNAPSE_CONF_AXIS2_XML,
+                SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
+        String serverName = "Synapse" + sampleId;
+
+        clusteringEnabled = Boolean.parseBoolean(SynapseTestUtils.getParameter(element,
+                SampleConfigConstants.TAG_ENABLE_CLUSTERING, "false"));
+
         information = new ServerConfigurationInformation();
-        manager = new ServerManager();
-        cdLatch = new CountDownLatch(1);
-        serverThread = new ServerThread();
-        serverThread.setName(configuration.getServerName() + " thread");
+        information.setSynapseHome(synapseHome);
+        information.setSynapseXMLLocation(synapseXml);
+        information.setServerName(serverName);
+        information.setAxis2Xml(axis2Xml);
+        information.setResolveRoot(repoPath);
+        information.setAxis2RepoLocation(repoPath);
+
+        synapseServer = new SynapseServer();
+    }
+
+    public boolean isClusteringEnabled() {
+        return clusteringEnabled;
+    }
+
+    public String getAxis2Xml() {
+        return information.getAxis2Xml();
+    }
+
+    public void setAxis2Xml(String path) {
+        information.setAxis2Xml(path);
     }
 
     public boolean startProcess() {
-        information.setSynapseHome(configuration.getSynapseHome());
-        information.setSynapseXMLLocation(configuration.getSynapseXml());
-        information.setServerName(configuration.getServerName());
-        information.setAxis2Xml(configuration.getAxis2Xml());
-        information.setResolveRoot(configuration.getAxis2Repo());
-        information.setAxis2RepoLocation(configuration.getAxis2Repo());
+        processException = null;
 
-        log.info("SynapseProcessController: Preparing to start synapse server");
-        serverThread.start();
-
-        try {
-            log.info("SynapseProcessController: Waiting for synapse to start");
-            cdLatch.await();
-            if (processException == null) {
-                log.info("SynapseProcessController: synapse is started. continuing tests");
-                return true;
-            } else {
-                log.warn("SynapseProcessController: There was an error starting synapse", processException);
-                return false;
+        synchronized (synapseServer) {
+            synapseServer.start();
+            while (serverState <= STARTING_UP) {
+                try {
+                    synapseServer.wait(1000);
+                } catch (InterruptedException e) {
+                    log.error("Synapse startup was interrupted", e);
+                    return false;
+                }
             }
-        } catch (InterruptedException e) {
+        }
+
+        if (serverState == STARTUP_FAILED) {
+            log.error("Synapse failed to start", processException);
             return false;
         }
+        return true;
     }
 
     public boolean stopProcess() {
-        if (serverThread.isRunning) {
-            serverThread.isRunning = false;
-            try {
-                cdLatch = new CountDownLatch(1);
-                cdLatch.await();
-            } catch (InterruptedException e) {
-                log.warn("Thread interrupted");
+        if (serverState == SERVER_ACTIVE) {
+            synchronized (synapseServer) {
+                serverState = SHUTTING_DOWN;
+                synapseServer.notifyAll();
+
+                while (serverState > UNDEFINED) {
+                    try {
+                        synapseServer.wait(1000);
+                    } catch (InterruptedException e) {
+                        log.warn("Synapse shutdown was interrupted", e);
+                        return false;
+                    }
+                }
             }
         }
         return true;
     }
 
-    private class ServerThread extends Thread {
+    public String getServerName() {
+        return information.getServerName();
+    }
 
-        public boolean isRunning = false;
+    private class SynapseServer extends Thread {
+
+        SynapseServer() {
+            super(information.getServerName().toLowerCase());
+        }
 
         public void run() {
-            processException = null;
-            log.info("SynapseProcessController.ServerThread: Initializing Synapse Server...");
+            log.info("Starting up Synapse...");
+
+            ServerManager manager = new ServerManager();
             try {
                 manager.init(information, null);
-                log.info("SynapseProcessController.ServerThread: Starting Synapse Server...");
                 manager.start();
-                isRunning = true;
+                serverState = SERVER_ACTIVE;
             } catch (Exception e) {
                 processException = e;
-            }
-            cdLatch.countDown();
-
-            log.info("SynapseProcessController.ServerThread: Await until test are finished");
-            while (isRunning) {
-                //wait
-                try {
-                    sleep(1000);
-                } catch (InterruptedException e) {
-                    log.warn("Thread interrupted");
+                serverState = STARTUP_FAILED;
+                return;
+            } finally {
+                synchronized (this) {
+                    this.notifyAll();
                 }
             }
-            log.info("SynapseProcessController.ServerThread:Shutting down Synapse Server...");
-            manager.shutdown();
-            cdLatch.countDown();
+
+            synchronized (this) {
+                while (serverState < SHUTTING_DOWN) {
+                    //wait for the tests
+                    try {
+                        this.wait(1000);
+                    } catch (InterruptedException e) {
+                        log.error("Axis2 server interrupted", e);
+                    }
+                }
+            }
+
+            log.info("Shutting down Synapse...");
+            try {
+                manager.shutdown();
+            } finally {
+                synchronized (this) {
+                    serverState = UNDEFINED;
+                    this.notifyAll();
+                }
+            }
         }
     }
 

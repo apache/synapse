@@ -26,16 +26,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample391 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample391() {
         super(391);
-        client = getStockQuoteClient();
     }
 
     public void testExternalXQuery() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: How to use the data from an external XML document with in XQuery ");
         result = client.requestStandardQuote(addUrl, null, null, "IBM",null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

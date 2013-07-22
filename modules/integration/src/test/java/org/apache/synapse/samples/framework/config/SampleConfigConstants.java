@@ -16,12 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.samples.framework;
+
+package org.apache.synapse.samples.framework.config;
 
 /**
  * Sample configuration constants
  */
 public class SampleConfigConstants {
+
+    public static final String ATTR_SERVER_ID = "id";
 
     //xml tag names
     public static final String TAG_SAMPLE_ID = "sampleID";
@@ -44,6 +47,8 @@ public class SampleConfigConstants {
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = "httpsPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = "counterEnabled";
 
+    public static final String TAG_BE_SERVER_CONF_DERBY_PORT = "dbPort";
+
     public static final String TAG_BE_SERVER_CONF_JMS_PROVIDER_URL = "providerURL";
     public static final String TAG_BE_SERVER_CONF_JMS_INITIAL_NAMING_FACTORY = "initialNamingFactory";
 
@@ -55,6 +60,8 @@ public class SampleConfigConstants {
     public static final String TAG_ENABLE_CLUSTERING = "enableClustering";
 
     //default values
+    public static final String DEFAULT_SERVER_ID = "default";
+
     public static final String DEFAULT_SYNAPSE_CONF_AXIS2_XML =
             "modules/integration/target/test_repos/synapse/conf/axis2_def.xml";
     public static final String DEFAULT_SYNAPSE_CONF_AXIS2_REPO =
@@ -64,6 +71,8 @@ public class SampleConfigConstants {
             "modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml";
     public static final String DEFAULT_BE_SERVER_CONF_AXIS2_REPO =
             "modules/integration/target/test_repos/axis2Server";
+
+    public static final String DEFAULT_BE_SERVER_CONF_DERBY_PORT = "1527";
 
     public static final String DEFAULT_BE_SERVER_CONF_JMS_PROVIDER_URL = "tcp://localhost:61616";
     public static final String DEFAULT_BE_SERVER_CONF_JMS_INITIAL_NAMING_FACTORY =

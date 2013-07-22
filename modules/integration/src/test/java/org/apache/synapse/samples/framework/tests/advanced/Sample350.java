@@ -26,17 +26,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample350 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample350() {
         super(350);
-        client = getStockQuoteClient();
     }
 
     public void testScriptMediationWithJS() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Introduction to the script mediator using js scripts ");
         result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
         assertTrue("Client did not get run successfully ", result.responseReceived());

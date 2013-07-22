@@ -26,16 +26,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample57 extends SynapseTestCase {
 
     private SampleClientResult result;
-    private StockQuoteSampleClient client;
 
     public Sample57() {
         super(57);
-        client = getStockQuoteClient();
     }
 
     public void testDynamicLB() {
         final String addUrl = "http://localhost:8280/services/LBService1";
-
+        final StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Dynamic load balancing between 3 nodes");
         try {
             Thread.sleep(3000);

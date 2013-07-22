@@ -26,16 +26,15 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample353 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample353() {
         super(353);
-        client = getStockQuoteClient();
     }
 
     public void testScriptMediationWithRuby() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Using Ruby scripts for mediation");
         result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");

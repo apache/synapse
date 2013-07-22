@@ -26,11 +26,8 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample7 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample7() {
         super(7);
-        client = getStockQuoteClient();
     }
 
 
@@ -38,6 +35,7 @@ public class Sample7 extends SynapseTestCase {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280";
         String expectedError = "Invalid custom quote request";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Creating SOAP fault messages and changing the direction of a message");
         SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);

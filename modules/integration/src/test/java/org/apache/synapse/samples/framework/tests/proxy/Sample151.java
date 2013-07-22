@@ -25,16 +25,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample151 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample151() {
         super(151);
-        client = getStockQuoteClient();
     }
 
     public void testCustomSequencesEndpointsWithProxy() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy1";
         String addUrl2 = "http://localhost:8280/services/StockQuoteProxy2";
+        StockQuoteSampleClient client = getStockQuoteClient();
 
         log.info("Running test: Custom sequences and endpoints with proxy services");
         SampleClientResult result1 = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);

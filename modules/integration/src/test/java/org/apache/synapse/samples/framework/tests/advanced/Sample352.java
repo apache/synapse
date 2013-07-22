@@ -26,18 +26,16 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample352 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample352() {
         super(352);
-        client = getStockQuoteClient();
     }
 
 
-    public void testAccesingAPIUsingScripting() {
+    public void testAccessingAPIUsingScripting() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Accessing Synapse message context API methods using scripting language");
         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
         assertTrue("Client did not get run successfully ", result.responseReceived());

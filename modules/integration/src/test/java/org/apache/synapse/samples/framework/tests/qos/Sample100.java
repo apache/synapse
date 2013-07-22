@@ -26,17 +26,16 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 public class Sample100 extends SynapseTestCase {
 
     SampleClientResult result;
-    StockQuoteSampleClient client;
 
     public Sample100() {
         super(100);
-        client = getStockQuoteClient();
     }
 
 
     public void testWSSecurity() {
         String trpUrl = "http://localhost:8280/";
         log.info("Running test: Using WS-Security for outgoing messages");
+        StockQuoteSampleClient client = getStockQuoteClient();
         result = client.requestStandardQuote(null, trpUrl, null, "IBM", null);
         assertTrue("Client did not run successfully", result.responseReceived());
     }

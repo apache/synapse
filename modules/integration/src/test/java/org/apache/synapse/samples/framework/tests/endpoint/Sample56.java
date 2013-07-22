@@ -25,17 +25,14 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample56 extends SynapseTestCase {
 
-    private StockQuoteSampleClient client;
-
     public Sample56() {
         super(56);
-        client = getStockQuoteClient();
     }
 
 
     public void testSmartClientMode() {
         String addUrl = "http://localhost:8280";
-
+        StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Smart Client mode");
         SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
         assertResponseReceived(result);

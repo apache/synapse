@@ -21,6 +21,7 @@ package org.apache.synapse.samples.framework;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.config.SampleConfigConstants;
@@ -63,6 +64,7 @@ public class ActiveMQController extends AbstractBackEndServerController {
     public boolean stopProcess() {
         try {
             broker.stop();
+            FileUtils.deleteQuietly(broker.getDataDirectoryFile());
             return true;
         } catch (Exception e) {
             log.error("Error while shutting down the broker", e);

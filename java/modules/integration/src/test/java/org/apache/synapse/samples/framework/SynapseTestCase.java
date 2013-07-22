@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -497,5 +498,15 @@ public abstract class SynapseTestCase extends TestCase {
 
     protected void assertResponseReceived(SampleClientResult result) {
         assertTrue("Client did not receive the expected response", result.responseReceived());
+    }
+
+    protected Axis2BackEndServerController getAxis2Server() {
+        List<BackEndServerController> servers = getBackendServerControllers();
+        for (BackEndServerController server : servers) {
+            if (server instanceof Axis2BackEndServerController) {
+                return (Axis2BackEndServerController) server;
+            }
+        }
+        return null;
     }
 }

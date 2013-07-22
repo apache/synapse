@@ -195,6 +195,7 @@
                 <p>
                     <ul>
                         <li><a href="samples/sample430.html">Sample 430: Callout mediator for synchronous web service invocations</a></li>
+                        <li><a href="samples/sample431.html">Sample 431: Callout Mediator with WS-Security for Outgoing Messages</a></li>
                     </ul>
                 </p>
                 <h4>URL Rewrite Mediator</h4>

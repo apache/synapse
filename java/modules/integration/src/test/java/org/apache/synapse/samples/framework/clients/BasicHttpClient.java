@@ -26,6 +26,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 
 /**
  * A simple HTTP client that enables making HTTP requests. Useful for testing
@@ -60,9 +61,29 @@ public class BasicHttpClient {
      * @throws Exception If an error occurs while making the HTTP call
      */
     public HttpResponse doPost(String url, byte[] payload, String contentType) throws Exception {
+        return doPost(url, payload, contentType, null);
+    }
+
+    /**
+     * Make a HTTP POST request on the specified URL.
+     *
+     * @param url A valid HTTP URL
+     * @param payload An array of bytes to be posted to the URL (message body)
+     * @param contentType Content type of the message body
+     * @param headers A map of HTTP headers to be set on the outgoing request
+     * @return A HttpResponse object
+     * @throws Exception If an error occurs while making the HTTP call
+     */
+    public HttpResponse doPost(String url, byte[] payload,
+                               String contentType, Map<String,String> headers) throws Exception {
         HttpClient client = new DefaultHttpClient();
         try {
             HttpPost post = new HttpPost(url);
+            if (headers != null) {
+                for (Map.Entry<String,String> entry : headers.entrySet()) {
+                    post.setHeader(entry.getKey(), entry.getValue());
+                }
+            }
             BasicHttpEntity entity = new BasicHttpEntity();
             entity.setContentType(contentType);
             entity.setContent(new ByteArrayInputStream(payload));

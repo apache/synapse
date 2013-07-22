@@ -22,7 +22,7 @@ package org.apache.synapse.samples.framework;
 import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.samples.framework.tests.Sample250;
+import org.apache.synapse.samples.framework.tests.transport.Sample250;
 import org.apache.synapse.samples.framework.tests.advanced.*;
 import org.apache.synapse.samples.framework.tests.endpoint.*;
 import org.apache.synapse.samples.framework.tests.message.*;
@@ -31,11 +31,12 @@ import org.apache.synapse.samples.framework.tests.qos.Sample100;
 import org.apache.synapse.samples.framework.tests.qos.Sample101;
 import org.apache.synapse.samples.framework.tests.rest.Sample10001;
 import org.apache.synapse.samples.framework.tests.rest.Sample800;
+import org.apache.synapse.samples.framework.tests.transport.Sample251;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/*
+/**
  * This is executed by maven and handles which samples to run
  */
 public class TestSamplesHandlerSuite extends TestSuite {
@@ -206,6 +207,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
 
         //Transport switching
         sampleClassRepo.put("250", Sample250.class);
+        sampleClassRepo.put("251", Sample251.class);
 
         //Advanced
         sampleClassRepo.put("350", Sample350.class);

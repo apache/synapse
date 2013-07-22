@@ -1,11 +1,8 @@
-package org.apache.synapse.samples.framework.tests;
+package org.apache.synapse.samples.framework.tests.transport;
 
 import org.apache.synapse.samples.framework.Axis2BackEndServerController;
-import org.apache.synapse.samples.framework.BackEndServerController;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.JMSSampleClient;
-
-import java.util.List;
 
 public class Sample250 extends SynapseTestCase {
 
@@ -14,14 +11,7 @@ public class Sample250 extends SynapseTestCase {
     }
 
     public void testPlaceOrder() throws Exception {
-        List<BackEndServerController> servers = getBackendServerControllers();
-        Axis2BackEndServerController axis2Server = null;
-        for (BackEndServerController server : servers) {
-            if (server instanceof Axis2BackEndServerController) {
-                axis2Server = (Axis2BackEndServerController) server;
-                break;
-            }
-        }
+        Axis2BackEndServerController axis2Server = getAxis2Server();
         if (axis2Server == null) {
             fail("Failed to load the Axis2BackEndServerController");
         }

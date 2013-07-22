@@ -16,17 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.advanced;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample372 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample372.class);
     SampleClientResult result;
     StockQuoteSampleClient client;
 
@@ -35,8 +33,7 @@ public class Sample372 extends SynapseTestCase {
         client = getStockQuoteClient();
     }
 
-
-    public void testConcAndRRBthrottling() {
+    public void testConcurrencyAndRateThrottling() {
         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
 
         log.info("Running test: concurrency throttling and request rate based throttling");

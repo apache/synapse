@@ -16,17 +16,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample6 extends SynapseTestCase {
-
-    private static final Log log = LogFactory.getLog(Sample6.class);
 
     private StockQuoteSampleClient client;
 
@@ -34,7 +31,6 @@ public class Sample6 extends SynapseTestCase {
         super(6);
         client = getStockQuoteClient();
     }
-
 
     public void testManipulatingHeadersAndFiltering() {
         String trpUrl = "http://localhost:8280/";

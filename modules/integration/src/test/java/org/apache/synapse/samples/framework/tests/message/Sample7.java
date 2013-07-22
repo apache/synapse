@@ -16,18 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.message;
 
 import org.apache.axis2.AxisFault;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample7 extends SynapseTestCase {
-
-    private static final Log log = LogFactory.getLog(Sample7.class);
 
     private StockQuoteSampleClient client;
 
@@ -49,7 +46,8 @@ public class Sample7 extends SynapseTestCase {
         assertNotNull("Did not receive expected error", resultEx);
         log.info("Got an error as expected: " + resultEx.getMessage());
         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
-        assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError)!=-1);
+        assertTrue("Did not receive expected error",
+                resultEx.getMessage().indexOf(expectedError) != -1);
 
     }
 

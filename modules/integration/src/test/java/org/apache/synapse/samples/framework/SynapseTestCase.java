@@ -47,7 +47,7 @@ import java.util.Properties;
  */
 public abstract class SynapseTestCase extends TestCase {
 
-    private static final Log log = LogFactory.getLog(SynapseTestCase.class);
+    protected final Log log = LogFactory.getLog(this.getClass());
 
     private SampleConfiguration configuration;
     private String sampleDescriptor;
@@ -59,8 +59,10 @@ public abstract class SynapseTestCase extends TestCase {
     private String currentLocation;
 
     protected SynapseTestCase(int sampleId) {
+        if (log.isDebugEnabled()) {
+            log.debug("Creating SynapseTestCase for test " + sampleId);
+        }
         this.sampleId = sampleId;
-        log.info("Creating Synapse TestCase for test " + sampleId);
         currentLocation = System.getProperty("user.dir") + File.separator;
         sampleDescriptor = "/sample" + sampleId + ".xml";
         configuration = new SampleConfiguration();
@@ -71,13 +73,23 @@ public abstract class SynapseTestCase extends TestCase {
 
     /**
      * Executed before this test case. That means, this will be executed before each test.
-     * Loads all configuration info. and starts the servers.
+     * Loads all configuration info and starts the servers.
      */
     public void setUp() {
         assertTrue("Could not load the global descriptor file for sample " + sampleId,
                 loadDescriptorInfoFile());
         assertTrue("There are errors in global descriptor file for sample " + sampleId,
                 processDescriptorFile());
+
+        // Print a short intro to the console, so the console output is more readable
+        String title = "Sample " + sampleId + ": " + configuration.getSampleName();
+        String underline = "";
+        for (int i = 0; i < title.length(); i++) {
+            underline += "=";
+        }
+        System.out.println("\n\n" + title);
+        System.out.println(underline);
+
         assertTrue("Could not load synapse configuration settings for the sample " + sampleId,
                 initSynapseConfigInfo());
         assertTrue("Could not load axis2 configuration settings for the sample " + sampleId,
@@ -115,7 +127,7 @@ public abstract class SynapseTestCase extends TestCase {
      */
     private void doCleanup() {
         if (pc != null) {
-            log.info("Stopping Synapse");
+            log.debug("Stopping Synapse");
             pc.stopProcess();
         }
 
@@ -149,7 +161,9 @@ public abstract class SynapseTestCase extends TestCase {
      * @return true if the configuration was loaded successfully
      */
     private boolean loadDescriptorInfoFile() {
-        log.info("Reading sample descriptor file from " + sampleDescriptor);
+        if (log.isDebugEnabled()) {
+            log.debug("Reading sample descriptor file from " + sampleDescriptor);
+        }
         sampleConfigElement = null;
         try {
             InputStream in = this.getClass().getResourceAsStream(sampleDescriptor);
@@ -209,7 +223,7 @@ public abstract class SynapseTestCase extends TestCase {
             OMElement ele = (OMElement) itr.next();
             synapseProperties.setProperty(ele.getLocalName(), ele.getText());
         }
-        log.info("Initializing Configuration information for synapse server...");
+        log.debug("Initializing configuration information for synapse server...");
         String synapseHome = currentLocation;
 
         String synapseXml = synapseProperties.getProperty(SampleConfigConstants.TAG_SYNAPSE_CONF_XML);
@@ -231,7 +245,9 @@ public abstract class SynapseTestCase extends TestCase {
             configuration.getSynapseServerConfig().setAxis2Repo(synapseHome +
                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
         } else {
-            log.info("Using Synapse Axis2 repository: " + axis2Repo);
+            if (log.isDebugEnabled()) {
+                log.debug("Using Synapse Axis2 repository: " + axis2Repo);
+            }
             configuration.getSynapseServerConfig().setAxis2Repo(synapseHome + axis2Repo);
         }
 
@@ -239,7 +255,9 @@ public abstract class SynapseTestCase extends TestCase {
             configuration.getSynapseServerConfig().setAxis2Xml(synapseHome +
                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
         } else {
-            log.info("Using Synapse Axis2 XML: " + axis2Xml);
+            if (log.isDebugEnabled()) {
+                log.debug("Using Synapse Axis2 XML: " + axis2Xml);
+            }
             configuration.getSynapseServerConfig().setAxis2Xml(synapseHome + axis2Xml);
         }
 
@@ -266,7 +284,7 @@ public abstract class SynapseTestCase extends TestCase {
             log.warn("No backend servers are defined");
             return false;
         }
-        log.info("Initializing Configuration information for backend servers...");
+        log.debug("Initializing configuration information for backend servers...");
 
         // Processing JMS servers
         Properties jmsProperties = new Properties();
@@ -391,8 +409,8 @@ public abstract class SynapseTestCase extends TestCase {
         return true;
     }
 
-    /*
-     * reads and stores client specific configuration information from descriptor
+    /**
+     * Reads and stores client specific configuration information from descriptor
      */
     private boolean initClientConfigInfo() {
         Properties clientProperties = new Properties();
@@ -412,7 +430,7 @@ public abstract class SynapseTestCase extends TestCase {
             clientProperties.setProperty(ele.getLocalName(), ele.getText());
         }
 
-        log.info("Initializing Configuration information for clients...");
+        log.debug("Initializing configuration information for clients...");
         String clientRepo = clientProperties.getProperty(
                 SampleConfigConstants.TAG_CLIENT_CONF_REPO);
         String clientAxis2Xml = clientProperties.getProperty(

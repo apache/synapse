@@ -16,18 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.endpoint;
 
 import org.apache.axis2.AxisFault;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample53 extends SynapseTestCase {
-
-    private static final Log log = LogFactory.getLog(Sample53.class);
 
     private SampleClientResult result;
     private StockQuoteSampleClient client;

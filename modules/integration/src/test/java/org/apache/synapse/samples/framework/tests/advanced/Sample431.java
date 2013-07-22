@@ -18,15 +18,12 @@
  */
 package org.apache.synapse.samples.framework.tests.advanced;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample431 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample431.class);
     SampleClientResult result;
     StockQuoteSampleClient client;
 

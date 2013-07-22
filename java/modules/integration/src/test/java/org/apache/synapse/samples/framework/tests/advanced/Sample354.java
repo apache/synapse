@@ -16,17 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.advanced;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample354 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample354.class);
     SampleClientResult result;
     StockQuoteSampleClient client;
 
@@ -34,7 +32,6 @@ public class Sample354 extends SynapseTestCase {
         super(354);
         client = getStockQuoteClient();
     }
-
 
     public void testScriptMediationWithInLineRuby() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";

@@ -16,22 +16,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.proxy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
-import java.util.concurrent.CountDownLatch;
-
 public class Sample154 extends SynapseTestCase {
 
-    private static final Log log = LogFactory.getLog(Sample154.class);
-
     private StockQuoteSampleClient client;
-    CountDownLatch latch;
 
     public Sample154() {
         super(154);

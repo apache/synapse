@@ -16,17 +16,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample8 extends SynapseTestCase {
-
-    private static final Log log = LogFactory.getLog(Sample8.class);
 
     private StockQuoteSampleClient client;
 
@@ -40,7 +37,7 @@ public class Sample8 extends SynapseTestCase {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280/";
 
-        log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations  ");
+        log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations");
         SampleClientResult result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
         assertResponseReceived(result);
     }

@@ -18,8 +18,6 @@
  */
 package org.apache.synapse.samples.framework.tests.proxy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -34,8 +32,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class Sample157 extends SynapseTestCase {
-
-    private static final Log log = LogFactory.getLog(Sample157.class);
 
     private String requestXml;
     private HttpClient httpclient;

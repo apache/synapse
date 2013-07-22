@@ -97,7 +97,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     }
 
     /**
-     * Everytime a response message is received this method gets invoked. It will then select
+     * Every time a response message is received this method gets invoked. It will then select
      * the outgoing *Synapse* message context for the reply we received, and determine what action
      * to take at the Synapse level
      *
@@ -157,7 +157,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             }
             
             if (callback != null) {
-                handleMessage(messageID, messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());
+                handleMessage(messageID, messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx(),
+                        (AsyncCallback)callback);
                 
             } else {
                 // TODO invoke a generic synapse error handler for this message
@@ -182,7 +183,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      * @throws AxisFault       if the message cannot be processed
      */
     private void handleMessage(String messageID ,MessageContext response,
-        org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {
+        org.apache.synapse.MessageContext synapseOutMsgCtx, AsyncCallback callback) throws AxisFault {
 
         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
@@ -218,9 +219,21 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                     log.debug("[Failed Request Message ID : " + messageID + "]" +
                             " [New to be Retried Request Message ID : " +
                             synapseOutMsgCtx.getMessageID() + "]");
-                }                   
+                }  
+                
+                int errorCode = (Integer)response.getProperty(SynapseConstants.ERROR_CODE);
 
-                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);
+                // If a timeout has occurred and the timeout action of the callback is to
+                // discard the message
+                if (errorCode == SynapseConstants.NHTTP_CONNECTION_TIMEOUT &&
+                        callback.getTimeOutAction() == SynapseConstants.DISCARD) {
+                    // Do not execute any fault sequences. Discard message
+                    log.warn("Synapse timed out for the request with Message ID : " + messageID +
+                            ". Ignoring fault handlers since the timeout action is DISCARD.");
+                    faultStack.removeAllElements();
+                } else {
+                    ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);
+                }
             }
 
         } else {
@@ -288,10 +301,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             // when axis2 receives a soap message without addressing headers it users
             // DISABLE_ADDRESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing
             // headers on the response. this causes a problem for synapse if the original message
-            // it receivs (from client) has addressing and the synaspse service invocation has not
+            // it receives (from client) has addressing and the synapse service invocation has not
             // engage addressing. in this case when synapse receives the response from the server
-            // addessing In handler dissable addressing since that response does not have addressing
-            // headers. synapse sends the response to its orignal client using the same message
+            // addressing In handler disable addressing since that response does not have addressing
+            // headers. synapse sends the response to its original client using the same message
             // context. Then this response does not have addressing headers since it already
             // disable. to avoid this we need to set the DISABLE_ADDRESSING_FOR_OUT_MESSAGES
             // property state to original state.
@@ -412,4 +425,5 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         System.arraycopy(newRelates, 0, trimmedRelates, 0, insertPos);
         mc.setRelationships(trimmedRelates);
     }
+
 }

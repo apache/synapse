@@ -824,6 +824,11 @@
                     samples/axis2Client/client_repo as the client repository unless these are
                     specified otherwise inside the 'configuration' sub-element.
                 </p>
+                <p>
+                    To invoke secured services, Callout mediator can be configured to enable WS-Security
+                    using the enableSec element. Security policy should be specified using the policy
+                    attribute which may point to a registry key or a local entry.
+                </p>
             </subsection>
             <subsection name="Clone Mediator" id="Clone">
                 <p>

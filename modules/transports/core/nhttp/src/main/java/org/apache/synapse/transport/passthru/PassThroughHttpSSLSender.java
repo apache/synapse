@@ -26,10 +26,10 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.impl.nio.reactor.SSLSetupHandler;
-import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 
 import javax.net.ssl.*;
@@ -46,21 +46,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
 public class PassThroughHttpSSLSender extends PassThroughHttpSender {
+
     private Log log = LogFactory.getLog(PassThroughHttpSSLSender.class);
 
-    protected IOEventDispatch getEventDispatch(NHttpClientHandler handler,
+    protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler,
                                                SSLContext sslContext,
                                                SSLSetupHandler sslIOSessionHandler,
                                                HttpParams params,
-                                               TransportOutDescription transportOut)
-            throws AxisFault {
+                                               TransportOutDescription transportOut) throws AxisFault {
 
-        SSLTargetIOEventDispatch dispatch = new SSLTargetIOEventDispatch(handler, sslContext,
-                sslIOSessionHandler, params);
-        dispatch.setContextMap(getCustomSSLContexts(transportOut));
-        return dispatch;
+        return new SSLTargetIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
     }
 
     /**
@@ -288,7 +284,7 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
 
         return new SSLSetupHandler() {
 
-            public void initalize(SSLEngine sslengine, HttpParams params) {
+            public void initalize(SSLEngine sslengine) {
             }
 
             public void verify(IOSession ioSession, SSLSession session) throws SSLException {

@@ -165,21 +165,21 @@
     <!-- Transport Ins -->
     <!-- ================================================= -->
     <!-- the non blocking http transport based on HttpCore + NIO extensions -->
-    <transportReceiver name="http" class="org.apache.synapse.transport.nhttp.HttpCoreNIOListener">
-    	<parameter name="port">8280</parameter>
-    	<parameter name="non-blocking">true</parameter>
+    <transportReceiver name="http" class="org.apache.synapse.transport.passthru.PassThroughHttpListener">
+        <parameter name="port">8280</parameter>
+        <parameter name="non-blocking">true</parameter>
+        <parameter name="httpGetProcessor" locked="false">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
         <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
-        <!-- paramter name="priorityConfigFile" locked="false">location of priority configuration file<parameter-->
     </transportReceiver>
 
-    <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->
-    <!--transportReceiver name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLListener">
-    	<parameter name="port" locked="false">8243</parameter>
+    <transportReceiver name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLListener">
+        <parameter name="port" locked="false">8243</parameter>
         <parameter name="non-blocking" locked="false">true</parameter>
+        <parameter name="httpGetProcessor" locked="false">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
-                <Location>lib/identity.jks</Location>
+                <Location>modules/integration/src/test/resources/identity.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
                 <KeyPassword>password</KeyPassword>
@@ -187,12 +187,14 @@
         </parameter>
         <parameter name="truststore" locked="false">
             <TrustStore>
-                <Location>lib/trust.jks</Location>
+                <Location>modules/integration/src/test/resources/trust.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>
         </parameter>
-    </transportReceiver-->
+        <!--<parameter name="SSLVerifyClient">require</parameter>
+            supports optional|require or defaults to none -->
+    </transportReceiver>
 
     <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)-->
     <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
@@ -242,19 +244,20 @@
     <!-- Transport Outs -->
     <!-- ================================================= -->
 
-    <transportSender name="http"  class="org.apache.synapse.transport.nhttp.HttpCoreNIOSender">
+    <transportSender name="http"  class="org.apache.synapse.transport.passthru.PassThroughHttpSender">
         <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="warnOnHTTP500" locked="false">*</parameter>
         <!--parameter name="http.proxyHost" locked="false">localhost</parameter>
         <parameter name="http.proxyPort" locked="false">3128</parameter>
         <parameter name="http.nonProxyHosts" locked="false">localhost|moon|sun</parameter-->
     </transportSender>
-    <!--transportSender name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender">
+
+    <transportSender name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLSender">
         <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="warnOnHTTP500" locked="false">*</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
-                <Location>lib/identity.jks</Location>
+                <Location>modules/integration/src/test/resources/identity.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
                 <KeyPassword>password</KeyPassword>
@@ -262,12 +265,14 @@
         </parameter>
         <parameter name="truststore" locked="false">
             <TrustStore>
-                <Location>lib/trust.jks</Location>
+                <Location>modules/integration/src/test/resources/trust.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>
         </parameter>
-    </transportSender-->
+        <!--<parameter name="SSLVerifyClient">require</parameter>
+            supports optional|require or defaults to none -->
+    </transportSender>
    
     <!-- Uncomment Transport sender for the non blocking local transport-->
     <!--transportSender name="local" class="org.apache.axis2.transport.local.NonBlockingLocalTransportSender"/-->

@@ -21,9 +21,10 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
+import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
@@ -47,8 +48,8 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
 
     private static final Log log = LogFactory.getLog(HttpCoreNIOSSLSender.class);
 
-    protected IOEventDispatch getEventDispatch(NHttpClientHandler handler, SSLContext sslContext,
-        SSLIOSessionHandler sslIOSessionHandler, HttpParams params,
+    protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler, SSLContext sslContext,
+        SSLSetupHandler sslIOSessionHandler, HttpParams params,
         TransportOutDescription transportOut) throws AxisFault {
 
         SSLClientIOEventDispatch dispatch = new SSLClientIOEventDispatch(handler, sslContext,
@@ -96,7 +97,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
      * @return the SSLIOSessionHandler to be used
      * @throws AxisFault if a configuration error occurs
      */
-    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
+    protected SSLSetupHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
             throws AxisFault {
 
         final Parameter hostnameVerifier = transportOut.getParameter("HostnameVerifier");
@@ -275,17 +276,16 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
         }
     }
 
-    private SSLIOSessionHandler createSSLIOSessionHandler(final String hostnameVerifier)
+    private SSLSetupHandler createSSLIOSessionHandler(final String hostnameVerifier)
             throws AxisFault {
 
-        return new SSLIOSessionHandler() {
+        return new SSLSetupHandler() {
 
-            public void initalize(SSLEngine sslengine, HttpParams params) {
+            public void initalize(SSLEngine sslengine) {
             }
 
-            public void verify(SocketAddress remoteAddress, SSLSession session)
-                throws SSLException {
-
+            public void verify(IOSession ioSession, SSLSession session) throws SSLException {
+                SocketAddress remoteAddress = ioSession.getRemoteAddress();
                 String address;
                 if (remoteAddress instanceof InetSocketAddress) {
                     address = ((InetSocketAddress) remoteAddress).getHostName();

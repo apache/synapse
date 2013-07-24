@@ -16,13 +16,11 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru.logging;
 
+import org.apache.http.nio.*;
 import org.apache.http.nio.reactor.IOSession;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.nio.NHttpClientIOTarget;
-import org.apache.http.nio.NHttpServerIOTarget;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpRequestFactory;
@@ -32,21 +30,21 @@ import org.apache.http.params.HttpParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class LoggingUtils {
+
     public final static String HEADER_LOG_ID = "org.wso2.carbon.transport.passthru.headers";
     public final static String WIRE_LOG_ID = "org.wso2.carbon.transport.passthru.wire";
 
     public static IOSession decorate(IOSession session, final String id) {
         Log log = LogFactory.getLog(session.getClass());
-        Log wirelog = LogFactory.getLog(WIRE_LOG_ID);
-        if (wirelog.isDebugEnabled() || log.isDebugEnabled()) {
-            session = new LoggingIOSession(wirelog, session, id);
+        Log wireLog = LogFactory.getLog(WIRE_LOG_ID);
+        if (wireLog.isDebugEnabled() || log.isDebugEnabled()) {
+            session = new LoggingIOSession(wireLog, session, id);
         }
         return session;
     }
 
-    public static NHttpClientHandler decorate(NHttpClientHandler handler) {
+    public static NHttpClientEventHandler decorate(NHttpClientEventHandler handler) {
         Log log = LogFactory.getLog(handler.getClass());
         if (log.isDebugEnabled()) {
             handler = new LoggingTargetHandler(handler);
@@ -54,7 +52,7 @@ public class LoggingUtils {
         return handler;
     }
 
-    public static NHttpServiceHandler decorate(NHttpServiceHandler handler) {
+    public static NHttpServerEventHandler decorate(NHttpServerEventHandler handler) {
         Log log = LogFactory.getLog(handler.getClass());
         if (log.isDebugEnabled()) {
             handler = new LoggingSourceHandler(handler);
@@ -62,17 +60,17 @@ public class LoggingUtils {
         return handler;
     }
 
-    public static NHttpClientIOTarget createClientConnection(
+    public static DefaultNHttpClientConnection createClientConnection(
             final IOSession iosession,
             final HttpResponseFactory responseFactory,
             final ByteBufferAllocator allocator,
             final HttpParams params) {
         Log log = LogFactory.getLog(DefaultNHttpClientConnection.class);
-        Log headerlog = LogFactory.getLog(HEADER_LOG_ID);
-        if (headerlog.isDebugEnabled() || log.isDebugEnabled()) {
+        Log headerLog = LogFactory.getLog(HEADER_LOG_ID);
+        if (headerLog.isDebugEnabled() || log.isDebugEnabled()) {
             return new LoggingNHttpTargetConnection(
                     log,
-                    headerlog,
+                    headerLog,
                     iosession,
                     responseFactory,
                     allocator,
@@ -86,17 +84,17 @@ public class LoggingUtils {
         }
     }
 
-    public static NHttpServerIOTarget createServerConnection(
+    public static DefaultNHttpServerConnection createServerConnection(
             final IOSession iosession,
             final HttpRequestFactory requestFactory,
             final ByteBufferAllocator allocator,
             final HttpParams params) {
         Log log = LogFactory.getLog(DefaultNHttpClientConnection.class);
-        Log headerlog = LogFactory.getLog(HEADER_LOG_ID);
-        if (headerlog.isDebugEnabled() || log.isDebugEnabled()) {
+        Log headerLog = LogFactory.getLog(HEADER_LOG_ID);
+        if (headerLog.isDebugEnabled() || log.isDebugEnabled()) {
             return new LoggingNHttpSourceConnection(
                     log,
-                    headerlog,
+                    headerLog,
                     iosession,
                     requestFactory,
                     allocator,

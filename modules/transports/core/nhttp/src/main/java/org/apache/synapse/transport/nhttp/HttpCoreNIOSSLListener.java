@@ -21,8 +21,6 @@ package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
 import java.io.FileInputStream;
-import java.net.SocketAddress;
-import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
@@ -43,9 +41,10 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 
 public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
@@ -53,8 +52,8 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
     private static final Log log = LogFactory.getLog(HttpCoreNIOSSLListener.class);
 
     protected IOEventDispatch getEventDispatch(
-        NHttpServiceHandler handler, SSLContext sslContext,
-        SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
+        NHttpServerEventHandler handler, SSLContext sslContext,
+        SSLSetupHandler sslIOSessionHandler, HttpParams params) {
         return new SSLServerIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
     }
 
@@ -171,13 +170,13 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
      * @return the SSLIOSessionHandler to be used
      * @throws AxisFault if a configuration error occurs
      */
-    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportInDescription transportIn) throws AxisFault {
+    protected SSLSetupHandler getSSLIOSessionHandler(TransportInDescription transportIn) throws AxisFault {
 
         final Parameter clientAuth = transportIn.getParameter("SSLVerifyClient");
 
-        return new SSLIOSessionHandler() {
+        return new SSLSetupHandler() {
 
-            public void initalize(SSLEngine sslengine, HttpParams params) {
+            public void initalize(SSLEngine sslengine) {
                 if (clientAuth != null) {
                     if ("optional".equals(clientAuth.getValue())) {
                         sslengine.setWantClientAuth(true);
@@ -187,8 +186,9 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
                 }
             }
 
-            public void verify(SocketAddress removeAddress, SSLSession session)
-                throws SSLException {}
+            public void verify(IOSession ioSession, SSLSession sslSession) throws SSLException {
+
+            }
         };
     }
 }

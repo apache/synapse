@@ -16,27 +16,41 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.http.impl.nio.DefaultClientIOEventDispatch;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.NHttpClientIOTarget;
+import org.apache.http.HttpResponseFactory;
+import org.apache.http.impl.nio.DefaultHttpClientIODispatch;
+import org.apache.http.impl.nio.DefaultNHttpClientConnection;
+import org.apache.http.impl.nio.DefaultNHttpClientConnectionFactory;
+import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 
-public class PlainClientIOEventDispatch extends DefaultClientIOEventDispatch {
+public class PlainClientIOEventDispatch extends DefaultHttpClientIODispatch {
 
-    public PlainClientIOEventDispatch(final NHttpClientHandler handler, final HttpParams params) {
-        super(LoggingUtils.decorate(handler), params);
+    public PlainClientIOEventDispatch(final NHttpClientEventHandler handler, final HttpParams params) {
+        super(LoggingUtils.decorate(handler), new TargetConnectionFactory(params));
     }
-    
-    @Override
-    protected NHttpClientIOTarget createConnection(IOSession session) {
-        return LoggingUtils.createClientConnection(
-                session, 
-                createHttpResponseFactory(), 
-                this.allocator, 
-                this.params);
+
+    private static class TargetConnectionFactory extends DefaultNHttpClientConnectionFactory {
+
+        public TargetConnectionFactory(HttpParams params) {
+            super(params);
+        }
+
+        @Override
+        protected DefaultNHttpClientConnection createConnection(IOSession session,
+                                                                HttpResponseFactory responseFactory,
+                                                                ByteBufferAllocator allocator,
+                                                                HttpParams params) {
+            return LoggingUtils.createClientConnection(
+                    session,
+                    responseFactory,
+                    allocator,
+                    params);
+        }
     }
     
 }

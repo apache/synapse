@@ -21,10 +21,8 @@ package org.apache.synapse.transport.passthru.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -52,7 +50,7 @@ public class PassThroughConfiguration {
 
     private PassThroughConfiguration() {
         try {
-            props = loadProperties("passthru-http.properties");
+            props = MiscellaneousUtil.loadProperties("passthru-http.properties");
         } catch (Exception ignored) {}
     }
 
@@ -100,50 +98,6 @@ public class PassThroughConfiguration {
 
     public boolean isPreserveServerHeader() {
         return getBooleanProperty(PassThroughConfigPNames.SERVER_HEADER_PRESERVE, true);
-    }
-
-    /**
-     * Loads the properties from a given property file path
-     *
-     * @param filePath Path of the property file
-     * @return Properties loaded from given file
-     */
-    private static Properties loadProperties(String filePath) {
-
-        Properties properties = new Properties();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (log.isDebugEnabled()) {
-            log.debug("Loading the file '" + filePath + "' from classpath");
-        }
-
-        InputStream in = cl.getResourceAsStream(filePath);
-        if (in == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to load file  '" + filePath + "'");
-            }
-
-            filePath = "conf" + File.separatorChar + filePath;
-            if (log.isDebugEnabled()) {
-                log.debug("Loading the file '" + filePath + "'");
-            }
-
-            in = cl.getResourceAsStream(filePath);
-            if (in == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to load file  '" + filePath + "'");
-                }
-            }
-        }
-        if (in != null) {
-            try {
-                properties.load(in);
-            } catch (IOException e) {
-                String msg = "Error loading properties from a file at : " + filePath;
-                log.error(msg, e);
-            }
-        }
-        return properties;
     }
 
     /**

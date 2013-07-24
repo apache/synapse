@@ -20,11 +20,11 @@
 package org.apache.synapse.transport.passthru.logging;
 
 import org.apache.http.impl.nio.DefaultNHttpServerConnection;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.SessionOutputBuffer;
 import org.apache.http.nio.reactor.SessionInputBuffer;
 import org.apache.http.nio.util.ByteBufferAllocator;
-import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.nio.NHttpMessageWriter;
 import org.apache.http.nio.NHttpMessageParser;
 import org.apache.http.*;
@@ -40,14 +40,14 @@ public class LoggingNHttpSourceConnection extends DefaultNHttpServerConnection {
 
     public LoggingNHttpSourceConnection(
             final Log log,
-            final Log headerlog,
+            final Log headerLog,
             final IOSession session,
             final HttpRequestFactory requestFactory,
             final ByteBufferAllocator allocator,
             final HttpParams params) {
         super(session, requestFactory, allocator, params);
         this.log = log;
-        this.headerLog = headerlog;
+        this.headerLog = headerLog;
     }
 
     @Override
@@ -71,19 +71,19 @@ public class LoggingNHttpSourceConnection extends DefaultNHttpServerConnection {
     }
 
     @Override
-    public void consumeInput(final NHttpServiceHandler handler) {
+    public void consumeInput(final NHttpServerEventHandler handler) {
         this.log.debug("Consume input");
         super.consumeInput(handler);
     }
 
     @Override
-    public void produceOutput(final NHttpServiceHandler handler) {
+    public void produceOutput(final NHttpServerEventHandler handler) {
         this.log.debug("Produce output");
         super.produceOutput(handler);
     }
 
     @Override
-    protected NHttpMessageWriter createResponseWriter(
+    protected NHttpMessageWriter<HttpResponse> createResponseWriter(
             final SessionOutputBuffer buffer,
             final HttpParams params) {
         return new LoggingNHttpMessageWriter(
@@ -91,7 +91,7 @@ public class LoggingNHttpSourceConnection extends DefaultNHttpServerConnection {
     }
 
     @Override
-    protected NHttpMessageParser createRequestParser(
+    protected NHttpMessageParser<HttpRequest> createRequestParser(
             final SessionInputBuffer buffer,
             final HttpRequestFactory requestFactory,
             final HttpParams params) {
@@ -99,11 +99,11 @@ public class LoggingNHttpSourceConnection extends DefaultNHttpServerConnection {
                 super.createRequestParser(buffer, requestFactory, params));
     }
 
-    class LoggingNHttpMessageWriter implements NHttpMessageWriter {
+    class LoggingNHttpMessageWriter implements NHttpMessageWriter<HttpResponse> {
 
-        private final NHttpMessageWriter writer;
+        private final NHttpMessageWriter<HttpResponse> writer;
 
-        public LoggingNHttpMessageWriter(final NHttpMessageWriter writer) {
+        public LoggingNHttpMessageWriter(final NHttpMessageWriter<HttpResponse> writer) {
             super();
             this.writer = writer;
         }
@@ -112,25 +112,24 @@ public class LoggingNHttpSourceConnection extends DefaultNHttpServerConnection {
             this.writer.reset();
         }
 
-        public void write(final HttpMessage message) throws IOException, HttpException {
-            if (message != null && headerLog.isDebugEnabled()) {
-                HttpResponse response = (HttpResponse) message;
+        public void write(final HttpResponse response) throws IOException, HttpException {
+            if (response != null && headerLog.isDebugEnabled()) {
                 headerLog.debug("<< " + response.getStatusLine().toString());
                 Header[] headers = response.getAllHeaders();
                 for (Header header : headers) {
                     headerLog.debug("<< " + header.toString());
                 }
             }
-            this.writer.write(message);
+            this.writer.write(response);
         }
 
     }
 
-    class LoggingNHttpMessageParser implements NHttpMessageParser {
+    class LoggingNHttpMessageParser implements NHttpMessageParser<HttpRequest> {
 
-        private final NHttpMessageParser parser;
+        private final NHttpMessageParser<HttpRequest> parser;
 
-        public LoggingNHttpMessageParser(final NHttpMessageParser parser) {
+        public LoggingNHttpMessageParser(final NHttpMessageParser<HttpRequest> parser) {
             super();
             this.parser = parser;
         }
@@ -143,17 +142,16 @@ public class LoggingNHttpSourceConnection extends DefaultNHttpServerConnection {
             return this.parser.fillBuffer(channel);
         }
 
-        public HttpMessage parse() throws IOException, HttpException {
-            HttpMessage message = this.parser.parse();
-            if (message != null && headerLog.isDebugEnabled()) {
-                HttpRequest request = (HttpRequest) message;
+        public HttpRequest parse() throws IOException, HttpException {
+            HttpRequest request = this.parser.parse();
+            if (request != null && headerLog.isDebugEnabled()) {
                 headerLog.debug(">> " + request.getRequestLine().toString());
                 Header[] headers = request.getAllHeaders();
                 for (Header header : headers) {
                     headerLog.debug(">> " + header.toString());
                 }
             }
-            return message;
+            return request;
         }
     }
 }

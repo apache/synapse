@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.clients;
 
 import org.apache.axiom.om.*;
@@ -73,7 +74,9 @@ public class StockQuoteSampleClient {
     private void init(String addUrl, String trpUrl, String prxUrl,
                       String policyKey, long timeout) throws Exception {
 
-        log.info("Initializing sample Axis2 client");
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing sample Axis2 client");
+        }
 
         configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
                     clientConfig.getClientRepo(), clientConfig.getAxis2Xml());
@@ -118,8 +121,11 @@ public class StockQuoteSampleClient {
 
     private void terminate() {
         if (serviceClient != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("cleaning up client");
+            }
             try {
-                log.info("cleaning up client");
+                serviceClient.cleanupTransport();
                 serviceClient.cleanup();
                 configContext.terminate();
             } catch (AxisFault axisFault) {
@@ -155,8 +161,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 
@@ -187,8 +194,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 
@@ -208,8 +216,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 
@@ -232,8 +241,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 
@@ -254,8 +264,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 
@@ -286,8 +297,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 
@@ -356,8 +368,9 @@ public class StockQuoteSampleClient {
         } catch (Exception e) {
             log.error("Error invoking service", e);
             clientResult.setException(e);
+        } finally {
+            terminate();
         }
-        terminate();
         return clientResult;
     }
 

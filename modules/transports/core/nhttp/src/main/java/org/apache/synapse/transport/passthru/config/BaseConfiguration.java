@@ -17,7 +17,6 @@
  *  under the License.
  */
 
-
 package org.apache.synapse.transport.passthru.config;
 
 import org.apache.axis2.AxisFault;
@@ -25,8 +24,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.nio.params.NIOReactorParams;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
@@ -41,8 +39,6 @@ import org.apache.synapse.transport.passthru.util.BufferFactory;
  * This class has common configurations for both sender and receiver.
  */
 public abstract class BaseConfiguration {
-
-    private Log log = LogFactory.getLog(BaseConfiguration.class);
 
     /**
      * Configurations given by axis2.xml
@@ -64,8 +60,6 @@ public abstract class BaseConfiguration {
 
     private int iOThreadsPerReactor;
 
-    private int iOBufferSize;
-
     protected PassThroughConfiguration conf = PassThroughConfiguration.getInstance();
 
     public BaseConfiguration(ConfigurationContext configurationContext,
@@ -79,8 +73,6 @@ public abstract class BaseConfiguration {
     public void build() throws AxisFault {
         iOThreadsPerReactor = conf.getIOThreadsPerReactor();
 
-        iOBufferSize = conf.getIOBufferSize();
-
         if (workerPool == null) {
             workerPool = WorkerPoolFactory.getWorkerPool(
                             conf.getWorkerPoolCoreSize(),
@@ -92,16 +84,38 @@ public abstract class BaseConfiguration {
         }
 
         httpParameters = retrieveHttpParameters();
-
-        bufferFactory = new BufferFactory(iOBufferSize, new HeapByteBufferAllocator(), 512);
+        bufferFactory = new BufferFactory(conf.getIOBufferSize(), new HeapByteBufferAllocator(), 512);
     }
 
-    public int getIOThreadsPerReactor() {
-        return iOThreadsPerReactor;
-    }
+    public IOReactorConfig getReactorConfig() {
+        IOReactorConfig config = new IOReactorConfig();
+        config.setIoThreadCount(iOThreadsPerReactor);
+        config.setSoTimeout(
+                conf.getIntProperty(HttpConnectionParams.SO_TIMEOUT, 60000));
+        config.setConnectTimeout(
+                conf.getIntProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 0));
+        config.setRcvBufSize(
+                conf.getIntProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
+        config.setSndBufSize(
+                conf.getIntProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
+        config.setTcpNoDelay(
+                conf.getBooleanProperty(HttpConnectionParams.TCP_NODELAY, true));
+        config.setInterestOpQueued(
+                conf.getBooleanProperty(NIOReactorParams.INTEREST_OPS_QUEUEING, false));
 
-    public int getIOBufferSize() {
-        return iOBufferSize;
+        if (conf.getIntProperty(HttpConnectionParams.SO_LINGER) != null) {
+            config.setSoLinger(conf.getIntProperty(HttpConnectionParams.SO_LINGER));
+        }
+
+        if (conf.getBooleanProperty(HttpConnectionParams.SO_REUSEADDR) != null) {
+            config.setSoReuseAddress(conf.getBooleanProperty(HttpConnectionParams.SO_REUSEADDR));
+        }
+
+        if (conf.getIntProperty(NIOReactorPNames.SELECT_INTERVAL) != null) {
+            config.setSelectInterval(conf.getIntProperty(NIOReactorPNames.SELECT_INTERVAL));
+        }
+
+        return config;
     }
 
     public WorkerPool getWorkerPool() {

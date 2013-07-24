@@ -18,35 +18,45 @@
  */
 package org.apache.synapse.transport.passthru;
 
-import org.apache.http.impl.nio.reactor.SSLSetupHandler;
-import org.apache.http.impl.nio.ssl.SSLServerIOEventDispatch;
-import org.apache.http.nio.NHttpServerIOTarget;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.HttpRequestFactory;
+import org.apache.http.impl.nio.DefaultHttpServerIODispatch;
+import org.apache.http.impl.nio.DefaultNHttpServerConnection;
+import org.apache.http.impl.nio.SSLNHttpServerConnectionFactory;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
+import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.passthru.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 
-public class SSLSourceIOEventDispatch extends SSLServerIOEventDispatch {
+public class SSLSourceIOEventDispatch extends DefaultHttpServerIODispatch {
 
-    private HttpParams params = null;
-
-    public SSLSourceIOEventDispatch(NHttpServiceHandler handler,
+    public SSLSourceIOEventDispatch(NHttpServerEventHandler handler,
                                     SSLContext sslcontext,
                                     SSLSetupHandler sslHandler,
                                     HttpParams params) {
-        super(handler, sslcontext, sslHandler, params);
-        this.params = params;
+        super(handler, new SSLSourceConnectionFactory(sslcontext, sslHandler, params));
     }
 
-    @Override
-    protected NHttpServerIOTarget createConnection(IOSession session) {
-        session = LoggingUtils.decorate(session, "sslserver");
-        return LoggingUtils.createServerConnection(
-                session,
-                createHttpRequestFactory(),
-                createByteBufferAllocator(),
-                this.params);
+    private static class SSLSourceConnectionFactory extends SSLNHttpServerConnectionFactory {
+
+        public SSLSourceConnectionFactory(SSLContext sslcontext, SSLSetupHandler sslHandler, HttpParams params) {
+            super(sslcontext, sslHandler, params);
+        }
+
+        @Override
+        protected DefaultNHttpServerConnection createConnection(IOSession session,
+                                                                HttpRequestFactory requestFactory,
+                                                                ByteBufferAllocator allocator,
+                                                                HttpParams params) {
+            session = LoggingUtils.decorate(session, "sslserver");
+            return LoggingUtils.createServerConnection(
+                    session,
+                    requestFactory,
+                    allocator,
+                    params);
+        }
     }
 }

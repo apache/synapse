@@ -56,8 +56,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.nio.reactor.SSLIOSession;
 import org.apache.http.nio.NHttpServerConnection;
+import org.apache.http.nio.reactor.ssl.SSLIOSession;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.HttpCoreRequestResponseTransport;
 import org.apache.synapse.transport.nhttp.NHttpConfiguration;
@@ -456,9 +456,10 @@ public class ServerWorker implements Runnable {
             msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
                 .getTransportIn(Constants.TRANSPORT_HTTPS));
             msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTPS);
-            SSLIOSession session = (SSLIOSession) (conn.getContext()).getAttribute("SSL_SESSION");
+            SSLIOSession session = (SSLIOSession) conn.getContext().getAttribute(
+                    SSLIOSession.SESSION_KEY);
             msgContext.setProperty("ssl.client.auth.cert.X509",
-                                                session.getAttribute("ssl.client.auth.cert.X509"));            
+                    session.getAttribute("ssl.client.auth.cert.X509"));
         } else {
             msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
                 .getTransportOut(Constants.TRANSPORT_HTTP));

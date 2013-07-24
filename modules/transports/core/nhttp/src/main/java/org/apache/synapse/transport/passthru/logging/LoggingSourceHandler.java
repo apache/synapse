@@ -20,23 +20,20 @@ package org.apache.synapse.transport.passthru.logging;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.nio.NHttpServerConnection;
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.ContentDecoder;
+import org.apache.http.nio.*;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 
 import java.io.IOException;
 
-public class LoggingSourceHandler implements NHttpServiceHandler {
+public class LoggingSourceHandler implements NHttpServerEventHandler {
 
     private final Log log;
 
-    private final NHttpServiceHandler handler;
+    private final NHttpServerEventHandler handler;
 
-    public LoggingSourceHandler (final NHttpServiceHandler handler) {
+    public LoggingSourceHandler (final NHttpServerEventHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("HTTP service handler may not be null");
@@ -45,7 +42,7 @@ public class LoggingSourceHandler implements NHttpServiceHandler {
         this.log = LogFactory.getLog(handler.getClass());
     }
 
-    public void connected(final NHttpServerConnection conn) {
+    public void connected(final NHttpServerConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Connected");
         }
@@ -59,26 +56,35 @@ public class LoggingSourceHandler implements NHttpServiceHandler {
         this.handler.closed(conn);
     }
 
-    public void exception(final NHttpServerConnection conn, final IOException ex) {
+    public void endOfInput(NHttpServerConnection conn) throws IOException {
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("HTTP connection " + conn + ": Closed at the remote end");
+        }
+        this.handler.endOfInput(conn);
+    }
+
+    public void exception(NHttpServerConnection conn, Exception ex) {
+        if (ex.getMessage() == null) {
+            ex.printStackTrace();
+            return;
+        }
         if (ex instanceof ConnectionClosedException ||
                 ex.getMessage().contains("Connection reset by peer") ||
                 ex.getMessage().contains("forcibly closed")) {
             if (this.log.isDebugEnabled()) {
                 this.log.debug("HTTP connection " + conn + ": " + ex.getMessage() +
-                    " (Probably the keepalive connection was closed)");
+                        " (Probably the keep-alive connection was closed)");
             }
+        } else if (ex instanceof HttpException) {
+            this.log.error("HTTP Error occurred on connection " + conn + ": " + ex.getMessage(), ex);
+            this.handler.exception(conn, ex);
         } else {
-            this.log.error("IO Error occured on HTTP connection " + conn + ": " + ex.getMessage(), ex);
+            this.log.error("IO Error occurred on HTTP connection " + conn + ": " + ex.getMessage(), ex);
         }
         this.handler.exception(conn, ex);
     }
 
-    public void exception(final NHttpServerConnection conn, final HttpException ex) {
-        this.log.error("HTTP Error occured on connection " + conn + ": " + ex.getMessage(), ex);
-        this.handler.exception(conn, ex);
-    }
-
-    public void requestReceived(final NHttpServerConnection conn) {
+    public void requestReceived(final NHttpServerConnection conn) throws IOException, HttpException {
         HttpRequest request = conn.getHttpRequest();
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP InRequest Received on connection " + conn + ": "
@@ -87,7 +93,7 @@ public class LoggingSourceHandler implements NHttpServiceHandler {
         this.handler.requestReceived(conn);
     }
 
-    public void outputReady(final NHttpServerConnection conn, final ContentEncoder encoder) {
+    public void outputReady(final NHttpServerConnection conn, final ContentEncoder encoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Output ready");
         }
@@ -97,14 +103,14 @@ public class LoggingSourceHandler implements NHttpServiceHandler {
         }
     }
 
-    public void responseReady(final NHttpServerConnection conn) {
+    public void responseReady(final NHttpServerConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Response ready");
         }
         this.handler.responseReady(conn);
     }
 
-    public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) {
+    public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Input ready");
         }
@@ -114,7 +120,7 @@ public class LoggingSourceHandler implements NHttpServiceHandler {
         }
     }
 
-    public void timeout(final NHttpServerConnection conn) {
+    public void timeout(final NHttpServerConnection conn) throws IOException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Timeout");
         }

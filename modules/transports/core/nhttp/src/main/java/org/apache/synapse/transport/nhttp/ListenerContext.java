@@ -31,6 +31,7 @@ import org.apache.axis2.transport.base.endpoint.URLEndpointsConfiguration;
 import org.apache.axis2.transport.base.endpoint.config.URLEndpointsConfigurationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -56,6 +57,7 @@ import java.util.Properties;
  * This class is being used to hold the different runtime objects used by the Listeners
  */
 public class ListenerContext {
+
     private Log log = LogFactory.getLog(ListenerContext.class);
 
     /** The Axis2 configuration context */
@@ -265,6 +267,22 @@ public class ListenerContext {
         return params;
     }
 
+    public IOReactorConfig getReactorConfig() {
+        IOReactorConfig config = new IOReactorConfig();
+        NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+        config.setIoThreadCount(cfg.getServerIOWorkers());
+        config.setSoTimeout(cfg.getProperty(NhttpConstants.SO_TIMEOUT_RECEIVER, 60000));
+        config.setSndBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
+        config.setRcvBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
+        config.setTcpNoDelay(cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1);
+        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
+            config.setInterestOpQueued(true);
+        }
+        if (cfg.getBooleanValue(HttpConnectionParams.SO_REUSEADDR, false)) {
+            config.setSoReuseAddress(true);
+        }
+        return config;
+    }
 
     public ConfigurationContext getCfgCtx() {
         return cfgCtx;

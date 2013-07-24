@@ -23,10 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpRequestFactory;
 import org.apache.http.HttpResponseFactory;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.NHttpClientIOTarget;
-import org.apache.http.nio.NHttpServerIOTarget;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.impl.nio.DefaultNHttpClientConnection;
+import org.apache.http.impl.nio.DefaultNHttpServerConnection;
+import org.apache.http.nio.*;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.params.HttpParams;
@@ -37,7 +36,7 @@ class LoggingUtils {
     public final static String WIRE_LOG_ID = "org.apache.synapse.transport.nhttp.wire";
     public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
 
-    public static NHttpClientHandler decorate(NHttpClientHandler handler) {
+    public static NHttpClientEventHandler decorate(NHttpClientEventHandler handler) {
         Log log = LogFactory.getLog(handler.getClass());
         if (log.isDebugEnabled()) {
             handler = new LoggingNHttpClientHandler(log, handler);
@@ -45,7 +44,7 @@ class LoggingUtils {
         return handler;
     }
 
-    public static NHttpServiceHandler decorate(NHttpServiceHandler handler) {
+    public static NHttpServerEventHandler decorate(NHttpServerEventHandler handler) {
         Log log = LogFactory.getLog(handler.getClass());
         if (log.isDebugEnabled()) {
             handler = new LoggingNHttpServiceHandler(log, handler);
@@ -53,7 +52,7 @@ class LoggingUtils {
         return handler;
     }
 
-    public static NHttpClientIOTarget createClientConnection(
+    public static DefaultNHttpClientConnection createClientConnection(
             final IOSession iosession,
             final HttpResponseFactory responseFactory,
             final ByteBufferAllocator allocator,
@@ -65,7 +64,7 @@ class LoggingUtils {
                 params);
     }
 
-    public static NHttpServerIOTarget createServerConnection(
+    public static DefaultNHttpServerConnection createServerConnection(
             final IOSession iosession,
             final HttpRequestFactory requestFactory,
             final ByteBufferAllocator allocator,

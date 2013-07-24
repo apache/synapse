@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMElement;
@@ -35,11 +36,11 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
 
@@ -74,7 +75,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     /** SSLContext if this listener is a SSL listener */
     private SSLContext sslContext = null;
     /** The SSL session handler that manages client authentication etc */
-    private SSLIOSessionHandler sslIOSessionHandler = null;
+    private SSLSetupHandler sslSetupHandler = null;
     /** JMX support */
     private TransportMBeanSupport mbeanSupport;
     /** state of the listener */
@@ -87,13 +88,13 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     private NhttpMetricsCollector metrics = null;
 
     protected IOEventDispatch getEventDispatch(
-        NHttpServiceHandler handler, SSLContext sslContext, 
-        SSLIOSessionHandler sslioSessionHandler, HttpParams params) {
+        NHttpServerEventHandler handler, SSLContext sslContext,
+        SSLSetupHandler setupHandler, HttpParams params) {
         return new PlainServerIOEventDispatch(handler, params);
     }
 
     /**
-     * Initialize the transport listener, and execute reactor in new seperate thread
+     * Initialize the transport listener, and execute reactor in new separate thread
      * @param cfgCtx the Axis2 configuration context
      * @param transportIn the description of the http/s transport from Axis2 configuration
      * @throws AxisFault on error
@@ -105,7 +106,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
         // is this an SSL listener?
         sslContext = getSSLContext(transportIn);
-        sslIOSessionHandler = getSSLIOSessionHandler(transportIn);
+        sslSetupHandler = getSSLIOSessionHandler(transportIn);
 
         listenerContext = new ListenerContext(cfgCtx, transportIn, sslContext != null);
         listenerContext.build();
@@ -180,7 +181,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @return always null
      * @throws AxisFault never thrown
      */
-    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportInDescription transportIn)
+    protected SSLSetupHandler getSSLIOSessionHandler(TransportInDescription transportIn)
         throws AxisFault {
         return null;
     }
@@ -200,8 +201,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         try {
             String prefix = (sslContext == null ? "http" : "https") + "-Listener I/O dispatcher";
             ioReactor = new DefaultListeningIOReactor(
-                NHttpConfiguration.getInstance().getServerIOWorkers(),                
-                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
+                listenerContext.getReactorConfig(),
+                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
                 public boolean handle(IOException ioException) {
@@ -228,7 +229,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
         handler = new ServerHandler(listenerContext);
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
-                sslContext, sslIOSessionHandler, params);
+                sslContext, sslSetupHandler, params);
         state = BaseConstants.STARTED;
 
         listenerContext.getHttpGetRequestProcessor().init(cfgCtx, handler);
@@ -289,7 +290,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         }
     }
 
-    private void removeServiceFfromURIMap(AxisService service) {
+    private void removeServiceFromURIMap(AxisService service) {
         eprToServiceNameMap.remove(serviceNameToEPRMap.get(service.getName()));
         serviceNameToEPRMap.remove(service.getName());
     }
@@ -305,7 +306,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             handler.stop();
             state = BaseConstants.STOPPED;
             for (Object obj : listenerContext.getCfgCtx().getAxisConfiguration().getServices().values()) {
-                removeServiceFfromURIMap((AxisService) obj);
+                removeServiceFromURIMap((AxisService) obj);
             }
         } catch (IOException e) {
             handleException("Error shutting down IOReactor", e);
@@ -314,7 +315,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /**
      * Pause the listener - Stops accepting new connections, but continues processing existing
-     * connections until they complete. This helps bring an instance into a maintenence mode
+     * connections until they complete. This helps bring an instance into a maintenance mode
      * @throws AxisFault
      */
     public void pause() throws AxisFault {
@@ -362,7 +363,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     /**
      * Stop accepting new connections, and wait the maximum specified time for in-flight
-     * requests to complete before a controlled shutdown for maintenence
+     * requests to complete before a controlled shutdown for maintenance
      *
      * @param millis a number of milliseconds to wait until pending requests are allowed to complete
      * @throws AxisFault
@@ -376,7 +377,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             state = BaseConstants.STOPPED;
             log.info("Listener shutdown in : " + (System.currentTimeMillis() - start) / 1000 + "s");
         } catch (IOException e) {
-            handleException("Error shutting down the IOReactor for maintenence", e);
+            handleException("Error shutting down the IOReactor for maintenance", e);
         }
     }
 
@@ -479,13 +480,13 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
                         addToServiceURIMap(service);
                         break;
                     case AxisEvent.SERVICE_REMOVE :
-                        removeServiceFfromURIMap(service);
+                        removeServiceFromURIMap(service);
                         break;
                     case AxisEvent.SERVICE_START  :
                         addToServiceURIMap(service);
                         break;
                     case AxisEvent.SERVICE_STOP   :
-                        removeServiceFfromURIMap(service);
+                        removeServiceFromURIMap(service);
                         break;
                 }
             }

@@ -18,5 +18,6 @@ public class Sample10001 extends SynapseTestCase {
         assertEquals(response.getStatus(), HttpStatus.SC_INTERNAL_SERVER_ERROR);
         OMElement body = response.getBodyAsXML();
         assertEquals(body.getLocalName(), "Exception");
+        log.info("An exception was thrown as expected.");
     }
 }

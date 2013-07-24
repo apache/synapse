@@ -16,40 +16,60 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru;
 
-import org.apache.http.impl.nio.reactor.SSLIOSession;
-import org.apache.http.impl.nio.reactor.SSLSetupHandler;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.NHttpClientIOTarget;
+import org.apache.http.HttpResponseFactory;
+import org.apache.http.impl.nio.DefaultHttpClientIODispatch;
+import org.apache.http.impl.nio.DefaultNHttpClientConnection;
+import org.apache.http.impl.nio.SSLNHttpClientConnectionFactory;
+import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
+import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.passthru.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
-import java.net.InetSocketAddress;
 import java.util.Map;
 
-public class SSLTargetIOEventDispatch extends org.apache.http.impl.nio.ssl.SSLClientIOEventDispatch {
+public class SSLTargetIOEventDispatch extends DefaultHttpClientIODispatch {
 
     private Map<String, SSLContext> contextMap;
 
-    private HttpParams params = null;
-
-    public SSLTargetIOEventDispatch(NHttpClientHandler handler,
+    public SSLTargetIOEventDispatch(NHttpClientEventHandler handler,
                                     SSLContext sslcontext,
                                     SSLSetupHandler sslHandler,
                                     HttpParams params) {
-        super(handler, sslcontext, sslHandler, params);
-        this.params = params;
+        super(handler, new SSLTargetConnectionFactory(sslcontext, sslHandler, params));
     }
 
     public void setContextMap(Map<String,SSLContext> contextMap) {
         this.contextMap = contextMap;
     }
 
-    @Override
-    protected SSLIOSession createSSLIOSession(IOSession session,
+    private static class SSLTargetConnectionFactory extends SSLNHttpClientConnectionFactory {
+
+        public SSLTargetConnectionFactory(SSLContext sslcontext,
+                                          SSLSetupHandler sslHandler, HttpParams params) {
+            super(sslcontext, sslHandler, params);
+        }
+
+        @Override
+        protected DefaultNHttpClientConnection createConnection(IOSession session,
+                                                                HttpResponseFactory responseFactory,
+                                                                ByteBufferAllocator allocator,
+                                                                HttpParams params) {
+            session = LoggingUtils.decorate(session, "sslclient");
+            return LoggingUtils.createClientConnection(
+                    session,
+                    responseFactory,
+                    allocator,
+                    params);
+        }
+    }
+
+    /*protected SSLIOSession createSSLIOSession(IOSession session,
                                               SSLContext sslcontext,
                                               SSLSetupHandler sslHandler) {
 
@@ -66,15 +86,5 @@ public class SSLTargetIOEventDispatch extends org.apache.http.impl.nio.ssl.SSLCl
         }
 
         return super.createSSLIOSession(session, customContext, sslHandler);
-    }
-
-    @Override
-    protected NHttpClientIOTarget createConnection(IOSession session) {
-        session = LoggingUtils.decorate(session, "sslclient");
-        return LoggingUtils.createClientConnection(
-                session,
-                createHttpResponseFactory(),
-                createByteBufferAllocator(),
-                params);
-    }
+    }*/
 }

@@ -17,7 +17,6 @@
  *  under the License.
  */
 
-
 package org.apache.synapse.transport.passthru;
 
 import org.apache.axiom.om.OMOutputFormat;

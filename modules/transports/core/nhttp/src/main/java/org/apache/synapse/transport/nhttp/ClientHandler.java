@@ -41,10 +41,7 @@ import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.nio.DefaultNHttpClientConnection;
-import org.apache.http.nio.ContentDecoder;
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.*;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.nio.util.ContentOutputBuffer;
@@ -75,7 +72,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * process every connection. Hence this class should not store any data related to a single
  * connection - as this is being shared.
  */
-public class ClientHandler implements NHttpClientHandler {
+public class ClientHandler implements NHttpClientEventHandler {
 
     private static final Log log = LogFactory.getLog(ClientHandler.class);
 
@@ -329,6 +326,21 @@ public class ClientHandler implements NHttpClientHandler {
         shutdownConnection(conn);
         context.removeAttribute(RESPONSE_SINK_BUFFER);
         context.removeAttribute(REQUEST_SOURCE_BUFFER);
+    }
+
+    public void endOfInput(NHttpClientConnection conn) throws IOException {
+        closed(conn);
+    }
+
+    public void exception(NHttpClientConnection conn, Exception e) {
+        if (e instanceof HttpException) {
+            exception(conn, (HttpException) e);
+        } else if (e instanceof IOException) {
+            exception(conn, (IOException) e);
+        } else {
+            log.error(e.getMessage(), e);
+            shutdownConnection(conn);
+        }
     }
 
     /**

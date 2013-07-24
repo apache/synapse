@@ -53,7 +53,7 @@ public class ClientWorker implements Runnable {
     private ConfigurationContext cfgCtx = null;
 
     /** the response message context that would be created */
-    private org.apache.axis2.context.MessageContext responseMsgCtx = null;
+    private MessageContext responseMsgCtx = null;
 
     /** the HttpResponse received */
     private TargetResponse response = null;

@@ -51,5 +51,7 @@ public class Sample800 extends SynapseTestCase {
         HttpResponse response = client.doPost("http://127.0.0.1:8280/stockquote/order",
                 payload.getBytes(), "application/xml");
         assertEquals(response.getStatus(), HttpStatus.SC_ACCEPTED);
+        Thread.sleep(2000);
+        assertEquals(1, getAxis2Server().getMessageCount("SimpleStockQuoteService", "placeOrder"));
     }
 }

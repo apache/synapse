@@ -34,6 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * This stores connections for a particular host + port.
  */
 public class HostConnections {
+
     private static final Log log = LogFactory.getLog(HostConnections.class);
     // host
     private String host;

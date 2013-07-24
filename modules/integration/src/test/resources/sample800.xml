@@ -11,6 +11,7 @@
         <axis2Server id='0'>
             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
+            <counterEnabled>true</counterEnabled>
         </axis2Server>
     </backEndServerConfig>
     <clientConfig>

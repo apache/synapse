@@ -21,6 +21,7 @@ package org.apache.synapse.transport.passthru;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.util.MessageContextBuilder;
@@ -59,7 +60,10 @@ public class TargetErrorHandler {
         }
 
         if (mc.getAxisOperation() == null ||
-                mc.getAxisOperation().getMessageReceiver() == null) {
+                mc.getAxisOperation().getMessageReceiver() == null ||
+                (mc.getOperationContext() != null &&
+                        Constants.VALUE_TRUE.equals(mc.getOperationContext().getProperty(
+                                Constants.RESPONSE_WRITTEN)))) {
             return;
         }
 
@@ -77,7 +81,7 @@ public class TargetErrorHandler {
                     SOAPEnvelope envelope = faultMessageContext.getEnvelope();
 
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending Fault for Request with Message ID : "
+                        log.debug("Sending fault for request with message ID : "
                                 + mc.getMessageID());
                     }
 

@@ -38,6 +38,7 @@ import java.net.InetSocketAddress;
  * connections for host:port pair. 
  */
 public class TargetConnections {
+
     private static final Log log = LogFactory.getLog(TargetConnections.class);
 
     /** map to hold the ConnectionPools. The key is host:port */

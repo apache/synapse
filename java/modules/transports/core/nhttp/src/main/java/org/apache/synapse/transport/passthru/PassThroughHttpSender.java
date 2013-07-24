@@ -116,7 +116,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                      TransportOutDescription transportOutDescription) throws AxisFault {
 
         if (log.isDebugEnabled()) {
-            log.debug("Initializing Pass-through HTTP/S Sender...");
+            log.debug("Initializing pass-through HTTP/S sender...");
         }
 
         // is this an SSL Sender?
@@ -147,7 +147,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                     proxyBypassList = (System.getProperty("http.nonProxyHosts")).split("\\|");
                 }
 
-                log.info("HTTP Sender using Proxy : "
+                log.info("HTTP sender using Proxy : "
                     + proxyHost + ":" + proxyPort + " bypassing : " + Arrays.toString(proxyBypassList));
             }
         }
@@ -223,10 +223,10 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                 try {
                     ioReactor.execute(ioEventDispatch);
                 } catch (Exception ex) {
-                   log.fatal("Exception encountered in the " + namePrefix + " Sender. " +
+                   log.fatal("Exception encountered in the " + namePrefix + " sender. " +
                             "No more connections will be initiated by this transport", ex);
                 }
-                log.info(namePrefix + " Sender shutdown");
+                log.info(namePrefix + " sender shutdown");
             }
         }, "PassThrough" + namePrefix + "Sender");
         t.start();
@@ -316,7 +316,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                     } catch (Exception e) {
                         handleException("Failed to submit the response", e);
                     }
-                }else {
+                } else {
                     //handleException("No valid destination EPR to send message");
                 	//should be able to handle sendUsingOutputStream  Ref NHTTP_NIO
                 	sendUsingOutputStream(msgContext);

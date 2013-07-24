@@ -23,8 +23,6 @@ import org.apache.http.nio.NHttpConnection;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class represents the information about a TCP Connection at a given point in time.
@@ -48,8 +46,6 @@ public class SourceContext {
     private Pipe reader;
 
     private Pipe writer;
-
-    private Lock lock = new ReentrantLock();
 
     public SourceContext(SourceConfiguration sourceConfiguration) {
         this.sourceConfiguration = sourceConfiguration;
@@ -92,10 +88,6 @@ public class SourceContext {
 
         this.reader = null;
         this.writer = null;
-    }
-
-    public Lock getLock() {
-        return lock;
     }
 
     public boolean isShutDown() {

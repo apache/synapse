@@ -38,12 +38,12 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.jmx.MBeanRegistrar;
@@ -73,9 +73,9 @@ public class PassThroughHttpListener implements TransportListener {
 
     /** SSLContext if this listener is a SSL listener */
     private SSLContext sslContext = null;
-    
+
     /** The SSL session handler that manages client authentication etc */
-    private SSLIOSessionHandler sslIOSessionHandler = null;
+    private SSLSetupHandler sslSetupHandler = null;
 
     /** The custom URI map for the services if there are any */
     private Map<String, String> serviceNameToEPRMap = new HashMap<String, String>();
@@ -91,8 +91,10 @@ public class PassThroughHttpListener implements TransportListener {
     public void init(ConfigurationContext cfgCtx, TransportInDescription transportInDescription)
             throws AxisFault {
 
-        log.info("Initializing Pass-through HTTP/S Listener...");
-        
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing pass-through HTTP/S Listener...");
+        }
+
         int portOffset = Integer.parseInt(System.getProperty("portOffset", "0"));
         Parameter portParam = transportInDescription.getParameter("port");
         int port = Integer.parseInt(portParam.getValue().toString());
@@ -108,7 +110,7 @@ public class PassThroughHttpListener implements TransportListener {
 
         // is this a SSL listener?
         sslContext = getSSLContext(transportInDescription);
-        sslIOSessionHandler = getSSLIOSessionHandler(transportInDescription);
+        sslSetupHandler = getSSLSetupHandler(transportInDescription);
 
         namePrefix = (sslContext == null) ? "HTTP" : "HTTPS";
 
@@ -133,28 +135,25 @@ public class PassThroughHttpListener implements TransportListener {
     }
 
     public void start() throws AxisFault {
-        log.info("Starting Pass-through " + namePrefix + " Listener...");
+        log.info("Starting pass-through " + namePrefix + " listener...");
 
         try {
             String prefix = namePrefix + "-Listener I/O dispatcher";
             ioReactor = new DefaultListeningIOReactor(
-                            sourceConfiguration.getIOThreadsPerReactor(),
-                            new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix),
-                            sourceConfiguration.getHttpParameters());
+                            sourceConfiguration.getReactorConfig(),
+                            new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
             
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
 
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: " + namePrefix +
-                            " ListeningIOReactor encountered a checked exception : " +
-                            ioException.getMessage(), ioException);
+                            " ListeningIOReactor encountered a checked exception." , ioException);
                     return true;
                 }
 
                 public boolean handle(RuntimeException runtimeException) {
                     log.warn("System may be unstable: " + namePrefix +
-                            " ListeningIOReactor encountered a runtime exception : "
-                            + runtimeException.getMessage(), runtimeException);
+                            " ListeningIOReactor encountered a runtime exception.", runtimeException);
                     return true;
                 }
             });
@@ -164,15 +163,14 @@ public class PassThroughHttpListener implements TransportListener {
         }
 
         SourceHandler handler = new SourceHandler(sourceConfiguration);
-
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext,
-                                      sslIOSessionHandler, sourceConfiguration.getHttpParameters());
+                sslSetupHandler, sourceConfiguration.getHttpParameters());
 
-        ListenerEndpoint endpoint = ioReactor.listen(
-                                      new InetSocketAddress(sourceConfiguration.getPort()));
-        
-        if(sourceConfiguration.getHttpGetRequestProcessor() != null){
-           sourceConfiguration.getHttpGetRequestProcessor().init(sourceConfiguration.getConfigurationContext(), handler);
+        ListenerEndpoint endpoint = ioReactor.listen(new InetSocketAddress(
+                sourceConfiguration.getPort()));
+        HttpGetRequestProcessor getProcessor = sourceConfiguration.getHttpGetRequestProcessor();
+        if (getProcessor != null){
+           getProcessor.init(sourceConfiguration.getConfigurationContext(), handler);
         }
 
         Thread t = new Thread(new Runnable() {
@@ -180,10 +178,10 @@ public class PassThroughHttpListener implements TransportListener {
                 try {
                     ioReactor.execute(ioEventDispatch);
                 } catch (Exception e) {
-                    log.fatal("Exception encountered in the " + namePrefix + " Listener. " +
-                            "No more connections will be accepted by this transport", e);
+                    log.fatal("Exception encountered in the " + namePrefix + " listener. " +
+                            "No more connections will be accepted by this transport.", e);
                 }
-                log.info(namePrefix + " Listener shutdown.");
+                log.info(namePrefix + " listener shutdown.");
             }
         }, "PassThrough" + namePrefix + "Listener");
         t.start();
@@ -191,11 +189,11 @@ public class PassThroughHttpListener implements TransportListener {
         try {
             endpoint.waitFor();
         } catch (InterruptedException e) {
-            log.warn("PassThroughHttpListener start event was interrupted", e);
+            log.warn("Pass-through " + namePrefix + " listener startup was interrupted", e);
         }
 
         state = BaseConstants.STARTED;
-        log.info("Pass-through " + namePrefix + " Listener " + "started on port : " +
+        log.info("Pass-through " + namePrefix + " listener " + "started on port: " +
                 sourceConfiguration.getPort());
     }
 
@@ -241,9 +239,8 @@ public class PassThroughHttpListener implements TransportListener {
         return null;
     }
 
-
     public void stop() throws AxisFault {
-        log.info("Stopping Pass-through " + namePrefix + " Listener..");
+        log.info("Stopping pass-through " + namePrefix + " listener..");
         try {
             ioReactor.shutdown();
         } catch (IOException e) {
@@ -252,7 +249,7 @@ public class PassThroughHttpListener implements TransportListener {
     }
 
     public void destroy() {
-        log.info("Destroying PassThroughHttpListener");
+        log.info("Destroying pass-through " + namePrefix + " listener");
         sourceConfiguration.getConfigurationContext().
                 getAxisConfiguration().getObserversList().remove(axisObserver);
 
@@ -377,8 +374,8 @@ public class PassThroughHttpListener implements TransportListener {
     }
 
     protected IOEventDispatch getEventDispatch(
-            NHttpServiceHandler handler, SSLContext sslContext,
-            SSLIOSessionHandler sslioSessionHandler, HttpParams params) {
+            NHttpServerEventHandler handler, SSLContext sslContext,
+            SSLSetupHandler sslSetupHandler, HttpParams params) {
         return new SourceIOEventDispatch(handler, params);
     }
 
@@ -395,12 +392,13 @@ public class PassThroughHttpListener implements TransportListener {
 
     /**
      * Create the SSL IO Session handler to be used by this listener
-     * @param transportIn transport in description
+     *
+     * @param transportOut Transport out description
      * @return always null
-     * @throws AxisFault never thrown
+     * @throws AxisFault on error
      */
-    protected SSLIOSessionHandler getSSLIOSessionHandler(
-            TransportInDescription transportIn) throws AxisFault {
+    protected SSLSetupHandler getSSLSetupHandler(TransportInDescription transportOut)
+            throws AxisFault {
         return null;
     }
 

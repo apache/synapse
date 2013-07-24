@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru;
 
 import org.apache.axiom.om.OMElement;
@@ -24,17 +25,16 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.impl.nio.SSLServerIOEventDispatch;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 
 import javax.net.ssl.*;
 import javax.xml.namespace.QName;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
@@ -42,10 +42,10 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
     
     private Log log = LogFactory.getLog(PassThroughHttpSSLListener.class);
 
-    protected IOEventDispatch getEventDispatch(
-        NHttpServiceHandler handler, SSLContext sslContext,
-        SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
-        return new SSLServerIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
+    @Override
+    protected IOEventDispatch getEventDispatch(NHttpServerEventHandler handler, SSLContext sslContext,
+                                               SSLSetupHandler sslSetupHandler, HttpParams params) {
+        return new SSLSourceIOEventDispatch(handler, sslContext, sslSetupHandler, params);
     }
 
     /**
@@ -140,23 +140,14 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
         }
     }
 
-    /**
-     * Create the SSLIOSessionHandler to initialize the SSL session / engine, and request for
-     * client authentication at the following levels, through an Axis2 transport configuration
-     * parameter as follows:
-     * SSLVerifyClient - none, optional, require
-     *
-     * @param transportIn the Axis2 transport configuration
-     * @return the SSLIOSessionHandler to be used
-     * @throws AxisFault if a configuration error occurs
-     */
-    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportInDescription transportIn) throws AxisFault {
+    protected SSLSetupHandler getSSLSetupHandler(TransportInDescription transportIn)
+            throws AxisFault {
 
         final Parameter clientAuth = transportIn.getParameter("SSLVerifyClient");
 
-        return new SSLIOSessionHandler() {
+        return new SSLSetupHandler() {
 
-            public void initalize(SSLEngine sslengine, HttpParams params) {
+            public void initalize(SSLEngine sslengine) {
                 if (clientAuth != null) {
                     if ("optional".equals(clientAuth.getValue())) {
                         sslengine.setWantClientAuth(true);
@@ -166,8 +157,9 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
                 }
             }
 
-            public void verify(SocketAddress removeAddress, SSLSession session)
-                throws SSLException {}
+            public void verify(IOSession ioSession, SSLSession sslSession) throws SSLException {
+
+            }
         };
     }
 }

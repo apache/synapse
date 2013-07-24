@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axis2.context.ConfigurationContext;
@@ -28,10 +29,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
-import org.apache.http.nio.ContentDecoder;
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.NHttpServerConnection;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.*;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.nio.util.ContentOutputBuffer;
@@ -66,7 +64,7 @@ import java.util.HashMap;
  * process every connection. Hence this class should not store any data related to a single
  * connection - as this is being shared.
  */
-public class ServerHandler implements NHttpServiceHandler {
+public class ServerHandler implements NHttpServerEventHandler {
 
     private static final Log log = LogFactory.getLog(ServerHandler.class);
 
@@ -512,6 +510,24 @@ public class ServerHandler implements NHttpServiceHandler {
         try {
             commitResponseHideExceptions(conn, response);
         } catch (Exception ignore) {}        
+    }
+
+    public void endOfInput(NHttpServerConnection conn) throws IOException {
+        closed(conn);
+    }
+
+    public void exception(NHttpServerConnection conn, Exception e) {
+        if (e instanceof HttpException) {
+            exception(conn, (HttpException) e);
+        } else if (e instanceof IOException) {
+            exception(conn, (IOException) e);
+        } else {
+            log.error("Unexpected I/O error: " + e.getClass().getName(), e);
+            if (metrics != null) {
+                metrics.incrementFaultsReceiving();
+            }
+            shutdownConnection(conn);
+        }
     }
 
     /**

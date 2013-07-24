@@ -16,26 +16,24 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru.logging;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.ContentDecoder;
+import org.apache.http.nio.*;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 
-public class LoggingTargetHandler implements NHttpClientHandler {
+public class LoggingTargetHandler implements NHttpClientEventHandler {
 
     private final Log log;
     
-    private final NHttpClientHandler handler;
+    private final NHttpClientEventHandler handler;
 
-    public LoggingTargetHandler(final NHttpClientHandler handler) {
+    public LoggingTargetHandler(final NHttpClientEventHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("HTTP client handler may not be null");
@@ -44,7 +42,7 @@ public class LoggingTargetHandler implements NHttpClientHandler {
         this.log = LogFactory.getLog(handler.getClass());
     }
 
-    public void connected(final NHttpClientConnection conn, final Object attachment) {
+    public void connected(final NHttpClientConnection conn, final Object attachment) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Connected (" + attachment + ")");
         }
@@ -58,24 +56,26 @@ public class LoggingTargetHandler implements NHttpClientHandler {
         this.handler.closed(conn);
     }
 
-    public void exception(final NHttpClientConnection conn, final IOException ex) {
+    public void endOfInput(NHttpClientConnection conn) throws IOException {
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("HTTP connection " + conn + ": Closed at remote end");
+        }
+        this.handler.endOfInput(conn);
+    }
+
+    public void exception(NHttpClientConnection conn, Exception ex) {
         this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
         this.handler.exception(conn, ex);
     }
 
-    public void exception(final NHttpClientConnection conn, final HttpException ex) {
-        this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
-        this.handler.exception(conn, ex);
-    }
-
-    public void requestReady(final NHttpClientConnection conn) {
+    public void requestReady(final NHttpClientConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": InRequest ready" + getRequestMessageID(conn));
         }
         this.handler.requestReady(conn);
     }
 
-    public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
+    public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Output ready" + getRequestMessageID(conn));
         }
@@ -85,7 +85,7 @@ public class LoggingTargetHandler implements NHttpClientHandler {
         }
     }
 
-    public void responseReceived(final NHttpClientConnection conn) {
+    public void responseReceived(final NHttpClientConnection conn) throws IOException, HttpException {
         HttpResponse response = conn.getHttpResponse();
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + " : "
@@ -94,7 +94,7 @@ public class LoggingTargetHandler implements NHttpClientHandler {
         this.handler.responseReceived(conn);
     }
 
-    public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
+    public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Input ready" + getRequestMessageID(conn));
         }
@@ -104,7 +104,7 @@ public class LoggingTargetHandler implements NHttpClientHandler {
         }
     }
 
-    public void timeout(final NHttpClientConnection conn) {
+    public void timeout(final NHttpClientConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Timeout" + getRequestMessageID(conn));
         }

@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMOutputFormat;
@@ -42,14 +43,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.SessionRequest;
 import org.apache.http.nio.reactor.SessionRequestCallback;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -79,8 +81,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
     private static final Log log = LogFactory.getLog(HttpCoreNIOSender.class);
 
-    /** The Axis2 configuration context */
-    private ConfigurationContext cfgCtx;
     /** The IOReactor */
     private DefaultConnectingIOReactor ioReactor = null;
     /** The client handler */
@@ -89,8 +89,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private final SessionRequestCallback sessionRequestCallback = getSessionRequestCallback();
     /** The SSL Context to be used */
     private SSLContext sslContext = null;
-    /** The SSL session handler that manages hostname verification etc */
-    private SSLIOSessionHandler sslIOSessionHandler = null;
     /** JMX support */
     private TransportMBeanSupport mbeanSupport;
     /** Metrics collector for the sender */
@@ -118,11 +116,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @throws AxisFault thrown on an error
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
-        this.cfgCtx = cfgCtx;
-
         // is this an SSL Sender?
         sslContext = getSSLContext(transportOut);
-        sslIOSessionHandler = getSSLIOSessionHandler(transportOut);
+        SSLSetupHandler sslSetupHandler = getSSLIOSessionHandler(transportOut);
 
         // configure proxy settings - only supports HTTP right now (See SYNAPSE-418)
         if (sslContext == null) {
@@ -166,8 +162,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         try {
             String prefix = (sslContext == null ? "http" : "https") + "-Sender I/O dispatcher";
             ioReactor = new DefaultConnectingIOReactor(
-                NHttpConfiguration.getInstance().getClientIOWorkers(),
-                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix), params);
+                getReactorConfig(),
+                new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: IOReactor encountered a checked exception : " +
@@ -188,7 +184,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         metrics = new NhttpMetricsCollector(false, transportOut.getName());
         handler = new ClientHandler(cfgCtx, params, metrics);
         final IOEventDispatch ioEventDispatch = getEventDispatch(
-            handler, sslContext, sslIOSessionHandler, params, transportOut);
+            handler, sslContext, sslSetupHandler, params, transportOut);
 
         // start the Sender in a new seperate thread
         Thread t = new Thread(new Runnable() {
@@ -225,8 +221,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return an IOEventDispatch instance
      * @throws AxisFault on error
      */
-    protected IOEventDispatch getEventDispatch(NHttpClientHandler handler, SSLContext sslContext,
-        SSLIOSessionHandler sslIOSessionHandler, HttpParams params,
+    protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler, SSLContext sslContext,
+        SSLSetupHandler sslIOSessionHandler, HttpParams params,
         TransportOutDescription trpOut) throws AxisFault {
 
         return new PlainClientIOEventDispatch(handler, params);
@@ -248,7 +244,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return always null
      * @throws AxisFault on error
      */
-    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
+    protected SSLSetupHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
         throws AxisFault {
         return null;
     }
@@ -277,6 +273,21 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
         }
         return params;
+    }
+
+    private IOReactorConfig getReactorConfig() {
+        IOReactorConfig config = new IOReactorConfig();
+        NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+        config.setIoThreadCount(cfg.getClientIOWorkers());
+        config.setSoTimeout(cfg.getProperty(NhttpConstants.SO_TIMEOUT_SENDER, 60000));
+        config.setConnectTimeout(cfg.getProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 10000));
+        config.setSndBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
+        config.setRcvBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
+        config.setTcpNoDelay(cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1);
+        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
+            config.setInterestOpQueued(true);
+        }
+        return config;
     }
 
     /**
@@ -441,11 +452,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 }
             }
 
-            try {
-                axis2Req.streamMessageContents();
-            } catch (AxisFault af) {
-                throw af;
-            }
+            axis2Req.streamMessageContents();
 
         } catch (MalformedURLException e) {
             handleException("Malformed destination EPR : " + epr.getAddress(), e);
@@ -774,7 +781,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             public void failed(SessionRequest request) {
                 handleError(request, NhttpConstants.CONNECTION_FAILED, 
                     "Connection refused or failed for : " + request.getRemoteAddress() + ", " +
-                    "IO Exception occured : " + request.getException().getMessage());
+                    "IO Exception occurred : " + request.getException().getMessage());
             }
 
             public void timeout(SessionRequest request) {

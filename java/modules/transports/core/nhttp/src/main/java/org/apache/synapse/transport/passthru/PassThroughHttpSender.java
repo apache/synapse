@@ -43,12 +43,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.impl.nio.reactor.SSLSetupHandler;
-import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
+import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
@@ -114,7 +114,10 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
     public void init(ConfigurationContext configurationContext,
                      TransportOutDescription transportOutDescription) throws AxisFault {
-        log.info("Initializing Pass-through HTTP/S Sender...");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing Pass-through HTTP/S Sender...");
+        }
 
         // is this an SSL Sender?
         SSLContext sslContext = getSSLContext(transportOutDescription);
@@ -175,9 +178,8 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
             String prefix = namePrefix + "-Sender I/O dispatcher";
 
             ioReactor = new DefaultConnectingIOReactor(
-                            targetConfiguration.getIOThreadsPerReactor(),
-                            new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix),
-                            targetConfiguration.getHttpParameters());
+                            targetConfiguration.getReactorConfig(),
+                            new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
 
@@ -231,7 +233,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
         state = BaseConstants.STARTED;
 
-        log.info("Pass-through " + namePrefix + " Sender started...");
+        log.info("Pass-through " + namePrefix + " sender started...");
     }
 
     public void cleanup(org.apache.axis2.context.MessageContext messageContext) throws AxisFault {
@@ -247,7 +249,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
     }
 
 
-    public InvocationResponse invoke(org.apache.axis2.context.MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         // remove unwanted HTTP headers (if any from the current message)
         PassThroughTransportUtils.removeUnwantedHeaders(msgContext,
                 targetConfiguration.isPreserveServerHeader(),
@@ -266,7 +268,8 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                     Pipe pipe = new Pipe(targetConfiguration.getBufferFactory().getBuffer(),
                             "Test", targetConfiguration);
                     msgContext.setProperty(PassThroughConstants.PASS_THROUGH_PIPE, pipe);
-                    msgContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
+                    msgContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED,
+                            Boolean.TRUE);
                 }
                 try {
                     URL url = new URL(epr.getAddress());
@@ -367,7 +370,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 					try {
 						msgContext.wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						log.warn("Interrupted while waiting for message serialization to complete", e);
 					}
 				}
 			}
@@ -378,39 +381,46 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
 			OutputStream out = (OutputStream) msgContext.getProperty("GET_ME_OUT");
 			if (out != null) {
-				String disableChunking = (String) msgContext.getProperty(PassThroughConstants.DISABLE_CHUNKING);
-				String forceHttp10 = (String) msgContext.getProperty(PassThroughConstants.FORCE_HTTP_1_0);
+				String disableChunking = (String) msgContext.getProperty(
+                        PassThroughConstants.DISABLE_CHUNKING);
+				String forceHttp10 = (String) msgContext.getProperty(
+                        PassThroughConstants.FORCE_HTTP_1_0);
 				Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
 				
 				if("true".equals(disableChunking) || "true".equals(forceHttp10) ){
 					ByteArrayOutputStream _out = new ByteArrayOutputStream();
-					MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(msgContext);
+					MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(
+                            msgContext);
 					OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
 					formatter.writeTo(msgContext, format, _out, false);
 					try {
                         long messageSize = setStreamAsTempData(formatter,msgContext,format);
-                        msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,messageSize);
+                        msgContext.setProperty(
+                                PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH, messageSize);
                         formatter.writeTo(msgContext, format, out, false);
                     } catch (IOException e) {
                     	 handleException("IO error while building message", e);
                     }
                 	pipe.setSerializationComplete(true);
-				}else {
+				} else {
 					
 					if ((disableChunking == null || !"true".equals(disableChunking)) ||
 					    (forceHttp10 == null || !"true".equals(forceHttp10))) {
-						MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(msgContext);
-						OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+						MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(
+                                msgContext);
+						OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(
+                                msgContext);
 						formatter.writeTo(msgContext, format, out, false);
 					}
 					
-					if ((msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
-						    (Boolean) msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE))) {
+					if ((msgContext.getProperty(
+                            PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
+						    (Boolean) msgContext.getProperty(
+                                    PassThroughConstants.REST_GET_DELETE_INVOKE))) {
 							pipe.setSerializationCompleteWithoutData(true);
-					}else{
+					} else {
 						pipe.setSerializationComplete(true);
 					}
-			
 				}
 			}
 		}
@@ -428,10 +438,11 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
      * @return an IOEventDispatch instance
      * @throws AxisFault on error
      */
-    protected IOEventDispatch getEventDispatch(NHttpClientHandler handler,
+    protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler,
                                                SSLContext sslContext,
                                                SSLSetupHandler sslIOSessionHandler,
-                                               HttpParams params, TransportOutDescription trpOut) throws AxisFault {
+                                               HttpParams params,
+                                               TransportOutDescription trpOut) throws AxisFault {
 
         return new TargetIOEventDispatch(handler, params);
     }
@@ -467,7 +478,8 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         NHttpServerConnection conn = (NHttpServerConnection) msgContext.getProperty(
                 PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);
         if (conn == null) {
-            ServerWorker serverWorker = (ServerWorker) msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
+            ServerWorker serverWorker = (ServerWorker) msgContext.getProperty(
+                    Constants.OUT_TRANSPORT_INFO);
             if (serverWorker != null) {
                 MessageContext requestContext = serverWorker.getRequestContext();
                 conn = (NHttpServerConnection) requestContext.getProperty(
@@ -520,7 +532,8 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                 if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {
                     out.write(new byte[0]);
                 } else {
-                    MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);
+                    MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(
+                            msgContext);
                     OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
                     formatter.writeTo(msgContext, format, out, false);
                 }
@@ -532,11 +545,11 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
             // nothing much to do as we have started the response already
             if (errorCode != null) {
                 if (log.isDebugEnabled()) {
-                    log.warn("A Source connection is closed because of an " +
+                    log.warn("A source connection is closed because of an " +
                             "error in target: " + conn);
                 }
             } else {
-                log.debug("A Source Connection is closed, because source handler " +
+                log.debug("A source connection is closed, because source handler " +
                         "is already in the process of writing a response while " +
                         "another response is submitted: " + conn);
             }
@@ -570,7 +583,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
             state = BaseConstants.STOPPED;
             log.info("Sender shutdown in : " + (System.currentTimeMillis() - start) / 1000 + "s");
         } catch (IOException e) {
-            handleException("Error shutting down the IOReactor for maintenence", e);
+            handleException("Error shutting down the IOReactor for maintenance", e);
         }
     }
 
@@ -608,9 +621,9 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         return false;
     }
 
-    private void handleException(String s, Exception e) throws AxisFault {
-        log.error(s, e);
-        throw new AxisFault(s, e);
+    private void handleException(String msg, Exception e) throws AxisFault {
+        log.error(msg, e);
+        throw new AxisFault(msg, e);
     }
 
     private void handleException(String msg) throws AxisFault {

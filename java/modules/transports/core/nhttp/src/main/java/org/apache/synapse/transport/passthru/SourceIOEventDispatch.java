@@ -19,29 +19,44 @@
 
 package org.apache.synapse.transport.passthru;
 
-import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
-import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.nio.NHttpServerIOTarget;
+import org.apache.http.HttpRequestFactory;
+import org.apache.http.impl.nio.DefaultHttpServerIODispatch;
+
+import org.apache.http.impl.nio.DefaultNHttpServerConnection;
+import org.apache.http.impl.nio.DefaultNHttpServerConnectionFactory;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.passthru.logging.LoggingUtils;
 
 /**
  * This is a factory for creating the logging sessions or non-logging sessions.
  */
-public class SourceIOEventDispatch extends DefaultServerIOEventDispatch {
+public class SourceIOEventDispatch extends DefaultHttpServerIODispatch {
 
-    public SourceIOEventDispatch(final NHttpServiceHandler handler, final HttpParams params) {
-        super(LoggingUtils.decorate(handler), params);
+    public SourceIOEventDispatch(final NHttpServerEventHandler handler, final HttpParams params) {
+        super(LoggingUtils.decorate(handler), new SourceConnectionFactory(params));
     }
 
-    @Override
-    protected NHttpServerIOTarget createConnection(IOSession session) {
-        session = LoggingUtils.decorate(session, "server");
-        return LoggingUtils.createServerConnection(
-                session,
-                createHttpRequestFactory(),
-                this.allocator,
-                this.params);
+    private static class SourceConnectionFactory extends DefaultNHttpServerConnectionFactory {
+
+        public SourceConnectionFactory(HttpParams params) {
+            super(params);
+        }
+
+        @Override
+        protected DefaultNHttpServerConnection createConnection(IOSession session,
+                                                                HttpRequestFactory requestFactory,
+                                                                ByteBufferAllocator allocator,
+                                                                HttpParams params) {
+            session = LoggingUtils.decorate(session, "server");
+            return LoggingUtils.createServerConnection(
+                    session,
+                    requestFactory,
+                    allocator,
+                    params);
+        }
     }
+
 }

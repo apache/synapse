@@ -43,7 +43,7 @@ import java.io.OutputStream;
  * receives events for a particular connection. These events give information
  * about the message and its various states.
  */
-public class SourceHandler implements NHttpServiceHandler {
+public class SourceHandler implements NHttpServerEventHandler {
 
     private static final Log log = LogFactory.getLog(SourceHandler.class);
 
@@ -262,7 +262,37 @@ public class SourceHandler implements NHttpServiceHandler {
         } 
     }
 
-    public void exception(NHttpServerConnection conn, IOException e) {        
+    public void endOfInput(NHttpServerConnection conn) throws IOException {
+        closed(conn);
+    }
+
+    public void exception(NHttpServerConnection conn, Exception e) {
+        if (e instanceof HttpException) {
+            exception(conn, (HttpException) e);
+        } else if (e instanceof IOException) {
+            exception(conn, (IOException) e);
+        } else {
+            metrics.incrementFaultsReceiving();
+
+            ProtocolState state = SourceContext.getState(conn);
+            if (state == ProtocolState.REQUEST_BODY ||
+                    state == ProtocolState.REQUEST_HEAD) {
+                informReaderError(conn);
+            } else if (state == ProtocolState.RESPONSE_BODY ||
+                    state == ProtocolState.RESPONSE_HEAD) {
+                informWriterError(conn);
+            } else if (state == ProtocolState.REQUEST_DONE) {
+                informWriterError(conn);
+            } else if (state == ProtocolState.RESPONSE_DONE) {
+                informWriterError(conn);
+            }
+
+            SourceContext.updateState(conn, ProtocolState.CLOSED);
+            sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+        }
+    }
+
+    public void exception(NHttpServerConnection conn, IOException e) {
         logIOException(e);
 
         metrics.incrementFaultsReceiving();
@@ -312,7 +342,7 @@ public class SourceHandler implements NHttpServiceHandler {
         }
     }
 
-    public void exception(NHttpServerConnection conn, HttpException e) {        
+    public void exception(NHttpServerConnection conn, HttpException e) {
         try {
             if (conn.isResponseSubmitted()) {
                 sourceConfiguration.getSourceConnections().shutDownConnection(conn);

@@ -32,11 +32,7 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.nio.DefaultNHttpClientConnection;
-import org.apache.http.nio.ContentDecoder;
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.nio.NHttpServerConnection;
+import org.apache.http.nio.*;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.connections.HostConnections;
@@ -45,7 +41,7 @@ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsColl
 /**
  * This class is handling events from the transport -- > client.
  */
-public class TargetHandler implements NHttpClientHandler {
+public class TargetHandler implements NHttpClientEventHandler {
 
     private static final Log log = LogFactory.getLog(TargetHandler.class);
 
@@ -451,6 +447,31 @@ public class TargetHandler implements NHttpClientHandler {
 
         TargetContext.updateState(conn, ProtocolState.CLOSED);
         targetConfiguration.getConnections().shutdownConnection(conn);
+    }
+
+    public void endOfInput(NHttpClientConnection conn) throws IOException {
+        closed(conn);
+    }
+
+    public void exception(NHttpClientConnection conn, Exception e) {
+        if (e instanceof HttpException) {
+            exception(conn, (HttpException) e);
+        } else if (e instanceof IOException) {
+            exception(conn, (IOException) e);
+        } else {
+            ProtocolState state = TargetContext.getState(conn);
+            MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
+            if (requestMsgCtx != null) {
+                targetErrorHandler.handleError(requestMsgCtx,
+                        ErrorCodes.SND_IO_ERROR,
+                        "Error in Sender",
+                        e,
+                        state);
+            }
+
+            TargetContext.updateState(conn, ProtocolState.CLOSING);
+            targetConfiguration.getConnections().shutdownConnection(conn);
+        }
     }
 
     private boolean isResponseHaveBodyExpected(

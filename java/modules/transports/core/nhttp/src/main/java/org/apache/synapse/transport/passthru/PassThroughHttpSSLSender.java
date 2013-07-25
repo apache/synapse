@@ -56,7 +56,8 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
                                                HttpParams params,
                                                TransportOutDescription transportOut) throws AxisFault {
 
-        return new SSLTargetIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
+        return new SSLTargetIOEventDispatch(handler, sslContext, getCustomSSLContexts(transportOut),
+                sslIOSessionHandler, params);
     }
 
     /**
@@ -105,9 +106,9 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
 
         final Parameter hostnameVerifier = transportOut.getParameter("HostnameVerifier");
         if (hostnameVerifier != null) {
-            return createSSLIOSessionHandler(hostnameVerifier.getValue().toString());
+            return createSSLSetupHandler(hostnameVerifier.getValue().toString());
         } else {
-            return createSSLIOSessionHandler(null);
+            return createSSLSetupHandler(null);
         }
     }
 
@@ -279,7 +280,7 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
         }
     }
 
-    private SSLSetupHandler createSSLIOSessionHandler(final String hostnameVerifier)
+    private SSLSetupHandler createSSLSetupHandler(final String hostnameVerifier)
             throws AxisFault {
 
         return new SSLSetupHandler() {

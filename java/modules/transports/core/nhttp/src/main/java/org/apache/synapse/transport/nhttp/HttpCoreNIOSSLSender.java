@@ -52,10 +52,8 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
         SSLSetupHandler sslIOSessionHandler, HttpParams params,
         TransportOutDescription transportOut) throws AxisFault {
 
-        SSLClientIOEventDispatch dispatch = new SSLClientIOEventDispatch(handler, sslContext,
-                sslIOSessionHandler, params);
-        dispatch.setContextMap(getCustomSSLContexts(transportOut));
-        return dispatch;
+        return new SSLClientIOEventDispatch(handler, sslContext,
+                getCustomSSLContexts(transportOut), sslIOSessionHandler, params);
     }
 
     /**
@@ -97,14 +95,14 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
      * @return the SSLIOSessionHandler to be used
      * @throws AxisFault if a configuration error occurs
      */
-    protected SSLSetupHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
+    protected SSLSetupHandler getSSLSetupHandler(TransportOutDescription transportOut)
             throws AxisFault {
 
         final Parameter hostnameVerifier = transportOut.getParameter("HostnameVerifier");
         if (hostnameVerifier != null) {
-            return createSSLIOSessionHandler(hostnameVerifier.getValue().toString());
+            return createSSLSetupHandler(hostnameVerifier.getValue().toString());
         } else {
-            return createSSLIOSessionHandler(null);
+            return createSSLSetupHandler(null);
         }        
     }
 
@@ -276,7 +274,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
         }
     }
 
-    private SSLSetupHandler createSSLIOSessionHandler(final String hostnameVerifier)
+    private SSLSetupHandler createSSLSetupHandler(final String hostnameVerifier)
             throws AxisFault {
 
         return new SSLSetupHandler() {

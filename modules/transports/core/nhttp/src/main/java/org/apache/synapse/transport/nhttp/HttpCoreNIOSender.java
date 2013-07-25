@@ -110,7 +110,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /** Weather Server header coming from server should be preserved */
     private boolean preserveServerHeader = true;
     /**
-     * Initialize the transport sender, and execute reactor in new seperate thread
+     * Initialize the transport sender, and execute reactor in new separate thread
      * @param cfgCtx the Axis2 configuration context
      * @param transportOut the description of the http/s transport from Axis2 configuration
      * @throws AxisFault thrown on an error
@@ -118,7 +118,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
         // is this an SSL Sender?
         sslContext = getSSLContext(transportOut);
-        SSLSetupHandler sslSetupHandler = getSSLIOSessionHandler(transportOut);
+        SSLSetupHandler sslSetupHandler = getSSLSetupHandler(transportOut);
 
         // configure proxy settings - only supports HTTP right now (See SYNAPSE-418)
         if (sslContext == null) {
@@ -244,7 +244,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return always null
      * @throws AxisFault on error
      */
-    protected SSLSetupHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
+    protected SSLSetupHandler getSSLSetupHandler(TransportOutDescription transportOut)
         throws AxisFault {
         return null;
     }

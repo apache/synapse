@@ -1269,18 +1269,18 @@
             <email>hiranya AT apache.org</email>
             <organization>WSO2</organization>
         </developer>
-	<developer>
+	    <developer>
             <name>Charith Wickramarachchi</name>
             <id>charith</id>
             <email>charith AT apache.org</email>
             <organization>WSO2</organization>
         </developer>
-	<developer>
+	    <developer>
             <name>Heshan Suriyaarachchi</name>
             <id>heshan</id>
             <email>heshan AT apache.org</email>
             <organization>WSO2</organization>
-	    <url>http://heshans.blogspot.com/</url>
+	        <url>http://heshans.blogspot.com/</url>
         </developer>
         <developer>
             <name>Rajika Kumarasiri</name>
@@ -1293,7 +1293,7 @@
             <email>kasun AT apache.org</email>
 	    <organization>WSO2</organization>
         </developer> 
-	<developer>
+	    <developer>
             <name>Udayanga Wickramasinghe</name>
             <id>uswick</id>
             <email>uswick AT apache.org</email>

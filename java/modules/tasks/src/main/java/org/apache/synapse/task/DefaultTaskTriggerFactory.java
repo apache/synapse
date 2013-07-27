@@ -16,16 +16,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.CronTrigger;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerUtils;
+import org.quartz.*;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Random;
 
@@ -53,47 +50,42 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
         long repeatInterval = taskDescription.getInterval();
         Date startTime = taskDescription.getStartTime();
         Date endTime = taskDescription.getEndTime();
+        String group = taskDescription.getGroup();
+
+        if (group == null || "".equals(group)) {
+            group = TaskDescription.DEFAULT_GROUP;
+        }
 
         Trigger trigger;
-        if (cron == null || "".equals(cron)) {
-            if (repeatCount >= 0) {
-                trigger = TriggerUtils.makeImmediateTrigger(repeatCount - 1, repeatInterval);
-            } else {
-                trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY,
-                        repeatInterval);
-            }
-
-        } else {
-            CronTrigger cronTrigger = new CronTrigger();
-            try {
-                cronTrigger.setCronExpression(cron);
-                trigger = cronTrigger;
-            } catch (ParseException e) {
-                throw new SynapseTaskException("Error setting cron expression : " +
-                        e.getMessage() + cron, log);
-            }
-        }
-
-        if (trigger == null) {
-            throw new SynapseTaskException("Trigger is null for the Task description : " +
-                    taskDescription, log);
-        }
+        TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger()
+                .withIdentity(name + "-trigger-" + String.valueOf(RANDOM.nextLong()), group);
 
         if (startTime != null) {
-            trigger.setStartTime(startTime);
-        }
-        if (endTime != null) {
-            trigger.setEndTime(endTime);
-        }
-        // give the trigger a random name
-        trigger.setName(name + "-trigger-" + String.valueOf(RANDOM.nextLong()));
-        String group = taskDescription.getGroup();
-        if (group != null && !"".equals(group)) {
-            trigger.setGroup(group);
+            triggerBuilder.startAt(startTime);
         } else {
-            trigger.setGroup(TaskDescription.DEFAULT_GROUP);
+            triggerBuilder.startNow();
         }
-        trigger.setVolatility(taskDescription.isVolatility());
+
+        if (endTime != null) {
+            triggerBuilder.endAt(endTime);
+        }
+
+        if (cron == null || "".equals(cron)) {
+            if (repeatCount >= 0) {
+                trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .withIntervalInMilliseconds(repeatInterval)
+                        .withRepeatCount(repeatCount - 1))
+                        .build();
+            } else {
+                trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .withIntervalInMilliseconds(repeatInterval)
+                        .repeatForever())
+                        .build();
+            }
+        } else {
+            trigger = triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+        }
+
         return trigger;
     }
 }

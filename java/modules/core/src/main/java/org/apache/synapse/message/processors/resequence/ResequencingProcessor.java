@@ -26,9 +26,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.util.xpath.SynapseXPath;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -175,11 +173,9 @@ public class ResequencingProcessor extends ScheduledMessageProcessor {
      * @return jobDetail - created JobDetail object with Name and JobClass
      */
     @Override
-    protected JobDetail getJobDetail() {
-        JobDetail jobDetail = new JobDetail();
-        jobDetail.setName(name + "-resequensing-job");
-        jobDetail.setJobClass(ResequencingJob.class);
-        return jobDetail;
+    protected JobBuilder getJobBuilder() {
+        return JobBuilder.newJob(ResequencingJob.class).withIdentity(
+                name + "-resequencing-job", SCHEDULED_MESSAGE_PROCESSOR_GROUP);
     }
 
     /**
@@ -200,8 +196,9 @@ public class ResequencingProcessor extends ScheduledMessageProcessor {
     @Override
     public void destroy() {
         try {
-            scheduler.deleteJob(name + "-resequensing-job",
-                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+            scheduler.deleteJob(new JobKey(name + "-resequencing-job",
+                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP));
+            scheduler.shutdown();
         } catch (SchedulerException e) {
         }
     }

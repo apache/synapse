@@ -326,7 +326,7 @@ public class TaskScheduler {
                 log.debug("Deleting a Job with [ Name :" + name + " ]" +
                         " [ Group :" + group + " ]");
             }
-            scheduler.deleteJob(name, group);
+            scheduler.deleteJob(new JobKey(name, group));
         } catch (SchedulerException e) {
             throw new SynapseTaskException("Error deleting a job with  [ Name :" + name + " ]" +
                     " [ Group :" + group + " ]");

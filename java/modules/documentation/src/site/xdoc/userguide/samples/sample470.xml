@@ -88,15 +88,15 @@
                         <li>
                             Add minimal client JARs of your EJB Container to SYNAPSE_HOME/lib. 
                             E.g. If you are using JBoss 7, it is sufficient to add the 
-                            jboss-client.jar file.
+                            <i>jboss-client.jar</i> file.
                         </li>
                         <li>
-                            Add the synapse-samples-ejb-1.0.0.jar to SYNAPSE_HOME/lib. (Note: adding 
+                            Add the <i>synapse-samples-ejb-1.0.0.jar</i> to SYNAPSE_HOME/lib. (Note: adding
                             only the remote interfaces of the EJBs will suffice. Here we are using
                             the complete jar file for simplicity.)
                         </li>                
                         <li>
-                            Configure a beanstalk named 'demo' in
+                            Configure a beanstalk named <i>demo</i> in
                             SYNAPSE_HOME/repository/conf/synapse.properties. You will need to 
                             specify the JNDI properties of your EJB Container in this configuration.
                             Some example configurations are shown below. <br/> 
@@ -127,9 +127,9 @@ synapse.beanstalks.demo.cache.timeout.stateful=30
                         <li>
                             If the JNDI names assigned to the EJBs by your EJB Container differ from
                             the JNDI names specified in the sample 470 configuration file
-                            (repository/conf/sample/synapse_sample_470.xml), edit 'jndiName' 
+                            (repository/conf/sample/synapse_sample_470.xml), edit the <i>jndiName</i>
                             attribute of all &lt; ejb /&gt; mediator invocations in the 
-                            synapse_sample_470.xml accordingly.
+                            <i>synapse_sample_470.xml</i> accordingly.
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 470 
@@ -174,7 +174,7 @@ synapse.beanstalks.demo.cache.timeout.stateful=30
                 </p>
                 <p>
                     Finally, Enrich and Bean mediators are used to build the response message extracting properties from
-                    the JavaBean stored in the <i>store</i> property.
+                    the JavaBean stored in the <i>store</i> message context property.
                 </p>
                 <p>A sample response is shown below.</p>
 

@@ -217,8 +217,8 @@
                 <h4>EJB Mediator</h4>
                 <p>
                     <ul>
-                        <li><a href="samples/sample470.html">Sample 470: Introduction to the EJB mediator: Invoking Stateless Session Beans</a></li>
-                        <li><a href="samples/sample471.html">Sample 471: Introduction to the EJB mediator: Invoking Stateful Session Beans</a></li>
+                        <li><a href="samples/sample470.html">Sample 470: Introduction to the EJB mediator I: Invoking Stateless Session Beans</a></li>
+                        <li><a href="samples/sample471.html">Sample 471: Introduction to the EJB mediator II: Invoking Stateful Session Beans</a></li>
                     </ul>
                 </p>
                 

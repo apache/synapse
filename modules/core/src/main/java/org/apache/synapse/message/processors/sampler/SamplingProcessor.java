@@ -16,22 +16,20 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.message.processors.sampler;
 
+package org.apache.synapse.message.processors.sampler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.message.processors.AbstractMessageProcessor;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SamplingProcessor extends ScheduledMessageProcessor{
-    private Log log = LogFactory.getLog(SamplingProcessor.class);
+public class SamplingProcessor extends ScheduledMessageProcessor {
+
+    private static final Log log = LogFactory.getLog(SamplingProcessor.class);
 
     public static final String CONCURRENCY = "concurrency";
     public static final String SEQUENCE = "sequence";
@@ -51,11 +49,9 @@ public class SamplingProcessor extends ScheduledMessageProcessor{
     }
 
     @Override
-    protected JobDetail getJobDetail() {
-        JobDetail jobDetail = new JobDetail();
-        jobDetail.setName(name + "-sampling-job");
-        jobDetail.setJobClass(SamplingJob.class);
-        return jobDetail;
+    protected JobBuilder getJobBuilder() {
+        return JobBuilder.newJob(SamplingJob.class).withIdentity(
+                name + "-sampling-job", SCHEDULED_MESSAGE_PROCESSOR_GROUP);
     }
 
     @Override
@@ -69,8 +65,8 @@ public class SamplingProcessor extends ScheduledMessageProcessor{
     @Override
     public void destroy() {
          try {
-            scheduler.deleteJob(name + "-sampling-job",
-                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+             scheduler.deleteJob(new JobKey(name + "-sampling-job",
+                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP));
         } catch (SchedulerException e) {
             log.error("Error while destroying the task " + e);
         }

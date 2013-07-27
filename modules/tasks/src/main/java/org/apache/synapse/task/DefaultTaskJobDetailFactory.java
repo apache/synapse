@@ -21,6 +21,7 @@ package org.apache.synapse.task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 
@@ -53,23 +54,6 @@ public class DefaultTaskJobDetailFactory implements TaskJobDetailFactory {
             resources = new HashMap<String, Object>();
         }
 
-        JobDetail jobDetail = new JobDetail();
-        jobDetail.setJobClass(jobClass);
-
-        String name = taskDescription.getName();
-        if (name == null || "".equals(name)) {
-            throw new SynapseTaskException("Name cannot be found.", log);
-        }
-        jobDetail.setName(name);
-
-
-        String group = taskDescription.getGroup();
-        if (group != null && !"".equals(group)) {
-            jobDetail.setGroup(group);
-        } else {
-            jobDetail.setGroup(TaskDescription.DEFAULT_GROUP);
-        }
-
         JobDataMap jobDataMap = new JobDataMap(resources);
 
         String className = taskDescription.getTaskClass();
@@ -81,8 +65,18 @@ public class DefaultTaskJobDetailFactory implements TaskJobDetailFactory {
         if (xmlProperties != null) {
             jobDataMap.put(TaskDescription.PROPERTIES, xmlProperties);
         }
-        jobDetail.setJobDataMap(jobDataMap);
 
-        return jobDetail;
+        String name = taskDescription.getName();
+        if (name == null || "".equals(name)) {
+            throw new SynapseTaskException("Name cannot be found.", log);
+        }
+
+        String group = taskDescription.getGroup();
+        if (group == null || "".equals(group)) {
+            group = TaskDescription.DEFAULT_GROUP;
+        }
+
+        return JobBuilder.newJob(jobClass).withIdentity(name, group).
+                usingJobData(jobDataMap).build();
     }
 }

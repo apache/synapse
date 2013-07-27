@@ -16,21 +16,17 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.message.processors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
-import java.text.ParseException;
 import java.util.Map;
 
 public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor {
-
 
     public static final String SCHEDULED_MESSAGE_PROCESSOR_GROUP =
             "synapse.message.processor.quartz";
@@ -72,27 +68,25 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
     public void start() {
         Trigger trigger;
+        TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger().
+                withIdentity(name + "-trigger-");
         if (cronExpression == null || "".equals(cronExpression)) {
-            trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY, interval);
+            trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInMilliseconds(interval)
+                    .repeatForever())
+                    .build();
         } else {
-            CronTrigger cronTrigger = new CronTrigger();
-            try {
-                cronTrigger.setCronExpression(cronExpression);
-                trigger = cronTrigger;
-            } catch (ParseException e) {
-                throw new SynapseException("Error setting cron expression : " +
-                        e.getMessage() + cronExpression, e);
-            }
+            trigger = triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
+                    .build();
         }
-        trigger.setName(name + "-trigger");
 
-        JobDetail jobDetail = getJobDetail();
+        JobBuilder jobBuilder = getJobBuilder();
         JobDataMap jobDataMap = getJobDataMap();
         jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE,
                 configuration.getMessageStore(messageStore));
         jobDataMap.put(MessageProcessorConsents.PARAMETERS, parameters);
-        jobDetail.setJobDataMap(jobDataMap);
-        jobDetail.setGroup(SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+
+        JobDetail jobDetail = jobBuilder.usingJobData(jobDataMap).build();
 
         try {
             scheduler.scheduleJob(jobDetail, trigger);
@@ -177,7 +171,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         }
     }
 
-    protected abstract JobDetail getJobDetail();
+    protected abstract JobBuilder getJobBuilder();
 
     protected JobDataMap getJobDataMap() {
         return new JobDataMap();
@@ -185,7 +179,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
     public void destroy() {
         try {
-            scheduler.deleteJob(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+            scheduler.deleteJob( new JobKey(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP));
             scheduler.shutdown(true);
         } catch (SchedulerException e) {
             log.error("Error while destroying the task " + e);

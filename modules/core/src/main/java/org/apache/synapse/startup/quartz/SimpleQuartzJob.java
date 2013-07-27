@@ -44,7 +44,7 @@ public class SimpleQuartzJob implements Job {
 
     public void execute(JobExecutionContext ctx) throws JobExecutionException {
 
-        String jobName = ctx.getJobDetail().getFullName();
+        String jobName = ctx.getJobDetail().getKey().getName();
         if (log.isDebugEnabled()) {
             log.debug("Executing task : " + jobName);
         }

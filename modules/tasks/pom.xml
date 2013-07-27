@@ -76,7 +76,7 @@
             <artifactId>synapse-commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opensymphony</groupId>
+            <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
         </dependency>
         <dependency>

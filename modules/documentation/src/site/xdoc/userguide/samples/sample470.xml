@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 470</title>
+    </properties>
+    <body>
+        <section name="Sample 470: Introduction to the EJB Mediator I - Invoking Stateless Session Beans">
+            <div class="xmlConf">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;proxy name=&quot;StoreLocatorProxy&quot; transports=&quot;https http&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot;&gt;
+        &lt;target&gt;
+            &lt;!-- First call StoreLocator#getClosestStore(), then call StoreRegistry#getStoreById() with the result. --&gt;
+            &lt;inSequence&gt;
+                &lt;bean action=&quot;CREATE&quot; class=&quot;samples.bean.Location&quot; var=&quot;loc&quot;/&gt;
+                &lt;bean action=&quot;SET_PROPERTY&quot; var=&quot;loc&quot; property=&quot;latitude&quot; value=&quot;{//m:latitude}&quot; xmlns:m=&quot;http://services.samples&quot;/&gt;
+                &lt;bean action=&quot;SET_PROPERTY&quot; var=&quot;loc&quot; property=&quot;longitude&quot; value=&quot;{//m:longitude}&quot; xmlns:m=&quot;http://services.samples&quot;/&gt;
+                &lt;ejb class=&quot;samples.ejb.StoreLocator&quot; beanstalk=&quot;demo&quot; method=&quot;getClosestStore&quot; target=&quot;store_id&quot; jndiName=&quot;StoreLocatorBean/remote&quot;&gt;
+                    &lt;args&gt;
+                        &lt;arg value=&quot;{get-property(&#39;loc&#39;)}&quot;/&gt;
+                    &lt;/args&gt;
+                &lt;/ejb&gt;
+                &lt;ejb class=&quot;samples.ejb.StoreRegistry&quot; beanstalk=&quot;demo&quot; method=&quot;getStoreById&quot; target=&quot;store&quot; jndiName=&quot;StoreRegistryBean/remote&quot;&gt;
+                    &lt;args&gt;
+                        &lt;arg value=&quot;{get-property(&#39;store_id&#39;)}&quot;/&gt;
+                    &lt;/args&gt;
+                &lt;/ejb&gt;
+                &lt;!-- Prepare the response. --&gt;
+                &lt;enrich&gt;
+                    &lt;source type=&quot;inline&quot; clone=&quot;true&quot;&gt;
+                        &lt;getClosestStoreResponse xmlns=&quot;&quot;&gt;
+                            &lt;store&gt;
+                                &lt;name&gt;?&lt;/name&gt;
+                                &lt;address&gt;?&lt;/address&gt;
+                                &lt;phone&gt;?&lt;/phone&gt;
+                            &lt;/store&gt;
+                        &lt;/getClosestStoreResponse&gt;
+                    &lt;/source&gt;
+                    &lt;target type=&quot;body&quot;/&gt;
+                &lt;/enrich&gt;
+                &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;name&quot; target=&quot;{//store/name/text()}&quot;/&gt;
+                &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;address&quot; target=&quot;{//store/address/text()}&quot;/&gt;
+                &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;phoneNo&quot; target=&quot;{//store/phone/text()}&quot;/&gt;
+                &lt;!-- Send the response back to the client of the ESB. --&gt;
+                &lt;header name=&quot;To&quot; action=&quot;remove&quot;/&gt;
+                &lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;
+                &lt;send/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate the usage of the EJB mediator for invoking EJB Stateless
+                    Session Beans hosted on a remote EJB Container.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Build the backend EJB jar to be hosted on the EJB Container by changing
+                            the directory to SYNAPSE_HOME/samples/axis2Server/src/EJBSampleBeans
+                            and invoking: <div class="command">mvn clean install</div>
+                        </li>
+                        <li>
+                            Deploy the built EJB jar 
+                            (SYNAPSE_HOME/samples/axis2Server/src/EJBSampleBeans/target/synapse-samples-ejb-1.0.0.jar)
+                            in an EJB Container such as JBoss or GlassFish.
+                        </li>
+                        <li>
+                            Add minimal client JARs of your EJB Container to SYNAPSE_HOME/lib. 
+                            E.g. If you are using JBoss 7, it is sufficient to add the 
+                            jboss-client.jar file.
+                        </li>
+                        <li>
+                            Add the synapse-samples-ejb-1.0.0.jar to SYNAPSE_HOME/lib. (Note: adding 
+                            only the remote interfaces of the EJBs will suffice. Here we are using
+                            the complete jar file for simplicity.)
+                        </li>                
+                        <li>
+                            Configure a beanstalk named 'demo' in
+                            SYNAPSE_HOME/repository/conf/synapse.properties. You will need to 
+                            specify the JNDI properties of your EJB Container in this configuration.
+                            Some example configurations are shown below. <br/> 
+                            For JBoss 7:
+                            <div class="consoleOutput">synapse.beanstalks=demo,foo
+#   JNDI properties
+synapse.beanstalks.demo.java.naming.factory.url.pkgs=org.jboss.ejb.client.naming
+#  Cache settings
+synapse.beanstalks.demo.cache.warn.limit.stateless=256
+synapse.beanstalks.demo.cache.warn.limit.stateful=256
+synapse.beanstalks.demo.cache.timeout.stateless=30
+synapse.beanstalks.demo.cache.timeout.stateful=30
+</div>
+                            <br/>                            
+                            For JBoss 6:
+                            <div class="consoleOutput">synapse.beanstalks=demo,foo
+#   JNDI properties
+synapse.beanstalks.demo.java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory
+synapse.beanstalks.demo.java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
+synapse.beanstalks.demo.java.naming.provider.url=localhost:1099
+#  Cache settings
+synapse.beanstalks.demo.cache.warn.limit.stateless=256
+synapse.beanstalks.demo.cache.warn.limit.stateful=256
+synapse.beanstalks.demo.cache.timeout.stateless=30
+synapse.beanstalks.demo.cache.timeout.stateful=30
+</div>
+                        </li>
+                        <li>
+                            If the JNDI names assigned to the EJBs by your EJB Container differ from
+                            the JNDI names specified in the sample 470 configuration file
+                            (repository/conf/sample/synapse_sample_470.xml), edit 'jndiName' 
+                            attribute of all &lt; ejb /&gt; mediator invocations in the 
+                            synapse_sample_470.xml accordingly.
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 470 
+                            (repository/conf/sample/synapse_sample_470.xml):
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 470<br/>
+                                Windows: synapse.bat -sample 470
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">                
+                <p>
+                    Send the following request to http://localhost:8280/services/StoreLocatorProxy
+                    using a tool such at <a href="http://ws.apache.org/tcpmon/">TCPMon</a> or curl.
+                </p>
+<div class="xmlConf">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;getClosestStore xmlns=&quot;http://services.samples&quot;&gt;
+        &lt;latitude&gt;78&lt;/latitude&gt;
+        &lt;longitude&gt;8&lt;/longitude&gt;
+    &lt;/getClosestStore&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</div>
+                <p>
+                    When the <i>StoreLocatorProxy</i> receives the request, it first creates an instance of
+                     <i>samples.bean.Location</i> using the Bean mediator.
+                    Then, it sets the properties of the newly created bean with the values
+                    extracted from the incoming SOAP message, again using the Bean mediator.
+                </p>
+                <p>
+                    The subsequent EJB mediator invokes the <i>getClosestStore()</i> method on the remote stateless
+                    session bean, <i>StoreLocator</i>, with the previously populated
+                    Location object as an argument and stores the result in the <i>store_id</i> message context
+                    property. Another EJB mediator that follows calls the <i>getStoreById()</i> method
+                    on a second stateless session bean,<i>StoreRegistry</i>, to obtain store details encapsulated in
+                    a JavaBean (an instance of samples.bean.Store) and stores this resulting bean in a message context
+                    property named <i>store</i>. The <i>demo</i> beanstalk provides all necessary configurations
+                    needed for the two remote EJB invocations.
+                </p>
+                <p>
+                    Finally, Enrich and Bean mediators are used to build the response message extracting properties from
+                    the JavaBean stored in the <i>store</i> property.
+                </p>
+                <p>A sample response is shown below.</p>
+
+<div class="xmlConf">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;getClosestStoreResponse&gt;
+     &lt;store&gt;
+        &lt;name&gt;Kadawatha&lt;/name&gt;
+        &lt;address&gt;253, Kandy Road, Kadawatha&lt;/address&gt;
+        &lt;phone&gt;0112990789&lt;/phone&gt;
+     &lt;/store&gt;
+     &lt;/getClosestStoreResponse&gt;
+     &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt; 
+</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

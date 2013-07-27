@@ -212,6 +212,17 @@
                         <li><a href="samples/sample460.html">Sample 460: Introduction to the Spring mediator</a></li>
                     </ul>
                 </p>
+                
+                
+                <h4>EJB Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="samples/sample470.html">Sample 470: Introduction to the EJB mediator: Invoking Stateless Session Beans</a></li>
+                        <li><a href="samples/sample471.html">Sample 471: Introduction to the EJB mediator: Invoking Stateful Session Beans</a></li>
+                    </ul>
+                </p>
+                
+                
             </subsection>
             <subsection name="Eventing">
                 <p>

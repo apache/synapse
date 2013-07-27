@@ -29,14 +29,14 @@
                 <bean action="CREATE" class="samples.bean.Location" var="loc"/>
                 <bean action="SET_PROPERTY" var="loc" property="latitude" value="{//m:latitude}" xmlns:m="http://services.samples"/>
                 <bean action="SET_PROPERTY" var="loc" property="longitude" value="{//m:longitude}" xmlns:m="http://services.samples"/>
-                <ejb class="samples.ejb.StoreLocator" beanstalk="demo" method="getClosestStore" target="loc_id" jndiName="StoreLocatorBean/remote">
+                <ejb class="samples.ejb.StoreLocator" beanstalk="demo" method="getClosestStore" target="store_id" jndiName="StoreLocatorBean/remote">
                     <args>
                         <arg value="{get-property('loc')}"/>
                     </args>
                 </ejb>
                 <ejb class="samples.ejb.StoreRegistry" beanstalk="demo" method="getStoreById" target="store" jndiName="StoreRegistryBean/remote">
                     <args>
-                        <arg value="{get-property('loc_id')}"/>
+                        <arg value="{get-property('store_id')}"/>
                     </args>
                 </ejb>
                 <!-- Prepare the response. -->

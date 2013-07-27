@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -201,15 +202,22 @@ public class TaskScheduler {
         }
 
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("scheduling job : " + jobDetail + " with trigger " + trigger);
+            if (taskDescription.getCount() != 0) {
+                if (!isTaskAlreadyRunning(jobDetail.getKey())) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Scheduling job : " + jobDetail + " with trigger " + trigger);
+                    }
+                    scheduler.scheduleJob(jobDetail, trigger);
+                } else {
+                    log.warn("Did not schedule the job : " + jobDetail + ". The job is already running.");
+                }
+            } else {
+                log.warn("Did not schedule the job : " + jobDetail + ". Job count is zero.");
             }
-            scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             throw new SynapseTaskException("Error scheduling job : " + jobDetail
                     + " with trigger " + trigger);
         }
-
     }
 
     /**
@@ -258,10 +266,18 @@ public class TaskScheduler {
         jobDetail.getJobDataMap().put(TaskDescription.INSTANCE, task);
 
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("scheduling job : " + jobDetail + " with trigger " + trigger);
+            if (taskDescription.getCount() != 0) {
+                if (!isTaskAlreadyRunning(jobDetail.getKey())) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Scheduling job : " + jobDetail + " with trigger " + trigger);
+                    }
+                    scheduler.scheduleJob(jobDetail, trigger);
+                } else {
+                    log.warn("Did not schedule the job : " + jobDetail + ". The job is already running.");
+                }
+            } else {
+                log.warn("Did not schedule the job : " + jobDetail + ". Job count is zero.");
             }
-            scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             throw new SynapseTaskException("Error scheduling job : " + jobDetail
                     + " with trigger " + trigger);
@@ -346,6 +362,20 @@ public class TaskScheduler {
         return runningTasks;
     }
 
+    private boolean isTaskAlreadyRunning(JobKey jobKey) throws SchedulerException {
+        List<JobExecutionContext> currentJobs = scheduler.getCurrentlyExecutingJobs();
+        JobKey currentJobKey;
+        for (JobExecutionContext jobCtx : currentJobs) {
+            currentJobKey = jobCtx.getJobDetail().getKey();
+            if (currentJobKey.compareTo(jobKey) == 0) {
+                //found it!
+                log.warn("The job " + jobKey.getName() + " is already running");
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Sets a Trigger Factory , if it needs to void using default factory
      *
@@ -371,8 +401,7 @@ public class TaskScheduler {
             schedulerMetaData = schedulerMetaData.append("[ Scheduler : ")
                     .append(scheduler).append(" ]");
         }
-        return new StringBuffer().append("[ TaskScheduler[ Name :").
-                append(name).append("]").append(schedulerMetaData).append(" ]").toString();
+        return "[ TaskScheduler[ Name : " + name + " ]" + schedulerMetaData + " ]";
     }
 
     private void assertInitialized() {
@@ -383,7 +412,6 @@ public class TaskScheduler {
     }
 
     private void assertStarted() {
-
         try {
             if (!scheduler.isStarted()) {
                 throw new SynapseTaskException("Scheduler has not been started yet", log);

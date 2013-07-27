@@ -124,7 +124,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
         SourceContext.updateState(conn, ProtocolState.GET_REQUEST_COMPLETE);
         sourceHandler.commitResponseHideExceptions(conn, response);
         closeOutputStream(os);
-        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
     }
 
     private void sendResponseAndFinish(HttpResponse response, byte[] data,
@@ -134,7 +134,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
         sourceHandler.commitResponseHideExceptions(conn, response);
         os.write(data);
         closeOutputStream(os);
-        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
     }
 
 	private void closeOutputStream(OutputStream os) {
@@ -165,28 +165,29 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 			MessageContext msgContext, NHttpServerConnection conn,
 			OutputStream os, String serviceName,
 			Map<String, String> parameters) {
-		AxisService service = cfgCtx.getAxisConfiguration().getServices()
-				.get(serviceName);
+		AxisService service = cfgCtx.getAxisConfiguration().getServices().get(serviceName);
 		if (service != null) {
 			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
 				String parameterValue = parameters.get("wsdl");
 				if (parameterValue == null) {
-					service.printWSDL(baos, getIpAddress());
+					service.printWSDL(output, getIpAddress());
 				} else {
 					// here the parameter value should be the wsdl file name
-					service.printUserWSDL(baos, parameterValue);
+					service.printUserWSDL(output, parameterValue);
 				}
 
                 response.addHeader(CONTENT_TYPE, TEXT_XML);
-                sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
+                sendResponseAndFinish(response, output.toByteArray(), conn, os, msgContext);
 
 			} catch (Exception e) {
 				handleBrowserException(response, conn, os,
-						"Error generating ?wsdl output for service : "
-								+ serviceName, e);
+						"Error generating ?wsdl output for service : " + serviceName, e);
 			}
 		} else {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to find service: " + serviceName + " for WSDL generation.");
+            }
 			msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
 		}
 	}
@@ -220,10 +221,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 								+ ". A WSDL cannot be generated.", null);
 			}
 			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				service.printWSDL2(baos, getIpAddress());
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
+				service.printWSDL2(output, getIpAddress());
 				response.addHeader(CONTENT_TYPE, TEXT_XML);
-                sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
+                sendResponseAndFinish(response, output.toByteArray(), conn, os, msgContext);
 			} catch (Exception e) {
 				handleBrowserException(response, conn, os,
 						"Error generating ?wsdl2 output for service : "
@@ -310,10 +311,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					.get(serviceName);
 			if (service != null) {
 				try {
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					service.printSchema(baos);
+					ByteArrayOutputStream output = new ByteArrayOutputStream();
+					service.printSchema(output);
 					response.addHeader(CONTENT_TYPE, TEXT_XML);
-                    sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
+                    sendResponseAndFinish(response, output.toByteArray(), conn, os, msgContext);
 				} catch (Exception e) {
 					handleBrowserException(response, conn, os,
 							"Error generating ?xsd output for service : "
@@ -345,14 +346,14 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 				// schema found - write it to the stream
 				if (schema != null) {
 					try {
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						schema.write(baos);
+						ByteArrayOutputStream output = new ByteArrayOutputStream();
+						schema.write(output);
 						response.addHeader(CONTENT_TYPE, TEXT_XML);
 						sourceHandler.commitResponseHideExceptions(conn,
 								response);
-						os.write(baos.toByteArray());
+						os.write(output.toByteArray());
 						closeOutputStream(os);
-                        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+                        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
 					} catch (Exception e) {
 						handleBrowserException(response, conn, os,
 								"Error generating named ?xsd output for service : "
@@ -363,7 +364,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					// no schema available by that name - send 404
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 					closeOutputStream(os);
-                    msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+                    msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
 				}
 			} else {
 				msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
@@ -456,8 +457,8 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
         String address = "127.0.0.1";
 
         while (e.hasMoreElements()) {
-            NetworkInterface netface = (NetworkInterface) e.nextElement();
-            Enumeration addresses = netface.getInetAddresses();
+            NetworkInterface networkInterface = (NetworkInterface) e.nextElement();
+            Enumeration addresses = networkInterface.getInetAddresses();
 
             while (addresses.hasMoreElements()) {
                 InetAddress ip = (InetAddress) addresses.nextElement();

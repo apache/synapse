@@ -179,7 +179,7 @@ public class ServerWorker implements Runnable {
             }
             response.setEntity(entity);
             
-			httpGetRequestProcessor.process(request.getRequest(), response,msgContext,
+			httpGetRequestProcessor.process(request.getRequest(), response, msgContext,
 					request.getConnection(), os, true);
 		} 
 		

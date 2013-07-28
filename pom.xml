@@ -392,6 +392,11 @@
                 <artifactId>synapse-vfs-transport</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-amqp-transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Apache Axis2 -->
             <dependency>

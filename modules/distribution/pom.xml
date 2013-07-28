@@ -132,6 +132,10 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-vfs-transport</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-amqp-transport</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.oopsconsultancy</groupId>

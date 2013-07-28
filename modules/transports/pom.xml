@@ -47,6 +47,7 @@
         <module>core/pipe</module>
         <module>core/vfs</module>
         <module>optional/fix</module>
+		<module>optional/amqp</module>
     </modules>
 
     <dependencies>

@@ -8,7 +8,7 @@ public class Sample300 extends SynapseTestCase {
         super(300);
     }
 
-    public void testRestToPox() throws Exception {
+    public void testScheduledTask() throws Exception {
         log.info("Waiting 10 seconds for the task to run...");
         Thread.sleep(10000);
         int messageCount = getAxis2Server().getMessageCount("SimpleStockQuoteService", "getQuote");

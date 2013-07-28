@@ -49,6 +49,11 @@
                     exchanges, industry utilities and associations, institutional investors, and IT
                     providers around the world.
 				</li>
+                <li>
+                    A AMQP transport which support the AMQP protocol.
+                    <a class="externalLink" href="http://www.amqp.org/">AMQP</a>  is a messaging
+                    protocol.
+                </li>
 			</ul>
 			<p>Note that while these transports are developed as part of the Synapse project,
                 they can be used with any Axis2 based application.
@@ -141,6 +146,20 @@
 						</li>
 					</ul>
 				</li>
+                <li>
+                    <a href="#amqp_transport">AMQP transport</a>
+                    <ul>
+                        <li>
+                            <a href="#setting_up_the_amqp_transport">Setting up the AMQP Transport</a>
+                        </li>
+                        <li>
+                            <a href="#amqp_transport_parameters">AMQP Transport Parameters</a>
+                        </li>
+                        <li>
+                            <a href="#amqp_transport_ex">Sample Configurations</a>
+                        </li>
+                    </ul>
+                </li>
 			</ul>
 		</section>
 	    <section name="Non-blocking HTTP transport" id="Non-blocking_HTTP_transport">
@@ -815,6 +834,355 @@
 				</dl>
 			</subsection>
 		</section>
+        <section name="AMQP transport" id="amqp_transport">
+            <subsection name="Setting Up the Transport" id="setting_up_the_amqp_transport">
+                <p>
+                    AMQP transport is based on the excellent
+                    <a href="http://www.rabbitmq.com/java-client.html">Java AMQP client</a> library from
+                    <a class="externalLink" href="http://www.rabbitmq.com/">RabbitMQ</a>.
+                    Due to the license, the client library doesn't ship with Apache Synapse. In order to use
+                    the AMQP transport download the RabbitMQ Java client library and copy
+                    the client library(rabbitmq-client.jar) into Synapse classpath(lib folder).
+                </p>
+                <p>
+                    To enable the AMQP transport, uncomment the AMQP transport sender and AMQP transport
+                    receiver configurations in the SYNAPSE_HOME/repository/conf/axis2.xml.
+                </p>
+            </subsection>
+            <subsection name="AMQP Transport Parameters" id="amqp_transport_parameters">
+                <p>
+                    Following parameters can be configured as part of transport receiver, sender or
+                    as part of the proxy service parameter or amqp endpoint deceleration.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>transport.amqp.Uri</tt>
+                    </dt>
+                    <dd>The connection URL for the broker of the form
+                        amqp://userName:password@hostName:portNumber/virtualHost</dd>
+                    <dt>
+                        <tt>transport.amqp.BrokerList</tt>
+                    </dt>
+                    <dd>The list of broker of the form, host1:port1,host2:port2... which will be used
+                        as the address array in AMQP connection to the broker</dd>
+                    <dt>
+                        <tt>transport.amqp.ExchangeName</tt>
+                    </dt>
+                    <dd>The name of the exchange to connect</dd>
+                    <dt>
+                        <tt>transport.amqp.IsExchangeDurable</tt>
+                    </dt>
+                    <dd>Should the exchange be declared as durable?</dd>
+                    <dt>
+                        <tt>transport.amqp.IsExchangeAutoDelete</tt>
+                    </dt>
+                    <dd>Should the exchange be auto delete? Possible values are true or false</dd>
+                    <dt>
+                        <tt>transport.amqp.ChannelPreFetchSize</tt>
+                    </dt>
+                    <dd>The channel pre fetch size for fair dispatch</dd>
+                    <dt>
+                        <tt>transport.amqp.ChannelPreFetchCountSize</tt>
+                    </dt>
+                    <dd>The channel prefetch count for fair dispatch</dd>
+                    <dt>
+                        <tt>transport.amqp.ExchangeType</tt>
+                    </dt>
+                    <dd>Type of the exchange to use. Possible values are, fanout, direct, header or topic</dd>
+                    <dt>
+                        <tt>transport.amqp.ExchangeInternal</tt>
+                    </dt>
+                    <dd>Should the exchange be declared as internal? Possible values are true or false </dd>
+                    <dt>
+                        <tt>transport.amqp.BindExchange</tt>
+                    </dt>
+                    <dd>The name of the exchange that the publisher/consumer should publish/consume message to.</dd>
+                    <dt>
+                        <tt>transport.amqp.BindingKeys</tt>
+                    </dt>
+                    <dd>The comma separated binding keys this queue should be bound into exchange</dd>
+                    <dt>
+                        <tt>transport.amqp.RoutingKey</tt>
+                    </dt>
+                    <dd>The routing key to be used by the publisher.</dd>
+                    <dt>
+                        <tt>transport.amqp.ConsumerTx</tt>
+                    </dt>
+                    <dd>Use transactions at consumer side if set to true. By default this will be
+                        considered false and explicit acknowledgement will be done</dd>
+                    <dt>
+                        <tt>transport.amqp.QueueName</tt>
+                    </dt>
+                    <dd>The name of the queue</dd>
+                    <dt>
+                        <tt>transport.amqp.IsQueueDurable</tt>
+                    </dt>
+                    <dd>Should the queue declare as durable? Possible values are true or false.</dd>
+                    <dt>
+                        <tt>transport.amqp.IsQueueRestricted</tt>
+                    </dt>
+                    <dd>Should the queue declare as restricted? Possible values are true or false.</dd>
+                    <dt>
+                        <tt>transport.amqp.IsQueueAutoDelete</tt>
+                    </dt>
+                    <dd>Should the queue declare as auto delete when it's no longer in use?.
+                    Possible values are true or false.</dd>
+                    <dt>
+                        <tt>transport.amqp.OperateOnBlockingMode</tt>
+                    </dt>
+                    <dd>True if the polling task should wait until it process  the accepted
+                        messages. This can be used in conjunction with a single thread polling
+                        task(in the whole transport, i.e. only a single AMQP proxy per flow)
+                        to achieve in order delivery</dd>
+                    <dt>
+                        <tt>transport.amqp.InitialReconnectDuration</tt>
+                    </dt>
+                    <dd>If a polling task encounter an exception due to some reason(most probably
+                        due to broker outage) the number of milliseconds it should be suspended
+                        before next re-try</dd>
+                    <dt>
+                        <tt>transport.amqp.ReconnectionProgressionFactor</tt>
+                    </dt>
+                    <dd>If the polling task fails again after the initial re-connection duration,
+                        next suspend duration will be calculated using this.</dd>
+                    <dt>
+                        <tt>transport.amqp.MaximumReconnectionDuration</tt>
+                    </dt>
+                    <dd>The maximum duration to suspend the polling task in case of an error. The
+                        current suspend duration will reach this value by following the series;
+                        transport.amqp.ReconnectionProgressionFactor * transport.amqp.InitialReconnectDuration.
+                        This upper bound is there because nobody wants to wait a long time until the
+                        next re-try if the broker is alive.
+                    </dd>
+                    <dt>
+                        <tt>transport.amqp.ConnectionFactoryName</tt>
+                    </dt>
+                    <dd>The connection factory to be used either with consumer or producer.</dd>
+                    <dt>
+                        <tt>transport.amqp.ResponseConnectionFactoryName</tt>
+                    </dt>
+                    <dd>In a two-way scenario which connection factory of the senders' should be used
+                        to send the response</dd>
+                    <dt>
+                        <tt>transport.amqp.ScheduledTaskInitialDelay</tt>
+                    </dt>
+                    <dd>The initial delay(in milliseconds) that the polling task should delay before initial attempt</dd>
+                    <dt>
+                        <tt>transport.amqp.ScheduledTaskDelay</tt>
+                    </dt>
+                    <dd>The delay(in milliseconds) that the polling task should delay before next attempt.</dd>
+                    <dt>
+                        <tt>transport.amqp.ScheduledTaskTimeUnit</tt>
+                    </dt>
+                    <dd>The time unit which should use to calculate,
+                        transport.amqp.ScheduledTaskInitialDelay and transport.amqp.ScheduledTaskDelay.</dd>
+                    <dt>
+                    <tt>transport.amqp.NoOfConcurrentConsumers</tt>
+                    </dt>
+                    <dd>Number of concurrent consumers per polling task.</dd>
+                    <dt>
+                        <tt>transport.amqp.NoOfDispatchingTask</tt>
+                    </dt>
+                    <dd>Number of dispatching task to use any request messages to actual processing task.</dd>
+                    <dt>
+                        <tt>transport.amqp.ContentType</tt>
+                    </dt>
+                    <dd>Configure the content type as a service parameter.</dd>
+                    <dt>
+                        <tt>AMQP_CONTENT_TYPE</tt>
+                    </dt>
+                    <dd>Message context property to set the AMQP message content type.</dd>
+                    <dt>
+                        <tt>AMQP_CONTENT_ENCODING</tt>
+                    </dt>
+                    <dd> Message context property to set the AMQP message encoding</dd>
+                    <dt>
+                        <tt>AMQP_HEADER_*</tt>
+                    </dt>
+                    <dd>Specify any AMQP headers as message context properties using AMQP_HEADER_*</dd>
+                    <dt>
+                        <tt>AMQP_DELIVERY_MODE</tt>
+                    </dt>
+                    <dd>Message context property to set the AMQP message delivery mode</dd>
+                    <dt>
+                        <tt>AMQP_PRIORITY</tt>
+                    </dt>
+                    <dd>Message context property to set the AMQP message priority.</dd>
+                    <dt>
+                        <tt>AMQP_CORRELATION_ID</tt>
+                    </dt>
+                    <dd>Message context property to set the AMQP message correlation id</dd>
+                    <dt>
+                        <tt>AMQP_REPLY_TO</tt>
+                    </dt>
+                    <dd>Message context property to set the AMQP message reply to header.</dd>
+                    <dt>
+                        <tt>AMQP_EXPIRATION</tt>
+                    </dt>
+                    <dd>Message context property to set the AMQP expiration.</dd>
+                    <dt>
+                        <tt>AMQP_MESSAGE_ID</tt>
+                    </dt>
+                    <dd>Message context property to set the message id of the AMQP message</dd>
+                    <dt>
+                        <tt>AMQP_TIME_STAMP</tt>
+                    </dt>
+                    <dd>Message context property to set the timestamp of the AMQP message.</dd>
+                    <dt>
+                        <tt>AMQP_TYPE</tt>
+                    </dt>
+                    <dd>Message context property to set the type of the AMQP message</dd>
+                    <dt>
+                        <tt>connection-factory-pool-size</tt>
+                    </dt>
+                    <dd>A system property to set the worker pool size of the connection factory executor service.</dd>
+                    <dt>
+                        <tt>worker-pool-size</tt>
+                    </dt>
+                    <dd>A system property to set the worker pool size used by deployed services for polling broker.</dd>
+                    <dt>
+                        <tt>semaphore-time-out</tt>
+                    </dt>
+                    <dd>A system property to set the time out(in seconds) of semaphore which waits for
+                    a response.</dd>
+                    <dt>
+                        <tt>AMQP_PRODUCER_TX</tt>
+                    </dt>
+                    <dd>Use transactions at producer side. Possible values are tx(for blocking transactions),
+                        lwpc(for light weight producer connections).</dd>
+                </dl>
+            </subsection>
+            <subsection name="Sample Configurations" id="amqp_transport_ex">
+                    <p>Producer example</p>
+                    <div class="xmlConf">
+&lt;proxy name="ProducerProxy" transports="http"&gt;
+    &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;property name="PRESERVE_WS_ADDRESSING" value="true"/&gt;"
+            &lt;log level="custom"&gt;
+                &lt;property name="status" value="At ProducerProxy"/&gt;
+            &lt;/log&gt;
+        &lt;/inSequence&gt;
+        &lt;endpoint&gt;
+            &lt;!--use the defined connection factory in AMQP transport sender--&gt;
+            &lt;address
+                uri="amqp://SimpleStockQuoteService?transport.amqp.ConnectionFactoryName=producer&amp;transport.amqp.QueueName=ProducerProxy"/&gt;
+        &lt;/endpoint&gt;
+        &lt;outSequence&gt;
+            &lt;send/&gt;
+        &lt;/outSequence&gt;
+    &lt;/target&gt;
+&lt;/proxy&gt;
+                    </div>
+                    <p>Consumer example</p>
+                    <div class="xmlConf">
+&lt;proxy name="ConsumerProxy" transports="amqp"&gt;
+    &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="status" value="At ConsumerProxy"/&gt;
+            &lt;/log&gt;
+        &lt;/inSequence&gt;
+        &lt;endpoint&gt;
+            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+        &lt;/endpoint&gt;
+        &lt;outSequence&gt;
+            &lt;send/&gt;
+        &lt;/outSequence&gt;
+    &lt;/target&gt;
+    &lt;parameter name="transport.amqp.ConnectionFactoryName"&gt;consumer&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.QueueName"&gt;ProducerProxy&lt;/parameter&gt;
+&lt;/proxy&gt;
+                    </div>
+                    <p>Routing example</p>
+                    <div class="xmlConf">
+&lt;proxy name="DirectPublisherProxy" transports="http"&gt;
+    &lt;target&gt;
+    &lt;inSequence&gt;
+        &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+        &lt;log level="custom"&gt;
+            &lt;property name="status" value="At DirectPublisherProxy"/&gt;
+        &lt;/log&gt;
+    &lt;/inSequence&gt;
+    &lt;endpoint&gt;
+        &lt;!--use the defined connection factory in AMQP transport sender, note how we don't provide
+            any queue name because this is bind to the exchange--&gt;
+        &lt;address
+            uri="amqp://?transport.amqp.ConnectionFactoryName=publisher&amp;transport.amqp.ExchangeName=direct_logs&amp;transport.amqp.ExchangeType=direct&amp;transport.amqp.RoutingKey=error"/&gt;
+    &lt;/endpoint&gt;
+    &lt;outSequence&gt;
+        &lt;send/&gt;
+    &lt;/outSequence&gt;
+    &lt;/target&gt;
+&lt;/proxy&gt;
 
+&lt;proxy name="DirectSubscriberProxy1" transports="amqp"&gt;
+    &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="status" value="At DirectSubscriberProxy 1"/&gt;
+            &lt;/log&gt;
+        &lt;/inSequence&gt;
+        &lt;endpoint&gt;
+            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+        &lt;/endpoint&gt;
+        &lt;outSequence&gt;
+            &lt;send/&gt;
+        &lt;/outSequence&gt;
+    &lt;/target&gt;
+    &lt;parameter name="transport.amqp.ConnectionFactoryName"&gt;subscriber&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.ExchangeName"&gt;direct_logs&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.ExchangeType"&gt;direct&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.BindingKeys"&gt;warning,error&lt;/parameter&gt;
+&lt;/proxy&gt;
+
+&lt;proxy name="DirectSubscriberProxy2" transports="amqp"&gt;
+    &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="status" value="At DirectSubscriberProxy 2"/&gt;
+            &lt;/log&gt;
+        &lt;/inSequence&gt;
+        &lt;endpoint&gt;
+            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+        &lt;/endpoint&gt;
+        &lt;outSequence&gt;
+            &lt;send/&gt;
+        &lt;/outSequence&gt;
+    &lt;/target&gt;
+    &lt;parameter name="transport.amqp.ConnectionFactoryName"&gt;subscriber&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.ExchangeName"&gt;direct_logs&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.ExchangeType"&gt;direct&lt;/parameter&gt;
+    &lt;parameter name="transport.amqp.BindingKeys"&gt;error&lt;/parameter&gt;
+&lt;/proxy&gt;
+                    </div>
+                    <p>Producer transactions</p>
+                    <div class="xmlConf">
+&lt;proxy name="ProducerTxProxy1" transports="http"&gt;
+    &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;property action="set" name="OUT_ONLY" value="true"/&gt;
+            &lt;property action="set" name="AMQP_PRODUCER_TX" scope="axis2" value="lwpc"/&gt;
+            &lt;log level="custom"&gt;
+                &lt;property name="status" value="At ProducerTxProxy1, use light weight producer confirm..."/&gt;
+            &lt;/log&gt;
+        &lt;/inSequence&gt;
+        &lt;endpoint&gt;
+            &lt;!--use the defined connection factory in AMQP transport sender--&gt;
+            &lt;address
+                uri="amqp://SimpleStockQuoteService?transport.amqp.ConnectionFactoryName=producer&amp;transport.amqp.QueueName=ProducerProxy"/&gt;
+        &lt;/endpoint&gt;
+        &lt;outSequence&gt;
+            &lt;send/&gt;
+        &lt;/outSequence&gt;
+    &lt;/target&gt;
+&lt;/proxy&gt;
+                    </div>
+            </subsection>
+        </section>
 	</body>
 </document>

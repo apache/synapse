@@ -113,7 +113,9 @@ public class AMQPTransportPollingTask {
 
 
     /**
-     * The name of the queue this consumer should bind to.{@link AMQPTransportConstant#PARAMETER_QUEUE_NAME}
+     * The name of the queue this consumer should bind to.{
+     *
+     * @link AMQPTransportConstant#PARAMETER_QUEUE_NAME}
      */
     private String queueName = null;
 
@@ -460,14 +462,20 @@ public class AMQPTransportPollingTask {
 
             } else {
                 // assume default exchange and bindings - simple consumer
-                channel.queueDeclare(queueName, isQueueDurable, isQueueRestricted, isQueueAutoDelete, null);
+                channel.queueDeclare(
+                        queueName,
+                        isQueueDurable,
+                        isQueueRestricted,
+                        isQueueAutoDelete,
+                        null);
 
             }
         } catch (IOException e) {
             handleException(e.getMessage(), e);
         }
 
-        // schedule dispatching tasks to handover messages from the internal buffer to actual processing task
+        // schedule dispatching tasks to handover messages from the internal buffer to actual
+        // processing task
         for (int i = 0; i < noOfDispatchingTask; i++) {
             pollingTaskScheduler.execute(new MessageDispatchTask(buffers));
         }
@@ -490,8 +498,8 @@ public class AMQPTransportPollingTask {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("A polling task started listening on the queue '" + queueName + "' on behalf of the service '" +
-                    serviceName + "'");
+            log.debug("A polling task started listening on the queue '" + queueName + "' on " +
+                    "behalf of the service '" + serviceName + "'");
         }
     }
 
@@ -547,8 +555,8 @@ public class AMQPTransportPollingTask {
                 log.error("Polling task for service '" + serviceName + "' received a " +
                         "shutdown signal", e);
             } catch (ConsumerCancelledException e) {
-                log.error("Polling task for service '" + serviceName + "' received a cancellation " +
-                        "signal");
+                log.error("Polling task for service '" + serviceName + "' received a " +
+                        "cancellation signal");
             }
         }
     }
@@ -601,8 +609,8 @@ public class AMQPTransportPollingTask {
                     handleFaultMessage(message, buffers, axisFault);
                 } catch (Exception e) {
                     // do not let the task die
-                    log.error("Error while sending the fault message to the client. Client will not" +
-                            " receive any errors!", e);
+                    log.error("Error while sending the fault message to the client. Client will " +
+                            "not receive any errors!", e);
                 }
             }
         }
@@ -629,15 +637,17 @@ public class AMQPTransportPollingTask {
                     Map<String, Object> trpHeaders = message.getHeaders();
 
                     if (message.getReplyTo() != null) {
-                        // this may not be the optimal way to check if this message should send a reply
-                        // a one way message can be send with 'reply to' set
+                        // this may not be the optimal way to check if this message should send
+                        // a reply a one way message can be send with 'reply to' set
                         msgContext.setProperty(Constants.OUT_TRANSPORT_INFO,
                                 new AMQPOutTransportInfo(contentType, responseConnectionFactory,
                                         message.getReplyTo()));
                         msgContext.setProperty(AMQPTransportConstant.PROPERTY_AMQP_REPLY_TO,
                                 message.getReplyTo());
-                        // cache the connection factory so that it can be used for sending the response
-                        msgContext.setProperty(AMQPTransportConstant.RESPONSE_CONNECTION_FACTORY_NAME,
+                        // cache the connection factory so that it can be used for sending the
+                        // response
+                        msgContext.setProperty(
+                                AMQPTransportConstant.RESPONSE_CONNECTION_FACTORY_NAME,
                                 responseConnectionFactory);
                     }
 
@@ -653,8 +663,10 @@ public class AMQPTransportPollingTask {
                     msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, trpHeaders);
 
                     Builder builder = BuilderUtil.getBuilderFromSelector(contentType, msgContext);
-                    InputStream gzipInputStream = HTTPTransportUtils.handleGZip(msgContext, inputStream);
-                    OMElement documentElement = builder.processDocument(gzipInputStream, contentType, msgContext);
+                    InputStream gzipInputStream = HTTPTransportUtils.handleGZip(
+                            msgContext, inputStream);
+                    OMElement documentElement = builder.processDocument(
+                            gzipInputStream, contentType, msgContext);
                     msgContext.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     isSOAP11 = msgContext.isSOAP11();
 

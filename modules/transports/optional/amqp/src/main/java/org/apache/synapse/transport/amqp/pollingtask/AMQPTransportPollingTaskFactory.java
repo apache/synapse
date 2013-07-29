@@ -94,7 +94,8 @@ public class AMQPTransportPollingTaskFactory {
         pt.setConnectionFactoryName(connectionFactory.getName());
 
         String responseConFac = AMQPTransportUtils.getOptionalStringParameter(
-                AMQPTransportConstant.PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME, svcParam, conFacParam);
+                AMQPTransportConstant.PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME,
+                svcParam, conFacParam);
         if (responseConFac != null) {
             pt.setResponseConnectionFactory(responseConFac);
         }
@@ -157,7 +158,8 @@ public class AMQPTransportPollingTaskFactory {
 
         try {
             Integer noOfConsumers = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, svcParam, conFacParam);
+                    AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS,
+                    svcParam, conFacParam);
             if (noOfConsumers != null) {
                 pt.setNoOfConcurrentConsumers(noOfConsumers);
             }
@@ -167,7 +169,8 @@ public class AMQPTransportPollingTaskFactory {
 
         try {
             Integer initialReconectionDuration = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcParam, conFacParam);
+                    AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION,
+                    svcParam, conFacParam);
             if (initialReconectionDuration != null) {
                 pt.setInitialReconnectDuration(initialReconectionDuration);
             }
@@ -177,7 +180,8 @@ public class AMQPTransportPollingTaskFactory {
 
         try {
             Integer reconnectionFactor = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR, svcParam, conFacParam);
+                    AMQPTransportConstant.PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR,
+                    svcParam, conFacParam);
             if (reconnectionFactor != null) {
                 pt.setReconnectionFactor(reconnectionFactor);
             }
@@ -187,7 +191,8 @@ public class AMQPTransportPollingTaskFactory {
 
         try {
             Integer dispatchingTask = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_DISPATCHING_TASK_SIZE, svcParam, conFacParam);
+                    AMQPTransportConstant.PARAMETER_DISPATCHING_TASK_SIZE,
+                    svcParam, conFacParam);
             if (dispatchingTask != null) {
                 pt.setNoOfDispatchingTask(dispatchingTask);
             }
@@ -203,7 +208,8 @@ public class AMQPTransportPollingTaskFactory {
 
         try {
             Integer initialDelay = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY, svcParam, conFacParam);
+                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY,
+                    svcParam, conFacParam);
             if (initialDelay != null) {
                 pt.setScheduledTaskInitialDelay(initialDelay.intValue());
             }
@@ -213,7 +219,8 @@ public class AMQPTransportPollingTaskFactory {
 
         try {
             Integer delay = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY, svcParam, conFacParam);
+                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY,
+                    svcParam, conFacParam);
             if (delay != null) {
                 pt.setScheduledTaskDelay(delay.intValue());
             }
@@ -222,7 +229,8 @@ public class AMQPTransportPollingTaskFactory {
         }
 
         String timeUnit = AMQPTransportUtils.getOptionalStringParameter(
-                AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_TIME_UNIT, svcParam, conFacParam);
+                AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_TIME_UNIT,
+                svcParam, conFacParam);
 
         if (timeUnit != null) {
             pt.setScheduledTaskTimeUnit(getTimeUnit(timeUnit));

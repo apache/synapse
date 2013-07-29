@@ -105,13 +105,15 @@ public final class AMQPTransportConstant {
     /**
      * True if requesting a mandatory publishing.
      */
-    public static final String PARAMETER_PUBLISHER_MANDATORY_PUBLISH = "transport.amqp.MandatoryPublish";
+    public static final String PARAMETER_PUBLISHER_MANDATORY_PUBLISH =
+            "transport.amqp.MandatoryPublish";
 
 
     /**
      * True if requesting an immediate publishing.
      */
-    public static final String PARAMETER_PUBLISHER_IMMEDIATE_PUBLISH = "transport.amqp.ImmediatePublish";
+    public static final String PARAMETER_PUBLISHER_IMMEDIATE_PUBLISH =
+            "transport.amqp.ImmediatePublish";
 
 
     /**
@@ -150,18 +152,20 @@ public final class AMQPTransportConstant {
 
 
     /**
-     * True if the polling task should wait until the she processed the accepted message. This can be used
-     * in conjunction with a single thread polling task(in the whole transport, i.e. only a single AMQP proxy per flow)
-     * to achieve in order delivery.
+     * True if the polling task should wait until the she processed the accepted message.
+     * This can be used in conjunction with a single thread polling task(in the whole transport,
+     * i.e. only a single AMQP proxy per flow) to achieve in order delivery.
      */
-    public static final String PARAMETER_OPERATE_ON_BLOCKING_MODE = "transport.amqp.OperateOnBlockingMode";
+    public static final String PARAMETER_OPERATE_ON_BLOCKING_MODE =
+            "transport.amqp.OperateOnBlockingMode";
 
 
     /**
-     * If a polling task encounter an exception due to some reason(most probably due to broker outage) the number of
-     * milliseconds it should be suspended before next re-try.
+     * If a polling task encounter an exception due to some reason(most probably due to broker
+     * outage) the number of milliseconds it should be suspended before next re-try.
      */
-    public static final String PARAMETER_INITIAL_RE_CONNECTION_DURATION = "transport.amqp.InitialReconnectDuration";
+    public static final String PARAMETER_INITIAL_RE_CONNECTION_DURATION =
+            "transport.amqp.InitialReconnectDuration";
 
     /**
      * If the polling task fails again after the initial re-connection duration
@@ -169,25 +173,31 @@ public final class AMQPTransportConstant {
      * next suspend duration will be calculated using this
      * (PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION).
      */
-    public static final String PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR = "transport.amqp.ReconnectionProgressionFactor";
+    public static final String PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR =
+            "transport.amqp.ReconnectionProgressionFactor";
 
 
     /**
-     * The maximum duration to suspend the polling task in case of an error. The current suspend duration will reach this
+     * The maximum duration to suspend the polling task in case of an error. The current suspend
+     * duration will reach this
      * value by following the series,
-     * PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION. This upper bound is there
+     * PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION.
+     * This upper bound is there
      * because nobody wants to wait a long time until the next re-try if the broker is alive.
      */
-    public static final String PARAMETER_MAX_RE_CONNECTION_DURATION = "transport.amqp.MaximumReconnectionDuration";
+    public static final String PARAMETER_MAX_RE_CONNECTION_DURATION =
+            "transport.amqp.MaximumReconnectionDuration";
 
 
     /**
      * The connection factory to be used either with consumer or producer.
      */
-    public static final String PARAMETER_CONNECTION_FACTORY_NAME = "transport.amqp.ConnectionFactoryName";
+    public static final String PARAMETER_CONNECTION_FACTORY_NAME =
+            "transport.amqp.ConnectionFactoryName";
 
     /**
-     * In a two-way scenario which connection factory of the senders' should be used to send the response
+     * In a two-way scenario which connection factory of the senders' should be used to send
+     * the response
      */
     public static final String PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME =
             "transport.amqp.ResponseConnectionFactoryName";
@@ -211,23 +221,27 @@ public final class AMQPTransportConstant {
      * {@link AMQPTransportConstant#PARAMETER_SCHEDULED_TASK_INITIAL_DELAY} and
      * {@link AMQPTransportConstant#PARAMETER_SCHEDULED_TASK_DELAY}.
      */
-    public static final String PARAMETER_SCHEDULED_TASK_TIME_UNIT = "transport.amqp.ScheduledTaskTimeUnit";
+    public static final String PARAMETER_SCHEDULED_TASK_TIME_UNIT =
+            "transport.amqp.ScheduledTaskTimeUnit";
 
     /**
      * Number of concurrent consumers per polling task.
      */
-    public static final String PARAMETER_NO_OF_CONCURRENT_CONSUMERS = "transport.amqp.NoOfConcurrentConsumers";
+    public static final String PARAMETER_NO_OF_CONCURRENT_CONSUMERS =
+            "transport.amqp.NoOfConcurrentConsumers";
 
     /**
      * Number of dispatching task to use any request messages to actual processing task.
      */
-    public static final String PARAMETER_DISPATCHING_TASK_SIZE = "transport.amqp.NoOfDispatchingTask";
+    public static final String PARAMETER_DISPATCHING_TASK_SIZE =
+            "transport.amqp.NoOfDispatchingTask";
 
     /**
      * Use the given channel number if possible. See
      * http://www.rabbitmq.com/releases/rabbitmq-java-client/v3.0.1/rabbitmq-java-client-javadoc-3.0.1/com/rabbitmq/client/Connection.html#createChannel(int)
      */
-    public static final String PARAMETER_AMQP_CHANNEL_NUMBER = "transport.amqp.ChannelNumber";
+    public static final String PARAMETER_AMQP_CHANNEL_NUMBER =
+            "transport.amqp.ChannelNumber";
 
     /**
      * Configure the content type as a service parameter

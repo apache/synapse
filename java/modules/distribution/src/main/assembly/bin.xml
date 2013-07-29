@@ -191,6 +191,7 @@
                 <exclude>quickfixj:quickfixj-all:jar</exclude>
                 <exclude>org.snmp4j:snmp4j</exclude>
                 <exclude>org.snmp4j:snmp4j-agent</exclude>
+                <exclude>com.rabbitmq:amqp-client:jar</exclude>
                 
                 <!-- Dependencies that are only used by the Axis2 sample server -->
                 <exclude>org.apache.axis2:axis2-jaxws:jar</exclude>

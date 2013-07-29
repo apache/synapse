@@ -837,12 +837,12 @@
         <section name="AMQP transport" id="amqp_transport">
             <subsection name="Setting Up the Transport" id="setting_up_the_amqp_transport">
                 <p>
-                    AMQP transport is based on the excellent
+                    AMQP transport is based on the widely used
                     <a href="http://www.rabbitmq.com/java-client.html">Java AMQP client</a> library from
                     <a class="externalLink" href="http://www.rabbitmq.com/">RabbitMQ</a>.
-                    Due to the license, the client library doesn't ship with Apache Synapse. In order to use
-                    the AMQP transport download the RabbitMQ Java client library and copy
-                    the client library(rabbitmq-client.jar) into Synapse classpath(lib folder).
+                    The client library is not distributed with Apache Synapse, and hence in order to use
+                    the AMQP transport, download the RabbitMQ Java client and copy the client library
+                    (rabbitmq-client.jar) into Synapse classpath (SYNAPSE_HOME/lib directory).
                 </p>
                 <p>
                     To enable the AMQP transport, uncomment the AMQP transport sender and AMQP transport
@@ -851,8 +851,8 @@
             </subsection>
             <subsection name="AMQP Transport Parameters" id="amqp_transport_parameters">
                 <p>
-                    Following parameters can be configured as part of transport receiver, sender or
-                    as part of the proxy service parameter or amqp endpoint deceleration.
+                    Following parameters can be configured as part of AMQP transport receiver, sender,
+                    a proxy service or an AMQP endpoint declaration.
                 </p>
                 <dl>
                     <dt>

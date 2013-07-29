@@ -977,6 +977,13 @@
                 <artifactId>snmp4j</artifactId>
                 <version>${snmp4j.version}</version>
             </dependency>
+            <dependency>
+                <!-- For AMQP transport -->
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>${rabbitmq.version}</version>
+                <scope>compile</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1054,7 +1061,7 @@
         <module>modules/packaging/package-skeleton</module>
         <module>modules/packaging/package-archetype</module>
         <module>modules/integration</module>
-	<module>modules/documentation</module>
+	    <module>modules/documentation</module>
     </modules>
 
     <properties>
@@ -1116,6 +1123,7 @@
         <activemq.version>5.2.0</activemq.version>
         <snmp4j.version>2.0.3</snmp4j.version>
         <snmp4j.agent.version>2.0.5</snmp4j.agent.version>
+        <rabbitmq.version>3.1.2</rabbitmq.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

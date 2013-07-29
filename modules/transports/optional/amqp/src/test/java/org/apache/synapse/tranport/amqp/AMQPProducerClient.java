@@ -11,8 +11,6 @@ import java.io.IOException;
  */
 public class AMQPProducerClient {
 
-    //    private static final String QUEUE_NAME = "ConsumerTxProxy";
-//    private static final String QUEUE_NAME = "worker-queue";
     private static final String QUEUE_NAME = "ProducerProxy";
 
     private static final String MESSAGE =
@@ -42,33 +40,67 @@ public class AMQPProducerClient {
 
     public static void main(String[] args) throws IOException {
 
+        if (args.length < 2) {
+            System.out.println("Usage: java AMQPProducerClient <queue?> " +
+                    "<queue|exchange-name> <routing-key>");
+            System.out.println("Default arguments will be used");
+        }
+
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection = factory.newConnection();
 
         Channel channel = connection.createChannel();
 
-        //channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);
-//        AMQPProducerClient.publish(MESSAGE2, channel, "subscriber-exchange");
-//        AMQPProducerClient.route(MESSAGE2, channel, "route-exchange", "fatal");
-//        AMQPProducerClient.route(MESSAGE2, channel, "topic-exchange", "kern.critical");
+        String queueName = null, exchangeName = null, routingKey = null;
+
+        if ("y".equals(args[0])) {
+            if (args[1] != null) {
+                queueName = args[1];
+            } else {
+                queueName = QUEUE_NAME;
+            }
+        } else {
+            if (args[2] != null) {
+                exchangeName = args[2];
+                if (args[3] != null) {
+                    routingKey = args[3];
+                } else {
+                    routingKey = "kern.critical";
+                }
+            } else {
+                exchangeName = "subscriber-exchange";
+            }
+        }
+
+        if (queueName != null) {
+            AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);
+        } else {
+            if (routingKey != null) {
+                AMQPProducerClient.route(MESSAGE2, channel, exchangeName, routingKey);
+            } else {
+                AMQPProducerClient.publish(MESSAGE2, channel, exchangeName);
+            }
+        }
 
         channel.close();
         connection.close();
-
     }
 
 
-    private static void produce(String message, Channel channel, String queueName) throws IOException {
+    private static void produce(String message, Channel channel, String queueName)
+            throws IOException {
         channel.basicPublish("", queueName, null, message.getBytes());
     }
 
-    private static void publish(String message, Channel channel, String exchangeName) throws IOException {
+    private static void publish(String message, Channel channel, String exchangeName)
+            throws IOException {
         channel.basicPublish(exchangeName, "", null, message.getBytes());
     }
 
-    private static void route(String message, Channel channel, String exchangeName, String routeKey) throws IOException {
+    private static void route(String message, Channel channel, String exchangeName,
+                              String routeKey)
+            throws IOException {
         channel.basicPublish(exchangeName, routeKey, null, message.getBytes());
     }
 

@@ -13,9 +13,7 @@
  */
 package org.apache.synapse.transport.amqp.pollingtask;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.*;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
@@ -545,6 +543,12 @@ public class AMQPTransportPollingTask {
             } catch (IOException e) {
                 log.error("I/O error occurs for the polling tasks for service '" + serviceName +
                         "'", e);
+            } catch (ShutdownSignalException e) {
+                log.error("Polling task for service '" + serviceName + "' received a " +
+                        "shutdown signal", e);
+            } catch (ConsumerCancelledException e) {
+                log.error("Polling task for service '" + serviceName + "' received a cancellation " +
+                        "signal");
             }
         }
     }

@@ -228,21 +228,21 @@
         	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
         	<parameter name="transport.jms.ConnectionFactoryJNDIName">TopicConnectionFactory</parameter>
-		<parameter name="transport.jms.ConnectionFactoryType" locked="false">topic</parameter>
+		    <parameter name="transport.jms.ConnectionFactoryType" locked="false">topic</parameter>
         </parameter>
 
         <parameter name="myQueueConnectionFactory">
         	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
         	<parameter name="transport.jms.ConnectionFactoryJNDIName">QueueConnectionFactory</parameter>
-		<parameter name="transport.jms.ConnectionFactoryType" locked="false">queue</parameter>
+		    <parameter name="transport.jms.ConnectionFactoryType" locked="false">queue</parameter>
         </parameter>
 
         <parameter name="default">
         	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
         	<parameter name="transport.jms.ConnectionFactoryJNDIName">QueueConnectionFactory</parameter>
-		<parameter name="transport.jms.ConnectionFactoryType" locked="false">queue</parameter>
+		    <parameter name="transport.jms.ConnectionFactoryType" locked="false">queue</parameter>
         </parameter>
     </transportReceiver>-->
 
@@ -266,21 +266,21 @@
     <!--Uncomment this for UDP transport support
     <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>-->
 
-    <!--Uncomment this for AMQP transport support-->
-    <!--<transportReceiver name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportListener">-->
-        <!--<parameter name="consumer" locked="false">-->
-            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-        <!--</parameter>-->
-        <!--<parameter name="worker-queue" locked="false">-->
-            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-            <!--<parameter name="transport.amqp.ChannelPreFetchCountSize" locked="false">1</parameter>-->
-        <!--</parameter>-->
-        <!--<parameter name="subscriber" locked="false">-->
-            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-        <!--</parameter>-->
-    <!--</transportReceiver>-->
+    <!--Uncomment this for AMQP transport support>
+    <transportReceiver name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportListener">
+        <parameter name="consumer" locked="false">
+            <parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>
+        </parameter>
 
-    <!--Uncomment this for AMQP transport support -->
+        <parameter name="worker-queue" locked="false">
+            <parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>
+            <parameter name="transport.amqp.ChannelPreFetchCountSize" locked="false">1</parameter>
+        </parameter>
+
+        <parameter name="subscriber" locked="false">
+            <parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>
+        </parameter>
+    </transportReceiver-->
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
@@ -365,15 +365,16 @@
     <transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/>-->
 
 
-    <!--Uncomment this for AMQP transport support-->
-    <!--<transportSender name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportSender">-->
-        <!--<parameter name="producer" locked="false">-->
-            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-        <!--</parameter>-->
-        <!--<parameter name="publisher" locked="false">-->
-            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-        <!--</parameter>-->
-    <!--</transportSender>-->
+    <!--Uncomment this for AMQP transport support>
+    <transportSender name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportSender">
+        <parameter name="producer" locked="false">
+            <parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>
+        </parameter>
+
+        <parameter name="publisher" locked="false">
+            <parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>
+        </parameter>
+    </transportSender-->
 
 
     <!-- ================================================= -->

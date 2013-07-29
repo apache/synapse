@@ -12,7 +12,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-amqp-transport</artifactId>
-    <name>Apache Synapse - AMQP transport</name>
+    <name>Apache Synapse - AMQP Transport</name>
     <packaging>bundle</packaging>
     <url>http://maven.apache.org</url>
 
@@ -65,30 +65,22 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>3.1.2</version>
-            <scope>compile</scope>
-            <!-- put a compile time dependency due to license -->
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-base</artifactId>
-            <version>${axis2.transport.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-http</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
     </dependencies>
 </project>

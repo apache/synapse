@@ -12,20 +12,29 @@ import java.io.IOException;
  */
 public class AMQPConsumerClient {
 
-    public static final String QUEUE_NAME = "ProducerProxy";
+    private static final String QUEUE_NAME = "ProducerProxy";
 
     public static void main(String[] args) throws IOException, InterruptedException {
+
+        String queueName;
+
+        if (args.length < 1) {
+            System.out.println("Usage: java AMQPConsumerClient <queue-name>");
+            System.out.println("Default arguments will be used");
+            queueName = QUEUE_NAME;
+        }
+        queueName = args[1];
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection = factory.newConnection();
 
         Channel channel = connection.createChannel();
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        channel.queueDeclare(queueName, false, false, false, null);
 
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(QUEUE_NAME, true, consumer);
-        System.out.println("Waiting for message on queue '" + QUEUE_NAME + "'");
+        channel.basicConsume(queueName, true, consumer);
+        System.out.println("Waiting for message on queue '" + queueName + "'");
 
         while (true) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();

@@ -27,8 +27,10 @@ public class AMQPConsumerClient {
         channel.basicConsume(QUEUE_NAME, true, consumer);
         System.out.println("Waiting for message on queue '" + QUEUE_NAME + "'");
 
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-        String message = new String(delivery.getBody());
-        System.out.println("[x] received '" + message + "'");
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println("[x] received '" + message + "'");
+        }
     }
 }

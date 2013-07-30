@@ -38,7 +38,7 @@ import java.io.IOException;
  */
 public class RabbitMQAMQPClient {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) {
         String queueName = System.getProperty("queueName");
         String mode = System.getProperty("mode");
         String routingKey = System.getProperty("routingKey");
@@ -60,47 +60,68 @@ public class RabbitMQAMQPClient {
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        Connection connection = factory.newConnection();
+        Connection connection = null;
+        Channel channel = null;
+        try {
+            connection = factory.newConnection();
 
-        Channel channel = connection.createChannel();
-        channel.queueDeclare(queueName, false, false, false, null);
+            channel = connection.createChannel();
 
+            if (mode == null) {
+                mode = "producer";
+            }
 
-        if (mode == null) {
-            mode = "producer";
-        }
-
-        if ("producer".equals(mode)) {
-            if (queueName != null) {
-                channel.basicPublish("", queueName, null, msg.getBytes());
-            } else {
-                if (routingKey != null) {
-                    if (exchangeName == null) {
-                        exchangeName = "topic-exchange";
-                    }
-                    channel.basicPublish(exchangeName, routingKey, null, msg.getBytes());
-
+            if ("producer".equals(mode)) {
+                if (queueName != null) {
+                    channel.basicPublish("", queueName, null, msg.getBytes());
                 } else {
-                    if (exchangeName == null) {
-                        exchangeName = "subscriber-exchange";
+                    if (routingKey != null) {
+                        if (exchangeName == null) {
+                            exchangeName = "topic-exchange";
+                        }
+                        channel.basicPublish(exchangeName, routingKey, null, msg.getBytes());
+
+                    } else {
+                        if (exchangeName == null) {
+                            exchangeName = "subscriber-exchange";
+                        }
+                        channel.basicPublish(exchangeName, "", null, msg.getBytes());
                     }
-                    channel.basicPublish(exchangeName, "", null, msg.getBytes());
+                }
+            } else {
+                if (queueName == null) {
+                    queueName = "ConsumerProxy";
+                }
+                QueueingConsumer consumer = new QueueingConsumer(channel);
+                channel.basicConsume(queueName, true, consumer);
+
+                QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                String message = new String(delivery.getBody());
+                System.out.println("[x] received '" + message + "'");
+            }
+            channel.close();
+            connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            if (channel != null && channel.isOpen()) {
+                try {
+                    channel.close();
+                } catch (IOException e) {
+                    System.err.println("Error occurred while closing the channel:" + e.getMessage());
                 }
             }
-        } else {
-            if (queueName == null) {
-                queueName = "ConsumerProxy";
+            if (connection != null && connection.isOpen()) {
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    System.err.println("Error occurred while closing the connection:" +
+                            e.getMessage());
+                }
             }
-            QueueingConsumer consumer = new QueueingConsumer(channel);
-            channel.basicConsume(queueName, true, consumer);
-
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-            String message = new String(delivery.getBody());
-            System.out.println("[x] received '" + message + "'");
         }
-
-        channel.close();
-        connection.close();
     }
 
     private static double getRandom(double base, double varience, boolean onlypositive) {
@@ -108,5 +129,4 @@ public class RabbitMQAMQPClient {
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
                 * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
     }
-
 }

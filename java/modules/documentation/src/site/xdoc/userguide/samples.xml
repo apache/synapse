@@ -120,6 +120,7 @@
                         <li><a href="samples/sample264.html">Sample 264: Request-response invocations with the JMS transport</a></li>
                         <li><a href="samples/sample265.html">Sample 265: Switching from TCP to HTTP/S</a></li>
                         <li><a href="samples/sample266.html">Sample 266: Switching from UDP to HTTP/S</a></li>
+                        <li><a href="samples/sample269.html">Sample 269: AMQP transport-consumer proxy</a></li>
                     </ul>
                 </p>
             </subsection>

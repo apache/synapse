@@ -64,7 +64,6 @@ public class RabbitMQAMQPClient {
         Channel channel = null;
         try {
             connection = factory.newConnection();
-
             channel = connection.createChannel();
 
             if (mode == null) {

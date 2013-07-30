@@ -31,6 +31,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
+import org.mozilla.javascript.Context;
 
 import javax.activation.DataHandler;
 import javax.script.*;
@@ -113,14 +114,20 @@ public class ScriptMediator extends AbstractMediator {
     private final Object resourceLock = new Object();
 
     /**
+     * Store the class loader from properties
+     */
+    private ClassLoader loader;
+
+    /**
      * Create a script mediator for the given language and given script source
      *
      * @param language         the BSF language
      * @param scriptSourceCode the source code of the script
      */
-    public ScriptMediator(String language, String scriptSourceCode) {
+    public ScriptMediator(String language, String scriptSourceCode,ClassLoader classLoader) {
         this.language = language;
         this.scriptSourceCode = scriptSourceCode;
+        this.setLoader(classLoader);
         this.includes = new TreeMap<Value, Object>();
         initInlineScript();
     }
@@ -134,9 +141,10 @@ public class ScriptMediator extends AbstractMediator {
      * @param function       the function to be invoked
      */
     public ScriptMediator(String language, Map<Value, Object> includeKeysMap,
-                          Value key, String function) {
+                          Value key, String function,ClassLoader classLoader) {
         this.language = language;
         this.key = key;
+        this.setLoader(classLoader);
         this.includes = includeKeysMap;
         if (function != null) {
             this.function = function;
@@ -198,6 +206,12 @@ public class ScriptMediator extends AbstractMediator {
         boolean returnValue;
         try {
 
+            //if the engine is Rhino then needs to set the class loader specifically
+            if(language.equals("js")){
+                Context cx = Context.enter();
+                cx.setApplicationClassLoader(this.loader);
+            }
+
             Object returnObject;
             if (key != null) {
                 returnObject = mediateWithExternalScript(synCtx);
@@ -218,7 +232,12 @@ public class ScriptMediator extends AbstractMediator {
                     "external " + language + " script" + " : " + key +
                     (function != null ? " function " + function : ""), e, synCtx);
             returnValue = false;
-        }
+        }  finally {
+                if(language.equals("js")){
+                          Context.exit();
+                     }
+    }
+
         return returnValue;
     }
 
@@ -439,6 +458,14 @@ public class ScriptMediator extends AbstractMediator {
 
     public Map<Value, Object> getIncludeMap() {
         return includes;
+    }
+
+    public ClassLoader getLoader() {
+        return loader;
+    }
+
+    public void setLoader(ClassLoader loader) {
+        this.loader = loader;
     }
 
 }

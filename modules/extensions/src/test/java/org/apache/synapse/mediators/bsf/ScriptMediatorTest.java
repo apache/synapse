@@ -38,7 +38,7 @@ public class ScriptMediatorTest extends TestCase {
 
     public void testInlineMediator() throws Exception {
         MessageContext mc = TestUtils.getTestContext("<foo/>", null);
-        ScriptMediator mediator = new ScriptMediator("js", inlinescript);
+        ScriptMediator mediator = new ScriptMediator("js", inlinescript,null);
         assertTrue(mediator.mediate(mc));
     }
 
@@ -47,7 +47,7 @@ public class ScriptMediatorTest extends TestCase {
         Random rand = new Random();
         String randomno = Integer.toString(rand.nextInt(200));
         mc.getEnvelope().getBody().getFirstElement().setText(randomno);
-        ScriptMediator mediator = new ScriptMediator("js", threadsafetyscript);
+        ScriptMediator mediator = new ScriptMediator("js", threadsafetyscript,null);
         mediator.mediate(mc);
         assertEquals(Integer.parseInt(mc.getEnvelope().getBody().getFirstElement().getText()),
                 Integer.parseInt(randomno) * 2);

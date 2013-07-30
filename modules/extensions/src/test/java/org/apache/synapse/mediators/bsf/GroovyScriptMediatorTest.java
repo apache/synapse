@@ -25,7 +25,7 @@ import org.apache.synapse.mediators.TestUtils;
 public class GroovyScriptMediatorTest extends TestCase {
 
     public void testXMLMediator2() throws Exception {
-       ScriptMediator mediator = new ScriptMediator("groovy", "mc.setPayloadXML(mc.getPayloadXML())");
+       ScriptMediator mediator = new ScriptMediator("groovy", "mc.setPayloadXML(mc.getPayloadXML())",null);
        mediator.initInlineScript();
        assertTrue(mediator.mediate(TestUtils.getTestContext("<a><b>petra</b></a>")));
     }

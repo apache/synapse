@@ -184,7 +184,24 @@ public class SynapseConfigUtils {
             if (url == null) {
                 return null;
             }
-            URLConnection connection = getURLConnection(url);
+
+            URLConnection connection = null;
+            // If wsdl url contains http basic authentication parameters.
+            if (url.getUserInfo() != null) {
+                String protocol = url.getProtocol();
+                if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
+                    // Create new url excluding user info
+                    URL newUrl = new URL(protocol, url.getHost(), url.getPort(), url.getFile());
+                    connection = getURLConnection(newUrl);
+                    String encoding = new String(new Base64().encode(url.getUserInfo().getBytes()));
+                    connection.setRequestProperty("Authorization", "Basic " + encoding);
+                } else {
+                    handleException("Unsupported protocol [" + protocol + "]. Supports only http " +
+                            "and https with basic authentication.");
+                }
+            } else {
+                connection = getURLConnection(url);
+            }
             if (connection == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Cannot create a URLConnection for given URL : " + url);

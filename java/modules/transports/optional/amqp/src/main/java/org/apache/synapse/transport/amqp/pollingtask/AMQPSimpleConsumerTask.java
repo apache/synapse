@@ -86,7 +86,6 @@ public class AMQPSimpleConsumerTask {
             this.responseMessage = responseMessage;
         }
 
-        @Override
         public void run() {
             try {
                 channel.queueDeclare(queueName, false, false, false, null);

@@ -413,6 +413,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>${rabbitmq.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
         </dependency>

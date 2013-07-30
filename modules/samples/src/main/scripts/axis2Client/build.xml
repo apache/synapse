@@ -119,6 +119,16 @@
         ant jsonclient
             [-Daddurl=http://localhost:8280/services/JSONProxy]
             [-Dsymbol=DELL]
+
+    ant rabbitmqclient
+        A simple client for RabbitMQ AMQP broker.
+
+        examples:
+        ant rabbitmqclient [-Damqpmode=consumer] [-DqueueName=ConsumerProxy] [-DpayLoad=IBM]
+        ant rabbitmqclient [-Damqpmode=producer] [-DqueueName=ConsumerProxy] [-DpayLoad=IBM]
+        ant rabbitmqclient [-Damqpmode=producer] [-DexchangeName=subscriber-exchange] [-DpayLoad=IBM]
+        ant rabbitmqclient [-Damqpmode=producer] [-DexchangeName=topic-exchange] [-DroutingKey=kern.critical] [-DpayLoad=IBM]
+
     </echo>
     </target>
 
@@ -159,7 +169,11 @@
     <property name="topicns" value=""/>
     <property name="mode" value=""/>
     <property name="identifier" value=""/>
-    <property name="expires" value=""/>
+    <property name="amqpmode" value=""/>
+    <property name="queueName" value=""/>
+    <property name="payLoad" value=""/>
+    <property name="exchangeName" value=""/>
+    <property name="routingKey" value=""/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
@@ -239,6 +253,17 @@
             <sysproperty key="jms_payload" value="${jms_payload}"/>
             <sysproperty key="jms_msgcount" value="${jms_msgcount}"/>
             <sysproperty key="java.io.tmpdir" value="./../../work/temp/sampleClient"/>
+        </java>
+    </target>
+
+    <target name="rabbitmqclient" depends="compile">
+        <java classname="samples.userguide.RabbitMQAMQPClient"
+              classpathref="javac.classpath" fork="true">
+            <sysproperty key="amqpmode"    value="${amqpmode}"/>
+            <sysproperty key="queueName"    value="${queueName}"/>
+            <sysproperty key="payLoad" value="${payLoad}"/>
+            <sysproperty key="exchangeName" value="${exchangeName}"/>
+            <sysproperty key="routingKey" value="${routingKey}"/>
         </java>
     </target>
 

@@ -91,6 +91,11 @@ public class TemplateContext {
         if (expression != null) {
             if (expression.getExpression() != null) {
                 if(expression.hasExprTypeKey()){
+                	if(expression.hasPropertyEvaluateExpr()){
+                		//TODO:evalute the string expression get the value
+                		//String evaluatedPath ="{//m0:getQuote/m0:request}";
+                		return expression.evalutePropertyExpression(synCtx);
+                	}
                     return expression.getExpression();
                 } else {
                     return expression.evaluateValue(synCtx);

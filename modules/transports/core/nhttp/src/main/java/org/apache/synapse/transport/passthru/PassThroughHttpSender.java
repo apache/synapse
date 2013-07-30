@@ -77,7 +77,7 @@ import java.util.List;
  */
 public class PassThroughHttpSender extends AbstractHandler implements TransportSender {
 
-    protected Log log;
+    protected Log log = LogFactory.getLog(this.getClass().getName());
 
     /** IOReactor used to create connections and manage them */
     private DefaultConnectingIOReactor ioReactor;
@@ -107,10 +107,6 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
     /** The list of known hosts to go via proxy */
     private List<String> knownProxyHosts = new ArrayList<String>();
-
-    public PassThroughHttpSender() {
-        log = LogFactory.getLog(this.getClass().getName());
-    }
 
     public void init(ConfigurationContext configurationContext,
                      TransportOutDescription transportOutDescription) throws AxisFault {

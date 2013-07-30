@@ -23,8 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
@@ -39,8 +37,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 public class PassThroughHttpSSLListener extends PassThroughHttpListener {
-    
-    private Log log = LogFactory.getLog(PassThroughHttpSSLListener.class);
 
     @Override
     protected IOEventDispatch getEventDispatch(NHttpServerEventHandler handler, SSLContext sslContext,

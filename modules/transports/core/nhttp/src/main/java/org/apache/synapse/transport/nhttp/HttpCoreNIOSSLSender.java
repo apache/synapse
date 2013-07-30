@@ -31,6 +31,9 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.transport.utils.sslcert.CertificateVerificationConfig;
+import org.apache.synapse.transport.utils.sslcert.CertificateVerificationException;
+import org.apache.synapse.transport.utils.sslcert.adaptor.SynapseAdaptorForOcspCrl;
 
 import javax.net.ssl.*;
 import javax.xml.namespace.QName;
@@ -44,9 +47,11 @@ import java.security.GeneralSecurityException;
 import java.net.SocketAddress;
 import java.net.InetSocketAddress;
 
-public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
+public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
 
     private static final Log log = LogFactory.getLog(HttpCoreNIOSSLSender.class);
+
+    private static final SynapseAdaptorForOcspCrl ocspCrl = new SynapseAdaptorForOcspCrl();
 
     protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler, SSLContext sslContext,
         SSLSetupHandler sslIOSessionHandler, HttpParams params,
@@ -58,6 +63,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
 
     /**
      * Create the SSLContext to be used by this sender
+     *
      * @param transportOut the Axis2 transport configuration
      * @return the SSLContext to be used
      */
@@ -98,12 +104,12 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
     protected SSLSetupHandler getSSLSetupHandler(TransportOutDescription transportOut)
             throws AxisFault {
 
-        final Parameter hostnameVerifier = transportOut.getParameter("HostnameVerifier");
-        if (hostnameVerifier != null) {
-            return createSSLSetupHandler(hostnameVerifier.getValue().toString());
-        } else {
-            return createSSLSetupHandler(null);
-        }        
+        Parameter hostnameVerifier = transportOut.getParameter("HostnameVerifier");
+        String hostnameVerifierValue = hostnameVerifier != null ?
+                hostnameVerifier.getValue().toString() : null;
+        Parameter revocationVerifierParam = transportOut.getParameter("CertificateRevocationVerifier");
+        return createSSLSetupHandler(hostnameVerifierValue,
+                new CertificateVerificationConfig(revocationVerifierParam));
     }
 
     /**
@@ -274,8 +280,8 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
         }
     }
 
-    private SSLSetupHandler createSSLSetupHandler(final String hostnameVerifier)
-            throws AxisFault {
+    private SSLSetupHandler createSSLSetupHandler(final String hostnameVerifier,
+												  final CertificateVerificationConfig cvConfig) throws AxisFault {
 
         return new SSLSetupHandler() {
 
@@ -292,6 +298,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
                 }
 
                 boolean valid = false;
+                //Do HostName verification.
                 if (hostnameVerifier != null) {
                     if ("Strict".equals(hostnameVerifier)) {
                         valid = HostnameVerifier.STRICT.verify(address, session);
@@ -306,6 +313,16 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
 
                 if (!valid) {
                     throw new SSLException("Host name verification failed for host : " + address);
+                }
+
+                if (cvConfig.isEnabled()) {
+                    try {
+                        ocspCrl.verifyRevocationStatus(session.getPeerCertificateChain(),
+                                cvConfig.getCacheSize(), cvConfig.getCacheDuration());
+                    } catch (CertificateVerificationException e) {
+                        throw new SSLException("Certificate chain validation failed for host : " +
+                                address, e);
+                    }
                 }
             }
         };

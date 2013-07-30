@@ -313,6 +313,12 @@
         </parameter>
         <!--<parameter name="HostnameVerifier">DefaultAndLocalhost</parameter>
             supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
+        <!-- Uncomment to enable OCSP/CRL certification revocation verification support
+        <parameter name="CertificateRevocationVerifier" locked="false">
+            <Enabled>true</Enabled>
+            <CacheSize>50</CacheSize>
+            <CacheDelayMins>15</CacheDelayMins>
+        </parameter-->
     </transportSender>
 
     <!-- Uncomment Transport sender for the non blocking local transport-->

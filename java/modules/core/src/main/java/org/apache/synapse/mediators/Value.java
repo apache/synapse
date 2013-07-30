@@ -188,6 +188,31 @@ public class Value {
     public boolean hasExprTypeKey() {
         return keyValue != null && keyValue.startsWith("{") && keyValue.endsWith("}");
     }
+    
+    public boolean hasPropertyEvaluateExpr(){
+    	return keyValue != null && keyValue.contains("get-property");
+    }
+
+    public Object evalutePropertyExpression(MessageContext synCtx) {
+        SynapseXPath expr = null;
+        try {
+            expr = new SynapseXPath(this.keyValue.substring(1, keyValue.length() - 1));
+            for (OMNamespace aNamespaceList : namespaceList) {
+                expr.addNamespace(aNamespaceList);
+            }
+
+            String result = expr.stringValueOf(synCtx);
+            SynapseXPath expression = new SynapseXPath(result);
+            for (OMNamespace aNamespaceList : namespaceList) {
+                expression.addNamespace(aNamespaceList);
+            }
+            return expression;
+        } catch (Exception e) {
+            handleException("Can not evaluate escaped expression : " + expr.toString());
+        }
+        return this.expression;
+
+    }
 
     public void setNamespaces(OMElement elem){
         Iterator namespaces = elem.getNamespacesInScope();

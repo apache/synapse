@@ -27,7 +27,7 @@ import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.config.xml.ValueFactory;
-
+import org.apache.synapse.SynapseConstants;
 import javax.xml.namespace.QName;
 import java.util.*;
 
@@ -65,6 +65,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ScriptMediator mediator;
+        ClassLoader  classLoader = (ClassLoader) properties.get(SynapseConstants.SYNAPSE_LIB_LOADER);
         OMAttribute keyAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
                 "key"));
         OMAttribute langAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,
@@ -93,9 +94,9 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
 
             String functionName = (functionAtt == null ? null : functionAtt.getAttributeValue());
             mediator = new ScriptMediator(langAtt.getAttributeValue(),
-                    includeKeysMap, generatedKey, functionName);
+                    includeKeysMap, generatedKey, functionName,classLoader);
         } else {
-            mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText());
+            mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText(),classLoader);
         }
 
         processAuditStatus(mediator, elem);

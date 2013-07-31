@@ -71,7 +71,7 @@ public class CRLCache implements ManageableCache {
             synchronized (CRLCache.class) {
                 if (cacheManager == null) {
                     cacheManager = new CacheManager(cache, size, delay);
-                    CacheController mbean = new CacheController(cache,cacheManager);
+                    CacheController mbean = new CacheController(cache, cacheManager);
                     MBeanRegistrar.getInstance().registerMBean(mbean, "CacheController",
                             "CRLCacheController");
                 }
@@ -103,7 +103,7 @@ public class CRLCache implements ManageableCache {
         return hashMap.size();
     }
 
-    public void resetIterator() {
+    public synchronized void resetIterator() {
         iterator = hashMap.entrySet().iterator();
     }
 
@@ -136,14 +136,14 @@ public class CRLCache implements ManageableCache {
             }
 
             return cacheValue.getValue();
-        } else
-            return null;
+        }
+        return null;
     }
 
     public synchronized void setCacheValue(String crlUrl, X509CRL crl) {
         CRLCacheValue cacheValue = new CRLCacheValue(crlUrl, crl);
         if (log.isDebugEnabled()) {
-            log.debug("Before set- HashMap size " + hashMap.size());
+            log.debug("Before set - HashMap size " + hashMap.size());
         }
         hashMap.put(crlUrl, cacheValue);
         if (log.isDebugEnabled()) {

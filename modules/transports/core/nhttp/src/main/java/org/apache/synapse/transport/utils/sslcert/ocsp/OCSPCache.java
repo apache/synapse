@@ -102,7 +102,7 @@ public class OCSPCache implements ManageableCache {
         return hashMap.size();
     }
 
-    public void resetIterator(){
+    public synchronized void resetIterator(){
         iterator = hashMap.entrySet().iterator();
     }
 
@@ -117,7 +117,7 @@ public class OCSPCache implements ManageableCache {
         try {
             String serviceUrl = cacheValue.serviceUrl;
             OCSPReq request = cacheValue.request;
-            OCSPResp response= ocspVerifier.getOCSPResponce(serviceUrl, request);
+            OCSPResp response= ocspVerifier.getOCSPResponse(serviceUrl, request);
 
             if (OCSPRespStatus.SUCCESSFUL != response.getStatus())
                 throw new CertificateVerificationException("OCSP response status not SUCCESSFUL");

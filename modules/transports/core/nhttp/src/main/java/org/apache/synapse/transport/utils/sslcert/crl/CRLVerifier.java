@@ -42,8 +42,9 @@ import java.util.List;
  */
 public class CRLVerifier implements RevocationVerifier {
 
-    private CRLCache cache;
     private static final Log log = LogFactory.getLog(CRLVerifier.class);
+
+    private CRLCache cache;
 
     public CRLVerifier(CRLCache cache) {
         this.cache = cache;
@@ -82,8 +83,9 @@ public class CRLVerifier implements RevocationVerifier {
             try {
                 X509CRL x509CRL = downloadCRLFromWeb(crlUrl);
                 if (x509CRL != null) {
-                    if (cache != null)
+                    if (cache != null) {
                         cache.setCacheValue(crlUrl, x509CRL);
+                    }
                     return getRevocationStatus(x509CRL, peerCert);
                 }
             } catch (Exception e) {

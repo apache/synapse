@@ -43,8 +43,9 @@ import java.util.Vector;
  */
 public class OCSPVerifier implements RevocationVerifier {
 
-    private OCSPCache cache;
     private static final Log log = LogFactory.getLog(OCSPVerifier.class);
+
+    private OCSPCache cache;
 
     public OCSPVerifier(OCSPCache cache) {
         this.cache = cache;
@@ -81,7 +82,7 @@ public class OCSPVerifier implements RevocationVerifier {
 
             SingleResp[] responses;
             try {
-                OCSPResp ocspResponse = getOCSPResponce(serviceUrl, request);
+                OCSPResp ocspResponse = getOCSPResponse(serviceUrl, request);
                 if (OCSPRespStatus.SUCCESSFUL != ocspResponse.getStatus()) {
                     continue; // Server didn't give the response right.
                 }
@@ -126,8 +127,8 @@ public class OCSPVerifier implements RevocationVerifier {
      * @throws CertificateVerificationException
      *
      */
-    protected OCSPResp getOCSPResponce(String serviceUrl, OCSPReq request) throws CertificateVerificationException {
-
+    protected OCSPResp getOCSPResponse(String serviceUrl,
+                                       OCSPReq request) throws CertificateVerificationException {
         try {
             //Todo: Use http client.
             byte[] array = request.getEncoded();
@@ -178,7 +179,8 @@ public class OCSPVerifier implements RevocationVerifier {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         try {
             //  CertID structure is used to uniquely identify certificates that are the subject of
-            // an OCSP request or response and has an ASN.1 definition. CertID structure is defined in RFC 2560
+            // an OCSP request or response and has an ASN.1 definition. CertID structure is defined
+            // in RFC 2560
             CertificateID id = new CertificateID(CertificateID.HASH_SHA1, issuerCert, serialNumber);
 
             // basic request generation with nonce
@@ -187,7 +189,8 @@ public class OCSPVerifier implements RevocationVerifier {
 
             // create details for nonce extension. The nonce extension is used to bind
             // a request to a response to prevent replay attacks. As the name implies,
-            // the nonce value is something that the client should only use once within a reasonably small period.
+            // the nonce value is something that the client should only use once within a reasonably
+            // small period.
             BigInteger nonce = BigInteger.valueOf(System.currentTimeMillis());
             Vector<ASN1ObjectIdentifier> objectIdentifiers = new Vector<ASN1ObjectIdentifier>();
             Vector<X509Extension> values = new Vector<X509Extension>();
@@ -199,7 +202,8 @@ public class OCSPVerifier implements RevocationVerifier {
 
             return generator.generate();
         } catch (OCSPException e) {
-            throw new CertificateVerificationException("Cannot generate OSCP Request with the given certificate", e);
+            throw new CertificateVerificationException("Cannot generate OCSP Request with the " +
+                    "given certificate", e);
         }
     }
 
@@ -217,19 +221,21 @@ public class OCSPVerifier implements RevocationVerifier {
 
         //Gets the DER-encoded OCTET string for the extension value for Authority information access Points
         byte[] aiaExtensionValue = cert.getExtensionValue(X509Extensions.AuthorityInfoAccess.getId());
-        if (aiaExtensionValue == null)
-            throw new CertificateVerificationException("Certificate Doesnt have Authority Information Access points");
+        if (aiaExtensionValue == null) {
+            throw new CertificateVerificationException("Certificate doesn't have authority " +
+                    "information access points");
+        }
         //might have to pass an ByteArrayInputStream(aiaExtensionValue)
         ASN1InputStream asn1In = new ASN1InputStream(aiaExtensionValue);
         AuthorityInformationAccess authorityInformationAccess;
 
         try {
             DEROctetString aiaDEROctetString = (DEROctetString) (asn1In.readObject());
-            ASN1InputStream asn1Inoctets = new ASN1InputStream(aiaDEROctetString.getOctets());
-            ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1Inoctets.readObject();
-            authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);//new AuthorityInformationAccess(aiaASN1Sequence);
+            ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets());
+            ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1InOctets.readObject();
+            authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);
         } catch (IOException e) {
-            throw new CertificateVerificationException("Cannot read certificate to get OSCP urls", e);
+            throw new CertificateVerificationException("Cannot read certificate to get OCSP URLs", e);
         }
 
         List<String> ocspUrlList = new ArrayList<String>();
@@ -243,8 +249,9 @@ public class OCSPVerifier implements RevocationVerifier {
                 ocspUrlList.add(accessLocation);
             }
         }
-        if(ocspUrlList.isEmpty())
+        if (ocspUrlList.isEmpty()) {
             throw new CertificateVerificationException("Cant get OCSP urls from certificate");
+        }
 
         return ocspUrlList;
     }

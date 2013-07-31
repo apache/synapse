@@ -19,7 +19,7 @@
 
 package org.apache.synapse.transport.utils.sslcert.cache;
 
-public class CacheController implements CacheControllerMBean{
+public class CacheController implements CacheControllerMBean {
 
     private ManageableCache cache;
     private CacheManager cacheManager;

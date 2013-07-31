@@ -50,24 +50,24 @@
             </div>
             <subsection name="Objective">
                 <p>
-                    Demonstrate the ability of Synapse's AMQP transport and how it acts as a consumer.
+                    Demonstrate the AMQP transport of Synapse.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
                 <p>
                     <ul>
                         <li>
-                            <a href="http://www.rabbitmq.com/java-client.html" >Download</a> the RabbitMQ Java client library and copy that
-                            into Synapse's class path(SYNAPSE_HOME/lib).
+                            <a href="http://www.rabbitmq.com/java-client.html" >Download</a> the RabbitMQ
+                            Java client library and copy it into Synapse class path (SYNAPSE_HOME/lib).
                         </li>
                         <li>
                             <a href="http://www.rabbitmq.com/" >Download</a> and install the RabbitMQ AMQP broker.
                             Then start the broker on its default port(5672).
                         </li>
                         <li>
-                            Uncomment the AMQP transport listener section axis2.xml(repository/conf/axis2.xml).If you want
-                            to run the broker on a different port other than the default port configure the connection
-                            factory definitions in AMQP transport listener appropriately.
+                            Uncomment the AMQP transport listener section in axis2.xml(repository/conf/axis2.xml).
+                            If you are running the AMQP broker on a port other than the default port,
+                            configure the connection factory definitions in AMQP transport listener appropriately.
                         </li>
                         <li>
                             Start Synapse using the configuration numbered 269 (repository/conf/sample/synapse_sample_269.xml)
@@ -82,20 +82,21 @@
             <subsection name="Executing the Client">
                 <p>
                     In this sample we are using a proxy service exposed over AMQP (note the transports=amqp
-                    attribute). If you check the WSDL of the proxy service using a web browser you
+                    attribute). If you check the WSDL of the proxy service using a web browser, you
                     will notice that it only has AMQP endpoints.
                 </p>
                 <p>
                     Run the sample RabbitMQ AMQP client by switching to the samples/axis2Client directory and
                     executing the following command. Other options that can be passed into the RabbitMQ
-                    client can be found just executing ant.
+                    client can be found by just executing 'ant'.
                 </p>
                 <div class="command">ant rabbitmqclient -Damqpmode=producer  -DqueueName=ConsumerProxy  -DpayLoad=IBM</div>
                 <p>
                     This will send a plain XML formatted place order request to a queue in the RabbitMQ
                     broker. The queue is named 'ConsumerProxy'. Synapse will be polling on this queue for
-                    any incoming messages so it will pick up the request. A message similar to following can be seen on the
-                    console indicating that the message has received at the proxy service.
+                    any incoming messages so it will pick up the request. A message similar to following
+                    will be logged on the console indicating that the message has been received at the
+                    proxy service.
                 </p>
                 <div class="consoleOutput">2013-07-30 17:00:56,687 [-] [pool-11-thread-5]  INFO LogMediator status = At ConsumerProxy</div>
                 <div class="consoleOutput">

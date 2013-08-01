@@ -151,25 +151,6 @@ public class AMQPTransportPollingTask {
     private int noOfConcurrentConsumers = 2;
 
     /**
-     * Initial duration(in milliseconds) to suspend the polling task in case of an error.
-     * {@link org.apache.synapse.transport.amqp.AMQPTransportConstant#PARAMETER_INITIAL_RE_CONNECTION_DURATION}.
-     */
-    private int initialReconnectDuration = 1000;
-
-    /**
-     * The progression factor for next re-try calculation.
-     * {@link AMQPTransportConstant#PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR}
-     */
-    private double reconnectionFactor = 2.0;
-
-    /**
-     * The maximum duration to suspend the polling task. This is to make sure there is an upper
-     * bound for the suspending the polling task in case of an error.
-     * {@link AMQPTransportConstant#PARAMETER_MAX_RE_CONNECTION_DURATION}
-     */
-    private int maxReconnectionDuration = 1000 * 60 * 10;
-
-    /**
      * The name of the connectionFactory this service is bound to.
      * {@link AMQPTransportConstant#PARAMETER_CONNECTION_FACTORY_NAME}
      */
@@ -302,18 +283,6 @@ public class AMQPTransportPollingTask {
         this.noOfConcurrentConsumers = noOfConcurrentConsumers;
     }
 
-    public void setInitialReconnectDuration(int initialReconnectDuration) {
-        this.initialReconnectDuration = initialReconnectDuration;
-    }
-
-    public void setReconnectionFactor(double reconnectionFactor) {
-        this.reconnectionFactor = reconnectionFactor;
-    }
-
-    public void setMaxReconnectionDuration(int maxReconnectionDuration) {
-        this.maxReconnectionDuration = maxReconnectionDuration;
-    }
-
     public void setConnectionFactoryName(String connectionFactoryName) {
         this.connectionFactoryName = connectionFactoryName;
     }
@@ -392,22 +361,6 @@ public class AMQPTransportPollingTask {
 
     public int getNoOfConcurrentConsumers() {
         return noOfConcurrentConsumers;
-    }
-
-    public int getInitialReconnectDuration() {
-        return initialReconnectDuration;
-    }
-
-    public double getReconnectionFactor() {
-        return reconnectionFactor;
-    }
-
-    public int getMaxReconnectionDuration() {
-        return maxReconnectionDuration;
-    }
-
-    public String getConnectionFactoryName() {
-        return connectionFactoryName;
     }
 
     public TimeUnit getScheduledTaskTimeUnit() {

@@ -17,6 +17,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.base.AbstractTransportListenerEx;
 import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
 import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;
+import org.apache.synapse.transport.amqp.ha.AMQPTransportReconnectHandler;
 import org.apache.synapse.transport.amqp.pollingtask.AMQPTransportPollingTask;
 
 import java.util.concurrent.ExecutorService;
@@ -40,6 +41,8 @@ public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTrans
 
     private ExecutorService connectionFactoryES;
 
+    private AMQPTransportReconnectHandler haHandler;
+
     @Override
     protected void doInit() throws AxisFault {
 
@@ -57,6 +60,25 @@ public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTrans
         workerPool = Executors.newScheduledThreadPool(
                 AMQPTransportUtils.getIntProperty(AMQPTransportConstant.PARAM_WORKER_POOL_SIZE,
                         AMQPTransportConstant.WORKER_POOL_DEFAULT));
+
+
+        int initialReconnectDuration = AMQPTransportUtils.getIntProperty(
+                AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, 1000);
+
+        double reconnectionProgressionFactor = AMQPTransportUtils.getDoubleProperty(
+                AMQPTransportConstant.PARAM_RE_CONNECTION_PROGRESSION_FACTOR, 2.0);
+
+        int maxReconnectionDuration = AMQPTransportUtils.getIntProperty(
+                AMQPTransportConstant.PARAM_MAX_RE_CONNECTION_DURATION, 1000 * 60 * 10);
+
+        haHandler = new AMQPTransportReconnectHandler(
+                connectionFactoryES,
+                maxReconnectionDuration,
+                reconnectionProgressionFactor,
+                initialReconnectDuration,
+                connectionFactoryManager);
+
+        new Thread(haHandler, "AMQP-HA-handler-task").start();
 
         log.info("AMQP transport listener initializing..");
     }

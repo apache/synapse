@@ -110,7 +110,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * This will provide the timer daemon object for the scheduled tasks.
      */
-    private Timer synapseTimer = new Timer(true);
+    private Timer synapseTimer;
 
     /** Hold reference to the Axis2 ConfigurationContext */
     private AxisConfiguration axisConfiguration = null;
@@ -167,13 +167,16 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /**
      * Holds synapse Libraries indexed by library qualified name
      */
-    Map<String,Library> synapseLibraries = new ConcurrentHashMap<String,Library>();
+    private Map<String,Library> synapseLibraries = new ConcurrentHashMap<String,Library>();
 
     /**
      * Holds the library imports  currently being included into Synapse engine
      */
-    Map<String,SynapseImport> synapseImports = new ConcurrentHashMap<String,SynapseImport>();
+    private Map<String,SynapseImport> synapseImports = new ConcurrentHashMap<String,SynapseImport>();
+
     private boolean allowHotUpdate = true;
+
+    private boolean initialized = false;
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -696,7 +699,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
                     try {
                         o = registry.getResource(entry, getProperties());
                     } catch (Exception e) {
-                        // Error occured while loading the resource from the registry
+                        // Error occurred while loading the resource from the registry
                         // Fall back to the cached value - Do not increase the expiry time
                         log.warn("Error while loading the resource " + key + " from the remote " +
                                 "registry. Previously cached value will be used. Check the " +
@@ -1106,6 +1109,10 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * @return synapseTimer timer object of the configuration
      */
     public Timer getSynapseTimer() {
+        if (synapseTimer == null) {
+            handleException("Attempted to access the Synapse timer " +
+                    "before initializing SynapseConfiguration");
+        }
         return synapseTimer;
     }
 
@@ -1190,7 +1197,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     }
 
     /**
-     * Sets the properties to configure the Synapse enviornment.
+     * Sets the properties to configure the Synapse environment.
      *
      * @param properties - Properties which needs to be set
      *
@@ -1247,7 +1254,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     }
 
     /**
-     * Gets the propety value if the property specified by the propKey is there or null else
+     * Gets the property value if the property specified by the propKey is there or null else
      *
      * @param propKey - key for the property lookup
      * @return String representation of the property value if found or null else
@@ -1268,78 +1275,6 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     }
 
     /**
-     * This method will be called on the soft shutdown or destroying the configuration
-     * and will destroy all the stateful managed parts of the configuration.
-     */
-    public synchronized void destroy() {
-        
-        if (log.isDebugEnabled()) {
-            log.debug("Destroying the Synapse Configuration");
-        }
-
-        // clear the timer tasks of Synapse
-        synapseTimer.cancel();
-        synapseTimer = null;
-
-        // stop and shutdown all the proxy services
-        for (ProxyService p : getProxyServices()) {
-
-            if (p.getTargetInLineInSequence() != null) {
-                p.getTargetInLineInSequence().destroy();
-            }
-
-            if (p.getTargetInLineOutSequence() != null) {
-                p.getTargetInLineOutSequence().destroy();
-            }
-        }
-
-        // destroy the managed mediators
-        for (ManagedLifecycle seq : getDefinedSequences().values()) {
-            seq.destroy();
-        }
-
-        //destroy sequence templates
-        for (TemplateMediator seqTemplate : getSequenceTemplates().values()) {
-            seqTemplate.destroy();
-        }
-
-        // destroy the managed endpoints
-        for (Endpoint endpoint : getDefinedEndpoints().values()) {
-            endpoint.destroy();
-        }
-
-        // destroy the startups
-        for (ManagedLifecycle stp : startups.values()) {
-            stp.destroy();
-        }
-        
-        // clear session information used for SA load balancing
-        try {
-            SALSessions.getInstance().reset();
-            DataSourceRepositoryHolder.getInstance().getDataSourceRepositoryManager().clear();
-        } catch (Throwable ignored) {}
-
-        // destroy the priority executors. 
-        for(PriorityExecutor pe : executors.values()) {
-            pe.destroy();
-        }
-
-        // destroy the Message Stores
-        for(MessageStore ms : messageStores.values()) {
-            ms.destroy();
-        }
-
-        // destroy the Message processors
-        for(MessageProcessor mp : messageProcessors.values()) {
-            mp.destroy();
-        }
-
-        for (API api : apiTable.values()) {
-            api.destroy();
-        }
-    }
-
-    /**
      * This method will be called in the startup of Synapse or in an initiation
      * and will initialize all the managed parts of the Synapse Configuration
      *
@@ -1347,10 +1282,43 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      *          SynapseEnvironment specifying the env to be initialized
      */
     public synchronized void init(SynapseEnvironment se) {
-        
+        if (initialized) {
+            log.warn("Attempted to re-initialize SynapseConfiguration");
+            return;
+        }
+
         if (log.isDebugEnabled()) {
             log.debug("Initializing the Synapse Configuration using the SynapseEnvironment");
         }
+        try {
+            doInit(se);
+        } finally {
+            initialized = true;
+        }
+    }
+
+    /**
+     * This method will be called on the soft shutdown or destroying the configuration
+     * and will destroy all the stateful managed parts of the configuration.
+     */
+    public synchronized void destroy() {
+        if (!initialized) {
+            log.warn("Attempted to destroy uninitialized SynapseConfiguration");
+            return;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Destroying the Synapse Configuration");
+        }
+        try {
+            doDestroy();
+        } finally {
+            initialized = false;
+        }
+    }
+
+    private void doInit(SynapseEnvironment se) {
+        synapseTimer = new Timer(true);
 
         // initialize registry
         if (registry != null && registry instanceof ManagedLifecycle) {
@@ -1367,7 +1335,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             seqTemplate.init(se);
         }
 
-         // initialize managed mediators
+        // initialize managed mediators
         for (ManagedLifecycle seq : getDefinedSequences().values()) {
             if (seq != null) {
                 seq.init(se);
@@ -1407,17 +1375,80 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
         }
 
         //initialize message stores
-        for(MessageStore messageStore : messageStores.values()) {
+        for (MessageStore messageStore : messageStores.values()) {
             messageStore.init(se);
         }
 
         // initialize message processors
-        for(MessageProcessor messageProcessor : messageProcessors.values()) {
+        for (MessageProcessor messageProcessor : messageProcessors.values()) {
             messageProcessor.init(se);
         }
 
         for (API api : apiTable.values()) {
             api.init(se);
+        }
+    }
+
+    private void doDestroy() {
+        // clear the timer tasks of Synapse
+        synapseTimer.cancel();
+        synapseTimer = null;
+
+        // stop and shutdown all the proxy services
+        for (ProxyService p : getProxyServices()) {
+
+            if (p.getTargetInLineInSequence() != null) {
+                p.getTargetInLineInSequence().destroy();
+            }
+
+            if (p.getTargetInLineOutSequence() != null) {
+                p.getTargetInLineOutSequence().destroy();
+            }
+        }
+
+        // destroy the managed mediators
+        for (ManagedLifecycle seq : getDefinedSequences().values()) {
+            seq.destroy();
+        }
+
+        //destroy sequence templates
+        for (TemplateMediator seqTemplate : getSequenceTemplates().values()) {
+            seqTemplate.destroy();
+        }
+
+        // destroy the managed endpoints
+        for (Endpoint endpoint : getDefinedEndpoints().values()) {
+            endpoint.destroy();
+        }
+
+        // destroy the startups
+        for (ManagedLifecycle stp : startups.values()) {
+            stp.destroy();
+        }
+
+        // clear session information used for SA load balancing
+        try {
+            SALSessions.getInstance().reset();
+            DataSourceRepositoryHolder.getInstance().getDataSourceRepositoryManager().clear();
+        } catch (Throwable ignored) {}
+
+        // destroy the priority executors.
+        for (PriorityExecutor pe : executors.values()) {
+            pe.destroy();
+        }
+
+        // destroy the Message Stores
+        for (MessageStore ms : messageStores.values()) {
+            ms.destroy();
+        }
+
+        // destroy the Message processors
+        for (MessageProcessor mp : messageProcessors.values()) {
+            mp.destroy();
+        }
+
+        for (API api : apiTable.values()) {
+            api.destroy();
         }
     }
 
@@ -1570,7 +1601,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     }
 
     /**
-     * Get Message sotres defined
+     * Get Message stores defined
      * @return  message store map stored as name of the message store and message store
      */
     public Map<String, MessageStore> getMessageStores() {

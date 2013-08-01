@@ -935,6 +935,11 @@
                 <version>${jms-1.1-spec.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                <version>${javamail-1.4-spec.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>wrapper</groupId>
                 <artifactId>wrapper</artifactId>
                 <version>${wrapper.version}</version>
@@ -1121,6 +1126,7 @@
         <truezip.version>6.6</truezip.version>
         <jsch.version>0.1.31</jsch.version>
         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
+        <javamail-1.4-spec.version>1.7.1</javamail-1.4-spec.version>
         <httpcore.nio.version>4.2.4</httpcore.nio.version>
         <http.client.version>4.1</http.client.version>
         <aspectj.version>1.6.1</aspectj.version>

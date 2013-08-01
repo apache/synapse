@@ -19,12 +19,12 @@
 
 package org.apache.synapse.registry;
 
+import org.apache.axiom.mime.ContentType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 
-import javax.mail.internet.ContentType;
-import javax.mail.internet.ParseException;
+import java.text.ParseException;
 import java.util.Date;
 
 public class RegistryEntryImpl implements RegistryEntry {

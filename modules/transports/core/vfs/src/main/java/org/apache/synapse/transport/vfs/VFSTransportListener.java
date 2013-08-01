@@ -18,6 +18,7 @@
 */
 package org.apache.synapse.transport.vfs;
 
+import org.apache.axiom.mime.ContentType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -40,11 +41,10 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 
-import javax.mail.internet.ContentType;
-import javax.mail.internet.ParseException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.*;
 
 /**

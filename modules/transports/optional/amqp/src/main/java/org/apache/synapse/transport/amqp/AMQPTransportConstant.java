@@ -164,29 +164,29 @@ public final class AMQPTransportConstant {
      * If a polling task encounter an exception due to some reason(most probably due to broker
      * outage) the number of milliseconds it should be suspended before next re-try.
      */
-    public static final String PARAMETER_INITIAL_RE_CONNECTION_DURATION =
-            "transport.amqp.InitialReconnectDuration";
+    public static final String PARAM_INITIAL_RE_CONNECTION_DURATION =
+            "initial-reconnect-duration";
 
     /**
      * If the polling task fails again after the initial re-connection duration
-     * {@link AMQPTransportConstant#PARAMETER_INITIAL_RE_CONNECTION_DURATION}
+     * {@link AMQPTransportConstant#PARAM_INITIAL_RE_CONNECTION_DURATION}
      * next suspend duration will be calculated using this
-     * (PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION).
+     * (PARAM_RE_CONNECTION_PROGRESSION_FACTOR * PARAM_INITIAL_RE_CONNECTION_DURATION).
      */
-    public static final String PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR =
-            "transport.amqp.ReconnectionProgressionFactor";
+    public static final String PARAM_RE_CONNECTION_PROGRESSION_FACTOR =
+            "reconnection-progression-factor";
 
 
     /**
      * The maximum duration to suspend the polling task in case of an error. The current suspend
      * duration will reach this
      * value by following the series,
-     * PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION.
+     * PARAM_RE_CONNECTION_PROGRESSION_FACTOR * PARAM_INITIAL_RE_CONNECTION_DURATION.
      * This upper bound is there
      * because nobody wants to wait a long time until the next re-try if the broker is alive.
      */
-    public static final String PARAMETER_MAX_RE_CONNECTION_DURATION =
-            "transport.amqp.MaximumReconnectionDuration";
+    public static final String PARAM_MAX_RE_CONNECTION_DURATION =
+            "maximum-reconnection-duration";
 
 
     /**

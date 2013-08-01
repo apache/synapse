@@ -40,7 +40,7 @@ public class AMQPTransportUtilsTest extends TestCase {
 
         cfMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, "direct");
         cfMap.put(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, "true");
-        cfMap.put(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, "10");
+        cfMap.put(AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, "10");
     }
 
     public void testGetStringProperty() throws Exception {
@@ -109,9 +109,9 @@ public class AMQPTransportUtilsTest extends TestCase {
 
     public void testGetOptionalIntParameter() throws Exception {
         assertEquals("Invalid value",
-                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION)),
+                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION)),
                 AMQPTransportUtils.getOptionalIntParameter(
-                        AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
+                        AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
 
         assertEquals("Invalid value",
                 Integer.parseInt(svcMap.get(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS)),

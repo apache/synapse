@@ -41,8 +41,8 @@ public class AMQPTransportConnectionFactoryManager {
      * Add the list of defined connection factories definition.
      *
      * @param transportInDescription The connection factory definition in axis2.xml
-     * @param es An instance of java.util.concurrent.ExecutorService to use with AMQP connection
-     *           factory
+     * @param es                     An instance of java.util.concurrent.ExecutorService to use with AMQP connection
+     *                               factory
      */
     public void addConnectionFactories(ParameterInclude transportInDescription, ExecutorService es) {
         for (Parameter p : transportInDescription.getParameters()) {
@@ -61,6 +61,10 @@ public class AMQPTransportConnectionFactoryManager {
     public void addConnectionFactory(Parameter parameter, ExecutorService es)
             throws AMQPTransportException {
         factories.put(parameter.getName(), new AMQPTransportConnectionFactory(parameter, es));
+    }
+
+    public void addConnectionFactory(String name, AMQPTransportConnectionFactory cf) {
+        factories.put(name, cf);
     }
 
     /**
@@ -112,4 +116,9 @@ public class AMQPTransportConnectionFactoryManager {
             throw new AMQPTransportException("Error occurred whiling shutting down connections", e);
         }
     }
+
+    public ConcurrentHashMap<String, AMQPTransportConnectionFactory> getAllFactories() {
+        return factories;
+    }
+
 }

@@ -94,7 +94,7 @@ public class AMQPTransportBuffers {
             // block if there is no messages
             return requestBuffer.take();
         } catch (InterruptedException e) {
-            // ignore
+            Thread.currentThread().interrupt();
         }
         return null;
     }

@@ -168,28 +168,6 @@ public class AMQPTransportPollingTaskFactory {
         }
 
         try {
-            Integer initialReconectionDuration = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION,
-                    svcParam, conFacParam);
-            if (initialReconectionDuration != null) {
-                pt.setInitialReconnectDuration(initialReconectionDuration);
-            }
-        } catch (AMQPTransportException e) {
-            throw new AxisFault("Could not assign the initial re-connection duration", e);
-        }
-
-        try {
-            Integer reconnectionFactor = AMQPTransportUtils.getOptionalIntParameter(
-                    AMQPTransportConstant.PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR,
-                    svcParam, conFacParam);
-            if (reconnectionFactor != null) {
-                pt.setReconnectionFactor(reconnectionFactor);
-            }
-        } catch (AMQPTransportException e) {
-            throw new AxisFault("Could not assign reconnection factor", e);
-        }
-
-        try {
             Integer dispatchingTask = AMQPTransportUtils.getOptionalIntParameter(
                     AMQPTransportConstant.PARAMETER_DISPATCHING_TASK_SIZE,
                     svcParam, conFacParam);
@@ -251,9 +229,6 @@ public class AMQPTransportPollingTaskFactory {
                     "Is queue restricted: '" + pt.isQueueRestricted() + "'\n" +
                     "Is queue auto deleted: '" + pt.isQueueAutoDelete() + "'\n" +
                     "Is blocking mode: '" + pt.isBlockingMode() + "'\n" +
-                    "Initial re-connection duration: '" + pt.getInitialReconnectDuration() + "(ms)'\n" +
-                    "Re-connection progression factor: '" + pt.getReconnectionFactor() + "'\n" +
-                    "Maximum re-connection duration: '" + pt.getMaxReconnectionDuration() + "'\n" +
                     "Number of concurrent consumers: '" + pt.getNoOfConcurrentConsumers() + "'\n" +
                     "Number of dispatching task: '" + pt.getNoOfDispatchingTask() + "'");
         }

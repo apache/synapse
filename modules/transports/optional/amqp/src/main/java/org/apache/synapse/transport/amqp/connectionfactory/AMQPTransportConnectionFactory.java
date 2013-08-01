@@ -26,7 +26,10 @@ import org.apache.synapse.transport.amqp.AMQPTransportException;
 import org.apache.synapse.transport.amqp.AMQPTransportUtils;
 
 import java.io.IOException;
-import java.util.Hashtable;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -65,7 +68,7 @@ public class AMQPTransportConnectionFactory {
     /**
      * The list of parameters(see above) in the connection factory definition.
      */
-    private Hashtable<String, String> parameters = new Hashtable<String, String>();
+    private Map<String, String> parameters = new HashMap<String, String>();
 
     /**
      * The AMQP connection to the broker maintain per connection factory.
@@ -77,6 +80,21 @@ public class AMQPTransportConnectionFactory {
      */
     private Channel channel = null;
 
+    public AMQPTransportConnectionFactory(
+            Map<String, String> parameters,
+            ExecutorService es)
+            throws AMQPTransportException {
+        try {
+            connection = createConnection(es, parameters);
+            channel = createChannel(connection, parameters);
+        } catch (Exception e) {
+            String msg = "Could not initialize the connection factory with parameters\n";
+            for (Map.Entry entry : parameters.entrySet()) {
+                msg = msg + entry.getKey() + ":" + entry.getValue() + "\n";
+            }
+            throw new AMQPTransportException(msg, e);
+        }
+    }
 
     public AMQPTransportConnectionFactory(Parameter parameter, ExecutorService es)
             throws AMQPTransportException {
@@ -87,7 +105,7 @@ public class AMQPTransportConnectionFactory {
 
             if (!(parameter.getValue() instanceof OMElement)) {
                 throw new AMQPTransportException("The connection factory '" + parameter.getName() +
-                        "' is in valid. It's required to have the least connection factory definition with '" +
+                        "' is invalid. It's required to have the least connection factory definition with '" +
                         AMQPTransportConstant.PARAMETER_CONNECTION_URI + "' parameter. Example: \n" +
                         "\n<transportReceiver name=\"amqp\" class=\"org.wso2.carbon.transports.amqp.AMQPTransportListener\">\n" +
                         "   <parameter name=\"default\" locked=\"false\">\n" +
@@ -106,60 +124,8 @@ public class AMQPTransportConnectionFactory {
                 parameters.put(entry.getName(), (String) entry.getValue());
             }
 
-            ConnectionFactory connectionFactory = new ConnectionFactory();
-            connectionFactory.setUri(parameters.get(AMQPTransportConstant.PARAMETER_CONNECTION_URI));
-
-            if (parameters.get(AMQPTransportConstant.PARAMETER_BROKER_LIST) != null) {
-                Address[] addresses = AMQPTransportUtils.getAddressArray(
-                        parameters.get(AMQPTransportConstant.PARAMETER_BROKER_LIST), ",", ':');
-                connection = connectionFactory.newConnection(es, addresses);
-            } else {
-                connection = connectionFactory.newConnection(es);
-            }
-
-            if (parameters.get(AMQPTransportConstant.PARAMETER_AMQP_CHANNEL_NUMBER) != null) {
-                int index = 0;
-                try {
-                    index = Integer.parseInt(parameters.get(
-                            AMQPTransportConstant.PARAMETER_AMQP_CHANNEL_NUMBER));
-                } catch (NumberFormatException e) {
-                    index = 1; // assume default,
-                    // fair dispatch see http://www.rabbitmq.com/tutorials/tutorial-two-java.html
-                }
-                channel = connection.createChannel(index);
-
-            } else {
-                channel = connection.createChannel();
-            }
-
-
-            int prefetchSize = 1024;
-            if (parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_SIZE) != null) {
-                try {
-                    prefetchSize = Integer.parseInt(
-                            parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_SIZE));
-                } catch (NumberFormatException e) {
-                    prefetchSize = 1024; // assume default
-                }
-            }
-
-            int prefetchCount = 0;
-            if (parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_COUNT) != null) {
-                try {
-                    prefetchCount = Integer.parseInt(
-                            parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_COUNT));
-                    channel.basicQos(prefetchCount);
-                } catch (NumberFormatException e) {
-                    prefetchCount = 0; // assume default
-                }
-            }
-
-            boolean useGlobally = false;
-            if (parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_QOS_GLOBAL) != null) {
-                useGlobally = Boolean.parseBoolean(parameters.get(
-                        AMQPTransportConstant.PARAMETER_CHANNEL_QOS_GLOBAL));
-            }
-
+            connection = createConnection(es, parameters);
+            channel = createChannel(connection, parameters);
 
         } catch (Exception e) {
             throw new AMQPTransportException("" +
@@ -199,6 +165,14 @@ public class AMQPTransportConnectionFactory {
     }
 
     /**
+     * Get the connection
+     * @return the connection to broker.
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /**
      * Return the name of this connection factory(the name given in axis2.xml)
      *
      * @return name of this connection factory
@@ -224,5 +198,65 @@ public class AMQPTransportConnectionFactory {
      */
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    private Connection createConnection(ExecutorService es, Map<String, String> parameters)
+            throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        connectionFactory.setUri(parameters.get(AMQPTransportConstant.PARAMETER_CONNECTION_URI));
+
+        if (parameters.get(AMQPTransportConstant.PARAMETER_BROKER_LIST) != null) {
+            Address[] addresses = AMQPTransportUtils.getAddressArray(
+                    parameters.get(AMQPTransportConstant.PARAMETER_BROKER_LIST), ",", ':');
+            return connectionFactory.newConnection(es, addresses);
+        }
+        return connectionFactory.newConnection(es);
+    }
+
+    private Channel createChannel(Connection connection, Map<String, String> parameters)
+            throws IOException {
+        Channel ch;
+        if (parameters.get(AMQPTransportConstant.PARAMETER_AMQP_CHANNEL_NUMBER) != null) {
+            int index = 0;
+            try {
+                index = Integer.parseInt(parameters.get(
+                        AMQPTransportConstant.PARAMETER_AMQP_CHANNEL_NUMBER));
+            } catch (NumberFormatException e) {
+                index = 1; // assume default,
+                // fair dispatch see http://www.rabbitmq.com/tutorials/tutorial-two-java.html
+            }
+            ch = connection.createChannel(index);
+
+        } else {
+            ch = connection.createChannel();
+        }
+
+        int prefetchSize = 1024;
+        if (parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_SIZE) != null) {
+            try {
+                prefetchSize = Integer.parseInt(
+                        parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_SIZE));
+            } catch (NumberFormatException e) {
+                prefetchSize = 1024; // assume default
+            }
+        }
+
+        int prefetchCount = 0;
+        if (parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_COUNT) != null) {
+            try {
+                prefetchCount = Integer.parseInt(
+                        parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_PREFETCH_COUNT));
+                ch.basicQos(prefetchCount);
+            } catch (NumberFormatException e) {
+                prefetchCount = 0; // assume default
+            }
+        }
+
+        boolean useGlobally = false;
+        if (parameters.get(AMQPTransportConstant.PARAMETER_CHANNEL_QOS_GLOBAL) != null) {
+            useGlobally = Boolean.parseBoolean(parameters.get(
+                    AMQPTransportConstant.PARAMETER_CHANNEL_QOS_GLOBAL));
+        }
+        return ch;
     }
 }

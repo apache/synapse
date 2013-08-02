@@ -28,6 +28,7 @@ package org.apache.synapse.transport.amqp.pollingtask;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.amqp.AMQPTransportMessage;
@@ -103,6 +104,8 @@ public class AMQPSimpleConsumerTask {
             } catch (InterruptedException e) {
                 log.error("Retrieving task was interrupted", e);
                 Thread.currentThread().interrupt();
+            } catch (ShutdownSignalException e) {
+                log.error("Shutdown signal was received for simple consumer task", e);
             }
         }
     }

@@ -935,26 +935,6 @@
                         task(in the whole transport, i.e. only a single AMQP proxy per flow)
                         to achieve in order delivery</dd>
                     <dt>
-                        <tt>transport.amqp.InitialReconnectDuration</tt>
-                    </dt>
-                    <dd>If a polling task encounter an exception due to some reason(most probably
-                        due to broker outage) the number of milliseconds it should be suspended
-                        before next re-try</dd>
-                    <dt>
-                        <tt>transport.amqp.ReconnectionProgressionFactor</tt>
-                    </dt>
-                    <dd>If the polling task fails again after the initial re-connection duration,
-                        next suspend duration will be calculated using this.</dd>
-                    <dt>
-                        <tt>transport.amqp.MaximumReconnectionDuration</tt>
-                    </dt>
-                    <dd>The maximum duration to suspend the polling task in case of an error. The
-                        current suspend duration will reach this value by following the series;
-                        transport.amqp.ReconnectionProgressionFactor * transport.amqp.InitialReconnectDuration.
-                        This upper bound is there because nobody wants to wait a long time until the
-                        next re-try if the broker is alive.
-                    </dd>
-                    <dt>
                         <tt>transport.amqp.ConnectionFactoryName</tt>
                     </dt>
                     <dd>The connection factory to be used either with consumer or producer.</dd>
@@ -1033,6 +1013,12 @@
                     </dt>
                     <dd>Message context property to set the type of the AMQP message</dd>
                     <dt>
+                        <tt>AMQP_PRODUCER_TX</tt>
+                    </dt>
+                    <dd>Use transactions at producer side. Possible values are tx(for blocking transactions),
+                        lwpc(for light weight producer connections).
+                    </dd>
+                    <dt>
                         <tt>connection-factory-pool-size</tt>
                     </dt>
                     <dd>A system property to set the worker pool size of the connection factory executor service.</dd>
@@ -1044,12 +1030,28 @@
                         <tt>semaphore-time-out</tt>
                     </dt>
                     <dd>A system property to set the time out(in seconds) of semaphore which waits for
-                    a response.</dd>
+                    a response.
+                    </dd>
                     <dt>
-                        <tt>AMQP_PRODUCER_TX</tt>
+                        <tt>initial-reconnect-duration</tt>
                     </dt>
-                    <dd>Use transactions at producer side. Possible values are tx(for blocking transactions),
-                        lwpc(for light weight producer connections).</dd>
+                    <dd>If a polling task encounter an exception due to some reason(most probably
+                        due to broker outage) it will be suspended until a successful re-connect.
+                        This system property defines the initial duration that the re-connection
+                        check task should should be suspended(1000 ms by default) before next re-try.</dd>
+                    <dt>
+                        <tt>reconnection-progression-factor</tt>
+                    </dt>
+                    <dd>A system property to define the factor(2.0 by default) to multiply the initial
+                        suspended duration to calculate the next suspending duration for the
+                        re-connection check task.</dd>
+                    <dt>
+                        <tt>maximum-reconnection-duration</tt>
+                    </dt>
+                    <dd>The maximum duration that re-connection check task should be suspended(
+                        10 minutes by default). After this time is reached, the suspended duration
+                        will be fall back to its original initial configured duration.
+                    </dd>
                 </dl>
             </subsection>
             <subsection name="Sample Configurations" id="amqp_transport_ex">

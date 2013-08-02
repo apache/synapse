@@ -97,7 +97,7 @@ public class AMQPTransportReconnectHandler implements Runnable {
                                     " The retry duration is set to initial reconnection duration " +
                                     "value(" + initialReconnectDuration + "s)");
                         }
-                        log.error("The reconnection attempt number '" + count++ + "' failed. Next " +
+                        log.info("The reconnection attempt number '" + count++ + "' failed. Next " +
                                 "re-try will be after '" + (retryDuration / 1000) + "' seconds");
                         try {
                             Thread.sleep(retryDuration);
@@ -117,6 +117,7 @@ public class AMQPTransportReconnectHandler implements Runnable {
                     connectionFactoryManager.removeConnectionFactory(name);
                     connectionFactoryManager.addConnectionFactory(
                             name, new AMQPTransportConnectionFactory(param, es));
+                    log.info("A new connection factory was created for -> '" + name + "'");
                 }
 
                 String conFacName = entry.getConnectionFactoryName();
@@ -127,7 +128,6 @@ public class AMQPTransportReconnectHandler implements Runnable {
                         new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));
                 entry.getLock().release();
 
-
                 while (blockedTasks.isEmpty()) {
                     entry = blockedTasks.take();
                     conFacName = entry.getConnectionFactoryName();
@@ -136,13 +136,23 @@ public class AMQPTransportReconnectHandler implements Runnable {
                     connectionMap.put(
                             entry.getKey(),
                             new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));
+                    log.info("The task with key '" + entry.getKey() + "' was combined with a new " +
+                            "connection factory");
                     entry.getLock().release();
                 }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (AMQPTransportException e) {
-            log.error("High Availability handler just died!. It's time to re-start", e);
+            log.error("High Availability handler just died!. It's time to reboot the system.", e);
         }
+    }
+
+    public BlockingQueue<AMQPTransportHAEntry> getBlockedTasks() {
+        return blockedTasks;
+    }
+
+    public ConcurrentMap<String, AMQPTransportHABrokerEntry> getConnectionMap() {
+        return connectionMap;
     }
 }

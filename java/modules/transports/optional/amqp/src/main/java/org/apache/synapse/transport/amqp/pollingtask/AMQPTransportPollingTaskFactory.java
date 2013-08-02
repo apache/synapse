@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.amqp.*;
 import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
+import org.apache.synapse.transport.amqp.ha.AMQPTransportReconnectHandler;
 
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,7 +37,8 @@ public class AMQPTransportPollingTaskFactory {
             AxisService service,
             ScheduledExecutorService pool,
             AMQPTransportEndpoint endpoint,
-            AMQPTransportConnectionFactory connectionFactory) throws AxisFault {
+            AMQPTransportConnectionFactory connectionFactory,
+            AMQPTransportReconnectHandler haHandler) throws AxisFault {
 
         Map<String, String> svcParam =
                 AMQPTransportUtils.getServiceStringParameters(service.getParameters());
@@ -48,6 +50,7 @@ public class AMQPTransportPollingTaskFactory {
         pt.setServiceName(service.getName());
         pt.setEndpoint(endpoint);
         pt.setPollingTaskScheduler(pool);
+        pt.setHaHandler(haHandler);
 
         // set buffers to hold request/response messages for this task
         pt.setBuffers(new AMQPTransportBuffers());
@@ -88,7 +91,6 @@ public class AMQPTransportPollingTaskFactory {
             }
             pt.setInternalExchange(isInternalExchange);
         }
-
 
         pt.setChannel(connectionFactory.getChannel());
         pt.setConnectionFactoryName(connectionFactory.getName());

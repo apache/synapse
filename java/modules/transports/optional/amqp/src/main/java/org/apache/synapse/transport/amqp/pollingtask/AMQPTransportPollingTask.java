@@ -29,16 +29,17 @@ import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.amqp.*;
+import org.apache.synapse.transport.amqp.ha.AMQPTransportHABrokerEntry;
+import org.apache.synapse.transport.amqp.ha.AMQPTransportHAEntry;
+import org.apache.synapse.transport.amqp.ha.AMQPTransportReconnectHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
+import java.util.concurrent.*;
 
 /**
  * The polling task deploy for each services exposed on AMQP transport. This task
@@ -206,6 +207,8 @@ public class AMQPTransportPollingTask {
     private String configuredContentType = AMQPTransportConstant.DEFAULT_CONTENT_TYPE;
 
     private ScheduledFuture<?> pollingTaskFuture;
+
+    private AMQPTransportReconnectHandler haHandler;
 
     public void setUseTx(boolean useTx) {
         isUseTx = useTx;
@@ -383,6 +386,10 @@ public class AMQPTransportPollingTask {
         this.responseConnectionFactory = responseConnectionFactory;
     }
 
+    public void setHaHandler(AMQPTransportReconnectHandler haHandler) {
+        this.haHandler = haHandler;
+    }
+
     /**
      * Start the polling task for this service
      */
@@ -507,6 +514,26 @@ public class AMQPTransportPollingTask {
             } catch (ShutdownSignalException e) {
                 log.error("Polling task for service '" + serviceName + "' received a " +
                         "shutdown signal", e);
+                Semaphore available = new Semaphore(0, true);
+                String key = UUID.randomUUID().toString();
+                haHandler.getBlockedTasks().add(new AMQPTransportHAEntry(
+                        available, key, connectionFactoryName));
+                try {
+                    available.acquire();
+                } catch (InterruptedException ie) {
+                    log.error("The blocking semaphore received an interrupted", e);
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+
+                AMQPTransportHABrokerEntry brokerEntry = haHandler.getConnectionMap().get(key);
+                if (brokerEntry == null) {
+                    log.error("No new connection factory were found for key '" + key + "'");
+                } else {
+                    setChannel(brokerEntry.getChannel());
+                    this.queueingConsumer = new QueueingConsumer(channel);
+                }
+
             } catch (ConsumerCancelledException e) {
                 log.error("Polling task for service '" + serviceName + "' received a " +
                         "cancellation signal");

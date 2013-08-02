@@ -531,7 +531,7 @@ public class AMQPTransportPollingTask {
                     try {
                         available.acquire();
                     } catch (InterruptedException ie) {
-                        log.error("The blocking semaphore received an interrupted", e);
+                        log.error("The blocking semaphore was interrupted", e);
                         Thread.currentThread().interrupt();
                         return;
                     }

@@ -51,7 +51,7 @@
         <section name="Installing Synapse">
             <p>
                 Let's start by downloading Apache Synapse. Launch a web browser and navigate to
-                the <a href="">Synapse Downloads</a> page. Download the binary distribution
+                the <a href="../download.html">Synapse Downloads</a> page. Download the binary distribution
                 of the latest release. Binary distributions are available in standard zip
                 format and Unix tar ball format.
             </p>
@@ -70,7 +70,7 @@
             <p>
                 Samples described in this tutorial involve routing messages to a Web Service
                 through the Synapse ESB. In real world applications, these Web Services could be
-                hosted in a web server in your organization, or practiacally anywhere in the
+                hosted in a web server in your organization, or practically anywhere in the
                 Internet. In this tutorial we will be using a sample Web Service that ships with
                 Synapse and we will deploy it in the sample Axis2 server that comes bundled with
                 Synapse.

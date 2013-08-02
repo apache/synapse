@@ -128,7 +128,7 @@ public class AMQPTransportReconnectHandler implements Runnable {
                         new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));
                 entry.getLock().release();
 
-                while (blockedTasks.isEmpty()) {
+                while (!blockedTasks.isEmpty()) {
                     entry = blockedTasks.take();
                     conFacName = entry.getConnectionFactoryName();
                     cf = connectionFactoryManager.
@@ -136,8 +136,10 @@ public class AMQPTransportReconnectHandler implements Runnable {
                     connectionMap.put(
                             entry.getKey(),
                             new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));
-                    log.info("The task with key '" + entry.getKey() + "' was combined with a new " +
-                            "connection factory");
+                    if (log.isDebugEnabled()) {
+                        log.info("The worker task with key '" + entry.getKey() + "' was combined with " +
+                                "a new connection factory");
+                    }
                     entry.getLock().release();
                 }
             }

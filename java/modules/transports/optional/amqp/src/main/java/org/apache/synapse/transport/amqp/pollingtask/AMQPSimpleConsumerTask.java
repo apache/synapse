@@ -99,7 +99,7 @@ public class AMQPSimpleConsumerTask {
                 semaphore.release();
 
             } catch (IOException e) {
-                log.error("I/O error occurred while retrieving the", e);
+                log.error("I/O error occurred", e);
             } catch (InterruptedException e) {
                 log.error("Retrieving task was interrupted", e);
                 Thread.currentThread().interrupt();

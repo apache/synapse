@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.impl.nio.DefaultNHttpServerConnection;
 import org.apache.http.nio.NHttpMessageParser;
 import org.apache.http.nio.NHttpMessageWriter;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.SessionInputBuffer;
 import org.apache.http.nio.reactor.SessionOutputBuffer;
@@ -92,7 +93,7 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
     }
 
     @Override
-    public void consumeInput(final NHttpServiceHandler handler) {
+    public void consumeInput(final NHttpServerEventHandler handler) {
         if (this.log.isDebugEnabled()) {
             this.log.debug(this.id + ": Consume input");
         }
@@ -100,7 +101,7 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
     }
 
     @Override
-    public void produceOutput(final NHttpServiceHandler handler) {
+    public void produceOutput(final NHttpServerEventHandler handler) {
         if (this.log.isDebugEnabled()) {
             this.log.debug(this.id + ": Produce output");
         }
@@ -146,8 +147,8 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
             if (message != null && headerlog.isDebugEnabled()) {
                 headerlog.debug(id + " << " + message.getStatusLine().toString());
                 Header[] headers = message.getAllHeaders();
-                for (int i = 0; i < headers.length; i++) {
-                    headerlog.debug(id + " << " + headers[i].toString());
+                for (Header header : headers) {
+                    headerlog.debug(id + " << " + header.toString());
                 }
             }
 
@@ -182,8 +183,8 @@ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
             if (message != null && headerlog.isDebugEnabled()) {
                 headerlog.debug(id + " >> " + message.getRequestLine().toString());
                 Header[] headers = message.getAllHeaders();
-                for (int i = 0; i < headers.length; i++) {
-                    headerlog.debug(id + " >> " + headers[i].toString());
+                for (Header header : headers) {
+                    headerlog.debug(id + " >> " + header.toString());
                 }
             }
             if (message != null && accesslog.isInfoEnabled()) {

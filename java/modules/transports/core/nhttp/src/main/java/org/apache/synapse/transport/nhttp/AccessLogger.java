@@ -16,10 +16,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,13 +35,12 @@ import java.util.Date;
  */
 public class AccessLogger {
 
-    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
-    private static Log log = LogFactory.getLog(ACCESS_LOG_ID);
+    private Log log;
 
     public AccessLogger(final Log log) {
         super();
         this.initOpen();
-        AccessLogger.log = log;
+        this.log = log;
         buffered = true;
         checkExists = false;
     }

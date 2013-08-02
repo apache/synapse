@@ -459,7 +459,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         if (conn != null) {
             errorMessage = "[" + conn + "] " + msg;
         } else {
-            errorMessage = "[" + conn + "] " + msg;
+            errorMessage = msg;
         }
         log.error(errorMessage, e);
     }

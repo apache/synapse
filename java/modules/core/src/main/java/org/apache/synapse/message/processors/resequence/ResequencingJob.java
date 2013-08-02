@@ -73,7 +73,7 @@ public class ResequencingJob implements Job {
         }
 
         /** Extract the SynapseXpath object from parameters to identify the sequence number of the message */
-        if (parameters != null && parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH) != null) {
+        if (parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH) != null) {
             seqNoxPath = (SynapseXPath) parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH);
         }
 
@@ -236,7 +236,7 @@ public class ResequencingJob implements Job {
         try {
             Thread.sleep(timePeriod);
         } catch (InterruptedException e) {
-            log.error(new String("Interrupted while thread sleeping in resequencer"));
+            log.error("Interrupted while thread sleeping in resequencer", e);
         }
     }
 

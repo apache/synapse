@@ -740,8 +740,7 @@ public class ClientHandler implements NHttpClientEventHandler {
                                     responseMsgCtx.getProperty("synapse.send") == null) {
                                 return;
                             }
-                        } else if (responseMsgCtx == null ||
-                                outMsgCtx.getOptions().isUseSeparateListener()) {
+                        } else if (outMsgCtx.getOptions().isUseSeparateListener()) {
                             // Since we need to notify the SynapseCallback receiver to remove the
                             // call backs registered  we set a custom property
                             setHeaders(context, response, outMsgCtx, responseMsgCtx);

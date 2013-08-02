@@ -120,10 +120,8 @@ public class SwitchCase implements ManagedLifecycle {
 
         Matcher matcher = regex.matcher(value);
         if (matcher == null) {
-
             log.warn("Matcher for the provided character sequence and the pattern ' "
                     + regex + " '" + " cannot be found. Switch case will not be executed.");
-
             return false;
         }
 

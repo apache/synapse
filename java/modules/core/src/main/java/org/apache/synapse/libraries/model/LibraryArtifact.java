@@ -96,7 +96,7 @@ public class LibraryArtifact implements SynapseArtifact{
             LibraryArtifact artifact = subArtifacts.get(artifactName);
             if (artifact.isLeafArtifact()) {
                 delegateClassLoading(artifact, library);
-                //this is where actual artifact is constructed to it's ture form
+                //this is where actual artifact is constructed to its true form
                 Object template = artifact.file.build();
                 if (artifact.file instanceof TemplateArtifactFile) {
 

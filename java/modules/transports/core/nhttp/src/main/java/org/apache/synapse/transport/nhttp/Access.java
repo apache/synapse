@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * org.apache.catalina.valves.AccessLogValve with thanks.
  */
 public class Access {
+
     private static Log log = LogFactory.getLog(Access.class);
 
     /**

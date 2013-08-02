@@ -544,7 +544,7 @@ public class AMQPTransportPollingTask {
                         stop();
                         try {
                             start();
-                            log.info("Polling task for service '" + serviceName + "' is re-deployed");
+                            log.info("Worker task for service '" + serviceName + "' is re-deployed");
                         } catch (AMQPTransportException ex) {
                             log.error("Start of polling tasks failed. System must be restarted!");
                         }

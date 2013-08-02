@@ -442,8 +442,8 @@ public class Axis2SynapseController implements SynapseController {
             }
 
             // continue stopping the axis2 environment if we created it
-            if (serverConfigurationInformation.isCreateNewInstance() && configurationContext != null
-                    && configurationContext.getAxisConfiguration() != null) {
+            if (serverConfigurationInformation.isCreateNewInstance() &&
+                    configurationContext.getAxisConfiguration() != null) {
                 Map<String, AxisService> serviceMap =
                         configurationContext.getAxisConfiguration().getServices();
                 for (AxisService svc : serviceMap.values()) {

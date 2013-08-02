@@ -47,30 +47,22 @@ public class SynapseImportSerializer {
     /**
      * This method will implements the serialization of SynapseImport object to its configuration
      *
-     * @param s the type SynapseImport which is subjected to the serialization
+     * @param synapseImport the type SynapseImport which is subjected to the serialization
      * @return OMElement serialized in to xml from the given parameters
      */
-    public OMElement serializeImport(SynapseImport s) {
-
-
-        if (!(s instanceof SynapseImport)) {
-            handleException("Unsupported Synapse Import passed in for serialization");
-        }
-
-        SynapseImport synapseImport = (SynapseImport) s;
-
+    public OMElement serializeImport(SynapseImport synapseImport) {
         OMElement importElem = fac.createOMElement("import", synNS);
 
         if (synapseImport.getLibName() != null) {
             importElem.addAttribute(fac.createOMAttribute(
-                    "name", nullNS, s.getLibName()));
+                    "name", nullNS, synapseImport.getLibName()));
         } else {
             handleException("Invalid Synapse Import. Target Library name is required");
         }
 
         if (synapseImport.getLibPackage() != null) {
             importElem.addAttribute(fac.createOMAttribute(
-                    "package", nullNS, s.getLibPackage()));
+                    "package", nullNS, synapseImport.getLibPackage()));
         } else {
             handleException("Invalid Synapse Import. Target Library package is required");
         }

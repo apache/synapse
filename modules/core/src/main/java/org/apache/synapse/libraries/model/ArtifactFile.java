@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.libraries.model;
 
 import org.apache.axiom.om.OMElement;
@@ -33,7 +34,7 @@ public abstract class ArtifactFile {
 
     private static final Log log = LogFactory.getLog(ArtifactFile.class);
 
-    protected static String fileName;
+    protected String fileName;
 
     protected OMElement configurationElement;
 

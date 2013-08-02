@@ -208,7 +208,7 @@ public class Value {
             }
             return expression;
         } catch (Exception e) {
-            handleException("Can not evaluate escaped expression : " + expr.toString());
+            handleException("Can not evaluate escaped expression : " + expr);
         }
         return this.expression;
 

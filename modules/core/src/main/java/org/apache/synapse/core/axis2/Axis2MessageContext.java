@@ -152,13 +152,10 @@ public class Axis2MessageContext implements MessageContext {
         if (o != null && o instanceof Mediator) {
             return (Mediator) o;
         } else {
-            Mediator m = getConfiguration().getSequenceTemplate(key);
-            if (m instanceof TemplateMediator) {
-                TemplateMediator templateMediator = (TemplateMediator) m;
-                synchronized (m) {
-                    if (!templateMediator.isInitialized()) {
-                        templateMediator.init(synEnv);
-                    }
+            TemplateMediator m = getConfiguration().getSequenceTemplate(key);
+            synchronized (m) {
+                if (!m.isInitialized()) {
+                    m.init(synEnv);
                 }
             }
             localEntries.put(key, m);

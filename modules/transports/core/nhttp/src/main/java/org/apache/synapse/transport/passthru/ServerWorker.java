@@ -404,9 +404,6 @@ public class ServerWorker implements Runnable {
                 if (soapVersion == 1) {
                     SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
                     envelope = fac.getDefaultEnvelope();
-                } else if (soapVersion == 2) {
-                    SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();
-                    envelope = fac.getDefaultEnvelope();
                 } else {
                     SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();
                     envelope = fac.getDefaultEnvelope();

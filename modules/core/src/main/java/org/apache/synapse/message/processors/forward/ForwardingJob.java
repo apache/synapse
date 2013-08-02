@@ -161,7 +161,7 @@ public class ForwardingJob implements StatefulJob {
                                 errorStop = true;
                                 continue;
 
-                            } else if(outCtx == null) {
+                            } else if (outCtx == null) {
                                 // This Means we have invoked an out only operation
                                 // remove the message and reset the count
                                 messageStore.poll();

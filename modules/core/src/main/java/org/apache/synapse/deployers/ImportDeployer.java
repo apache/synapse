@@ -148,9 +148,7 @@ public class ImportDeployer extends AbstractSynapseArtifactDeployer {
                     //this is a important step -> we need to unload what ever the components loaded previously
                     synLib.unLoadLibrary();
                     //then reload
-                    if (synLib != null) {
-                        LibDeployerUtils.loadLibArtifacts(synImport, synLib);
-                    }
+                    LibDeployerUtils.loadLibArtifacts(synImport, synLib);
                     log.info("Synapse Library Import named '" + synImportQualfiedName +
                              " has been deployed from file : "
                              + fileName);

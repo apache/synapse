@@ -98,8 +98,10 @@ public class AMQPTransportConnectionFactoryManager {
             } catch (IOException e) {
                 throw new AMQPTransportException("Could not remove the connection '" + name + "'", e);
             }
+        } else {
+            throw new AMQPTransportException("No connection factory found with the name '"
+                    + name + "'");
         }
-        throw new AMQPTransportException("No connection factory found with the name '" + name + "'");
     }
 
     /**

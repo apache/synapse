@@ -24,7 +24,6 @@ import org.apache.synapse.transport.amqp.pollingtask.AMQPTransportPollingTaskFac
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -77,7 +76,8 @@ public class AMQPTransportEndpoint extends ProtocolEndpoint {
                     service,
                     workerPool,
                     this,
-                    conFac);
+                    conFac,
+                    transportReceiver.getHaHandler());
 
         } catch (AMQPTransportException e) {
             throw new AxisFault("Could not load the AMQP endpoint configuration, " + e.getMessage(), e);

@@ -41,7 +41,7 @@ public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTrans
 
     private ExecutorService connectionFactoryES;
 
-    private AMQPTransportReconnectHandler haHandler;
+    private AMQPTransportReconnectHandler haHandlerTask;
 
     @Override
     protected void doInit() throws AxisFault {
@@ -71,14 +71,14 @@ public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTrans
         int maxReconnectionDuration = AMQPTransportUtils.getIntProperty(
                 AMQPTransportConstant.PARAM_MAX_RE_CONNECTION_DURATION, 1000 * 60 * 10);
 
-        haHandler = new AMQPTransportReconnectHandler(
+        haHandlerTask = new AMQPTransportReconnectHandler(
                 connectionFactoryES,
                 maxReconnectionDuration,
                 reconnectionProgressionFactor,
                 initialReconnectDuration,
                 connectionFactoryManager);
 
-        new Thread(haHandler, "AMQP-HA-handler-task").start();
+        new Thread(haHandlerTask, "AMQP-HA-handler-task").start();
 
         log.info("AMQP transport listener initializing..");
     }
@@ -136,5 +136,9 @@ public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTrans
         }
         return connectionFactoryManager.getConnectionFactory(
                 AMQPTransportConstant.DEFAULT_CONNECTION_FACTORY_NAME);
+    }
+
+    public AMQPTransportReconnectHandler getHaHandler(){
+        return haHandlerTask;
     }
 }

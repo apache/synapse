@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.passthru.jmx;
 
 import org.apache.axis2.AxisFault;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -101,13 +102,21 @@ public class LatencyView implements LatencyViewMBean {
         scheduler.scheduleAtFixedRate(new LongTermDataCollector(), LARGE_DATA_COLLECTION_PERIOD,
                 LARGE_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
 
-        MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
-
+        boolean registered = false;
+        try {
+            registered = MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
+        } finally {
+            if (!registered) {
+                scheduler.shutdownNow();
+            }
+        }
     }
 
     public void destroy() {
         MBeanRegistrar.getInstance().unRegisterMBean(NHTTP_LATENCY_VIEW, name);
-        scheduler.shutdownNow();
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
     }
 
     /**

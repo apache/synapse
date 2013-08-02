@@ -20,6 +20,7 @@
 package org.apache.synapse.transport.passthru.jmx;
 
 import org.apache.axis2.AxisFault;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -104,13 +105,22 @@ public class ConnectionsView implements ConnectionsViewMBean {
         scheduler.scheduleAtFixedRate(longTermCollector, LONG_DATA_COLLECTION_PERIOD,
                 LONG_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
 
-        MBeanRegistrar.getInstance().registerMBean(this, PASS_THROUGH_CONNECTIONS, name);
+        boolean registered = false;
+        try {
+            registered = MBeanRegistrar.getInstance().registerMBean(this, PASS_THROUGH_CONNECTIONS, name);
+        } finally {
+            if (!registered) {
+                scheduler.shutdownNow();
+            }
+        }
 
     }
 
     public void destroy() {
         MBeanRegistrar.getInstance().unRegisterMBean(PASS_THROUGH_CONNECTIONS, name);
-        scheduler.shutdownNow();
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
     }
 
     private void initCounters(AtomicInteger[] counters) {
@@ -230,8 +240,8 @@ public class ConnectionsView implements ConnectionsViewMBean {
         Integer[] array = shortTermDataQueue.toArray(new Integer[shortTermDataQueue.size()]);
 
         if (n > array.length) {
-            for (int i = 0; i < array.length; i++) {
-                sum += array[i];
+            for (Integer anArray : array) {
+                sum += anArray;
             }
         } else {
             for (int i = 0; i < n; i++) {
@@ -254,8 +264,8 @@ public class ConnectionsView implements ConnectionsViewMBean {
         Integer[] array = longTermDataQueue.toArray(new Integer[longTermDataQueue.size()]);
 
         if (samples > array.length) {
-            for (int i = 0; i < array.length; i++) {
-                sum += array[i];
+            for (Integer anArray : array) {
+                sum += anArray;
             }
         } else {
             for (int i = 0; i < samples; i++) {

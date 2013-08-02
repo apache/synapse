@@ -45,8 +45,8 @@ import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.http.params.HttpParams;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
-import org.apache.synapse.transport.passthru.jmx.MBeanRegistrar;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
 import org.apache.synapse.transport.passthru.jmx.TransportView;
 

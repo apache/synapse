@@ -538,7 +538,7 @@ public class AMQPTransportPollingTask {
 
                     AMQPTransportHABrokerEntry brokerEntry = haHandler.getConnectionMap().get(key);
                     if (brokerEntry == null) {
-                        log.error("No new connection factory were found for key '" + key + "'");
+                        log.error("No new connection factory was found for key '" + key + "'");
                     } else {
                         setChannel(brokerEntry.getChannel());
                         stop();

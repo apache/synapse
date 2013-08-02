@@ -741,17 +741,13 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                 targetInLineFaultSequence.destroy();
             }
 
-            try {
-                AxisService as = axisConfig.getService(this.getName());
-                if (as != null) {
-                    as.setActive(false);
-                    axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_STOP, as), as);
-                }
-                this.setRunning(false);
-                auditInfo("Stopped the proxy service : " + name);
-            } catch (AxisFault axisFault) {
-                handleException("Error stopping the proxy service : " + name, axisFault);
+            AxisService as = axisConfig.getServiceForActivation(this.getName());
+            if (as != null && as.isActive()) {
+                as.setActive(false);
+                axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_STOP, as), as);
             }
+            this.setRunning(false);
+            auditInfo("Stopped the proxy service : " + name);
         } else {
             auditWarn("Unable to stop proxy service : " + name +
                 ". Couldn't access Axis configuration");

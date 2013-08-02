@@ -75,7 +75,7 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
             if (sessionList != null) {
                 for (String sessionID : sessionList) {
                     SessionInformation sessionInfoObj = SALSessions.getInstance().getSession(sessionID);
-                    if (sessionInfoObj != null) {
+                    if (sessionInfoObj != null && sessionInfoObj.getMember() != null) {
                         Map<String, String> subDomainNames =
                                 (Map<String, String>) sessionInfoObj.getMember().getProperties().get(HOSTS);
                         if (log.isDebugEnabled()) {

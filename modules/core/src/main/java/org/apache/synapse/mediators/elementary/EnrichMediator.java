@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.mediators.elementary;
 
 import org.apache.axiom.om.OMNode;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
  */
 
 public class EnrichMediator extends AbstractMediator {
+
     public static final int CUSTOM = 0;
 
     public static final int ENVELOPE = 1;

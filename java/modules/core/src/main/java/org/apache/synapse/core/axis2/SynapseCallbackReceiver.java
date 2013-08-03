@@ -40,6 +40,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.aspects.statistics.ErrorLogFactory;
 import org.apache.synapse.aspects.statistics.StatisticsReporter;
+import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
@@ -61,19 +62,47 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
     private static final Log log = LogFactory.getLog(SynapseCallbackReceiver.class);
 
+    private static final String CALLBACK_STORE_CATEGORY = "SynapseCallbackStore";
+    private static final String CALLBACK_STORE_NAME = "SynapseCallbackStore";
+
+    private static final SynapseCallbackReceiver instance = new SynapseCallbackReceiver();
+
     /** This is the synchronized callbackStore that maps outgoing messageID's to callback objects */
     private final Map<String, AxisCallback> callbackStore;  // will be made thread safe in the constructor
 
+    private boolean initialized = false;
+
+    private SynapseCallbackReceiver() {
+        callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
+    }
+
     /**
-     * Create the *single* instance of this class that would be used by all anonymous services
+     * Get the singleton SynapseCallbackReceiver instance
+     *
+     * @return A SynapseCallbackReceiver
+     */
+    public static SynapseCallbackReceiver getInstance() {
+        return instance;
+    }
+
+    /**
+     * Initialize the singleton instance of this class that would be used by all anonymous services
      * used for outgoing messaging.
+     *
      * @param synCfg the Synapse configuration
      * @param contextInformation server runtime information
      */
-    public SynapseCallbackReceiver(SynapseConfiguration synCfg,
+    public void init(SynapseConfiguration synCfg,
                                    ServerContextInformation contextInformation) {
 
-        callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());
+        if (initialized) {
+            log.warn("Attempted to re-initialize SynapseCallbackReceiver");
+            return;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing SynapseCallbackReceiver");
+        }
 
         // create the Timer object and a TimeoutHandler task
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore, contextInformation);
@@ -83,10 +112,43 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
         // schedule timeout handler to run every n seconds (n : specified or defaults to 15s)
         timeOutTimer.schedule(timeoutHandler, 0, timeoutHandlerInterval);
+
+        MBeanRegistrar.getInstance().registerMBean(new SynapseCallbackStoreView(this),
+                CALLBACK_STORE_CATEGORY, CALLBACK_STORE_NAME);
+        initialized = true;
+    }
+
+    /**
+     * Destroy and cleanup this callback receiver instance
+     */
+    public void destroy() {
+        if (!initialized) {
+            log.warn("Attempted to destroy uninitialized SynapseCallbackReceiver");
+            return;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Destroying SynapseCallbackReceiver");
+        }
+        MBeanRegistrar.getInstance().unRegisterMBean(CALLBACK_STORE_CATEGORY,
+                CALLBACK_STORE_NAME);
+        initialized = false;
     }
 
     public int getCallbackCount() {
         return callbackStore.size();
+    }
+
+    public String[] getPendingCallbacks() {
+        Set<String> keys = callbackStore.keySet();
+        List<String> list = new ArrayList<String>();
+        synchronized (callbackStore) {
+            Iterator<String> iterator = keys.iterator();
+            while (iterator.hasNext()) {
+                list.add(iterator.next());
+            }
+        }
+        return list.toArray(new String[list.size()]);
     }
 
     public void addCallback(String MsgID, AxisCallback callback) {

@@ -348,6 +348,9 @@ public class Axis2SynapseController implements SynapseController {
         } catch (IOException e) {
             log.error("Error while initializing SNMP", e);
         }
+
+        SynapseCallbackReceiver.getInstance().init(serverContextInformation.getSynapseConfiguration(),
+                serverContextInformation);
     }
 
     /**
@@ -459,6 +462,8 @@ public class Axis2SynapseController implements SynapseController {
                     }
                 }
             }
+
+            SynapseCallbackReceiver.getInstance().destroy();
         } catch (AxisFault e) {
             log.error("Error stopping the Axis2 Environment");
         }
@@ -621,7 +626,7 @@ public class Axis2SynapseController implements SynapseController {
             }
             int pendingTransportThreads = pendingListenerThreads + pendingSenderThreads;
 
-            int pendingCallbacks = serverContextInformation.getCallbackCount();
+            int pendingCallbacks = SynapseCallbackReceiver.getInstance().getCallbackCount();
             if (pendingCallbacks > 0) {
                 log.info("Waiting for: " + pendingCallbacks + " callbacks/replies..");
             }

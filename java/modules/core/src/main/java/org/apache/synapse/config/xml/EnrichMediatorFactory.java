@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -32,8 +33,8 @@ import org.apache.synapse.mediators.elementary.Target;
 
 import java.util.Properties;
 
-
 public class EnrichMediatorFactory extends AbstractMediatorFactory {
+
     private static final QName XML_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enrich");
     private static final QName ATT_PROPERTY = new QName("property");
     private static final QName ATT_XPATH = new QName("xpath");
@@ -81,7 +82,7 @@ public class EnrichMediatorFactory extends AbstractMediatorFactory {
 
     private void populateSource(Source source, OMElement sourceEle) {
 
-        // type attribue
+        // type attribute
         OMAttribute typeAttr = sourceEle.getAttribute(ATT_TYPE);
         if (typeAttr != null && typeAttr.getAttributeValue() != null) {
             source.setSourceType(convertTypeToInit(typeAttr.getAttributeValue()));

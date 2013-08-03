@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.EnqueueMediator;
 
-
 public class EnqueueMediatorSerializer extends AbstractMediatorSerializer{
 
     public OMElement serializeSpecificMediator(Mediator m) {
@@ -48,8 +47,10 @@ public class EnqueueMediatorSerializer extends AbstractMediatorSerializer{
             handleException("Invalid enqueue mediator. sequence is required");
         }
 
-        enqueue.addAttribute(fac.createOMAttribute(
-                "priority", nullNS, mediator.getPriority() + ""));
+        if (mediator.getPriority() != 0) {
+            enqueue.addAttribute(fac.createOMAttribute(
+                    "priority", nullNS, mediator.getPriority() + ""));
+        }
 
         return enqueue;
     }

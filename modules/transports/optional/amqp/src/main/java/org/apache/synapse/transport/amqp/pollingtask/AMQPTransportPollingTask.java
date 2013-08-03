@@ -555,7 +555,7 @@ public class AMQPTransportPollingTask {
 
             } catch (ConsumerCancelledException e) {
                 log.error("Polling task for service '" + serviceName + "' received a " +
-                        "cancellation signal");
+                        "cancellation signal", e);
             }
         }
     }

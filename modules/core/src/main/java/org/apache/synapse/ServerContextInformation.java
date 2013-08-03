@@ -38,8 +38,6 @@ public class ServerContextInformation {
     private SynapseConfiguration synapseConfiguration;
     /* Keeps the SynapseEnvironment */
     private SynapseEnvironment synapseEnvironment;
-    /** Callback receiver */    
-    private SynapseCallbackReceiver synapseCallbackReceiver;
     /** State of the server */
     private ServerState serverState = ServerState.UNDETERMINED;
     /** Reference to the server configuration */
@@ -95,27 +93,7 @@ public class ServerContextInformation {
         this.synapseEnvironment = synapseEnvironment;
     }
 
-    public SynapseCallbackReceiver getSynapseCallbackReceiver() {
-        return synapseCallbackReceiver;
-    }
-
-    public void setSynapseCallbackReceiver(SynapseCallbackReceiver synapseCallbackReceiver) {
-        this.synapseCallbackReceiver = synapseCallbackReceiver;
-    }
-
     public ServerConfigurationInformation getServerConfigurationInformation() {
         return serverConfigurationInformation;
-    }
-
-    /**
-     * Returns the number of current callbacks.
-     *
-     * @return the number of current callbacks.
-     */
-    public int getCallbackCount() {
-        if (synapseCallbackReceiver != null) {
-            return synapseCallbackReceiver.getCallbackCount();
-        }
-        return 0;
     }
 }

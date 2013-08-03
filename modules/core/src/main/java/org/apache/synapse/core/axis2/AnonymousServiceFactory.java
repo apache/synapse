@@ -27,7 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.config.SynapseConfiguration;
 
 import javax.xml.namespace.QName;
@@ -49,8 +48,6 @@ public class AnonymousServiceFactory {
 
     public static final String OUT_IN_OPERATION   = "anonOutInOp";
     public static final String OUT_ONLY_OPERATION = "anonOutonlyOp";
-
-    private static SynapseCallbackReceiver synapseCallbackReceiver = null;
 
     /**
      * Creates an AxisService for the requested QoS for sending out messages
@@ -161,7 +158,7 @@ public class AnonymousServiceFactory {
         try {
             DynamicAxisOperation dynamicOperation =
                 new DynamicAxisOperation(new QName(OUT_IN_OPERATION));
-            dynamicOperation.setMessageReceiver(getCallbackReceiver(synCfg, axisCfg));
+            dynamicOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());
             AxisMessage inMsg = new AxisMessage();
             inMsg.setName("in-message");
             inMsg.setParent(dynamicOperation);
@@ -173,7 +170,7 @@ public class AnonymousServiceFactory {
 
             OutOnlyAxisOperation asyncOperation =
                 new OutOnlyAxisOperation(new QName(OUT_ONLY_OPERATION));
-            asyncOperation.setMessageReceiver(getCallbackReceiver(synCfg, axisCfg));
+            asyncOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());
             AxisMessage outOnlyMsg = new AxisMessage();
             outOnlyMsg.setName("out-message");
             outOnlyMsg.setParent(asyncOperation);
@@ -193,39 +190,9 @@ public class AnonymousServiceFactory {
 
         } catch (AxisFault e) {
             handleException(
-                "Error occured while creating an anonymous service for QoS : " +
+                "Error occurred while creating an anonymous service for QoS : " +
                  serviceKey, e);
         }
         return null;
-    }
-
-    /**
-     * Create a single callback receiver if required, and return its reference
-     * @param synCfg the Synapse configuration
-     * @param axisCfg axis configuration
-     * @return the callback receiver thats created or now exists
-     */
-    private static synchronized SynapseCallbackReceiver getCallbackReceiver(
-            SynapseConfiguration synCfg, AxisConfiguration axisCfg) {
-
-        if (synapseCallbackReceiver == null) {
-            Parameter serverCtxParam =
-                    axisCfg.getParameter(
-                            SynapseConstants.SYNAPSE_SERVER_CTX_INFO);
-            if (serverCtxParam == null ||
-                    !(serverCtxParam.getValue() instanceof ServerContextInformation)) {
-                String msg = "ServerContextInformation not found";
-                log.error(msg);
-                throw new SynapseException(msg);
-            }
-
-            ServerContextInformation contextInformation =
-                    (ServerContextInformation) serverCtxParam.getValue();
-
-            synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg, contextInformation);
-
-            contextInformation.setSynapseCallbackReceiver(synapseCallbackReceiver);
-        }
-        return synapseCallbackReceiver;
     }
 }

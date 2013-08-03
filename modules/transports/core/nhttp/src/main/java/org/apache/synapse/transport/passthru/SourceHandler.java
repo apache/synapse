@@ -467,7 +467,7 @@ public class SourceHandler implements NHttpServerEventHandler {
     
     /**
      * Commit the response to the connection. Processes the response through the configured
-     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted
+     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targeted
      * for non critical (i.e. browser requests etc) requests, which are not core messages
      * @param conn the connection being processed
      * @param response the response to commit over the connection
@@ -481,7 +481,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         } catch (HttpException e) {
             handleException("Unexpected HTTP protocol error : " + e.getMessage(), e, conn);
         } catch (IOException e) {
-            handleException("IO error submiting response : " + e.getMessage(), e, conn);
+            handleException("IO error submitting response : " + e.getMessage(), e, conn);
         }
     }
 

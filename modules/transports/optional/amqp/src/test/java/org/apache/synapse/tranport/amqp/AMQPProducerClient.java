@@ -74,7 +74,7 @@ public class AMQPProducerClient {
         }
 
         if (queueName != null) {
-            AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);
+            AMQPProducerClient.produce(MESSAGE2, channel, queueName);
         } else {
             if (routingKey != null) {
                 AMQPProducerClient.route(MESSAGE2, channel, exchangeName, routingKey);

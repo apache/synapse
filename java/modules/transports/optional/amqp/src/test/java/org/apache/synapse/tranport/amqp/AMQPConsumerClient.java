@@ -22,8 +22,9 @@ public class AMQPConsumerClient {
             System.out.println("Usage: java AMQPConsumerClient <queue-name>");
             System.out.println("Default arguments will be used");
             queueName = QUEUE_NAME;
+        } else {
+            queueName = args[1];
         }
-        queueName = args[1];
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");

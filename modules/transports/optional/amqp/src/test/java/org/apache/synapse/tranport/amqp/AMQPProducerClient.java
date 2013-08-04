@@ -90,7 +90,9 @@ public class AMQPProducerClient {
 
     private static void produce(String message, Channel channel, String queueName)
             throws IOException {
-        channel.basicPublish("", queueName, null, message.getBytes());
+        for (int i = 0; i < 1000000; i++) {
+            channel.basicPublish("", queueName, null, message.getBytes());
+        }
     }
 
     private static void publish(String message, Channel channel, String exchangeName)

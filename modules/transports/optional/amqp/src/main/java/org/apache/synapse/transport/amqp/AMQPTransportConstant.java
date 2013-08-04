@@ -339,7 +339,7 @@ public final class AMQPTransportConstant {
 
     public static final String PARAM_WORKER_POOL_SIZE = "worker-pool-size";
 
-    public static final int WORKER_POOL_DEFAULT = 1000;
+    public static final int WORKER_POOL_DEFAULT = 75;
 
     public static final String PARAM_SEMAPHORE_TIME_OUT = "semaphore-time-out";
 

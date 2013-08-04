@@ -69,7 +69,8 @@ public class ValueFactory {
                 key = new Value(attributeValue);
             }
         } else {
-            handleException("The 'key' attribute is required for the XSLT mediator");
+            handleException("The '" + name + "' attribute is required on the " +
+                    elem.getLocalName() + " element");
         }
         return key;
     }

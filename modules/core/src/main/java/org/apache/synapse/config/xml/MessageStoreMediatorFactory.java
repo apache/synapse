@@ -47,21 +47,21 @@ public class MessageStoreMediatorFactory extends AbstractMediatorFactory{
     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
         MessageStoreMediator messageStoreMediator = new MessageStoreMediator();
         OMAttribute nameAtt = elem.getAttribute(ATT_NAME);
-        if(nameAtt != null) {
+        if (nameAtt != null) {
             messageStoreMediator.setName(nameAtt.getAttributeValue());
         }
 
         OMAttribute messageStoreNameAtt = elem.getAttribute(ATT_MESSAGE_STORE);
 
-        if(messageStoreNameAtt != null) {
+        if (messageStoreNameAtt != null) {
             messageStoreMediator.setMessageStoreName(messageStoreNameAtt.getAttributeValue());
         } else {
-            throw new SynapseException("Message Store mediator must have a Message store defined");
+            throw new SynapseException("Message Store mediator must have a message store defined");
         }
 
         OMAttribute sequenceAtt = elem.getAttribute(ATT_SEQUENCE);
 
-        if(sequenceAtt != null) {
+        if (sequenceAtt != null) {
             messageStoreMediator.setOnStoreSequence(sequenceAtt.getAttributeValue());
         }
 

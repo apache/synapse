@@ -33,8 +33,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This implements the well known <code>Sample</code> EIP (Enterprise Integration Pattern), which controls the flow
- * of messages and limit the rate at which the messages are flowing through the sampler</p>
+ * <p>This implements the well known <code>Sample</code> EIP (Enterprise Integration Pattern),
+ * which controls the flow of messages and limit the rate at which the messages are flowing
+ * through the sampler</p>
  *
  * <p>Please note that the usage of this will require the sampler to be on the out-flow as well to correctly
  * determine & to manage the rate.</p>

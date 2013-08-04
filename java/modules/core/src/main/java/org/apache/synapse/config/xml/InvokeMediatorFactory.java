@@ -71,9 +71,9 @@ public class InvokeMediatorFactory extends AbstractMediatorFactory {
             OMElement child = (OMElement) subElements.next();
             if (child.getQName().equals(WITH_PARAM_Q)) {
                 OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
-                Value paramValue = new ValueFactory().createValue("value", child);
                 if (paramNameAttr != null) {
                     //set parameter value
+                    Value paramValue = new ValueFactory().createValue("value", child);
                     invoker.addExpressionForParamName(paramNameAttr.getAttributeValue(), paramValue);
                 }
             }

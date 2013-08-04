@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.mediators.template;
 
 import org.apache.synapse.Mediator;
@@ -25,8 +26,8 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.eip.EIPUtils;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -50,7 +51,8 @@ public class InvokeMediator extends AbstractMediator {
     private Map<String, Value> pName2ExpressionMap;
 
     public InvokeMediator() {
-        pName2ExpressionMap = new HashMap<String, Value>();
+        // use a LinkedHashMap to maintain the order in which params are defined by the user
+        pName2ExpressionMap = new LinkedHashMap<String, Value>();
     }
 
     public boolean mediate(MessageContext synCtx) {

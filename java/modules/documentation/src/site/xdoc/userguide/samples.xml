@@ -128,6 +128,8 @@
                 <p>
                     <ul>
                         <li><a href="samples/sample300.html">Sample 300: Introduction to tasks with simple trigger</a></li>
+                        <li><a href="samples/sample301.html">Sample 301: Message Injector Task to invoke a named sequence</a></li>
+                        <li><a href="samples/sample302.html">Sample 302: Message Injector Task to invoke a Proxy service</a></li>
                     </ul>
                 </p>
             </subsection>

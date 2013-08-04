@@ -42,10 +42,14 @@ public class SamplingThrottleMediatorSerializer extends AbstractMediatorSerializ
         if (samplingThrottleMediator.getId() != null) {
             samplerElem.addAttribute("id", samplingThrottleMediator.getId(), nullNS);
         }
-        samplerElem.addAttribute("rate",
-                Integer.toString(samplingThrottleMediator.getSamplingRate()), nullNS);
-        samplerElem.addAttribute("unitTime",
-                Long.toString(samplingThrottleMediator.getUnitTime()), nullNS);
+        if (samplingThrottleMediator.getSamplingRate() != 1) {
+            samplerElem.addAttribute("rate",
+                    Integer.toString(samplingThrottleMediator.getSamplingRate()), nullNS);
+        }
+        if (samplingThrottleMediator.getUnitTime() != 1000) {
+            samplerElem.addAttribute("unitTime",
+                    Long.toString(samplingThrottleMediator.getUnitTime()), nullNS);
+        }
 
         if (samplingThrottleMediator.isMessageQueueExplicitlySet()) {
             OMElement messageQueueElem = fac.createOMElement("messageQueue", synNS);

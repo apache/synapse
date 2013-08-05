@@ -131,7 +131,7 @@ public class SALSessions {
 
         if (sessionID == null || "".equals(sessionID)) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot find session ID .Returing null");
+                log.debug("Cannot find session ID. Returning null.");
             }
             return;
         }
@@ -524,7 +524,7 @@ public class SALSessions {
 
     /*
      * Factory method to create a session information using given endpoint list,
-     * session id and other informations
+     * session id and other information
      */
     private SessionInformation createSessionInformation(MessageContext synCtx,
                                                         String id, List<Endpoint> endpoints) {
@@ -580,7 +580,7 @@ public class SALSessions {
 
     /*
      * Factory method to create a session information using a given member node ,
-     * session id and other informations
+     * session id and other information
      */
     private SessionInformation createSessionInformation(MessageContext synCtx,
                                                         String id, Member currentMember) {

@@ -115,7 +115,7 @@ public class SynapseObserverTest extends TestCase {
         assertTrue(!observer.tracker.get(type).contains(name));
     }
 
-    private class SimpleSynapseObserver implements SynapseObserver {
+    private class SimpleSynapseObserver extends AbstractSynapseObserver {
 
         private Map<Integer, Set<String>> tracker = new HashMap<Integer, Set<String>>();
 

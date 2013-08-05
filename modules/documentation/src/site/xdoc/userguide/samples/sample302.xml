@@ -99,7 +99,7 @@
                     Axis2 server, which will send back a response to Synapse. So every 5 seconds you
                     will notice that Axis2 is generating a quote and Synapse is receiving the stock
                     quote response. You will also see the "SampleProxy invoked" message getting
-                    loggedlog on the console.
+                    logged on the console.
                 </p>
             </subsection>
         </section>

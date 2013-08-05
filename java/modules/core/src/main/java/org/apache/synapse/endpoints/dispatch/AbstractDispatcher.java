@@ -36,7 +36,6 @@ import java.util.Map;
 public abstract class AbstractDispatcher implements Dispatcher {
 
     protected Log log;
-    private final static String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
 
     protected AbstractDispatcher() {
         log = LogFactory.getLog(this.getClass());
@@ -149,7 +148,7 @@ public abstract class AbstractDispatcher implements Dispatcher {
         org.apache.axis2.context.MessageContext axis2MessageContext =
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        Object o = axis2MessageContext.getProperty(TRANSPORT_HEADERS);
+        Object o = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         if (o != null && o instanceof Map) {
             return (Map) o;
         }

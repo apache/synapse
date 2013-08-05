@@ -78,4 +78,19 @@ public class APISerializationTest extends AbstractTestCase {
         OMElement out = APISerializer.serializeAPI(api);
         assertXMLEqual(xml, out.toString());
     }
+
+    public void testAPISerialization6() throws Exception {
+        String xml = "<api name=\"test\" context=\"/dictionary\" hostname=\"apache.org\" port=\"8243\"" +
+                " xmlns=\"http://ws.apache.org/ns/synapse\"><resource url-mapping=\"/admin/view/*\" " +
+                "><inSequence><log/><send/></inSequence><outSequence><log/><send/></outSequence></resource>" +
+                "<resource url-mapping=\"/admin/*\"><inSequence><log/><send/></inSequence><outSequence>" +
+                "<log/><send/></outSequence></resource><resource uri-template=\"/{char}/{word}\">" +
+                "<inSequence><send/></inSequence><faultSequence><log level=\"full\"/></faultSequence>" +
+                "</resource><handlers><handler class=\"org.apache.synapse.config.xml.rest.TestHandler\"/>" +
+                "</handlers></api>";
+        OMElement om = AXIOMUtil.stringToOM(xml);
+        API api = APIFactory.createAPI(om);
+        OMElement out = APISerializer.serializeAPI(api);
+        assertXMLEqual(xml, out.toString());
+    }
 }

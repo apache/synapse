@@ -78,18 +78,18 @@ public class ResequencingJob implements Job {
         }
 
         /** Extract the number of messages interested to come */
-        if (parameters != null && parameters.get(ResequencingProcessor.REQ_INIT_MSGS) != null) {
+        if (parameters.get(ResequencingProcessor.REQ_INIT_MSGS) != null) {
             processor.setRequiredInitMsgs(new AtomicInteger(Integer.parseInt((String) parameters.get(
                     ResequencingProcessor.REQ_INIT_MSGS))));
         }
         /** Extract the delay wait until the interested messages come */
-        if (parameters != null && parameters.get(ResequencingProcessor.REQ_INIT_MSGS_DELAY) != null) {
+        if (parameters.get(ResequencingProcessor.REQ_INIT_MSGS_DELAY) != null) {
             processor.setRequiredInitMsgsDelay(new AtomicInteger(Integer.parseInt((String) parameters.get(
                     ResequencingProcessor.REQ_INIT_MSGS_DELAY))));
         }
 
         /** Extract whether to delete duplicate messages */
-        if (parameters != null && parameters.get(ResequencingProcessor.DELETE_DUPLICATES) != null) {
+        if (parameters.get(ResequencingProcessor.DELETE_DUPLICATES) != null) {
             String result=(String) parameters.get(ResequencingProcessor.DELETE_DUPLICATES);
             if(result.equalsIgnoreCase("TRUE")){
                 processor.setDeleteDuplicates(new AtomicBoolean(true));

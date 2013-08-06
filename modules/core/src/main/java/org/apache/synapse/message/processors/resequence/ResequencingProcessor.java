@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class will be used as the processor of the resequencer and set up
- * the necessary environment for the ReequencingJob.
+ * the necessary environment for the ResequencingJob.
  * This should be run periodically after given time interval and
  * for that this should be inherited from ScheduledMessageProcessor class
  */
@@ -126,8 +126,6 @@ public class ResequencingProcessor extends ScheduledMessageProcessor {
      * This method use to find the minimum sequence number in the message store at the startup
      */
     private void findFirstSeqNum() {
-
-
         MessageStore store = configuration.getMessageStore(messageStore);
         SynapseXPath seqNoxPath = null;
 

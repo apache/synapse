@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/*
+/**
  * This class is instantiated by SimpleQuartzFactory (or by hand)
  * When it is initialized it creates a Quartz Scheduler with a job and a trigger
  * The class it starts is always an instance of SimpleQuartzJob

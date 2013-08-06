@@ -107,6 +107,22 @@ public class InMemoryMessageStoreTest extends TestCase {
         msg = store.peek();
         assertEquals("BAR", msg.getMessageID());
     }
+
+    public void testStoreObserver() throws Exception {
+        MessageStore store = new InMemoryMessageStore();
+        TestObserver observer = new TestObserver();
+        store.registerObserver(observer);
+
+        for (int i = 0; i < 100; i++) {
+            store.offer(createMessageContext("ID" + i));
+        }
+        assertEquals(100, observer.getCount());
+
+        for (int i = 0; i < 100; i++) {
+            store.poll();
+        }
+        assertEquals(0, observer.getCount());
+    }
     
     private MessageContext createMessageContext(String identifier) throws Exception {
         MessageContext msg = TestUtils.createLightweightSynapseMessageContext("<test/>");
@@ -117,6 +133,22 @@ public class InMemoryMessageStoreTest extends TestCase {
     private void populateStore(MessageStore store, int count) throws Exception {
         for (int i = 0; i < count; i++) {
             store.offer(createMessageContext("ID" + i));
+        }
+    }
+
+    private static class TestObserver implements MessageStoreObserver {
+        int counter = 0;
+
+        public void messageAdded(String messageId) {
+            counter++;
+        }
+
+        public void messageRemoved(String messageId) {
+            counter--;
+        }
+
+        public int getCount() {
+            return counter;
         }
     }
 }

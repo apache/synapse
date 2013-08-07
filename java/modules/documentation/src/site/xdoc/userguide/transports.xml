@@ -212,6 +212,10 @@
             &lt;Password&gt;password&lt;/Password&gt;
         &lt;/TrustStore&gt;
     &lt;/parameter&gt;
+    &lt;parameter name="CertificateRevocationVerifier"&gt;
+            &lt;CacheSize&gt;50&lt;/CacheSize&gt;
+            &lt;CacheDurationMins&gt;5&lt;/CacheDurationMins&gt;
+    &lt;/parameter&gt;
 &lt;/transportSender&gt;</div>
 			</subsection>
 			<subsection name="Transport listener parameters" id="Transport_listener_parameters">
@@ -345,7 +349,7 @@
 					</dd>
 				</dl>
 				<p>Note that the HTTPS sender has no proxy support yet.</p>
-				<p>The following parameters are specific to the HTTP sender:</p>
+				<p>The following parameters are specific to the HTTPS sender:</p>
 				<dl>
 					<dt>
 						<tt>keystore</tt>
@@ -388,6 +392,24 @@
 						<a href="../apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier Javadoc</a>
 						for more details.
 					</dd>
+                    <dt>
+                        <tt>CertificateRevocationVerifier</tt>
+                    </dt>
+                    <dd>
+                        This is an optional parameter to validate the revocation status of the host
+                        certificates using <a href="http://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
+                        <a href="http://www.ietf.org/rfc/rfc5280.txt">CRL</a> when making HTTPS connections.
+                        Simply uncomment this parameter in the axis2.xml file to enable the feature.
+                        Two LRU caches are used to cache CRLs and OCSP responses until they are expired. "CacheSize"
+                        property defines the maximum size of a cache. When this limit is reached, the
+                        old values will be automatically removed and updated with new values. "CacheDurationMins"
+                        is used to configure the time duration (in minutes) between two consecutive
+                        runs of the CacheManager task which periodically performs housekeeping work
+                        in each cache. Refer the example configuration above to see how to configure
+                        these properties. The scheduled CacheManager tasks for OCSP and CRL caches can
+                        be manually controlled using the JMX MBeans registered under the "CacheController"
+                        category.
+                    </dd>
 				</dl>
 		</subsection>
 		</section>

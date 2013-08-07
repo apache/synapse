@@ -29,7 +29,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
- *      &lt;enableSec policy="string"/&gt;?
+ *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
  * &lt;/callout&gt;
  * </pre>
  */
@@ -84,10 +84,23 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
                 "key", nullNS, mediator.getTargetKey()));
         }
 
-        if (mediator.isSecurityOn() && mediator.getWsSecPolicyKey() != null) {
-            OMElement security = fac.createOMElement("enableSec", synNS, callout);
-            security.addAttribute(fac.createOMAttribute(
-                    "policy", nullNS, mediator.getWsSecPolicyKey()));
+        if (mediator.isSecurityOn()) {
+            OMElement security = fac.createOMElement("enableSec", synNS);
+            if (mediator.getWsSecPolicyKey() != null) {
+                security.addAttribute(fac.createOMAttribute(
+                        "policy", nullNS, mediator.getWsSecPolicyKey()));
+                callout.addChild(security);
+            } else if (mediator.getOutboundWsSecPolicyKey() != null || mediator.getInboundWsSecPolicyKey() != null) {
+                if (mediator.getOutboundWsSecPolicyKey() != null) {
+                    security.addAttribute(fac.createOMAttribute(
+                            "outboundPolicy", nullNS, mediator.getOutboundWsSecPolicyKey()));
+                }
+                if (mediator.getInboundWsSecPolicyKey() != null) {
+                    security.addAttribute(fac.createOMAttribute(
+                            "inboundPolicy", nullNS, mediator.getInboundWsSecPolicyKey()));
+                }
+                callout.addChild(security);
+            }
         }
 
         return callout;

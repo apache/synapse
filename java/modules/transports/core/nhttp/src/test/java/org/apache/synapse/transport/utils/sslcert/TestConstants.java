@@ -26,14 +26,14 @@ public interface TestConstants {
     final static int NEXT_UPDATE_PERIOD = 1000000;
 
     /**
-     * The certificates in the resources folder will contain the certificates in the certificate chain from
-     * https://www.github.com
-     * These certificates are chosen because the certificate issuers support both CRL and OCSP. Read the certificates for
-     * more details.
-     *
-     * CAUTION: Replace the certificates if they expire or are marked as revoked by their issuers. At the moment they are
-     * valid. The expiry dates of the certificates are as follows:
-     *
+     * The certificates in the resources folder will contain the certificates in the certificate
+     * chain from https://www.github.com
+     * These certificates are chosen because the certificate issuers support both CRL and OCSP.
+     * Read the certificates for more details.
+     * <p/>
+     * CAUTION: Replace the certificates if they expire or are marked as revoked by their issuers.
+     * At the moment they are valid. The expiry dates of the certificates are as follows:
+     * <p/>
      * github.com                    : 09/02/2015
      * DigiCertHighAssuranceEVCA-1   : 11/10/2021
      * DigiCertHighAssuranceEVRootCA : 11/10/2031

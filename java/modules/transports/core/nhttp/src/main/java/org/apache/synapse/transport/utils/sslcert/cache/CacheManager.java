@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Cache Manager takes care of and maintains an LRU cache which implements ManageableCache Interface.
- * Delay should be configured such that cacheManager is not too much involved with the cache,
+ * Duration should be configured such that cacheManager is not too much involved with the cache,
  * but manages it optimally.
  */
 public class CacheManager {
@@ -45,7 +45,7 @@ public class CacheManager {
     private ScheduledFuture scheduledFuture = null;
     private ManageableCache cache;
     private int cacheMaxSize;
-    private int delay;
+    private int duration;
     private CacheManagingTask cacheManagingTask;
 
     /**
@@ -55,23 +55,23 @@ public class CacheManager {
      * @param cacheMaxSize Maximum size of the cache. If the cache exceeds this size, LRU values
      *                     will be removed
      */
-    public CacheManager(ManageableCache cache, int cacheMaxSize, int delay) {
+    public CacheManager(ManageableCache cache, int cacheMaxSize, int duration) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         this.cache = cache;
         this.cacheMaxSize = cacheMaxSize;
         this.cacheManagingTask = new CacheManagingTask();
-        this.delay = delay;
+        this.duration = duration;
         start();
     }
 
     /**
-     * To Start the CacheManager. Should be called only once per CacheManager so called in
-     * constructor. CacheManager will run its scheduled task every "delay" number of minutes.
+     * To Start the CacheManager. Should be called only once per CacheManager hence called in
+     * constructor. CacheManager will run its scheduled task every "duration" number of minutes.
      */
     private boolean start() {
         if (scheduledFuture == null || (scheduledFuture.isCancelled())) {
             scheduledFuture = scheduler.scheduleWithFixedDelay(cacheManagingTask,
-                    delay, delay, TimeUnit.MINUTES);
+                    duration, duration, TimeUnit.MINUTES);
             log.info(cache.getClass().getSimpleName()+" Cache Manager Started");
             return true;
         }
@@ -79,7 +79,7 @@ public class CacheManager {
     }
 
     /**
-     * To wake cacheManager up at will. If this method is called while its task is running, it
+     * Used to wake cacheManager up at will. If this method is called while its task is running, it
      * will run its task again soon after its done. CacheManagerTask will be rescheduled as before.
      * @return true if successfully waken up. false otherwise.
      */
@@ -89,7 +89,7 @@ public class CacheManager {
                 scheduledFuture.cancel(DO_NOT_INTERRUPT_IF_RUNNING);
             }
             scheduledFuture = scheduler.scheduleWithFixedDelay(cacheManagingTask,
-                    0, delay,TimeUnit.MINUTES);
+                    0, duration,TimeUnit.MINUTES);
             log.info(cache.getClass().getSimpleName()+" Cache Manager Wakened Up.....");
             return true;
         }
@@ -97,24 +97,24 @@ public class CacheManager {
     }
 
     /**
-     * Change the cacheManager delay (schedule period) to given value.
-     * @param delay new delay to which the cacheManager schedule period should change.
+     * Change the cacheManager duration (schedule period) to given value.
+     * @param duration new duration to which the cacheManager schedule period should change.
      * @return true if successfully changed. false otherwise.
-     * @throws IllegalArgumentException if given delay is not between the allowed limit.
+     * @throws IllegalArgumentException if given duration is not between the allowed limit.
      */
-    public boolean changeDelay(int delay) throws IllegalArgumentException {
-        int min = Constants.CACHE_MIN_DELAY_MINS;
-        int max = Constants.CACHE_MAX_DELAY_MINS;
-        if (delay < min || delay > max) {
-            throw new IllegalArgumentException("Delay time should should be between " + min +
+    public boolean changeDuration(int duration) throws IllegalArgumentException {
+        int min = Constants.CACHE_MIN_DURATION_MINS;
+        int max = Constants.CACHE_MAX_DURATION_MINS;
+        if (duration < min || duration > max) {
+            throw new IllegalArgumentException("Duration time should should be between " + min +
                     " and " + max + " minutes");
         }
-        this.delay = delay;
+        this.duration = duration;
         return wakeUpNow();
     }
 
-    public int getDelay(){
-        return delay;
+    public int getDuration(){
+        return duration;
     }
 
     /**

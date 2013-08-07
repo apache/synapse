@@ -31,11 +31,13 @@ import java.security.cert.X509Certificate;
 public class RevocationVerificationTest extends TestCase {
 
     /**
-     * Tests CRL Path Validation with the use of a real certificate chain. The verification process will make
-     * HTTP calls to remote CRL server URLs extracted from the certificates in the chain. Usually these certificates
-     * will not be revoked. So the path validation must be successful to pass the test. In case they are revoked
-     * or expired, new certificates should be added to the resources directory and Constants should be modified
-     * accordingly. See the interface TestConstants for expiry dates of the certificates.
+     * Tests CRL Path Validation with the use of a real certificate chain. The verification process
+     * will make HTTP calls to remote CRL server URLs extracted from the certificates in the
+     * chain. Usually these certificates will not be revoked. So the path validation must be
+     * successful to pass the test. In case they are revoked or expired, new certificates should
+     * be added to the resources directory and Constants should be modified accordingly. See the
+     * interface TestConstants for expiry dates of the certificates.
+     *
      * @throws Exception
      */
     public void testCRLPathValidation() throws Exception {
@@ -55,8 +57,9 @@ public class RevocationVerificationTest extends TestCase {
     }
 
     /**
-     * Tests CRL path validation with fake certificates. The path validation should fail since they are fake and do not
-     * contain proper information.
+     * Tests CRL path validation with fake certificates. The path validation should fail since
+     * they are fake and do not contain proper information.
+     *
      * @throws Exception
      */
     public void testCRLPathValidationWithFakeCerts() throws Exception {
@@ -75,8 +78,10 @@ public class RevocationVerificationTest extends TestCase {
     }
 
     /**
-     * Tests path validation with OCSP. The process makes remote HTTP requests to corresponding OCSP servers at the
-     * certificate authorities. The path validation must be successful to pass the test.
+     * Tests path validation with OCSP. The process makes remote HTTP requests to corresponding
+     * OCSP servers at the certificate authorities. The path validation must be successful to
+     * pass the test.
+     *
      * @throws Exception
      */
     public void testOCSPPathValidation() throws Exception {
@@ -95,8 +100,10 @@ public class RevocationVerificationTest extends TestCase {
     }
 
     /**
-     * Tests OCSP path validation with a chain of fake certificates. In order to pass the test, the path validation
-     * should fail since the certificates are fake and do not contain right information.
+     * Tests OCSP path validation with a chain of fake certificates. In order to pass the test,
+     * the path validation should fail since the certificates are fake and do not contain right
+     * information.
+     *
      * @throws Exception
      */
     public void testOCSPPathValidationWithFakeCerts() throws Exception {

@@ -48,7 +48,7 @@ import java.util.List;
  *      <configuration [axis2xml="string"] [repository="string"]/>?
  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
  *      <target xpath="expression" | key="string"/>
- *      <enableSec policy="string"/>?
+ *      <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
  * </callout>
  */
 public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
@@ -67,6 +67,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
     private boolean securityOn = false;  //Should messages be sent using WS-Security?
     private String wsSecPolicyKey = null;
+    private String inboundWsSecPolicyKey = null;
+    private String outboundWsSecPolicyKey = null;
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -92,11 +94,19 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                     options.setProperty(
                             SynapseConstants.RAMPART_POLICY,
                             MessageHelper.getPolicy(synCtx, wsSecPolicyKey));
-                    sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
                 } else {
-                    handleException("Security policy not found", synCtx);
+                    if (inboundWsSecPolicyKey != null) {
+                        options.setProperty(SynapseConstants.RAMPART_IN_POLICY,
+                                            MessageHelper.getPolicy(
+                                                    synCtx, inboundWsSecPolicyKey));
+                    }
+                    if (outboundWsSecPolicyKey != null) {
+                        options.setProperty(SynapseConstants.RAMPART_OUT_POLICY,
+                                            MessageHelper.getPolicy(
+                                                    synCtx, outboundWsSecPolicyKey));
+                    }
                 }
-
+                sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
             }
 
             options.setTo(new EndpointReference(serviceURL));
@@ -375,4 +385,45 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     public void setWsSecPolicyKey(String wsSecPolicyKey) {
         this.wsSecPolicyKey = wsSecPolicyKey;
     }
+
+    /**
+     * Get the outbound security policy key. This is used when we specify different policies for
+     * inbound and outbound.
+     *
+     * @return outbound security policy key
+     */
+    public String getOutboundWsSecPolicyKey() {
+        return outboundWsSecPolicyKey;
+    }
+
+    /**
+     * Set the outbound security policy key.This is used when we specify different policies for
+     * inbound and outbound.
+     *
+     * @param outboundWsSecPolicyKey outbound security policy key.
+     */
+    public void setOutboundWsSecPolicyKey(String outboundWsSecPolicyKey) {
+        this.outboundWsSecPolicyKey = outboundWsSecPolicyKey;
+    }
+
+    /**
+     * Get the inbound security policy key. This is used when we specify different policies for
+     * inbound and outbound.
+     *
+     * @return inbound security policy key
+     */
+    public String getInboundWsSecPolicyKey() {
+        return inboundWsSecPolicyKey;
+    }
+
+    /**
+     * Set the inbound security policy key. This is used when we specify different policies for
+     * inbound and outbound.
+     *
+     * @param inboundWsSecPolicyKey inbound security policy key.
+     */
+    public void setInboundWsSecPolicyKey(String inboundWsSecPolicyKey) {
+        this.inboundWsSecPolicyKey = inboundWsSecPolicyKey;
+    }
+
 }

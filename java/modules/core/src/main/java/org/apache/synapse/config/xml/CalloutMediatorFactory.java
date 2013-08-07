@@ -38,6 +38,7 @@ import java.util.Properties;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
+ *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
  *      &lt;enableSec policy="string" /&gt;?
  * &lt;/callout&gt;
  * </pre>
@@ -60,7 +61,11 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
     private static final QName Q_SEC
                 = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec");
     private static final QName ATT_POLICY
-                = new QName(XMLConfigConstants.NULL_NAMESPACE, "policy");
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "policy");
+    private static final QName ATT_OUTBOUND_SEC_POLICY
+                = new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy");
+    private static final QName ATT_INBOUND_SEC_POLICY
+                = new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy");
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
@@ -152,11 +157,21 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         }
 
         if (wsSec != null) {
+            callout.setSecurityOn(true);
             OMAttribute policyKey = wsSec.getAttribute(ATT_POLICY);
+            OMAttribute outboundPolicyKey = wsSec.getAttribute(ATT_OUTBOUND_SEC_POLICY);
+            OMAttribute inboundPolicyKey = wsSec.getAttribute(ATT_INBOUND_SEC_POLICY);
             if (policyKey != null) {
-                callout.setSecurityOn(true);
                 callout.setWsSecPolicyKey(policyKey.getAttributeValue());
+            } else if (outboundPolicyKey != null || inboundPolicyKey != null) {
+                if (outboundPolicyKey != null) {
+                    callout.setOutboundWsSecPolicyKey(outboundPolicyKey.getAttributeValue());
+                }
+                if (inboundPolicyKey != null) {
+                    callout.setInboundWsSecPolicyKey(inboundPolicyKey.getAttributeValue());
+                }
             } else {
+                callout.setSecurityOn(false);
                 handleException("A policy key is required to enable security");
             }
         }

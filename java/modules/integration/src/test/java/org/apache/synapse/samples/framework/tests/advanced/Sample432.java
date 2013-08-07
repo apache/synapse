@@ -16,22 +16,24 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.samples.framework.tests.advanced;
 
 import org.apache.synapse.samples.framework.SampleClientResult;
 import org.apache.synapse.samples.framework.SynapseTestCase;
 import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
-public class Sample431 extends SynapseTestCase {
+public class Sample432 extends SynapseTestCase {
 
     SampleClientResult result;
 
-    public Sample431() {
-        super(431);
+    public Sample432() {
+        super(432);
     }
 
-    public void testCallOutSecurity() {
-        log.info("Running test: Callout mediator with security");
+    public void testCallOutSecurityWithDifferentPoliciesForInboundAndOutbound() {
+        log.info("Running test: Callout mediator security sample with different policies " +
+                "for inbound and outbound flows");
         String trpUrl = "http://localhost:8280/";
         StockQuoteSampleClient client = getStockQuoteClient();
         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);

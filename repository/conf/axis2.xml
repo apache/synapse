@@ -315,9 +315,8 @@
             supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
         <!-- Uncomment to enable OCSP/CRL certification revocation verification support
         <parameter name="CertificateRevocationVerifier" locked="false">
-            <Enabled>true</Enabled>
             <CacheSize>50</CacheSize>
-            <CacheDelayMins>15</CacheDelayMins>
+            <CacheDurationMins>15</CacheDurationMins>
         </parameter-->
     </transportSender>
 

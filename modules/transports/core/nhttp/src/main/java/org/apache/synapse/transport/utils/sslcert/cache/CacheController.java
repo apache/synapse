@@ -37,8 +37,8 @@ public class CacheController implements CacheControllerMBean {
         return cacheManager.wakeUpNow();
     }
 
-    public boolean changeCacheManagerDelayMins(int delay){
-        return cacheManager.changeDelay(delay);
+    public boolean changeCacheManagerDurationMins(int duration){
+        return cacheManager.changeDuration(duration);
     }
 
     public boolean isCacheManagerRunning() {
@@ -49,7 +49,7 @@ public class CacheController implements CacheControllerMBean {
         return cache.getCacheSize();
     }
 
-    public int getCacheManagerDelayMins(){
-        return cacheManager.getDelay();
+    public int getCacheManagerDurationMins(){
+        return cacheManager.getDuration();
     }
 }

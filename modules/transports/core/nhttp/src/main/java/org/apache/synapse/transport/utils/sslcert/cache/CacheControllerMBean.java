@@ -35,10 +35,10 @@ public interface CacheControllerMBean {
 
     /**
      * Changes cacheManager task scheduled period.
-     * @param delay Delay which cacheManager thread waits to start its task again.
-     * @return true if successfully changed delay. False otherwise.
+     * @param duration Duration which cacheManager thread waits to start its task again.
+     * @return true if successfully changed duration. False otherwise.
      */
-    public boolean changeCacheManagerDelayMins(int delay);
+    public boolean changeCacheManagerDurationMins(int duration);
 
     /**
      * @return true if CacheManager is running. False if its stopped.
@@ -51,7 +51,7 @@ public interface CacheControllerMBean {
     public int getCacheSize();
 
     /**
-     * @return cacheManager delay in minutes.
+     * @return cacheManager duration in minutes.
      */
-    public int getCacheManagerDelayMins();
+    public int getCacheManagerDurationMins();
 }

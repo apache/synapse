@@ -108,8 +108,9 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
         String hostnameVerifierValue = hostnameVerifier != null ?
                 hostnameVerifier.getValue().toString() : null;
         Parameter revocationVerifierParam = transportOut.getParameter("CertificateRevocationVerifier");
-        return createSSLSetupHandler(hostnameVerifierValue,
-                new CertificateVerificationConfig(revocationVerifierParam));
+        CertificateVerificationConfig cvConfig = revocationVerifierParam != null ?
+                new CertificateVerificationConfig(revocationVerifierParam) : null;
+        return createSSLSetupHandler(hostnameVerifierValue, cvConfig);
     }
 
     /**
@@ -315,7 +316,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
                     throw new SSLException("Host name verification failed for host : " + address);
                 }
 
-                if (cvConfig.isEnabled()) {
+                if (cvConfig != null) {
                     try {
                         ocspCrl.verifyRevocationStatus(session.getPeerCertificateChain(),
                                 cvConfig.getCacheSize(), cvConfig.getCacheDuration());

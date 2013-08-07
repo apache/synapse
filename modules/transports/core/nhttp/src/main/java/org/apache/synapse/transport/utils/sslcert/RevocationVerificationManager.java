@@ -37,18 +37,18 @@ import java.security.cert.X509Certificate;
 public class RevocationVerificationManager {
 
     private int cacheSize = Constants.CACHE_DEFAULT_ALLOCATED_SIZE;
-    private int cacheDelayMins = Constants.CACHE_DEFAULT_DELAY_MINS;
+    private int cacheDurationMins = Constants.CACHE_DEFAULT_DURATION_MINS;
     private static final Log log = LogFactory.getLog(RevocationVerificationManager.class);
 
-    public RevocationVerificationManager(Integer cacheAllocatedSize, Integer cacheDelayMins) {
+    public RevocationVerificationManager(Integer cacheAllocatedSize, Integer cacheDurationMins) {
 
         if (cacheAllocatedSize != null && cacheAllocatedSize > Constants.CACHE_MIN_ALLOCATED_SIZE
                 && cacheAllocatedSize < Constants.CACHE_MAX_ALLOCATED_SIZE) {
             this.cacheSize = cacheAllocatedSize;
         }
-        if (cacheDelayMins != null && cacheDelayMins > Constants.CACHE_MIN_DELAY_MINS
-                && cacheDelayMins < Constants.CACHE_MAX_DELAY_MINS) {
-            this.cacheDelayMins = cacheDelayMins;
+        if (cacheDurationMins != null && cacheDurationMins > Constants.CACHE_MIN_DURATION_MINS
+                && cacheDurationMins < Constants.CACHE_MAX_DURATION_MINS) {
+            this.cacheDurationMins = cacheDurationMins;
         }
     }
 
@@ -68,9 +68,9 @@ public class RevocationVerificationManager {
         long start = System.currentTimeMillis();
 
         OCSPCache ocspCache = OCSPCache.getCache();
-        ocspCache.init(cacheSize, cacheDelayMins);
+        ocspCache.init(cacheSize, cacheDurationMins);
         CRLCache crlCache = CRLCache.getCache();
-        crlCache.init(cacheSize, cacheDelayMins);
+        crlCache.init(cacheSize, cacheDurationMins);
 
         RevocationVerifier[] verifiers = {new OCSPVerifier(ocspCache), new CRLVerifier(crlCache)};
 

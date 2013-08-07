@@ -39,14 +39,14 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
     protected OMElement serializeSpecificMediator(Mediator m) {
         if (!(m instanceof TemplateMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
+            return null;
         }
 
         TemplateMediator mediator = (TemplateMediator) m;
         OMElement templateElem = fac.createOMElement("template", synNS);
 
         if (mediator.getName() != null) {
-            templateElem.addAttribute(fac.createOMAttribute(
-                    "name", nullNS, mediator.getName()));
+            templateElem.addAttribute(fac.createOMAttribute("name", nullNS, mediator.getName()));
             //serialize parameters
             serializeParams(templateElem,mediator);
             serializeBody(templateElem, mediator.getList());
@@ -65,7 +65,7 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
         Collection<TemplateParameter> params = mediator.getParameters();
         if (params != null && params.size() > 0) {
-               TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
+            TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
         }
     }
 

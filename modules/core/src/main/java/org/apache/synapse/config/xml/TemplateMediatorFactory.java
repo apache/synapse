@@ -16,20 +16,18 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.TemplateParameter;
 import org.apache.synapse.mediators.template.TemplateMediator;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
+
 /**
  * Factory class for Template configuration as follows
  * <template name="simple_func">
@@ -39,6 +37,7 @@ import java.util.Properties;
     </template>
  */
 public class TemplateMediatorFactory extends AbstractListMediatorFactory {
+
     private static final QName TEMPLATE_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "template");
     private static final QName TEMPLATE_BODY_Q
@@ -55,7 +54,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
             addChildren(templateBodyElem, templateTemplateMediator, properties);
         } else {
-            String msg = "A EIP template should be a named mediator .";
+            String msg = "An EIP template must be a named mediator .";
             log.error(msg);
             throw new SynapseException(msg);
         }

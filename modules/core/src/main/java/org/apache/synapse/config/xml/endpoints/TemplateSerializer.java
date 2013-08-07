@@ -45,9 +45,8 @@ public class TemplateSerializer {
 
         List<String> parameters = template.getParameters();
         for (String entry : parameters) {
-            OMElement paramElement = fac.createOMElement(
-                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "parameter"));
-
+            OMElement paramElement = fac.createOMElement("parameter",
+                    SynapseConstants.SYNAPSE_OMNAMESPACE);
             paramElement.addAttribute(fac.createOMAttribute("name", nullNS, entry));
             templateElement.addChild(paramElement);
         }

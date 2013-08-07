@@ -61,7 +61,7 @@ public class TemplateParameterSerializer {
      */
     public static void serializeTemplateParameters(OMElement parent,
                                                Collection<TemplateParameter> params) {
-            serializeTemplateParameters(parent, params, PARAMETER_Q);
+        serializeTemplateParameters(parent, params, PARAMETER_Q);
     }
 
     /**

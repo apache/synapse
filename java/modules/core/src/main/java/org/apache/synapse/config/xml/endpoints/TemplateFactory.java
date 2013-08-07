@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 public class TemplateFactory {
+
     public static final Log log = LogFactory.getLog(TemplateFactory.class);
 
     public Template createEndpointTemplate(OMElement element, Properties properties) {
@@ -53,15 +54,11 @@ public class TemplateFactory {
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "parameter"));
         while (paramItr.hasNext()) {
             OMElement paramElement = (OMElement) paramItr.next();
-
             OMAttribute paramName = paramElement.getAttribute(new QName("name"));
-
             if (paramName == null) {
                 handleException("parameter name should be present");
             }
-
             assert paramName != null;
-
             template.addParameter(paramName.getAttributeValue().trim());
         }
 

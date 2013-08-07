@@ -42,7 +42,7 @@ public class TemplateMediator extends AbstractListMediator {
 
     private String eipPatternName;
     private String fileName;
-    /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
+    /** flag to ensure that each and every sequence is initialized and destroyed at most once */
     private boolean initialized = false;
 
     public void setParameters(Collection<TemplateParameter> paramNames) {

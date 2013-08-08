@@ -44,6 +44,8 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
     private Map<String,Resource> resources = new LinkedHashMap<String,Resource>();
     private List<Handler> handlers = new ArrayList<Handler>();
 
+    private int protocol = RESTConstants.PROTOCOL_HTTP_AND_HTTPS;
+
     private VersionStrategy versionStrategy = new DefaultStrategy(this);
 
     private String fileName;
@@ -66,6 +68,14 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
             return name + ":v" +versionStrategy.getVersion();
         }
         return name;
+    }
+
+    public int getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(int protocol) {
+        this.protocol = protocol;
     }
 
     public String getAPIName() {
@@ -176,9 +186,10 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
                 return false;
             }
 
+            org.apache.axis2.context.MessageContext msgCtx =
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
             if (host != null || port != -1) {
-                org.apache.axis2.context.MessageContext msgCtx =
-                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();
                 String hostHeader = getHostHeader(msgCtx);
                 if (hostHeader != null) {
                     if (host != null && !host.equals(extractHostName(hostHeader))) {
@@ -203,6 +214,29 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
                     }
                     return false;
                 }
+            }
+            if (protocol == RESTConstants.PROTOCOL_HTTP_ONLY &&
+                    !Constants.TRANSPORT_HTTP.equals(msgCtx.getIncomingTransportName())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Protocol information does not match - Expected HTTP");
+                }
+                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
+                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
+                        msgCtx.getIncomingTransportName());
+                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
+                        msgCtx.getIncomingTransportName() + "]");
+                return false;
+            } else if (protocol == RESTConstants.PROTOCOL_HTTPS_ONLY &&
+                    !Constants.TRANSPORT_HTTPS.equals(msgCtx.getIncomingTransportName())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Protocol information does not match - Expected HTTPS");
+                }
+                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
+                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
+                        msgCtx.getIncomingTransportName());
+                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
+                        msgCtx.getIncomingTransportName() + "]");
+                return false;
             }
         }
 

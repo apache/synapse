@@ -21,12 +21,14 @@ package org.apache.synapse.config.xml.rest;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.Handler;
+import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.version.VersionStrategy;
 
 import javax.xml.namespace.QName;
@@ -40,11 +42,13 @@ public class APIFactory {
         OMAttribute nameAtt = apiElt.getAttribute(new QName("name"));
         if (nameAtt == null || "".equals(nameAtt.getAttributeValue())) {
             handleException("Attribute 'name' is required for an API definition");
+            return null;
         }
 
         OMAttribute contextAtt = apiElt.getAttribute(new QName("context"));
         if (contextAtt == null || "".equals(contextAtt.getAttributeValue())) {
             handleException("Attribute 'context' is required for an API definition");
+            return null;
         }
 
         API api = new API(nameAtt.getAttributeValue(), contextAtt.getAttributeValue());
@@ -87,6 +91,20 @@ public class APIFactory {
             }
         }
 
+        OMAttribute transport = apiElt.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "transport"));
+        if (transport != null) {
+            String transports = transport.getAttributeValue();
+            if (!"".equals(transports)) {
+                if (Constants.TRANSPORT_HTTP.equals(transports)) {
+                    api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
+                } else if (Constants.TRANSPORT_HTTPS.equals(transports)) {
+                    api.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
+                } else {
+                    handleException("Invalid protocol name: " + transports);
+                }
+            }
+        }
         return api;
     }
 

@@ -80,6 +80,38 @@ public class APIDispatcherTest extends RESTMediationTestCase {
         assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
     }
 
+    public void testTransportBasedAPIDispatch() throws Exception {
+        API api = new API(TEST_API, "/test");
+        api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
+        SynapseConfiguration synapseConfig = new SynapseConfiguration();
+        synapseConfig.addAPI(TEST_API, api);
+
+        RESTRequestHandler handler = new RESTRequestHandler();
+
+        // Messages with '/test' context should be dispatched
+        MessageContext synCtx = getMessageContext(synapseConfig, false, "/test", "GET");
+        handler.process(synCtx);
+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+        synCtx = getMessageContext(synapseConfig, false, "/test/", "GET");
+        handler.process(synCtx);
+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar?a=5", "GET");
+        handler.process(synCtx);
+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+        synCtx = getMessageContext(synapseConfig, false, "/test?a=5", "GET");
+        handler.process(synCtx);
+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+
+        // Messages sent via HTTPS should NOT be dispatched
+        synCtx = getMessageContext(synapseConfig, true, "/test", "GET");
+        handler.process(synCtx);
+        assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+
+        synCtx = getMessageContext(synapseConfig, true, "/test/foo/bar?a=5", "GET");
+        handler.process(synCtx);
+        assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+    }
+
     public void testResponseDispatch() throws Exception {
         API api = new API(TEST_API, "/test");
         SynapseConfiguration synapseConfig = new SynapseConfiguration();

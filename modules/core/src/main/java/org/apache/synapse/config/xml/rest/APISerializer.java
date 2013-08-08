@@ -19,12 +19,12 @@
 
 package org.apache.synapse.config.xml.rest;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.*;
+import org.apache.axis2.Constants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.Handler;
+import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.Resource;
 
 public class APISerializer {
@@ -60,6 +60,13 @@ public class APISerializer {
             }
             apiElt.addChild(handlersElt);
         }
+
+        if (api.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY) {
+            apiElt.addAttribute("transport", Constants.TRANSPORT_HTTP, null);
+        } else if (api.getProtocol() == RESTConstants.PROTOCOL_HTTPS_ONLY) {
+            apiElt.addAttribute("transport", Constants.TRANSPORT_HTTPS, null);
+        }
+
         return apiElt;
     }
 }

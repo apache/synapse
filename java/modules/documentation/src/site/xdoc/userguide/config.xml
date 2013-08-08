@@ -1470,7 +1470,7 @@
                 APIs provide a flexible and powerful approach for defining full fledged REST APIs
                 in Synapse. An API definition starts with the &lt;api&gt; element.
             </p>
-            <div class="xmlConf">&lt;api name="string" context="string" [hostname="string"][port="int"]&gt;
+            <div class="xmlConf">&lt;api name="string" context="string" [transport="http|https"][hostname="string"][port="int"]&gt;
     &lt;resource [methods="http-method-list"][inSequence="string"][outSequence="string"]
                 [faultSequence="string"][url-mapping="string"][uri-template="string"]
                 [content-type="string"][user-agent="str"]&gt;
@@ -1488,7 +1488,8 @@
                 attribute is used to define the URL context at which the REST API will be anchored
                 (eg: /ws, /foo/bar, /soap). The API will only receive requests that fall in the
                 specified URL context. In addition to that an API could be bound to a particular
-                host and a port using the 'hostname' and 'port' attributes.
+                host and a port using the 'hostname' and 'port' attributes. The 'transport' attribute
+                can be used to restrict the API to process either HTTP messages or HTTPS messages only.
             </p>
             <p>
                 An API must also contain one or more resources. Resources define how messages

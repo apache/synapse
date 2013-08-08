@@ -251,9 +251,8 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         boolean wsdlFound = false;
         String publishWSDL = null;
 
-        SynapseEnvironment synEnv = SynapseConfigUtils.getSynapseEnvironment(axisCfg);
-        String synapseHome = synEnv != null ? synEnv.getServerContextInformation()
-                .getServerConfigurationInformation().getSynapseHome() : "";
+        String synapseHome = synCfg.getProperty(SynapseConstants.SYNAPSE_HOME) != null ?
+                synCfg.getProperty(SynapseConstants.SYNAPSE_HOME) : "";
 
         if (wsdlKey != null) {
             synCfg.getEntryDefinition(wsdlKey);
@@ -374,8 +373,8 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                                     "Could not get the WSDL to Axis Service Builder");
                         }
 
-                        wsdlToAxisServiceBuilder.setBaseUri(wsdlURI != null ?
-                                wsdlURI.toString() : synapseHome);
+                        URI baseURI = SynapseConfigUtils.resolveRelativeURI(wsdlURI, synapseHome);
+                        wsdlToAxisServiceBuilder.setBaseUri(baseURI.toString());
 
                         if (trace()) {
                             trace.info("Setting up custom resolvers");
@@ -399,8 +398,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                                     ((WSDL11ToAxisServiceBuilder)
                                             wsdlToAxisServiceBuilder).setCustomWSDLResolver(
                                             new CustomWSDLLocator(new InputSource(wsdlInputStream),
-                                                    wsdlURI != null ? wsdlURI.toString() : "",
-                                                    resourceMap, synCfg));
+                                                    baseURI.toString(), resourceMap, synCfg));
                                 }
                             } else {
                                 //if the resource map isn't available ,
@@ -412,7 +410,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                                     ((WSDL11ToAxisServiceBuilder)
                                             wsdlToAxisServiceBuilder).setCustomWSDLResolver(
                                             new CustomWSDLLocator(new InputSource(wsdlInputStream),
-                                                    wsdlURI != null ? wsdlURI.toString() : ""));
+                                                    baseURI.toString()));
                                 }
                             }
                         }

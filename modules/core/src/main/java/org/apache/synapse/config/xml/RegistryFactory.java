@@ -78,7 +78,8 @@ public class RegistryFactory {
 
     private static Properties getProperties(OMElement elem, Properties topLevelProps) {
         Iterator params = elem.getChildrenWithName(PARAMETER_Q);
-        Properties props = new Properties(topLevelProps);
+        Properties props = new Properties();
+        props.putAll(topLevelProps);
         while (params.hasNext()) {
             Object o = params.next();
             if (o instanceof OMElement) {

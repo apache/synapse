@@ -21,8 +21,10 @@ package org.apache.synapse.transport.passthru.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 
+import java.nio.charset.CodingErrorAction;
 import java.util.Properties;
 
 /**
@@ -188,6 +190,28 @@ public class PassThroughConfiguration {
         }
 
         return val == null ? def : val;
+    }
+
+    public CodingErrorAction getMalformedInputActionValue() {
+        String val = getStringProperty(HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION, "report");
+        return getCodingErrorAction(val);
+    }
+
+    public CodingErrorAction getUnMappableInputActionValue() {
+        String val = getStringProperty(HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION, "report");
+        return getCodingErrorAction(val);
+    }
+
+    private CodingErrorAction getCodingErrorAction(String action) {
+        if ("report".equals(action)) {
+            return CodingErrorAction.REPORT;
+        } else if ("ignore".equals(action)) {
+            return CodingErrorAction.IGNORE;
+        } else if ("replace".equals(action)) {
+            return CodingErrorAction.REPLACE;
+        } else {
+            return CodingErrorAction.REPORT;
+        }
     }
 
 }

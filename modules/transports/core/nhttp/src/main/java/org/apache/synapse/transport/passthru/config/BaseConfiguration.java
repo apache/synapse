@@ -142,8 +142,11 @@ public abstract class BaseConfiguration {
             setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING,
                     conf.getBooleanProperty(NIOReactorParams.INTEREST_OPS_QUEUEING, false)).
             setParameter(HttpProtocolParams.ORIGIN_SERVER,
-                    conf.getStringProperty(HttpProtocolParams.ORIGIN_SERVER, "Synapse-PassThrough-HTTP"));
-
+                    conf.getStringProperty(HttpProtocolParams.ORIGIN_SERVER, "Synapse-PassThrough-HTTP")).
+            setParameter(HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
+                    conf.getMalformedInputActionValue()).
+            setParameter(HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
+                    conf.getUnMappableInputActionValue());
         /* Set advanced tuning params only if they are explicitly set so that we are not loosing
            internal defaults of HttpCore-NIO */
         if (conf.getIntProperty(HttpConnectionParams.SO_LINGER) != null) {

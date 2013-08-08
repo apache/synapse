@@ -636,6 +636,34 @@ public class SynapseConfigUtils {
         return url;
     }
 
+    /**
+     * Resolve a relative URI. If the URI is a file and it's path is relative, the basePath will be
+     * used as parent location. If the URI is null the basePath will be returned as URI.
+     *
+     * @param uri      the URI to resolve
+     * @param basePath the base path
+     * @return the absolute URI
+     */
+    public static URI resolveRelativeURI(URI uri, String basePath) {
+        URI baseURI;
+        if (uri != null) {
+            if ("file".equals(uri.getScheme())) {
+                String wsdlPath = uri.getSchemeSpecificPart();
+                if (!new File(wsdlPath).isAbsolute()) {
+                    baseURI = new File(new File(basePath),
+                            wsdlPath).toURI();
+                } else {
+                    baseURI = uri;
+                }
+            } else {
+                baseURI = uri;
+            }
+        } else {
+            baseURI = new File(basePath).toURI();
+        }
+        return baseURI;
+    }
+
     public static String resolveRelativeURI(String parentLocation, String relativeLocation) {
 
         if (relativeLocation == null) {

@@ -34,6 +34,7 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
@@ -126,20 +127,22 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
             if (wsdlURI != null) {
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
                 if (noParsing == null || !JavaUtils.isTrueExplicitly(noParsing)) {
+                    String synapseHome = properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
+                            properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "";
                     try {
                         OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI)
-                                .toString(), properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
-                                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
+                                .toString(), synapseHome);
                         if (wsdlOM != null && wsdlOM instanceof OMElement) {
                             OMElement omElement = (OMElement) wsdlOM;
                             OMNamespace ns = omElement.getNamespace();
                             if (ns != null) {
                                 String nsUri = omElement.getNamespace().getNamespaceURI();
                                 if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
-
+                                    URI baseURI = SynapseConfigUtils.resolveRelativeURI(
+                                            new URI(wsdlURI), synapseHome);
                                     new WSDL11EndpointBuilder().
                                             populateEndpointDefinitionFromWSDL(endpoint,
-                                                    wsdlURI.trim(), omElement, serviceName, portName);
+                                                    baseURI.toString(), omElement, serviceName, portName);
 
                                 } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
                                     //endpoint = new WSDL20EndpointBuilder().

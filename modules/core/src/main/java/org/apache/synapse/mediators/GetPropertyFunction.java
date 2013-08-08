@@ -112,7 +112,8 @@ public class GetPropertyFunction implements Function {
                         !XMLConfigConstants.SCOPE_DEFAULT.equals(argOne) &&
                         !XMLConfigConstants.SCOPE_TRANSPORT.equals(argOne) &&
                             !XMLConfigConstants.SCOPE_REGISTRY.equals(argOne) &&
-                            !XMLConfigConstants.SCOPE_FUNC.equals(argOne)) {
+                            !XMLConfigConstants.SCOPE_FUNC.equals(argOne) &&
+                            !XMLConfigConstants.SCOPE_SYSTEM.equals(argOne)) {
                         return evaluate(XMLConfigConstants.SCOPE_DEFAULT, args.get(0),
                             args.get(1), context.getNavigator());
                     } else {
@@ -354,6 +355,17 @@ public class GetPropertyFunction implements Function {
                     return propEntry.getValue().toString();
                 }
             }
+        } else if (XMLConfigConstants.SCOPE_SYSTEM.equals(scope)) {
+            String val = System.getProperty(key);
+            if (val != null) {
+                return val;
+            } else {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "No system property is found for key '" + key + "'");
+                }
+                return NULL_STRING;
+            }
+
         } else {
             if (traceOrDebugOn) {
                 traceOrDebug(traceOn, "Invalid scope : '" + scope + "' has been set for the " +

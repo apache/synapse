@@ -93,8 +93,6 @@ public class AMQPTransportSender extends AbstractTransportSender {
         cache = new AMQPSenderCache(new ConcurrentHashMap<Integer, AMQPSender>());
         responseTracker = new ConcurrentHashMap<String, Semaphore>();
         responseMessage = new ConcurrentHashMap<String, AMQPTransportMessage>();
-//        MBeanRegister.getInstance().registerMBean(
-//                new TransportView(null, this), "Transport", "amqp-tx-receiver");
 
         log.info("AMQP transport sender initializing..");
     }

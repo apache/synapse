@@ -48,4 +48,9 @@ public class RESTConstants {
 
     public static final String NO_MATCHING_RESOURCE_HANDLER = "_resource_mismatch_handler_";
 
+    /** The Synapse MC property that indicates the in-transport */
+    public static final String REST_API_IN_TRANSPORT = "REST_API_IN_TRANSPORT";
+    /** The Synapse MC property that marks if the message was denied on the accessed transport */
+    public static final String REST_API_TRANSPORT_DENIED = "REST_API_TRANSPORT_DENIED";
+
 }

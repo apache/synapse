@@ -20,12 +20,12 @@
 package org.apache.synapse.transport.fix;
 
 import org.apache.axiom.attachments.ByteArrayDataSource;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.base.BaseUtils;
@@ -80,7 +80,7 @@ public class FIXUtils {
             log.debug("Creating SOAP envelope for FIX message...");
         }
 
-        SOAPFactory soapFactory = new SOAP11Factory();
+        SOAPFactory soapFactory = OMAbstractFactory.getSOAP11Factory();
         OMElement msg = soapFactory.createOMElement(FIXConstants.FIX_MESSAGE, null);
         msg.addAttribute(soapFactory.createOMAttribute(FIXConstants.FIX_MESSAGE_INCOMING_SESSION,
                 null, sessionID));
@@ -111,8 +111,7 @@ public class FIXUtils {
                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
                     msgField.addChild(binaryData);
                 } else {
-                    soapFactory.createOMText(msgField, value.toString(),
-                            OMElement.CDATA_SECTION_NODE);
+                    createOMText(soapFactory, msgField, value.toString());
                 }
                 header.addChild(msgField);
             }
@@ -141,8 +140,7 @@ public class FIXUtils {
                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
                     msgField.addChild(binaryData);
                 } else {
-                    soapFactory.createOMText(msgField, value.toString(),
-                            OMElement.CDATA_SECTION_NODE);
+                    createOMText(soapFactory, msgField, value.toString());
                 }
                 trailer.addChild(msgField);
             }
@@ -193,8 +191,7 @@ public class FIXUtils {
                      binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);
                      msgField.addChild(binaryData);
                  } else {
-                     soapFactory.createOMText(msgField, value.toString(),
-                             OMElement.CDATA_SECTION_NODE);
+                     createOMText(soapFactory, msgField, value.toString());
                  }
 
                  body.addChild(msgField);
@@ -779,7 +776,7 @@ public class FIXUtils {
     }
 
     /**
-     * Reads the SOAP body of a message and attempts to retreive the session identifier string
+     * Reads the SOAP body of a message and attempts to retrieve the session identifier string
      * with a namesapce
      *
      * @param body Body of the SOAP message
@@ -791,6 +788,24 @@ public class FIXUtils {
                    FIXConstants.FIX_MESSAGE, ns.getPrefix()));
            return messageNode.getAttributeValue(new QName(ns.getNamespaceURI(),
                    FIXConstants.FIX_MESSAGE_INCOMING_SESSION, ns.getPrefix()));
+    }
+
+    /**
+     * Creates a text node within a CDATA section selectively by looking at the enclosing text.
+     *
+     * @param soapFactory SOAPFactory instance used to create the OMText object
+     * @param field Parent OMElement (field element)
+     * @param text String text to be added to the field element
+     */
+    private static void createOMText(SOAPFactory soapFactory, OMElement field, String text) {
+        if (text == null) {
+            return;
+        }
+        if (text.indexOf('<') == -1 && text.indexOf('&') == -1 && text.indexOf('>') == -1) {
+            soapFactory.createOMText(field, text);
+        } else {
+            soapFactory.createOMText(field, text, OMElement.CDATA_SECTION_NODE);
+        }
     }
 
     /**

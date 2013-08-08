@@ -129,9 +129,13 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                             getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
                                                             "membershipHandler"));
             if (eventHandler != null) {
-                String clazz =
-                        eventHandler.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
-                                                                 "class")).trim();
+                String clazz = eventHandler.getAttributeValue(new QName(
+                        XMLConfigConstants.NULL_NAMESPACE, "class"));
+                if (clazz == null) {
+                    handleException("class attribute is required on the membershipHandler element");
+                } else {
+                    clazz = clazz.trim();
+                }
                 try {
                     LoadBalanceMembershipHandler lbMembershipHandler =
                             (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
@@ -157,9 +161,10 @@ public class DynamicLoadbalanceEndpointFactory extends EndpointFactory {
                 } catch (Exception e) {
                     String msg = "Could not instantiate " +
                             "LoadBalanceMembershipHandler implementation " + clazz;
-                    log.error(msg, e);
-                    throw new SynapseException(msg, e);
+                    handleException(msg, e);
                 }
+            } else {
+                handleException("membershipHandler element is required");
             }
 
             processProperties(loadbalanceEndpoint, epConfig);

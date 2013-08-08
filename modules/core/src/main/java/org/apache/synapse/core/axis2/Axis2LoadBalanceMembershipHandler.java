@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.clustering.ClusteringAgent;

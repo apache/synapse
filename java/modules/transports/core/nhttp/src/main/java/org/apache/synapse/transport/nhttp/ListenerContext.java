@@ -259,7 +259,13 @@ public class ListenerContext {
                 cfg.getProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, 0) == 1)
             .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
                 cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
-            .setParameter(HttpProtocolParams.ORIGIN_SERVER, "Synapse-HttpComponents-NIO");
+            .setParameter(HttpProtocolParams.ORIGIN_SERVER, "Synapse-HttpComponents-NIO")
+            .setParameter(
+                    HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
+                    cfg.getMalformedInputActionValue())
+            .setParameter(
+                    HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
+                    cfg.getUnMappableInputActionValue());
 
         if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
             params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);

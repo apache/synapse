@@ -21,8 +21,10 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.synapse.commons.util.MiscellaneousUtil;
 
+import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -216,4 +218,25 @@ public final class NHttpConfiguration {
         return methods.contains(method);
     }
 
+    public CodingErrorAction getMalformedInputActionValue() {
+        String val = getStringValue(HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION, "report");
+        return getCodingErrorAction(val);
+    }
+
+    public CodingErrorAction getUnMappableInputActionValue() {
+        String val = getStringValue(HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION, "report");
+        return getCodingErrorAction(val);
+    }
+
+    private CodingErrorAction getCodingErrorAction(String action) {
+        if ("report".equals(action)) {
+            return CodingErrorAction.REPORT;
+        } else if ("ignore".equals(action)) {
+            return CodingErrorAction.IGNORE;
+        } else if ("replace".equals(action)) {
+            return CodingErrorAction.REPLACE;
+        } else {
+            return CodingErrorAction.REPORT;
+        }
+    }
 }

@@ -27,7 +27,6 @@ import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -42,7 +41,7 @@ public abstract class AbstractRegistry implements Registry {
 
     /**
      * Get the resource for the given key from this registry
-     * @param entry The Enrty instance that contains meta-data
+     * @param entry The Entry instance that contains meta-data
      * @param properties bag of properties with additional information
      * @return the matching resultant object
      */

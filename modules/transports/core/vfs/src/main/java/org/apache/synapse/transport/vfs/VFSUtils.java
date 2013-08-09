@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -114,12 +111,12 @@ public class VFSUtils extends BaseUtils {
      * @return boolean true if the lock has been acquired or false if not
      */
     public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {
-        
+
         // generate a random lock value to ensure that there are no two parties
         // processing the same file
         Random random = new Random();
         byte[] lockValue = String.valueOf(random.nextLong()).getBytes();
-        
+
         try {
             // check whether there is an existing lock for this item, if so it is assumed
             // to be processed by an another listener (downloading) or a sender (uploading)
@@ -214,6 +211,13 @@ public class VFSUtils extends BaseUtils {
         return url;
     }
 
+    /**
+     * Generate a unique file name to be used as a temp file
+     * @return the temp file name
+     */
+    public static String generateTempFileName() {
+        return "file".concat(UUID.randomUUID().toString());
+    }
 
     private static boolean verifyLock(byte[] lockValue, FileObject lockObject) {
         try {

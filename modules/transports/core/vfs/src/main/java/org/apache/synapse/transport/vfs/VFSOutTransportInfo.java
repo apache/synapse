@@ -43,27 +43,33 @@ public class VFSOutTransportInfo implements OutTransportInfo {
     private long reconnectTimeout = 30000;
     private boolean append;
     private boolean fileLocking;
+    private boolean isUseTempFile = false;
 
     /**
      * Constructs the VFSOutTransportInfo containing the information about the file to which the
      * response has to be submitted to.
-     * 
+     *
      * @param outFileURI URI of the file to which the message is delivered
      */
     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {
-        
+
         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
             this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
         } else {
             this.outFileURI = outFileURI;
         }
 
-        Map<String,String> properties = BaseUtils.getEPRProperties(outFileURI);
+        Map<String, String> properties = BaseUtils.getEPRProperties(outFileURI);
         if (properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {
             String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);
             maxRetryCount = Integer.parseInt(strMaxRetryCount);
         } else {
             maxRetryCount = VFSConstants.DEFAULT_MAX_RETRY_COUNT;
+        }
+
+        if (properties.containsKey(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE)) {
+            String useTempFile = properties.get(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE);
+            isUseTempFile = Boolean.valueOf(useTempFile).booleanValue();
         }
 
         if (properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {
@@ -122,10 +128,14 @@ public class VFSOutTransportInfo implements OutTransportInfo {
         return reconnectTimeout;
     }
 
+    public boolean isUseTempFile() {
+        return isUseTempFile;
+    }
+
     public void setReconnectTimeout(long reconnectTimeout) {
         this.reconnectTimeout = reconnectTimeout;
     }
-    
+
     public boolean isAppend() {
         return append;
     }

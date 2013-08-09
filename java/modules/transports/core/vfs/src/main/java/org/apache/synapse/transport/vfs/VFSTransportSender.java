@@ -312,8 +312,6 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
     private FileObject getTempFileObject(FileSystemManager fsManager,
                                          FileObject originalFileObj,
                                          String fileName) throws FileSystemException {
-        FileObject pareFileObject = originalFileObj.getParent();
-        String parentURL = pareFileObject.getURL().toString();
-        return fsManager.resolveFile(parentURL.concat(File.separator).concat(fileName));
+        return fsManager.resolveFile(originalFileObj.getParent(), fileName);
     }
 }

@@ -28,16 +28,22 @@ import java.util.Properties;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.axis2.util.JavaUtils;
+import org.apache.synapse.registry.Registry;
 
 public class MultiXMLConfigurationBuilderTest extends TestCase {
 
     public void testConfigurationBuilder() throws Exception {
         URL u = this.getClass().getClassLoader().getResource("synapse-config");
+        if (u == null) {
+            fail("Failed to load the synapse-config resource files");
+        }
         String root = new File(u.toURI()).getAbsolutePath();
 
         System.out.println("Using SYNAPSE_CONFIG_HOME=" + root);
+        Properties properties = new Properties();
+        properties.setProperty("foo", "bar");
         SynapseConfiguration synapseConfig =
-                MultiXMLConfigurationBuilder.getConfiguration(root, new Properties());
+                MultiXMLConfigurationBuilder.getConfiguration(root, properties);
 
         assertNotNull(synapseConfig.getDefinedSequences().get("main"));
         assertNotNull(synapseConfig.getDefinedSequences().get("fault"));
@@ -57,6 +63,10 @@ public class MultiXMLConfigurationBuilderTest extends TestCase {
         assertNotNull(synapseConfig.getStartup("task1"));
 
         assertNotNull(synapseConfig.getRegistry());
+        Registry registry = synapseConfig.getRegistry();
+        Properties targetProperties = registry.getConfigurationProperties();
+        assertEquals("bar", targetProperties.getProperty("foo"));
+
         assertTrue(JavaUtils.isTrueExplicitly(synapseConfig.getProperty(
                 MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION)));
     }

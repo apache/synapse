@@ -38,6 +38,7 @@ import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -127,7 +128,9 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 int maxRetryCount = vfsOutInfo.getMaxRetryCount();
                 long reconnectionTimeout = vfsOutInfo.getReconnectTimeout();
                 boolean append = vfsOutInfo.isAppend();
-                
+                boolean isUseTempFile = vfsOutInfo.isUseTempFile();
+                String tempTargetFileName, actualTargetFileName = null;
+
                 while (wasError) {
                     
                     try {
@@ -152,7 +155,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         try {
                             Thread.sleep(reconnectionTimeout);
                         } catch (InterruptedException e2) {
-                            e2.printStackTrace();
+                            Thread.currentThread().interrupt();
                         }
                     }
                 }
@@ -160,9 +163,14 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 if (replyFile.exists()) {
 
                     if (replyFile.getType() == FileType.FOLDER) {
+                        if (isUseTempFile) {
+                            tempTargetFileName = VFSUtils.generateTempFileName();
+                            actualTargetFileName = VFSUtils.getFileName(msgCtx, vfsOutInfo);
+                        } else {
+                            tempTargetFileName = VFSUtils.getFileName(msgCtx, vfsOutInfo);
+                        }
                         // we need to write a file containing the message to this folder
-                        FileObject responseFile = fsManager.resolveFile(replyFile,
-                                VFSUtils.getFileName(msgCtx, vfsOutInfo));
+                        FileObject responseFile = fsManager.resolveFile(replyFile, tempTargetFileName);
 
                         // if file locking is not disabled acquire the lock
                         // before uploading the file
@@ -180,7 +188,16 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                             populateResponseFile(responseFile, msgCtx,append, false);
                         }
 
+                        if (isUseTempFile) {
+                            responseFile.moveTo(fsManager.resolveFile(replyFile, actualTargetFileName));
+                        }
+
                     } else if (replyFile.getType() == FileType.FILE) {
+                        if (isUseTempFile) {
+                            tempTargetFileName = VFSUtils.generateTempFileName();
+                            actualTargetFileName = replyFile.getURL().toString();
+                            replyFile = getTempFileObject(fsManager, replyFile, tempTargetFileName);
+                        }
 
                         // if file locking is not disabled acquire the lock
                         // before uploading the file
@@ -192,11 +209,20 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                             populateResponseFile(replyFile, msgCtx, append, false);
                         }
 
+                        if (isUseTempFile) {
+                            replyFile.moveTo(fsManager.resolveFile(actualTargetFileName));
+                        }
                     } else {
                         handleException("Unsupported reply file type : " + replyFile.getType() +
                                 " for file : " + vfsOutInfo.getOutFileURI());
                     }
                 } else {
+                    if (isUseTempFile) {
+                        tempTargetFileName = VFSUtils.generateTempFileName();
+                        actualTargetFileName = replyFile.getURL().toString();
+                        replyFile = getTempFileObject(fsManager, replyFile, tempTargetFileName);
+                    }
+
                     // if file locking is not disabled acquire the lock before uploading the file
                     if (vfsOutInfo.isFileLockingEnabled()) {
                         acquireLockForSending(replyFile, vfsOutInfo);
@@ -206,6 +232,10 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                     } else {
                         replyFile.createFile();
                         populateResponseFile(replyFile, msgCtx, append, false);
+                    }
+
+                    if (isUseTempFile) {
+                        replyFile.moveTo(fsManager.resolveFile(actualTargetFileName));
                     }
                 }
             } catch (FileSystemException e) {
@@ -277,5 +307,13 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 } catch (InterruptedException ignore) {}
             }
         }
+    }
+
+    private FileObject getTempFileObject(FileSystemManager fsManager,
+                                         FileObject originalFileObj,
+                                         String fileName) throws FileSystemException {
+        FileObject pareFileObject = originalFileObj.getParent();
+        String parentURL = pareFileObject.getURL().toString();
+        return fsManager.resolveFile(parentURL.concat(File.separator).concat(fileName));
     }
 }

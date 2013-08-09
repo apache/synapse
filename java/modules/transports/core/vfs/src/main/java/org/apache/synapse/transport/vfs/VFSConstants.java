@@ -20,7 +20,7 @@
 package org.apache.synapse.transport.vfs;
 
 public final class VFSConstants {
-    
+
     // vfs transport prefix (e.g. used in an out EPR etc)
     public static final String VFS_PREFIX = "vfs:";
 
@@ -41,8 +41,8 @@ public final class VFSConstants {
     public static final String TRANSPORT_FILE_FILE_URI = "transport.vfs.FileURI";
     public static final String TRANSPORT_FILE_FILE_NAME_PATTERN = "transport.vfs.FileNamePattern";
     public static final String TRANSPORT_FILE_CONTENT_TYPE = "transport.vfs.ContentType";
-    public static final String TRANSPORT_FILE_LOCKING = "transport.vfs.Locking";    
-    public static final String TRANSPORT_FILE_LOCKING_ENABLED = "enable";    
+    public static final String TRANSPORT_FILE_LOCKING = "transport.vfs.Locking";
+    public static final String TRANSPORT_FILE_LOCKING_ENABLED = "enable";
     public static final String TRANSPORT_FILE_LOCKING_DISABLED = "disable";
 
     public static final String REPLY_FILE_URI = "transport.vfs.ReplyFileURI";
@@ -53,15 +53,15 @@ public final class VFSConstants {
 
     public static final String DEFAULT_XML_RESPONSE_FILE = "response.xml";
     public static final String DEFAULT_NON_XML_RESPONSE_FILE = "response.dat";
-    
+
     public static final String STREAMING = "transport.vfs.Streaming";
-    
+
     public static final String MAX_RETRY_COUNT = "transport.vfs.MaxRetryCount";
     public static final String RECONNECT_TIMEOUT = "transport.vfs.ReconnectTimeout";
     public static final String APPEND = "transport.vfs.Append";
     public static final int DEFAULT_MAX_RETRY_COUNT = 3;
     public static final long DEFAULT_RECONNECT_TIMEOUT = 30000;
-    
+
     // transport header property names used by the VFS transport
     public static final String FILE_PATH = "FILE_PATH";
     public static final String FILE_NAME = "FILE_NAME";
@@ -98,6 +98,11 @@ public final class VFSConstants {
        */
       public static final String TRANSPORT_FAILED_RECORD_NEXT_RETRY_DURATION =
               "transport.vfs.FailedRecordNextRetryDuration";
+
+      /**
+       * Should use a temp file when uploading ?
+       */
+      public static final String TRANSPORT_FILE_USE_TEMP_FILE = "transport.vfs.UseTempFile";
 
       public static final int DEFAULT_NEXT_RETRY_DURATION = 3000; // 3 seconds
 

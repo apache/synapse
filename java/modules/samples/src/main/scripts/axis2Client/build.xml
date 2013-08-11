@@ -256,7 +256,10 @@
         </java>
     </target>
 
-    <target name="rabbitmqclient" depends="compile">
+    <target name="rabbitmqclient" depends="init">
+        <javac srcdir="src" destdir="${class.dir}" includes="**/RabbitMQAMQPClient.java">
+            <classpath refid="javac.classpath"/>
+        </javac>
         <java classname="samples.userguide.RabbitMQAMQPClient"
               classpathref="javac.classpath" fork="true">
             <sysproperty key="amqpmode"    value="${amqpmode}"/>
@@ -389,7 +392,7 @@
     </target>
 
     <target name="compile" depends="init" description="Compile all Java">
-        <javac srcdir="src" destdir="${class.dir}">
+        <javac srcdir="src" destdir="${class.dir}" excludes="**/RabbitMQAMQPClient.java">
             <classpath refid="javac.classpath"/>
         </javac>
     </target>

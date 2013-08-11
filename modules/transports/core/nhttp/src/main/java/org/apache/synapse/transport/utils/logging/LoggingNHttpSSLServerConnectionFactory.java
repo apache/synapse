@@ -28,6 +28,10 @@ import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 
 import javax.net.ssl.SSLContext;
 
+/**
+ * The SSL-enabled version of the LoggingNHttpServerConnectionFactory. Identical in behavior
+ * to the parent class, but wraps IOSession instances with SSLIOSession instances.
+ */
 public class LoggingNHttpSSLServerConnectionFactory extends LoggingNHttpServerConnectionFactory {
 
     private SSLContext sslContext;

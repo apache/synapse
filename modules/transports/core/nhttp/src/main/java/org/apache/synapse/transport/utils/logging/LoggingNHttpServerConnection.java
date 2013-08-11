@@ -36,6 +36,11 @@ import java.io.IOException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
+/**
+ * An extension of the DefaultNHttpServerConnection class, that provides some
+ * additional logging features. This implementation enhances the default connection
+ * class by logging all the major events that occur on the connection instance.
+ */
 public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
 
     private final Log log;

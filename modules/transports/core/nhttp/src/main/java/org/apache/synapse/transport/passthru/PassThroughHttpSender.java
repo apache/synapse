@@ -171,7 +171,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         targetConfiguration.setMetrics(metrics);
 
         try {
-            String prefix = namePrefix + "-Sender I/O dispatcher";
+            String prefix = namePrefix + "-PT-Sender I/O Dispatcher";
 
             ioReactor = new DefaultConnectingIOReactor(
                             targetConfiguration.getReactorConfig(),

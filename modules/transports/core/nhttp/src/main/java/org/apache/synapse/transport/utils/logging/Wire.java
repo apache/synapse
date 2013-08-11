@@ -23,40 +23,42 @@ import org.apache.commons.logging.Log;
 
 import java.nio.ByteBuffer;
 
+/**
+ * A utility for logging wire-level information of HTTP connections.
+ */
 public class Wire {
 
     private final Log log;
 
     public Wire(final Log log) {
-        super();
         this.log = log;
     }
 
     private void wire(final String header, final byte[] b, int pos, int off) {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < off; i++) {
             int ch = b[pos + i];
             if (ch == 13) {
-                buffer.append("[\\r]");
+                builder.append("[\\r]");
             } else if (ch == 10) {
-                buffer.append("[\\n]\"");
-                buffer.insert(0, "\"");
-                buffer.insert(0, header);
-                this.log.debug(buffer.toString());
-                buffer.setLength(0);
+                builder.append("[\\n]\"");
+                builder.insert(0, "\"");
+                builder.insert(0, header);
+                this.log.debug(builder.toString());
+                builder.setLength(0);
             } else if ((ch < 32) || (ch > 127)) {
-                buffer.append("[0x");
-                buffer.append(Integer.toHexString(ch));
-                buffer.append("]");
+                builder.append("[0x");
+                builder.append(Integer.toHexString(ch));
+                builder.append("]");
             } else {
-                buffer.append((char) ch);
+                builder.append((char) ch);
             }
         }
-        if (buffer.length() > 0) {
-            buffer.append('\"');
-            buffer.insert(0, '\"');
-            buffer.insert(0, header);
-            this.log.debug(buffer.toString());
+        if (builder.length() > 0) {
+            builder.append('\"');
+            builder.insert(0, '\"');
+            builder.insert(0, header);
+            this.log.debug(builder.toString());
         }
     }
 

@@ -28,20 +28,40 @@ import org.apache.synapse.commons.util.MiscellaneousUtil;
 import java.nio.charset.CodingErrorAction;
 import java.util.Properties;
 
+/**
+ * A base class for parsing transport configuration files and initializing basic
+ * HTTP Core configuration objects.
+ */
 public abstract class HttpTransportConfiguration {
 
     protected Log log = LogFactory.getLog(this.getClass());
 
     private Properties props;
 
+    /**
+     * Create a new HttpTransportConfiguration instance.
+     *
+     * @param fileName Name of the file (without extensions) from where the transport
+     *                 configuration should be loaded.
+     */
     public HttpTransportConfiguration(String fileName) {
         try {
             props = MiscellaneousUtil.loadProperties(fileName + ".properties");
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Get the number of I/O dispatcher threads that should be used in each IOReactor.
+     *
+     * @return A positive integer
+     */
     abstract protected int getThreadsPerReactor();
 
+    /**
+     * Get the IOReactor configuration
+     *
+     * @return A fully initialized IOReactorConfig instance
+     */
     public IOReactorConfig getReactorConfig() {
         IOReactorConfig.Builder builder = IOReactorConfig.custom()
                 .setIoThreadCount(getThreadsPerReactor())
@@ -66,6 +86,11 @@ public abstract class HttpTransportConfiguration {
         return builder.build();
     }
 
+    /**
+     * Get the connection configuration
+     *
+     * @return A fully initialized ConnectionConfig instance
+     */
     public ConnectionConfig getConnectionConfig() {
         return ConnectionConfig.custom()
                 .setBufferSize(getIntProperty(HttpConfigConstants.SOCKET_BUFFER_SIZE, 8 * 1024))

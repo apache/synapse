@@ -30,16 +30,31 @@ import org.apache.http.nio.NHttpServerEventHandler;
 
 import java.io.IOException;
 
+/**
+ * A decorator (wrapper) for NHttpServerEventHandler instances. This decorator
+ * logs additional debug information regarding each of the events triggered on the
+ * actual NHttpServerEventHandler instance. Most events are logged 'before' they are
+ * dispatched to the wrapped NHttpServerEventHandler, but this implementation does
+ * not modify the event arguments by any means. In that sense this decorator is
+ * read-only and safe. This implementation does not log the exception event. It is
+ * expected that the actual NHttpServerEventHandler will take the necessary steps to
+ * log exceptions.
+ */
 public class LoggingServerEventHandler implements NHttpServerEventHandler {
 
     private final Log log;
 
     private final NHttpServerEventHandler handler;
 
+    /**
+     * Create a new instance of the decorator.
+     *
+     * @param handler The instance of NHttpServerEventHandler to be decorated (wrapped)
+     */
     public LoggingServerEventHandler(final NHttpServerEventHandler handler) {
         super();
         if (handler == null) {
-            throw new IllegalArgumentException("HTTP service handler may not be null");
+            throw new IllegalArgumentException("HTTP service handler must not be null");
         }
         this.handler = handler;
         this.log = LogFactory.getLog(handler.getClass());

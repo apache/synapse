@@ -28,6 +28,7 @@
                         <li><a href="#Filter">Filter Mediator</a></li>
                         <li><a href="#InOut">In/Out Mediator</a></li>
                         <li><a href="#Switch">Switch Mediator</a></li>
+                        <li><a href="#Validate">Validate Mediator</a></li>
                     </ul>
                 </li>
                 <li>
@@ -380,6 +381,27 @@
                     mediators. If none of the cases match, the message will handed to the 'default'
                     case (if available).
                 </p>
+            </subsection>
+            <subsection name="Validate Mediator" id="Validate">
+                <p>
+                    The validate mediator validates the XML node selected by
+                    the source xpath expression, against the specified XML schema. If the source
+                    attribute is not specified, the validation is performed against the first
+                    child of the SOAP body of the current message. If the validation fails,
+                    the on-fail sequence of mediators is executed. Feature elements could be used to
+                    turn on/off some of the underlying features of the schema validator (See <a
+                    href="http://xerces.apache.org/xerces2-j/features.html">http://xerces.apache.org/xerces2-j/features.html</a>).
+                    The schema can be specified as a static or dynamic key. When
+                    needed, imports can be specified using additional resources.
+                </p>
+                <div class="xmlConf">&lt;validate [source="xpath"]&gt;
+    &lt;schema key="string" /&gt;+
+    &lt;resource location="&lt;external-schema&gt;" key="string"&gt;*
+    &lt;feature name="&lt;validation-feature-name&gt;" value="true|false"/&gt;*
+    &lt;on-fail&gt;
+        mediator+
+    &lt;/on-fail&gt;
+&lt;/validate&gt;</div>
             </subsection>
         </section>
         <section name="Transformation Mediators" id="TransformationMediators">

@@ -40,6 +40,13 @@ import org.apache.http.nio.util.HeapByteBufferAllocator;
 
 import java.io.IOException;
 
+/**
+ * A connection factory implementation for DefaultNHttpClientConnection instances.
+ * Based on the current logging configuration, this factory decides whether to create
+ * regular DefaultNHttpClientConnection objects or to create LoggingNHttpClientConnection
+ * objects. Also, depending on the logging configuration, this factory may choose to
+ * wrap IOSession instances in LoggingIOSession objects.
+ */
 public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFactory<DefaultNHttpClientConnection> {
 
     private static final Log targetConnLog = LogFactory.getLog(

@@ -33,6 +33,76 @@ import java.util.Map;
 
 public class LoggingUtils {
 
+    /**
+     * Create a new DefaultHttpServerIODispatch instance using the provided parameters.
+     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
+     * depending on the current logging configuration.
+     *
+     * @param handler An NHttpServerEventHandler instance
+     * @param config A ConnectionConfig instance
+     * @return A DefaultHttpServerIODispatch instance
+     */
+    public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
+                                                                  final ConnectionConfig config) {
+        return new DefaultHttpServerIODispatch(decorate(handler),
+                new LoggingNHttpServerConnectionFactory(config));
+    }
+
+    /**
+     * Create a new DefaultHttpServerIODispatch instance using the provided parameters.
+     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
+     * depending on the current logging configuration.
+     *
+     * @param handler An NHttpServerEventHandler instance
+     * @param config A ConnectionConfig instance
+     * @param sslContext An SSLContext instance to initialize SSL support
+     * @param sslSetupHandler An SSLSetupHandler instance
+     * @return A DefaultHttpServerIODispatch instance
+     */
+    public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
+                                                                  final ConnectionConfig config,
+                                                                  final SSLContext sslContext,
+                                                                  final SSLSetupHandler sslSetupHandler) {
+        return new DefaultHttpServerIODispatch(decorate(handler),
+                new LoggingNHttpSSLServerConnectionFactory(config, sslContext, sslSetupHandler));
+    }
+
+    /**
+     * Create a new DefaultHttpClientIODispatch instance using the provided parameters.
+     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
+     * depending on the current logging configuration.
+     *
+     * @param handler An NHttpClientEventHandler instance
+     * @param config A ConnectionConfig instance
+     * @return A DefaultHttpClientIODispatch instance
+     */
+    public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
+                                                                  final ConnectionConfig config) {
+        return new DefaultHttpClientIODispatch(decorate(handler),
+                new LoggingNHttpClientConnectionFactory(config));
+    }
+
+    /**
+     * Create a new DefaultHttpClientIODispatch instance using the provided parameters.
+     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
+     * depending on the current logging configuration.
+     *
+     * @param handler An NHttpServerEventHandler instance
+     * @param config A ConnectionConfig instance
+     * @param sslContext An SSLContext instance to initialize SSL support
+     * @param sslSetupHandler An SSLSetupHandler instance
+     * @param customContexts A Map of endpoints and SSLContext instances
+     * @return A DefaultHttpClientIODispatch instance
+     */
+    public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
+                                                                  final ConnectionConfig config,
+                                                                  final SSLContext sslContext,
+                                                                  final SSLSetupHandler sslSetupHandler,
+                                                                  Map<String, SSLContext> customContexts) {
+        return new DefaultHttpClientIODispatch(decorate(handler),
+                new LoggingNHttpSSLClientConnectionFactory(config, sslContext, sslSetupHandler, customContexts));
+    }
+
     private static NHttpClientEventHandler decorate(NHttpClientEventHandler handler) {
         Log log = LogFactory.getLog(handler.getClass());
         if (log.isDebugEnabled()) {
@@ -47,34 +117,5 @@ public class LoggingUtils {
             handler = new LoggingServerEventHandler(handler);
         }
         return handler;
-    }
-
-    public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
-                                                                  final ConnectionConfig config) {
-        return new DefaultHttpServerIODispatch(decorate(handler),
-                new LoggingNHttpServerConnectionFactory(config));
-    }
-
-    public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
-                                                                  final ConnectionConfig config,
-                                                                  final SSLContext sslContext,
-                                                                  final SSLSetupHandler sslSetupHandler) {
-        return new DefaultHttpServerIODispatch(decorate(handler),
-                new LoggingNHttpSSLServerConnectionFactory(config, sslContext, sslSetupHandler));
-    }
-
-    public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
-                                                                  final ConnectionConfig config) {
-        return new DefaultHttpClientIODispatch(decorate(handler),
-                new LoggingNHttpClientConnectionFactory(config));
-    }
-
-    public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
-                                                                  final ConnectionConfig config,
-                                                                  final SSLContext sslContext,
-                                                                  final SSLSetupHandler sslSetupHandler,
-                                                                  Map<String, SSLContext> customContexts) {
-        return new DefaultHttpClientIODispatch(decorate(handler),
-                new LoggingNHttpSSLClientConnectionFactory(config, sslContext, sslSetupHandler, customContexts));
     }
 }

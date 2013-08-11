@@ -30,6 +30,12 @@ import javax.net.ssl.SSLContext;
 import java.net.InetSocketAddress;
 import java.util.Map;
 
+/**
+ * The SSL-enabled version of the LoggingNHttpClientConnectionFactory. Identical in behavior
+ * to the parent class, but wraps IOSession instances with SSLIOSession instances. This
+ * implementation also supports using different SSLContext instances for different target
+ * I/O sessions.
+ */
 public class LoggingNHttpSSLClientConnectionFactory extends LoggingNHttpClientConnectionFactory {
 
     private SSLContext sslContext;

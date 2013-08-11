@@ -80,8 +80,10 @@ public class PassThroughHttpListener implements TransportListener {
 
     /** The custom URI map for the services if there are any */
     private Map<String, String> serviceNameToEPRMap = new HashMap<String, String>();
+
     /** The service name map for the custom URI if there are any */
     private Map<String, String> eprToServiceNameMap = new HashMap<String, String>();
+
     /** the axis observer that gets notified of service life cycle events*/
     private final AxisObserver axisObserver = new GenericAxisObserver();
 
@@ -137,10 +139,10 @@ public class PassThroughHttpListener implements TransportListener {
         log.info("Starting pass-through " + namePrefix + " listener...");
 
         try {
-            String prefix = namePrefix + "-Listener I/O dispatcher";
+            String prefix = namePrefix + "-PT-Listener I/O Dispatcher";
             ioReactor = new DefaultListeningIOReactor(
                             sourceConfiguration.getReactorConfig(),
-                            new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
+                            new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
             
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
 

@@ -31,6 +31,14 @@ import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * A decorator (wrapper) for IOSession instances. This decorator logs additional
+ * debug information regarding each of the events triggered on the actual IOSession
+ * instance. Most events are logged 'before' they are dispatched to the wrapped
+ * IOSession, but this implementation does not modify the event arguments by any means.
+ * In that sense this decorator is read-only and safe. This implementation also facilitates
+ * intercepting and logging HTTP messages at wire-level.
+ */
 public class LoggingIOSession implements IOSession {
 
     private static AtomicLong COUNT = new AtomicLong(0);
@@ -41,14 +49,22 @@ public class LoggingIOSession implements IOSession {
     private final ByteChannel channel;
     private final String id;
 
+    /**
+     * Create a new instance of the decorator.
+     *
+     * @param sessionLog Log instance used to log IOSession events.
+     * @param wireLog Log instance used to log wire-level HTTP messages.
+     * @param session IOSession to be decorated.
+     * @param id An identifier (name) that will be attached to the IOSession for the logging
+     *           purposes.
+     */
     public LoggingIOSession(
             final Log sessionLog,
             final Log wireLog,
             final IOSession session,
             final String id) {
-        super();
         if (session == null) {
-            throw new IllegalArgumentException("I/O session may not be null");
+            throw new IllegalArgumentException("I/O session must not be null");
         }
         this.session = session;
         this.channel = new LoggingByteChannel();

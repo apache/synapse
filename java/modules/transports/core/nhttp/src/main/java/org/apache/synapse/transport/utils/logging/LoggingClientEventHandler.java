@@ -30,16 +30,30 @@ import org.apache.http.nio.NHttpClientEventHandler;
 
 import java.io.IOException;
 
+/**
+ * A decorator (wrapper) for NHttpClientEventHandler instances. This decorator
+ * logs additional debug information regarding each of the events triggered on the
+ * actual NHttpClientEventHandler instance. Most events are logged 'before' they are
+ * dispatched to the wrapped NHttpClientEventHandler, but this implementation does
+ * not modify the event arguments by any means. In that sense this decorator is
+ * read-only and safe. This implementation does not log the exception event. It is
+ * expected that the actual NHttpClientEventHandler will take the necessary steps to
+ * log exceptions.
+ */
 public class LoggingClientEventHandler implements NHttpClientEventHandler {
 
     private final Log log;
 
     private final NHttpClientEventHandler handler;
 
+    /**
+     * Create a new instance of the decorator.
+     *
+     * @param handler The instance of NHttpClientEventHandler to be decorated (wrapped)
+     */
     public LoggingClientEventHandler(final NHttpClientEventHandler handler) {
-        super();
         if (handler == null) {
-            throw new IllegalArgumentException("HTTP client handler may not be null");
+            throw new IllegalArgumentException("HTTP client handler must not be null");
         }
         this.handler = handler;
         this.log = LogFactory.getLog(handler.getClass());
@@ -73,14 +87,14 @@ public class LoggingClientEventHandler implements NHttpClientEventHandler {
 
     public void requestReady(final NHttpClientConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": InRequest ready" + getRequestMessageID(conn));
+            this.log.debug("HTTP connection " + conn + ": InRequest ready");
         }
         this.handler.requestReady(conn);
     }
 
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Output ready" + getRequestMessageID(conn));
+            this.log.debug("HTTP connection " + conn + ": Output ready");
         }
         this.handler.outputReady(conn, encoder);
         if (this.log.isDebugEnabled()) {
@@ -91,15 +105,14 @@ public class LoggingClientEventHandler implements NHttpClientEventHandler {
     public void responseReceived(final NHttpClientConnection conn) throws IOException, HttpException {
         HttpResponse response = conn.getHttpResponse();
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + " : "
-                    + response.getStatusLine() + getRequestMessageID(conn));
+            this.log.debug("HTTP connection " + conn + " : " + response.getStatusLine());
         }
         this.handler.responseReceived(conn);
     }
 
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Input ready" + getRequestMessageID(conn));
+            this.log.debug("HTTP connection " + conn + ": Input ready");
         }
         this.handler.inputReady(conn, decoder);
         if (this.log.isDebugEnabled()) {
@@ -109,17 +122,8 @@ public class LoggingClientEventHandler implements NHttpClientEventHandler {
 
     public void timeout(final NHttpClientConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Timeout" + getRequestMessageID(conn));
+            this.log.debug("HTTP connection " + conn + ": Timeout");
         }
         this.handler.timeout(conn);
-    }
-
-    private static String getRequestMessageID(final NHttpClientConnection conn) {
-        /*Axis2HttpRequest axis2Request = (Axis2HttpRequest)
-                conn.getContext().getAttribute(ClientHandler.AXIS2_HTTP_REQUEST);
-        if (axis2Request != null) {
-            return " [InRequest Message ID : " + axis2Request.getMsgContext().getMessageID() + "]";
-        }*/
-        return "";
     }
 }

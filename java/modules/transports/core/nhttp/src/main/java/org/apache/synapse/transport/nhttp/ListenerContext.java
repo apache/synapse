@@ -31,12 +31,8 @@ import org.apache.axis2.transport.base.endpoint.URLEndpointsConfiguration;
 import org.apache.axis2.transport.base.endpoint.config.URLEndpointsConfigurationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.params.NIOReactorPNames;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.synapse.commons.evaluators.EvaluatorConstants;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.Parser;
@@ -82,8 +78,6 @@ public class ListenerContext {
     private String host = "localhost";
     /** The bind addresses as (address, port) pairs */
     private String bindAddress = null;
-
-    private HttpParams params = null;
 
     /** Endpoints configuration for specific HTTP Urls */
     private URLEndpointsConfiguration endpoints = null;
@@ -155,9 +149,6 @@ public class ListenerContext {
             httpGetRequestProcessor = new DefaultHttpGetProcessor();
         }
 
-        params = getListenerParameters();
-
-
         param = transportIn.getParameter(NhttpConstants.ENDPOINTS_CONFIGURATION);
         if (param != null && param.getValue() != null) {
             endpoints = new URLEndpointsConfigurationFactory().create(param.getValue().toString());
@@ -171,7 +162,7 @@ public class ListenerContext {
      * @throws org.apache.axis2.AxisFault if an error occurs
      */
     private void createPriorityConfiguration(String fileName) throws AxisFault {
-        OMElement definitions = null;
+        OMElement definitions;
         try {
             FileInputStream fis = new FileInputStream(fileName);
             definitions = new StAXOMBuilder(fis).getDocumentElement();
@@ -179,8 +170,10 @@ public class ListenerContext {
             definitions.build();
         } catch (FileNotFoundException e) {
             handleException("Priority configuration file cannot be found : " + fileName, e);
+            return;
         } catch (XMLStreamException e) {
             handleException("Error parsing priority configuration xml file " + fileName, e);
+            return;
         }
 
         OMElement executorElem = definitions.getFirstChildWithName(
@@ -243,51 +236,14 @@ public class ListenerContext {
         return null;
     }
 
-    /**
-     * get HTTP protocol parameters to which the listener must adhere to
-     * @return the applicable HTTP protocol parameters
-     */
-    private HttpParams getListenerParameters() {
-        HttpParams params = new BasicHttpParams();
+    public ConnectionConfig getConnectionConfig() {
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        params
-            .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
-                cfg.getProperty(NhttpConstants.SO_TIMEOUT_RECEIVER, 60000))
-            .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
-                cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024))
-            .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK,
-                cfg.getProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, 0) == 1)
-            .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
-                cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
-            .setParameter(HttpProtocolParams.ORIGIN_SERVER, "Synapse-HttpComponents-NIO")
-            .setParameter(
-                    HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
-                    cfg.getMalformedInputActionValue())
-            .setParameter(
-                    HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
-                    cfg.getUnMappableInputActionValue());
-
-        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
-            params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
-        }
-        return params;
+        return cfg.getConnectionConfig();
     }
 
     public IOReactorConfig getReactorConfig() {
-        IOReactorConfig config = new IOReactorConfig();
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        config.setIoThreadCount(cfg.getServerIOWorkers());
-        config.setSoTimeout(cfg.getProperty(NhttpConstants.SO_TIMEOUT_RECEIVER, 60000));
-        config.setSndBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
-        config.setRcvBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
-        config.setTcpNoDelay(cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1);
-        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
-            config.setInterestOpQueued(true);
-        }
-        if (cfg.getBooleanValue(HttpConnectionParams.SO_REUSEADDR, false)) {
-            config.setSoReuseAddress(true);
-        }
-        return config;
+        return cfg.getReactorConfig();
     }
 
     public ConfigurationContext getCfgCtx() {
@@ -332,10 +288,6 @@ public class ListenerContext {
 
     public String getBindAddress() {
         return bindAddress;
-    }
-
-    public HttpParams getParams() {
-        return params;
     }
 
     public URLEndpointsConfiguration getEndpoints() {

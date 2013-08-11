@@ -19,7 +19,6 @@
 
 package org.apache.synapse.transport.passthru;
 
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.Comparator;
 import java.util.Map;
@@ -60,10 +59,10 @@ import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.nio.reactor.ssl.SSLIOSession;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.HttpCoreRequestResponseTransport;
-import org.apache.synapse.transport.nhttp.NHttpConfiguration;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.RESTUtil;
+import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
 
@@ -89,18 +88,14 @@ public class ServerWorker implements Runnable {
     private HttpGetRequestProcessor httpGetRequestProcessor = null;
     
     private boolean isHttps = false;
-    
-    
-    private OutputStream os; //only used for WSDL  requests..
   
     public ServerWorker(final SourceRequest request,
-                        final SourceConfiguration sourceConfiguration, final OutputStream os) {
+                        final SourceConfiguration sourceConfiguration) {
         this.request = request;
         this.sourceConfiguration = sourceConfiguration;
         this.isHttps = sourceConfiguration.isSsl();
         this.msgContext = createMessageContext(request);
         this.httpGetRequestProcessor = sourceConfiguration.getHttpGetRequestProcessor();
-        this.os = os;
 
         // set these properties to be accessed by the engine
         msgContext.setProperty(
@@ -180,7 +175,7 @@ public class ServerWorker implements Runnable {
             response.setEntity(entity);
             
 			httpGetRequestProcessor.process(request.getRequest(), response, msgContext,
-					request.getConnection(), os, true);
+					request.getConnection(), true);
 		} 
 		
 		//need special case to handle REST
@@ -258,7 +253,7 @@ public class ServerWorker implements Runnable {
 				// Dispatcher Service.
 
 				if (axisService == null) {
-					String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
+					String defaultSvcName = PassThroughConfiguration.getInstance().getStringProperty(
                             "nhttp.default.service", "__SynapseService");
 					axisService =  msgContext.getConfigurationContext().getAxisConfiguration()
 					                        .getService(defaultSvcName);

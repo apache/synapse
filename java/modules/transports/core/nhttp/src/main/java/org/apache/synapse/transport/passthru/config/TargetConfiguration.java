@@ -19,12 +19,9 @@
 
 package org.apache.synapse.transport.passthru.config;
 
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.threads.WorkerPool;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.passthru.connections.TargetConnections;
 
@@ -33,13 +30,12 @@ import org.apache.synapse.transport.passthru.connections.TargetConnections;
  */
 public class TargetConfiguration extends BaseConfiguration {
 
-    private HttpProcessor httpProcessor = null;
-
     private int maxConnections = Integer.MAX_VALUE;
 
-    /** Weather User-Agent header coming from client should be preserved */
+    /** Whether User-Agent header coming from client should be preserved */
     private boolean preserveUserAgentHeader = false;
-    /** Weather Server header coming from server should be preserved */
+
+    /** Whether Server header coming from server should be preserved */
     private boolean preserveServerHeader = true;
 
     private TargetConnections connections = null;
@@ -48,32 +44,23 @@ public class TargetConfiguration extends BaseConfiguration {
                                ParameterInclude parameters,
                                WorkerPool pool) {
         super(configurationContext, parameters, pool);
-
-        httpProcessor = new ImmutableHttpProcessor(
-                new HttpRequestInterceptor[] {
-                        new RequestContent(),
-                        new RequestTargetHost(),
-                        new RequestConnControl(),
-                        new RequestUserAgent(),
-                        new RequestExpectContinue()
-         });
-    }
-
-    public void build() throws AxisFault {
-        super.build();
-
-        maxConnections = conf.getIntProperty(PassThroughConfigPNames.MAX_CONNECTION_PER_HOST_PORT,
+        maxConnections = conf.getIntProperty(
+                PassThroughConfigPNames.MAX_CONNECTION_PER_HOST_PORT,
                 Integer.MAX_VALUE);
-        preserveUserAgentHeader = conf.isPreserveUserAgentHeader();
-        preserveServerHeader = conf.isPreserveServerHeader();
+        preserveUserAgentHeader = conf.getBooleanProperty(
+                PassThroughConfigPNames.USER_AGENT_HEADER_PRESERVE, false);
+        preserveServerHeader = conf.getBooleanProperty(
+                PassThroughConfigPNames.SERVER_HEADER_PRESERVE, true);
     }
 
-    public HttpParams getHttpParameters() {
-        return httpParameters;
-    }
-
-    public HttpProcessor getHttpProcessor() {
-        return httpProcessor;
+    @Override
+    protected HttpProcessor initHttpProcessor() {
+        return new ImmutableHttpProcessor(
+                new RequestContent(),
+                new RequestTargetHost(),
+                new RequestConnControl(),
+                new RequestUserAgent(),
+                new RequestExpectContinue(false));
     }
 
     public int getMaxConnections() {

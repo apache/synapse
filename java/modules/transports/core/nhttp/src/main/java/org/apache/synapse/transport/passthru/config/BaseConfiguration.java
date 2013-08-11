@@ -19,19 +19,14 @@
 
 package org.apache.synapse.transport.passthru.config;
 
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.ParameterInclude;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.params.NIOReactorPNames;
-import org.apache.http.nio.params.NIOReactorParams;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HttpProcessor;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 
@@ -49,16 +44,13 @@ public abstract class BaseConfiguration {
     private WorkerPool workerPool = null;
 
     /** The Axis2 ConfigurationContext */
-    protected ConfigurationContext configurationContext = null;
+    private ConfigurationContext configurationContext = null;
 
-    /** Default http parameters */
-    protected HttpParams httpParameters = null;
-
-    protected BufferFactory bufferFactory = null;
+    private BufferFactory bufferFactory = null;
 
     private PassThroughTransportMetricsCollector metrics = null;
 
-    private int iOThreadsPerReactor;
+    private HttpProcessor httpProcessor;
 
     protected PassThroughConfiguration conf = PassThroughConfiguration.getInstance();
 
@@ -66,56 +58,32 @@ public abstract class BaseConfiguration {
                              ParameterInclude parameters,
                              WorkerPool workerPool) {
         this.parameters = parameters;
-        this.workerPool = workerPool;
         this.configurationContext = configurationContext;
-    }
-
-    public void build() throws AxisFault {
-        iOThreadsPerReactor = conf.getIOThreadsPerReactor();
-
         if (workerPool == null) {
-            workerPool = WorkerPoolFactory.getWorkerPool(
-                            conf.getWorkerPoolCoreSize(),
-                            conf.getWorkerPoolMaxSize(),
-                            conf.getWorkerThreadKeepaliveSec(),
-                            conf.getWorkerPoolQueueLen(),
-                            "Pass-through Message Processing Thread Group",
-                            "PassThroughMessageProcessor");
+            this.workerPool = WorkerPoolFactory.getWorkerPool(
+                    conf.getWorkerPoolCoreSize(),
+                    conf.getWorkerPoolMaxSize(),
+                    conf.getWorkerThreadKeepaliveSec(),
+                    conf.getWorkerPoolQueueLen(),
+                    "Pass-through Message Processing Thread Group",
+                    "PassThroughMessageProcessor");
+        } else {
+            this.workerPool = workerPool;
         }
 
-        httpParameters = retrieveHttpParameters();
-        bufferFactory = new BufferFactory(conf.getIOBufferSize(), new HeapByteBufferAllocator(), 512);
+        int bufferSize = conf.getIntProperty(PassThroughConfigPNames.IO_BUFFER_SIZE, 1024 * 8);
+        bufferFactory = new BufferFactory(bufferSize, HeapByteBufferAllocator.INSTANCE, 512);
+        httpProcessor = initHttpProcessor();
     }
+
+    abstract protected HttpProcessor initHttpProcessor();
 
     public IOReactorConfig getReactorConfig() {
-        IOReactorConfig config = new IOReactorConfig();
-        config.setIoThreadCount(iOThreadsPerReactor);
-        config.setSoTimeout(
-                conf.getIntProperty(HttpConnectionParams.SO_TIMEOUT, 60000));
-        config.setConnectTimeout(
-                conf.getIntProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 0));
-        config.setRcvBufSize(
-                conf.getIntProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
-        config.setSndBufSize(
-                conf.getIntProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
-        config.setTcpNoDelay(
-                conf.getBooleanProperty(HttpConnectionParams.TCP_NODELAY, true));
-        config.setInterestOpQueued(
-                conf.getBooleanProperty(NIOReactorParams.INTEREST_OPS_QUEUEING, false));
+        return conf.getReactorConfig();
+    }
 
-        if (conf.getIntProperty(HttpConnectionParams.SO_LINGER) != null) {
-            config.setSoLinger(conf.getIntProperty(HttpConnectionParams.SO_LINGER));
-        }
-
-        if (conf.getBooleanProperty(HttpConnectionParams.SO_REUSEADDR) != null) {
-            config.setSoReuseAddress(conf.getBooleanProperty(HttpConnectionParams.SO_REUSEADDR));
-        }
-
-        if (conf.getIntProperty(NIOReactorPNames.SELECT_INTERVAL) != null) {
-            config.setSelectInterval(conf.getIntProperty(NIOReactorPNames.SELECT_INTERVAL));
-        }
-
-        return config;
+    public ConnectionConfig getConnectionConfig() {
+        return conf.getConnectionConfig();
     }
 
     public WorkerPool getWorkerPool() {
@@ -126,49 +94,12 @@ public abstract class BaseConfiguration {
         return configurationContext;
     }
 
-    protected HttpParams retrieveHttpParameters() throws AxisFault {
-        HttpParams params = new BasicHttpParams();
-        params.
-            setIntParameter(HttpConnectionParams.SO_TIMEOUT,
-                    conf.getIntProperty(HttpConnectionParams.SO_TIMEOUT, 60000)).
-            setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT,
-                    conf.getIntProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 0)).
-            setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
-                    conf.getIntProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024)).
-            setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK,
-                    conf.getBooleanProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, false)).
-            setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
-                    conf.getBooleanProperty(HttpConnectionParams.TCP_NODELAY, true)).
-            setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING,
-                    conf.getBooleanProperty(NIOReactorParams.INTEREST_OPS_QUEUEING, false)).
-            setParameter(HttpProtocolParams.ORIGIN_SERVER,
-                    conf.getStringProperty(HttpProtocolParams.ORIGIN_SERVER, "Synapse-PassThrough-HTTP")).
-            setParameter(HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
-                    conf.getMalformedInputActionValue()).
-            setParameter(HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
-                    conf.getUnMappableInputActionValue());
-        /* Set advanced tuning params only if they are explicitly set so that we are not loosing
-           internal defaults of HttpCore-NIO */
-        if (conf.getIntProperty(HttpConnectionParams.SO_LINGER) != null) {
-            HttpConnectionParams.setLinger(params,
-                    conf.getIntProperty(HttpConnectionParams.SO_LINGER));
-        }
-
-        if (conf.getBooleanProperty(HttpConnectionParams.SO_REUSEADDR) != null) {
-            HttpConnectionParams.setSoReuseaddr(params,
-                    conf.getBooleanProperty(HttpConnectionParams.SO_REUSEADDR));
-        }
-
-        if (conf.getIntProperty(NIOReactorPNames.SELECT_INTERVAL) != null) {
-            NIOReactorParams.setSelectInterval(params,
-                    conf.getIntProperty(NIOReactorPNames.SELECT_INTERVAL));
-        }
-
-        return params;
-    }
-
     public BufferFactory getBufferFactory() {
         return bufferFactory;
+    }
+
+    public HttpProcessor getHttpProcessor() {
+        return httpProcessor;
     }
 
     public PassThroughTransportMetricsCollector getMetrics() {

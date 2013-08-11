@@ -21,9 +21,6 @@ package org.apache.synapse.transport.passthru;
 
 public class PassThroughConstants {
 
-    public static final int DEFAULT_IO_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
-    public static final int DEFAULT_MAX_CONN_PER_HOST_PORT = Integer.MAX_VALUE;
-    
     public static final String REQUEST_MESSAGE_CONTEXT = "REQUEST_MESSAGE_CONTEXT";
     public static final String CONNECTION_POOL = "CONNECTION_POOL";
 
@@ -83,6 +80,8 @@ public class PassThroughConstants {
 
     protected static final String PASS_THROUGH_TARGET_CONNECTION = "pass-through.Target-Connection";
     protected static final String PASS_THROUGH_TARGET_RESPONSE = "pass-through.Target-Response";
+
+    public static final String PASS_THROUGH_RESPONSE_SOURCE_BUFFER = "synapse.response-source-buffer";
 
     public static final String PASS_THROUGH_PIPE = "pass-through.pipe";
 

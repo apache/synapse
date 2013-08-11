@@ -25,10 +25,8 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.params.*;
 import org.apache.http.protocol.*;
 import org.apache.http.HttpResponseFactory;
-import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.ParamUtils;
@@ -48,9 +46,6 @@ public class SourceConfiguration extends BaseConfiguration {
 
     private Log log = LogFactory.getLog(SourceConfiguration.class);
 
-    /** This is used to process HTTP responses */
-    private HttpProcessor httpProcessor = null;
-
     /** Response factory used for creating HTTP Responses */
     private HttpResponseFactory responseFactory = null;
 
@@ -60,46 +55,34 @@ public class SourceConfiguration extends BaseConfiguration {
     /** Object to manage the source connections */
     private SourceConnections sourceConnections = null;
 
-    private TransportInDescription inDescription;
-
     private String host;
+
+    private String transportName;
 
     /** The EPR prefix for services available over this transport */
     private String serviceEPRPrefix;
+
     /** The EPR prefix for services with custom URI available over this transport */
     private String customEPRPrefix;
     
     /** SSLContext if this listener is a SSL listener */
     private boolean ssl = false;
-    
-    
+
     /** WSDL processor for Get requests*/
     private HttpGetRequestProcessor httpGetRequestProcessor = null;
 
-
     public SourceConfiguration(ConfigurationContext configurationContext,
                                TransportInDescription description,
-                               WorkerPool pool) {
+                               WorkerPool pool, boolean ssl) throws AxisFault {
+
         super(configurationContext, description, pool);
-        this.inDescription = description;
-        httpProcessor = new ImmutableHttpProcessor(
-                new HttpResponseInterceptor[]{
-                        new ResponseDate(),
-                        new ResponseServer(),
-                        new ResponseContent(),
-                        new ResponseConnControl()});
+        this.transportName = description.getName();
+        this.ssl = ssl;
+        this.responseFactory = new DefaultHttpResponseFactory();
+        this.sourceConnections = new SourceConnections();
+        this.port = ParamUtils.getRequiredParamInt(parameters, "port");
 
-        responseFactory = new DefaultHttpResponseFactory();
-
-        sourceConnections = new SourceConnections();
-    }
-
-    public void build() throws AxisFault {
-        super.build();
-
-        port = ParamUtils.getRequiredParamInt(parameters, "port");
-
-        Parameter hostParameter = inDescription.getParameter(TransportListener.HOST_ADDRESS);
+        Parameter hostParameter = parameters.getParameter(TransportListener.HOST_ADDRESS);
         if (hostParameter != null) {
             host = ((String) hostParameter.getValue()).trim();
         } else {
@@ -110,32 +93,33 @@ public class SourceConfiguration extends BaseConfiguration {
             }
         }
 
-        Parameter param = inDescription.getParameter(PassThroughConstants.WSDL_EPR_PREFIX);
+        Parameter param = parameters.getParameter(PassThroughConstants.WSDL_EPR_PREFIX);
         if (param != null) {
             serviceEPRPrefix = getServiceEPRPrefix(configurationContext, (String) param.getValue());
             customEPRPrefix = (String) param.getValue();
         } else {
             serviceEPRPrefix = getServiceEPRPrefix(configurationContext, host, port);
-            customEPRPrefix = inDescription.getName() + "://" + host + ":" +
+            customEPRPrefix = transportName + "://" + host + ":" +
                     (port == 80 ? "" : port) + "/";
         }
-        
+
         // create http Get processor
-        param = inDescription.getParameter(NhttpConstants.HTTP_GET_PROCESSOR);
+        param = parameters.getParameter(NhttpConstants.HTTP_GET_PROCESSOR);
         if (param != null && param.getValue() != null) {
             httpGetRequestProcessor = createHttpGetProcessor(param.getValue().toString());
             if (httpGetRequestProcessor == null) {
                 handleException("Cannot create HttpGetRequestProcessor");
             }
-        } 
+        }
     }
 
-    public HttpParams getHttpParameters() {
-        return httpParameters;
-    }
-
-    public HttpProcessor getHttpProcessor() {
-        return httpProcessor;
+    @Override
+    protected HttpProcessor initHttpProcessor() {
+        return new ImmutableHttpProcessor(
+                new ResponseDate(),
+                new ResponseServer("Synapse-PassThrough-Http"),
+                new ResponseContent(),
+                new ResponseConnControl());
     }
 
     public HttpResponseFactory getResponseFactory() {
@@ -150,8 +134,8 @@ public class SourceConfiguration extends BaseConfiguration {
         return sourceConnections;
     }
 
-    public TransportInDescription getInDescription() {
-        return inDescription;
+    public String getTransportName() {
+        return transportName;
     }
 
     public String getServiceEPRPrefix() {
@@ -161,19 +145,11 @@ public class SourceConfiguration extends BaseConfiguration {
     public String getCustomEPRPrefix() {
         return customEPRPrefix;
     }
-    
-    
-    
+
     public boolean isSsl() {
 		return ssl;
 	}
 
-	public void setSsl(boolean ssl) {
-		this.ssl = ssl;
-	}
-	
-	
-	
 	public HttpGetRequestProcessor getHttpGetRequestProcessor() {
 		return httpGetRequestProcessor;
 	}
@@ -220,8 +196,6 @@ public class SourceConfiguration extends BaseConfiguration {
 					+ (!cfgCtx.getServiceContextPath().endsWith("/") ? "/" : "");
 		}
 	}
-    
-    
     
     private HttpGetRequestProcessor createHttpGetProcessor(String str) throws AxisFault {
         Object obj = null;

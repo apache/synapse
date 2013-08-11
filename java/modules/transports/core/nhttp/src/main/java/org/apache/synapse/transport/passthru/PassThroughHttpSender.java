@@ -42,6 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.NHttpServerConnection;
@@ -49,7 +50,6 @@ import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.HttpParams;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
@@ -61,6 +61,7 @@ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsColl
 import org.apache.synapse.transport.passthru.jmx.TransportView;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
@@ -159,7 +160,6 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
         targetConfiguration = new TargetConfiguration(configurationContext,
                 transportOutDescription, workerPool);
-        targetConfiguration.build();
         configurationContext.setProperty(PassThroughConstants.PASS_THROUGH_TRANSPORT_WORKER_POOL,
                 targetConfiguration.getWorkerPool());
 
@@ -211,7 +211,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         TargetHandler handler = new TargetHandler(deliveryAgent, targetConfiguration);
         final IOEventDispatch ioEventDispatch =
                 getEventDispatch(handler, sslContext, sslSetupHandler,
-                        targetConfiguration.getHttpParameters(), transportOutDescription);
+                        targetConfiguration.getConnectionConfig(), transportOutDescription);
 
         // start the sender in a separate thread
         Thread t = new Thread(new Runnable() {
@@ -429,7 +429,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
      * @param handler The passthru target handler instance
      * @param sslContext SSL context used by the sender or null
      * @param sslIOSessionHandler SSL session handler or null
-     * @param params HTTP parameters
+     * @param config ConnectionConfig instance
      * @param trpOut Transport out description
      * @return an IOEventDispatch instance
      * @throws AxisFault on error
@@ -437,10 +437,10 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
     protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler,
                                                SSLContext sslContext,
                                                SSLSetupHandler sslIOSessionHandler,
-                                               HttpParams params,
+                                               ConnectionConfig config,
                                                TransportOutDescription trpOut) throws AxisFault {
 
-        return new TargetIOEventDispatch(handler, params);
+        return LoggingUtils.getClientIODispatch(handler, config);
     }
 
     /**

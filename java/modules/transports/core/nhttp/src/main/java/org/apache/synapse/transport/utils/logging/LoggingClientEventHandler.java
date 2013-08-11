@@ -17,23 +17,26 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.passthru.logging;
+package org.apache.synapse.transport.utils.logging;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.nio.*;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
+import org.apache.http.nio.ContentDecoder;
+import org.apache.http.nio.ContentEncoder;
+import org.apache.http.nio.NHttpClientConnection;
+import org.apache.http.nio.NHttpClientEventHandler;
 
 import java.io.IOException;
 
-public class LoggingTargetHandler implements NHttpClientEventHandler {
+public class LoggingClientEventHandler implements NHttpClientEventHandler {
 
     private final Log log;
-    
+
     private final NHttpClientEventHandler handler;
 
-    public LoggingTargetHandler(final NHttpClientEventHandler handler) {
+    public LoggingClientEventHandler(final NHttpClientEventHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("HTTP client handler may not be null");
@@ -64,7 +67,7 @@ public class LoggingTargetHandler implements NHttpClientEventHandler {
     }
 
     public void exception(NHttpClientConnection conn, Exception ex) {
-        this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
+        // Do not log errors at this level - Actual handler implementation should do that
         this.handler.exception(conn, ex);
     }
 
@@ -116,7 +119,7 @@ public class LoggingTargetHandler implements NHttpClientEventHandler {
                 conn.getContext().getAttribute(ClientHandler.AXIS2_HTTP_REQUEST);
         if (axis2Request != null) {
             return " [InRequest Message ID : " + axis2Request.getMsgContext().getMessageID() + "]";
-        }*/        
+        }*/
         return "";
     }
 }

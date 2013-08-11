@@ -35,14 +35,15 @@ import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.HttpParams;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -89,8 +90,8 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
     protected IOEventDispatch getEventDispatch(
         NHttpServerEventHandler handler, SSLContext sslContext,
-        SSLSetupHandler setupHandler, HttpParams params) {
-        return new PlainServerIOEventDispatch(handler, params);
+        SSLSetupHandler setupHandler, ConnectionConfig config) {
+        return LoggingUtils.getServerIODispatch(handler, config);
     }
 
     /**
@@ -197,7 +198,6 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         }
         
         // configure the IO reactor on the specified port
-        HttpParams params = listenerContext.getParams();
         try {
             String prefix = (sslContext == null ? "http" : "https") + "-Listener I/O dispatcher";
             ioReactor = new DefaultListeningIOReactor(
@@ -229,7 +229,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
 
         handler = new ServerHandler(listenerContext);
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler,
-                sslContext, sslSetupHandler, params);
+                sslContext, sslSetupHandler, listenerContext.getConnectionConfig());
         state = BaseConstants.STARTED;
 
         listenerContext.getHttpGetRequestProcessor().init(cfgCtx, handler);
@@ -354,7 +354,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     /**
-     * Returns the number of requestes queued in the thread pool
+     * Returns the number of requests queued in the thread pool
      * @return queue size
      */
     public int getQueueSize() {
@@ -381,34 +381,6 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         }
     }
 
-
-    /**
-     * Return the EPR for the given service (implements deprecated method temporarily)
-     */
-    public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
-
-        String trailer = "";
-        //Strip out the operation name
-        if (serviceName.indexOf('/') != -1) {
-            trailer += serviceName.substring(serviceName.indexOf("/"));
-            serviceName = serviceName.substring(0, serviceName.indexOf('/'));
-        }
-        // strip out the endpoint name if present
-        if (serviceName.indexOf('.') != -1) {
-            trailer += serviceName.substring(serviceName.indexOf("."));
-            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
-        }
-
-        if (serviceNameToEPRMap.containsKey(serviceName)) {
-            return new EndpointReference(
-                    customEPRPrefix + serviceNameToEPRMap.get(serviceName) + trailer);
-        } else {
-            if (serviceEPRPrefix == null) {
-                return null;
-            }
-            return new EndpointReference(serviceEPRPrefix + serviceName + trailer);
-        }
-    }
 
     /**
      * Return the EPRs for the given service over this transport

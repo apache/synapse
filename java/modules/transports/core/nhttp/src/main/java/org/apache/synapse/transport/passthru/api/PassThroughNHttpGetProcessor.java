@@ -43,6 +43,8 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.nio.NHttpServerConnection;
+import org.apache.http.nio.entity.ContentOutputStream;
+import org.apache.http.nio.util.SimpleOutputBuffer;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.NHttpConfiguration;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -51,6 +53,7 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
+import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
@@ -76,7 +79,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 
 	public void process(HttpRequest request, HttpResponse response,
 			MessageContext msgContext, NHttpServerConnection conn,
-			OutputStream os, boolean isRestDispatching) {
+			boolean isRestDispatching) {
 
 		String uri = request.getRequestLine().getUri();
 		String serviceName = getServiceName(request);
@@ -100,6 +103,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 		} else {
 			msgContext.setTo(new EndpointReference(uri));
 		}
+
+        SimpleOutputBuffer outputBuffer = (SimpleOutputBuffer) conn.getContext().getAttribute(
+                PassThroughConstants.PASS_THROUGH_RESPONSE_SOURCE_BUFFER);
+        ContentOutputStream os = new ContentOutputStream(outputBuffer);
 
 		if (isServiceListBlocked(uri)) {
             sendResponseAndFinish(response, HttpStatus.SC_FORBIDDEN, conn, os, msgContext);
@@ -132,7 +139,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                                        MessageContext msgContext) throws IOException {
         SourceContext.updateState(conn, ProtocolState.GET_REQUEST_COMPLETE);
         sourceHandler.commitResponseHideExceptions(conn, response);
-        os.write(data);
+        write(conn, os, data);
         closeOutputStream(os);
         msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
     }
@@ -181,7 +188,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                 sendResponseAndFinish(response, output.toByteArray(), conn, os, msgContext);
 
 			} catch (Exception e) {
-				handleBrowserException(response, conn, os,
+				handleBrowserException(response, msgContext, conn, os,
 						"Error generating ?wsdl output for service : " + serviceName, e);
 			}
 		} else {
@@ -216,7 +223,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					.getParameterValue("serviceType");
 			if ("proxy".equals(parameterValue)
 					&& !isWSDLProvidedForProxyService(service)) {
-				handleBrowserException(response, conn, os,
+				handleBrowserException(response, msgContext, conn, os,
 						"No WSDL was provided for the Service " + serviceName
 								+ ". A WSDL cannot be generated.", null);
 			}
@@ -226,7 +233,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 				response.addHeader(CONTENT_TYPE, TEXT_XML);
                 sendResponseAndFinish(response, output.toByteArray(), conn, os, msgContext);
 			} catch (Exception e) {
-				handleBrowserException(response, conn, os,
+				handleBrowserException(response, msgContext, conn, os,
 						"Error generating ?wsdl2 output for service : "
 								+ serviceName, e);
 			}
@@ -316,7 +323,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 					response.addHeader(CONTENT_TYPE, TEXT_XML);
                     sendResponseAndFinish(response, output.toByteArray(), conn, os, msgContext);
 				} catch (Exception e) {
-					handleBrowserException(response, conn, os,
+					handleBrowserException(response, msgContext, conn, os,
 							"Error generating ?xsd output for service : "
 									+ serviceName, e);
 				}
@@ -351,11 +358,11 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 						response.addHeader(CONTENT_TYPE, TEXT_XML);
 						sourceHandler.commitResponseHideExceptions(conn,
 								response);
-						os.write(output.toByteArray());
+                        write(conn, os, output.toByteArray());
 						closeOutputStream(os);
                         msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
 					} catch (Exception e) {
-						handleBrowserException(response, conn, os,
+						handleBrowserException(response, msgContext, conn, os,
 								"Error generating named ?xsd output for service : "
 										+ serviceName, e);
 					}
@@ -372,7 +379,6 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 		}
 	}
 
-	
 	/**
      * Handles browser exception.
      *
@@ -382,7 +388,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
      * @param msg      message
      * @param e        Exception
      */
-    protected void handleBrowserException(HttpResponse response,
+    protected void handleBrowserException(HttpResponse response, MessageContext msgContext,
                                           NHttpServerConnection conn, OutputStream os,
                                           String msg, Exception e) {
         if (e == null) {
@@ -397,7 +403,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
             response.addHeader(CONTENT_TYPE, TEXT_HTML);
             sourceHandler.commitResponseHideExceptions(conn, response);
             try {
-                os.write(msg.getBytes());
+                write(conn, os, msg.getBytes());
                 os.close();
             } catch (IOException ignore) {
             }
@@ -409,6 +415,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
             } catch (IOException ignore) {
             }
         }
+        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, Boolean.TRUE);
     }
     
     
@@ -421,8 +428,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 	 * @return whether to proceed with incomingURI
 	 */
 	protected boolean isServiceListBlocked(String incomingURI) {
-		String isBlocked = NHttpConfiguration.getInstance()
-				.isServiceListBlocked();
+		String isBlocked = NHttpConfiguration.getInstance().isServiceListBlocked();
 
 		return (("/services").equals(incomingURI) || ("/services" + "/")
 				.equals(incomingURI)) && Boolean.parseBoolean(isBlocked);
@@ -472,6 +478,17 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
     
     protected static boolean isIP(String hostAddress) {
         return hostAddress.split("[.]").length == 4;
+    }
+
+    private void write(NHttpServerConnection conn, OutputStream os,
+                       byte[] data) throws IOException {
+        synchronized (conn.getContext()) {
+            // The SimpleOutputBuffer on which this output stream is based is not thread safe.
+            // Explicit synchronization required.
+            // Do not worry about running out of buffer space.
+            // SimpleOutputBuffer expands to fit the data.
+            os.write(data);
+        }
     }
 
 }

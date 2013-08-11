@@ -24,7 +24,6 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
-import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -127,9 +126,6 @@ public class SourceResponse {
             }
         }
 
-        response.setParams(new DefaultedHttpParams(response.getParams(),
-                sourceConfiguration.getHttpParameters()));
-
         SourceContext.updateState(conn, ProtocolState.RESPONSE_HEAD);
 
         // Pre-process HTTP response
@@ -165,7 +161,6 @@ public class SourceResponse {
 
             if (!this.connStrategy.keepAlive(response, conn.getContext())) {
                 SourceContext.updateState(conn, ProtocolState.CLOSING);
-
                 sourceConfiguration.getSourceConnections().closeConnection(conn);
             } else if (SourceContext.get(conn).isShutDown()) {
                 // we need to shut down if the shutdown flag is set

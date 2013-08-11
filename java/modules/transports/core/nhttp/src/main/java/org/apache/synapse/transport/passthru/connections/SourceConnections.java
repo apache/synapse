@@ -145,7 +145,7 @@ public class SourceConnections {
      */
     public void closeConnection(NHttpServerConnection conn) {
         if (log.isDebugEnabled()) {
-            log.debug("Shutting down connection forcefully " + conn);
+            log.debug("Closing connection forcefully " + conn);
         }
         lock.lock();
         try {

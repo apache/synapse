@@ -37,6 +37,7 @@ import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
@@ -44,11 +45,11 @@ import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.HttpParams;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
 import org.apache.synapse.transport.passthru.jmx.TransportView;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -111,12 +112,10 @@ public class PassThroughHttpListener implements TransportListener {
         // is this a SSL listener?
         sslContext = getSSLContext(transportInDescription);
         sslSetupHandler = getSSLSetupHandler(transportInDescription);
-
         namePrefix = (sslContext == null) ? "HTTP" : "HTTPS";
 
-        sourceConfiguration = new SourceConfiguration(cfgCtx, transportInDescription, workerPool);
-        sourceConfiguration.setSsl(sslContext != null);
-        sourceConfiguration.build();
+        sourceConfiguration = new SourceConfiguration(cfgCtx, transportInDescription,
+                workerPool, sslContext != null);
 
         // register to receive updates on services for lifetime management
         cfgCtx.getAxisConfiguration().addObservers(axisObserver);
@@ -164,7 +163,7 @@ public class PassThroughHttpListener implements TransportListener {
 
         SourceHandler handler = new SourceHandler(sourceConfiguration);
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext,
-                sslSetupHandler, sourceConfiguration.getHttpParameters());
+                sslSetupHandler, sourceConfiguration.getConnectionConfig());
 
         ListenerEndpoint endpoint = ioReactor.listen(new InetSocketAddress(
                 sourceConfiguration.getPort()));
@@ -320,9 +319,8 @@ public class PassThroughHttpListener implements TransportListener {
         public void init(AxisConfiguration axisConfig) {}
 
         public void serviceUpdate(AxisEvent event, AxisService service) {
-            if (!ignoreService(service)
-                    && BaseUtils.isUsingTransport(service,
-                    sourceConfiguration.getInDescription().getName())) {
+            if (!ignoreService(service) && BaseUtils.isUsingTransport(
+                    service, sourceConfiguration.getTransportName())) {
                 switch (event.getEventType()) {
                     case AxisEvent.SERVICE_DEPLOY :
                         addToServiceURIMap(service);
@@ -375,8 +373,8 @@ public class PassThroughHttpListener implements TransportListener {
 
     protected IOEventDispatch getEventDispatch(
             NHttpServerEventHandler handler, SSLContext sslContext,
-            SSLSetupHandler sslSetupHandler, HttpParams params) {
-        return new SourceIOEventDispatch(handler, params);
+            SSLSetupHandler sslSetupHandler, ConnectionConfig config) {
+        return LoggingUtils.getServerIODispatch(handler, config);
     }
 
     /**

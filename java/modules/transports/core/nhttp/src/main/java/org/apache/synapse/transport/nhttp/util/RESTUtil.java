@@ -285,7 +285,7 @@ public class RESTUtil {
             RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
             AxisService axisService = requestDispatcher.findService(msgContext);
             if (axisService == null) {
-                String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
+                String defaultSvcName = NHttpConfiguration.getInstance().getStringProperty(
                         "nhttp.default.service", "__SynapseService");
                 axisService = msgContext.getConfigurationContext()
                         .getAxisConfiguration().getService(defaultSvcName);

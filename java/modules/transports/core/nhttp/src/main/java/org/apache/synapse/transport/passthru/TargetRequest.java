@@ -31,7 +31,6 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -203,24 +202,15 @@ public class TargetRequest {
                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(requestMsgCtx);
                 request.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
                         messageFormatter.formatSOAPAction(requestMsgCtx, null, soapAction));
-                request.setHeader(HTTPConstants.USER_AGENT,"Synapse-PT-HttpComponents-NIO");
+                request.setHeader(HttpHeaders.USER_AGENT, "Synapse-PT-HttpComponents-NIO");
             }
     	}
 
-        request.setParams(new DefaultedHttpParams(request.getParams(),
-                targetConfiguration.getHttpParameters()));
-        
-        
-	
-		
-		this.processChunking(conn, requestMsgCtx);
-		
+        this.processChunking(conn, requestMsgCtx);
 
         if (!keepAlive) {
             request.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
         }
-        
-       
 
         // Pre-process HTTP request
         conn.getContext().setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
@@ -230,8 +220,7 @@ public class TargetRequest {
 
         // start the request
         targetConfiguration.getHttpProcessor().process(request, conn.getContext());
-        
-        
+
         conn.submitRequest(request);
 
         if (hasEntityBody) {

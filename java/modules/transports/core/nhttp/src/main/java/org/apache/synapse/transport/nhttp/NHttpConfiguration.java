@@ -19,20 +19,15 @@
 
 package org.apache.synapse.transport.nhttp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
+import org.apache.synapse.transport.utils.config.HttpTransportConfiguration;
 
-import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Store and manage properties that tune the nhttp transport
  */
-public final class NHttpConfiguration {
+public final class NHttpConfiguration extends HttpTransportConfiguration {
 
     // defaults
     private static final int WORKERS_CORE_THREADS  = 20;
@@ -47,23 +42,21 @@ public final class NHttpConfiguration {
     private static final String S_T_MAX      = "snd_t_max";
     private static final String S_T_ALIVE    = "snd_alive_sec";
     private static final String S_T_QLEN     = "snd_qlen";
-    private static final String S_IO_WORKERS = "snd_io_threads";
 
     // client sender
     private static final String C_T_CORE     = "lst_t_core";
     private static final String C_T_MAX      = "lst_t_max";
     private static final String C_T_ALIVE    = "lst_alive_sec";
     private static final String C_T_QLEN     = "lst_qlen";
-    private static final String C_IO_WORKERS = "lst_io_threads";
+
+    private static final String IO_WORKERS = "io_threads_per_reactor";
 
     // general
     private static final String G_BUFFER_SIZE  = "nhttp_buffer_size";
     private static final String G_DISABLED_HTTP_METHODS = "nhttp_disabled_methods";
 
-    private static final Log log = LogFactory.getLog(NHttpConfiguration.class);
     private static NHttpConfiguration _instance = new NHttpConfiguration();
-    private Properties props;
-    List<String> methods;
+    private List<String> methods;
 
     /** Comma separated list of blocked uris*/
     public static final String BLOCK_SERVICE_LIST = "http.block_service_list";
@@ -71,9 +64,12 @@ public final class NHttpConfiguration {
     public static final String BLOCK_SERVICE_LIST_DEFAULT = "false";
     
     private NHttpConfiguration() {
-        try {
-            props = MiscellaneousUtil.loadProperties("nhttp.properties");
-        } catch (Exception ignore) {}
+        super("nhttp");
+    }
+
+    @Override
+    protected int getThreadsPerReactor() {
+        return getIntProperty(IO_WORKERS, IO_WORKER_COUNT);
     }
 
     public static NHttpConfiguration getInstance() {
@@ -81,136 +77,65 @@ public final class NHttpConfiguration {
     }
 
     public int getServerCoreThreads() {
-        return getProperty(S_T_CORE, WORKERS_CORE_THREADS);
+        return getIntProperty(S_T_CORE, WORKERS_CORE_THREADS);
     }
 
     public int getServerMaxThreads() {
-        return getProperty(S_T_MAX, WORKERS_MAX_THREADS);
+        return getIntProperty(S_T_MAX, WORKERS_MAX_THREADS);
     }
 
     public int getServerKeepalive() {
-        return getProperty(S_T_ALIVE, WORKER_KEEP_ALIVE);
+        return getIntProperty(S_T_ALIVE, WORKER_KEEP_ALIVE);
     }
 
     public int getServerQueueLen() {
-        return getProperty(S_T_QLEN, BLOCKING_QUEUE_LENGTH);
+        return getIntProperty(S_T_QLEN, BLOCKING_QUEUE_LENGTH);
     }
-
-    public int getServerIOWorkers() {
-        return getProperty(S_IO_WORKERS, IO_WORKER_COUNT);
-    }
-
 
     public int getClientCoreThreads() {
-        return getProperty(C_T_CORE, WORKERS_CORE_THREADS);
+        return getIntProperty(C_T_CORE, WORKERS_CORE_THREADS);
     }
 
     public int getClientMaxThreads() {
-        return getProperty(C_T_MAX, WORKERS_MAX_THREADS);
+        return getIntProperty(C_T_MAX, WORKERS_MAX_THREADS);
     }
 
     public int getClientKeepalive() {
-        return getProperty(C_T_ALIVE, WORKER_KEEP_ALIVE);
+        return getIntProperty(C_T_ALIVE, WORKER_KEEP_ALIVE);
     }
 
     public int getClientQueueLen() {
-        return getProperty(C_T_QLEN, BLOCKING_QUEUE_LENGTH);
-    }
-
-    public int getClientIOWorkers() {
-        return getProperty(C_IO_WORKERS, IO_WORKER_COUNT);
+        return getIntProperty(C_T_QLEN, BLOCKING_QUEUE_LENGTH);
     }
 
     public int getBufferSize() {
-        return getProperty(G_BUFFER_SIZE, BUFFER_SIZE);
+        return getIntProperty(G_BUFFER_SIZE, BUFFER_SIZE);
     }
 
     public boolean isKeepAliveDisabled() {
-        return getProperty(NhttpConstants.DISABLE_KEEPALIVE, 0) == 1;
+        return getIntProperty(NhttpConstants.DISABLE_KEEPALIVE, 0) == 1;
     }
 
     public boolean isPreserveUserAgentHeader() {
-        return getBooleanValue(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false);
+        return getBooleanProperty(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false);
     }
 
     public boolean isPreserveServerHeader() {
-        return getBooleanValue(NhttpConstants.SERVER_HEADER_PRESERVE, true);
+        return getBooleanProperty(NhttpConstants.SERVER_HEADER_PRESERVE, true);
     }
 
     public boolean isCountConnections() {
-        return getBooleanValue(NhttpConstants.COUNT_CONNECTIONS, false);
+        return getBooleanProperty(NhttpConstants.COUNT_CONNECTIONS, false);
     }
 
     public String isServiceListBlocked() {
-        return getStringValue(BLOCK_SERVICE_LIST, BLOCK_SERVICE_LIST_DEFAULT);
-    }
-
-    /**
-     * Get properties that tune nhttp transport. Preference to system properties
-     * @param name name of the system/config property
-     * @param def default value to return if the property is not set
-     * @return the value of the property to be used
-     */
-    public int getProperty(String name, int def) {
-        String val = System.getProperty(name);
-        if (val == null) {
-            val = props.getProperty(name);
-        }
-
-        if (val != null && Integer.valueOf(val) > 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("Using nhttp tuning parameter : " + name + " = " + val);
-            }
-            return Integer.valueOf(val);
-        }        
-        return def;
-    }
-
-    /**
-     * Get properties that tune nhttp transport. Preference to system properties
-     * @param name name of the system/config property
-     * @param def default value to return if the property is not set
-     * @return the value of the property to be used
-     */
-    public boolean getBooleanValue(String name, boolean def) {
-        String val = System.getProperty(name);
-        if (val == null) {
-            val = props.getProperty(name);
-        }
-
-        if (val != null && Boolean.parseBoolean(val)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Using nhttp tuning parameter : " + name);
-            }
-            return true;
-        } else if (val != null && !Boolean.parseBoolean(val)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Using nhttp tuning parameter : " + name);
-            }
-            return false;
-        }
-        return def;
-    }
-
-    /**
-     * Get properties that tune nhttp transport. Preference to system properties
-     * @param name name of the system/config property
-     * @param def default value to return if the property is not set
-     * @return the value of the property to be used
-     */
-    public String getStringValue(String name, String def) {
-        String val = System.getProperty(name);
-        if (val == null) {
-            val = props.getProperty(name);
-        }
-
-        return val == null ? def : val;
+        return getStringProperty(BLOCK_SERVICE_LIST, BLOCK_SERVICE_LIST_DEFAULT);
     }
 
     public boolean isHttpMethodDisabled(String method) {
         if (methods == null) {
             methods = new ArrayList<String>();
-            String methodsString = getStringValue(G_DISABLED_HTTP_METHODS, "");
+            String methodsString = getStringProperty(G_DISABLED_HTTP_METHODS, "");
             for (String methodStr : methodsString.split(",")) {
                 methods.add(methodStr.trim().toUpperCase());
             }
@@ -218,25 +143,4 @@ public final class NHttpConfiguration {
         return methods.contains(method);
     }
 
-    public CodingErrorAction getMalformedInputActionValue() {
-        String val = getStringValue(HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION, "report");
-        return getCodingErrorAction(val);
-    }
-
-    public CodingErrorAction getUnMappableInputActionValue() {
-        String val = getStringValue(HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION, "report");
-        return getCodingErrorAction(val);
-    }
-
-    private CodingErrorAction getCodingErrorAction(String action) {
-        if ("report".equals(action)) {
-            return CodingErrorAction.REPORT;
-        } else if ("ignore".equals(action)) {
-            return CodingErrorAction.IGNORE;
-        } else if ("replace".equals(action)) {
-            return CodingErrorAction.REPLACE;
-        } else {
-            return CodingErrorAction.REPORT;
-        }
-    }
 }

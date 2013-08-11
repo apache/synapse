@@ -19,19 +19,13 @@
 
 package org.apache.synapse.transport.passthru.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
-
-import java.nio.charset.CodingErrorAction;
-import java.util.Properties;
+import org.apache.synapse.transport.utils.config.HttpTransportConfiguration;
 
 /**
  * This class encapsulates pass-through http transport tuning configurations specified via a
  * configurations file or system properties.
  */
-public class PassThroughConfiguration {
+public class PassThroughConfiguration extends HttpTransportConfiguration {
 
     /**
      * Default tuning parameter values
@@ -40,20 +34,12 @@ public class PassThroughConfiguration {
     private static final int DEFAULT_WORKER_POOL_SIZE_MAX        = 200;
     private static final int DEFAULT_WORKER_THREAD_KEEPALIVE_SEC = 60;
     private static final int DEFAULT_WORKER_POOL_QUEUE_LENGTH    = -1;
-    private static final int DEFAULT_IO_BUFFER_SIZE              = 8 * 1024;
-    private static final int DEFAULT_IO_THREADS_PER_REACTOR      =
-                                                         Runtime.getRuntime().availableProcessors();
-
-    private static final Log log = LogFactory.getLog(PassThroughConfiguration.class);
+    private static final int DEFAULT_IO_THREADS_PER_REACTOR      = Runtime.getRuntime().availableProcessors();
 
     private static PassThroughConfiguration _instance = new PassThroughConfiguration();
 
-    private Properties props;
-
     private PassThroughConfiguration() {
-        try {
-            props = MiscellaneousUtil.loadProperties("passthru-http.properties");
-        } catch (Exception ignored) {}
+        super("passthru-http") ;
     }
 
     public static PassThroughConfiguration getInstance() {
@@ -80,138 +66,9 @@ public class PassThroughConfiguration {
                 DEFAULT_WORKER_POOL_QUEUE_LENGTH);
     }
 
-    public int getIOThreadsPerReactor() {
+    protected int getThreadsPerReactor() {
         return getIntProperty(PassThroughConfigPNames.IO_THREADS_PER_REACTOR,
                 DEFAULT_IO_THREADS_PER_REACTOR);
-    }
-
-    public int getIOBufferSize() {
-        return getIntProperty(PassThroughConfigPNames.IO_BUFFER_SIZE,
-                DEFAULT_IO_BUFFER_SIZE);
-    }
-
-    public boolean isKeepAliveDisabled() {
-        return getBooleanProperty(PassThroughConfigPNames.DISABLE_KEEPALIVE, false);
-    }
-
-    public boolean isPreserveUserAgentHeader() {
-        return getBooleanProperty(PassThroughConfigPNames.USER_AGENT_HEADER_PRESERVE, false);
-    }
-
-    public boolean isPreserveServerHeader() {
-        return getBooleanProperty(PassThroughConfigPNames.SERVER_HEADER_PRESERVE, true);
-    }
-
-    /**
-     * Get an int property that tunes pass-through http transport. Prefer system properties
-     *
-     * @param name name of the system/config property
-     * @param def  default value to return if the property is not set
-     * @return the value of the property to be used
-     */
-    public Integer getIntProperty(String name, Integer def) {
-        String val = System.getProperty(name);
-        if (val == null) {
-            val = props.getProperty(name);
-        }
-
-        if (val != null) {
-            int intVal;
-            try {
-                intVal = Integer.valueOf(val);
-            } catch (NumberFormatException e) {
-                log.warn("Invalid pass-through http tuning property value. " + name +
-                        " must be an integer");
-                return def;
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("Using pass-through http tuning parameter : " + name + " = " + val);
-            }
-            return intVal;
-        }
-
-        return def;
-    }
-
-    /**
-     * Get an int property that tunes pass-through http transport. Prefer system properties
-     *
-     * @param name name of the system/config property
-     * @return the value of the property, null if the property is not found
-     */
-    public Integer getIntProperty(String name) {
-        return getIntProperty(name, null);
-    }
-
-    /**
-     * Get a boolean property that tunes pass-through http transport. Prefer system properties
-     *
-     * @param name name of the system/config property
-     * @param def  default value to return if the property is not set
-     * @return the value of the property to be used
-     */
-    public Boolean getBooleanProperty(String name, Boolean def) {
-        String val = System.getProperty(name);
-        if (val == null) {
-            val = props.getProperty(name);
-        }
-
-        if (val != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Using pass-through http tuning parameter : " + name + " = " + val);
-            }
-            return Boolean.valueOf(val);
-        }
-
-        return def;
-    }
-
-    /**
-     * Get a Boolean property that tunes pass-through http transport. Prefer system properties
-     *
-     * @param name name of the system/config property
-     * @return the value of the property, null if the property is not found
-     */
-    public Boolean getBooleanProperty(String name) {
-        return getBooleanProperty(name, null);
-    }
-
-    /**
-     * Get a String property that tunes pass-through http transport. Prefer system properties
-     *
-     * @param name name of the system/config property
-     * @param def  default value to return if the property is not set
-     * @return the value of the property to be used
-     */
-    public String getStringProperty(String name, String def) {
-        String val = System.getProperty(name);
-        if (val == null) {
-            val = props.getProperty(name);
-        }
-
-        return val == null ? def : val;
-    }
-
-    public CodingErrorAction getMalformedInputActionValue() {
-        String val = getStringProperty(HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION, "report");
-        return getCodingErrorAction(val);
-    }
-
-    public CodingErrorAction getUnMappableInputActionValue() {
-        String val = getStringProperty(HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION, "report");
-        return getCodingErrorAction(val);
-    }
-
-    private CodingErrorAction getCodingErrorAction(String action) {
-        if ("report".equals(action)) {
-            return CodingErrorAction.REPORT;
-        } else if ("ignore".equals(action)) {
-            return CodingErrorAction.IGNORE;
-        } else if ("replace".equals(action)) {
-            return CodingErrorAction.REPLACE;
-        } else {
-            return CodingErrorAction.REPORT;
-        }
     }
 
 }

@@ -41,11 +41,12 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.HttpParams;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
 
@@ -53,14 +54,10 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
 
     protected IOEventDispatch getEventDispatch(
         NHttpServerEventHandler handler, SSLContext sslContext,
-        SSLSetupHandler sslIOSessionHandler, HttpParams params) {
-        return new SSLServerIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
+        SSLSetupHandler sslSetupHandler, ConnectionConfig config) {
+        return LoggingUtils.getServerIODispatch(handler, config, sslContext, sslSetupHandler);
     }
 
-    /**
-     * Return the EPR prefix for services made available over this transport
-     * @return
-     */
     protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String host, int port) {
         return "https://" + host + (port == 443 ? "" : ":" + port) +
             (!cfgCtx.getServiceContextPath().startsWith("/") ? "/" : "") +

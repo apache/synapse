@@ -24,11 +24,12 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.base.ParamUtils;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.HttpParams;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 import org.apache.synapse.transport.utils.sslcert.CertificateVerificationConfig;
 import org.apache.synapse.transport.utils.sslcert.CertificateVerificationException;
 import org.apache.synapse.transport.utils.sslcert.adaptor.SynapseAdaptorForOcspCrl;
@@ -53,12 +54,12 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
 
     protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler,
                                                SSLContext sslContext,
-                                               SSLSetupHandler sslIOSessionHandler,
-                                               HttpParams params,
+                                               SSLSetupHandler sslSetupHandler,
+                                               ConnectionConfig config,
                                                TransportOutDescription transportOut) throws AxisFault {
 
-        return new SSLTargetIOEventDispatch(handler, sslContext, getCustomSSLContexts(transportOut),
-                sslIOSessionHandler, params);
+        return LoggingUtils.getClientIODispatch(handler, config, sslContext, sslSetupHandler,
+                getCustomSSLContexts(transportOut));
     }
 
     /**

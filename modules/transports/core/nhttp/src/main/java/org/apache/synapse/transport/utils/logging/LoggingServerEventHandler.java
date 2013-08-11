@@ -17,29 +17,26 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.nhttp;
-
-import java.io.IOException;
+package org.apache.synapse.transport.utils.logging;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
-import org.apache.http.ConnectionClosedException;
-import org.apache.http.nio.*;
+import org.apache.http.nio.ContentDecoder;
+import org.apache.http.nio.ContentEncoder;
+import org.apache.http.nio.NHttpServerConnection;
+import org.apache.http.nio.NHttpServerEventHandler;
 
-/**
- * Decorator class intended to transparently extend an {@link NHttpServerEventHandler}
- * with basic event logging capabilities using Commons Logging. 
- */
-class LoggingNHttpServiceHandler implements NHttpServerEventHandler {
+import java.io.IOException;
+
+public class LoggingServerEventHandler implements NHttpServerEventHandler {
 
     private final Log log;
+
     private final NHttpServerEventHandler handler;
-    
-    public LoggingNHttpServiceHandler(
-            final Log log, 
-            final NHttpServerEventHandler handler) {
+
+    public LoggingServerEventHandler(final NHttpServerEventHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("HTTP service handler may not be null");
@@ -47,7 +44,7 @@ class LoggingNHttpServiceHandler implements NHttpServerEventHandler {
         this.handler = handler;
         this.log = LogFactory.getLog(handler.getClass());
     }
-    
+
     public void connected(final NHttpServerConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Connected");
@@ -64,32 +61,22 @@ class LoggingNHttpServiceHandler implements NHttpServerEventHandler {
 
     public void endOfInput(NHttpServerConnection conn) throws IOException {
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": Closed at remote end");
+            this.log.debug("HTTP connection " + conn + ": Closed at the remote end");
         }
         this.handler.endOfInput(conn);
     }
 
     public void exception(NHttpServerConnection conn, Exception ex) {
-        if (ex instanceof ConnectionClosedException ||
-                ex.getMessage().contains("Connection reset by peer") ||
-                ex.getMessage().contains("forcibly closed")) {
-            if (this.log.isDebugEnabled()) {
-                this.log.debug("HTTP connection " + conn + ": " + ex.getMessage() +
-                        " (Probably the keepalive connection was closed)");
-            }
-        } else if (ex instanceof HttpException) {
-            this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
-            this.handler.exception(conn, ex);
-        } else {
-            this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
-        }
+        // No need to log errors at this level - Actual handler implementation
+        // should take care of that
         this.handler.exception(conn, ex);
     }
 
     public void requestReceived(final NHttpServerConnection conn) throws IOException, HttpException {
         HttpRequest request = conn.getHttpRequest();
         if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + conn + ": " + request.getRequestLine());
+            this.log.debug("HTTP InRequest Received on connection " + conn + ": "
+                    + request.getRequestLine());
         }
         this.handler.requestReceived(conn);
     }
@@ -127,5 +114,4 @@ class LoggingNHttpServiceHandler implements NHttpServerEventHandler {
         }
         this.handler.timeout(conn);
     }
-
 }

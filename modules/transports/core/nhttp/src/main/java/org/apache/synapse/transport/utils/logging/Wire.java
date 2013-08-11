@@ -16,13 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.synapse.transport.passthru.logging;
+
+package org.apache.synapse.transport.utils.logging;
 
 import org.apache.commons.logging.Log;
 
 import java.nio.ByteBuffer;
 
 public class Wire {
+
     private final Log log;
 
     public Wire(final Log log) {
@@ -37,11 +39,11 @@ public class Wire {
             if (ch == 13) {
                 buffer.append("[\\r]");
             } else if (ch == 10) {
-                    buffer.append("[\\n]\"");
-                    buffer.insert(0, "\"");
-                    buffer.insert(0, header);
-                    this.log.debug(buffer.toString());
-                    buffer.setLength(0);
+                buffer.append("[\\n]\"");
+                buffer.insert(0, "\"");
+                buffer.insert(0, header);
+                this.log.debug(buffer.toString());
+                buffer.setLength(0);
             } else if ((ch < 32) || (ch > 127)) {
                 buffer.append("[0x");
                 buffer.append(Integer.toHexString(ch));

@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -49,8 +50,6 @@ import org.apache.http.nio.util.ContentInputBuffer;
 import org.apache.http.nio.util.SharedInputBuffer;
 import org.apache.http.nio.util.SharedOutputBuffer;
 import org.apache.http.nio.entity.ContentInputStream;
-import org.apache.http.params.DefaultedHttpParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
@@ -76,8 +75,6 @@ public class ClientHandler implements NHttpClientEventHandler {
 
     private static final Log log = LogFactory.getLog(ClientHandler.class);
 
-    /** the HTTP protocol parameters to adhere to for outgoing messages */
-    private final HttpParams params;
     /** the HttpProcessor for response messages received */
     private final HttpProcessor httpProcessor;
     /** the connection re-use strategy */
@@ -122,15 +119,12 @@ public class ClientHandler implements NHttpClientEventHandler {
      * context and Http protocol parameters given
      * 
      * @param cfgCtx the Axis2 configuration context
-     * @param params the Http protocol parameters to adhere to
      * @param metrics statistics collection metrics
      */
-    public ClientHandler(final ConfigurationContext cfgCtx, final HttpParams params,
-        final NhttpMetricsCollector metrics) {
+    public ClientHandler(final ConfigurationContext cfgCtx, final NhttpMetricsCollector metrics) {
         
         super();
         this.cfgCtx = cfgCtx;
-        this.params = params;
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
         this.metrics = metrics;
@@ -228,7 +222,7 @@ public class ClientHandler implements NHttpClientEventHandler {
 
             HttpContext context = conn.getContext();
             ContentOutputBuffer outputBuffer
-                    = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+                    = new SharedOutputBuffer(cfg.getBufferSize(), allocator);
             axis2Req.setOutputBuffer(outputBuffer);
             context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);
 
@@ -238,7 +232,6 @@ public class ClientHandler implements NHttpClientEventHandler {
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
 
             HttpRequest request = axis2Req.getRequest();
-            request.setParams(new DefaultedHttpParams(request.getParams(), this.params));
             this.httpProcessor.process(request, context);
             if (axis2Req.getTimeout() > 0) {
                 conn.setSocketTimeout(axis2Req.getTimeout());
@@ -521,10 +514,10 @@ public class ClientHandler implements NHttpClientEventHandler {
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        ContentInputBuffer inBuf = (ContentInputBuffer) context.getAttribute(RESPONSE_SINK_BUFFER);
+        SharedInputBuffer inBuf = (SharedInputBuffer) context.getAttribute(RESPONSE_SINK_BUFFER);
 
         try {
-            int bytesRead = inBuf.consumeContent(decoder);
+            int bytesRead = inBuf.consumeContent(decoder, conn);
             if (metrics != null && bytesRead > 0) {
                 if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
                     metrics.incrementBytesReceived(getMessageContext(conn), bytesRead);
@@ -598,12 +591,12 @@ public class ClientHandler implements NHttpClientEventHandler {
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         HttpContext context = conn.getContext();
 
-        ContentOutputBuffer outBuf
-                = (ContentOutputBuffer) context.getAttribute(REQUEST_SOURCE_BUFFER);
+        SharedOutputBuffer outBuf
+                = (SharedOutputBuffer) context.getAttribute(REQUEST_SOURCE_BUFFER);
         if (outBuf == null) return;
 
         try {
-            int bytesWritten = outBuf.produceContent(encoder);
+            int bytesWritten = outBuf.produceContent(encoder, conn);
             if (metrics != null) {
                 if (bytesWritten > 0) {
                     if (metrics.getLevel() == MetricsCollector.LEVEL_FULL) {
@@ -711,7 +704,7 @@ public class ClientHandler implements NHttpClientEventHandler {
 
                 // sometimes, some http clients sends an "\r\n" as the content body with a
                 // HTTP 202 OK.. we will just get it into this temp buffer and ignore it..
-                ContentInputBuffer inputBuffer = new SharedInputBuffer(8, conn, allocator);
+                ContentInputBuffer inputBuffer = new SharedInputBuffer(8, allocator);
                 context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
 
                 // create a dummy message with an empty SOAP envelope and a property
@@ -954,8 +947,7 @@ public class ClientHandler implements NHttpClientEventHandler {
         }
 
         if (expectEntityBody) {
-            inputBuffer
-                = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+            inputBuffer = new SharedInputBuffer(cfg.getBufferSize(), allocator);
             context.setAttribute(RESPONSE_SINK_BUFFER, inputBuffer);
 
             BasicHttpEntity entity = new BasicHttpEntity();
@@ -1116,13 +1108,11 @@ public class ClientHandler implements NHttpClientEventHandler {
      * @return the HttpProcessor that processes requests
      */
     private HttpProcessor getHttpProcessor() {
-        BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
-        httpProcessor.addInterceptor(new RequestContent());
-        httpProcessor.addInterceptor(new RequestTargetHost());
-        httpProcessor.addInterceptor(new RequestConnControl());
-        httpProcessor.addInterceptor(new RequestUserAgent());
-        httpProcessor.addInterceptor(new RequestExpectContinue());
-        return httpProcessor;
+        return new ImmutableHttpProcessor(new RequestContent(),
+                new RequestTargetHost(),
+                new RequestConnControl(),
+                new RequestUserAgent(),
+                new RequestExpectContinue(false));
     }
 
     public int getActiveCount() {

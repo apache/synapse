@@ -41,21 +41,17 @@ import org.apache.axis2.transport.base.TransportMBeanSupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.NHttpClientEventHandler;
-import org.apache.http.nio.params.NIOReactorPNames;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.SessionRequest;
 import org.apache.http.nio.reactor.SessionRequestCallback;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 import org.apache.synapse.transport.nhttp.debug.ClientConnectionDebug;
@@ -63,6 +59,7 @@ import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -158,7 +155,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         preserveUserAgentHeader = NHttpConfiguration.getInstance().isPreserveUserAgentHeader();
         preserveServerHeader = NHttpConfiguration.getInstance().isPreserveServerHeader();
 
-        HttpParams params = getClientParameters();
         try {
             String prefix = (sslContext == null ? "http" : "https") + "-Sender I/O dispatcher";
             ioReactor = new DefaultConnectingIOReactor(
@@ -182,9 +178,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         metrics = new NhttpMetricsCollector(false, transportOut.getName());
-        handler = new ClientHandler(cfgCtx, params, metrics);
+        handler = new ClientHandler(cfgCtx, metrics);
         final IOEventDispatch ioEventDispatch = getEventDispatch(
-            handler, sslContext, sslSetupHandler, params, transportOut);
+            handler, sslContext, sslSetupHandler, getConnectionConfig(), transportOut);
 
         // start the Sender in a new seperate thread
         Thread t = new Thread(new Runnable() {
@@ -216,16 +212,15 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @param handler The NHTTP client handler instance
      * @param sslContext SSL context used by the sender or null
      * @param sslIOSessionHandler SSL session handler or null
-     * @param params HTTP parameters
+     * @param config ConnectionConfig object
      * @param trpOut Transport out description
      * @return an IOEventDispatch instance
      * @throws AxisFault on error
      */
     protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler, SSLContext sslContext,
-        SSLSetupHandler sslIOSessionHandler, HttpParams params,
+        SSLSetupHandler sslIOSessionHandler, ConnectionConfig config,
         TransportOutDescription trpOut) throws AxisFault {
-
-        return new PlainClientIOEventDispatch(handler, params);
+        return LoggingUtils.getClientIODispatch(handler, config);
     }
 
     /**
@@ -253,47 +248,14 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * get HTTP protocol parameters to which the sender must adhere to
      * @return the applicable HTTP protocol parameters
      */
-    private HttpParams getClientParameters() {
+    private ConnectionConfig getConnectionConfig() {
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        HttpParams params = new BasicHttpParams();
-        params
-            .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
-                cfg.getProperty(NhttpConstants.SO_TIMEOUT_SENDER, 60000))
-            .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT,
-                cfg.getProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 10000))
-            .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
-                cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024))
-            .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK,
-                cfg.getProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, 0) == 1)
-            .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
-                cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
-            .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO")
-            .setParameter(
-                    HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
-                    cfg.getMalformedInputActionValue())
-            .setParameter(
-                    HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
-                    cfg.getUnMappableInputActionValue());
-
-        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
-            params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
-        }
-        return params;
+        return cfg.getConnectionConfig();
     }
 
     private IOReactorConfig getReactorConfig() {
-        IOReactorConfig config = new IOReactorConfig();
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        config.setIoThreadCount(cfg.getClientIOWorkers());
-        config.setSoTimeout(cfg.getProperty(NhttpConstants.SO_TIMEOUT_SENDER, 60000));
-        config.setConnectTimeout(cfg.getProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 10000));
-        config.setSndBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
-        config.setRcvBufSize(cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024));
-        config.setTcpNoDelay(cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1);
-        if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
-            config.setInterestOpQueued(true);
-        }
-        return config;
+        return cfg.getReactorConfig();
     }
 
     /**

@@ -16,6 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.transport.passthru;
 
 import org.apache.axis2.AxisFault;
@@ -24,8 +25,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.NHttpServerConnection;
-
-import java.io.OutputStream;
 
 /**
  * This PassThrough transport level interface is used for plugging in different implementations
@@ -54,14 +53,12 @@ public interface HttpGetRequestProcessor {
      * @param response      The HttpResponse
      * @param msgContext    The MessageContext
      * @param conn          The NHttpServerConnection
-     * @param os            The OutputStream
      * @param isRestDispatching Rest dispatching
      */
     void process(HttpRequest request,
                  HttpResponse response,
                  MessageContext msgContext,
                  NHttpServerConnection conn,
-                 OutputStream os,
                  boolean isRestDispatching);
 
 }

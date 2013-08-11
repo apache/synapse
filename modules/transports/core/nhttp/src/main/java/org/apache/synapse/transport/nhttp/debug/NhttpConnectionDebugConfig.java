@@ -53,13 +53,13 @@ public class NhttpConnectionDebugConfig {
 
     private NhttpConnectionDebugConfig() {
 
-        this.keyValueSeparator = NHttpConfiguration.getInstance().getStringValue(
+        this.keyValueSeparator = NHttpConfiguration.getInstance().getStringProperty(
                 KEY_VALUE_SEPARATOR_PROPERTY, DEFAULT_KEY_VALUE_SEPARATOR);
-        this.fieldSeparator = NHttpConfiguration.getInstance().getStringValue(
+        this.fieldSeparator = NHttpConfiguration.getInstance().getStringProperty(
                 FIELD_SEPARATOR_PROPERTY, DEFAULT_FIELD_SEPARATOR);
-        this.statementSeparator = NHttpConfiguration.getInstance().getStringValue(
+        this.statementSeparator = NHttpConfiguration.getInstance().getStringProperty(
                 STATEMENT_SEPARATOR_PROPERTY, DEFAULT_STATEMENT_SEPARATOR);
-        String headerSet = NHttpConfiguration.getInstance().getStringValue(
+        String headerSet = NHttpConfiguration.getInstance().getStringProperty(
                 HEADER_INFO_PROPERTY, HEADER_INFO_ALL);
         if (HEADER_INFO_NONE.equals(headerSet)) {
             this.noHeaders = true;

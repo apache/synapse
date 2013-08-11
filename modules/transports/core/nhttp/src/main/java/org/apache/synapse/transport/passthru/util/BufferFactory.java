@@ -42,7 +42,7 @@ public class BufferFactory {
         if (allocator != null) {
             this.allocator = allocator;
         } else {
-            this.allocator = new HeapByteBufferAllocator();
+            this.allocator = HeapByteBufferAllocator.INSTANCE;
         }
 
         buffers = new ByteBuffer[size];

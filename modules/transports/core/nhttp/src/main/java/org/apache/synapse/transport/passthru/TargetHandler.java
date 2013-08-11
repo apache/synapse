@@ -459,6 +459,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         } else if (e instanceof IOException) {
             exception(conn, (IOException) e);
         } else {
+            log.error("Unexpected exception encountered in TargetHandler", e);
             ProtocolState state = TargetContext.getState(conn);
             MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
             if (requestMsgCtx != null) {

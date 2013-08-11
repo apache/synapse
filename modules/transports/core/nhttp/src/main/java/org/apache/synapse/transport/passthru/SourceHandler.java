@@ -20,13 +20,11 @@
 package org.apache.synapse.transport.passthru;
 
 import org.apache.http.nio.*;
-import org.apache.http.nio.entity.ContentOutputStream;
 import org.apache.http.nio.util.ContentOutputBuffer;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.http.nio.util.SimpleOutputBuffer;
 import org.apache.http.*;
+import org.apache.http.nio.util.SimpleOutputBuffer;
 import org.apache.http.protocol.*;
-import org.apache.http.params.DefaultedHttpParams;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
@@ -36,7 +34,6 @@ import org.apache.synapse.transport.passthru.jmx.LatencyView;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * This is the class where transport interacts with the client. This class
@@ -100,17 +97,16 @@ public class SourceHandler implements NHttpServerEventHandler {
 
             String method = request.getRequest() != null ?
                     request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
-            OutputStream os = null;
 			if ("GET".equals(method)) {
 				HttpContext context = request.getConnection().getContext();
 				ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,
-                        new HeapByteBufferAllocator());
-				context.setAttribute("synapse.response-source-buffer",outputBuffer);
-				os = new ContentOutputStream(outputBuffer);
+                        HeapByteBufferAllocator.INSTANCE);
+				context.setAttribute(PassThroughConstants.PASS_THROUGH_RESPONSE_SOURCE_BUFFER,
+                        outputBuffer);
 			} 
 
             sourceConfiguration.getWorkerPool().execute(
-                    new ServerWorker(request, sourceConfiguration,os));
+                    new ServerWorker(request, sourceConfiguration));
 
         } catch (HttpException e) {
             log.error("HTTP exception while processing request", e);
@@ -186,31 +182,32 @@ public class SourceHandler implements NHttpServerEventHandler {
         }
     }
 
-    public void outputReady(NHttpServerConnection conn,
-                            ContentEncoder encoder) {
+    public void outputReady(NHttpServerConnection conn, ContentEncoder encoder) {
         try {
             ProtocolState protocolState = SourceContext.getState(conn);
-            
-            //special case to handle WSDLs
-            if(protocolState == ProtocolState.GET_REQUEST_COMPLETE){
-            	// we need to shut down if the shutdown flag is set
-            	 HttpContext context = conn.getContext();
-            	 ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(
-                         "synapse.response-source-buffer");
-            	  int bytesWritten = outBuf.produceContent(encoder);
-                  if (metrics != null && bytesWritten > 0) {
-                      metrics.incrementBytesSent(bytesWritten);
-                  }
-                
-                  conn.requestInput();
-                  if(outBuf instanceof SimpleOutputBuffer && !((SimpleOutputBuffer)outBuf).hasData()){
-                	  sourceConfiguration.getSourceConnections().releaseConnection(conn);
-                  }
-                  
-            	return;
+
+            // special case to handle WSDLs
+            if (protocolState == ProtocolState.GET_REQUEST_COMPLETE) {
+                SimpleOutputBuffer outBuf = (SimpleOutputBuffer) conn.getContext().getAttribute(
+                        PassThroughConstants.PASS_THROUGH_RESPONSE_SOURCE_BUFFER);
+                synchronized (conn.getContext()) {
+                    // SimpleOutputBuffer is not thread safe
+                    // Explicit synchronization required
+                    int bytesWritten = outBuf.produceContent(encoder);
+                    if (metrics != null && bytesWritten > 0) {
+                        metrics.incrementBytesSent(bytesWritten);
+                    }
+
+                    conn.requestInput();
+                    if (!outBuf.hasData()) {
+                        // We are done - At this point the entire response payload has been
+                        // written out to the SimpleOutputBuffer
+                        sourceConfiguration.getSourceConnections().releaseConnection(conn);
+                    }
+                }
+                return;
             }
-            
-                        
+
             if (protocolState != ProtocolState.RESPONSE_HEAD
                     && protocolState != ProtocolState.RESPONSE_BODY) {
                 log.warn("Illegal incoming connection state: "
@@ -222,7 +219,6 @@ public class SourceHandler implements NHttpServerEventHandler {
             }
 
             SourceContext.updateState(conn, ProtocolState.RESPONSE_BODY);
-
             SourceResponse response = SourceContext.getResponse(conn);
 
             int bytesSent = response.write(conn, encoder);
@@ -272,6 +268,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         } else if (e instanceof IOException) {
             exception(conn, (IOException) e);
         } else {
+            log.error("Unexpected exception encountered in SourceHandler", e);
             metrics.incrementFaultsReceiving();
 
             ProtocolState state = SourceContext.getState(conn);
@@ -337,38 +334,37 @@ public class SourceHandler implements NHttpServerEventHandler {
             metrics.incrementFaultsReceiving();
         } else {
             log.error("Unexpected I/O error: " + e.getClass().getName(), e);
-
             metrics.incrementFaultsReceiving();
         }
     }
 
     public void exception(NHttpServerConnection conn, HttpException e) {
+        if (log.isDebugEnabled()) {
+            log.debug("HTTP protocol error encountered in SourceHandler", e);
+        }
+
+        if (conn.isResponseSubmitted()) {
+            sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+            return;
+        }
+        HttpContext httpContext = conn.getContext();
+
+        HttpResponse response = new BasicHttpResponse(
+                HttpVersion.HTTP_1_1, HttpStatus.SC_BAD_REQUEST, "Bad request");
+        response.addHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
+
+        // Pre-process HTTP request
+        httpContext.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
+        httpContext.setAttribute(ExecutionContext.HTTP_REQUEST, null);
+        httpContext.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
+
         try {
-            if (conn.isResponseSubmitted()) {
-                sourceConfiguration.getSourceConnections().shutDownConnection(conn);
-                return;
-            }
-            HttpContext httpContext = conn.getContext();
-
-            HttpResponse response = new BasicHttpResponse(
-                    HttpVersion.HTTP_1_1, HttpStatus.SC_BAD_REQUEST, "Bad request");
-            response.setParams(
-                    new DefaultedHttpParams(sourceConfiguration.getHttpParameters(),
-                            response.getParams()));
-            response.addHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
-
-            // Pre-process HTTP request
-            httpContext.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
-            httpContext.setAttribute(ExecutionContext.HTTP_REQUEST, null);
-            httpContext.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
-
             sourceConfiguration.getHttpProcessor().process(response, httpContext);
-
-            conn.submitResponse(response);            
+            conn.submitResponse(response);
             SourceContext.updateState(conn, ProtocolState.CLOSED);
             conn.close();
-        } catch (Exception e1) {
-            log.error(e.getMessage(), e);
+        } catch (Exception ex) {
+            log.error("Error while handling HttpException", ex);
             SourceContext.updateState(conn, ProtocolState.CLOSED);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
         }

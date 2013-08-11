@@ -30,7 +30,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.nio.*;
-import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.nio.util.ContentOutputBuffer;
 import org.apache.http.nio.util.ContentInputBuffer;
@@ -38,7 +37,6 @@ import org.apache.http.nio.util.SharedInputBuffer;
 import org.apache.http.nio.util.SharedOutputBuffer;
 import org.apache.http.nio.entity.ContentInputStream;
 import org.apache.http.nio.entity.ContentOutputStream;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.*;
 import org.apache.http.util.EncodingUtils;
 import org.apache.commons.logging.Log;
@@ -68,23 +66,17 @@ public class ServerHandler implements NHttpServerEventHandler {
 
     private static final Log log = LogFactory.getLog(ServerHandler.class);
 
-    /** the HTTP protocol parameters to adhere to */
-    private final HttpParams params;
     /** the factory to create HTTP responses */
     private final HttpResponseFactory responseFactory;
     /** the HTTP response processor */
     private final HttpProcessor httpProcessor;
     /** the strategy to re-use connections */
     private final ConnectionReuseStrategy connStrategy;
-    /** the buffer allocator */
-    private final ByteBufferAllocator allocator;
 
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
     /** the nhttp configuration */
     private NHttpConfiguration cfg = null;
-    /** is this https? */
-    private boolean isHttps = false;
 
     /** the thread pool to process requests */
     private WorkerPool workerPool = null;
@@ -95,22 +87,17 @@ public class ServerHandler implements NHttpServerEventHandler {
     private volatile List<NHttpServerConnection> activeConnections = null;
 
     /**
-     * This parset is used by the priority executor to parse a given HTTP message and
+     * This parser is used by the priority executor to parse a given HTTP message and
      * determine the priority of the message
      */
     private Parser parser = null;
 
-    /** WSDL processor for Get requests*/
-    private HttpGetRequestProcessor httpGetRequestProcessor = null;
-
     /**
-     * An executor capable of exucuting the Server Worker according the priority assigned
+     * An executor capable of executing the Server Worker according the priority assigned
      * to a particular message
      */
     private PriorityExecutor executor = null;
 
-    private boolean restDispatching = true;
-    
     private LatencyView latencyView = null;
     private LatencyView s2sLatencyView = null;
     private ThreadingView threadingView = null;
@@ -126,18 +113,14 @@ public class ServerHandler implements NHttpServerEventHandler {
         super();
         this.listenerContext = listenerContext;
         this.cfgCtx = listenerContext.getCfgCtx();
-        this.params = listenerContext.getParams();
-        this.isHttps = listenerContext.isSsl();
         this.metrics = listenerContext.getMetrics();
         this.responseFactory = new DefaultHttpResponseFactory();
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
-        this.allocator = new HeapByteBufferAllocator();
         this.activeConnections = new ArrayList<NHttpServerConnection>();
         this.latencyView = new LatencyView("NHTTPLatencyView", listenerContext.getTransportIn().getName());
         this.s2sLatencyView = new LatencyView("NHTTPS2SLatencyView", listenerContext.getTransportIn().getName());
         this.threadingView = new ThreadingView("HttpServerWorker", true, 50);
-        this.restDispatching = listenerContext.isRestDispatching();
 
         this.cfg = NHttpConfiguration.getInstance();
         if (listenerContext.getExecutor() == null)  {
@@ -151,8 +134,6 @@ public class ServerHandler implements NHttpServerEventHandler {
             this.executor = listenerContext.getExecutor();
             this.parser = listenerContext.getParser();
         }
-
-        this.httpGetRequestProcessor = listenerContext.getHttpGetRequestProcessor();
     }
 
     /**
@@ -179,7 +160,7 @@ public class ServerHandler implements NHttpServerEventHandler {
                 conn.getContext().setAttribute(NhttpConstants.REQUEST_READ, Boolean.FALSE);
                 
                 ContentInputBuffer inputBuffer
-                        = new SharedInputBuffer(cfg.getBufferSize(), conn, allocator);
+                        = new SharedInputBuffer(cfg.getBufferSize(), HeapByteBufferAllocator.INSTANCE);
                 context.setAttribute(REQUEST_SINK_BUFFER, inputBuffer);
                 is = new ContentInputStream(inputBuffer);
             } else {
@@ -188,7 +169,7 @@ public class ServerHandler implements NHttpServerEventHandler {
             }
             
             ContentOutputBuffer outputBuffer
-                    = new SharedOutputBuffer(cfg.getBufferSize(), conn, allocator);
+                    = new SharedOutputBuffer(cfg.getBufferSize(), HeapByteBufferAllocator.INSTANCE);
             context.setAttribute(RESPONSE_SOURCE_BUFFER, outputBuffer);
             OutputStream os = new ContentOutputStream(outputBuffer);
 
@@ -196,7 +177,6 @@ public class ServerHandler implements NHttpServerEventHandler {
             ProtocolVersion httpVersion = request.getRequestLine().getProtocolVersion();
             HttpResponse response = responseFactory.newHttpResponse(
                 httpVersion, HttpStatus.SC_OK, context);
-            response.setParams(this.params);
 
             // create a basic HttpEntity using the source channel of the response pipe
             BasicHttpEntity entity = new BasicHttpEntity();
@@ -243,11 +223,11 @@ public class ServerHandler implements NHttpServerEventHandler {
     public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) {
 
         HttpContext context = conn.getContext();
-        ContentInputBuffer inBuf
-                = (ContentInputBuffer) context.getAttribute(REQUEST_SINK_BUFFER);
+        SharedInputBuffer inBuf
+                = (SharedInputBuffer) context.getAttribute(REQUEST_SINK_BUFFER);
 
         try {
-            int bytesRead = inBuf.consumeContent(decoder);
+            int bytesRead = inBuf.consumeContent(decoder, conn);
             if (metrics != null && bytesRead > 0) {
                 metrics.incrementBytesReceived(bytesRead);
             }
@@ -278,17 +258,17 @@ public class ServerHandler implements NHttpServerEventHandler {
 
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(
+        SharedOutputBuffer outBuf = (SharedOutputBuffer) context.getAttribute(
                 RESPONSE_SOURCE_BUFFER);
 
         if (outBuf == null) {
-            // fix for SYNAPSE 584. This is a temporaly fix becuase of HTTPCORE-208
+            // fix for SYNAPSE 584. This is a temporarily fix because of HTTPCORE-208
             shutdownConnection(conn);
             return;
         }
 
         try {
-            int bytesWritten = outBuf.produceContent(encoder);
+            int bytesWritten = outBuf.produceContent(encoder, conn);
             if (metrics != null && bytesWritten > 0) {
                 metrics.incrementBytesSent(bytesWritten);
             }
@@ -490,6 +470,9 @@ public class ServerHandler implements NHttpServerEventHandler {
      * @param e the exception encountered
      */
     public void exception(final NHttpServerConnection conn, final HttpException e) {
+        if (log.isDebugEnabled()) {
+            log.debug("HTTP protocol error encountered in ServerHandler", e);
+        }
         if (metrics != null) {
             metrics.incrementFaultsReceiving();
         }
@@ -522,7 +505,7 @@ public class ServerHandler implements NHttpServerEventHandler {
         } else if (e instanceof IOException) {
             exception(conn, (IOException) e);
         } else {
-            log.error("Unexpected I/O error: " + e.getClass().getName(), e);
+            log.error("Unexpected error: " + e.getClass().getName(), e);
             if (metrics != null) {
                 metrics.incrementFaultsReceiving();
             }
@@ -609,12 +592,11 @@ public class ServerHandler implements NHttpServerEventHandler {
      * @return the HttpProcessor that processes HttpResponses of this server
      */
     private HttpProcessor getHttpProcessor() {
-        BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
-        httpProcessor.addInterceptor(new ResponseDate());
-        httpProcessor.addInterceptor(new ResponseServer());
-        httpProcessor.addInterceptor(new ResponseContent());
-        httpProcessor.addInterceptor(new ResponseConnControl());
-        return httpProcessor;
+        return new ImmutableHttpProcessor(
+                new ResponseDate(),
+                new ResponseServer("Synapse-HttpComponents-NIO"),
+                new ResponseContent(),
+                new ResponseConnControl());
     }
 
     public int getActiveCount() {

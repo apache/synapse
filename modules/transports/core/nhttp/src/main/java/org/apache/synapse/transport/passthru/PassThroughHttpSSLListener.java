@@ -23,11 +23,12 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.http.params.HttpParams;
+import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 import javax.net.ssl.*;
 import javax.xml.namespace.QName;
@@ -40,8 +41,8 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
 
     @Override
     protected IOEventDispatch getEventDispatch(NHttpServerEventHandler handler, SSLContext sslContext,
-                                               SSLSetupHandler sslSetupHandler, HttpParams params) {
-        return new SSLSourceIOEventDispatch(handler, sslContext, sslSetupHandler, params);
+                                               SSLSetupHandler sslSetupHandler, ConnectionConfig config) {
+        return LoggingUtils.getServerIODispatch(handler, config, sslContext, sslSetupHandler);
     }
 
     /**

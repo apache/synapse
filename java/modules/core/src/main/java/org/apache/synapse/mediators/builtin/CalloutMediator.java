@@ -44,7 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <callout serviceURL="string" [action="string"][passHeaders="true|false"]>
+ * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
  *      <configuration [axis2xml="string"] [repository="string"]/>?
  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
  *      <target xpath="expression" | key="string"/>
@@ -109,7 +109,13 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                 sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
             }
 
-            options.setTo(new EndpointReference(serviceURL));
+            if (serviceURL != null) {
+                options.setTo(new EndpointReference(serviceURL));
+            } else if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {
+                options.setTo(new EndpointReference(synCtx.getTo().getAddress()));
+            } else {
+                handleException("Service URL or 'To' header is required", synCtx);
+            }
 
             if (action != null) {
                 options.setAction(action);

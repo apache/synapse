@@ -34,12 +34,11 @@ import java.util.Properties;
  * Factory for {@link CalloutMediator} instances.
  * 
  * <pre>
- * &lt;callout serviceURL="string" [action="string"][passHeaders="true|false"]&gt;
+ * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
  *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
- *      &lt;enableSec policy="string" /&gt;?
  * &lt;/callout&gt;
  * </pre>
  */
@@ -81,8 +80,6 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         if (attServiceURL != null) {
             callout.setServiceURL(attServiceURL.getAttributeValue());
-        } else {
-            handleException("The 'serviceURL' attribute is required for the Callout mediator");
         }
 
         if (attAction != null) {

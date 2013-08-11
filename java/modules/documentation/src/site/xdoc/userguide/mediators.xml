@@ -812,10 +812,11 @@
                     current message, or the name of a key/property using which the response would be
                     attached to the current message context as a property.
                 </p>
-                <div class="xmlConf">&lt;callout serviceURL="string" [action="string"]&gt;
+                <div class="xmlConf">&lt;callout [serviceURL="string"] [action="string"]&gt;
     &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
     &lt;source xpath="expression" | key="string"&gt;
     &lt;target xpath="expression" | key="string"/&gt;
+    &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
 &lt;/callout&gt;</div>
                 <p>
                     Since the callout mediator performs a blocking call, it cannot use the default
@@ -826,8 +827,14 @@
                 </p>
                 <p>
                     To invoke secured services, Callout mediator can be configured to enable WS-Security
-                    using the enableSec element. Security policy should be specified using the policy
-                    attribute which may point to a registry key or a local entry.
+                    using the enableSec element. Security policy should be specified using the 'policy'
+                    attribute which may point to a registry key or a local entry. You can also specify
+                    two different policies for inbound and outbound messages (flows). This is done by
+                    using the 'inboundPolicy' and 'outboundPolicy' attributes.
+                </p>
+                <p>
+                    When the 'serviceURL' attribute is not present, the 'To' header on the request
+                    is used as the target endpoint.
                 </p>
             </subsection>
             <subsection name="Clone Mediator" id="Clone">

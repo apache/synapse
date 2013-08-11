@@ -25,7 +25,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
 
 /**
  * <pre>
- * &lt;callout serviceURL="string" [action="string"][passHeaders="true|false"]&gt;
+ * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;
  *      &lt;target xpath="expression" | key="string"/&gt;
@@ -46,7 +46,9 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
         OMElement callout = fac.createOMElement("callout", synNS);
         saveTracingState(callout, mediator);
 
-        callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
+        if (mediator.getServiceURL() != null) {
+            callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
+        }
         if (mediator.getAction() != null) {
             callout.addAttribute(fac.createOMAttribute("action", nullNS, mediator.getAction()));
         }

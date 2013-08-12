@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Pass Through HTTP Transport</title>
+    </properties>
+    <body>
+        <section name="Pass Through HTTP Transport" id="Introduction">
+            <p>
+                The Pass Through HTTP transport (PTHTTP transport) was developed by
+                <a href="http://wso2.com">WSO2</a> as a more efficient and more scalable
+                alternative to the standard Non-blocking HTTP transport (NHTTP transport) of
+                Synapse. The PTHTTP transport was later contributed to the Synapse project,
+                and was made the default HTTP transport of the Synapse ESB. All versions of
+                Synapse released after version 2.1, use the PTHTTP transport by default to
+                receive and send HTTP messages.
+            </p>
+            <p>
+                The PTHTTP transport was originally designed to facilitate content agnostic (pass
+                through) HTTP mediation in a highly efficient manner. That is, it mediates
+                HTTP messages without reading the message body. A number of enterprise integration
+                scenarios (e.g. header-based routing, load balancing, URL rewriting) require
+                efficient means of content agnostic mediation, and the standard NHTTP transport of
+                Synapse is somewhat inefficient when supporting such use cases. The dual-buffer I/O
+                model of the NHTTP transport induces unnecessary copying of message payload data
+                between buffers, and it by default parses all received messages using the Axis2
+                message builder framework. The PTHTTP transport was originally designed with a
+                single-buffer I/O model, and it skips the Axis2 message builder framework altogether.
+                Therefore, the PTHTTP transport delivers excellent throughput and minimal latency
+                when it comes to content agnostic mediation scenarios.
+            </p>
+            <p>
+                However, the original PTHTTP transport did not support any mediation scenario that
+                requires accessing message payload data (e.g. content-based routing, XSLT
+                transformation). In order to overcome this limitation, a number of architectural
+                improvements were introduced to the Synapse mediation engine. These enhancements
+                enable Synapse to use the PTHTTP transport as the default HTTP transport. Now Synapse
+                uses a single buffer and does not invoke the Axis2 builders for all content agnostic
+                mediation flows, but for content-aware mediation flows, it transparently falls back
+                to the dual-buffer mode and engages the Axis2 message builder framework. Individual
+                mediators in a message flow (sequence, proxy service) decide whether to invoke the
+                Axis2 message builders, based on how the mediators intend to process the messages.
+                This last enhancement, called deferred building, improves the mediation performance
+                of non-HTTP flows as well.
+            </p>
+            <p>
+                Similar to the NHTTP transport, the PTHTTP transport is also based on the Apache
+                HTTP Core NIO library.
+            </p>
+        </section>
+        <section name="Transport Configuration" id="Configuration">
+            <p>
+                Pass Through HTTP transport is configured by default in the repository/conf/axis2.xml
+                file of Synapse. The default configuration activates the following four components:
+            </p>
+            <ul>
+                <li>HTTP transport listener</li>
+                <li>HTTP transport sender</li>
+                <li>HTTPS transport listener</li>
+                <li>HTTPS transport sender</li>
+            </ul>
+            <p>
+                Each of the above components are configured separately in the axis2.xml file. Next
+                few sections describe the various parameters that can be used to customize the
+                behavior of these components.
+            </p>
+            <subsection name="HTTP Transport Listener" id="HTTPListener">
+                <p>
+                    The default configuration of the Pass Through HTTP listener is shown
+                    below, as it appears in the axis2.xml file.
+                </p>
+                <div class="xmlConf">&lt;transportReceiver name="http" class="org.apache.synapse.transport.passthru.PassThroughHttpListener"&gt;
+    &lt;parameter name="port"&gt;8280&lt;/parameter&gt;
+    &lt;parameter name="httpGetProcessor" locked="false"&gt;org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor&lt;/parameter&gt;
+&lt;/transportReceiver&gt;</div>
+                <p>
+                    The default configuration, simply sets the HTTP port to 8280 and specifies the
+                    name of the class responsible for processing incoming HTTP GET requests. A
+                    complete listing of supported parameters is given below.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>port</td>
+                        <td>
+                            The port number on which the HTTP listener should listen.
+                            <div class="xmlConf">&lt;parameter name="port"&gt;8280&lt;/parameter&gt;</div>
+                        </td>
+                        <td>Yes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>bind-address</td>
+                        <td>
+                            The hostname or IP address to which the HTTP listener should bind. When
+                            deploying Synapse on machines that have multiple network interfaces,
+                            this parameter can be used to bind the HTTP listener to a specific network
+                            interface.
+                            <div class="xmlConf">&lt;parameter name="bind-address"&gt;10.0.0.5&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>All available network interfaces</td>
+                    </tr>
+                    <tr>
+                        <td>hostname</td>
+                        <td>
+                            The hostname or IP address used to calculate the service endpoints
+                            exposed through this transport listener. This can be used to customize
+                            the hostname of the endpoints (EPRs) that appear in the generated WSDLs.
+                            This parameter is ignored if the WSDLEPRPrefix parameter is set.
+                            <div class="xmlConf">&lt;parameter name="hostname"&gt;10.0.0.5&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>localhost</td>
+                    </tr>
+                    <tr>
+                        <td>httpGetProcessor</td>
+                        <td>
+                            The full qualified name of the class that's responsible for handling incoming
+                            HTTP GET requests. The specified class must implement the
+                            org.apache.synapse.transport.passthru.HttpGetRequestProcessor interface. If it
+                            is required to customize the way Synapse handles HTTP GET requests, one could
+                            implement the above interface, and register the custom class with Synapse using
+                            this parameter. By default Synapse ships with an HTTP GET request handler that
+                            responds to ?wsdl and ?xsd requests and mediates all the others.
+                            <div class="xmlConf">&lt;parameter name="httpGetProcessor"&gt;foo.bar.CustomGETProcessor&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>WSDLEPRPrefix</td>
+                        <td>
+                            A URL prefix that should be added to all the HTTP endpoints exposed
+                            through this transport listener. This prefix will appear in all WSDLs
+                            advertised by the transport. This is particularly useful when Synapse
+                            is fronted by a proxy server or a load balancer and it is required to mention
+                            the proxy/load balancer endpoints in the WSDLs generated by Synapse. This
+                            parameter has higher priority than the hostname parameter.
+                            <div class="xmlConf">&lt;parameter name="WSDLEPRPrefix"&gt;http://proxy.example.com:8080/&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>http://&lt;host&gt;:&lt;port&gt;/</td>
+                    </tr>
+                </table>
+                <p>
+                    All the above parameters are also applicable to the HTTPS transport listener.
+                </p>
+            </subsection>
+            <subsection name="HTTP Transport Sender" id="HTTPSender">
+                <p>
+                    The default Pass Through HTTP sender configuration available in the axis2.xml
+                    file is shown below.
+                </p>
+                <div class="xmlConf">&lt;transportSender name="http"  class="org.apache.synapse.transport.passthru.PassThroughHttpSender" /&gt;</div>
+                <p>
+                    Following parameters can be specified to customize the behavior of the HTTP
+                    sender.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>http.proxyHost</td>
+                        <td>
+                            The hostname or IP address of the proxy server through which the HTTP
+                            messages should be sent. Use this property when Synapse should use an
+                            external HTTP proxy to tunnel the outgoing HTTP traffic. This parameter
+                            is only applicable to the HTTP sender. HTTPS sender does not support
+                            external proxies yet.
+                            <div class="xmlConf">&lt;parameter name="http.proxyHost"&gt;proxy.example.com&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>http.proxyPort</td>
+                        <td>
+                            The port number of the proxy server through which the HTTP messages
+                            should be sent. Only used if the http.proxyHost parameter is also
+                            configured. This parameter is only applicable to the HTTP sender.
+                            HTTPS sender does not support external proxies yet.
+                            <div class="xmlConf">&lt;parameter name="http.proxyPort"&gt;8080&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>80</td>
+                    </tr>
+                    <tr>
+                        <td>http.nonProxyHosts</td>
+                        <td>
+                            Use this parameter to specify a proxy bypass list. That is, a list of
+                            target hosts for which Synapse will not use the configured external
+                            proxy. Only used if the http.proxyHost parameter is also set. The value
+                            of this parameter can be a single hostname/IP address or a list of
+                            hostnames/IP addresses separated by the '|' character. Parameter also
+                            supports regular expressions which can be used to specify hostname
+                            patterns.
+                            <div class="xmlConf">&lt;parameter name="http.nonProxyHosts"&gt;10.0.0.8|foo.com|*.bar.org&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                </table>
+            </subsection>
+            <subsection name="HTTPS Transport Listener" id="HTTPSListener">
+                <p>
+                    Pass Through HTTPS listener supports all the parameters supported by the
+                    HTTP listener. In addition, HTTPS listener supports several SSL/TLS specific
+                    parameters. The default HTTPS listener configuration in the axis2.xml file is
+                    shown below.
+                </p>
+                <div class="xmlConf">&lt;transportReceiver name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLListener"&gt;
+    &lt;parameter name="port" locked="false"&gt;8243&lt;/parameter&gt;
+    &lt;parameter name="httpGetProcessor" locked="false"&gt;org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor&lt;/parameter&gt;
+    &lt;parameter name="keystore" locked="false"&gt;
+        &lt;KeyStore&gt;
+            &lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+            &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+        &lt;/KeyStore&gt;
+    &lt;/parameter&gt;
+    &lt;parameter name="truststore" locked="false"&gt;
+        &lt;TrustStore&gt;
+            &lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+        &lt;/TrustStore&gt;
+    &lt;/parameter&gt;
+&lt;/transportReceiver&gt;</div>
+                <p>
+                    A complete list of parameters supported by the HTTPS listener is given below.
+                    Information regarding the parameters also supported by the HTTP listener are
+                    duplicated here for reader's convenience.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>port</td>
+                        <td>
+                            The port number on which the HTTP listener should listen.
+                            <div class="xmlConf">&lt;parameter name="port"&gt;8280&lt;/parameter&gt;</div>
+                        </td>
+                        <td>Yes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>keystore</td>
+                        <td>
+                            Specifies the keystore that should be used to initialize SSL/TLS
+                            support. A keystore typically houses a private key and some certificates
+                            with their corresponding public keys. The value of this parameter is a
+                            complex XML element. This XML element should specify:
+                            <ul>
+                                <li>Location: Path to the keystore file</li>
+                                <li>Type: type of the keystore file (JKS, PKCS etc.)</li>
+                                <li>Password: Password to unlock the keystore file</li>
+                                <li>KeyPassword: Password to unlock the private key in the keystore file</li>
+                            </ul>
+                            All 4 values are required. Keystore paths are resolved relative to the
+                            Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
+                            Java security and keystores, please refer
+                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            specification.
+                            <br/>
+                            <br/>
+                            <strong>
+                                Synapse ships with a default keystore file. It is highly recommended
+                                that a different keystore file is used in production deployments of
+                                Synapse, since the passwords of the default keystore are publicly
+                                known.
+                            </strong>
+                            <div class="xmlConf">&lt;parameter name="keystore" locked="false"&gt;
+    &lt;KeyStore&gt;
+        &lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+        &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+    &lt;/KeyStore&gt;
+&lt;/parameter&gt;</div>
+                        </td>
+                        <td>Yes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>truststore</td>
+                        <td>
+                            Specifies the truststore that should be used to initialize SSL/TLS
+                            support. A truststore typically houses the CA certificates and other
+                            trusted public certificates. The value of this parameter is a complex
+                            XML element. This XML element should specify:
+                            <ul>
+                                <li>Location: Path to the truststore file</li>
+                                <li>Type: type of the truststore file (JKS, PKCS etc.)</li>
+                                <li>Password: Password to unlock the truststore file</li>
+                            </ul>
+                            All 3 values are required. Truststore paths are resolved relative to the
+                            Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
+                            Java security and truststores, please refer
+                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            specification.
+                            <br/>
+                            <br/>
+                            <strong>
+                                Synapse ships with a default truststore file. It is highly recommended
+                                that a different truststore file is used in production deployments of
+                                Synapse, since the password of the default truststore is publicly
+                                known.
+                            </strong>
+                            <div class="xmlConf">&lt;parameter name="truststore" locked="false"&gt;
+    &lt;TrustStore&gt;
+        &lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+    &lt;/TrustStore&gt;
+&lt;/parameter&gt;</div>
+                        </td>
+                        <td>Yes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>SSLVerifyClient</td>
+                        <td>
+                            Use this parameter to enable client certificate verification (client
+                            authentication). This option provides functionality similar to the
+                            <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">SSLVerifyClient directive</a>
+                            of Apache HTTPD. Supported values are:
+                            <ul>
+                                <li>none: No client certificate is required</li>
+                                <li>optional: Client may present a valid certificate, but is not required to do so</li>
+                                <li>require: Client must present a valid certificate (the SSL handshake will not succeed without it)</li>
+                            </ul>
+                            <div class="xmlConf">&lt;parameter name="SSLVerifyClient"&gt;require&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>None</td>
+                    </tr>
+                    <tr>
+                        <td>bind-address</td>
+                        <td>
+                            The hostname or IP address to which the HTTP listener should bind. When
+                            deploying Synapse on machines that have multiple network interfaces,
+                            this parameter can be used to bind the HTTP listener to a specific network
+                            interface.
+                            <div class="xmlConf">&lt;parameter name="bind-address"&gt;10.0.0.5&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>All available network interfaces</td>
+                    </tr>
+                    <tr>
+                        <td>hostname</td>
+                        <td>
+                            The hostname or IP address used to calculate the service endpoints
+                            exposed through this transport listener. This can be used to customize
+                            the hostname of the endpoints (EPRs) that appear in the generated WSDLs.
+                            This parameter is ignored if the WSDLEPRPrefix parameter is set.
+                            <div class="xmlConf">&lt;parameter name="hostname"&gt;10.0.0.5&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>localhost</td>
+                    </tr>
+                    <tr>
+                        <td>httpGetProcessor</td>
+                        <td>
+                            The full qualified name of the class that's responsible for handling incoming
+                            HTTP GET requests. The specified class must implement the
+                            org.apache.synapse.transport.passthru.HttpGetRequestProcessor interface. If it
+                            is required to customize the way Synapse handles HTTP GET requests, one could
+                            implement the above interface, and register the custom class with Synapse using
+                            this parameter. By default Synapse ships with an HTTP GET request handler that
+                            responds to ?wsdl and ?xsd requests and mediates all the others.
+                            <div class="xmlConf">&lt;parameter name="httpGetProcessor"&gt;foo.bar.CustomGETProcessor&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>WSDLEPRPrefix</td>
+                        <td>
+                            A URL prefix that should be added to all the HTTP endpoints exposed
+                            through this transport listener. This prefix will appear in all WSDLs
+                            advertised by the transport. This is particularly useful when Synapse
+                            is fronted by a proxy server or a load balancer and it is required to mention
+                            the proxy/load balancer endpoints in the WSDLs generated by Synapse. This
+                            parameter has higher priority than the hostname parameter.
+                            <div class="xmlConf">&lt;parameter name="WSDLEPRPrefix"&gt;https://proxy.example.com:8443/&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>https://&lt;host&gt;:&lt;port&gt;/</td>
+                    </tr>
+                </table>
+            </subsection>
+        </section>
+    </body>
+</document>

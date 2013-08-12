@@ -264,7 +264,10 @@ public class PassThroughHttpListener implements TransportListener {
     }
 
     public void destroy() {
-        log.info("Destroying pass-through " + namePrefix + " listener");
+        if (log.isDebugEnabled()) {
+            log.debug("Destroying pass-through " + namePrefix + " listener");
+        }
+        ioReactor = null;
         sourceConfiguration.getConfigurationContext().
                 getAxisConfiguration().getObserversList().remove(axisObserver);
 

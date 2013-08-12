@@ -320,12 +320,13 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
             } else {
                 handleException("No valid destination EPR to send message");
             }
+
+            if (msgContext.getOperationContext() != null) {
+                msgContext.getOperationContext().setProperty(
+                        Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+            }
         }
 
-        if (msgContext.getOperationContext() != null) {
-            msgContext.getOperationContext().setProperty(
-                Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-        }
 
         return InvocationResponse.CONTINUE;
     }

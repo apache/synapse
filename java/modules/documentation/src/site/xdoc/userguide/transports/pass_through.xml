@@ -312,7 +312,7 @@
     &lt;/KeyStore&gt;
 &lt;/parameter&gt;</div>
                         </td>
-                        <td>Yes</td>
+                        <td>No</td>
                         <td>N/A</td>
                     </tr>
                     <tr>
@@ -348,7 +348,7 @@
     &lt;/TrustStore&gt;
 &lt;/parameter&gt;</div>
                         </td>
-                        <td>Yes</td>
+                        <td>No</td>
                         <td>N/A</td>
                     </tr>
                     <tr>
@@ -420,6 +420,201 @@
                         </td>
                         <td>No</td>
                         <td>https://&lt;host&gt;:&lt;port&gt;/</td>
+                    </tr>
+                </table>
+            </subsection>
+            <subsection name="HTTPS Transport Sender" id="HTTPSSender">
+                <p>
+                    As of today, the Pass Through HTTPS sender does not support sending messages
+                    through an external proxy. Therefore some of the parameters supported by the
+                    HTTP sender (http.proxyHost, http.proxyPort etc.) cannot be used with the
+                    HTTPS sender. However, there are several SSL/TLS related parameters that need
+                    to be configured when setting up the HTTPS sender. The default HTTPS sender
+                    configuration in the axis2.xml file is shown below.
+                </p>
+                <div class="xmlConf">&lt;transportSender name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLSender"&gt;
+        &lt;parameter name="keystore" locked="false"&gt;
+            &lt;KeyStore&gt;
+                &lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+                &lt;Type&gt;JKS&lt;/Type&gt;
+                &lt;Password&gt;password&lt;/Password&gt;
+                &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+            &lt;/KeyStore&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name="truststore" locked="false"&gt;
+            &lt;TrustStore&gt;
+                &lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+                &lt;Type&gt;JKS&lt;/Type&gt;
+                &lt;Password&gt;password&lt;/Password&gt;
+            &lt;/TrustStore&gt;
+        &lt;/parameter&gt;
+    &lt;/transportSender&gt;</div>
+                <p>
+                    Following table lists all the parameters supported by the Pass Through HTTPS
+                    sender.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>keystore</td>
+                        <td>
+                            Specifies the keystore that should be used to initialize SSL/TLS
+                            support. A keystore typically houses a private key and some certificates
+                            with their corresponding public keys. The value of this parameter is a
+                            complex XML element. This XML element should specify:
+                            <ul>
+                                <li>Location: Path to the keystore file</li>
+                                <li>Type: type of the keystore file (JKS, PKCS etc.)</li>
+                                <li>Password: Password to unlock the keystore file</li>
+                                <li>KeyPassword: Password to unlock the private key in the keystore file</li>
+                            </ul>
+                            All 4 values are required. Keystore paths are resolved relative to the
+                            Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
+                            Java security and keystores, please refer
+                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            specification.
+                            <br/>
+                            <br/>
+                            <strong>
+                                Synapse ships with a default keystore file. It is highly recommended
+                                that a different keystore file is used in production deployments of
+                                Synapse, since the passwords of the default keystore are publicly
+                                known.
+                            </strong>
+                            <div class="xmlConf">&lt;parameter name="keystore" locked="false"&gt;
+    &lt;KeyStore&gt;
+        &lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+        &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+    &lt;/KeyStore&gt;
+&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>truststore</td>
+                        <td>
+                            Specifies the truststore that should be used to initialize SSL/TLS
+                            support. A truststore typically houses the CA certificates and other
+                            trusted public certificates. The value of this parameter is a complex
+                            XML element. This XML element should specify:
+                            <ul>
+                                <li>Location: Path to the truststore file</li>
+                                <li>Type: type of the truststore file (JKS, PKCS etc.)</li>
+                                <li>Password: Password to unlock the truststore file</li>
+                            </ul>
+                            All 3 values are required. Truststore paths are resolved relative to the
+                            Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
+                            Java security and truststores, please refer
+                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            specification.
+                            <br/>
+                            <br/>
+                            <strong>
+                                Synapse ships with a default truststore file. It is highly recommended
+                                that a different truststore file is used in production deployments of
+                                Synapse, since the password of the default truststore is publicly
+                                known.
+                            </strong>
+                            <div class="xmlConf">&lt;parameter name="truststore" locked="false"&gt;
+    &lt;TrustStore&gt;
+        &lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+    &lt;/TrustStore&gt;
+&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>HostnameVerifier</td>
+                        <td>
+                            This parameter can be used to configure target hostname verification.
+                            That is, it enables validating server hostnames against the names specified
+                            in the certificates presented by the servers during SSL handshake.
+                            Supported values are:
+                            <ul>
+                                <li>Default</li>
+                                <li>DefaultAndLocalhost</li>
+                                <li>AllowAll</li>
+                                <li>Strict</li>
+                            </ul>
+                            Please refer <a href="http://synapse.apache.org/apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier</a>
+                            Javadocs to learn more about this feature and the semantics of the above
+                            options. The AllowAll option essentially disables hostname verification
+                            by accepting all certificates. The Strict option requires the server
+                            hostnames to match exactly to the names specified in the server certificates.
+                            Any deviations will cause the SSL handshake to fail.
+                            <div class="xmlConf">&lt;parameter name="HostnameVerifier"&gt;Strict&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>Default</td>
+                    </tr>
+                    <tr>
+                        <td>customSSLProfiles</td>
+                        <td>
+                            By default, the HTTPS sender uses the SSL settings configured under
+                            keystore and truststore parameters to communicate with all remote
+                            HTTPS endpoints. However, in some cases we may need to use different
+                            SSL settings to communicate with different endpoints. The customSSLProfiles
+                            parameter allows configuring separate keystores and truststores for
+                            each target server. The value of this parameter is a set of XML elements
+                            (profile elements). Each profile element must be configured with the following
+                            child elements:
+                            <ul>
+                                <li>servers: A comma-separated list of servers to which this SSL profile is related to</li>
+                                <li>KeyStore: A keystore configuration (similar to the keystore parameter)</li>
+                                <li>TrustStore: A truststore configuration (similar to the truststore parameter)</li>
+                                <li>novalidatecert: Optional parameter to disable certification validation</li>
+                            </ul>
+                            An example is given below. According to this configuration, when Synapse
+                            communicates with server1.example.com or server2.example.com, it will use
+                            the first SSL configuration (identity1.jks and trust1.jks). When
+                            communicating with server3.example.com it will use the second SSL
+                            configuration (identity2.jks and trust2.jks). For all other endpoints,
+                            Synapse will use the default SSL configuration, configured under keystore
+                            and truststore parameters.
+                            <div class="xmlConf">&lt;parameter name="customSSLProfiles"&gt;
+&lt;profile&gt;
+    &lt;servers&gt;server1.example.com:443,server2.example.com:443&lt;/servers&gt;
+    &lt;KeyStore&gt;
+        &lt;Location&gt;lib/identity1.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+        &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+    &lt;/KeyStore&gt;
+    &lt;TrustStore&gt;
+        &lt;Location&gt;lib/trust1.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+    &lt;/TrustStore&gt;
+&lt;/profile&gt;
+&lt;profile&gt;
+    &lt;servers&gt;server3.example.com:443&lt;/servers&gt;
+    &lt;KeyStore&gt;
+        &lt;Location&gt;lib/identity2.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+        &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+    &lt;/KeyStore&gt;
+    &lt;TrustStore&gt;
+        &lt;Location&gt;lib/trust2.jks&lt;/Location&gt;
+        &lt;Type&gt;JKS&lt;/Type&gt;
+        &lt;Password&gt;password&lt;/Password&gt;
+    &lt;/TrustStore&gt;
+&lt;/profile&gt;
+&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
                     </tr>
                 </table>
             </subsection>

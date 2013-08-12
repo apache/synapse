@@ -183,6 +183,7 @@ public class Axis2BackEndServerController extends AbstractBackEndServerControlle
             log.info("Shutting down Axis2 server...");
             try {
                 listenerManager.stop();
+                listenerManager.destroy();
                 configContext.terminate();
             } catch (Exception e) {
                 log.warn("Error while shutting down Axis2 server", e);

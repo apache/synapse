@@ -26,85 +26,39 @@ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
 
 public class Sample53 extends SynapseTestCase {
 
-    private SampleClientResult result;
-    private String addUrl;
-
     public Sample53() {
         super(53);
     }
 
-
     public void testFailOver() {
         String expectedError = "COULDN'T SEND THE MESSAGE TO THE SERVER";
-        addUrl = "http://localhost:8280/services/LBService1";
+        String addUrl = "http://localhost:8280/services/LBService1";
         log.info("Running test: Failover sending among 3 endpoints");
         final StockQuoteSampleClient client = getStockQuoteClient();
 
         // Send some messages and check
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                result = client.sessionlessClient(addUrl, null, 10);
-            }
-        });
-        t.start();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-
-        }
+        SampleClientResult result = client.sessionlessClient(addUrl, null, 10);
         assertResponseReceived(result);
 
         // Stop BE server 1
         getBackendServerControllers().get(0).stopProcess();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-
-        }
+        sleep(2000);
 
         // Send another burst of messages and check
-        t = new Thread(new Runnable() {
-            public void run() {
-                result = client.sessionlessClient(addUrl, null, 10);
-            }
-        });
-        t.start();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-
-        }
+        result = client.sessionlessClient(addUrl, null, 10);
         assertResponseReceived(result);
 
         // Stop BE server 2
         getBackendServerControllers().get(1).stopProcess();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-
-        }
+        sleep(2000);
 
         // Send some more messages and check
-        t = new Thread(new Runnable() {
-            public void run() {
-                result = client.sessionlessClient(addUrl, null, 10);
-            }
-        });
-        t.start();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-
-        }
+        result = client.sessionlessClient(addUrl, null, 10);
         assertResponseReceived(result);
 
         // Stop BE server 3
         getBackendServerControllers().get(2).stopProcess();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-
-        }
+        sleep(2000);
 
         // Send another message - Should fail
         result = client.sessionlessClient(addUrl, null, 1);
@@ -113,6 +67,13 @@ public class Sample53 extends SynapseTestCase {
         log.info("Got an error as expected: " + resultEx.getMessage());
         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
         assertTrue("Did not receive expected error", resultEx.getMessage().contains(expectedError));
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ignored) {
+        }
     }
 
 }

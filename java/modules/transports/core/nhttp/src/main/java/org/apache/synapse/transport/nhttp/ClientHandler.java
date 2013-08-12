@@ -227,8 +227,8 @@ public class ClientHandler implements NHttpClientEventHandler {
             context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);
 
             context.setAttribute(AXIS2_HTTP_REQUEST, axis2Req);
-            context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
-            context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
+            context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);
+            context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
 
             HttpRequest request = axis2Req.getRequest();
@@ -239,7 +239,7 @@ public class ClientHandler implements NHttpClientEventHandler {
 
             context.setAttribute(NhttpConstants.ENDPOINT_PREFIX, axis2Req.getEndpointURLPrefix());
             context.setAttribute(NhttpConstants.HTTP_REQ_METHOD, request.getRequestLine().getMethod());
-            context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+            context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);
             setServerContextAttribute(NhttpConstants.REQ_DEPARTURE_TIME,
                         System.currentTimeMillis(), conn);
             conn.submitRequest(request);
@@ -955,7 +955,7 @@ public class ClientHandler implements NHttpClientEventHandler {
                 entity.setChunked(true);
             }
             response.setEntity(entity);
-            context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
+            context.setAttribute(HttpCoreContext.HTTP_RESPONSE, response);
             
         } else {
             conn.resetInput();

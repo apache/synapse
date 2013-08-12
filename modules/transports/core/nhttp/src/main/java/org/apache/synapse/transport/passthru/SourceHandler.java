@@ -320,7 +320,7 @@ public class SourceHandler implements NHttpServerEventHandler {
                 e.getMessage().toLowerCase().contains("connection reset by peer") ||
                 e.getMessage().toLowerCase().contains("forcibly closed")))) {
             if (log.isDebugEnabled()) {
-                log.debug("I/O error (Probably a keepalive connection was closed):" + e.getMessage());
+                log.debug("I/O error (Probably a keep-alive connection was closed):" + e.getMessage());
             }
         } else if (e.getMessage() != null) {
             String msg = e.getMessage().toLowerCase();
@@ -354,9 +354,9 @@ public class SourceHandler implements NHttpServerEventHandler {
         response.addHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
 
         // Pre-process HTTP request
-        httpContext.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
-        httpContext.setAttribute(ExecutionContext.HTTP_REQUEST, null);
-        httpContext.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
+        httpContext.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);
+        httpContext.setAttribute(HttpCoreContext.HTTP_REQUEST, null);
+        httpContext.setAttribute(HttpCoreContext.HTTP_RESPONSE, response);
 
         try {
             sourceConfiguration.getHttpProcessor().process(response, httpContext);

@@ -19,11 +19,11 @@
 package org.apache.synapse.transport.nhttp;
 
 import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.HttpHost;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.protocol.HttpCoreContext;
 
 import java.util.*;
 import java.io.IOException;
@@ -35,12 +35,13 @@ public class ConnectionPool {
     /** A map of available connections for reuse. The key selects the host+port of the
      * connection and the value contains a List of available connections to destination
      */
-    private static Map connMap = Collections.synchronizedMap(new HashMap());
+    private static Map<String,List<NHttpClientConnection>> connMap =
+            Collections.synchronizedMap(new HashMap<String,List<NHttpClientConnection>>());
 
     public static NHttpClientConnection getConnection(String host, int port) {
 
         String key = host + ":" + Integer.toString(port);
-        List connections = (List) connMap.get(key);
+        List<NHttpClientConnection> connections = connMap.get(key);
 
         if (connections == null || connections.isEmpty()) {
             if (log.isDebugEnabled()) {
@@ -49,11 +50,10 @@ public class ConnectionPool {
             return null;
 
         } else {
-            NHttpClientConnection conn = null;
-
+            NHttpClientConnection conn;
             synchronized (connections) {
                 while (!connections.isEmpty()) {
-                    conn = (NHttpClientConnection) connections.remove(0);
+                    conn = connections.remove(0);
 
                     if (conn.isOpen() && !conn.isStale()) {
                         if (log.isDebugEnabled()) {
@@ -80,16 +80,16 @@ public class ConnectionPool {
     public static void release(NHttpClientConnection conn) {
 
         HttpHost host = (HttpHost) conn.getContext().getAttribute(
-            ExecutionContext.HTTP_TARGET_HOST);
+            HttpCoreContext.HTTP_TARGET_HOST);
         String key = host.getHostName() + ":" + Integer.toString(host.getPort());
 
-        List connections = (List) connMap.get(key);
+        List<NHttpClientConnection> connections = connMap.get(key);
         if (connections == null) {
             synchronized(connMap) {
                 // use double locking to make sure
-                connections = (List) connMap.get(key);
+                connections = connMap.get(key);
                 if (connections == null) {
-                    connections = Collections.synchronizedList(new LinkedList());
+                    connections = Collections.synchronizedList(new LinkedList<NHttpClientConnection>());
                     connMap.put(key, connections);
                 }
             }
@@ -118,8 +118,8 @@ public class ConnectionPool {
         ctx.removeAttribute(ClientHandler.REQUEST_SOURCE_BUFFER);
         ctx.removeAttribute(ClientHandler.RESPONSE_SINK_BUFFER);
 
-        ctx.removeAttribute(ExecutionContext.HTTP_REQUEST);
-        ctx.removeAttribute(ExecutionContext.HTTP_RESPONSE);
+        ctx.removeAttribute(HttpCoreContext.HTTP_REQUEST);
+        ctx.removeAttribute(HttpCoreContext.HTTP_RESPONSE);
 
         conn.resetOutput();
     }
@@ -127,10 +127,10 @@ public class ConnectionPool {
     public static void forget(NHttpClientConnection conn) {
 
         HttpHost host = (HttpHost) conn.getContext().getAttribute(
-            ExecutionContext.HTTP_TARGET_HOST);
+            HttpCoreContext.HTTP_TARGET_HOST);
         String key = host.getHostName() + ":" + Integer.toString(host.getPort());
 
-        List connections = (List) connMap.get(key);
+        List<NHttpClientConnection> connections = connMap.get(key);
         if (connections != null) {
             synchronized(connections) {
                 connections.remove(conn);

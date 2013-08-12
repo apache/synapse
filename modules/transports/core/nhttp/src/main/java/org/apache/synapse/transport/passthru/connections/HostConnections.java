@@ -22,8 +22,8 @@ package org.apache.synapse.transport.passthru.connections;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -86,8 +86,8 @@ public class HostConnections {
     public void release(NHttpClientConnection conn) {
         conn.getMetrics().reset();
         HttpContext ctx = conn.getContext();
-        ctx.removeAttribute(ExecutionContext.HTTP_REQUEST);
-        ctx.removeAttribute(ExecutionContext.HTTP_RESPONSE);
+        ctx.removeAttribute(HttpCoreContext.HTTP_REQUEST);
+        ctx.removeAttribute(HttpCoreContext.HTTP_RESPONSE);
 
         lock.lock();
         try {

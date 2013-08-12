@@ -145,7 +145,7 @@ public class ServerHandler implements NHttpServerEventHandler {
         HttpContext context = conn.getContext();
         context.setAttribute(NhttpConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());
         HttpRequest request = conn.getHttpRequest();
-        context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
+        context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);
         context.setAttribute(NhttpConstants.MESSAGE_IN_FLIGHT, "true");
 
         // prepare to collect debug information

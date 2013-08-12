@@ -31,8 +31,9 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
@@ -213,14 +214,14 @@ public class TargetRequest {
         }
 
         // Pre-process HTTP request
-        conn.getContext().setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
-        conn.getContext().setAttribute(ExecutionContext.HTTP_TARGET_HOST,
+        HttpContext context = conn.getContext();
+        context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);
+        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST,
                 new HttpHost(url.getHost(), port));
-        conn.getContext().setAttribute(ExecutionContext.HTTP_REQUEST, request);
+        context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);
 
         // start the request
-        targetConfiguration.getHttpProcessor().process(request, conn.getContext());
-
+        targetConfiguration.getHttpProcessor().process(request, context);
         conn.submitRequest(request);
 
         if (hasEntityBody) {

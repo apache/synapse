@@ -24,8 +24,9 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
-import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 
 import java.io.IOException;
@@ -129,12 +130,13 @@ public class SourceResponse {
         SourceContext.updateState(conn, ProtocolState.RESPONSE_HEAD);
 
         // Pre-process HTTP response
-        conn.getContext().setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
-        conn.getContext().setAttribute(ExecutionContext.HTTP_RESPONSE, response);
-        conn.getContext().setAttribute(ExecutionContext.HTTP_REQUEST,
+        HttpContext context = conn.getContext();
+        context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);
+        context.setAttribute(HttpCoreContext.HTTP_RESPONSE, response);
+        context.setAttribute(HttpCoreContext.HTTP_REQUEST,
                 SourceContext.getRequest(conn).getRequest());
         
-        sourceConfiguration.getHttpProcessor().process(response, conn.getContext());
+        sourceConfiguration.getHttpProcessor().process(response, context);
         conn.submitResponse(response);        
     }
 

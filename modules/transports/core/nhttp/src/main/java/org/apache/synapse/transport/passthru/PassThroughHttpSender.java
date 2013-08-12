@@ -244,7 +244,6 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         }
     }
 
-
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         // remove unwanted HTTP headers (if any from the current message)
         PassThroughTransportUtils.removeUnwantedHeaders(msgContext,
@@ -390,17 +389,16 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                             msgContext);
 					OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
 					formatter.writeTo(msgContext, format, _out, false);
-					try {
-                        long messageSize = setStreamAsTempData(formatter,msgContext,format);
+                    try {
+                        long messageSize = setStreamAsTempData(formatter, msgContext, format);
                         msgContext.setProperty(
                                 PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH, messageSize);
                         formatter.writeTo(msgContext, format, out, false);
                     } catch (IOException e) {
-                    	 handleException("IO error while building message", e);
+                    	 handleException("I/O error while serializing message", e);
                     }
                 	pipe.setSerializationComplete(true);
 				} else {
-					
 					if ((disableChunking == null || !"true".equals(disableChunking)) ||
 					    (forceHttp10 == null || !"true".equals(forceHttp10))) {
 						MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(

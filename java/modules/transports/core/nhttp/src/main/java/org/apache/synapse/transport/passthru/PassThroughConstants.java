@@ -42,6 +42,7 @@ public class PassThroughConstants {
     public static final String SERVICE_URI_LOCATION = "ServiceURI";
 
     public static final String WSDL_EPR_PREFIX = "WSDLEPRPrefix";
+    public static final String BIND_ADDRESS = "bind-address" ;
 
     public static final String EPR_TO_SERVICE_NAME_MAP = "service.epr.map";
     public static final String NON_BLOCKING_TRANSPORT = "NonBlockingTransport";

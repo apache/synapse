@@ -52,6 +52,8 @@ public class SourceConfiguration extends BaseConfiguration {
     /** port of the listener */
     private int port = 8280;
 
+    private String bindAddress = null;
+
     /** Object to manage the source connections */
     private SourceConnections sourceConnections = null;
 
@@ -81,6 +83,11 @@ public class SourceConfiguration extends BaseConfiguration {
         this.responseFactory = new DefaultHttpResponseFactory();
         this.sourceConnections = new SourceConnections();
         this.port = ParamUtils.getRequiredParamInt(parameters, "port");
+
+        Parameter bindAddressParameter = parameters.getParameter(PassThroughConstants.BIND_ADDRESS);
+        if (bindAddressParameter != null) {
+            this.bindAddress = ((String) bindAddressParameter.getValue()).trim();
+        }
 
         Parameter hostParameter = parameters.getParameter(TransportListener.HOST_ADDRESS);
         if (hostParameter != null) {
@@ -128,6 +135,10 @@ public class SourceConfiguration extends BaseConfiguration {
 
     public int getPort() {
         return port;
+    }
+
+    public String getBindAddress() {
+        return bindAddress;
     }
 
     public SourceConnections getSourceConnections() {

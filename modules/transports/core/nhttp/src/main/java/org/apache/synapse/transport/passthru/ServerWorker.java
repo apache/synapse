@@ -162,7 +162,7 @@ public class ServerWorker implements Runnable {
         msgContext.setTo(new EndpointReference(uri));
         msgContext.setProperty(PassThroughConstants.REST_URL_POSTFIX, uri);
 
-		if ("GET".equals(method) || "DELETE".equals(method)) {
+		if (("GET".equals(method) || "DELETE".equals(method)) && httpGetRequestProcessor != null) {
 			HttpResponse response = sourceConfiguration.getResponseFactory().newHttpResponse(
 		                request.getVersion(), HttpStatus.SC_OK,
 		                request.getConnection().getContext());

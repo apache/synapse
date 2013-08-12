@@ -53,7 +53,9 @@ import org.apache.synapse.transport.utils.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -167,8 +169,20 @@ public class PassThroughHttpListener implements TransportListener {
         final IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext,
                 sslSetupHandler, sourceConfiguration.getConnectionConfig());
 
-        ListenerEndpoint endpoint = ioReactor.listen(new InetSocketAddress(
-                sourceConfiguration.getPort()));
+        ListenerEndpoint endpoint;
+        if (sourceConfiguration.getBindAddress() != null) {
+            try {
+                endpoint = ioReactor.listen(new InetSocketAddress(
+                        InetAddress.getByName(sourceConfiguration.getBindAddress()),
+                        sourceConfiguration.getPort()));
+            } catch (UnknownHostException e) {
+                handleException("Failed to resolve the bind address: " +
+                        sourceConfiguration.getBindAddress(), e);
+                return;
+            }
+        } else {
+            endpoint = ioReactor.listen(new InetSocketAddress(sourceConfiguration.getPort()));
+        }
         HttpGetRequestProcessor getProcessor = sourceConfiguration.getHttpGetRequestProcessor();
         if (getProcessor != null){
            getProcessor.init(sourceConfiguration.getConfigurationContext(), handler);

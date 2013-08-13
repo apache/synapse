@@ -875,7 +875,7 @@
                         the Pass Through transport thread pool. Once a thread in the pool has
                         been idle for this duration, it will be removed from the pool and
                         destroyed. This reduces the size of the thread pool, but the thread pool
-                        size is not allowed drop below the value of the worker_pool_size_core
+                        size is not to allowed drop below the value of the worker_pool_size_core
                         property.
                         <div class="xmlConf">worker_thread_keepalive_sec=10</div>
                     </td>
@@ -904,23 +904,24 @@
                 Pass Through HTTP transport. At least, consider tuning the worker_pool_size_core
                 and worker_pool_size_max to match the expected load in your deployment.
             </p>
-            <p>
-                Users deploying Synapse on Unix/Linux systems are further advised to set the
-                following OS level configuration parameters. This is completely optional, but
-                for high-throughput and high-volume deployments, configuring these parameters
-                may be crucial.
-            </p>
-            <ul>
-                <li>
-                    Increase the limit on open file descriptors by editing the
-                    /etc/security/limits.conf file.
-                    <div class="xmlConf">* soft nofile 4096
+            <subsection name="Unix/Linux Specific Settings" id="LinuxSettings">
+                <p>
+                    Users deploying Synapse on Unix/Linux systems are further advised to set the
+                    following OS level configuration parameters. This is completely optional, but
+                    for high-throughput and high-volume deployments, configuring these parameters
+                    may be crucial.
+                </p>
+                <ul>
+                    <li>
+                        Increase the limit on open file descriptors by editing the
+                        /etc/security/limits.conf file.
+                        <div class="xmlConf">* soft nofile 4096
 * hard nofile 65535</div>
-                </li>
-                <li>
-                    Increase the TCP port range and optimize other TCP settings in the
-                    /etc/sysctl.conf file.
-                    <div class="xmlConf">net.ipv4.tcp_fin_timeout = 30
+                    </li>
+                    <li>
+                        Increase the TCP port range and optimize other TCP settings in the
+                        /etc/sysctl.conf file.
+                        <div class="xmlConf">net.ipv4.tcp_fin_timeout = 30
 fs.file-max = 2097152
 net.ipv4.tcp_tw_recycle = 1
 net.ipv4.tcp_tw_reuse = 1
@@ -931,8 +932,165 @@ net.core.wmem_max = 67108864
 net.ipv4.tcp_rmem = 4096 87380 16777216
 net.ipv4.tcp_wmem = 4096 65536 16777216
 net.ipv4.ip_local_port_range = 1024 65535</div>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </subsection>
+        </section>
+        <section name="Logging Configuration" id="Logging">
+            <p>
+                <strong>Note: This section is applicable to both Pass Through and NHTTP transports of
+                Synapse.</strong>
+            </p>
+            <p>
+                Synapse HTTP transports have some advanced logging capabilities built in to them,
+                which can be enabled to obtain more low-level information about how the transports
+                operate. These logging features are based on
+                <a href="http://commons.apache.org/proper/commons-logging/">Apache Commons Logging</a>
+                and Log4J, which constitute the logging framework used by Apache Synapse. Therefore,
+                these features should be enabled from the log4j.properties file, which can be found
+                in the lib directory of the Synapse installation.
+            </p>
+            <p>
+                Advanced logging for HTTP transports is activated by setting the log level to DEBUG
+                on a set of predefined logging categories. These categories are already listed in
+                the default log4j.properties file that ships with Synapse, and you only need to
+                uncomment them to use the advanced logging features. Please note that changes to
+                log4j.properties file are not picked up at runtime, and therefore you must restart
+                Synapse for the changes to take effect. A complete listing of the logging categories
+                related to Synapse HTTP transports is given below.
+            </p>
+            <dl>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.headers=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging the headers of all the HTTP messages received and sent by
+                    Synapse.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.headers.SourceHeaders=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging the headers of all the HTTP messages exchanged between client
+                    applications and Synapse.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.headers.TargetHeaders=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging the headers of all the HTTP messages exchanged between Synapse
+                    and backend servers.
+                </dd>
+            </dl>
+            <dl>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.wire=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging the complete wire-level messages received and sent by Synapse.
+                    This will log HTTP headers as well message bodies.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.wire.SourceWire=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging the complete wire-level messages exchanged between client
+                    applications and Synapse.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.wire.TargetWire=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging the complete wire-level messages exchanged between Synapse
+                    and backend servers.
+                </dd>
+            </dl>
+            <dl>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.conn=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging for all HTTP connections. This will log all the significant events
+                    that occur on HTTP connections during their life cycles. Some of these events
+                    include read, write and shutdown.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.conn.SourceConnection=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging for HTTP connections established between client applications and
+                    Synapse.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.conn.TargetConnection=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging for HTTP connections established between Synapse and backend
+                    servers.
+                </dd>
+            </dl>
+            <dl>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.session=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging for all I/O sessions. This will log all the significant events
+                    that occur on HTTP I/O sessions during their life cycles. Some of these events
+                    include setting NIO interest ops, read, write and shutdown.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.session.SourceSession=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging for I/O sessions established between client applications and
+                    Synapse.
+                </dd>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http.session.TargetSession=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables logging for I/O sessions established between Synapse and backend
+                    servers.
+                </dd>
+            </dl>
+            <dl>
+                <dt>
+                    <tt>log4j.category.org.apache.synapse.transport.http=DEBUG</tt>
+                </dt>
+                <dd>
+                    Enables all the advanced logging features (all listed above).
+                </dd>
+            </dl>
+            <subsection name="Guidelines for Using Advanced Logging" id="LoggingGuidelines">
+                <p>
+                    Most of the above advanced logging features have been designed to aid Synapse developers
+                    in identifying problems and fixing issues in the Synapse HTTP transports. However,
+                    they are also useful to the Synapse users and system administrators when debugging
+                    configuration errors and certain types of integration problems. For instance, if you
+                    ever come across a situation where Synapse behaves erratically when communicating
+                    with a particular client or a server, enabling some of the above mentioned logging
+                    features may help you pinpoint the cause of the issue.
+                </p>
+                <p>
+                    Please bare in mind that you trade mediation performance for additional logging.
+                    As you enable more and more logging features, the performance degradation induced
+                    by logging becomes greater. Hence these advanced logging features are not suitable
+                    to be enabled on production deployments. However, they are quite helpful during the
+                    development and testing phases of an integration project. In a production deployment,
+                    you may occasionally need to enable advanced logging for short periods of time to obtain
+                    debug information to resolve certain production issues. But it is not recommended to
+                    have these features permanently enabled on production systems.
+                </p>
+                <p>
+                    Also note that activating advanced logging features may greatly increase the amount
+                    of data written to the Synapse log files. If the Synapse server is receiving a large
+                    volume of traffic, enabling any one of the above logging features may cause
+                    Synapse to generate gigabytes of logs within minutes. This could easily drive a
+                    system out of disk space or cause some other unexpected I/O issue. Therefore be
+                    mindful about how much extra information you want Synapse to log, the prevailing
+                    levels of load/traffic and the availability of hardware resources.
+                </p>
+            </subsection>
         </section>
     </body>
 </document>

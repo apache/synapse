@@ -59,7 +59,7 @@ public class TargetConfiguration extends BaseConfiguration {
                 new RequestContent(),
                 new RequestTargetHost(),
                 new RequestConnControl(),
-                new RequestUserAgent(),
+                new RequestUserAgent("Synapse-PT-HttpComponents-NIO"),
                 new RequestExpectContinue(false));
     }
 

@@ -192,10 +192,8 @@ public class TargetRequest {
             	requestMsgCtx.getAxisOperation().getInputAction();
             }
 
-            if (requestMsgCtx.isSOAP11() && soapAction != null &&
-                    soapAction.length() > 0) {
-                Header existingHeader =
-                	request.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
+            if (requestMsgCtx.isSOAP11() && soapAction != null && soapAction.length() > 0) {
+                Header existingHeader = request.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
                 if (existingHeader != null) {
                 	request.removeHeader(existingHeader);
                 }
@@ -203,7 +201,6 @@ public class TargetRequest {
                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(requestMsgCtx);
                 request.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
                         messageFormatter.formatSOAPAction(requestMsgCtx, null, soapAction));
-                request.setHeader(HttpHeaders.USER_AGENT, "Synapse-PT-HttpComponents-NIO");
             }
     	}
 
@@ -216,8 +213,7 @@ public class TargetRequest {
         // Pre-process HTTP request
         HttpContext context = conn.getContext();
         context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);
-        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST,
-                new HttpHost(url.getHost(), port));
+        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST, new HttpHost(url.getHost(), port));
         context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);
 
         // start the request

@@ -746,7 +746,7 @@
                 <tr>
                     <td>http.socket.rcv-buffer-size</td>
                     <td>
-                        Set the size of the buffers used by the underlying platform
+                        Set the size of the buffers (in bytes) used by the underlying platform
                         for incoming network I/O. This value is only a hint. When set, this is a
                         suggestion to the OS kernel from Synapse about the size of buffers to
                         use for the data to be received over the socket
@@ -759,7 +759,7 @@
                 <tr>
                     <td>http.socket.snd-buffer-size</td>
                     <td>
-                        Set the size of the buffers used by the underlying platform
+                        Set the size of the buffers (in bytes) used by the underlying platform
                         for outgoing network I/O. This value is only a hint. When set, this is a
                         suggestion to the OS kernel from Synapse about the size of buffers to
                         use for the data to be sent over the socket
@@ -839,6 +839,42 @@
                     </td>
                     <td>No</td>
                     <td>report</td>
+                </tr>
+                <tr>
+                    <td>io_buffer_size</td>
+                    <td>
+                        Set the size of the I/O buffers (in bytes) used as the pipes between HTTP
+                        listener and sender. Typically, the HTTP listener would write the incoming
+                        message data to one of these buffers, and the sender would read from it to
+                        send the message out.
+                        <div class="xmlConf">io_buffer_size=10240</div>
+                    </td>
+                    <td>No</td>
+                    <td>8192</td>
+                </tr>
+                <tr>
+                    <td>http.user.agent.preserve</td>
+                    <td>
+                        Specify whether Synapse should preserve the User-Agent header sent by the
+                        client applications, when forwarding messages to backend servers. Allowed
+                        values are either true or false. If set to false, Synapse will overwrite
+                        the original User-Agent header value with the string 'Synapse-PT-HttpComponents-NIO'.
+                        <div class="xmlConf">http.user.agent.preserve=true</div>
+                    </td>
+                    <td>No</td>
+                    <td>false</td>
+                </tr>
+                <tr>
+                    <td>http.server.preserve</td>
+                    <td>
+                        Specify whether Synapse should preserve the Server header sent by the
+                        backend servers, when forwarding messages to client applications. Allowed
+                        values are either true or false. If set to false, Synapse will overwrite
+                        the original Server header value with the string 'Synapse-PT-HttpComponents-NIO'.
+                        <div class="xmlConf">http.server.preserve=false</div>
+                    </td>
+                    <td>No</td>
+                    <td>true</td>
                 </tr>
                 <tr>
                     <td>worker_pool_size_core</td>

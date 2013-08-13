@@ -124,7 +124,7 @@ public class SourceConfiguration extends BaseConfiguration {
     protected HttpProcessor initHttpProcessor() {
         return new ImmutableHttpProcessor(
                 new ResponseDate(),
-                new ResponseServer("Synapse-PassThrough-Http"),
+                new ResponseServer("Synapse-PT-HttpComponents-NIO"),
                 new ResponseContent(),
                 new ResponseConnControl());
     }

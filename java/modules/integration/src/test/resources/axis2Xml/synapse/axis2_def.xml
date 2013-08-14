@@ -191,7 +191,6 @@
 
     <transportReceiver name="http" class="org.apache.synapse.transport.passthru.PassThroughHttpListener">
         <parameter name="port">8280</parameter>
-        <parameter name="non-blocking">true</parameter>
         <parameter name="httpGetProcessor" locked="false">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
         <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
@@ -199,7 +198,6 @@
 
     <transportReceiver name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLListener">
         <parameter name="port" locked="false">8243</parameter>
-        <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="httpGetProcessor" locked="false">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
@@ -233,16 +231,12 @@
     <!--/transportSender-->
 
     <transportSender name="http"  class="org.apache.synapse.transport.passthru.PassThroughHttpSender">
-        <parameter name="non-blocking" locked="false">true</parameter>
-        <parameter name="warnOnHTTP500" locked="false">*</parameter>
         <!--parameter name="http.proxyHost" locked="false">localhost</parameter>
         <parameter name="http.proxyPort" locked="false">3128</parameter>
         <parameter name="http.nonProxyHosts" locked="false">localhost|moon|sun</parameter-->
     </transportSender>
 
     <transportSender name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLSender">
-        <parameter name="non-blocking" locked="false">true</parameter>
-        <parameter name="warnOnHTTP500" locked="false">*</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
                 <Location>modules/integration/src/test/resources/identity.jks</Location>

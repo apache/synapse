@@ -982,15 +982,16 @@
             <subsection name="Guidelines for Using Advanced Settings" id="AdvancedGuidelines">
                 <p>
                     Note that all the above settings are optional. In fact the entire passthru-http.properties
-                    file is optional. Synapse is programmed with some reasonable default values (also
-                    given in the table) for each of the above settings. However, it is highly
-                    recommended to tweak the above values to obtain best performance from the
-                    Pass Through HTTP transport. At least, consider tuning the worker_pool_size_core
-                    and worker_pool_size_max to match the expected load in your deployment.
+                    file is optional. Synapse is programmed with some reasonable default values for
+                    each of the above settings, and these defaults will deliver good performance in
+                    most scenarios. However, to obtain 'best' performance from the Pass Through HTTP
+                    transport, it is recommended to tweak the above values. At least, consider tuning
+                    the worker_pool_size_core and worker_pool_size_max to match the expected load in
+                    your deployment.
                 </p>
                 <p>
                     You might be tempted to configure the transport with a very large thread pool
-                    (e.g. 1000's of threads). But bare in mind that more threads equals more memory
+                    (e.g. 1000's of threads). But bare in mind that more threads equal more memory
                     usage. Also, on some operating systems there are restrictions on the number of
                     threads that can be spawned by an application. Therefore, do not attempt to set
                     the thread pool size to an unnecessarily large value. Do a rough estimate of your
@@ -1002,9 +1003,9 @@
                 </p>
                 <p>
                     It is highly recommended to run some load tests on Synapse using your own mediation
-                    (sequence/proxy/API) configurations on the actual production hardware. This will
-                    give you a much clear idea of what transport level properties need to be tuned up
-                    in your deployment.
+                    configurations (sequences, proxy services etc.) on the actual production hardware.
+                    This will give you a much clear idea about what transport level properties need to
+                    be tuned up in your deployment.
                 </p>
             </subsection>
             <subsection name="Unix/Linux Specific Settings" id="LinuxSettings">
@@ -1012,7 +1013,7 @@
                     Users deploying Synapse on Unix/Linux systems are further advised to set the
                     following OS level configuration parameters. This is completely optional, but
                     for high-throughput and high-volume deployments, configuring these parameters
-                    may be crucial.
+                    may prove to be useful.
                 </p>
                 <ul>
                     <li>

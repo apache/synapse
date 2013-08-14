@@ -54,6 +54,14 @@
                         <li><a href="#LoggingGuidelines">Guidelines for Using Advanced Logging</a></li>
                     </ul>
                 </li>
+                <li>
+                    <a href="#JMX">Monitoring with JMX</a>
+                    <ul>
+                        <li><a href="#ConnectionsView">ConnectionsView (org.apache.synapse.PassThroughConnections)</a></li>
+                        <li><a href="#LatencyView">LatencyView (org.apache.synapse.PassThroughTransportLatency)</a></li>
+                        <li><a href="#TransportView">TransportView (org.apache.synapse.Transport)</a></li>
+                    </ul>
+                </li>
             </ul>
         </section>
         <section name="Introduction" id="Introduction">
@@ -219,7 +227,7 @@
                 <p>
                     All the above parameters are also applicable to the HTTPS transport listener.
                 </p>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="HTTP Transport Sender" id="HTTPSender">
                 <p>
@@ -279,7 +287,7 @@
                         <td>N/A</td>
                     </tr>
                 </table>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="HTTPS Transport Listener" id="HTTPSListener">
                 <p>
@@ -473,7 +481,7 @@
                         <td>https://&lt;host&gt;:&lt;port&gt;/</td>
                     </tr>
                 </table>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="HTTPS Transport Sender" id="HTTPSSender">
                 <p>
@@ -713,7 +721,7 @@
                         <td>N/A</td>
                     </tr>
                 </table>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
         </section>
         <section name="Advanced Settings and Performance Tuning" id="AdvancedSettings">
@@ -895,7 +903,7 @@
                         <td>report</td>
                     </tr>
                 </table>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="Synapse HTTP Mediation Settings" id="SynapseSettings">
                 <p>
@@ -946,7 +954,7 @@
                         <td>true</td>
                     </tr>
                 </table>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="Thread Pool Settings" id="ThreadPoolSettings">
                 <p>
@@ -1017,7 +1025,7 @@
                         <td>-1</td>
                     </tr>
                 </table>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="Guidelines for Using Advanced Settings" id="AdvancedGuidelines">
                 <p>
@@ -1047,7 +1055,7 @@
                     This will give you a much clear idea about what transport level properties need to
                     be tuned up in your deployment.
                 </p>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
             <subsection name="Unix/Linux Specific Settings" id="LinuxSettings">
                 <p>
@@ -1079,7 +1087,7 @@ net.ipv4.tcp_wmem = 4096 65536 16777216
 net.ipv4.ip_local_port_range = 1024 65535</div>
                     </li>
                 </ul>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
         </section>
         <section name="Logging Configuration" id="Logging">
@@ -1207,7 +1215,7 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                     Enables all the advanced logging features (all listed above).
                 </dd>
             </dl>
-            <p><a href="#Contents">Back to top</a></p>
+            <p><a href="#Contents">[Back to top]</a></p>
             <subsection name="Guidelines for Using Advanced Logging" id="LoggingGuidelines">
                 <p>
                     Most of the above advanced logging features have been designed to aid Synapse developers
@@ -1237,7 +1245,7 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                     mindful about how much extra information you want Synapse to log, the prevailing
                     levels of load/traffic and the availability of hardware resources.
                 </p>
-                <p><a href="#Contents">Back to top</a></p>
+                <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
         </section>
         <section name="Monitoring with JMX" id="JMX">
@@ -1249,7 +1257,7 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                 by Synapse when forwarding HTTP traffic. Following sections describe the available
                 JMX MBeans and the attributes present in each MBean.
             </p>
-            <subsection name="ConnectionsView (org.apache.synapse.PassThroughConnections)" id="ConnectionsMBean">
+            <subsection name="ConnectionsView (org.apache.synapse.PassThroughConnections)" id="ConnectionsView">
                 <p>
                     Typically, Synapse exposes four instances of this MBean, under the following
                     identifiers.
@@ -1372,6 +1380,256 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                             provided in the MBean interface. This attribute keeps track of the date
                             and time of the last reset event. If the MBean has never been reset,
                             this attribute provides the time when the transport was started.
+                        </td>
+                    </tr>
+                </table>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+            <subsection name="LatencyView (org.apache.synapse.PassThroughTransportLatency)" id="LatencyView">
+                <p>
+                    Synapse keeps track of how much latency (delay) is added by the ESB to each
+                    message flow. This is an estimate of how much time a client application would
+                    save if the requests were to go directly to the backend server, instead of
+                    going through Synapse. The LatencyView MBean exposes this information via JMX.
+                    Synapse usually exposes two instances of this MBean, one for the HTTP transport
+                    and the other for the HTTPS transport. Each instance consists of the following
+                    attributes.
+                </p>
+                <table>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>AllTimeAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over all the messages mediated
+                            by the transport
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastMinuteAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over the messages mediated
+                            by the transport during last minute (updated every minute)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last5MinuteAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over the messages mediated
+                            by the transport during last 5 minutes (updated every minute)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last15MinuteAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over the messages mediated
+                            by the transport during last 15 minutes (updated every minute)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastHourAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over the messages mediated
+                            by the transport during last hour (updated every 5 minutes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last8HourAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over the messages mediated
+                            by the transport during last 8 hours (updated every 5 minutes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last24HourAvgLatency</td>
+                        <td>double</td>
+                        <td>
+                            Average latency in milliseconds, computed over the messages mediated
+                            by the transport during last 24 hours (updated every 5 minutes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastResetTime</td>
+                        <td>java.util.Date</td>
+                        <td>
+                            The MBean statistics can be reset manually via one of the operations
+                            provided in the MBean interface. This attribute keeps track of the date
+                            and time of the last reset event. If the MBean has never been reset,
+                            this attribute provides the time when the transport was started.
+                        </td>
+                    </tr>
+                </table>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+            <subsection name="TransportView (org.apache.synapse.Transport)" id="TransportView">
+                <p>
+                    An instance of this MBean is usually available for each transport listener
+                    and sender enabled in Synapse. This also includes non-HTTP transports. As far
+                    as the Pass Through HTTP transport is concerned, Synapse exposes four instances
+                    of this MBean with the following identifiers.
+                </p>
+                <ul>
+                    <li>passthru-http-receiver</li>
+                    <li>passthru-http-sender</li>
+                    <li>passthru-https-receiver</li>
+                    <li>passthru-https-sender</li>
+                </ul>
+                <p>
+                    Following attributes are available on each instance of the MBean.
+                </p>
+                <table>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>ActiveThreadCount</td>
+                        <td>int</td>
+                        <td>
+                            The number of threads in the transport thread pool, that are currently
+                            executing tasks
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AvgSizeReceived</td>
+                        <td>double</td>
+                        <td>
+                            Average size (in bytes) of all the messages received
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AvgSizeSent</td>
+                        <td>int</td>
+                        <td>
+                            Average size (in bytes) of all the messages sent
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>BytesReceived</td>
+                        <td>long</td>
+                        <td>
+                            The total number of bytes received by the transport
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>BytesSent</td>
+                        <td>long</td>
+                        <td>
+                            The total number of bytes sent by the transport
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>FaultsReceiving</td>
+                        <td>long</td>
+                        <td>
+                            The total number of errors encountered while receiving messages
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>FaultsSent</td>
+                        <td>long</td>
+                        <td>
+                            The total number of errors encountered while sending messages
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastResetTime</td>
+                        <td>long</td>
+                        <td>
+                            The MBean statistics can be reset manually via one of the operations
+                            provided in the MBean interface. This attribute keeps track of the
+                            timestamp (milliseconds since epoch) of the last reset event. If the
+                            MBean has never been reset, this attribute provides the time when the
+                            transport was started.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MaxSizeReceived</td>
+                        <td>long</td>
+                        <td>
+                            Size of the largest message received (in bytes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MaxSizeSent</td>
+                        <td>long</td>
+                        <td>
+                            Size of the largest message sent (int bytes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MessagesReceived</td>
+                        <td>long</td>
+                        <td>
+                            Total number of messages received
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MessagesSent</td>
+                        <td>long</td>
+                        <td>
+                            Total number of messages sent
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MetricsWindow</td>
+                        <td>long</td>
+                        <td>
+                            Time elapsed in milliseconds, since the last MBean reset event
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MinSizeReceived</td>
+                        <td>long</td>
+                        <td>
+                            Size of the smallest message received (in bytes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MinSizeSent</td>
+                        <td>long</td>
+                        <td>
+                            Size of the smallest message sent (int bytes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>QueueSize</td>
+                        <td>long</td>
+                        <td>
+                            Number of tasks currently queued on the transport thread pool
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ResponseCodeTable</td>
+                        <td>java.util.Map</td>
+                        <td>
+                            A map representing the distribution of HTTP status codes received
+                            by the transport. Keys are integers (status codes) and the values are
+                            long integers indicating the number of time each status code was encountered.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>TimeoutsReceiving</td>
+                        <td>long</td>
+                        <td>
+                            Number of timeouts encountered while receiving messages
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>TimeoutsSending</td>
+                        <td>long</td>
+                        <td>
+                            Number of timeouts encountered while sending messages
                         </td>
                     </tr>
                 </table>

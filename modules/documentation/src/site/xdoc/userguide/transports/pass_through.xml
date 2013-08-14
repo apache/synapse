@@ -24,7 +24,39 @@
         <title>Apache Synapse - Pass Through HTTP Transport</title>
     </properties>
     <body>
-        <section name="Pass Through HTTP Transport" id="Introduction">
+        <section name="Pass Through HTTP Transport" id="Contents">
+            <ul>
+                <li>
+                    <a href="#Introduction">Introduction</a>
+                </li>
+                <li>
+                    <a href="#Configuration">Transport Configuration</a>
+                    <ul>
+                        <li><a href="#HTTPListener">HTTP Transport Listener</a></li>
+                        <li><a href="#HTTPSender">HTTP Transport Sender</a></li>
+                        <li><a href="#HTTPSListener">HTTPS Transport Listener</a></li>
+                        <li><a href="#HTTPSSender">HTTPS Transport Sender</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#AdvancedSettings">Advanced Settings and Performance Tuning</a>
+                    <ul>
+                        <li><a href="#HttpCoreSettings">Apache HTTP Core Settings</a></li>
+                        <li><a href="#SynapseSettings">Synapse HTTP Mediation Settings</a></li>
+                        <li><a href="#ThreadPoolSettings">Thread Pool Settings</a></li>
+                        <li><a href="#AdvancedGuidelines">Guidelines for Using Advanced Settings</a></li>
+                        <li><a href="#LinuxSettings">Unix/Linux Specific Settings</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#Logging">Logging Configuration</a>
+                    <ul>
+                        <li><a href="#LoggingGuidelines">Guidelines for Using Advanced Logging</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="Introduction" id="Introduction">
             <p>
                 The Pass Through HTTP transport (PTHTTP transport) was developed by
                 <a href="http://wso2.com">WSO2</a> as a more efficient and more scalable
@@ -81,6 +113,7 @@
                 the mediation engine. Settings related to configuring I/O reactor threads and PTHTTP
                 threads are discussed under <a href="#AdvancedSettings">advanced settings</a>.
             </p>
+            <p><a href="#Contents">[Back to top]</a></p>
         </section>
         <section name="Transport Configuration" id="Configuration">
             <p>
@@ -186,6 +219,7 @@
                 <p>
                     All the above parameters are also applicable to the HTTPS transport listener.
                 </p>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="HTTP Transport Sender" id="HTTPSender">
                 <p>
@@ -245,6 +279,7 @@
                         <td>N/A</td>
                     </tr>
                 </table>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="HTTPS Transport Listener" id="HTTPSListener">
                 <p>
@@ -438,6 +473,7 @@
                         <td>https://&lt;host&gt;:&lt;port&gt;/</td>
                     </tr>
                 </table>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="HTTPS Transport Sender" id="HTTPSSender">
                 <p>
@@ -677,6 +713,7 @@
                         <td>N/A</td>
                     </tr>
                 </table>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
         </section>
         <section name="Advanced Settings and Performance Tuning" id="AdvancedSettings">
@@ -858,6 +895,7 @@
                         <td>report</td>
                     </tr>
                 </table>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="Synapse HTTP Mediation Settings" id="SynapseSettings">
                 <p>
@@ -908,6 +946,7 @@
                         <td>true</td>
                     </tr>
                 </table>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="Thread Pool Settings" id="ThreadPoolSettings">
                 <p>
@@ -978,6 +1017,7 @@
                         <td>-1</td>
                     </tr>
                 </table>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="Guidelines for Using Advanced Settings" id="AdvancedGuidelines">
                 <p>
@@ -1007,6 +1047,7 @@
                     This will give you a much clear idea about what transport level properties need to
                     be tuned up in your deployment.
                 </p>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
             <subsection name="Unix/Linux Specific Settings" id="LinuxSettings">
                 <p>
@@ -1038,6 +1079,7 @@ net.ipv4.tcp_wmem = 4096 65536 16777216
 net.ipv4.ip_local_port_range = 1024 65535</div>
                     </li>
                 </ul>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
         </section>
         <section name="Logging Configuration" id="Logging">
@@ -1165,6 +1207,7 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                     Enables all the advanced logging features (all listed above).
                 </dd>
             </dl>
+            <p><a href="#Contents">Back to top</a></p>
             <subsection name="Guidelines for Using Advanced Logging" id="LoggingGuidelines">
                 <p>
                     Most of the above advanced logging features have been designed to aid Synapse developers
@@ -1194,6 +1237,7 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                     mindful about how much extra information you want Synapse to log, the prevailing
                     levels of load/traffic and the availability of hardware resources.
                 </p>
+                <p><a href="#Contents">Back to top</a></p>
             </subsection>
         </section>
     </body>

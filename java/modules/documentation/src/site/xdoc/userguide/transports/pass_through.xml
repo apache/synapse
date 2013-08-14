@@ -84,7 +84,8 @@
         </section>
         <section name="Transport Configuration" id="Configuration">
             <p>
-                Pass Through HTTP transport is configured by default in the repository/conf/axis2.xml
+                Pass Through HTTP transport is configured by default in the
+                <strong>SYNAPSE_HOME/repository/conf/axis2.xml</strong>
                 file of Synapse. The default configuration activates the following four components:
             </p>
             <ul>
@@ -682,264 +683,330 @@
             <p>
                 In addition to the basic parameters described in the previous section, the
                 Pass Through HTTP transport provides some advanced options to tweak its
-                runtime behavior and performance. These options are configured in the
-                passthru-http.properties file which should be placed in the lib directory of
-                Synapse. These advanced options enable the user to control some of the low-level
+                runtime behavior and performance. These options should be configured in the
+                <strong>SYNAPSE_HOME/lib/passthru-http.properties</strong> file. These advanced
+                options enable the user to control some of the low-level
                 transport settings related to TCP sockets, I/O buffers and thread pools. Following
-                table describes all the advanced options that can be set for the Pass Through
+                sections describe all the advanced options that can be set for the Pass Through
                 HTTP transport.
             </p>
-            <table>
-                <tr>
-                    <th>Parameter Name</th>
-                    <th>Description/Example</th>
-                    <th>Required</th>
-                    <th>Default</th>
-                </tr>
-                <tr>
-                    <td>http.socket.timeout</td>
-                    <td>
-                        Set the TCP socket timeout in milliseconds
-                        (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
-                        <div class="xmlConf">http.socket.timeout=20000</div>
-                    </td>
-                    <td>No</td>
-                    <td>60000</td>
-                </tr>
-                <tr>
-                    <td>http.connection.timeout</td>
-                    <td>
-                        Set the TCP connection timeout in milliseconds. This determines the timeout
-                        value for non-blocking connection requests. Setting this property to
-                        0 disables connection timeout (i.e. no timeout).
-                        <div class="xmlConf">http.connection.timeout=30000</div>
-                    </td>
-                    <td>No</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>http.nio.interest-ops-queueing</td>
-                    <td>
-                        Determines whether or not I/O interest operations are to be queued and
-                        executed asynchronously by the I/O reactor thread or to be applied to
-                        the underlying
-                        <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/channels/SelectionKey.html">SelectionKey</a>
-                        immediately. Allowed values are either 'true' or 'false'.
-                        <div class="xmlConf">http.nio.interest-ops-queueing=false</div>
-                    </td>
-                    <td>No</td>
-                    <td>false</td>
-                </tr>
-                <tr>
-                    <td>http.tcp.nodelay</td>
-                    <td>
-                        Setting this property to 'true' disables
-                        <a href="http://en.wikipedia.org/wiki/Nagle's_algorithm">Nagle's algorithm</a>
-                        for the HTTP connections. That is, outgoing data will not be buffered
-                        and aggregated together
-                        (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#TCP_NODELAY">TCP_NODELAY</a>).
-                        <div class="xmlConf">http.tcp.nodelay=true</div>
-                    </td>
-                    <td>No</td>
-                    <td>true</td>
-                </tr>
-                <tr>
-                    <td>http.socket.rcv-buffer-size</td>
-                    <td>
-                        Set the size of the buffers (in bytes) used by the underlying platform
-                        for incoming network I/O. This value is only a hint. When set, this is a
-                        suggestion to the OS kernel from Synapse about the size of buffers to
-                        use for the data to be received over the socket
-                        (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
-                        <div class="xmlConf">http.socket.rcv-buffer-size=4096</div>
-                    </td>
-                    <td>No</td>
-                    <td>8192</td>
-                </tr>
-                <tr>
-                    <td>http.socket.snd-buffer-size</td>
-                    <td>
-                        Set the size of the buffers (in bytes) used by the underlying platform
-                        for outgoing network I/O. This value is only a hint. When set, this is a
-                        suggestion to the OS kernel from Synapse about the size of buffers to
-                        use for the data to be sent over the socket
-                        (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
-                        <div class="xmlConf">http.socket.snd-buffer-size=4096</div>
-                    </td>
-                    <td>No</td>
-                    <td>8192</td>
-                </tr>
-                <tr>
-                    <td>http.socket.linger</td>
-                    <td>
-                        Specify the linger-on-close timeout duration (in milliseconds) for the
-                        sockets created by the HTTP transport. Setting to 0 or a negative value
-                        disables linger-on-close
-                        (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_LINGER">SO_LINGER</a>).
-                        <div class="xmlConf">http.socket.linger=5000</div>
-                    </td>
-                    <td>No</td>
-                    <td>-1</td>
-                </tr>
-                <tr>
-                    <td>http.socket.reuseaddr</td>
-                    <td>
-                        Set the <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
-                        socket option for the sockets created by the HTTP transport. Accepted
-                        values are either 'true' or 'false'.
-                        <div class="xmlConf">http.socket.reuseaddr=true</div>
-                    </td>
-                    <td>No</td>
-                    <td>false</td>
-                </tr>
-                <tr>
-                    <td>http.nio.select-interval</td>
-                    <td>
-                        Set the time interval in milliseconds at which the I/O reactor wakes up
-                        to check for timed out sessions and session requests.
-                        <div class="xmlConf">http.nio.select-interval=2500</div>
-                    </td>
-                    <td>No</td>
-                    <td>1000</td>
-                </tr>
-                <tr>
-                    <td>io_threads_per_reactor</td>
-                    <td>
-                        Set the number of I/O dispatcher threads to be used by each I/O reactor.
-                        Typically, this property controls the ability of the HTTP transport
-                        to handle concurrent I/O events.
-                        It is recommended that this property is set to the number of CPU cores
-                        available for Synapse. By default, Synapse determines the number of
-                        available CPU cores and initializes this setting accordingly.
-                        <div class="xmlConf">io_threads_per_reactor=4</div>
-                    </td>
-                    <td>No</td>
-                    <td>Number of CPU cores</td>
-                </tr>
-                <tr>
-                    <td>http.malformed.input.action</td>
-                    <td>
-                        Specify the action to be performed when a malformed input is detected
-                        during character set encoding or decoding. Supported values are
-                        'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
-                        for more details on each of these options.
-                        <div class="xmlConf">http.malformed.input.action=ignore</div>
-                    </td>
-                    <td>No</td>
-                    <td>report</td>
-                </tr>
-                <tr>
-                    <td>http.unmappable.input.action</td>
-                    <td>
-                        Specify the action to be performed when an un-mappable character is detected
-                        during character set encoding or decoding. Supported values are
-                        'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
-                        for more details on each of these options.
-                        <div class="xmlConf">http.malformed.input.action=ignore</div>
-                    </td>
-                    <td>No</td>
-                    <td>report</td>
-                </tr>
-                <tr>
-                    <td>io_buffer_size</td>
-                    <td>
-                        Set the size of the I/O buffers (in bytes) used as the pipes between HTTP
-                        listener and sender. Typically, the HTTP listener would write the incoming
-                        message data to one of these buffers, and the sender would read from it to
-                        send the message out.
-                        <div class="xmlConf">io_buffer_size=10240</div>
-                    </td>
-                    <td>No</td>
-                    <td>8192</td>
-                </tr>
-                <tr>
-                    <td>http.user.agent.preserve</td>
-                    <td>
-                        Specify whether Synapse should preserve the User-Agent header sent by the
-                        client applications, when forwarding messages to backend servers. Allowed
-                        values are either true or false. If set to false, Synapse will overwrite
-                        the original User-Agent header value with the string 'Synapse-PT-HttpComponents-NIO'.
-                        <div class="xmlConf">http.user.agent.preserve=true</div>
-                    </td>
-                    <td>No</td>
-                    <td>false</td>
-                </tr>
-                <tr>
-                    <td>http.server.preserve</td>
-                    <td>
-                        Specify whether Synapse should preserve the Server header sent by the
-                        backend servers, when forwarding messages to client applications. Allowed
-                        values are either true or false. If set to false, Synapse will overwrite
-                        the original Server header value with the string 'Synapse-PT-HttpComponents-NIO'.
-                        <div class="xmlConf">http.server.preserve=false</div>
-                    </td>
-                    <td>No</td>
-                    <td>true</td>
-                </tr>
-                <tr>
-                    <td>worker_pool_size_core</td>
-                    <td>
-                        Initial size of the internal thread pool used by the Pass
-                        Through HTTP transport. This thread pool is used for mediating
-                        messages through the Synapse mediation engine. Note that both HTTP
-                        listener and sender draw threads from this pool. It is further shared
-                        between the HTTP and HTTPS transports. The size of this thread pool
-                        determines the capacity of Synapse to mediate concurrent HTTP messages.
-                        <div class="xmlConf">worker_pool_size_core=100</div>
-                    </td>
-                    <td>No</td>
-                    <td>40</td>
-                </tr>
-                <tr>
-                    <td>worker_pool_size_max</td>
-                    <td>
-                        The thread pool used by the Pass Through HTTP transport grows in size, as
-                        more and more jobs are submitted to it. This property determines the
-                        maximum limit up to which the thread pool may grow. In other words,
-                        this property specifies the maximum number of threads that may ever exist
-                        in the transport thread pool. Value of this property must be greater than
-                        or equal to the vallue of worker_pool_size_core.
-                        <div class="xmlConf">worker_pool_size_max=500</div>
-                    </td>
-                    <td>No</td>
-                    <td>200</td>
-                </tr>
-                <tr>
-                    <td>worker_thread_keepalive_sec</td>
-                    <td>
-                        Specify the idle time period (in seconds) for the excessive threads in
-                        the Pass Through transport thread pool. Once a thread in the pool has
-                        been idle for this duration, it will be removed from the pool and
-                        destroyed. This reduces the size of the thread pool, but the thread pool
-                        size is not to allowed drop below the value of the worker_pool_size_core
-                        property.
-                        <div class="xmlConf">worker_thread_keepalive_sec=10</div>
-                    </td>
-                    <td>No</td>
-                    <td>60</td>
-                </tr>
-                <tr>
-                    <td>worker_pool_queue_length</td>
-                    <td>
-                        Determines the length of the queue used by the Pass Through transport
-                        thread pool to store pending jobs. To use an unbounded queue, set this
-                        property to -1. If a bounded queue is used, and if the queue ever gets
-                        filled to its capacity, any further attempts to submit jobs will fail,
-                        causing some messages to be dropped by Synapse.
-                        <div class="xmlConf">worker_pool_queue_length=1000</div>
-                    </td>
-                    <td>No</td>
-                    <td>-1</td>
-                </tr>
-            </table>
-            <p>
-                Note that all the above settings are optional. In fact the entire passthru-http.properties
-                file is optional. Synapse is programmed with some reasonable default values (also
-                given in the table) for each of the above settings. However, it is highly
-                recommended to tweak the above values to obtain best performance from the
-                Pass Through HTTP transport. At least, consider tuning the worker_pool_size_core
-                and worker_pool_size_max to match the expected load in your deployment.
-            </p>
+            <subsection name="Apache HTTP Core Settings" id="HttpCoreSettings">
+                <p>
+                    Following properties control various facets of
+                    <a href="http://hc.apache.org/httpcomponents-core-ga/index.html">Apache HTTP Core</a>,
+                    the framework underlying the Pass Through HTTP transport.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>http.socket.timeout</td>
+                        <td>
+                            Set the TCP socket timeout in milliseconds
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
+                            <div class="xmlConf">http.socket.timeout=20000</div>
+                        </td>
+                        <td>No</td>
+                        <td>60000</td>
+                    </tr>
+                    <tr>
+                        <td>http.connection.timeout</td>
+                        <td>
+                            Set the TCP connection timeout in milliseconds. This determines the timeout
+                            value for non-blocking connection requests. Setting this property to
+                            0 disables connection timeout (i.e. no timeout).
+                            <div class="xmlConf">http.connection.timeout=30000</div>
+                        </td>
+                        <td>No</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>http.nio.interest-ops-queueing</td>
+                        <td>
+                            Determines whether or not I/O interest operations are to be queued and
+                            executed asynchronously by the I/O reactor thread or to be applied to
+                            the underlying
+                            <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/channels/SelectionKey.html">SelectionKey</a>
+                            immediately. Allowed values are either 'true' or 'false'.
+                            <div class="xmlConf">http.nio.interest-ops-queueing=false</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.tcp.nodelay</td>
+                        <td>
+                            Setting this property to 'true' disables
+                            <a href="http://en.wikipedia.org/wiki/Nagle's_algorithm">Nagle's algorithm</a>
+                            for the HTTP connections. That is, outgoing data will not be buffered
+                            and aggregated together
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#TCP_NODELAY">TCP_NODELAY</a>).
+                            <div class="xmlConf">http.tcp.nodelay=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.buffer-size</td>
+                        <td>
+                            Set the size of the I/O session buffers (in bytes) used by the transport
+                            for reading incoming data and writing outgoing data.
+                            <div class="xmlConf">http.socket.buffer-size=4096</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.rcv-buffer-size</td>
+                        <td>
+                            Set the size of the buffers (in bytes) used by the underlying platform
+                            for incoming network I/O. This value is only a hint. When set, this is a
+                            suggestion to the OS kernel from Synapse about the size of buffers to
+                            use for the data to be received over the socket
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
+                            <div class="xmlConf">http.socket.rcv-buffer-size=4096</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.snd-buffer-size</td>
+                        <td>
+                            Set the size of the buffers (in bytes) used by the underlying platform
+                            for outgoing network I/O. This value is only a hint. When set, this is a
+                            suggestion to the OS kernel from Synapse about the size of buffers to
+                            use for the data to be sent over the socket
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
+                            <div class="xmlConf">http.socket.snd-buffer-size=4096</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.linger</td>
+                        <td>
+                            Specify the linger-on-close timeout duration (in milliseconds) for the
+                            sockets created by the HTTP transport. Setting to 0 or a negative value
+                            disables linger-on-close
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_LINGER">SO_LINGER</a>).
+                            <div class="xmlConf">http.socket.linger=5000</div>
+                        </td>
+                        <td>No</td>
+                        <td>-1</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.reuseaddr</td>
+                        <td>
+                            Set the <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
+                            socket option for the sockets created by the HTTP transport. Accepted
+                            values are either 'true' or 'false'.
+                            <div class="xmlConf">http.socket.reuseaddr=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.nio.select-interval</td>
+                        <td>
+                            Set the time interval in milliseconds at which the I/O reactor wakes up
+                            to check for timed out sessions and session requests.
+                            <div class="xmlConf">http.nio.select-interval=2500</div>
+                        </td>
+                        <td>No</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>io_threads_per_reactor</td>
+                        <td>
+                            Set the number of I/O dispatcher threads to be used by each I/O reactor.
+                            Typically, this property controls the ability of the HTTP transport
+                            to handle concurrent I/O events.
+                            It is recommended that this property is set to the number of CPU cores
+                            available for Synapse. By default, Synapse determines the number of
+                            available CPU cores and initializes this setting accordingly.
+                            <div class="xmlConf">io_threads_per_reactor=4</div>
+                        </td>
+                        <td>No</td>
+                        <td>Number of CPU cores</td>
+                    </tr>
+                    <tr>
+                        <td>http.malformed.input.action</td>
+                        <td>
+                            Specify the action to be performed when a malformed input is detected
+                            during character set encoding or decoding. Supported values are
+                            'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
+                            for more details on each of these options.
+                            <div class="xmlConf">http.malformed.input.action=ignore</div>
+                        </td>
+                        <td>No</td>
+                        <td>report</td>
+                    </tr>
+                    <tr>
+                        <td>http.unmappable.input.action</td>
+                        <td>
+                            Specify the action to be performed when an un-mappable character is detected
+                            during character set encoding or decoding. Supported values are
+                            'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
+                            for more details on each of these options.
+                            <div class="xmlConf">http.malformed.input.action=ignore</div>
+                        </td>
+                        <td>No</td>
+                        <td>report</td>
+                    </tr>
+                </table>
+            </subsection>
+            <subsection name="Synapse HTTP Mediation Settings" id="SynapseSettings">
+                <p>
+                    Following settings determine the behavior of Synapse with respect to mediating
+                    HTTP traffic.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>io_buffer_size</td>
+                        <td>
+                            Set the size of the I/O buffers (in bytes) used as the pipes between HTTP
+                            listener and sender. Typically, the HTTP listener would write the incoming
+                            message data to one of these buffers, and the sender would read from it to
+                            send the message out.
+                            <div class="xmlConf">io_buffer_size=10240</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.user.agent.preserve</td>
+                        <td>
+                            Specify whether Synapse should preserve the User-Agent header sent by the
+                            client applications, when forwarding messages to backend servers. Allowed
+                            values are either true or false. If set to false, Synapse will overwrite
+                            the original User-Agent header value with the string 'Synapse-PT-HttpComponents-NIO'.
+                            <div class="xmlConf">http.user.agent.preserve=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.server.preserve</td>
+                        <td>
+                            Specify whether Synapse should preserve the Server header sent by the
+                            backend servers, when forwarding messages to client applications. Allowed
+                            values are either true or false. If set to false, Synapse will overwrite
+                            the original Server header value with the string 'Synapse-PT-HttpComponents-NIO'.
+                            <div class="xmlConf">http.server.preserve=false</div>
+                        </td>
+                        <td>No</td>
+                        <td>true</td>
+                    </tr>
+                </table>
+            </subsection>
+            <subsection name="Thread Pool Settings" id="ThreadPoolSettings">
+                <p>
+                    The Pass Through HTTP transport uses a thread pool for mediating messages
+                    through the Synapse mediation engine. Both HTTP listener and sender draw threads
+                    from this pool. It is further shared between the HTTP and HTTPS transports. The
+                    size of this thread pool determines the capacity of Synapse to mediate
+                    concurrent HTTP messages.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>worker_pool_size_core</td>
+                        <td>
+                            Initial the size of the internal thread pool used by the Pass
+                            Through HTTP transport. This is also the minimum size of the thread pool.
+                            That is, the number of threads in the pool is not allowed to drop
+                            below this limit.
+                            <div class="xmlConf">worker_pool_size_core=100</div>
+                        </td>
+                        <td>No</td>
+                        <td>40</td>
+                    </tr>
+                    <tr>
+                        <td>worker_pool_size_max</td>
+                        <td>
+                            The thread pool used by the Pass Through HTTP transport grows in size, as
+                            more and more jobs are submitted to it. This property determines the
+                            maximum limit up to which the thread pool may grow. In other words,
+                            this property specifies the maximum number of threads that may ever exist
+                            in the transport thread pool. Value of this property must be greater than
+                            or equal to the value of worker_pool_size_core.
+                            <div class="xmlConf">worker_pool_size_max=500</div>
+                        </td>
+                        <td>No</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td>worker_thread_keepalive_sec</td>
+                        <td>
+                            Specify the idle time period (in seconds) for the excessive threads in
+                            the Pass Through transport thread pool. Once a thread in the pool has
+                            been idle for this duration, it will be removed from the pool and
+                            destroyed. This reduces the size of the thread pool, but the thread pool
+                            size is not to allowed drop below the value of the worker_pool_size_core
+                            property.
+                            <div class="xmlConf">worker_thread_keepalive_sec=10</div>
+                        </td>
+                        <td>No</td>
+                        <td>60</td>
+                    </tr>
+                    <tr>
+                        <td>worker_pool_queue_length</td>
+                        <td>
+                            Determines the length of the queue used by the Pass Through transport
+                            thread pool to store pending jobs. To use an unbounded queue, set this
+                            property to -1. If a bounded queue is used, and if the queue ever gets
+                            filled to its capacity, any further attempts to submit jobs will fail,
+                            causing some messages to be dropped by Synapse.
+                            <div class="xmlConf">worker_pool_queue_length=1000</div>
+                        </td>
+                        <td>No</td>
+                        <td>-1</td>
+                    </tr>
+                </table>
+            </subsection>
+            <subsection name="Guidelines for Using Advanced Settings" id="AdvancedGuidelines">
+                <p>
+                    Note that all the above settings are optional. In fact the entire passthru-http.properties
+                    file is optional. Synapse is programmed with some reasonable default values (also
+                    given in the table) for each of the above settings. However, it is highly
+                    recommended to tweak the above values to obtain best performance from the
+                    Pass Through HTTP transport. At least, consider tuning the worker_pool_size_core
+                    and worker_pool_size_max to match the expected load in your deployment.
+                </p>
+                <p>
+                    You might be tempted to configure the transport with a very large thread pool
+                    (e.g. 1000's of threads). But bare in mind that more threads equals more memory
+                    usage. Also, on some operating systems there are restrictions on the number of
+                    threads that can be spawned by an application. Therefore, do not attempt to set
+                    the thread pool size to an unnecessarily large value. Do a rough estimate of your
+                    expected workload (expected number of concurrent users), and set the thread pool
+                    size accordingly. As for setting the number of I/O dispatcher threads
+                    (io_threads_per_reactor), setting it to match the number of available CPU cores
+                    generally results in good performance. Synapse does this for you by default,
+                    so you shouldn't have to do any extra work with regard to this property.
+                </p>
+                <p>
+                    It is highly recommended to run some load tests on Synapse using your own mediation
+                    (sequence/proxy/API) configurations on the actual production hardware. This will
+                    give you a much clear idea of what transport level properties need to be tuned up
+                    in your deployment.
+                </p>
+            </subsection>
             <subsection name="Unix/Linux Specific Settings" id="LinuxSettings">
                 <p>
                     Users deploying Synapse on Unix/Linux systems are further advised to set the

@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * <ul>
  *  <li>t1 - Receiving a new request (ServerHandler#requestReceived)</li>
- *  <li>t2 - Obtaining a connection to forward the request (Clienthandler#processConnection)</li>
+ *  <li>t2 - Obtaining a connection to forward the request (ClientHandler#processConnection)</li>
  *  <li>t3 - Reading the complete response from the backend server (ClientHandler#inputReady)</li>
  *  <li>t4 - Writing the complete response to the client (ServerHandler#outputReady)</li>
  * <ul>
@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class LatencyView implements LatencyViewMBean {
 
-    private static final String NHTTP_LATENCY_VIEW = "NhttpTransportLatency";
+    private static final String NHTTP_LATENCY_VIEW = "PassThroughTransportLatency";
 
     private static final int SMALL_DATA_COLLECTION_PERIOD = 5;
     private static final int LARGE_DATA_COLLECTION_PERIOD = 5 * 60;
@@ -124,7 +124,7 @@ public class LatencyView implements LatencyViewMBean {
      *
      * @param reqArrival The request arrival time
      * @param reqDeparture The request departure time (backend connection establishment)
-     * @param resArrival The resoponse arrival time
+     * @param resArrival The response arrival time
      * @param resDeparture The response departure time
      */
     public void notifyTimes(long reqArrival, long reqDeparture,

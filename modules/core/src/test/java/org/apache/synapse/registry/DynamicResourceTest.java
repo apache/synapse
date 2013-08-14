@@ -101,7 +101,7 @@ public class DynamicResourceTest extends TestCase {
         System.out.println("Testing advanced sequence caching...");
         synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
         System.out.println("Waiting for the cache to expire...");
-        Thread.sleep(8500L);
+        Thread.sleep(10000L);
         Mediator seq3 = synCtx.getSequence(KEY_DYNAMIC_SEQUENCE_1);
         assertNotNull(seq3);
         assertTrue(((SequenceMediator) seq3).isInitialized());
@@ -114,7 +114,7 @@ public class DynamicResourceTest extends TestCase {
         System.out.println("Testing sequence reloading...");
         registry.updateResource(KEY_DYNAMIC_SEQUENCE_1, TestUtils.createOMElement(DYNAMIC_SEQUENCE_2));
         System.out.println("Waiting for the cache to expire...");
-        Thread.sleep(8500L);
+        Thread.sleep(10000L);
         synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>", config);
         Mediator seq4 = synCtx.getSequence(KEY_DYNAMIC_SEQUENCE_1);
         assertNotNull(seq4);
@@ -158,7 +158,7 @@ public class DynamicResourceTest extends TestCase {
         System.out.println("Testing advanced endpoint caching...");
         synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
         System.out.println("Waiting for the cache to expire...");
-        Thread.sleep(8500L);
+        Thread.sleep(10000L);
         Endpoint ep3 = synCtx.getEndpoint(KEY_DYNAMIC_ENDPOINT_1);
         assertNotNull(ep3);
         assertEquals(1, registry.getHitCount());
@@ -168,7 +168,7 @@ public class DynamicResourceTest extends TestCase {
         System.out.println("Testing endpoint reloading...");
         registry.updateResource(KEY_DYNAMIC_ENDPOINT_1, TestUtils.createOMElement(DYNAMIC_ENDPOINT_2));
         System.out.println("Waiting for the cache to expire...");
-        Thread.sleep(8500L);
+        Thread.sleep(10000L);
         synCtx = TestUtils.createSynapseMessageContext("<empty/>", config);
         Endpoint ep4 = synCtx.getEndpoint(KEY_DYNAMIC_ENDPOINT_1);
         assertNotNull(ep4);

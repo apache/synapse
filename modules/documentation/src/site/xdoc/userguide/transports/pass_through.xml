@@ -1240,5 +1240,142 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                 <p><a href="#Contents">Back to top</a></p>
             </subsection>
         </section>
+        <section name="Monitoring with JMX" id="JMX">
+            <p>
+                Pass Through HTTP transport exposes several JMX MBeans, which can be used to obtain
+                crucial statistical information about how the transport performs. This includes the
+                number of inbound and outbound connections opened by the transport, the number of
+                HTTP messages mediated, distribution of the message sizes and the latency incurred
+                by Synapse when forwarding HTTP traffic. Following sections describe the available
+                JMX MBeans and the attributes present in each MBean.
+            </p>
+            <subsection name="ConnectionsView (org.apache.synapse.PassThroughConnections)" id="ConnectionsMBean">
+                <p>
+                    Typically, Synapse exposes four instances of this MBean, under the following
+                    identifiers.
+                </p>
+                <ul>
+                    <li>
+                        http-listener: Provides information regarding the connections established
+                        between the client applications and the Pass Through HTTP listener.
+                    </li>
+                    <li>
+                        http-sender: Provides information regarding the connections established
+                        between the Pass Through HTTP sender and the backend servers.
+                    </li>
+                    <li>
+                        https-listener: Provides information regarding the connections established
+                        between the client applications and the Pass Through HTTPS listener.
+                    </li>
+                    <li>
+                        https-sender: Provides information regarding the connections established
+                        between the Pass Through HTTPS sender and the backend servers.
+                    </li>
+                </ul>
+                <p>
+                    Each instance of the MBean consists of the following attributes.
+                </p>
+                <table>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>ActiveConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of currently active (open) connections
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastMinuteConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of connections created during last minute (updated every minute)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last5MinuteConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of connections created during last 5 minutes (updated every minute)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last15MinuteConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of connections created during last 15 minutes (updated every minute)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastHourConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of connections created during last hour (updated every 5 minutes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last8HourConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of connections created during last 8 hours (updated every 5 minutes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last24HourConnections</td>
+                        <td>int</td>
+                        <td>
+                            Number of connections created during last 24 hours (updated every 5 minutes)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>RequestSizeMap</td>
+                        <td>java.util.Map</td>
+                        <td>
+                            A map representing the size distribution of the request messages
+                            processed by the transport. Map keys are strings and the values are
+                            integers. Following keys are available by default.
+                            <ul>
+                                <li>&lt; 1 K</li>
+                                <li>&lt; 10 K</li>
+                                <li>&lt; 100 K</li>
+                                <li>&lt; 1 M</li>
+                                <li>&lt; 10 M</li>
+                                <li>&gt; 10 M</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ResponseSizeMap</td>
+                        <td>java.util.Map</td>
+                        <td>
+                            A map representing the size distribution of the response messages
+                            processed by the transport. Map keys are strings and the values are
+                            integers. Following keys are available by default.
+                            <ul>
+                                <li>&lt; 1 K</li>
+                                <li>&lt; 10 K</li>
+                                <li>&lt; 100 K</li>
+                                <li>&lt; 1 M</li>
+                                <li>&lt; 10 M</li>
+                                <li>&gt; 10 M</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>LastResetTime</td>
+                        <td>java.util.Date</td>
+                        <td>
+                            The MBean statistics can be reset manually via one of the operations
+                            provided in the MBean interface. This attribute keeps track of the date
+                            and time of the last reset event. If the MBean has never been reset,
+                            this attribute provides the time when the transport was started.
+                        </td>
+                    </tr>
+                </table>
+            </subsection>
+        </section>
     </body>
 </document>

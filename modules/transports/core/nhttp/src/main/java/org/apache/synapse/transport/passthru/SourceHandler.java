@@ -261,14 +261,14 @@ public class SourceHandler implements NHttpServerEventHandler {
 
         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {
             if (log.isDebugEnabled()) {
-                log.debug("Keep-Alive connection was closed at the remote end: " + conn);
+                log.debug("Keep-Alive connection was closed by the client: " + conn);
             }
         } else if (state == ProtocolState.REQUEST_BODY || state == ProtocolState.REQUEST_HEAD) {
             informReaderError(conn);
-            log.warn("Connection closed at the remote end while reading the request: " + conn);
+            log.warn("Connection closed by the client while reading the request: " + conn);
         } else if (state == ProtocolState.RESPONSE_BODY || state == ProtocolState.RESPONSE_HEAD) {
             informWriterError(conn);
-            log.warn("Connection closed at the remote end while writing the response: " + conn);
+            log.warn("Connection closed by the client end while writing the response: " + conn);
         } else if (state == ProtocolState.REQUEST_DONE) {
             log.warn("Connection closed by the client after request is read: " + conn);
         }
@@ -424,7 +424,7 @@ public class SourceHandler implements NHttpServerEventHandler {
             informWriterError(conn);
             log.warn("Connection closed while writing the response: " + conn);
         } else if (state == ProtocolState.REQUEST_DONE) {
-            log.warn("Connection closed by the client after request is read: " + conn);
+            log.warn("Connection closed after request is read: " + conn);
         }
 
         metrics.disconnected();

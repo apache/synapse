@@ -108,7 +108,10 @@ public class TargetContext {
     public void reset() {
         request = null;
         response = null;
-        state = ProtocolState.REQUEST_READY;
+        if (state != ProtocolState.CLOSED) {
+            // The connection is still not closed - Prepare to send more requests on this
+            state = ProtocolState.REQUEST_READY;
+        }
 
         if (writer != null) {
             ByteBuffer buffer = writer.getBuffer();

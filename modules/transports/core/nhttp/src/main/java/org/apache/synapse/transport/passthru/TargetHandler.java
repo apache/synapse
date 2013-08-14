@@ -241,9 +241,7 @@ public class TargetHandler implements NHttpClientEventHandler {
                                                                                       
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-
             informReaderError(conn);
-
             TargetContext.updateState(conn, ProtocolState.CLOSED);
             targetConfiguration.getConnections().shutdownConnection(conn);
         }
@@ -292,16 +290,12 @@ public class TargetHandler implements NHttpClientEventHandler {
 			}
         } catch (IOException e) {
             logIOException(conn, e);
-
             informReaderError(conn);
-
             TargetContext.updateState(conn, ProtocolState.CLOSED);
             targetConfiguration.getConnections().shutdownConnection(conn);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-
             informReaderError(conn);
-
             TargetContext.updateState(conn, ProtocolState.CLOSED);
             targetConfiguration.getConnections().shutdownConnection(conn);
         }
@@ -318,15 +312,15 @@ public class TargetHandler implements NHttpClientEventHandler {
             }
         } else if (state == ProtocolState.REQUEST_HEAD || state == ProtocolState.REQUEST_BODY) {
             informWriterError(conn);
-            log.warn("Connection closed by target host while sending the request");
+            log.warn("Connection closed while sending the request");
             sendFault = true;
         } else if (state == ProtocolState.RESPONSE_HEAD || state == ProtocolState.RESPONSE_BODY) {
             informReaderError(conn);
-            log.warn("Connection closed by target host while receiving the response");
+            log.warn("Connection closed while receiving the response");
             sendFault = false;
         } else if (state == ProtocolState.REQUEST_DONE) {
             informWriterError(conn);
-            log.warn("Connection closed by target host before receiving the request");
+            log.warn("Connection closed before receiving the request");
             sendFault = true;
         }
 
@@ -343,8 +337,10 @@ public class TargetHandler implements NHttpClientEventHandler {
 
         metrics.disconnected();
 
-        TargetContext.updateState(conn, ProtocolState.CLOSED);
-        targetConfiguration.getConnections().shutdownConnection(conn);
+        if (state != ProtocolState.CLOSED) {
+            TargetContext.updateState(conn, ProtocolState.CLOSED);
+            targetConfiguration.getConnections().shutdownConnection(conn);
+        }
     }
 
     public void exception(NHttpClientConnection conn, IOException e) {
@@ -450,7 +446,40 @@ public class TargetHandler implements NHttpClientEventHandler {
     }
 
     public void endOfInput(NHttpClientConnection conn) throws IOException {
-        closed(conn);
+        ProtocolState state = TargetContext.getState(conn);
+        boolean sendFault = false;
+
+        if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {
+            if (log.isDebugEnabled()) {
+                log.debug("Keep-Alive Connection closed by the target host");
+            }
+        } else if (state == ProtocolState.REQUEST_HEAD || state == ProtocolState.REQUEST_BODY) {
+            informWriterError(conn);
+            log.warn("Connection closed by the target host while sending the request");
+            sendFault = true;
+        } else if (state == ProtocolState.RESPONSE_HEAD || state == ProtocolState.RESPONSE_BODY) {
+            informReaderError(conn);
+            log.warn("Connection closed by the target host while receiving the response");
+            sendFault = false;
+        } else if (state == ProtocolState.REQUEST_DONE) {
+            informWriterError(conn);
+            log.warn("Connection closed by the target host before receiving the request");
+            sendFault = true;
+        }
+
+        if (sendFault) {
+            MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
+            if (requestMsgCtx != null) {
+                targetErrorHandler.handleError(requestMsgCtx,
+                        ErrorCodes.CONNECTION_CLOSED,
+                        "Error in Sender",
+                        null,
+                        state);
+            }
+        }
+
+        TargetContext.updateState(conn, ProtocolState.CLOSED);
+        targetConfiguration.getConnections().shutdownConnection(conn);
     }
 
     public void exception(NHttpClientConnection conn, Exception e) {

@@ -78,7 +78,11 @@ public class SourceContext {
     public void reset() {
         this.request = null;
         this.response = null;
-        this.state = ProtocolState.REQUEST_READY;
+        if (this.state != ProtocolState.CLOSED) {
+            // if the connection is not closed yet, prepare to receive a new request
+            // on it
+            this.state = ProtocolState.REQUEST_READY;
+        }
 
         if (writer != null) {
             ByteBuffer buffer = writer.getBuffer();

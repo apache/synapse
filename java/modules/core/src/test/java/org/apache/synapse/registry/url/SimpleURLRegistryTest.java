@@ -78,7 +78,7 @@ public class SimpleURLRegistryTest extends TestCase {
         Thread.sleep(5000);
         XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());
 
-        // the renewed cache should be valid for another 5 secs
+        // the renewed cache should be valid for another 3 secs
         // change the file now and change next cache duration
         writeToFile(TEXT_2);
         props.put("cachableDuration", "100");

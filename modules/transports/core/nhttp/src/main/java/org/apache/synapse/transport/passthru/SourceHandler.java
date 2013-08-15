@@ -193,11 +193,9 @@ public class SourceHandler implements NHttpServerEventHandler {
                 synchronized (conn.getContext()) {
                     // SimpleOutputBuffer is not thread safe
                     // Explicit synchronization required
-                    if (outBuf.hasData()) {
-                        int bytesWritten = outBuf.produceContent(encoder);
-                        if (metrics != null && bytesWritten > 0) {
-                            metrics.incrementBytesSent(bytesWritten);
-                        }
+                    int bytesWritten = outBuf.produceContent(encoder);
+                    if (metrics != null && bytesWritten > 0) {
+                        metrics.incrementBytesSent(bytesWritten);
                     }
 
                     conn.requestInput();

@@ -21,13 +21,13 @@ package org.apache.synapse.transport.passthru;
 
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,9 +55,6 @@ public class SourceResponse {
 
     /** Version of the response */
     private ProtocolVersion version = HttpVersion.HTTP_1_1;
-
-    /** Connection strategy */
-    private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
     private SourceRequest request = null;
 
@@ -157,23 +154,10 @@ public class SourceResponse {
         // Update connection state
         if (encoder.isCompleted()) {
             SourceContext.updateState(conn, ProtocolState.RESPONSE_DONE);
-
-            sourceConfiguration.getMetrics().
-                    notifySentMessageSize(conn.getMetrics().getSentBytesCount());
-
-            if (!this.connStrategy.keepAlive(response, conn.getContext())) {
-                SourceContext.updateState(conn, ProtocolState.CLOSING);
-                sourceConfiguration.getSourceConnections().closeConnection(conn);
-            } else if (SourceContext.get(conn).isShutDown()) {
-                // we need to shut down if the shutdown flag is set
-                SourceContext.updateState(conn, ProtocolState.CLOSING);
-                sourceConfiguration.getSourceConnections().closeConnection(conn);
-            } else {
-                // Reset connection state
-                sourceConfiguration.getSourceConnections().releaseConnection(conn);
-                // Ready to deal with a new request                
-                conn.requestInput();
-            }
+            sourceConfiguration.getMetrics().notifySentMessageSize(
+                    conn.getMetrics().getSentBytesCount());
+            PassThroughTransportUtils.finishUsingSourceConnection(response, conn,
+                    sourceConfiguration.getSourceConnections());
         }
         return bytes;
     }

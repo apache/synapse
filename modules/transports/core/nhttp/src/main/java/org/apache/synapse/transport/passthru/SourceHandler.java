@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.jmx.LatencyView;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
+import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.io.IOException;
 
@@ -202,7 +203,8 @@ public class SourceHandler implements NHttpServerEventHandler {
                     if (!outBuf.hasData() && encoder.isCompleted()) {
                         // We are done - At this point the entire response payload has been
                         // written out to the SimpleOutputBuffer
-                        sourceConfiguration.getSourceConnections().releaseConnection(conn);
+                        PassThroughTransportUtils.finishUsingSourceConnection(conn.getHttpResponse(),
+                                conn, sourceConfiguration.getSourceConnections());
                     }
                 }
                 return;

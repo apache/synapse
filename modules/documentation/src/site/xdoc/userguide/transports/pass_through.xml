@@ -707,7 +707,7 @@
                                     and updated with new values. Default value is 50.
                                 </li>
                                 <li>
-                                    CacheDurationMins: Set the time duration (in minutes) between
+                                    CacheDurationMins: Sets the time duration (in minutes) between
                                     two consecutive runs of the CacheManager task which periodically
                                     performs housekeeping work in each cache. Default value is 15.
                                 </li>
@@ -751,7 +751,7 @@
                     <tr>
                         <td>http.socket.timeout</td>
                         <td>
-                            Set the TCP socket timeout in milliseconds
+                            Sets the TCP socket timeout in milliseconds
                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
                             <div class="xmlConf">http.socket.timeout=20000</div>
                         </td>
@@ -761,7 +761,7 @@
                     <tr>
                         <td>http.connection.timeout</td>
                         <td>
-                            Set the TCP connection timeout in milliseconds. This determines the timeout
+                            Sets the TCP connection timeout in milliseconds. This determines the timeout
                             value for non-blocking connection requests. Setting this property to
                             0 disables connection timeout (i.e. no timeout).
                             <div class="xmlConf">http.connection.timeout=30000</div>
@@ -798,7 +798,7 @@
                     <tr>
                         <td>http.socket.buffer-size</td>
                         <td>
-                            Set the size of the I/O session buffers (in bytes) used by the transport
+                            Sets the size of the I/O session buffers (in bytes) used by the transport
                             for reading incoming data and writing outgoing data.
                             <div class="xmlConf">http.socket.buffer-size=4096</div>
                         </td>
@@ -808,7 +808,7 @@
                     <tr>
                         <td>http.socket.rcv-buffer-size</td>
                         <td>
-                            Set the size of the buffers (in bytes) used by the underlying platform
+                            Sets the size of the buffers (in bytes) used by the underlying platform
                             for incoming network I/O. This value is only a hint. When set, this is a
                             suggestion to the OS kernel from Synapse about the size of buffers to
                             use for the data to be received over the socket
@@ -821,7 +821,7 @@
                     <tr>
                         <td>http.socket.snd-buffer-size</td>
                         <td>
-                            Set the size of the buffers (in bytes) used by the underlying platform
+                            Sets the size of the buffers (in bytes) used by the underlying platform
                             for outgoing network I/O. This value is only a hint. When set, this is a
                             suggestion to the OS kernel from Synapse about the size of buffers to
                             use for the data to be sent over the socket
@@ -846,7 +846,7 @@
                     <tr>
                         <td>http.socket.reuseaddr</td>
                         <td>
-                            Set the <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
+                            Sets the <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
                             socket option for the sockets created by the HTTP transport. Accepted
                             values are either 'true' or 'false'.
                             <div class="xmlConf">http.socket.reuseaddr=true</div>
@@ -857,7 +857,7 @@
                     <tr>
                         <td>http.nio.select-interval</td>
                         <td>
-                            Set the time interval in milliseconds at which the I/O reactor wakes up
+                            Sets the time interval in milliseconds at which the I/O reactor wakes up
                             to check for timed out sessions and session requests.
                             <div class="xmlConf">http.nio.select-interval=2500</div>
                         </td>
@@ -867,7 +867,7 @@
                     <tr>
                         <td>io_threads_per_reactor <a name="io_threads_per_reactor"/></td>
                         <td>
-                            Set the number of I/O dispatcher threads to be used by each I/O reactor.
+                            Sets the number of I/O dispatcher threads to be used by each I/O reactor.
                             Typically, this property controls the ability of the HTTP transport
                             to handle concurrent I/O events.
                             It is recommended that this property is set to the number of CPU cores
@@ -920,7 +920,7 @@
                     <tr>
                         <td>io_buffer_size</td>
                         <td>
-                            Set the size of the I/O buffers (in bytes) used as the pipes between HTTP
+                            Sets the size of the I/O buffers (in bytes) used as the pipes between HTTP
                             listener and sender. Typically, the HTTP listener would write the incoming
                             message data to one of these buffers, and the sender would read from it to
                             send the message out.

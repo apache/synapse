@@ -104,7 +104,31 @@ public class TargetConnections {
     }
 
     /**
-     * This connection is no longer valid. So we need to shutdownConnection connection.
+     * This connection is no longer needed. So we need to close connection.
+     *
+     * @param conn connection to shutdownConnection
+     */
+    public void closeConnection(NHttpClientConnection conn) {
+        HostConnections pool = (HostConnections) conn.getContext().getAttribute(
+                PassThroughConstants.CONNECTION_POOL);
+
+        TargetContext.get(conn).reset();
+
+        if (pool != null) {
+            pool.forget(conn);
+        } else {
+            // we shouldn't get here
+            log.fatal("Connection without a pool. Something wrong. Need to fix.");
+        }
+
+        try {
+            conn.close();
+        } catch (IOException ignored) {
+        }
+    }
+
+    /**
+     * This connection is no longer valid. So we need to shutdown connection.
      *
      * @param conn connection to shutdownConnection
      */

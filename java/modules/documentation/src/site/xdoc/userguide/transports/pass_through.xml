@@ -834,7 +834,7 @@
                     <tr>
                         <td>http.socket.linger</td>
                         <td>
-                            Specify the linger-on-close timeout duration (in milliseconds) for the
+                            Specifies the linger-on-close timeout duration (in milliseconds) for the
                             sockets created by the HTTP transport. Setting to 0 or a negative value
                             disables linger-on-close
                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_LINGER">SO_LINGER</a>).
@@ -881,7 +881,7 @@
                     <tr>
                         <td>http.malformed.input.action</td>
                         <td>
-                            Specify the action to be performed when a malformed input is detected
+                            Specifies the action to be performed when a malformed input is detected
                             during character set encoding or decoding. Supported values are
                             'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
                             for more details on each of these options.
@@ -893,7 +893,7 @@
                     <tr>
                         <td>http.unmappable.input.action</td>
                         <td>
-                            Specify the action to be performed when an un-mappable character is detected
+                            Specifies the action to be performed when an un-mappable character is detected
                             during character set encoding or decoding. Supported values are
                             'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
                             for more details on each of these options.
@@ -930,24 +930,64 @@
                         <td>8192</td>
                     </tr>
                     <tr>
-                        <td>http.user.agent.preserve</td>
+                        <td>http.max.connection.per.target</td>
                         <td>
-                            Specify whether Synapse should preserve the User-Agent header sent by the
+                            Determines the maximum number of HTTP connections the transport is
+                            allowed to maintain per target HTTP host (i.e. host:port pair). Used to
+                            control the number of connections created by the Pass Through transport
+                            for each endpoint.
+                            <div class="xmlConf">http.max.connection.per.target=1000</div>
+                        </td>
+                        <td>No</td>
+                        <td><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Integer.html#MAX_VALUE">Integer.MAX_VALUE</a></td>
+                    </tr>
+                    <tr>
+                        <td>http.user.agent.value <a name="http.user.agent.value"/></td>
+                        <td>
+                            Specifies the string that should be used as the value of the HTTP User-Agent
+                            header for outgoing requests. If the request already has a User-Agent
+                            header (sent by the client), and the
+                            <a href="#http.user.agent.preserve">http.user.agent.preserve</a> property
+                            is set to true, this property will be ignored.
+                            <div class="xmlConf">http.user.agent.value=Finance-Data-Client</div>
+                        </td>
+                        <td>No</td>
+                        <td>Synapse-PT-HttpComponents-NIO</td>
+                    </tr>
+                    <tr>
+                        <td>http.server.value <a name="http.server.value"/></td>
+                        <td>
+                            Specifies the string that should be used as the value of the HTTP Server
+                            header for outgoing responses. If the response already has a Server
+                            header (sent by the backend server), and the
+                            <a href="#http.server.preserve">http.server.preserve</a> property
+                            is set to true, this property will be ignored.
+                            <div class="xmlConf">http.server.value=Media-Gateway-Server</div>
+                        </td>
+                        <td>No</td>
+                        <td>Synapse-PT-HttpComponents-NIO</td>
+                    </tr>
+                    <tr>
+                        <td>http.user.agent.preserve <a name="http.user.agent.preserve"/></td>
+                        <td>
+                            Specifies whether Synapse should preserve the User-Agent header sent by the
                             client applications, when forwarding messages to backend servers. Allowed
                             values are either true or false. If set to false, Synapse will overwrite
-                            the original User-Agent header value with the string 'Synapse-PT-HttpComponents-NIO'.
+                            the original User-Agent header value with the value of the
+                            <a href="#http.user.agent.value">http.user.agent.value</a> property.
                             <div class="xmlConf">http.user.agent.preserve=true</div>
                         </td>
                         <td>No</td>
                         <td>false</td>
                     </tr>
                     <tr>
-                        <td>http.server.preserve</td>
+                        <td>http.server.preserve <a name="http.server.preserve"/></td>
                         <td>
-                            Specify whether Synapse should preserve the Server header sent by the
+                            Specifies whether Synapse should preserve the Server header sent by the
                             backend servers, when forwarding messages to client applications. Allowed
                             values are either true or false. If set to false, Synapse will overwrite
-                            the original Server header value with the string 'Synapse-PT-HttpComponents-NIO'.
+                            the original Server header value with the value of the
+                            <a href="#http.server.value">http.server.value</a> property.
                             <div class="xmlConf">http.server.preserve=false</div>
                         </td>
                         <td>No</td>
@@ -974,7 +1014,7 @@
                     <tr>
                         <td>worker_pool_size_core <a name="worker_pool_size_core"/></td>
                         <td>
-                            Initial the size of the internal thread pool used by the Pass
+                            Initial size of the internal thread pool used by the Pass
                             Through HTTP transport. This is also the minimum size of the thread pool.
                             That is, the number of threads in the pool is not allowed to drop
                             below this limit.
@@ -1000,7 +1040,7 @@
                     <tr>
                         <td>worker_thread_keepalive_sec</td>
                         <td>
-                            Specify the idle time period (in seconds) for the excessive threads in
+                            Specifies the idle time period (in seconds) for the excessive threads in
                             the Pass Through transport thread pool. Once a thread in the pool has
                             been idle for this duration, it will be removed from the pool and
                             destroyed. This reduces the size of the thread pool, but the thread pool

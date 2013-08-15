@@ -45,7 +45,7 @@ public class TargetConfiguration extends BaseConfiguration {
                                WorkerPool pool) {
         super(configurationContext, parameters, pool);
         maxConnections = conf.getIntProperty(
-                PassThroughConfigPNames.MAX_CONNECTION_PER_HOST_PORT,
+                PassThroughConfigPNames.MAX_CONNECTION_PER_TARGET,
                 Integer.MAX_VALUE);
         preserveUserAgentHeader = conf.getBooleanProperty(
                 PassThroughConfigPNames.USER_AGENT_HEADER_PRESERVE, false);
@@ -55,11 +55,14 @@ public class TargetConfiguration extends BaseConfiguration {
 
     @Override
     protected HttpProcessor initHttpProcessor() {
+        String userAgent = conf.getStringProperty(
+                PassThroughConfigPNames.USER_AGENT_HEADER_VALUE,
+                "Synapse-PT-HttpComponents-NIO");
         return new ImmutableHttpProcessor(
                 new RequestContent(),
                 new RequestTargetHost(),
                 new RequestConnControl(),
-                new RequestUserAgent("Synapse-PT-HttpComponents-NIO"),
+                new RequestUserAgent(userAgent),
                 new RequestExpectContinue(false));
     }
 

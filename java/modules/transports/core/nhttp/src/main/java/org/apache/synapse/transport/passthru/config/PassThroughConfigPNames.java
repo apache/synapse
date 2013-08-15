@@ -71,7 +71,19 @@ public interface PassThroughConfigPNames {
     public String DISABLE_KEEPALIVE = "http.connection.disable.keepalive";
 
     /**
-     * Defines the maximum number of connections per host port
+     * Defines the maximum number of connections per target (host:port pair)
      */
-    public String MAX_CONNECTION_PER_HOST_PORT = "http.max.connection.per.host.port";
+    public String MAX_CONNECTION_PER_TARGET = "http.max.connection.per.target";
+
+    /**
+     * Determines the value of the User-Agent header sent by the transport, when sending
+     * requests to a backend endpoint.
+     */
+    public String USER_AGENT_HEADER_VALUE = "http.user.agent.value";
+
+    /**
+     * Determines the value of the Server header sent by the transport, when sending
+     * responses to a client.
+     */
+    public String SERVER_HEADER_VALUE = "http.server.value";
 }

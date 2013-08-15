@@ -122,9 +122,12 @@ public class SourceConfiguration extends BaseConfiguration {
 
     @Override
     protected HttpProcessor initHttpProcessor() {
+        String  server = conf.getStringProperty(
+                PassThroughConfigPNames.SERVER_HEADER_VALUE,
+                "Synapse-PT-HttpComponents-NIO");
         return new ImmutableHttpProcessor(
                 new ResponseDate(),
-                new ResponseServer("Synapse-PT-HttpComponents-NIO"),
+                new ResponseServer(server),
                 new ResponseContent(),
                 new ResponseConnControl());
     }

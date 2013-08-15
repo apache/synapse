@@ -24,11 +24,21 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.http.ConnectionReuseStrategy;
+import org.apache.http.HttpResponse;
+import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.nio.NHttpClientConnection;
+import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.apache.synapse.transport.passthru.ProtocolState;
+import org.apache.synapse.transport.passthru.SourceContext;
+import org.apache.synapse.transport.passthru.TargetContext;
+import org.apache.synapse.transport.passthru.connections.SourceConnections;
+import org.apache.synapse.transport.passthru.connections.TargetConnections;
 
 import java.net.InetAddress;
 import java.util.Map;
@@ -40,6 +50,8 @@ import java.util.Iterator;
 public class PassThroughTransportUtils {
 
     private static final Log log = LogFactory.getLog(PassThroughTransportUtils.class);
+
+    private static final ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
     /**
      * This method tries to determine the hostname of the given InetAddress without
@@ -210,6 +222,33 @@ public class PassThroughTransportUtils {
     public static boolean builderInvoked(MessageContext messageContext) {
         return Boolean.TRUE.equals(messageContext.getProperty(
                 PassThroughConstants.MESSAGE_BUILDER_INVOKED));
+    }
+
+    public static void finishUsingSourceConnection(HttpResponse response,
+                                                   NHttpServerConnection conn,
+                                                   SourceConnections connections) {
+        if (!connStrategy.keepAlive(response, conn.getContext()) ||
+                SourceContext.get(conn).isShutDown()) {
+            SourceContext.updateState(conn, ProtocolState.CLOSING);
+            connections.closeConnection(conn);
+        } else {
+            // Reset connection state
+            connections.releaseConnection(conn);
+            // Ready to deal with a new request
+            conn.requestInput();
+        }
+    }
+
+    public static void finishUsingTargetConnection(HttpResponse response,
+                                                   NHttpClientConnection conn,
+                                                   TargetConnections connections) {
+        if (!connStrategy.keepAlive(response, conn.getContext())) {
+            // this is a connection we should not re-use
+            TargetContext.updateState(conn, ProtocolState.CLOSING);
+            connections.closeConnection(conn);
+        } else {
+            connections.releaseConnection(conn);
+        }
     }
 
 }

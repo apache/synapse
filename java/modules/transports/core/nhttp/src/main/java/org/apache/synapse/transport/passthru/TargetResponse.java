@@ -21,10 +21,10 @@ package org.apache.synapse.transport.passthru;
 
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.NHttpClientConnection;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
+import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,10 +55,6 @@ public class TargetResponse {
 
     /** Protocol version */
     private ProtocolVersion version = HttpVersion.HTTP_1_1;
-
-    /** This utility class is used for determining weather we need to close the connection
-     * after submitting the response */
-    private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
 
     /** The connection */
     private NHttpClientConnection connection;
@@ -104,19 +100,9 @@ public class TargetResponse {
                 entity.setChunked(true);
             }
             response.setEntity(entity);
-        } else {            
-            if (!connStrategy.keepAlive(response, conn.getContext())) {
-                try {
-                    // this is a connection we should not re-use
-                    TargetContext.updateState(conn, ProtocolState.CLOSING);
-                    targetConfiguration.getConnections().shutdownConnection(conn);
-                                       
-                } catch (Exception ignore) {
-
-                }
-            } else {
-                targetConfiguration.getConnections().releaseConnection(conn);
-            }
+        } else {
+            PassThroughTransportUtils.finishUsingTargetConnection(response, conn,
+                    targetConfiguration.getConnections());
         }
     }
 
@@ -140,13 +126,8 @@ public class TargetResponse {
             TargetContext.updateState(conn, ProtocolState.RESPONSE_DONE);
             targetConfiguration.getMetrics().notifyReceivedMessageSize(
                     conn.getMetrics().getReceivedBytesCount());
-
-            if (!this.connStrategy.keepAlive(response, conn.getContext())) {
-                TargetContext.updateState(conn, ProtocolState.CLOSED);
-                targetConfiguration.getConnections().shutdownConnection(conn);
-            } else {
-                targetConfiguration.getConnections().releaseConnection(conn);
-            }
+            PassThroughTransportUtils.finishUsingTargetConnection(response, conn,
+                    targetConfiguration.getConnections());
         }
         return bytes;
     }

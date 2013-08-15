@@ -229,7 +229,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
     }
 
     /**
-     * Return the number of total connections opened during last 'n' munites
+     * Return the number of total connections opened during last 'n' minutes
      * of execution
      *
      * @param n Number of minutes in the execution history

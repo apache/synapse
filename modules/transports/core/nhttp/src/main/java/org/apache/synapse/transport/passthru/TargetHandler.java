@@ -102,7 +102,7 @@ public class TargetHandler implements NHttpClientEventHandler {
             TargetRequest request = TargetContext.getRequest(conn);
             if (request != null) {
                 request.start(conn);
-                targetConfiguration.getMetrics().incrementMessagesSent();
+                metrics.incrementMessagesSent();
             }
             conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
                     System.currentTimeMillis());
@@ -150,11 +150,11 @@ public class TargetHandler implements NHttpClientEventHandler {
                 int bytesWritten = request.write(conn, encoder);
                 metrics.incrementBytesSent(bytesWritten);
             }
+
         } catch (IOException ex) {
             logIOException(conn, ex);
             TargetContext.updateState(conn, ProtocolState.CLOSING);
             targetConfiguration.getConnections().shutdownConnection(conn);
-
             informWriterError(conn);
 
             MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
@@ -169,7 +169,6 @@ public class TargetHandler implements NHttpClientEventHandler {
             log.error("Error occurred while writing data to the target", e);
             TargetContext.updateState(conn, ProtocolState.CLOSED);
             targetConfiguration.getConnections().shutdownConnection(conn);
-
             informWriterError(conn);
 
             MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
@@ -209,10 +208,9 @@ public class TargetHandler implements NHttpClientEventHandler {
             if (targetRequest != null) {
                 method = targetRequest.getMethod();
             }
-            boolean canResponseHaveBody =
-                    isResponseHaveBodyExpected(method, response);
-            TargetResponse targetResponse = new TargetResponse(
-                    targetConfiguration, response, conn, canResponseHaveBody);
+            boolean canResponseHaveBody = isResponseHaveBodyExpected(method, response);
+            TargetResponse targetResponse = new TargetResponse(targetConfiguration, response,
+                    conn, canResponseHaveBody);
             TargetContext.setResponse(conn, targetResponse);
             targetResponse.start(conn);
 
@@ -225,17 +223,15 @@ public class TargetHandler implements NHttpClientEventHandler {
                     new ClientWorker(targetConfiguration.getConfigurationContext(),
                             requestMsgContext, targetResponse));
 
-            targetConfiguration.getMetrics().incrementMessagesReceived();
+            metrics.incrementMessagesReceived();
             
-			NHttpServerConnection sourceConn =
-			                                   (NHttpServerConnection) requestMsgContext.getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);
+			NHttpServerConnection sourceConn = (NHttpServerConnection) requestMsgContext.
+                    getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);
 			if (sourceConn != null) {
 				sourceConn.getContext().setAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME,
-				                                     conn.getContext()
-				                                         .getAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME));
+                        conn.getContext().getAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME));
 				sourceConn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
-				                                     conn.getContext()
-				                                         .getAttribute(PassThroughConstants.REQ_DEPARTURE_TIME));
+                        conn.getContext().getAttribute(PassThroughConstants.REQ_DEPARTURE_TIME));
 
 			}
                                                                                       
@@ -281,9 +277,7 @@ public class TargetHandler implements NHttpClientEventHandler {
             }
 
             TargetContext.updateState(conn, ProtocolState.RESPONSE_BODY);
-
             TargetResponse response = TargetContext.getResponse(conn);
-
 			if (response != null) {
 				int responseRead = response.read(conn, decoder);
 				metrics.incrementBytesReceived(responseRead);
@@ -303,7 +297,6 @@ public class TargetHandler implements NHttpClientEventHandler {
 
     public void closed(NHttpClientConnection conn) {
         ProtocolState state = TargetContext.getState(conn);
-        
         boolean sendFault = false;
 
         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {
@@ -345,9 +338,7 @@ public class TargetHandler implements NHttpClientEventHandler {
 
     public void exception(NHttpClientConnection conn, IOException e) {
         ProtocolState state = TargetContext.getState(conn);
-
         logIOException(conn, e);
-
         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
         if (requestMsgCtx != null) {
             targetErrorHandler.handleError(requestMsgCtx,
@@ -528,7 +519,6 @@ public class TargetHandler implements NHttpClientEventHandler {
     private String getErrorMessage(String message, NHttpClientConnection conn) {
         if (conn != null && conn instanceof DefaultNHttpClientConnection) {
             DefaultNHttpClientConnection c = ((DefaultNHttpClientConnection) conn);
-
             if (c.getRemoteAddress() != null) {
                 return message + " For : " + c.getRemoteAddress().getHostAddress() + ":" +
                         c.getRemotePort();
@@ -556,9 +546,7 @@ public class TargetHandler implements NHttpClientEventHandler {
 
     private void informReaderError(NHttpClientConnection conn) {
         Pipe reader = TargetContext.get(conn).getReader();
-
         metrics.incrementFaultsReceiving();
-
         if (reader != null) {
             reader.producerError();
         }
@@ -566,9 +554,7 @@ public class TargetHandler implements NHttpClientEventHandler {
 
     private void informWriterError(NHttpClientConnection conn) {
         Pipe writer = TargetContext.get(conn).getWriter();
-
         metrics.incrementFaultsReceiving();
-
         if (writer != null) {
             writer.consumerError();
         }

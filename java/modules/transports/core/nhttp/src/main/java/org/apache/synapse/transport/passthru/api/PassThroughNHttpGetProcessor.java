@@ -53,7 +53,6 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
-import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {

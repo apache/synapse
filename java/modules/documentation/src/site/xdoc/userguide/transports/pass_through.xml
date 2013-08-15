@@ -330,8 +330,8 @@
                     <tr>
                         <td>port</td>
                         <td>
-                            The port number on which the HTTP listener should listen.
-                            <div class="xmlConf">&lt;parameter name="port"&gt;8280&lt;/parameter&gt;</div>
+                            The port number on which the HTTPS listener should listen.
+                            <div class="xmlConf">&lt;parameter name="port"&gt;8243&lt;/parameter&gt;</div>
                         </td>
                         <td>Yes</td>
                         <td>N/A</td>
@@ -493,22 +493,22 @@
                     configuration in the axis2.xml file is shown below.
                 </p>
                 <div class="xmlConf">&lt;transportSender name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLSender"&gt;
-        &lt;parameter name="keystore" locked="false"&gt;
-            &lt;KeyStore&gt;
-                &lt;Location&gt;lib/identity.jks&lt;/Location&gt;
-                &lt;Type&gt;JKS&lt;/Type&gt;
-                &lt;Password&gt;password&lt;/Password&gt;
-                &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
-            &lt;/KeyStore&gt;
-        &lt;/parameter&gt;
-        &lt;parameter name="truststore" locked="false"&gt;
-            &lt;TrustStore&gt;
-                &lt;Location&gt;lib/trust.jks&lt;/Location&gt;
-                &lt;Type&gt;JKS&lt;/Type&gt;
-                &lt;Password&gt;password&lt;/Password&gt;
-            &lt;/TrustStore&gt;
-        &lt;/parameter&gt;
-    &lt;/transportSender&gt;</div>
+    &lt;parameter name="keystore" locked="false"&gt;
+        &lt;KeyStore&gt;
+            &lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+            &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+        &lt;/KeyStore&gt;
+    &lt;/parameter&gt;
+    &lt;parameter name="truststore" locked="false"&gt;
+        &lt;TrustStore&gt;
+            &lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+        &lt;/TrustStore&gt;
+    &lt;/parameter&gt;
+&lt;/transportSender&gt;</div>
                 <p>
                     Following table lists all the parameters supported by the Pass Through HTTPS
                     sender.
@@ -657,34 +657,34 @@
                             Synapse will use the default SSL configuration, configured under keystore
                             and truststore parameters.
                             <div class="xmlConf">&lt;parameter name="customSSLProfiles"&gt;
-&lt;profile&gt;
-    &lt;servers&gt;server1.example.com:443,server2.example.com:443&lt;/servers&gt;
-    &lt;KeyStore&gt;
-        &lt;Location&gt;lib/identity1.jks&lt;/Location&gt;
-        &lt;Type&gt;JKS&lt;/Type&gt;
-        &lt;Password&gt;password&lt;/Password&gt;
-        &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
-    &lt;/KeyStore&gt;
-    &lt;TrustStore&gt;
-        &lt;Location&gt;lib/trust1.jks&lt;/Location&gt;
-        &lt;Type&gt;JKS&lt;/Type&gt;
-        &lt;Password&gt;password&lt;/Password&gt;
-    &lt;/TrustStore&gt;
-&lt;/profile&gt;
-&lt;profile&gt;
-    &lt;servers&gt;server3.example.com:443&lt;/servers&gt;
-    &lt;KeyStore&gt;
-        &lt;Location&gt;lib/identity2.jks&lt;/Location&gt;
-        &lt;Type&gt;JKS&lt;/Type&gt;
-        &lt;Password&gt;password&lt;/Password&gt;
-        &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
-    &lt;/KeyStore&gt;
-    &lt;TrustStore&gt;
-        &lt;Location&gt;lib/trust2.jks&lt;/Location&gt;
-        &lt;Type&gt;JKS&lt;/Type&gt;
-        &lt;Password&gt;password&lt;/Password&gt;
-    &lt;/TrustStore&gt;
-&lt;/profile&gt;
+    &lt;profile&gt;
+        &lt;servers&gt;server1.example.com:443,server2.example.com:443&lt;/servers&gt;
+        &lt;KeyStore&gt;
+            &lt;Location&gt;lib/identity1.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+            &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+        &lt;/KeyStore&gt;
+        &lt;TrustStore&gt;
+            &lt;Location&gt;lib/trust1.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+        &lt;/TrustStore&gt;
+    &lt;/profile&gt;
+    &lt;profile&gt;
+        &lt;servers&gt;server3.example.com:443&lt;/servers&gt;
+        &lt;KeyStore&gt;
+            &lt;Location&gt;lib/identity2.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+            &lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+        &lt;/KeyStore&gt;
+        &lt;TrustStore&gt;
+            &lt;Location&gt;lib/trust2.jks&lt;/Location&gt;
+            &lt;Type&gt;JKS&lt;/Type&gt;
+            &lt;Password&gt;password&lt;/Password&gt;
+        &lt;/TrustStore&gt;
+    &lt;/profile&gt;
 &lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>

@@ -1023,10 +1023,12 @@
                     <tr>
                         <td>snd_t_core <a name="snd_t_core"/></td>
                         <td>
-                            Initial size of the thread pool used by the NHTTP transport for processing
-                            request messages. This is also the minimum size of the thread pool.
-                            That is, the number of threads in the pool is not allowed to drop
-                            below this limit.
+                            Set the core size of the thread pool used by the NHTTP
+                            transport. The thread pool starts with 0 threads, and grows in size as
+                            new tasks are submitted to it. Once the number of threads reaches or
+                            exceeds the core size, the thread pool will not allow the thread count
+                            to go below the core size. That is, the thread pool keeps the core amount
+                            of threads in the pool even if they are idle.
                             <div class="xmlConf">snd_t_core=100</div>
                         </td>
                         <td>No</td>
@@ -1049,12 +1051,11 @@
                     <tr>
                         <td>snd_alive_sec</td>
                         <td>
-                            Specifies the idle time period (in seconds) for the excessive threads in
-                            the NHTTP transport thread pool. Once a thread in the pool has
-                            been idle for this duration, it will be removed from the pool and
-                            destroyed. This reduces the size of the thread pool, but the thread pool
-                            size is not allowed to drop below the value of the
-                            <a href="#snd_t_core">snd_t_core</a> property.
+                            Specifies the idle time period (in seconds) for the excess threads in
+                            the NHTTP transport thread pool. When the number of threads in the
+                            pool is greater than <a href="#snd_t_core">snd_t_core</a>,
+                            this is the maximum time that excess idle threads will wait for new tasks
+                            before terminating.
                             <div class="xmlConf">snd_alive_sec=10</div>
                         </td>
                         <td>No</td>
@@ -1087,10 +1088,12 @@
                     <tr>
                         <td>lst_t_core <a name="lst_t_core"/></td>
                         <td>
-                            Initial size of the thread pool used by the NHTTP transport for processing
-                            response messages. This is also the minimum size of the thread pool.
-                            That is, the number of threads in the pool is not allowed to drop
-                            below this limit.
+                            Set the core size of the thread pool used by the NHTTP
+                            transport. The thread pool starts with 0 threads, and grows in size as
+                            new tasks are submitted to it. Once the number of threads reaches or
+                            exceeds the core size, the thread pool will not allow the thread count
+                            to go below the core size. That is, the thread pool keeps the core amount
+                            of threads in the pool even if they are idle.
                             <div class="xmlConf">lst_t_core=100</div>
                         </td>
                         <td>No</td>
@@ -1113,12 +1116,11 @@
                     <tr>
                         <td>lst_alive_sec</td>
                         <td>
-                            Specifies the idle time period (in seconds) for the excessive threads in
-                            the NHTTP transport thread pool. Once a thread in the pool has
-                            been idle for this duration, it will be removed from the pool and
-                            destroyed. This reduces the size of the thread pool, but the thread pool
-                            size is not allowed to drop below the value of the
-                            <a href="#lst_t_core">lst_t_core</a> property.
+                            Specifies the idle time period (in seconds) for the excess threads in
+                            the NHTTP transport thread pool. When the number of threads in the
+                            pool is greater than <a href="#lst_t_core">lst_t_core</a>,
+                            this is the maximum time that excess idle threads will wait for new tasks
+                            before terminating.
                             <div class="xmlConf">lst_alive_sec=10</div>
                         </td>
                         <td>No</td>

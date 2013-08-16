@@ -1014,10 +1014,12 @@
                     <tr>
                         <td>worker_pool_size_core <a name="worker_pool_size_core"/></td>
                         <td>
-                            Initial size of the internal thread pool used by the Pass
-                            Through HTTP transport. This is also the minimum size of the thread pool.
-                            That is, the number of threads in the pool is not allowed to drop
-                            below this limit.
+                            Set the core size of the thread pool used by the Pass Through HTTP
+                            transport. The thread pool starts with 0 threads, and grows in size as
+                            new tasks are submitted to it. Once the number of threads reaches or
+                            exceeds the core size, the thread pool will not allow the thread count
+                            to go below the core size. That is, the thread pool keeps the core amount
+                            of threads in the pool even if they are idle.
                             <div class="xmlConf">worker_pool_size_core=100</div>
                         </td>
                         <td>No</td>
@@ -1027,7 +1029,7 @@
                         <td>worker_pool_size_max <a name="worker_pool_size_max"/></td>
                         <td>
                             The thread pool used by the Pass Through HTTP transport grows in size, as
-                            more and more jobs are submitted to it. This property determines the
+                            more and more tasks are submitted to it. This property determines the
                             maximum limit up to which the thread pool may grow. In other words,
                             this property specifies the maximum number of threads that may ever exist
                             in the transport thread pool. Value of this property must be greater than
@@ -1040,12 +1042,11 @@
                     <tr>
                         <td>worker_thread_keepalive_sec</td>
                         <td>
-                            Specifies the idle time period (in seconds) for the excessive threads in
-                            the Pass Through transport thread pool. Once a thread in the pool has
-                            been idle for this duration, it will be removed from the pool and
-                            destroyed. This reduces the size of the thread pool, but the thread pool
-                            size is not allowed to drop below the value of the
-                            <a href="#worker_pool_size_core">worker_pool_size_core</a> property.
+                            Specifies the idle time period (in seconds) for the excess threads in
+                            the Pass Through transport thread pool. When the number of threads in the
+                            pool is greater than <a href="#worker_pool_size_core">worker_pool_size_core</a>,
+                            this is the maximum time that excess idle threads will wait for new tasks
+                            before terminating.
                             <div class="xmlConf">worker_thread_keepalive_sec=10</div>
                         </td>
                         <td>No</td>
@@ -1058,7 +1059,9 @@
                             thread pool to store pending jobs. To use an unbounded queue, set this
                             property to -1. If a bounded queue is used, and if the queue ever gets
                             filled to its capacity, any further attempts to submit jobs will fail,
-                            causing some messages to be dropped by Synapse.
+                            causing some messages to be dropped by Synapse. The thread pool starts
+                            queueing jobs, when all the existing threads are busy and the pool has
+                            already reached the maximum number of threads.
                             <div class="xmlConf">worker_pool_queue_length=1000</div>
                         </td>
                         <td>No</td>

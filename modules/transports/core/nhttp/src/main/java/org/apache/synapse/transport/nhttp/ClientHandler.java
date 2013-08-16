@@ -1111,7 +1111,7 @@ public class ClientHandler implements NHttpClientEventHandler {
         return new ImmutableHttpProcessor(new RequestContent(),
                 new RequestTargetHost(),
                 new RequestConnControl(),
-                new RequestUserAgent(),
+                new RequestUserAgent("Synapse-HttpComponents-NIO"),
                 new RequestExpectContinue(false));
     }
 

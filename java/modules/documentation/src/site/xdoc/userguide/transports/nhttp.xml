@@ -46,6 +46,9 @@
                         <li><a href="#ThreadPoolSettings">Thread Pool Settings</a></li>
                     </ul>
                 </li>
+                <li>
+                    <a href="#Logging">Logging Configuration</a>
+                </li>
             </ul>
         </section>
         <section name="Introduction" id="Introduction">
@@ -1001,19 +1004,14 @@
             </subsection>
             <subsection name="Thread Pool Settings" id="ThreadPoolSettings">
                 <p>
-                    The NHTTP transport listener and sender use two separate thread pools for
-                    mediating requests and responses through the Synapse mediation engine (there are
-                    separate thread pools for HTTP and HTTPS transports thus adding up to a total of
-                    4 thread pools). The sizes of these thread pools determine the capacity of
-                    Synapse to mediate concurrent HTTP messages. Use the following properties to
-                    fine tune these thread pools.
+                    The NHTTP transport uses two separate thread pools for mediating HTTP requests
+                    and responses through the Synapse mediation engine. The size of these thread
+                    pools determine the capacity of Synapse to handle concurrent HTTP traffic. Use
+                    the following properties to fine tune these thread pools according to your
+                    expected workload.
                 </p>
                 <p>
-                    <strong>
-                        Note: Properties prefixed with 'snd' apply to the thread pools used to
-                        process request messages, and the properties prefixed with 'lst' apply to
-                        the thread pools used to process response messages.
-                    </strong>
+                    <strong>HTTP Request Thread Pool</strong>
                 </p>
                 <table>
                     <tr>
@@ -1075,6 +1073,17 @@
                         <td>No</td>
                         <td>-1</td>
                     </tr>
+                </table>
+                <p>
+                    <strong>HTTP Response Thread Pool</strong>
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
                     <tr>
                         <td>lst_t_core <a name="lst_t_core"/></td>
                         <td>
@@ -1131,6 +1140,15 @@
                 </table>
                 <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
+        </section>
+        <section name="Logging Configuration" id="Logging">
+            <p>
+                The NHTTP and Pass Through transports share the same logging framework. Therefore
+                both transports support the same exact logging features and configuration options.
+                Please refer the <a href="pass_through.html#Logging">Pass Through transport logging
+                configuration</a> to learn more about the available features and how to enable them.
+            </p>
+            <p><a href="#Contents">[Back to top]</a></p>
         </section>
     </body>
 </document>

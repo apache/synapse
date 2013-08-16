@@ -1044,8 +1044,8 @@
                             the Pass Through transport thread pool. Once a thread in the pool has
                             been idle for this duration, it will be removed from the pool and
                             destroyed. This reduces the size of the thread pool, but the thread pool
-                            size is not to allowed drop below the value of the worker_pool_size_core
-                            property.
+                            size is not allowed to drop below the value of the
+                            <a href="#worker_pool_size_core">worker_pool_size_core</a> property.
                             <div class="xmlConf">worker_thread_keepalive_sec=10</div>
                         </td>
                         <td>No</td>

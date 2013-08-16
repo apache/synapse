@@ -182,7 +182,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         final IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslSetupHandler, getConnectionConfig(), transportOut);
 
-        // start the Sender in a new seperate thread
+        // start the Sender in a new separate thread
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {

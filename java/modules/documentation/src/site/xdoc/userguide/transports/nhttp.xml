@@ -38,6 +38,14 @@
                         <li><a href="#HTTPSSender">HTTPS Transport Sender</a></li>
                     </ul>
                 </li>
+                <li>
+                    <a href="#AdvancedSettings">Advanced Settings and Performance Tuning</a>
+                    <ul>
+                        <li><a href="#HttpCoreSettings">Apache HTTP Core Settings</a></li>
+                        <li><a href="#SynapseSettings">Synapse HTTP Mediation Settings</a></li>
+                        <li><a href="#ThreadPoolSettings">Thread Pool Settings</a></li>
+                    </ul>
+                </li>
             </ul>
         </section>
         <section name="Introduction" id="Introduction">
@@ -725,6 +733,400 @@
                         </td>
                         <td>No</td>
                         <td>N/A</td>
+                    </tr>
+                </table>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+        </section>
+        <section name="Advanced Settings and Performance Tuning" id="AdvancedSettings">
+            <p>
+                In addition to the basic parameters described in the previous section, the
+                NHTTP transport provides some advanced options to tweak its
+                runtime behavior and performance. These options should be configured in the
+                <strong>SYNAPSE_HOME/lib/nhttp.properties</strong> file.
+            </p>
+            <subsection name="Apache HTTP Core Settings" id="HttpCoreSettings">
+                <p>
+                    Following properties control various facets of
+                    <a href="http://hc.apache.org/httpcomponents-core-ga/index.html">Apache HTTP Core</a>,
+                    the framework underlying the NHTTP transport.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>http.socket.timeout</td>
+                        <td>
+                            Sets the TCP socket timeout in milliseconds
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
+                            <div class="xmlConf">http.socket.timeout=20000</div>
+                        </td>
+                        <td>No</td>
+                        <td>60000</td>
+                    </tr>
+                    <tr>
+                        <td>http.connection.timeout</td>
+                        <td>
+                            Sets the TCP connection timeout in milliseconds. This determines the timeout
+                            value for non-blocking connection requests. Setting this property to
+                            0 disables connection timeout (i.e. no timeout).
+                            <div class="xmlConf">http.connection.timeout=30000</div>
+                        </td>
+                        <td>No</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>http.nio.interest-ops-queueing</td>
+                        <td>
+                            Determines whether or not I/O interest operations are to be queued and
+                            executed asynchronously by the I/O reactor thread or to be applied to
+                            the underlying
+                            <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/channels/SelectionKey.html">SelectionKey</a>
+                            immediately. Allowed values are either 'true' or 'false'.
+                            <div class="xmlConf">http.nio.interest-ops-queueing=false</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.tcp.nodelay</td>
+                        <td>
+                            Setting this property to 'true' disables
+                            <a href="http://en.wikipedia.org/wiki/Nagle's_algorithm">Nagle's algorithm</a>
+                            for the HTTP connections. That is, outgoing data will not be buffered
+                            and aggregated together
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#TCP_NODELAY">TCP_NODELAY</a>).
+                            <div class="xmlConf">http.tcp.nodelay=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.buffer-size</td>
+                        <td>
+                            Sets the size of the I/O session buffers (in bytes) used by the transport
+                            for reading incoming data and writing outgoing data.
+                            <div class="xmlConf">http.socket.buffer-size=4096</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.rcv-buffer-size</td>
+                        <td>
+                            Sets the size of the buffers (in bytes) used by the underlying platform
+                            for incoming network I/O. This value is only a hint. When set, this is a
+                            suggestion to the OS kernel from Synapse about the size of buffers to
+                            use for the data to be received over the socket
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
+                            <div class="xmlConf">http.socket.rcv-buffer-size=4096</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.snd-buffer-size</td>
+                        <td>
+                            Sets the size of the buffers (in bytes) used by the underlying platform
+                            for outgoing network I/O. This value is only a hint. When set, this is a
+                            suggestion to the OS kernel from Synapse about the size of buffers to
+                            use for the data to be sent over the socket
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
+                            <div class="xmlConf">http.socket.snd-buffer-size=4096</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.linger</td>
+                        <td>
+                            Specifies the linger-on-close timeout duration (in milliseconds) for the
+                            sockets created by the HTTP transport. Setting to 0 or a negative value
+                            disables linger-on-close
+                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_LINGER">SO_LINGER</a>).
+                            <div class="xmlConf">http.socket.linger=5000</div>
+                        </td>
+                        <td>No</td>
+                        <td>-1</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.reuseaddr</td>
+                        <td>
+                            Sets the <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
+                            socket option for the sockets created by the HTTP transport. Accepted
+                            values are either 'true' or 'false'.
+                            <div class="xmlConf">http.socket.reuseaddr=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.nio.select-interval</td>
+                        <td>
+                            Sets the time interval in milliseconds at which the I/O reactor wakes up
+                            to check for timed out sessions and session requests.
+                            <div class="xmlConf">http.nio.select-interval=2500</div>
+                        </td>
+                        <td>No</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>io_threads_per_reactor <a name="io_threads_per_reactor"/></td>
+                        <td>
+                            Sets the number of I/O dispatcher threads to be used by each I/O reactor.
+                            Typically, this property controls the ability of the HTTP transport
+                            to handle concurrent I/O events.
+                            It is recommended that this property is set to the number of CPU cores
+                            available for Synapse. By default, Synapse determines the number of
+                            available CPU cores and initializes this setting accordingly.
+                            <div class="xmlConf">io_threads_per_reactor=4</div>
+                        </td>
+                        <td>No</td>
+                        <td>Number of CPU cores</td>
+                    </tr>
+                    <tr>
+                        <td>http.malformed.input.action</td>
+                        <td>
+                            Specifies the action to be performed when a malformed input is detected
+                            during character set encoding or decoding. Supported values are
+                            'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
+                            for more details on each of these options.
+                            <div class="xmlConf">http.malformed.input.action=ignore</div>
+                        </td>
+                        <td>No</td>
+                        <td>report</td>
+                    </tr>
+                    <tr>
+                        <td>http.unmappable.input.action</td>
+                        <td>
+                            Specifies the action to be performed when an un-mappable character is detected
+                            during character set encoding or decoding. Supported values are
+                            'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
+                            for more details on each of these options.
+                            <div class="xmlConf">http.malformed.input.action=ignore</div>
+                        </td>
+                        <td>No</td>
+                        <td>report</td>
+                    </tr>
+                </table>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+            <subsection name="Synapse HTTP Mediation Settings" id="SynapseSettings">
+                <p>
+                    Following settings determine the behavior of Synapse with respect to mediating
+                    HTTP traffic.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>nhttp_buffer_size</td>
+                        <td>
+                            Sets the size of the I/O buffers (in bytes) used to receive incoming
+                            message data and write outgoing message data.
+                            <div class="xmlConf">io_buffer_size=10240</div>
+                        </td>
+                        <td>No</td>
+                        <td>8192</td>
+                    </tr>
+                    <tr>
+                        <td>http.user.agent.preserve <a name="http.user.agent.preserve"/></td>
+                        <td>
+                            Specifies whether Synapse should preserve the User-Agent header sent by the
+                            client applications, when forwarding messages to backend servers. Allowed
+                            values are either true or false. If set to false, Synapse will overwrite
+                            the original User-Agent header value with the string 'Synapse-HttpComponents-NIO'.
+                            <a href="#http.user.agent.value">http.user.agent.value</a> property.
+                            <div class="xmlConf">http.user.agent.preserve=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.server.preserve <a name="http.server.preserve"/></td>
+                        <td>
+                            Specifies whether Synapse should preserve the Server header sent by the
+                            backend servers, when forwarding messages to client applications. Allowed
+                            values are either true or false. If set to false, Synapse will overwrite
+                            the original Server header value with the string 'Synapse-HttpComponents-NIO'.
+                            <div class="xmlConf">http.server.preserve=false</div>
+                        </td>
+                        <td>No</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>nhttp_disabled_methods</td>
+                        <td>
+                            A comma separated list of HTTP methods that should be disabled. That is,
+                            HTTP methods in this list will not be handled by the transport listeners.
+                            Any attempt to invoke a disabled HTTP method will trigger an exception.
+                            <div class="xmlConf">nhttp_disabled_methods=PUT,DELETE</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>http.connection.disable.keepalive</td>
+                        <td>
+                            Determines whether the transport sender should use keep-alive for
+                            outbound HTTP connections. If set to true, Synapse will send outgoing
+                            requests with the 'Connection: close' header, indicating that connection
+                            should not be kept alive after the HTTP interaction is complete.
+                            <div class="xmlConf">http.connection.disable.keepalive=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>http.count.connections</td>
+                        <td>
+                            Determines whether Synapse should keep track of the HTTP connections
+                            established with target hosts. This information can be later accessed
+                            via JMX (ConnectionsView).
+                            <div class="xmlConf">http.count.connections=true</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                </table>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+            <subsection name="Thread Pool Settings" id="ThreadPoolSettings">
+                <p>
+                    The NHTTP transport listener and sender use two separate thread pools for
+                    mediating requests and responses through the Synapse mediation engine (there are
+                    separate thread pools for HTTP and HTTPS transports thus adding up to a total of
+                    4 thread pools). The sizes of these thread pools determine the capacity of
+                    Synapse to mediate concurrent HTTP messages. Use the following properties to
+                    fine tune these thread pools.
+                </p>
+                <p>
+                    <strong>
+                        Note: Properties prefixed with 'snd' apply to the thread pools used to
+                        process request messages, and the properties prefixed with 'lst' apply to
+                        the thread pools used to process response messages.
+                    </strong>
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>snd_t_core <a name="snd_t_core"/></td>
+                        <td>
+                            Initial size of the thread pool used by the NHTTP transport for processing
+                            request messages. This is also the minimum size of the thread pool.
+                            That is, the number of threads in the pool is not allowed to drop
+                            below this limit.
+                            <div class="xmlConf">snd_t_core=100</div>
+                        </td>
+                        <td>No</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>snd_t_max</td>
+                        <td>
+                            The thread pools used by the NHTTP transport grow in size, as
+                            more and more jobs are submitted to them. This property determines the
+                            maximum limit up to which the thread pool may grow. In other words,
+                            this property specifies the maximum number of threads that may ever exist
+                            in the transport thread pool. Value of this property must be greater than
+                            or equal to the value of <a href="#snd_t_core">snd_t_core</a>.
+                            <div class="xmlConf">snd_t_core=500</div>
+                        </td>
+                        <td>No</td>
+                        <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>snd_alive_sec</td>
+                        <td>
+                            Specifies the idle time period (in seconds) for the excessive threads in
+                            the NHTTP transport thread pool. Once a thread in the pool has
+                            been idle for this duration, it will be removed from the pool and
+                            destroyed. This reduces the size of the thread pool, but the thread pool
+                            size is not allowed to drop below the value of the
+                            <a href="#snd_t_core">snd_t_core</a> property.
+                            <div class="xmlConf">snd_alive_sec=10</div>
+                        </td>
+                        <td>No</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>snd_qlen</td>
+                        <td>
+                            Determines the length of the queue used by the NHTTP transport
+                            thread pool to store pending jobs. To use an unbounded queue, set this
+                            property to -1. If a bounded queue is used, and if the queue ever gets
+                            filled to its capacity, any further attempts to submit jobs will fail,
+                            causing some messages to be dropped by Synapse.
+                            <div class="xmlConf">snd_qlen=1000</div>
+                        </td>
+                        <td>No</td>
+                        <td>-1</td>
+                    </tr>
+                    <tr>
+                        <td>lst_t_core <a name="lst_t_core"/></td>
+                        <td>
+                            Initial size of the thread pool used by the NHTTP transport for processing
+                            response messages. This is also the minimum size of the thread pool.
+                            That is, the number of threads in the pool is not allowed to drop
+                            below this limit.
+                            <div class="xmlConf">lst_t_core=100</div>
+                        </td>
+                        <td>No</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>lst_t_max</td>
+                        <td>
+                            The thread pools used by the NHTTP transport grow in size, as
+                            more and more jobs are submitted to them. This property determines the
+                            maximum limit up to which the thread pool may grow. In other words,
+                            this property specifies the maximum number of threads that may ever exist
+                            in the transport thread pool. Value of this property must be greater than
+                            or equal to the value of <a href="#lst_t_core">lst_t_core</a>.
+                            <div class="xmlConf">lst_t_core=500</div>
+                        </td>
+                        <td>No</td>
+                        <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>lst_alive_sec</td>
+                        <td>
+                            Specifies the idle time period (in seconds) for the excessive threads in
+                            the NHTTP transport thread pool. Once a thread in the pool has
+                            been idle for this duration, it will be removed from the pool and
+                            destroyed. This reduces the size of the thread pool, but the thread pool
+                            size is not allowed to drop below the value of the
+                            <a href="#lst_t_core">lst_t_core</a> property.
+                            <div class="xmlConf">lst_alive_sec=10</div>
+                        </td>
+                        <td>No</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>lst_qlen</td>
+                        <td>
+                            Determines the length of the queue used by the NHTTP transport
+                            thread pool to store pending jobs. To use an unbounded queue, set this
+                            property to -1. If a bounded queue is used, and if the queue ever gets
+                            filled to its capacity, any further attempts to submit jobs will fail,
+                            causing some messages to be dropped by Synapse.
+                            <div class="xmlConf">lst_qlen=1000</div>
+                        </td>
+                        <td>No</td>
+                        <td>-1</td>
                     </tr>
                 </table>
                 <p><a href="#Contents">[Back to top]</a></p>

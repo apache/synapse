@@ -33,7 +33,14 @@
                     <a href="#Configuration">Transport Configuration</a>
                     <ul>
                         <li><a href="#Listener">File Transport Listener (VFS Listener)</a></li>
+                        <li><a href="#Sender">File Transport Sender (VFS Sender)</a></li>
                     </ul>
+                </li>
+                <li>
+                    <a href="#SFTP">Using SFTP</a>
+                </li>
+                <li>
+                    <a href="#Issues">Known Issues</a>
                 </li>
             </ul>
         </section>
@@ -293,6 +300,123 @@
                 </table>
                 <p><a href="#Contents">[Back to top]</a></p>
             </subsection>
+            <subsection name="File Transport Sender (VFS Sender)" id="Sender">
+                <p>
+                    The file transport sender allows writing outgoing messages to local or remote
+                    files. To activate the file transport sender, simply uncomment the following
+                    transport sender configuration in the <strong>SYNAPSE_HOME/repository/conf/axis2.xml</strong>
+                    file.
+                </p>
+                <div class="xmlConf">&lt;transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender"/&gt;</div>
+                <p>
+                    To send a message using the file transport, define a Synapse endpoint with an
+                    address that starts with the prefix 'vfs:'. The rest of the address should be a
+                    valid local or remote file URI. An example is shown below:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    Some more example file URIs are listed below. Remember to prefix each
+                    URI with the string 'vfs:' when using these to define Synapse endpoints.
+                    Refer <a class="externalLink" href="http://commons.apache.org/vfs/filesystems.html">http://commons.apache.org/vfs/filesystems.html</a>
+                    for a complete list of Commons VFS supported protocols and their corresponding
+                    URI formats.
+                </p>
+                <ul>
+                    <li>
+                        <tt>file:///directory/filename.ext</tt>
+                    </li>
+                    <li>
+                        <tt>file:////somehost/someshare/afile.txt</tt>
+                    </li>
+                    <li>
+                        <tt>jar:../lib/classes.jar!/META-INF/manifest.mf</tt>
+                    </li>
+                    <li>
+                        <tt>jar:zip:outer.zip!/nested.jar!/somedir</tt>
+                    </li>
+                    <li>
+                        <tt>ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz</tt>
+                    </li>
+                </ul>
+                <p>
+                    By default file locking is globally enabled for the file transport sender.
+                    This behavior can be overridden at the endpoint level by specifying
+                    <tt>transport.vfs.Locking</tt> as a URL query parameter with the appropriate value
+                    (enable/disable) on a given endpoint:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out?transport.vfs.Locking=disable&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    You may also change the global locking behavior by setting the <tt>transport.vfs.Locking</tt>
+                    parameter in the file transport sender configuration in axis2.xml file.
+                </p>
+                <p>
+                    When writing to remote file locations using a protocol such as FTP, you might
+                    want Synapse to communicate with the FTP server in the passive mode. To
+                    configure this behavior, simply add the query parameter <tt>vfs.passive</tt> to the
+                    endpoint address:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz?vfs.passive=true&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    It should be noted that by its nature, the file transport sender doesn't support
+                    synchronous responses and should only be invoked using the out-only message
+                    exchange pattern. In a Synapse mediation (sequence/proxy/API), this can be forced
+                    using the following mediator:
+                </p>
+                <div class="xmlConf">&lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;</div>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+        </section>
+        <section name="Using SFTP" id="SFTP">
+            <p>
+                To avoid man-in-the-middle attacks, SSH clients will only connect to hosts with
+                a known host key. When connecting for the first time to an SSH server, a typical
+                command line SSH client would request confirmation from the user to add the
+                server and its fingerprint to the list of known hosts.
+            </p>
+            <p>
+                The VFS transports supports SFTP through the
+                <a class="externalLink" href="http://www.jcraft.com/jsch/">JSch</a>
+                library and this library also requires a list of known hosts. Since Synapse is
+                not an interactive process, it can't request confirmation from the user and is
+                therefore unable to automatically add a host to the list. This implies that the
+                list of known hosts must be set up manually before the transport can connect.
+            </p>
+            <p>
+                JSch loads the list of known hosts from a file called <tt>known_hosts</tt> in
+                the <tt>.ssh</tt> sub-directory of the user's home directory, i.e. <tt>$HOME/.ssh</tt>
+                in Unix and <tt>%HOMEPATH%\.ssh</tt> in Windows. The location and format of this
+                file are compatible with the <a class="externalLink" href="http://www.openssh.com/">OpenSSH</a>
+                client.
+            </p>
+            <p>
+                Since the file not only contains a list of host names but also the fingerprints
+                of their host keys, the easiest way to add a new host to that file is to simply
+                use the OpenSSH client to open an SSH session on the target host. The client will
+                then ask to add the credentials to the <tt>known_hosts</tt> file. Note that if
+                the SSH server is configured to only allow SFTP sessions, but no interactive
+                sessions, the connection will actually fail. Since this doesn't rollback the
+                change to the <tt>known_hosts</tt> file, this error can be ignored.
+            </p>
+        </section>
+        <section name="Known issues" id="Issues">
+            <p>
+                The VFS listener will start reading a file as soon as it appears in the configured
+                location. To avoid processing half written files, the creation of these files should
+                be made atomic. On most platforms this can be achieved by writing the data to a
+                temporary file and then moving the file to the target location. Note however that
+                a move operation is only atomic if the source and destination are on the same
+                physical file system. The location for the temporary file should be chosen with
+                that constraint in mind.
+            </p>
+            <p>
+                It should also be noted that the VFS transport sender doesn't create files atomically.
+            </p>
         </section>
     </body>
 </document>

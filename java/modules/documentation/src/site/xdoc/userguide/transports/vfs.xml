@@ -33,7 +33,17 @@
                     <a href="#Configuration">Transport Configuration</a>
                     <ul>
                         <li><a href="#Listener">File Transport Listener (VFS Listener)</a></li>
-                        <li><a href="#Sender">File Transport Sender (VFS Sender)</a></li>
+                        <li>
+                            <a href="#Sender">File Transport Sender (VFS Sender)</a>
+                            <ul>
+                                <li><a href="#Locking">File Locking</a></li>
+                                <li><a href="#Passive">FTP Passive Mode</a></li>
+                                <li><a href="#Retry">Retrying on Error</a></li>
+                                <li><a href="#transport.vfs.UseTempFile">Using Temporary Files</a></li>
+                                <li><a href="#Append">Appending to Files</a></li>
+                                <li><a href="#OutOnly">Out-only Message Exchange Pattern</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -137,7 +147,7 @@
                             a directory location is specified, the transport will attempt to read
                             any file dropped into the directory.
                             <div class="xmlConf">&lt;parameter name="transport.vfs.FileURI"&gt;file:///home/user/test/in&lt;/parameter&gt;</div>
-                            <div class="xmlConf">&lt;parameter name="transport.vfs.FileURI"&gt;sftp://bob:password@ftp.example.org/test/in&lt;/parameter&gt;</div>
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FileURI"&gt;sftp://bob:password@example.com/logs&lt;/parameter&gt;</div>
                         </td>
                         <td>Yes</td>
                         <td>N/A</td>
@@ -190,7 +200,7 @@
                             Specify the location to which the files should be moved after successfully
                             processing them. Required if transport.vfs.ActionAfterProcess is set to
                             MOVE. Ignored otherwise. Value must be a valid URI (local or remote).
-                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveAfterProcess"&gt;file:///home/user/test/original&lt;/parameter&gt;</div>
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveAfterProcess"&gt;file:///home/test/original&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
                         <td>N/A</td>
@@ -298,74 +308,79 @@
                         <td>false</td>
                     </tr>
                     <tr>
-                        <td>transport.vfs.UseTempFile</td>
-                        <td>If this parameter is set to true, the transport will create a temporary, then
-                        will transfer the content and it will be renamed to the configured file name. This
-                        is specially useful to avoid processing of partially transferred files using VFS
-                        transport. This configuration should be configured as part of the endpoint
-                        deceleration.</td>
-                        <td>No</td>
-                        <td>false</td>
-                    </tr>
-                    <tr>
                         <td>transport.vfs.MaxRetryCount</td>
-                        <td>The number of attempts that the polling task should attempt to poll the remote
-                        VFS destination after an error occurs when trying to resolve the remote file.
-                        For each erroneous attempts polling will be suspended for the amount given by
-                        the parameter 'transport.vfs.ReconnectTimeout'.
-                        <div class="xmlConf">&lt;parameter name="transport.vfs.MaxRetryCount"&gt;3&lt;/parameter&gt;</div>
+                        <td>
+                            If the file transport listener encounters an error while trying to
+                            read a file, it will try to read the file again after some time. This
+                            parameter sets the maximum number of times the listener should retry
+                            before giving up. Use the <a href="#transport.vfs.ReconnectTimeout">transport.vfs.ReconnectTimeout</a>
+                            parameter to set the time duration between retries.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MaxRetryCount"&gt;3&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
                         <td>3</td>
                     </tr>
                     <tr>
-                        <td>transport.vfs.ReconnectTimeout</td>
-                        <td>The amount the current polling task should be suspended after the failed
-                        attempt to resolve the file object.
-                        <div class="xmlConf">&lt;parameter name="transport.vfs.ReconnectTimeout"&gt;30000&lt;/parameter&gt;</div>
+                        <td>transport.vfs.ReconnectTimeout <a name="transport.vfs.ReconnectTimeout"/></td>
+                        <td>
+                            The amount of time (in seconds) the current polling task should be
+                            suspended for after a failed attempt to resolve a file.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ReconnectTimeout"&gt;30000&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
-                        <td>30000 milliseconds</td>
+                        <td>30</td>
                     </tr>
                     <tr>
-                        <td>transport.vfs.FailedRecordsFileName</td>
-                        <td>Once the processing is done on a file it will be moved(to a new file) or
-                        deleted. If this operation fails, a log can be written with the cause to the
-                        given fail record file.
-                        <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileName"&gt;vfs-move-failed-records.properties&lt;/parameter&gt;</div>
+                        <td>transport.vfs.FailedRecordsFileName <a name="transport.vfs.FailedRecordsFileName"/></td>
+                        <td>
+                            Once a file has been fully processed, it will be moved to a new
+                            location or deleted. If this operation fails, a log entry with the
+                            failure details can be written to a separate log file. This parameter
+                            controls the name of this failure log file.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileName"&gt;move-errors.txt&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
                         <td>vfs-move-failed-records.properties</td>
                     </tr>
                     <tr>
                         <td>transport.vfs.FailedRecordsFileDestination</td>
-                        <td>The destination to create the log file of failed move or delete operations
-                        on processed files.
-                        <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileDestination"&gt;repository/conf&lt;/parameter&gt;</div>
+                        <td>
+                            Once a file has been fully processed, it will be moved to a new
+                            location or deleted. If this operation fails, a log entry with the
+                            failure details can be written to a separate log file. This parameter
+                            controls the location (directory path) of this failure log file. To set
+                            the name of the log file use the <a href="#transport.vfs.FailedRecordsFileName">transport.vfs.FailedRecordsFileName</a>
+                            parameter.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileDestination"&gt;logs/&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
                         <td>repository/conf</td>
                     </tr>
                     <tr>
                         <td>transport.vfs.FailedRecordNextRetryDuration</td>
-                        <td>Once a move operation failed, the move task will be retried after this
-                        configured amount of time.
-                        <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileName"&gt;vfs-move-failed-records.properties&lt;/parameter&gt;</div>
+                        <td>
+                            When a move operation has failed, the operation will be retried after this
+                            amount of time (configured in milliseconds).
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordNextRetryDuration"&gt;5000&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
-                        <td>3000 milliseconds</td>
+                        <td>3000</td>
                     </tr>
                     <tr>
                         <td>transport.vfs.MoveAfterFailedMove</td>
-                        <td>The destination to move the file after a failed move attempt.
+                        <td>
+                            The destination to move the file after a failed move attempt.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveAfterFailedMove"&gt;repository/move-errors&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
                         <td>N/A</td>
                     </tr>
                     <tr>
                         <td>transport.vfs.MoveFailedRecordTimestampFormat</td>
-                        <td>The time stamp format to report the failed move operation in the log.
-                        <div class="xmlConf">&lt;parameter name="transport.vfs.MoveFailedRecordTimestampFormat"&gt;dd/MM/yyyy/ HH:mm:ss&lt;/parameter&gt;</div>
+                        <td>
+                            The time stamp format to use when reporting failed move operations in
+                            the log.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveFailedRecordTimestampFormat"&gt;HH:mm:ss&lt;/parameter&gt;</div>
                         </td>
                         <td>No</td>
                         <td>dd/MM/yyyy/ HH:mm:ss</td>
@@ -413,6 +428,8 @@
                         <tt>ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz</tt>
                     </li>
                 </ul>
+
+                <h4>File Locking <a name="Locking"/></h4>
                 <p>
                     By default file locking is globally enabled for the file transport sender.
                     This behavior can be overridden at the endpoint level by specifying
@@ -426,6 +443,8 @@
                     You may also change the global locking behavior by setting the <tt>transport.vfs.Locking</tt>
                     parameter in the file transport sender configuration in axis2.xml file.
                 </p>
+
+                <h4>FTP Passive Mode <a name="Passive"/></h4>
                 <p>
                     When writing to remote file locations using a protocol such as FTP, you might
                     want Synapse to communicate with the FTP server in the passive mode. To
@@ -435,6 +454,70 @@
                 <div class="xmlConf">&lt;endpoint&gt;
     &lt;address uri=&quot;vfs:ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz?vfs.passive=true&quot;/&gt;
 &lt;/endpoint&gt;</div>
+
+                <h4>Retrying on Error <a name="Retry"/></h4>
+                <p>
+                    When the file transport sender encounters an error while trying to write a file,
+                    it can retry after some time. This is useful to recover from certain types of
+                    transient I/O errors and network connectivity issues. Following parameters
+                    can be configured as URL query parameters on the file (vfs) endpoints to
+                    make use of this feature.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MaxRetryCount</td>
+                        <td>
+                            Maximum number of retries to perform before giving up.
+                        </td>
+                        <td>No</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ReconnectTimeout</td>
+                        <td>
+                            Time duration (in seconds) between retry attempts.
+                        </td>
+                        <td>No</td>
+                        <td>30</td>
+                    </tr>
+                </table>
+
+                <h4>Using Temporary Files <a name="transport.vfs.UseTempFile"/></h4>
+                <p>
+                    The file transport sender does not write file content atomically. Therefore a
+                    process reading a file updated by Synapse, may read partial
+                    content. To get around this limitation, the temporary file support can be
+                    activated on the target file (vfs) endpoint:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out?transport.vfs.UseTempFile=true&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    This forces the file transport sender to write the data to a temporary file and
+                    then move the temporary file to the actual destination configured in the file
+                    endpoint. On most operating systems (e.g. Unix/Linux, Windows), this delivers the
+                    desired atomic file update behavior. When the file endpoint points to a remote
+                    file system, the temporary files will be created on the remote file system, thus
+                    preserving the atomic update behavior.
+                </p>
+
+                <h4>Appending to Files <a name="Append"/></h4>
+                <p>
+                    When updating an existing file, the file transport sender usually overwrites the
+                    old content. To get append behavior instead, set transport.vfs.Append parameter
+                    on the target endpoint:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out?transport.vfs.Append=true&quot;/&gt;
+&lt;/endpoint&gt;</div>
+
+                <h4>Out-only Message Exchange Pattern <a name="OutOnly"/></h4>
                 <p>
                     It should be noted that by its nature, the file transport sender doesn't support
                     synchronous responses and should only be invoked using the out-only message
@@ -489,6 +572,8 @@
             </p>
             <p>
                 It should also be noted that the VFS transport sender doesn't create files atomically.
+                Use the <a href="#transport.vfs.UseTempFile">transport.vfs.UseTempFile</a> endpoint
+                parameter to get around this issue.
             </p>
         </section>
     </body>

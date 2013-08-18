@@ -297,6 +297,79 @@
                         <td>No</td>
                         <td>false</td>
                     </tr>
+                    <tr>
+                        <td>transport.vfs.UseTempFile</td>
+                        <td>If this parameter is set to true, the transport will create a temporary, then
+                        will transfer the content and it will be renamed to the configured file name. This
+                        is specially useful to avoid processing of partially transferred files using VFS
+                        transport. This configuration should be configured as part of the endpoint
+                        deceleration.</td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MaxRetryCount</td>
+                        <td>The number of attempts that the polling task should attempt to poll the remote
+                        VFS destination after an error occurs when trying to resolve the remote file.
+                        For each erroneous attempts polling will be suspended for the amount given by
+                        the parameter 'transport.vfs.ReconnectTimeout'.
+                        <div class="xmlConf">&lt;parameter name="transport.vfs.MaxRetryCount"&gt;3&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ReconnectTimeout</td>
+                        <td>The amount the current polling task should be suspended after the failed
+                        attempt to resolve the file object.
+                        <div class="xmlConf">&lt;parameter name="transport.vfs.ReconnectTimeout"&gt;30000&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>30000 milliseconds</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FailedRecordsFileName</td>
+                        <td>Once the processing is done on a file it will be moved(to a new file) or
+                        deleted. If this operation fails, a log can be written with the cause to the
+                        given fail record file.
+                        <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileName"&gt;vfs-move-failed-records.properties&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>vfs-move-failed-records.properties</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FailedRecordsFileDestination</td>
+                        <td>The destination to create the log file of failed move or delete operations
+                        on processed files.
+                        <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileDestination"&gt;repository/conf&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>repository/conf</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FailedRecordNextRetryDuration</td>
+                        <td>Once a move operation failed, the move task will be retried after this
+                        configured amount of time.
+                        <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileName"&gt;vfs-move-failed-records.properties&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>3000 milliseconds</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveAfterFailedMove</td>
+                        <td>The destination to move the file after a failed move attempt.
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveFailedRecordTimestampFormat</td>
+                        <td>The time stamp format to report the failed move operation in the log.
+                        <div class="xmlConf">&lt;parameter name="transport.vfs.MoveFailedRecordTimestampFormat"&gt;dd/MM/yyyy/ HH:mm:ss&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>dd/MM/yyyy/ HH:mm:ss</td>
+                    </tr>
                 </table>
                 <p><a href="#Contents">[Back to top]</a></p>
             </subsection>

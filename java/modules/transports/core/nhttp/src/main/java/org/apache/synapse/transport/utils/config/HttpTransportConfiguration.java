@@ -58,14 +58,45 @@ public abstract class HttpTransportConfiguration {
     abstract protected int getThreadsPerReactor();
 
     /**
-     * Get the IOReactor configuration
+     * Get the listening I/O reactor configuration
      *
      * @return A fully initialized IOReactorConfig instance
      */
-    public IOReactorConfig getReactorConfig() {
+    public IOReactorConfig getListeningReactorConfig() {
         IOReactorConfig.Builder builder = IOReactorConfig.custom()
                 .setIoThreadCount(getThreadsPerReactor())
-                .setSoTimeout(getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000))
+                .setSoTimeout(getIntProperty(HttpConfigConstants.LISTENER_SO_TIMEOUT,
+                        getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
+                .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
+                .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
+                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
+                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
+                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
+
+        if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
+            builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));
+        }
+
+        if (getBooleanProperty(HttpConfigConstants.SO_REUSEADDR) != null) {
+            builder.setSoReuseAddress(getBooleanProperty(HttpConfigConstants.SO_REUSEADDR));
+        }
+
+        if (getIntProperty(HttpConfigConstants.SELECT_INTERVAL) != null) {
+            builder.setSelectInterval(getIntProperty(HttpConfigConstants.SELECT_INTERVAL));
+        }
+        return builder.build();
+    }
+
+    /**
+     * Get the connecting I/O reactor configuration
+     *
+     * @return A fully initialized IOReactorConfig instance
+     */
+    public IOReactorConfig getConnectingReactorConfig() {
+        IOReactorConfig.Builder builder = IOReactorConfig.custom()
+                .setIoThreadCount(getThreadsPerReactor())
+                .setSoTimeout(getIntProperty(HttpConfigConstants.SENDER_SO_TIMEOUT,
+                        getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
                 .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))

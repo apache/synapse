@@ -749,14 +749,39 @@
                         <th>Default</th>
                     </tr>
                     <tr>
-                        <td>http.socket.timeout</td>
+                        <td>http.socket.timeout <a name="http.socket.timeout"/></td>
                         <td>
                             Sets the TCP socket timeout in milliseconds
                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
+                            This applies to sockets opened by both transport listener and sender.
                             <div class="xmlConf">http.socket.timeout=20000</div>
                         </td>
                         <td>No</td>
                         <td>60000</td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.timeout.listener</td>
+                        <td>
+                            Sets the timeout in milliseconds for all the TCP sockets opened by the
+                            transport listener. This overrides the value of
+                            <a href="#http.socket.timeout">http.socket.timeout</a> for the transport
+                            listener.
+                            <div class="xmlConf">http.socket.timeout.listener=20000</div>
+                        </td>
+                        <td>No</td>
+                        <td>Value of <a href="#http.socket.timeout">http.socket.timeout</a></td>
+                    </tr>
+                    <tr>
+                        <td>http.socket.timeout.sender</td>
+                        <td>
+                            Sets the timeout in milliseconds for all the TCP sockets opened by the
+                            transport sender. This overrides the value of
+                            <a href="#http.socket.timeout">http.socket.timeout</a> for the transport
+                            sender.
+                            <div class="xmlConf">http.socket.timeout.sender=20000</div>
+                        </td>
+                        <td>No</td>
+                        <td>Value of <a href="#http.socket.timeout">http.socket.timeout</a></td>
                     </tr>
                     <tr>
                         <td>http.connection.timeout</td>

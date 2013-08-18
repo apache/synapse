@@ -174,7 +174,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
             String prefix = namePrefix + "-PT-Sender I/O Dispatcher";
 
             ioReactor = new DefaultConnectingIOReactor(
-                            targetConfiguration.getReactorConfig(),
+                            targetConfiguration.getReactorConfig(false),
                             new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {

@@ -243,7 +243,7 @@ public class ListenerContext {
 
     public IOReactorConfig getReactorConfig() {
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        return cfg.getReactorConfig();
+        return cfg.getListeningReactorConfig();
     }
 
     public ConfigurationContext getCfgCtx() {

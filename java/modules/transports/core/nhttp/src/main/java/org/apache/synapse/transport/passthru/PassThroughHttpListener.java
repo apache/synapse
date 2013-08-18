@@ -143,7 +143,7 @@ public class PassThroughHttpListener implements TransportListener {
         try {
             String prefix = namePrefix + "-PT-Listener I/O Dispatcher";
             ioReactor = new DefaultListeningIOReactor(
-                            sourceConfiguration.getReactorConfig(),
+                            sourceConfiguration.getReactorConfig(true),
                             new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
             
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {

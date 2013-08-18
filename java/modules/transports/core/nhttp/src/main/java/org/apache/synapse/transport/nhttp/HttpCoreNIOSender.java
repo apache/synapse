@@ -255,7 +255,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
     private IOReactorConfig getReactorConfig() {
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        return cfg.getReactorConfig();
+        return cfg.getConnectingReactorConfig();
     }
 
     /**

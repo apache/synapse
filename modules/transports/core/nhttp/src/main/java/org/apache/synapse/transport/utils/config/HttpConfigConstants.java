@@ -30,6 +30,8 @@ public class HttpConfigConstants {
     public static final String SO_LINGER = "http.socket.linger";
     public static final String SO_REUSEADDR = "http.socket.reuseaddr";
     public static final String SO_TIMEOUT = "http.socket.timeout";
+    public static final String LISTENER_SO_TIMEOUT = "http.socket.timeout.listener";
+    public static final String SENDER_SO_TIMEOUT = "http.socket.timeout.sender";
     public static final String SELECT_INTERVAL = "http.nio.select-interval";
 
     public static final String HTTP_MALFORMED_INPUT_ACTION = "http.malformed.input.action";

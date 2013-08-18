@@ -33,7 +33,16 @@ public class HttpTransportConfigurationTest extends TestCase {
         assertEquals("barValue", config.getStringProperty("bar", "barValue"));
         assertEquals(true, (boolean) config.getBooleanProperty("baz", true));
 
-        IOReactorConfig reactorConfig = config.getReactorConfig();
+        IOReactorConfig reactorConfig = config.getListeningReactorConfig();
+        assertEquals(2, reactorConfig.getIoThreadCount());
+        assertEquals(0, reactorConfig.getConnectTimeout());
+        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+        assertEquals(60000, reactorConfig.getSoTimeout());
+        assertEquals(true, reactorConfig.isTcpNoDelay());
+        assertEquals(false, reactorConfig.isInterestOpQueued());
+
+        reactorConfig = config.getConnectingReactorConfig();
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
         assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
@@ -54,7 +63,7 @@ public class HttpTransportConfigurationTest extends TestCase {
         assertEquals("Testing", config.getStringProperty("test.bar", "NotTesting"));
         assertEquals(true, (boolean) config.getBooleanProperty("test.baz", false));
 
-        IOReactorConfig reactorConfig = config.getReactorConfig();
+        IOReactorConfig reactorConfig = config.getListeningReactorConfig();
         assertEquals(true, reactorConfig.isSoReuseAddress());
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
@@ -68,6 +77,28 @@ public class HttpTransportConfigurationTest extends TestCase {
         assertEquals(1024 * 8, connConfig.getBufferSize());
         assertEquals(CodingErrorAction.REPORT, connConfig.getMalformedInputAction());
         assertEquals(CodingErrorAction.REPORT, connConfig.getUnmappableInputAction());
+    }
+
+    public void testTimeoutConfig() {
+        HttpTransportConfiguration config = new SimpleHttpTransportConfiguration("test-http");
+
+        IOReactorConfig reactorConfig = config.getListeningReactorConfig();
+        assertEquals(30000, reactorConfig.getSoTimeout());
+        assertEquals(2, reactorConfig.getIoThreadCount());
+        assertEquals(0, reactorConfig.getConnectTimeout());
+        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+        assertEquals(true, reactorConfig.isTcpNoDelay());
+        assertEquals(false, reactorConfig.isInterestOpQueued());
+
+        reactorConfig = config.getConnectingReactorConfig();
+        assertEquals(20000, reactorConfig.getSoTimeout());
+        assertEquals(2, reactorConfig.getIoThreadCount());
+        assertEquals(0, reactorConfig.getConnectTimeout());
+        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+        assertEquals(true, reactorConfig.isTcpNoDelay());
+        assertEquals(false, reactorConfig.isInterestOpQueued());
     }
 
     class SimpleHttpTransportConfiguration extends HttpTransportConfiguration {

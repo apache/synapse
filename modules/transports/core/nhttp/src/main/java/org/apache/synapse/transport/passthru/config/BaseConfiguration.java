@@ -78,8 +78,12 @@ public abstract class BaseConfiguration {
 
     abstract protected HttpProcessor initHttpProcessor();
 
-    public IOReactorConfig getReactorConfig() {
-        return conf.getReactorConfig();
+    public IOReactorConfig getReactorConfig(boolean listener) {
+        if (listener) {
+            return conf.getListeningReactorConfig();
+        } else {
+            return conf.getConnectingReactorConfig();
+        }
     }
 
     public ConnectionConfig getConnectionConfig() {

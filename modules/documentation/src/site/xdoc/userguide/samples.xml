@@ -200,6 +200,7 @@
                         <li><a href="samples/sample430.html">Sample 430: Callout mediator for synchronous web service invocations</a></li>
                         <li><a href="samples/sample431.html">Sample 431: Callout Mediator with WS-Security for Outgoing Messages</a></li>
                         <li><a href="samples/sample432.html">Sample 432: Callout Mediator - Invoke a secured service which has different policies for inbound and outbound flows</a></li>
+                        <li><a href="samples/sample433.html">Sample 433: Callout Mediator - Invoke a service using a defined Endpoint</a></li>
                     </ul>
                 </p>
                 <h4>URL Rewrite Mediator</h4>

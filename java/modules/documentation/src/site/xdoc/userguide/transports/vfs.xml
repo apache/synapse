@@ -130,7 +130,8 @@
                 <p>
                     A proxy service configured with the VFS listener, can be further customized by
                     setting a number of parameters (some of which are required). Following table
-                    lists all the supported service parameters.
+                    lists all the supported service parameters. Please refer <a href="../samples/sample254.html">sample 254</a>
+                    for an example that demonstrates how to use some of these settings.
                 </p>
                 <table>
                     <tr>

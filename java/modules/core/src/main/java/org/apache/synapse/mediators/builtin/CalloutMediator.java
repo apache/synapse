@@ -21,54 +21,71 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.synapse.*;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2BlockingClient;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.endpoints.AbstractEndpoint;
+import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.DefaultEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
- *      <configuration [axis2xml="string"] [repository="string"]/>?
- *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
- *      <target xpath="expression" | key="string"/>
- *      <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
+ * <configuration [axis2xml="string"] [repository="string"]/>?
+ * <source xpath="expression" | key="string">? <!-- key can be a MC property or entry key -->
+ * <target xpath="expression" | key="string"/>?
+ * <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
  * </callout>
  */
 public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
 
-    private ConfigurationContext configCtx = null;
     private String serviceURL = null;
+
     private String action = null;
+
     private String requestKey = null;
+
     private SynapseXPath requestXPath = null;
+
     private SynapseXPath targetXPath = null;
+
     private String targetKey = null;
+
     private String clientRepository = null;
+
     private String axis2xml = null;
+
     private boolean passHeaders = false;
-    public final static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
-    public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
+
     private boolean securityOn = false;  //Should messages be sent using WS-Security?
+
     private String wsSecPolicyKey = null;
+
     private String inboundWsSecPolicyKey = null;
+
     private String outboundWsSecPolicyKey = null;
+
+    private String endpointKey = null;
+
+    private Endpoint endpoint;
+
+    Axis2BlockingClient blockingMsgSender = null;
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -83,93 +100,83 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         }
 
         try {
-            ServiceClient sc = new ServiceClient(configCtx, null);
-            Options options = new Options();
-
-            if (isSecurityOn()) {
+            if (endpoint == null && endpointKey != null) {
+                endpoint = synCtx.getEndpoint(endpointKey);
                 if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("Callout mediator: using security");
+                    synLog.traceOrDebug("Using the defined endpoint : " + endpoint.getName());
                 }
-                if (wsSecPolicyKey != null) {
-                    options.setProperty(
-                            SynapseConstants.RAMPART_POLICY,
-                            MessageHelper.getPolicy(synCtx, wsSecPolicyKey));
+            } else if (synLog.isTraceOrDebugEnabled()) {
+                if (serviceURL != null) {
+                    synLog.traceOrDebug("Using the serviceURL : " + serviceURL);
                 } else {
-                    if (inboundWsSecPolicyKey != null) {
-                        options.setProperty(SynapseConstants.RAMPART_IN_POLICY,
-                                            MessageHelper.getPolicy(
-                                                    synCtx, inboundWsSecPolicyKey));
-                    }
-                    if (outboundWsSecPolicyKey != null) {
-                        options.setProperty(SynapseConstants.RAMPART_OUT_POLICY,
-                                            MessageHelper.getPolicy(
-                                                    synCtx, outboundWsSecPolicyKey));
+                    synLog.traceOrDebug("Using the To header as the EPR ");
+                }
+                if (securityOn) {
+                    synLog.traceOrDebug("Security enabled within the Callout Mediator config");
+                    if (wsSecPolicyKey != null) {
+                        synLog.traceOrDebug("Using security policy key : " + wsSecPolicyKey);
+                    } else {
+                        if (inboundWsSecPolicyKey != null) {
+                            synLog.traceOrDebug("Using inbound security policy key : " + inboundWsSecPolicyKey);
+                        }
+                        if (outboundWsSecPolicyKey != null) {
+                            synLog.traceOrDebug("Using outbound security policy key : " + outboundWsSecPolicyKey);
+                        }
                     }
                 }
-                sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
             }
 
-            if (serviceURL != null) {
-                options.setTo(new EndpointReference(serviceURL));
-            } else if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {
-                options.setTo(new EndpointReference(synCtx.getTo().getAddress()));
-            } else {
-                handleException("Service URL or 'To' header is required", synCtx);
+            org.apache.axis2.context.MessageContext axis2MsgCtx =
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            if (Constants.VALUE_TRUE.equals(axis2MsgCtx.getProperty(Constants.Configuration.ENABLE_MTOM))) {
+                ((AbstractEndpoint) endpoint).getDefinition().setUseMTOM(true);
             }
+
+            MessageContext synapseOutMsgCtx = MessageHelper.cloneMessageContext(synCtx);
 
             if (action != null) {
-                options.setAction(action);
-            } else {
-                if (synCtx.isSOAP11()) {
-                    options.setProperty(Constants.Configuration.DISABLE_SOAP_ACTION, true);
-                } else {
-                    Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
-                    org.apache.axis2.context.MessageContext axis2MessageCtx =
-                            axis2smc.getAxis2MessageContext();
-                    axis2MessageCtx.getTransportOut().addParameter(
-                            new Parameter(HTTPConstants.OMIT_SOAP_12_ACTION, true));
+                synapseOutMsgCtx.setSoapAction(action);
+            }
+
+            if (requestKey != null || requestXPath != null) {
+                SOAPBody soapBody = synapseOutMsgCtx.getEnvelope().getBody();
+                soapBody.removeChildren();
+                soapBody.addChild(getRequestPayload(synCtx));
+                if (!passHeaders) {
+                    SOAPHeader soapHeader = synapseOutMsgCtx.getEnvelope().getHeader();
+                    soapHeader.removeChildren();
                 }
             }
 
-            if (passHeaders) {
-                SOAPHeader header = synCtx.getEnvelope().getHeader();
-                if (header != null) {
-                    Iterator headerElements = header.cloneOMElement().getChildElements();
-                    while (headerElements.hasNext()) {
-                        sc.addHeader((OMElement) headerElements.next());
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("About to invoke the service");
+                if (synLog.isTraceTraceEnabled()) {
+                    synLog.traceTrace("Request message payload : " + synapseOutMsgCtx.getEnvelope());
+                }
+            }
+
+            MessageContext resultMsgCtx = null;
+            try {
+                if ("true".equals(synCtx.getProperty(SynapseConstants.OUT_ONLY))) {
+                    blockingMsgSender.send(endpoint, synapseOutMsgCtx);
+                } else {
+                    resultMsgCtx = blockingMsgSender.send(endpoint, synapseOutMsgCtx);
+                    if ("true".equals(resultMsgCtx.getProperty(SynapseConstants.BLOCKING_CLIENT_ERROR))) {
+                        handleFault(synCtx, (Exception) synCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
                     }
                 }
-            }
-
-            options.setProperty(
-                    AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
-            sc.setOptions(options);
-
-            OMElement request = getRequestPayload(synCtx);
-            if (synLog.isTraceOrDebugEnabled()) {
-                synLog.traceOrDebug("About to invoke service : " + serviceURL + (action != null ?
-                    " with action : " + action : ""));
-                if (synLog.isTraceTraceEnabled()) {
-                    synLog.traceTrace("Request message payload : " + request);
-                }
-            }
-
-            OMElement result = null;
-            try {
-                options.setCallTransportCleanup(true);
-                result = sc.sendReceive(request);
-            } catch (AxisFault axisFault) {
-                handleFault(synCtx, axisFault);
+            } catch (Exception ex) {
+                handleFault(synCtx, ex);
             }
 
             if (synLog.isTraceTraceEnabled()) {
-                synLog.traceTrace("Response payload received : " + result);
+                synLog.traceTrace("Response payload received : " + resultMsgCtx.getEnvelope());
             }
 
-            if (result != null) {
+            if (resultMsgCtx != null) {
                 if (targetXPath != null) {
                     Object o = targetXPath.evaluate(synCtx);
-
+                    OMElement result = resultMsgCtx.getEnvelope().getBody().getFirstElement();
                     if (o != null && o instanceof OMElement) {
                         OMNode tgtNode = (OMElement) o;
                         tgtNode.insertSiblingAfter(result);
@@ -181,10 +188,13 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
                         tgtNode.detach();
                     } else {
                         handleException("Evaluation of target XPath expression : " +
-                            targetXPath.toString() + " did not yield an OMNode", synCtx);
+                                        targetXPath.toString() + " did not yeild an OMNode", synCtx);
                     }
-                } if (targetKey != null) {
+                } else if (targetKey != null) {
+                    OMElement result = resultMsgCtx.getEnvelope().getBody().getFirstElement();
                     synCtx.setProperty(targetKey, result);
+                } else {
+                    synCtx.setEnvelope(resultMsgCtx.getEnvelope());
                 }
             } else {
                 synLog.traceOrDebug("Service returned a null response");
@@ -192,46 +202,51 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
         } catch (AxisFault e) {
             handleException("Error invoking service : " + serviceURL +
-                (action != null ? " with action : " + action : ""), e, synCtx);
+                            (action != null ? " with action : " + action : ""), e, synCtx);
         } catch (JaxenException e) {
             handleException("Error while evaluating the XPath expression: " + targetXPath,
-                    e, synCtx);
+                            e, synCtx);
         }
 
         synLog.traceOrDebug("End : Callout mediator");
         return true;
     }
 
-    private void handleFault(MessageContext synCtx, AxisFault axisFault) {
+    private void handleFault(MessageContext synCtx, Exception ex) {
         synCtx.setProperty(SynapseConstants.SENDING_FAULT, Boolean.TRUE);
-        if (axisFault.getFaultCodeElement() != null) {
-            synCtx.setProperty(SynapseConstants.ERROR_CODE,
-                    axisFault.getFaultCodeElement().getText());
-        } else {
-            synCtx.setProperty(SynapseConstants.ERROR_CODE,
-                    SynapseConstants.CALLOUT_OPERATION_FAILED);
-        }
 
-        if (axisFault.getFaultReasonElement() != null) {
-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
-                    axisFault.getFaultReasonElement().getText());
-        } else {
-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, "Error while performing " +
-                    "the callout operation");
-        }
+        if (ex instanceof AxisFault) {
+            AxisFault axisFault = (AxisFault) ex;
 
-        if (axisFault.getFaultDetailElement() != null) {
-            if (axisFault.getFaultDetailElement().getFirstElement() != null) {
-                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
-                        axisFault.getFaultDetailElement().getFirstElement());
+            if (axisFault.getFaultCodeElement() != null) {
+                synCtx.setProperty(SynapseConstants.ERROR_CODE,
+                                   axisFault.getFaultCodeElement().getText());
             } else {
-                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
-                        axisFault.getFaultDetailElement().getText());
+                synCtx.setProperty(SynapseConstants.ERROR_CODE,
+                                   SynapseConstants.CALLOUT_OPERATION_FAILED);
+            }
+
+            if (axisFault.getMessage() != null) {
+                synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
+                                   axisFault.getMessage());
+            } else {
+                synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, "Error while performing " +
+                                                                   "the callout operation");
+            }
+
+            if (axisFault.getFaultDetailElement() != null) {
+                if (axisFault.getFaultDetailElement().getFirstElement() != null) {
+                    synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                                       axisFault.getFaultDetailElement().getFirstElement());
+                } else {
+                    synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                                       axisFault.getFaultDetailElement().getText());
+                }
             }
         }
 
-        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, axisFault);
-        throw new SynapseException("Error while performing the callout operation", axisFault);
+        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, ex);
+        throw new SynapseException("Error while performing the callout operation", ex);
     }
 
     private OMElement getRequestPayload(MessageContext synCtx) throws AxisFault {
@@ -267,20 +282,40 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     }
 
     public void init(SynapseEnvironment synEnv) {
-        try {
-            configCtx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                    clientRepository != null ? clientRepository : DEFAULT_CLIENT_REPO,
-            axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
-        } catch (AxisFault e) {
-            String msg = "Error initializing callout mediator : " + e.getMessage();
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
+        blockingMsgSender = new Axis2BlockingClient(clientRepository, axis2xml);
+
+        EndpointDefinition endpointDefinition = null;
+        if (serviceURL != null) {
+            endpoint = new AddressEndpoint();
+            endpointDefinition = new EndpointDefinition();
+            endpointDefinition.setAddress(serviceURL);
+            ((AddressEndpoint) endpoint).setDefinition(endpointDefinition);
+        } else if (endpointKey == null) {
+            // Use a default endpoint in this case - i.e. the To header
+            endpoint = new DefaultEndpoint();
+            endpointDefinition = new EndpointDefinition();
+            ((DefaultEndpoint) endpoint).setDefinition(endpointDefinition);
+        }
+        // If the endpointKey is specified, we'll look it up at mediation time
+
+        if (endpointDefinition != null && isSecurityOn()) {
+            endpointDefinition.setSecurityOn(true);
+            if (wsSecPolicyKey != null) {
+                endpointDefinition.setWsSecPolicyKey(wsSecPolicyKey);
+            } else {
+                if (inboundWsSecPolicyKey != null) {
+                    endpointDefinition.setInboundWsSecPolicyKey(inboundWsSecPolicyKey);
+                }
+                if (outboundWsSecPolicyKey != null) {
+                    endpointDefinition.setOutboundWsSecPolicyKey(outboundWsSecPolicyKey);
+                }
+            }
         }
     }
 
     public void destroy() {
         try {
-            configCtx.terminate();
+            blockingMsgSender.cleanup();
         } catch (AxisFault ignore) {}
     }
 
@@ -430,6 +465,14 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
      */
     public void setInboundWsSecPolicyKey(String inboundWsSecPolicyKey) {
         this.inboundWsSecPolicyKey = inboundWsSecPolicyKey;
+    }
+
+    public void setEndpointKey(String key) {
+        this.endpointKey = key;
+    }
+
+    public String getEndpointKey() {
+        return endpointKey;
     }
 
 }

@@ -48,7 +48,10 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
         if (mediator.getServiceURL() != null) {
             callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
+        } else if (mediator.getEndpointKey() != null) {
+            callout.addAttribute(fac.createOMAttribute("endpointKey", nullNS, mediator.getEndpointKey()));
         }
+
         if (mediator.getAction() != null) {
             callout.addAttribute(fac.createOMAttribute("action", nullNS, mediator.getAction()));
         }
@@ -70,20 +73,24 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
             callout.addAttribute(fac.createOMAttribute("passHeaders", nullNS, "true"));
         }
 
-        OMElement source = fac.createOMElement("source", synNS, callout);
-        if (mediator.getRequestXPath() != null) {
-            SynapseXPathSerializer.serializeXPath(mediator.getRequestXPath(), source, "xpath");
-        } else if (mediator.getRequestKey() != null) {
-            source.addAttribute(fac.createOMAttribute(
-                "key", nullNS, mediator.getRequestKey()));
+        if (mediator.getRequestXPath() != null || mediator.getRequestKey() != null) {
+            OMElement source = fac.createOMElement("source", synNS, callout);
+            if (mediator.getRequestXPath() != null) {
+                SynapseXPathSerializer.serializeXPath(mediator.getRequestXPath(), source, "xpath");
+            } else if (mediator.getRequestKey() != null) {
+                source.addAttribute(fac.createOMAttribute(
+                        "key", nullNS, mediator.getRequestKey()));
+            }
         }
 
-        OMElement target = fac.createOMElement("target", synNS, callout);
-        if (mediator.getTargetXPath() != null) {
-            SynapseXPathSerializer.serializeXPath(mediator.getTargetXPath(), target, "xpath");
-        } else if (mediator.getTargetKey() != null) {
-            target.addAttribute(fac.createOMAttribute(
-                "key", nullNS, mediator.getTargetKey()));
+        if (mediator.getTargetXPath() != null || mediator.getTargetKey() != null) {
+            OMElement target = fac.createOMElement("target", synNS, callout);
+            if (mediator.getTargetXPath() != null) {
+                SynapseXPathSerializer.serializeXPath(mediator.getTargetXPath(), target, "xpath");
+            } else if (mediator.getTargetKey() != null) {
+                target.addAttribute(fac.createOMAttribute(
+                        "key", nullNS, mediator.getTargetKey()));
+            }
         }
 
         if (mediator.isSecurityOn()) {

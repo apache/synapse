@@ -65,12 +65,14 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy");
     private static final QName ATT_INBOUND_SEC_POLICY
                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy");
+    private static final QName ATT_ENDPOINT = new QName("endpointKey");
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CalloutMediator callout = new CalloutMediator();
 
         OMAttribute attServiceURL = elem.getAttribute(ATT_URL);
+        OMAttribute attEndpoint = elem.getAttribute(ATT_ENDPOINT);
         OMAttribute attAction     = elem.getAttribute(ATT_ACTION);
         OMAttribute attPassHeaders = elem.getAttribute(ATT_PASS_HEADERS);
         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
@@ -80,6 +82,8 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         if (attServiceURL != null) {
             callout.setServiceURL(attServiceURL.getAttributeValue());
+        } else if (attEndpoint != null) {
+            callout.setEndpointKey(attEndpoint.getAttributeValue());
         }
 
         if (attAction != null) {
@@ -130,8 +134,6 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
                 handleException("A 'xpath' or 'key' attribute " +
                     "is required for the Callout 'source'");
             }
-        } else {
-            handleException("The message 'source' must be specified for a Callout mediator");
         }
 
         if (targetElt != null) {
@@ -149,8 +151,6 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
                 handleException("A 'xpath' or 'key' attribute " +
                     "is required for the Callout 'target'");
             }
-        } else {
-            handleException("The message 'target' must be specified for a Callout mediator");
         }
 
         if (wsSec != null) {

@@ -19,6 +19,8 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 
 /**
@@ -50,7 +52,9 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
 
     public void testCalloutMediatorSerializationScenarioTwo() throws Exception {
         File axis2xml = new File("axis2.xml");
-        axis2xml.createNewFile();
+        if (!axis2xml.exists() && !axis2xml.createNewFile()) {
+            fail("Failed to create test axis2.xml file");
+        }
         String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
                           "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
                           "action=\"urn:getQuote\"><configuration axis2xml=\"axis2.xml\" " +
@@ -60,6 +64,7 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
                           "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" key=\"key2\"/></callout>";
         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
         assertTrue(serialization(inputXml, calloutMediatorSerializer));
+        FileUtils.deleteQuietly(axis2xml);
     }
 
     public void testCalloutMediatorSerializationScenarioThree() {
@@ -99,6 +104,13 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
                 "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" xpath=\"s11:Body/" +
                 "child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
                 "<enableSec outboundPolicy=\"out_sec_policy\" inboundPolicy=\"in_sec_policy\"/></callout>";
+        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
+        assertTrue(serialization(inputXml, calloutMediatorSerializer));
+    }
+
+    public void testCalloutMediatorSerializationScenarioSix() {
+        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
+                "endpointKey=\"endpoint\"/>";
         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
         assertTrue(serialization(inputXml, calloutMediatorSerializer));
     }

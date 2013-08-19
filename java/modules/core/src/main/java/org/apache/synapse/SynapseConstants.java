@@ -408,7 +408,13 @@ public final class SynapseConstants {
     // callout operation failed
     public static final int CALLOUT_OPERATION_FAILED    = 401000;
 
+    // - Axis2 Blocking Client Constants
+    /**The Synapse MC property that marks to Exception to be thrown on SOAPFault(Retry on SOAPFault) */
+    public static final String THROW_EXCEPTION_ON_SOAPFAULT = "THROW_EXCEPTION_ON_SOAPFAULT";
 
+    public static final String BLOCKING_CLIENT_ERROR = "blocking.client.error";
+
+    public static final String HTTP_SENDER_STATUSCODE = "transport.http.statusCode";
 
     // Fail-safe mode properties
     public static final String FAIL_SAFE_MODE_STATUS = "failsafe.mode.enable";

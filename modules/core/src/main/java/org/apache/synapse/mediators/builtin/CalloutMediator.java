@@ -48,6 +48,7 @@ import java.util.List;
 /**
  * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
  * <configuration [axis2xml="string"] [repository="string"]/>?
+ * <endpoint/>?
  * <source xpath="expression" | key="string">? <!-- key can be a MC property or entry key -->
  * <target xpath="expression" | key="string"/>?
  * <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
@@ -81,11 +82,11 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     private String outboundWsSecPolicyKey = null;
 
-    private String endpointKey = null;
+    private Endpoint endpoint = null;
 
-    private Endpoint endpoint;
+    private boolean isWrappingEndpointCreated = false;
 
-    Axis2BlockingClient blockingMsgSender = null;
+    private Axis2BlockingClient blockingMsgSender = null;
 
     public boolean mediate(MessageContext synCtx) {
 
@@ -100,27 +101,27 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         }
 
         try {
-            if (endpoint == null && endpointKey != null) {
-                endpoint = synCtx.getEndpoint(endpointKey);
-                if (synLog.isTraceOrDebugEnabled()) {
+
+            if (synLog.isTraceOrDebugEnabled()) {
+                if (!isWrappingEndpointCreated) {
                     synLog.traceOrDebug("Using the defined endpoint : " + endpoint.getName());
-                }
-            } else if (synLog.isTraceOrDebugEnabled()) {
-                if (serviceURL != null) {
-                    synLog.traceOrDebug("Using the serviceURL : " + serviceURL);
                 } else {
-                    synLog.traceOrDebug("Using the To header as the EPR ");
-                }
-                if (securityOn) {
-                    synLog.traceOrDebug("Security enabled within the Callout Mediator config");
-                    if (wsSecPolicyKey != null) {
-                        synLog.traceOrDebug("Using security policy key : " + wsSecPolicyKey);
+                    if (serviceURL != null) {
+                        synLog.traceOrDebug("Using the serviceURL : " + serviceURL);
                     } else {
-                        if (inboundWsSecPolicyKey != null) {
-                            synLog.traceOrDebug("Using inbound security policy key : " + inboundWsSecPolicyKey);
-                        }
-                        if (outboundWsSecPolicyKey != null) {
-                            synLog.traceOrDebug("Using outbound security policy key : " + outboundWsSecPolicyKey);
+                        synLog.traceOrDebug("Using the To header as the EPR ");
+                    }
+                    if (securityOn) {
+                        synLog.traceOrDebug("Security enabled within the Callout Mediator config");
+                        if (wsSecPolicyKey != null) {
+                            synLog.traceOrDebug("Using security policy key : " + wsSecPolicyKey);
+                        } else {
+                            if (inboundWsSecPolicyKey != null) {
+                                synLog.traceOrDebug("Using inbound security policy key : " + inboundWsSecPolicyKey);
+                            }
+                            if (outboundWsSecPolicyKey != null) {
+                                synLog.traceOrDebug("Using outbound security policy key : " + outboundWsSecPolicyKey);
+                            }
                         }
                     }
                 }
@@ -285,18 +286,24 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         blockingMsgSender = new Axis2BlockingClient(clientRepository, axis2xml);
 
         EndpointDefinition endpointDefinition = null;
+
         if (serviceURL != null) {
+            // If Service URL is specified, it is given the highest priority
             endpoint = new AddressEndpoint();
             endpointDefinition = new EndpointDefinition();
             endpointDefinition.setAddress(serviceURL);
             ((AddressEndpoint) endpoint).setDefinition(endpointDefinition);
-        } else if (endpointKey == null) {
+            isWrappingEndpointCreated = true;
+        } else if (endpoint == null) {
             // Use a default endpoint in this case - i.e. the To header
             endpoint = new DefaultEndpoint();
             endpointDefinition = new EndpointDefinition();
             ((DefaultEndpoint) endpoint).setDefinition(endpointDefinition);
+            isWrappingEndpointCreated = true;
+        } else {
+            endpoint.init(synEnv);
         }
-        // If the endpointKey is specified, we'll look it up at mediation time
+        // If the endpoint is specified, we'll look it up at mediation time.
 
         if (endpointDefinition != null && isSecurityOn()) {
             endpointDefinition.setSecurityOn(true);
@@ -314,6 +321,9 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
     }
 
     public void destroy() {
+        if (!isWrappingEndpointCreated) {
+            endpoint.destroy();
+        }
         try {
             blockingMsgSender.cleanup();
         } catch (AxisFault ignore) {}
@@ -467,12 +477,25 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         this.inboundWsSecPolicyKey = inboundWsSecPolicyKey;
     }
 
-    public void setEndpointKey(String key) {
-        this.endpointKey = key;
+    /**
+     * Get the defined endpoint
+     *
+     * @return endpoint
+     */
+    public Endpoint getEndpoint() {
+        if (!isWrappingEndpointCreated) {
+            return endpoint;
+        }
+        return null;
     }
 
-    public String getEndpointKey() {
-        return endpointKey;
+    /**
+     * Set the defined endpoint
+     *
+     * @param endpoint defined endpoint
+     */
+    public void setEndpoint(Endpoint endpoint) {
+        this.endpoint = endpoint;
     }
 
 }

@@ -41,6 +41,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.util.MessageHelper;
 
@@ -92,6 +93,11 @@ public class Axis2BlockingClient {
 
         if (log.isDebugEnabled()) {
             log.debug("Start Sending the Message ");
+        }
+
+        if (endpoint instanceof IndirectEndpoint) {
+            // Get the real endpoint if endpoint is an indirect one
+            endpoint = ((IndirectEndpoint) endpoint).getRealEndpoint(synapseInMsgCtx);
         }
 
         AbstractEndpoint abstractEndpoint = (AbstractEndpoint) endpoint;

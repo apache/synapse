@@ -18,12 +18,14 @@
   ~  under the License.
   -->
 
-<!-- Callout  mediator Endpoint Sample-->
+<!-- Callout  mediator Inline Endpoint Sample-->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">
         <callout>
-            <endpoint key="StockQuoteServiceEndpoint"/>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </endpoint>
             <configuration axis2xml="modules/integration/target/test_repos/axis2Client/conf/axis2_def.xml" repository="modules/integration/target/test_repos/axis2Client"/>
             <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
@@ -37,9 +39,5 @@
         <send/>
         <drop/>
     </sequence>
-
-    <endpoint name="StockQuoteServiceEndpoint">
-       <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-    </endpoint>
 
 </definitions>

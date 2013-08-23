@@ -20,15 +20,17 @@
 
 <document>
     <properties>
-        <title>Apache Synapse - Sample 433</title>
+        <title>Apache Synapse - Sample 434</title>
     </properties>
     <body>
-        <section name="Sample 433: Callout Mediator - Invoke a service using a defined Endpoint">
+        <section name="Sample 434: Callout Mediator - Invoke a service using an inline Endpoint">
             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main"&gt;
         &lt;callout&gt;
-            &lt;endpoint key="StockQuoteServiceEndpoint"/&gt;
+            &lt;endpoint&gt;
+                   &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
             &lt;source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
@@ -42,14 +44,10 @@
         &lt;drop/&gt;
     &lt;/sequence&gt;
 
-    &lt;endpoint name="StockQuoteServiceEndpoint"&gt;
-       &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
-    &lt;/endpoint&gt;
-
 &lt;/definitions&gt;</div>
             <subsection name="Objective">
                 <p>
-                    Demonstrate how to invoke a service from Callout Mediator using a defined endpoint.
+                    Demonstrate how to invoke a service from Callout mediator using an inline endpoint.
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -59,10 +57,10 @@
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>
-                            Start Synapse using the configuration numbered 433 (repository/conf/sample/synapse_sample_433.xml)
+                            Start Synapse using the configuration numbered 434 (repository/conf/sample/synapse_sample_434.xml)
                             <div class="command">
-                                Unix/Linux: sh synapse.sh -sample 433<br/>
-                                Windows: synapse.bat -sample 433
+                                Unix/Linux: sh synapse.sh -sample 434<br/>
+                                Windows: synapse.bat -sample 434
                             </div>
                         </li>
                     </ul>
@@ -71,9 +69,9 @@
             <subsection name="Executing the Client">
                 <p>
                     In this sample, the Callout mediator does the direct service invocation to the
-                    StockQuoteService using the client request, gets the response and sets it as the
-                    first child of the SOAP message body. Callout Mediator uses the defined endpoint
-                    named 'StockQuoteServiceEndpoint' to send the message to the StockQuoteService.
+                    StockQuoteService using the client request, gets the response, and sets it as the
+                    first child of the SOAP message body. Callout Mediator uses the inline endpoint
+                    to send the message to the StockQuoteService.
                 </p>
                 <p>
                     Invoke the client as follows.

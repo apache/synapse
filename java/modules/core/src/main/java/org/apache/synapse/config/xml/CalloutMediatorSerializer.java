@@ -21,14 +21,17 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 
 /**
  * <pre>
  * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
- *      &lt;source xpath="expression" | key="string"&gt;
- *      &lt;target xpath="expression" | key="string"/&gt;
+ *      &lt;endpoint/&gt;?
+ *      &lt;source xpath="expression" | key="string"&gt;?
+ *      &lt;target xpath="expression" | key="string"/&gt;?
  *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
  * &lt;/callout&gt;
  * </pre>
@@ -48,8 +51,11 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
         if (mediator.getServiceURL() != null) {
             callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
-        } else if (mediator.getEndpointKey() != null) {
-            callout.addAttribute(fac.createOMAttribute("endpointKey", nullNS, mediator.getEndpointKey()));
+        }
+
+        Endpoint endpoint = mediator.getEndpoint();
+        if (endpoint != null) {
+            callout.addChild(EndpointSerializer.getElementFromEndpoint(endpoint));
         }
 
         if (mediator.getAction() != null) {

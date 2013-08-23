@@ -109,8 +109,19 @@ public class CalloutMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testCalloutMediatorSerializationScenarioSix() {
-        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
-                "endpointKey=\"endpoint\"/>";
+        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                          "<endpoint key=\"endpointKey\"/>" +
+                          "</callout>";
+        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
+        assertTrue(serialization(inputXml, calloutMediatorSerializer));
+    }
+
+    public void testCalloutMediatorSerializationScenarioSeven() {
+        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                          "<endpoint>" +
+                          "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\"/>" +
+                          "</endpoint>" +
+                          "</callout>";
         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
         assertTrue(serialization(inputXml, calloutMediatorSerializer));
     }

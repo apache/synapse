@@ -113,11 +113,22 @@ public class IndirectEndpoint extends AbstractEndpoint {
     }
 
     /**
+     * Get the real endpoint
+     *
+     * @param synCtx Message Context
+     * @return real endpoint which is referred by the indirect endpoint
+     */
+    public Endpoint getRealEndpoint(MessageContext synCtx) {
+        reLoadAndInitEndpoint(((Axis2MessageContext) synCtx).
+                getAxis2MessageContext().getConfigurationContext());
+        return realEndpoint;
+    }
+
+    /**
      * Reload as needed , either from registry , local entries or predefined endpoints 
      * @param cc ConfigurationContext
      */
     private synchronized void reLoadAndInitEndpoint(ConfigurationContext cc) {
-
         Parameter parameter = cc.getAxisConfiguration().getParameter(
                 SynapseConstants.SYNAPSE_CONFIG);
         Parameter synEnvParameter = cc.getAxisConfiguration().getParameter(

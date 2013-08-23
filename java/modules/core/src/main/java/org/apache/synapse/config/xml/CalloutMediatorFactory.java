@@ -23,6 +23,9 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.endpoints.AbstractEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.jaxen.JaxenException;
 
@@ -36,8 +39,9 @@ import java.util.Properties;
  * <pre>
  * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
- *      &lt;source xpath="expression" | key="string"&gt;
- *      &lt;target xpath="expression" | key="string"/&gt;
+ *      &lt;endpoint/&gt;?
+ *      &lt;source xpath="expression" | key="string"&gt;?
+ *      &lt;target xpath="expression" | key="string"/&gt;?
  *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
  * &lt;/callout&gt;
  * </pre>
@@ -65,16 +69,16 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy");
     private static final QName ATT_INBOUND_SEC_POLICY
                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy");
-    private static final QName ATT_ENDPOINT = new QName("endpointKey");
+    private static final QName Q_ENDPOINT = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CalloutMediator callout = new CalloutMediator();
 
         OMAttribute attServiceURL = elem.getAttribute(ATT_URL);
-        OMAttribute attEndpoint = elem.getAttribute(ATT_ENDPOINT);
         OMAttribute attAction     = elem.getAttribute(ATT_ACTION);
         OMAttribute attPassHeaders = elem.getAttribute(ATT_PASS_HEADERS);
+        OMElement epElement = elem.getFirstChildWithName(Q_ENDPOINT);
         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
         OMElement   sourceElt     = elem.getFirstChildWithName(Q_SOURCE);
         OMElement   targetElt     = elem.getFirstChildWithName(Q_TARGET);
@@ -82,8 +86,18 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
 
         if (attServiceURL != null) {
             callout.setServiceURL(attServiceURL.getAttributeValue());
-        } else if (attEndpoint != null) {
-            callout.setEndpointKey(attEndpoint.getAttributeValue());
+        }
+
+        if (epElement != null) {
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties);
+            if (endpoint != null) {
+                if (endpoint instanceof AbstractEndpoint &&
+                        ((AbstractEndpoint) endpoint).isLeafEndpoint()) {
+                    callout.setEndpoint(endpoint);
+                } else {
+                    handleException("Callout mediator only supports leaf endpoints");
+                }
+            }
         }
 
         if (attAction != null) {

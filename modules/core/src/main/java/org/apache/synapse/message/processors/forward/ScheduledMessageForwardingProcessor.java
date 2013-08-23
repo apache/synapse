@@ -19,12 +19,11 @@
 
 package org.apache.synapse.message.processors.forward;
 
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2BlockingClient;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.quartz.*;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,8 +35,7 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
 
     public static final String BLOCKING_SENDER = "blocking.sender";
 
-
-    private BlockingMessageSender sender = null;
+    private Axis2BlockingClient sender = null;
 
     private volatile AtomicBoolean active = new AtomicBoolean(true);
 
@@ -48,13 +46,8 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
     @Override
     public void init(SynapseEnvironment se) {
         super.init(se);
-        try {
-            view = new MessageForwardingProcessorView(
-                    se.getSynapseConfiguration().getMessageStore(messageStore),sender,this);
-        } catch (Exception e) {
-            throw new SynapseException(e);
-        }
-
+        view = new MessageForwardingProcessorView(
+                se.getSynapseConfiguration().getMessageStore(messageStore), getSender(), this);
         org.apache.synapse.commons.jmx.MBeanRegistrar.getInstance().registerMBean(view,
                 "Message Forwarding Processor view", getName());
     }
@@ -68,38 +61,18 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
     @Override
     protected JobDataMap getJobDataMap() {
         JobDataMap jdm = new JobDataMap();
-        sender = initMessageSender(parameters);
-        jdm.put(BLOCKING_SENDER,sender);
+        jdm.put(BLOCKING_SENDER, getSender());
         jdm.put(PROCESSOR_INSTANCE,this);
         return jdm;
     }
 
-     private BlockingMessageSender initMessageSender(Map<String ,Object> params) {
-
-        String axis2repo = (String) params.get(ForwardingProcessorConstants.AXIS2_REPO);
-        String axis2Config = (String) params.get(ForwardingProcessorConstants.AXIS2_CONFIG);
-
-        sender = new BlockingMessageSender();
-
-        if(axis2repo != null) {
-            sender.setClientRepository(axis2repo);
+    private synchronized Axis2BlockingClient getSender() {
+        if (sender != null) {
+            return sender;
         }
-
-
-        if(axis2Config != null) {
-            sender.setAxis2xml(axis2Config);
-        }
-        sender.init();
-
-        return sender;
-    }
-
-    public BlockingMessageSender getSender() {
-        return sender;
-    }
-
-    public void setSender(BlockingMessageSender sender) {
-        this.sender = sender;
+        String axis2repo = (String) parameters.get(ForwardingProcessorConstants.AXIS2_REPO);
+        String axis2Config = (String) parameters.get(ForwardingProcessorConstants.AXIS2_CONFIG);
+        return new Axis2BlockingClient(axis2repo, axis2Config);
     }
 
     public boolean isActive() {
@@ -140,7 +113,8 @@ public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcess
 
     /**
      * Return the JMS view of Message Processor
-     * @return
+     *
+     * @return MessageForwardingProcessorView
      */
     public MessageForwardingProcessorView getView() {
         return view;

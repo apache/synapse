@@ -16,19 +16,26 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.message.processors.forward;
 
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2BlockingClient;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.message.processors.MessageProcessorConsents;
 import org.apache.synapse.message.store.MessageStore;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.StatefulJob;
 
 import java.util.Map;
 import java.util.Set;
@@ -45,17 +52,14 @@ public class ForwardingJob implements StatefulJob {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
 
-        /**
-         * Get the Global Objects from DataMap
-         */
-        MessageStore messageStore = (MessageStore) jdm.get(
-                MessageProcessorConsents.MESSAGE_STORE);
+        //Get the Global Objects from DataMap
+        MessageStore messageStore = (MessageStore) jdm.get(MessageProcessorConsents.MESSAGE_STORE);
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(
                 MessageProcessorConsents.PARAMETERS);
-        BlockingMessageSender sender =
-                (BlockingMessageSender) jdm.get(ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
-        ScheduledMessageForwardingProcessor processor =
-                (ScheduledMessageForwardingProcessor) jdm.get(ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
+        Axis2BlockingClient sender = (Axis2BlockingClient) jdm.get(
+                ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
+        ScheduledMessageForwardingProcessor processor = (ScheduledMessageForwardingProcessor) jdm.get(
+                ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
 
         int maxDeliverAttempts = -1;
         String mdaParam = null;
@@ -107,8 +111,8 @@ public class ForwardingJob implements StatefulJob {
                 Set proSet = messageContext.getPropertyKeySet();
 
                 if (proSet != null) {
-                    if (proSet.contains(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR)) {
-                        proSet.remove(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR);
+                    if (proSet.contains(SynapseConstants.BLOCKING_CLIENT_ERROR)) {
+                        proSet.remove(SynapseConstants.BLOCKING_CLIENT_ERROR);
                     }
                 }
 
@@ -123,14 +127,13 @@ public class ForwardingJob implements StatefulJob {
                         return;
                     }
 
-                    if (ep instanceof AddressEndpoint) {
+                    if ((ep != null) && (((AbstractEndpoint) ep).isLeafEndpoint())) {
 
                         try {
-                            MessageContext outCtx = sender.send(
-                                    ((AddressEndpoint) ep).getDefinition(), messageContext);
+                            MessageContext outCtx = sender.send(ep, messageContext);
 
                             if (outCtx != null && "true".equals(outCtx.
-                                    getProperty(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR))) {
+                                    getProperty(SynapseConstants.BLOCKING_CLIENT_ERROR))) {
                                 // This Means an Error has occurred
 
                                 if (maxDeliverAttempts > 0) {
@@ -204,9 +207,15 @@ public class ForwardingJob implements StatefulJob {
                             continue;
                         }
                     } else {
-                        // Currently only Address Endpoint delivery is supported
-                        log.warn("Address Endpoint Named " + targetEp + " not found.Hence removing " +
-                                "the message form store");
+                        String logMsg;
+                        if (ep == null) {
+                            logMsg = "Endpoint named " + targetEp + " not found.Hence removing " +
+                                    "the message form store";
+                        } else {
+                            logMsg = "Unsupported endpoint type. Only address/wsdl/default " +
+                                    "endpoint types supported";
+                        }
+                        log.warn(logMsg);
                         messageStore.poll();
                     }
 
@@ -228,29 +237,6 @@ public class ForwardingJob implements StatefulJob {
             }
         }
     }
-
-
-    private BlockingMessageSender initMessageSender(Map<String, Object> params) {
-
-        BlockingMessageSender sender = null;
-        String axis2repo = (String) params.get(ForwardingProcessorConstants.AXIS2_REPO);
-        String axis2Config = (String) params.get(ForwardingProcessorConstants.AXIS2_CONFIG);
-
-        sender = new BlockingMessageSender();
-
-        if (axis2repo != null) {
-            sender.setClientRepository(axis2repo);
-        }
-
-
-        if (axis2Config != null) {
-            sender.setAxis2xml(axis2Config);
-        }
-        sender.init();
-
-        return sender;
-    }
-
 
     /**
      * Helper method to get a value of a parameters in the AxisConfiguration

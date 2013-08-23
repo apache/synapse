@@ -16,21 +16,19 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.apache.synapse.message.processors.forward;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseArtifact;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2BlockingClient;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.message.processors.MessageProcessor;
-import org.apache.synapse.message.processors.ScheduledMessageProcessor;
-import org.apache.synapse.message.store.AbstractMessageStore;
 import org.apache.synapse.message.store.MessageStore;
 
 import java.util.ArrayList;
@@ -39,37 +37,34 @@ import java.util.Set;
 
 public class MessageForwardingProcessorView implements MessageForwardingProcessorViewMBean {
 
+    private static final Log log = LogFactory.getLog(MessageForwardingProcessorView.class);
+
     private MessageStore messageStore;
-
-    private BlockingMessageSender sender;
-
+    private Axis2BlockingClient sender;
     private ScheduledMessageForwardingProcessor processor;
-    private static Log log = LogFactory.getLog(MessageForwardingProcessorView.class);
 
-
-    public MessageForwardingProcessorView(MessageStore messageStore, BlockingMessageSender sender,
-                                          ScheduledMessageForwardingProcessor processor)
-            throws Exception {
+    public MessageForwardingProcessorView(MessageStore messageStore, Axis2BlockingClient sender,
+                                          ScheduledMessageForwardingProcessor processor) {
         if (messageStore != null) {
             this.messageStore = messageStore;
         } else {
-            throw new Exception("Error , Can not create Message Forwarding Processor " +
-                    "view with null " + "message store");
+            throw new SynapseException("Cannot create Message Forwarding Processor " +
+                    "view with null message store");
         }
 
         if (sender != null) {
             this.sender = sender;
         } else {
-            throw new Exception("Error , Can not create Message Forwarding Processor " +
-                    "view with null " + "Message Sender");
+            throw new SynapseException("Cannot create Message Forwarding Processor " +
+                    "view with null message sender");
         }
 
 
         if (processor != null) {
             this.processor = processor;
         } else {
-            throw new SynapseException("Error , Can not create Message Forwarding Processor " +
-                    "view with null " + "Message Processor");
+            throw new SynapseException("Cannot create Message Forwarding Processor " +
+                    "view with null message processor");
         }
 
     }
@@ -186,23 +181,18 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
         if (messageContext != null) {
             Set proSet = messageContext.getPropertyKeySet();
 
-            if (proSet != null) {
-                if (proSet.contains(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR)) {
-                    proSet.remove(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR);
-                }
+            if (proSet != null && proSet.contains(SynapseConstants.BLOCKING_CLIENT_ERROR)) {
+                proSet.remove(SynapseConstants.BLOCKING_CLIENT_ERROR);
             }
 
-            String targetEp =
-                    (String) messageContext.getProperty(ForwardingProcessorConstants.TARGET_ENDPOINT);
+            String targetEp = (String) messageContext.getProperty(
+                    ForwardingProcessorConstants.TARGET_ENDPOINT);
 
             if (targetEp != null) {
                 Endpoint ep = messageContext.getEndpoint(targetEp);
-
-                if (ep instanceof AddressEndpoint) {
-
+                if ((ep != null) && (((AbstractEndpoint) ep).isLeafEndpoint())) {
                     try {
-                        MessageContext outCtx = sender.send(
-                                ((AddressEndpoint) ep).getDefinition(), messageContext);
+                        sender.send(ep, messageContext);
                         // If no Exception Occurred We remove the Message
                         if (delete) {
                             messageStore.poll();
@@ -212,17 +202,21 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
                         throw new Exception(e);
                     }
                 } else {
-                    // Currently only Address Endpoint delivery is supported
-                    String logMsg = "Address Endpoint Named " + targetEp +
-                            " not found.Hence removing " +
-                            "the message form store";
+                    String logMsg;
+                    if (ep == null) {
+                        logMsg = "Endpoint named " + targetEp + "not found. Hence removing " +
+                                "the message form store";
+                    } else {
+                        logMsg = "Unsupported endpoint type. Only address/wsdl/default endpoint " +
+                                "types supported";
+                    }
+
                     log.warn(logMsg);
                     if (delete) {
                         messageStore.poll();
                     }
                     throw new Exception(logMsg);
                 }
-
 
             } else {
                 //No Target Endpoint defined for the Message

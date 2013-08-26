@@ -79,6 +79,10 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
             callout.addAttribute(fac.createOMAttribute("passHeaders", nullNS, "true"));
         }
 
+        if (!mediator.isInitClientOptions()) {
+            callout.addAttribute(fac.createOMAttribute("initAxis2ClientOptions", nullNS, "false"));
+        }
+
         if (mediator.getRequestXPath() != null || mediator.getRequestKey() != null) {
             OMElement source = fac.createOMElement("source", synNS, callout);
             if (mediator.getRequestXPath() != null) {

@@ -74,6 +74,8 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     private boolean passHeaders = false;
 
+    private boolean initClientOptions = true;
+
     private boolean securityOn = false;  //Should messages be sent using WS-Security?
 
     private String wsSecPolicyKey = null;
@@ -284,6 +286,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void init(SynapseEnvironment synEnv) {
         blockingMsgSender = new Axis2BlockingClient(clientRepository, axis2xml);
+        blockingMsgSender.setInitClientOptions(initClientOptions);
 
         EndpointDefinition endpointDefinition = null;
 
@@ -399,6 +402,14 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     public void setPassHeaders(boolean passHeaders) {
         this.passHeaders = passHeaders;
+    }
+
+    public boolean isInitClientOptions() {
+        return initClientOptions;
+    }
+
+    public void setInitClientOptions(boolean initClientOptions) {
+        this.initClientOptions = initClientOptions;
     }
 
     /**

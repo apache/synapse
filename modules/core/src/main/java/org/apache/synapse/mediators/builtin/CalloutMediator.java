@@ -46,7 +46,7 @@ import org.jaxen.JaxenException;
 import java.util.List;
 
 /**
- * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
+ * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"] [initAxis2ClientOptions="true|false"]>
  * <configuration [axis2xml="string"] [repository="string"]/>?
  * <endpoint/>?
  * <source xpath="expression" | key="string">? <!-- key can be a MC property or entry key -->

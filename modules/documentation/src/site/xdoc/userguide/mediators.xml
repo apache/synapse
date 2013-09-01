@@ -826,37 +826,60 @@
             </subsection>
             <subsection name="Callout Mediator" id="Callout">
                 <p>
-                    Callout mediator performs a blocking external service invocation during
-                    mediation. 'serviceURL' and optional 'action' attributes specify the parameters
-                    for the external service call. The source element specifies the payload for the
-                    request message using an XPath expression; or a registry key. The target element
-                    specifies a node, at which the response payload will be attached into the
-                    current message, or the name of a key/property using which the response would be
-                    attached to the current message context as a property.
+                    Callout mediator performs a blocking external service invocation during mediation.
+                    The target external service can be configured either using a child endpoint element
+                    or using the 'serviceURL' attribute. When serviceURL is specified, it is used as
+                    the EPR of the external service. We can specify the endpoint element if we want to
+                    leverage endpoint functionality like format conversions, security, etc.
+                    The target endpoint can be defined inline or we can refer to an existing named
+                    endpoint in the configuration.
+                    Only Leaf endpoint types (Address/WSDL/Default) are supported.
+                    When both serviceURL and endpoint is not present, 'To' header on the request is
+                    used as the target endpoint.
                 </p>
-                <div class="xmlConf">&lt;callout [serviceURL="string"] [action="string"]&gt;
+                <div class="xmlConf">&lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"] [initAxis2ClientOptions="true|false"] &gt;
     &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
-    &lt;source xpath="expression" | key="string"&gt;
-    &lt;target xpath="expression" | key="string"/&gt;
+    &lt;endpoint/&gt;?
+    &lt;source xpath="expression" | key="string"&gt;?
+    &lt;target xpath="expression" | key="string"/&gt;?
     &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
 &lt;/callout&gt;</div>
                 <p>
+                    'action' attribute can be used to specify the SOAP Action of the external service
+                    call. When 'initAxis2ClientOptions' is set to false, axis2 client options available
+                    in the incoming message context is reused for the service invocation.
+                    When 'passHeaders' is set to true, SOAP Headers of the received message is parsed
+                    to the external service.
+                </p>
+                <p>
+                    The source element specifies the payload for the request message using an XPath
+                    expression or a registry key.
+                    When source element is not defined, entire SOAP Envelope arrived at the Callout
+                    mediator is treated as the source.
+                    The target element specifies a node, at which the response payload will be
+                    attached into the current message, or the name of a key/property using which the
+                    response would be attached to the current message context as a property.
+                    When target element is not specified, entire SOAP Envelope arrived to the
+                    Callout mediator is replaced from the response received from the external service
+                    invocation.
+
+                </p>
+                <p>
                     Since the callout mediator performs a blocking call, it cannot use the default
-                    non-blocking http/s transports based on Java NIO, and thus defaults to using the
-                    samples/axis2Client/client_repo/conf/axis2.xml as the Axis2 configuration, and
-                    samples/axis2Client/client_repo as the client repository unless these are
-                    specified otherwise inside the 'configuration' sub-element.
+                    non-blocking http/s transports based on Java NIO, and thus defaults to
+                    using the repository/conf/axis2_blocking_client.xml as the
+                    Axis2 configuration, and repository/ as the client repository
+                    unless these are specified inside the 'configuration' sub-element.
                 </p>
                 <p>
                     To invoke secured services, Callout mediator can be configured to enable WS-Security
-                    using the enableSec element. Security policy should be specified using the 'policy'
+                    using the 'enableSec' element. Security policy should be specified using the 'policy'
                     attribute which may point to a registry key or a local entry. You can also specify
                     two different policies for inbound and outbound messages (flows). This is done by
-                    using the 'inboundPolicy' and 'outboundPolicy' attributes.
-                </p>
-                <p>
-                    When the 'serviceURL' attribute is not present, the 'To' header on the request
-                    is used as the target endpoint.
+                    using the 'inboundPolicy' and 'outboundPolicy' attributes. These security
+                    configurations will not get activated if we configure the external service using
+                    the endpoint element. When endpoint is defined, security settings can be
+                    configured at the endpoint.
                 </p>
             </subsection>
             <subsection name="Clone Mediator" id="Clone">

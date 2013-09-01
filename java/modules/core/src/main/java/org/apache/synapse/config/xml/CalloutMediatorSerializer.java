@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
 
 /**
  * <pre>
- * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
+ * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"] [initAxis2ClientOptions="true|false"]&gt;
  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
  *      &lt;endpoint/&gt;?
  *      &lt;source xpath="expression" | key="string"&gt;?

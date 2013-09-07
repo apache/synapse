@@ -30,7 +30,6 @@ public class Sample7 extends SynapseTestCase {
         super(7);
     }
 
-
     public void testLocalRegEntriesAndSchemaValidation() {
         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
         String trpUrl = "http://localhost:8280";

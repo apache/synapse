@@ -133,16 +133,16 @@ public class SOAPUtils {
                         } else {
                             newSOAPHeader.addAttribute(attr);
                         }
-
-                        Iterator itrChildren = soapHeader.getChildren();
-                        while (itrChildren.hasNext()) {
-                            OMNode node = (OMNode) itrChildren.next();
-                            itrChildren.remove();
-                            newSOAPHeader.addChild(node);
-                        }
-
-                        newEnvelope.getHeader().addChild(newSOAPHeader);
                     } // while(allAttributes.hasNext())
+
+                    Iterator itrChildren = soapHeader.getChildren();
+                    while (itrChildren.hasNext()) {
+                        OMNode node = (OMNode) itrChildren.next();
+                        itrChildren.remove();
+                        newSOAPHeader.addChild(node);
+                    }
+
+                    newEnvelope.getHeader().addChild(newSOAPHeader);
 
                 } else {
                     itr.remove();
@@ -289,16 +289,16 @@ public class SOAPUtils {
                         } else {
                             newSOAPHeader.addAttribute(attr);
                         }
-
-                        Iterator itrChildren = soapHeaderBlock.getChildren();
-                        while (itrChildren.hasNext()) {
-                            OMNode node = (OMNode) itrChildren.next();
-                            itrChildren.remove();
-                            newSOAPHeader.addChild(node);
-                        }
-
-                        newEnvelope.getHeader().addChild(newSOAPHeader);
                     }
+
+                    Iterator itrChildren = soapHeaderBlock.getChildren();
+                    while (itrChildren.hasNext()) {
+                        OMNode node = (OMNode) itrChildren.next();
+                        itrChildren.remove();
+                        newSOAPHeader.addChild(node);
+                    }
+
+                    newEnvelope.getHeader().addChild(newSOAPHeader);
 
                 } else {
                     itr.remove();

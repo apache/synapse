@@ -19,20 +19,19 @@
 package samples.userguide;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -172,12 +171,7 @@ public class AMQPConsumer {
      * @throws XMLStreamException on error
      */
     private void parseOrder(String payload) throws XMLStreamException {
-        InputStream is = new ByteArrayInputStream(payload.getBytes());
-        javax.xml.stream.XMLStreamReader parser = XMLInputFactory
-                .newInstance().createXMLStreamReader(is);
-        StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(parser,
-                null);
-        SOAPEnvelope envelope = (SOAPEnvelope) builder.getDocumentElement();
+        SOAPEnvelope envelope = OMXMLBuilderFactory.createSOAPModelBuilder(new StringReader(payload)).getSOAPEnvelope();
         // retrieve SOAP body
         SOAPBody soapBody = envelope.getBody();
         OMElement messageNode = soapBody.getFirstChildWithName(new QName(

@@ -20,7 +20,8 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
@@ -100,9 +101,9 @@ public class ServiceDynamicLoadbalanceEndpointFactory extends EndpointFactory {
                 configuration = System.getProperty(configuration.substring("$system:".length()));
             }
             // Load the file
-            StAXOMBuilder builder = null;
+            OMXMLParserWrapper builder = null;
             try {
-                builder = new StAXOMBuilder(new URL(configuration).openStream());
+                builder = OMXMLBuilderFactory.createOMBuilder(new URL(configuration).openStream());
             } catch (Exception e) {
                 handleException("Could not load ServiceDynamicLoadbalanceEndpoint configuration file " +
                                 configuration);

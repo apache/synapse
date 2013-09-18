@@ -21,7 +21,8 @@ package org.apache.synapse.samples.framework;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
@@ -192,7 +193,7 @@ public abstract class SynapseTestCase extends TestCase {
             if (in == null) {
                 fail("Cannot read sample descriptor file");
             }
-            StAXOMBuilder builder = new StAXOMBuilder(in);
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);
             return builder.getDocumentElement();
         } catch (Exception e) {
             log.error("Error loading test descriptor", e);

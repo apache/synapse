@@ -20,7 +20,6 @@
 package org.apache.synapse.samples.framework.clients;
 
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -48,6 +47,8 @@ import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
 import samples.common.StockQuoteHandler;
 
 import javax.xml.namespace.QName;
+
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class StockQuoteSampleClient {
             log.info("Using WS-Security");
             serviceClient.engageModule("addressing");
             serviceClient.engageModule("rampart");
-            StAXOMBuilder builder = new StAXOMBuilder(policyKey);
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new FileInputStream(policyKey));
             Policy policy = PolicyEngine.getPolicy(builder.getDocumentElement());
             options.setProperty(RampartMessageData.KEY_RAMPART_POLICY, policy);
         }

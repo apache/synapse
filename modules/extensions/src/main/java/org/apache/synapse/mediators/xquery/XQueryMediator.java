@@ -22,9 +22,11 @@ import net.sf.saxon.javax.xml.xquery.*;
 import net.sf.saxon.xqj.SaxonXQDataSource;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -41,8 +43,6 @@ import org.xml.sax.InputSource;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -352,9 +352,8 @@ public class XQueryMediator extends AbstractMediator {
                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||
                             XQItemType.XQITEMKIND_ELEMENT == itemKind ||
                             XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
-                        StAXOMBuilder builder = new StAXOMBuilder(
-                                XMLInputFactory.newInstance().createXMLStreamReader(
-                                        new StringReader(xqItem.getItemAsString())));
+                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(
+                                new StringReader(xqItem.getItemAsString()));
                         OMElement resultOM = builder.getDocumentElement();
                         if (resultOM != null) {
                             //replace the target node from the result
@@ -393,9 +392,8 @@ public class XQueryMediator extends AbstractMediator {
                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||
                             XQItemType.XQITEMKIND_ELEMENT == itemKind ||
                             XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
-                        StAXOMBuilder builder = new StAXOMBuilder(
-                                XMLInputFactory.newInstance().createXMLStreamReader(
-                                        new StringReader(xqItem.getItemAsString())));
+                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(
+                                new StringReader(xqItem.getItemAsString()));
                         OMElement resultOM = builder.getDocumentElement();
                         if (resultOM != null) {
                             ((OMElement) destination).addChild(resultOM);
@@ -409,7 +407,7 @@ public class XQueryMediator extends AbstractMediator {
             resultSequence.close();  // closing the result sequence
         } catch (XQException e) {
             handleException("Error during the querying " + e.getMessage(), e);
-        } catch (XMLStreamException e) {
+        } catch (OMException e) {
             handleException("Error during retrieving  the Doument Node as  the result "
                     + e.getMessage(), e);
         }

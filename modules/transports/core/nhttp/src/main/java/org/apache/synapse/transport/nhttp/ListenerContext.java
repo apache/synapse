@@ -21,7 +21,8 @@ package org.apache.synapse.transport.nhttp;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
@@ -165,13 +166,13 @@ public class ListenerContext {
         OMElement definitions;
         try {
             FileInputStream fis = new FileInputStream(fileName);
-            definitions = new StAXOMBuilder(fis).getDocumentElement();
+            definitions = OMXMLBuilderFactory.createOMBuilder(fis).getDocumentElement();
             assert definitions != null;
             definitions.build();
         } catch (FileNotFoundException e) {
             handleException("Priority configuration file cannot be found : " + fileName, e);
             return;
-        } catch (XMLStreamException e) {
+        } catch (OMException e) {
             handleException("Error parsing priority configuration xml file " + fileName, e);
             return;
         }

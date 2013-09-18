@@ -22,7 +22,8 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -34,10 +35,6 @@ import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.throttle.*;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 
 /**
@@ -168,27 +165,14 @@ public class ThrottleMediatorTest extends TestCase {
                 OMAbstractFactory.getSOAP11Factory().createOMDocument();
         omDoc.addChild(envelope);
 
-        envelope.getBody().addChild(createOMElement(payload));
+        envelope.getBody().addChild(OMXMLBuilderFactory.createOMBuilder(new StringReader(payload)).getDocumentElement());
 
         synMc.setEnvelope(envelope);
         return synMc;
     }
 
-    public static OMElement createOMElement(String xml) {
-        try {
-            XMLStreamReader reader = XMLInputFactory
-                    .newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            return builder.getDocumentElement();
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void testMediate() throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
-        StAXOMBuilder builder = new StAXOMBuilder(in);
+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new StringReader(POLICY));
         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
         throttleMediator.setPolicyKey("throttlepolicy");
         MessageContext synCtx = createLightweightSynapseMessageContext("<empty/>");
@@ -222,10 +206,9 @@ public class ThrottleMediatorTest extends TestCase {
     }
 
     public void testMediateWithInLineXML() throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());
-        StAXOMBuilder build = new StAXOMBuilder(in);
+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new StringReader(POLICY));
         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();
-        throttleMediator.setInLinePolicy(build.getDocumentElement());
+        throttleMediator.setInLinePolicy(builder.getDocumentElement());
         MessageContext synCtx = createLightweightSynapseMessageContext("<empty/>");
         synCtx.setProperty(REMOTE_ADDR, "192.168.8.212");
         SynapseConfiguration synCfg = new SynapseConfiguration();

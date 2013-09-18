@@ -20,7 +20,8 @@ package org.apache.synapse.libraries.util;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.util.Utils;
 import org.apache.commons.logging.Log;
@@ -33,7 +34,6 @@ import org.apache.synapse.libraries.model.LibraryArtifact;
 import org.apache.synapse.libraries.model.SynapseLibrary;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -100,7 +100,7 @@ public class LibDeployerUtils {
         InputStream xmlInputStream = null;
         try {
             xmlInputStream = new FileInputStream(f);
-            OMElement documentElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();
+            OMElement documentElement = OMXMLBuilderFactory.createOMBuilder(xmlInputStream).getDocumentElement();
             if (documentElement == null) {
                 throw new SynapseArtifactDeploymentException("Document element for artifacts.xml is " +
                                                              "null. Can't build " +
@@ -117,7 +117,7 @@ public class LibDeployerUtils {
         } catch (FileNotFoundException e) {
             throw new SynapseArtifactDeploymentException("artifacts.xml File cannot be loaded from " + libXmlPath, e);
 
-        } catch (XMLStreamException e) {
+        } catch (OMException e) {
             throw new SynapseArtifactDeploymentException("Error while parsing the artifacts.xml file ", e);
         } finally {
             if (xmlInputStream != null) {
@@ -238,7 +238,7 @@ public class LibDeployerUtils {
     private static LibraryArtifact buildArtifact(SynapseLibrary library, InputStream artifactXmlStream, String directoryPath) {
         LibraryArtifact artifact = null;
         try {
-            OMElement artElement = new StAXOMBuilder(artifactXmlStream).getDocumentElement();
+            OMElement artElement = OMXMLBuilderFactory.createOMBuilder(artifactXmlStream).getDocumentElement();
 
             if (LibDeployerConstants.ARTIFACT.equals(artElement.getLocalName())) {
                 artifact = populateLibraryArtifact(artElement, directoryPath, null, library);
@@ -247,7 +247,7 @@ public class LibDeployerUtils {
                           + library.getQName());
                 return null;
             }
-        } catch (XMLStreamException e) {
+        } catch (OMException e) {
             throw new SynapseArtifactDeploymentException("Error parsing artifact.xml for path : " +
                                                          directoryPath ,e);
         }

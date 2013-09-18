@@ -20,13 +20,13 @@
 package org.apache.synapse.libraries.model;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentException;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.util.Properties;
 
@@ -51,10 +51,10 @@ public abstract class ArtifactFile {
         InputStream xmlInputStream = null;
         try {
             xmlInputStream = new FileInputStream(f);
-            configurationElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();
+            configurationElement = OMXMLBuilderFactory.createOMBuilder(xmlInputStream).getDocumentElement();
         } catch (FileNotFoundException e) {
                throw new SynapseArtifactDeploymentException("file not found at : " + fileXmlPath);
-        } catch (XMLStreamException e) {
+        } catch (OMException e) {
             throw new SynapseArtifactDeploymentException("Error while parsing the artifacts.xml file : " + fileXmlPath , e);
         } finally {
             if (xmlInputStream != null) {

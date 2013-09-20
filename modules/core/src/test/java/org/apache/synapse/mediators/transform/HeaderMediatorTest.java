@@ -41,7 +41,7 @@ public class HeaderMediatorTest extends TestCase {
         headerMediator.setQName(new QName(SynapseConstants.HEADER_TO));
         headerMediator.setValue(TEST_HEADER);
 
-        // invoke transformation, with static enveope
+        // invoke transformation, with static envelope
         MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         headerMediator.mediate(synCtx);
 
@@ -119,5 +119,30 @@ public class HeaderMediatorTest extends TestCase {
         result = synCtx.getEnvelope().getHeader().getFirstChildWithName(
                 new QName("http://org.synapse.example", "complexHeader"));
         assertNull(result);
+    }
+
+    public void testEmbeddedXmlClone() throws Exception {
+        // Test for SYNAPSE-977
+        String complexHeader = "<header><m:complexHeader xmlns:m=\"http://org.synapse.example\">TEST</m:complexHeader></header>";
+
+        HeaderMediatorFactory fac = new HeaderMediatorFactory();
+        HeaderMediator headerMediator = (HeaderMediator) fac.createMediator(
+                AXIOMUtil.stringToOM(complexHeader), new Properties());
+
+        // Adding headers.
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        headerMediator.mediate(synCtx);
+        OMElement result = synCtx.getEnvelope().getHeader().getFirstElement();
+        assertEquals("complexHeader", result.getLocalName());
+        assertEquals("TEST", result.getText());
+
+        // Now mutate the result
+        result.setText("TEST123");
+
+        synCtx = TestUtils.getTestContext("<empty/>");
+        headerMediator.mediate(synCtx);
+        result = synCtx.getEnvelope().getHeader().getFirstElement();
+        assertEquals("complexHeader", result.getLocalName());
+        assertEquals("TEST", result.getText());
     }
 }

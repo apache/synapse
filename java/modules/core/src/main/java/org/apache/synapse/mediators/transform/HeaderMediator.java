@@ -169,7 +169,9 @@ public class HeaderMediator extends AbstractMediator {
             hb.setText(value);
         } else if (hasEmbeddedXml()) {
             for (OMElement e : embeddedXmlContent) {
-                header.addChild(e);
+                // Don't attach the original OMElement here.
+                // If another mediator down the line, changes the OM, we are in trouble.
+                header.addChild(e.cloneOMElement());
             }
         }
     }

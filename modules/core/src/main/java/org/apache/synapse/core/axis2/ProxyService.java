@@ -75,7 +75,6 @@ import java.util.*;
  *       <resource location="..." key="..."/>*
  *    </publishWSDL>?
  *    <enableSec/>?
- *    <enableRM/>?
  *    <policy key="string" [type=("in" |"out")] [operationName="string"]
  *      [operationNamespace="string"]>?
  *       // optional service parameters
@@ -183,10 +182,6 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
      * Should WS Addressing be engaged on this service
      */
     private boolean wsAddrEnabled = false;
-    /**
-     * Should WS RM be engaged on this service
-     */
-    private boolean wsRMEnabled = false;
     /**
      * Should WS Sec be engaged on this service
      */
@@ -605,17 +600,6 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
             }
         }
 
-        // should RM be engaged on this service?
-        if (wsRMEnabled) {
-            auditInfo("WS-Reliable messaging is enabled for service : " + name);
-            try {
-                proxyService.engageModule(axisCfg.getModule(
-                    SynapseConstants.RM_MODULE_NAME), axisCfg);
-            } catch (AxisFault axisFault) {
-                handleException("Error loading WS RM module on proxy service : " + name, axisFault);
-            }
-        }
-
         // should Security be engaged on this service?
         if (wsSecEnabled) {
             auditInfo("WS-Security is enabled for service : " + name);
@@ -628,7 +612,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
             }
         }
 
-        moduleEngaged = wsSecEnabled || wsRMEnabled || wsAddrEnabled;
+        moduleEngaged = wsSecEnabled || wsAddrEnabled;
         wsdlPublished = wsdlFound;
 
         auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
@@ -872,14 +856,6 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
 
     public void setWsAddrEnabled(boolean wsAddrEnabled) {
         this.wsAddrEnabled = wsAddrEnabled;
-    }
-
-    public boolean isWsRMEnabled() {
-        return wsRMEnabled;
-    }
-
-    public void setWsRMEnabled(boolean wsRMEnabled) {
-        this.wsRMEnabled = wsRMEnabled;
     }
 
     public boolean isWsSecEnabled() {

@@ -42,9 +42,7 @@ public class AnonymousServiceFactory {
     private static final String NONE            = "__NONE__";
     private static final String ADDR_ONLY       = "__ADDR_ONLY__";
     private static final String SEC_ONLY        = "__SEC_ONLY__";
-    private static final String RM_AND_ADDR     = "__RM_AND_ADDR__";
     private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
-    private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
 
     public static final String OUT_IN_OPERATION   = "anonOutInOp";
     public static final String OUT_ONLY_OPERATION = "anonOutonlyOp";
@@ -57,14 +55,13 @@ public class AnonymousServiceFactory {
      * @param synCfg   Synapse configuration
      * @param axisCfg  Axis2 configuration
      * @param wsAddrOn whether addressing is on or not
-     * @param wsRMOn   whether RM is on ot not
      * @param wsSecOn  whether security is on or not
      * @return An Axis service for the requested QoS
      */
     public static AxisService getAnonymousService(SynapseConfiguration synCfg,
                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
-                                                  boolean wsRMOn, boolean wsSecOn) {
-        return getAnonymousService(synCfg, axisCfg, wsAddrOn, wsRMOn, wsSecOn, true);
+                                                  boolean wsSecOn) {
+        return getAnonymousService(synCfg, axisCfg, wsAddrOn, wsSecOn, true);
     }
 
 
@@ -74,14 +71,13 @@ public class AnonymousServiceFactory {
      * @param synCfg Synapse configuration
      * @param axisCfg Axis2 configuration
      * @param wsAddrOn whether addressing is on or not
-     * @param wsRMOn whether RM is on ot not
      * @param wsSecOn whether security is on or not
      * @param setCallback whether to register a synapse callback receiver or not
      * @return An Axis service for the requested QoS
      */
     public static AxisService getAnonymousService(SynapseConfiguration synCfg,
                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
-                                                  boolean wsRMOn, boolean wsSecOn, boolean setCallback) {
+                                                  boolean wsSecOn, boolean setCallback) {
 
         // if non of addressing, security and rm is engaged then checkbit is 0
         int checkbit = 0;
@@ -89,8 +85,6 @@ public class AnonymousServiceFactory {
         if (wsAddrOn) { checkbit += 1; }
         // if security is on increase the checkbit by 2
         if (wsSecOn) { checkbit += 2; }
-        // if reliable messaging is on increase the checkbit by 4
-        if (wsRMOn) { checkbit += 4; }
 
         String servicekey;
         switch (checkbit) {
@@ -105,18 +99,6 @@ public class AnonymousServiceFactory {
                 break;
             case 3 :
                 servicekey = SEC_AND_ADDR;
-                break;
-            case 4 :
-                servicekey = RM_AND_ADDR;
-                break;
-            case 5 :
-                servicekey = RM_AND_ADDR;
-                break;
-            case 6:
-                servicekey = RM_SEC_AND_ADDR;
-                break;
-            case 7:
-                servicekey = RM_SEC_AND_ADDR;
                 break;
             default :
                 servicekey = NONE;
@@ -139,11 +121,6 @@ public class AnonymousServiceFactory {
                     if (wsAddrOn) {
                         service.engageModule(axisCfg.getModule(
                             SynapseConstants.ADDRESSING_MODULE_NAME), axisCfg);
-
-                        if (wsRMOn) {
-                            service.engageModule(axisCfg.getModule(
-                                SynapseConstants.RM_MODULE_NAME), axisCfg);
-                        }
                     }
                     // if WS-A is off, WS-RM should be too
 

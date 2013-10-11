@@ -219,8 +219,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
         contentAware = definition != null &&
                 ((definition.getFormat() != null && !definition.getFormat().equals(SynapseConstants.FORMAT_REST)) ||
-                definition.isSecurityOn() || definition.isReliableMessagingOn() ||
-                definition.isAddressingOn());
+                definition.isSecurityOn() || definition.isAddressingOn());
     }
 
     public boolean readyToSend() {

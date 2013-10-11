@@ -167,31 +167,6 @@
                                     <fileset dir="${SSQ3.dir}"/>
                                 </jar>
 
-                                <property name="src4" value="../samples/services/ReliableStockQuoteService/src"/>
-                                <delete dir="${temp.dir}"/>
-                                <mkdir dir="${temp.dir}"/>
-                                <mkdir dir="${classes}"/>
-                                <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
-                                    <src path="${src4}"/>
-                                    <classpath refid="maven.compile.classpath"/>
-                                </javac>
-                                <property name="RSQ.dir" value="${temp.dir}/ReliableStockQuoteService"/>
-                                <mkdir dir="${RSQ.dir}"/>
-
-                                <mkdir dir="${RSQ.dir}/META-INF"/>
-                                <copy file="${src4}/../conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml"/>
-                                <!--<copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl"-->
-                                <!--tofile="${RSQ.dir}/META-INF/service.wsdl"/>-->
-                                <copy toDir="${RSQ.dir}">
-                                    <fileset dir="${classes}">
-                                        <include name="**/*.class"/>
-                                    </fileset>
-                                </copy>
-
-                                <jar destfile="${services}/ReliableStockQuoteService.aar">
-                                    <fileset dir="${RSQ.dir}"/>
-                                </jar>
-
                                 <property name="src5" value="../samples/services/LoadbalanceFailoverService/src"/>
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
@@ -270,14 +245,6 @@
                                     </outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.apache.sandesha2</groupId>
-                                    <artifactId>sandesha2</artifactId>
-                                    <version>${sandesha2.version}</version>
-                                    <type>mar</type>
-                                    <outputDirectory>target/test_repos/axis2Server/modules
-                                    </outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.apache.axis2</groupId>
                                     <artifactId>addressing</artifactId>
                                     <version>${addressing.version}</version>
@@ -309,15 +276,6 @@
                                     <outputDirectory>target/test_repos/synapse/modules
                                     </outputDirectory>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.sandesha2</groupId>
-                                    <artifactId>sandesha2</artifactId>
-                                    <version>${sandesha2.version}</version>
-                                    <type>mar</type>
-                                    <outputDirectory>target/test_repos/synapse/modules
-                                    </outputDirectory>
-                                </artifactItem>
-
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -391,11 +349,6 @@
                     <artifactId>woden-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2-core</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>

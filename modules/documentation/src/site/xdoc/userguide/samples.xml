@@ -73,7 +73,6 @@
                 <p>
                     <ul>
                         <li><a href="samples/sample100.html">Sample 100: Using WS-Security for outgoing messages</a></li>
-                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages</a></li>
                     </ul>
                 </p>
             </subsection>
@@ -96,7 +95,6 @@
                 <p>
                     <ul>
                         <li><a href="samples/sample200.html">Sample 200: Engaging WS-Security on proxy services</a></li>
-                        <li><a href="samples/sample201.html">Sample 201: Reliable communication between the client and proxy services using WS-ReliableMessaging</a></li>
                     </ul>
                 </p>
             </subsection>

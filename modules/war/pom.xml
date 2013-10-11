@@ -113,13 +113,6 @@
                                     <outputDirectory>target/temp/lib</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.apache.sandesha2</groupId>
-                                    <artifactId>sandesha2</artifactId>
-                                    <version>${sandesha2.version}</version>
-                                    <type>mar</type>
-                                    <outputDirectory>target/temp/lib</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.apache.rampart</groupId>
                                     <artifactId>rampart</artifactId>
                                     <version>${rampart.version}</version>
@@ -208,7 +201,6 @@
                             <includes>
                                 <include>addressing-${addressing.version}.mar</include>
                                 <include>rampart-${rampart.version}.mar</include>
-                                <include>sandesha2-${sandesha2.version}.mar</include>
                             </includes>
                         </resource>
                         <resource>

@@ -51,8 +51,6 @@ public final class SynapseConstants {
     public static final QName SYNAPSE_OPERATION_NAME = new QName("mediate");
 
     //- names of modules to be engaged at runtime -
-    /** The Name of the WS-RM module */
-    public static final String RM_MODULE_NAME = "sandesha2";
     /** The Name of the WS-A Addressing module */
     public static final String ADDRESSING_MODULE_NAME = "addressing";
     /** The Name of the WS-Security module */
@@ -97,10 +95,8 @@ public final class SynapseConstants {
     public static final String RAMPART_POLICY = "rampartPolicy";
     /** The Axis2 client options property name for the Rampart in message policy */
     public static final String RAMPART_IN_POLICY = "rampartInPolicy";
-    /** The Axis2 client options property name for the Rampart out messsage policy */
+    /** The Axis2 client options property name for the Rampart out message policy */
     public static final String RAMPART_OUT_POLICY = "rampartOutPolicy";
-    /** The Axis2 client options property name for the Sandesha policy */
-	public static final String SANDESHA_POLICY = "sandeshaPolicy";
     /** ServerManager MBean category and id */
     public static final String SERVER_MANAGER_MBEAN = "ServerManager";
     public static final String RECEIVING_SEQUENCE = "RECEIVING_SEQUENCE";

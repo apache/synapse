@@ -300,17 +300,6 @@
                                             </outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>org.apache.sandesha2</groupId>
-                                            <artifactId>sandesha2</artifactId>
-                                            <version>${sandesha2.version}</version>
-                                            <type>mar</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>target/test_repos/axis2Server/modules
-                                            </outputDirectory>
-                                        </artifactItem>
-
-
-                                        <artifactItem>
                                             <groupId>org.apache.axis2</groupId>
                                             <artifactId>addressing</artifactId>
                                             <version>${addressing.version}</version>
@@ -323,15 +312,6 @@
                                             <groupId>org.apache.rampart</groupId>
                                             <artifactId>rampart</artifactId>
                                             <version>${rampart.version}</version>
-                                            <type>mar</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>target/test_repos/synapse/modules
-                                            </outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.apache.sandesha2</groupId>
-                                            <artifactId>sandesha2</artifactId>
-                                            <version>${sandesha2.version}</version>
                                             <type>mar</type>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>target/test_repos/synapse/modules

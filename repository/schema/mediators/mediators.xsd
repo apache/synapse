@@ -38,7 +38,6 @@
     <xs:include schemaLocation="transformation/xslt.xsd"/>
     <xs:include schemaLocation="transformation/xquery.xsd"/>
     <xs:include schemaLocation="transformation/rewrite.xsd"/>
-    <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
     <xs:include schemaLocation="advanced/cache.xsd"/>
     <xs:include schemaLocation="advanced/event.xsd"/>
@@ -77,7 +76,6 @@
             <xs:element ref="validate"/>
             <xs:element ref="filter"/>
             <xs:element ref="switch"/>
-            <xs:element ref="RMSequence"/>
             <xs:element ref="makefault"/>
             <xs:element ref="script"/>
             <xs:element ref="xslt"/>

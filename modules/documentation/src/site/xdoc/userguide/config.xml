@@ -737,7 +737,6 @@
                 <div class="xmlConf">&lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
          [encoding="<em>charset encoding</em>"]
          [statistics="enable|disable"] [trace="enable|disable"]&gt;
-    &lt;enableRM [policy="<em>key</em>"]/&gt;?
     &lt;enableSec [policy="<em>key</em>"]/&gt;?
     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
 
@@ -764,9 +763,9 @@
                     attributes of the endpoint directly in the configuration. The 'uri' attribute
                     of the address element contains the EPR of the target endpoint. Message format
                     for the endpoint and the method to optimize attachments can be specified in the
-                    'format' and 'optimize' attributes respectively. Reliable messaging and security
+                    'format' and 'optimize' attributes respectively. Security
                     policies for the endpoint can be specified in the policy attribute of the
-                    'enableRM' and 'enableSec' elements respectively. WS-Addressing can be engaged
+                    'enableSec' element. WS-Addressing can be engaged
                     for the messages sent to the endpoint by using the 'enableAddressing' element.
                 </p>
                 <p>
@@ -844,7 +843,7 @@
                     Default endpoint is an endpoint defined for adding QoS and other configurations
                     to the endpoint which is resolved from the 'To' address of the message context.
                     All the configurations such as message format for the endpoint, the method to
-                    optimize attachments, reliable messaging, security policies for the endpoint
+                    optimize attachments, and security policies for the endpoint
                     can be specified as in the case of Address Endpoint. This endpoint differs from
                     the address endpoint only in the 'uri' attribute which will not be present in
                     this endpoint. Following section describes the configuration of a default
@@ -853,7 +852,6 @@
                 <div class="xmlConf">&lt;default [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
          [encoding="<em>charset encoding</em>"]
          [statistics="enable|disable"] [trace="enable|disable"]&gt;
-    &lt;enableRM [policy="<em>key</em>"]/&gt;?
     &lt;enableSec [policy="<em>key</em>"]/&gt;?
     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
 
@@ -882,13 +880,12 @@
                     WSDL document can be specified either as a URI or as an inline definition within
                     the configuration. The service and port name containing the target EPR has to be
                     specified with the 'service' and 'port' (or 'endpoint') attributes respectively.
-                    Elements like 'enableRM', 'enableSec', 'enableAddressing', 'suspendOnFailure' and
+                    Elements like 'enableSec', 'enableAddressing', 'suspendOnFailure' and
                     'timeout' are same as for an Address endpoint.
                 </p>
                 <div class="xmlConf">&lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
     &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
     &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
-    &lt;enableRM [policy="key"]/&gt;?
     &lt;enableSec [policy="key"]/&gt;?
     &lt;enableAddressing/&gt;?
 
@@ -1035,7 +1032,6 @@
     &lt;/publishWSDL&gt;?
     &lt;enableAddressing/&gt;?
     &lt;enableSec/&gt;?
-    &lt;enableRM/&gt;?
     &lt;policy key="string" [type="(in | out)"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)
     &lt;parameter name="string"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)
         string | xml
@@ -1084,7 +1080,7 @@
                 elements (e.g. the JMS destination etc). If the proxy service should enable
                 WS-Reliable Messaging or Security, the appropriate modules should be engaged, and
                 specified service level policies will apply. To engage the required modules, one may
-                use the 'enableSec', 'enableRM' and 'enableAddressing' elements.
+                use the 'enableSec', and 'enableAddressing' elements.
             </p>
             <p>
                 A dynamic proxy may be defined by specifying the properties of the proxy as dynamic

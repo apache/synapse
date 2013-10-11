@@ -43,10 +43,6 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     private String address = null;
     /**
-     * Should messages be sent in an WS-RM Sequence ?
-     */
-    private boolean reliableMessagingOn = false;
-    /**
      * Should messages be sent using WS-A?
      */
     private boolean addressingOn = false;
@@ -58,10 +54,6 @@ public class EndpointDefinition implements AspectConfigurable {
      * Should messages be sent using WS-Security?
      */
     private boolean securityOn = false;
-    /**
-     * The "key" for any WS-RM Policy overrides to be used
-     */
-    private String wsRMPolicyKey = null;
     /**
      * The "key" for any Rampart Security Policy to be used
      */
@@ -220,24 +212,6 @@ public class EndpointDefinition implements AspectConfigurable {
     }
 
     /**
-     * Is RM turned on on this endpoint?
-     *
-     * @return true if on
-     */
-    public boolean isReliableMessagingOn() {
-        return reliableMessagingOn;
-    }
-
-    /**
-     * Request that RM be turned on/off on this endpoint
-     *
-     * @param reliableMessagingOn a boolean flag indicating RM is on or not
-     */
-    public void setReliableMessagingOn(boolean reliableMessagingOn) {
-        this.reliableMessagingOn = reliableMessagingOn;
-    }
-
-    /**
      * Is WS-A turned on on this endpoint?
      *
      * @return true if on
@@ -346,24 +320,6 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     public void setOutboundWsSecPolicyKey(String outboundWsSecPolicyKey) {
         this.outboundWsSecPolicyKey = outboundWsSecPolicyKey;
-    }
-
-    /**
-     * Get the WS-RM configuration policys' 'key' to be used
-     *
-     * @return the WS-RM configuration policys' 'key' to be used
-     */
-    public String getWsRMPolicyKey() {
-        return wsRMPolicyKey;
-    }
-
-    /**
-     * Set the WS-RM configuration policys' 'key' to be used
-     *
-     * @param wsRMPolicyKey the WS-RM configuration policys' 'key' to be used
-     */
-    public void setWsRMPolicyKey(String wsRMPolicyKey) {
-        this.wsRMPolicyKey = wsRMPolicyKey;
     }
 
     public void setUseSeparateListener(boolean b) {

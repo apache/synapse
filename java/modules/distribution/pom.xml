@@ -98,15 +98,6 @@
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2</artifactId>
-            <type>mar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2-policy</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
             <type>mar</type>

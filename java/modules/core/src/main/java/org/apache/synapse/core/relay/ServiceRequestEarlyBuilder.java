@@ -26,7 +26,6 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -82,12 +81,6 @@ public class ServiceRequestEarlyBuilder extends AbstractHandler {
                     WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
             if (outMessage != null && Boolean.TRUE.equals(
                     outMessage.getProperty(RelayConstants.FORCE_RESPONSE_EARLY_BUILD))) {
-                return buildMessage(messageContext);
-            }
-
-            AxisOperation operation = messageContext.getAxisOperation();
-            if (operation != null && operation.getName().getLocalPart().
-                    startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) {
                 return buildMessage(messageContext);
             }
         }

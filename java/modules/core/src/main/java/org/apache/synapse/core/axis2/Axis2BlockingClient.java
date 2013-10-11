@@ -146,7 +146,7 @@ public class Axis2BlockingClient {
 
         AxisService anonymousService = AnonymousServiceFactory.getAnonymousService(null,
                 configurationContext.getAxisConfiguration(), endpointDefinition.isAddressingOn(),
-                false, endpointDefinition.isSecurityOn(), false);
+                endpointDefinition.isSecurityOn(), false);
         anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
         ServiceGroupContext serviceGroupContext = new ServiceGroupContext(configurationContext, (AxisServiceGroup) anonymousService.getParent());
         ServiceContext serviceCtx = serviceGroupContext.getServiceContext(anonymousService);

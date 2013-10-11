@@ -194,7 +194,6 @@ public class TestSamplesHandlerSuite extends TestSuite {
 
         //QoS
         sampleClassRepo.put("100", Sample100.class);
-        sampleClassRepo.put("101", Sample101.class);
 
         //Proxy Service
         sampleClassRepo.put("150", Sample150.class);

@@ -47,7 +47,6 @@ public class MediatorSerializerFinder {
         SwitchMediatorSerializer.class,
         InMediatorSerializer.class,
         OutMediatorSerializer.class,
-        RMSequenceMediatorSerializer.class,     
         ClassMediatorSerializer.class,
         ValidateMediatorSerializer.class,
         XSLTMediatorSerializer.class,
@@ -134,7 +133,7 @@ public class MediatorSerializerFinder {
     /**
      * This method will return the serializer Map registered with the Finder
      * 
-     * @return Map of serilaizers already registered with the Finder
+     * @return Map of serializers already registered with the Finder
      */
     public Map<String, MediatorSerializer> getSerializerMap() {
         return serializerMap;

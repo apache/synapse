@@ -22,7 +22,6 @@ package samples.userguide;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -34,9 +33,6 @@ import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.RampartMessageData;
-import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaClient;
-import org.apache.sandesha2.Sandesha2Constants;
 import samples.common.StockQuoteHandler;
 
 import java.io.File;
@@ -117,8 +113,6 @@ public class StockQuoteClient {
         String repo = getProperty("repository", "client_repo");
         String svcPolicy = getProperty("policy", null);
         String rest = getProperty("rest", null);
-        String wsrm = getProperty("wsrm", null);
-        String wsrm11 = getProperty("wsrm11", null);
         String itr = getProperty("itr", "1");
         int iterations = 1;
         boolean infinite = false;
@@ -139,7 +133,7 @@ public class StockQuoteClient {
 
         double price = 0;
         int quantity = 0;
-        ConfigurationContext configContext = null;
+        ConfigurationContext configContext;
 
         Options options = new Options();
         OMElement payload = null;
@@ -212,15 +206,6 @@ public class StockQuoteClient {
             System.out.println("Sending as REST");
             options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
         }
-        if (Boolean.parseBoolean(wsrm) || Boolean.parseBoolean(wsrm11)) {
-            System.out.println("Using WS-RM");
-            serviceClient.engageModule("sandesha2");
-            if (Boolean.parseBoolean(wsrm11)){
-               options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, Sandesha2Constants.SPEC_VERSIONS.v1_1);
-            }
-            options.setProperty(SandeshaClientConstants.LAST_MESSAGE, Constants.VALUE_TRUE);
-            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UIDGenerator.generateURNString());
-        }
 
         if ("soap12".equals(soapVer)) {
             options.setSoapVersionURI(SOAP12Constants. SOAP_ENVELOPE_NAMESPACE_URI);
@@ -246,17 +231,6 @@ public class StockQuoteClient {
                 InnerStruct.RESULT = serviceClient.sendReceive(payload);
                 i++;
                 printResult();
-                if (Boolean.parseBoolean(wsrm) || Boolean.parseBoolean(wsrm11)) {
-                    // give some time for RM to terminate normally
-                    if (Boolean.parseBoolean(wsrm11)){
-                        SandeshaClient.terminateSequence(serviceClient);
-                    }
-                    Thread.sleep(5000);
-                    if (configContext != null) {
-                        configContext.getListenerManager().stop();
-                    }
-                    serviceClient.cleanup();
-                }
             }
         }
     }
@@ -280,10 +254,10 @@ public class StockQuoteClient {
         }
     }
 
-    private static double getRandom(double base, double varience, boolean onlypositive) {
+    private static double getRandom(double base, double variance, boolean onlyPositive) {
         double rand = Math.random();
-        return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
-                * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
+        return (base + ((rand > 0.5 ? 1 : -1) * variance * base * rand))
+                * (onlyPositive ? 1 : (rand > 0.5 ? 1 : -1));
     }
 
 }

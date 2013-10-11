@@ -31,7 +31,8 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 import javax.xml.namespace.QName;
 import java.util.StringTokenizer;
 
-public class EndpointDefinitionFactory implements DefinitionFactory{
+public class EndpointDefinitionFactory implements DefinitionFactory {
+
     public static final Log log = LogFactory.getLog(EndpointDefinitionFactory.class);
 
     /**
@@ -123,19 +124,6 @@ public class EndpointDefinitionFactory implements DefinitionFactory{
                 if (outboundPolicyKey != null && outboundPolicyKey.getAttributeValue() != null) {
                     definition.setOutboundWsSecPolicyKey(outboundPolicyKey.getAttributeValue());
                 }
-            }
-        }
-
-        OMElement wsRm = elem.getFirstChildWithName(
-                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
-        if (wsRm != null) {
-
-            definition.setReliableMessagingOn(true);
-
-            OMAttribute policy
-                    = wsRm.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
-            if (policy != null) {
-                definition.setWsRMPolicyKey(policy.getAttributeValue());
             }
         }
 

@@ -19,14 +19,12 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
@@ -39,11 +37,6 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.client.SandeshaClient;
-import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.policy.SandeshaPolicyBean;
-import org.apache.sandesha2.policy.builders.RMAssertionBuilder;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.rest.RESTConstants;
@@ -81,8 +74,6 @@ public class Axis2FlexibleMEPClient {
         String wsSecPolicyKey = null;
         String inboundWsSecPolicyKey = null;
         String outboundWsSecPolicyKey = null;
-        boolean wsRMEnabled = false;
-        String wsRMPolicyKey = null;
         boolean wsAddressingEnabled = false;
         String wsAddressingVersion = null;
 
@@ -92,9 +83,7 @@ public class Axis2FlexibleMEPClient {
             wsSecPolicyKey = endpoint.getWsSecPolicyKey();
             inboundWsSecPolicyKey = endpoint.getInboundWsSecPolicyKey();
             outboundWsSecPolicyKey = endpoint.getOutboundWsSecPolicyKey();
-            wsRMEnabled = endpoint.isReliableMessagingOn();
-            wsRMPolicyKey = endpoint.getWsRMPolicyKey();
-            wsAddressingEnabled = endpoint.isAddressingOn() || wsRMEnabled;
+            wsAddressingEnabled = endpoint.isAddressingOn();
             wsAddressingVersion = endpoint.getAddressingVersion();
         }
 
@@ -109,7 +98,6 @@ public class Axis2FlexibleMEPClient {
             log.debug(
                 "Sending [add = " + wsAddressingEnabled +
                 "] [sec = " + wsSecurityEnabled +
-                "] [rm = " + wsRMEnabled +
                 (endpoint != null ?
                     "] [mtom = " + endpoint.isUseMTOM() +
                     "] [swa = " + endpoint.isUseSwa() +
@@ -329,7 +317,7 @@ public class Axis2FlexibleMEPClient {
 
         AxisService anonymousService =
             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),
-                    axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
+                    axisCfg, wsAddressingEnabled, wsSecurityEnabled);
         // mark the anon services created to be used in the client side of synapse as hidden
         // from the server side of synapse point of view
         anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
@@ -349,20 +337,6 @@ public class Axis2FlexibleMEPClient {
 
         Options clientOptions = MessageHelper.cloneOptions(originalInMsgCtx.getOptions());
         clientOptions.setUseSeparateListener(separateListener);
-        // if RM is requested,
-        if (wsRMEnabled) {
-            // if a WS-RM policy is specified, use it
-            if (wsRMPolicyKey != null) {
-                Object property = synapseOutMessageContext.getEntry(wsRMPolicyKey);
-                if (property instanceof OMElement) {
-                    OMElement policyOMElement = (OMElement) property;
-                    RMAssertionBuilder builder = new RMAssertionBuilder();
-                    SandeshaPolicyBean sandeshaPolicyBean = (SandeshaPolicyBean) builder.build(policyOMElement, null);
-                    Parameter policyParam = new Parameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN, sandeshaPolicyBean);
-                    anonymousService.addParameter(policyParam);
-                }
-            }
-        }
 
         // if security is enabled,
         if (wsSecurityEnabled) {
@@ -416,7 +390,7 @@ public class Axis2FlexibleMEPClient {
 
         // this is a temporary fix for converting messages from HTTP 1.1 chunking to HTTP 1.0.
         // Without this HTTP transport can block & become unresponsive because we are streaming
-        // HTTP 1.1 messages and HTTP 1.0 require the whole message to caculate the content length
+        // HTTP 1.1 messages and HTTP 1.0 require the whole message to calculate the content length
         if (originalInMsgCtx.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
             synapseOutMessageContext.getEnvelope().toString();
         }
@@ -436,19 +410,6 @@ public class Axis2FlexibleMEPClient {
         }
 
         mepClient.execute(true);
-        if (wsRMEnabled) {
-            Object rm11 = clientOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
-            if ((rm11 != null) && rm11.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){
-                ServiceClient serviceClient = new ServiceClient(
-                        axisOutMsgCtx.getConfigurationContext(), axisOutMsgCtx.getAxisService());
-                serviceClient.setTargetEPR(
-                        new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
-                serviceClient.setOptions(clientOptions);
-                serviceClient.getOptions().setTo(
-                        new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
-                SandeshaClient.terminateSequence(serviceClient);
-            }
-        }
    }
 
     private static MessageContext cloneForSend(MessageContext ori, String preserveAddressing)

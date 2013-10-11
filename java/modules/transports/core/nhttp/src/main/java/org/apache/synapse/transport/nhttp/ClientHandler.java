@@ -425,15 +425,6 @@ public class ClientHandler implements NHttpClientEventHandler {
 
         final MessageContext mc = axis2Request.getMsgContext();
 
-        // if the request message is a sandesha messag we ignore the
-        // exception handling
-        // we cannot use the declared sandesha2 constant since
-        // nhttp transport shouldn't take a sandesha2 dependency
-        String done = (String) mc.getProperty("Sandesha2AppProcessingDone");
-		if (JavaUtils.isTrueExplicitly(done)) {
-			return;
-		}
-
         if (mc.getAxisOperation() != null &&
                 mc.getAxisOperation().getMessageReceiver() != null) {
 

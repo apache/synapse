@@ -118,6 +118,8 @@ public class SynapseTestUtils {
             return new DerbyServerController(root);
         } else if (SampleConfigConstants.TAG_BE_SERVER_CONF_JMS_BROKER.equals(root.getLocalName())) {
             return new ActiveMQController(root);
+        } else if (SampleConfigConstants.TAG_BE_SERVER_CONF_ECHO_SERVER.equals(root.getLocalName())) {
+            return new EchoHttpServerController(root);
         }
         return null;
     }

@@ -22,6 +22,7 @@ package org.apache.synapse.samples.framework;
 import junit.framework.TestSuite;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.samples.framework.tests.rest.Sample10002;
 import org.apache.synapse.samples.framework.tests.tasks.*;
 import org.apache.synapse.samples.framework.tests.transport.Sample250;
 import org.apache.synapse.samples.framework.tests.advanced.*;
@@ -242,5 +243,6 @@ public class TestSamplesHandlerSuite extends TestSuite {
 
         sampleClassRepo.put("800", Sample800.class);
         sampleClassRepo.put("10001", Sample10001.class);
+        sampleClassRepo.put("10002", Sample10002.class);
     }
 }

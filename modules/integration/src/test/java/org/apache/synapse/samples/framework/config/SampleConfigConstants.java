@@ -39,6 +39,7 @@ public class SampleConfigConstants {
     public static final String TAG_BE_SERVER_CONF_AXIS2_SERVER = "axis2Server";
     public static final String TAG_BE_SERVER_CONF_JMS_BROKER = "jmsBroker";
     public static final String TAG_BE_SERVER_CONF_DERBY_SERVER = "derbyServer";
+    public static final String TAG_BE_SERVER_CONF_ECHO_SERVER = "echoServer";
     public static final String TAG_BE_SERVER_CONF_QFIX_EXECUTOR = "fixExecutor";
 
     public static final String TAG_BE_SERVER_CONF_AXIS2_REPO = "axis2Repo";
@@ -46,6 +47,8 @@ public class SampleConfigConstants {
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT = "httpPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = "httpsPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = "counterEnabled";
+
+    public static final String TAG_BE_SERVER_CONF_ECHO_HTTP_PORT = "port";
 
     public static final String TAG_BE_SERVER_CONF_DERBY_PORT = "dbPort";
 

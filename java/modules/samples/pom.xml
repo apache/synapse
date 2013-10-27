@@ -417,7 +417,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.woden</groupId>
-                    <artifactId>woden-api</artifactId>
+                    <artifactId>woden-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -520,7 +520,7 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-api</artifactId>
+                        <artifactId>woden-core</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.xmlbeans</groupId>
@@ -535,7 +535,7 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-api</artifactId>
+                        <artifactId>woden-core</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -546,7 +546,7 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-api</artifactId>
+                        <artifactId>woden-core</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -557,7 +557,7 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-api</artifactId>
+                        <artifactId>woden-core</artifactId>
                     </exclusion>
                 </exclusions>
                 <type>mar</type>
@@ -922,7 +922,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.woden</groupId>
-                <artifactId>woden-api</artifactId>
+                <artifactId>woden-core</artifactId>
                 <version>${woden.version}</version>
             </dependency>
             <dependency>
@@ -1101,7 +1101,7 @@
         <aspectj.version>1.6.1</aspectj.version>
         <qfj.version>1.4.0</qfj.version>
         <wso2uri-template.version>1.0.0</wso2uri-template.version>
-        <woden.version>1.0M9</woden.version>
+        <woden.version>1.0-SNAPSHOT</woden.version>
         <activemq.version>5.2.0</activemq.version>
         <snmp4j.version>2.0.3</snmp4j.version>
         <snmp4j.agent.version>2.0.5</snmp4j.agent.version>

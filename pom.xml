@@ -198,8 +198,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.3.2</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1049,6 +1049,11 @@
     <properties>
         <!-- Sets the source encoding to UTF-8 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <!-- The Java version used to build Synapse. This property is used in the configuration
+             of the maven-compiler-plugin as well as certain ant tasks executed using
+             maven-antrun-plugin. -->
+        <java.version>1.6</java.version>
 
         <synapse.version>2.2.0-SNAPSHOT</synapse.version>
 

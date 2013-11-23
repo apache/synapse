@@ -78,6 +78,9 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
             if (request instanceof HttpEntityEnclosingRequest) {
                 HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
                 byte[] entityContent = EntityUtils.toByteArray(entity);
+                if (log.isDebugEnabled()) {
+                	log.debug("Request entity read; size=" + entityContent.length);
+                }
                 response.setStatusCode(HttpStatus.SC_OK);
                 response.setEntity(new ByteArrayEntity(entityContent,
                         ContentType.create(entity.getContentType().getValue())));

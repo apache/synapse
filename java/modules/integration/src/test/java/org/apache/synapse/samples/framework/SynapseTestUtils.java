@@ -52,16 +52,16 @@ public class SynapseTestUtils {
         List<InetAddress> ipAddresses = new ArrayList<InetAddress>();
         String ipAddress = null;
 
-        Enumeration e = NetworkInterface.getNetworkInterfaces();
+        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
         while (e.hasMoreElements()) {
-            NetworkInterface ni = (NetworkInterface) e.nextElement();
+            NetworkInterface ni = e.nextElement();
             // Clustering doesn't work for loop-back addresses, so we are not interested
             // we are not interested in inactive interfaces either
-            // if (ni.isLoopback() || !ni.isUp()) continue; TODO: Find Java 5 alternative
+            if (ni.isLoopback() || !ni.isUp()) continue;
 
-            Enumeration e2 = ni.getInetAddresses();
+            Enumeration<InetAddress> e2 = ni.getInetAddresses();
             while (e2.hasMoreElements()) {
-                InetAddress ip = (InetAddress) e2.nextElement();
+                InetAddress ip = e2.nextElement();
                 ipAddresses.add(ip);
             }
         }

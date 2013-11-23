@@ -100,7 +100,7 @@
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
 
-                                <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+                                <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
                                     <src path="${src}"/>
                                     <classpath refid="maven.compile.classpath"/>
                                 </javac>
@@ -126,7 +126,7 @@
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
-                                <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+                                <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
                                     <src path="${src2}"/>
                                     <classpath refid="maven.compile.classpath"/>
                                 </javac>
@@ -150,7 +150,7 @@
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
-                                <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+                                <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
                                     <src path="${src3}"/>
                                     <classpath refid="maven.compile.classpath"/>
                                 </javac>
@@ -171,7 +171,7 @@
                                 <delete dir="${temp.dir}"/>
                                 <mkdir dir="${temp.dir}"/>
                                 <mkdir dir="${classes}"/>
-                                <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+                                <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
                                     <src path="${src5}"/>
                                     <classpath refid="maven.compile.classpath"/>
                                 </javac>

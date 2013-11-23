@@ -293,7 +293,6 @@
                             <value>${tests}</value>
                         </property>
                         <timeStamp>${maven.build.timestamp}</timeStamp>
-                        <log4j.configuration>test-log4j.properties</log4j.configuration>
                     </systemPropertyVariables>
                     <argLine>-Xms128m -Xmx384m -XX:MaxPermSize=128m</argLine>
                     <workingDirectory>../..</workingDirectory>

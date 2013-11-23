@@ -59,7 +59,7 @@
             <post>user@synapse.apache.org</post>
             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>
         </mailingList>
-	    <mailingList>
+        <mailingList>
             <name>Apache Synapse Commits List</name>
             <subscribe>commits-subscribe@synapse.apache.org</subscribe>
             <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>
@@ -325,12 +325,12 @@
                 <artifactId>synapse-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-documentation</artifactId>
                 <version>${project.version}</version>
-		<type>zip</type>
-		<classifier>docs</classifier>
+                <type>zip</type>
+                <classifier>docs</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
@@ -1043,7 +1043,7 @@
         <module>modules/packaging/package-skeleton</module>
         <module>modules/packaging/package-archetype</module>
         <module>modules/integration</module>
-	    <module>modules/documentation</module>
+        <module>modules/documentation</module>
     </modules>
 
     <properties>
@@ -1135,12 +1135,12 @@
             <email>saminda AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
-	    <developer>
+        <developer>
             <name>Afkham Azeez</name>
             <id>azeez</id>
             <email>azeez AT wso2.com</email>
             <organization>WSO2</organization>
-	        <url>http://afkham.org/</url>
+            <url>http://afkham.org/</url>
         </developer>
         <developer>
             <name>Paul Fremantle</name>
@@ -1265,18 +1265,18 @@
             <email>hiranya AT apache.org</email>
             <organization>UC Santa Barbara</organization>
         </developer>
-	    <developer>
+        <developer>
             <name>Charith Wickramarachchi</name>
             <id>charith</id>
             <email>charith AT apache.org</email>
             <organization>WSO2</organization>
         </developer>
-	    <developer>
+        <developer>
             <name>Heshan Suriyaarachchi</name>
             <id>heshan</id>
             <email>heshan AT apache.org</email>
             <organization>WSO2</organization>
-	        <url>http://heshans.blogspot.com/</url>
+            <url>http://heshans.blogspot.com/</url>
         </developer>
         <developer>
             <name>Rajika Kumarasiri</name>
@@ -1287,9 +1287,9 @@
             <name>Kasun Indrasiri</name>
             <id>kasun</id>
             <email>kasun AT apache.org</email>
-	    <organization>WSO2</organization>
+            <organization>WSO2</organization>
         </developer> 
-	    <developer>
+        <developer>
             <name>Udayanga Wickramasinghe</name>
             <id>uswick</id>
             <email>uswick AT apache.org</email>

@@ -19,11 +19,11 @@
 
 package org.apache.synapse.samples.framework.clients;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
@@ -42,12 +42,12 @@ public class BasicHttpClient {
      * @throws Exception If an error occurs while making the HTTP call
      */
     public HttpResponse doGet(String url) throws Exception {
-        HttpClient client = new DefaultHttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
         try {
             HttpGet get = new HttpGet(url);
             return new HttpResponse(client.execute(get));
         } finally {
-            client.getConnectionManager().shutdown();
+            client.close();
         }
     }
 
@@ -76,7 +76,7 @@ public class BasicHttpClient {
      */
     public HttpResponse doPost(String url, byte[] payload,
                                String contentType, Map<String,String> headers) throws Exception {
-        HttpClient client = new DefaultHttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
         try {
             HttpPost post = new HttpPost(url);
             if (headers != null) {
@@ -90,7 +90,7 @@ public class BasicHttpClient {
             post.setEntity(entity);
             return new HttpResponse(client.execute(post));
         } finally {
-            client.getConnectionManager().shutdown();
+            client.close();
         }
     }
 

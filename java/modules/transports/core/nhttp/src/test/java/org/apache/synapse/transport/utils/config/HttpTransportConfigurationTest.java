@@ -36,8 +36,6 @@ public class HttpTransportConfigurationTest extends TestCase {
         IOReactorConfig reactorConfig = config.getListeningReactorConfig();
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
-        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
-        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
         assertEquals(60000, reactorConfig.getSoTimeout());
         assertEquals(true, reactorConfig.isTcpNoDelay());
         assertEquals(false, reactorConfig.isInterestOpQueued());
@@ -45,8 +43,6 @@ public class HttpTransportConfigurationTest extends TestCase {
         reactorConfig = config.getConnectingReactorConfig();
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
-        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
-        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
         assertEquals(60000, reactorConfig.getSoTimeout());
         assertEquals(true, reactorConfig.isTcpNoDelay());
         assertEquals(false, reactorConfig.isInterestOpQueued());
@@ -67,8 +63,6 @@ public class HttpTransportConfigurationTest extends TestCase {
         assertEquals(true, reactorConfig.isSoReuseAddress());
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
-        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
-        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
         assertEquals(60000, reactorConfig.getSoTimeout());
         assertEquals(true, reactorConfig.isTcpNoDelay());
         assertEquals(false, reactorConfig.isInterestOpQueued());
@@ -79,13 +73,14 @@ public class HttpTransportConfigurationTest extends TestCase {
         assertEquals(CodingErrorAction.REPORT, connConfig.getUnmappableInputAction());
     }
 
-    public void testTimeoutConfig() {
+    public void testTimeoutAndBufferSizeConfig() {
         HttpTransportConfiguration config = new SimpleHttpTransportConfiguration("test-http");
 
         IOReactorConfig reactorConfig = config.getListeningReactorConfig();
         assertEquals(30000, reactorConfig.getSoTimeout());
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
+        // Should be able to override platform default buffer sizes if needed
         assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
         assertEquals(1024 * 8, reactorConfig.getSndBufSize());
         assertEquals(true, reactorConfig.isTcpNoDelay());
@@ -95,6 +90,7 @@ public class HttpTransportConfigurationTest extends TestCase {
         assertEquals(20000, reactorConfig.getSoTimeout());
         assertEquals(2, reactorConfig.getIoThreadCount());
         assertEquals(0, reactorConfig.getConnectTimeout());
+        // Should be able to override platform default buffer sizes if needed
         assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
         assertEquals(1024 * 8, reactorConfig.getSndBufSize());
         assertEquals(true, reactorConfig.isTcpNoDelay());

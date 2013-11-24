@@ -69,9 +69,15 @@ public abstract class HttpTransportConfiguration {
                         getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
-                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
-                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
-                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
+                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true));
+
+        if (getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE) != null) {
+            builder.setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE));
+        }
+
+        if (getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE) != null) {
+            builder.setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE));
+        }
 
         if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
             builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));
@@ -99,9 +105,15 @@ public abstract class HttpTransportConfiguration {
                         getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
-                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
-                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
-                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
+                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true));
+
+        if (getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE) != null) {
+            builder.setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE));
+        }
+
+        if (getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE) != null) {
+            builder.setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE));
+        }
 
         if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
             builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));

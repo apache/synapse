@@ -838,10 +838,11 @@
                             suggestion to the OS kernel from Synapse about the size of buffers to
                             use for the data to be received over the socket
                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
-                            <div class="xmlConf">http.socket.rcv-buffer-size=4096</div>
+                            If no value is specified, Synapse will use the platform (OS) default.
+                            <div class="xmlConf">http.socket.rcv-buffer-size=8192</div>
                         </td>
                         <td>No</td>
-                        <td>8192</td>
+                        <td>Platform default</td>
                     </tr>
                     <tr>
                         <td>http.socket.snd-buffer-size</td>
@@ -851,10 +852,11 @@
                             suggestion to the OS kernel from Synapse about the size of buffers to
                             use for the data to be sent over the socket
                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
-                            <div class="xmlConf">http.socket.snd-buffer-size=4096</div>
+                            If no value is specified, Synapse will use the platform (OS) default.
+                            <div class="xmlConf">http.socket.snd-buffer-size=8192</div>
                         </td>
                         <td>No</td>
-                        <td>8192</td>
+                        <td>Platform default</td>
                     </tr>
                     <tr>
                         <td>http.socket.linger</td>

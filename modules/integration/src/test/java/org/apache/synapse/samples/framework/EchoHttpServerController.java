@@ -33,6 +33,7 @@ import org.apache.synapse.samples.framework.config.SampleConfigConstants;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -98,7 +99,9 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
 
         public RequestListenerThread(final int port) throws IOException {
             this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;
-            this.serversocket = new ServerSocket(port);
+            this.serversocket = new ServerSocket();
+            this.serversocket.setReuseAddress(true);
+            this.serversocket.bind(new InetSocketAddress(port));
 
             // Set up the HTTP protocol processor
             HttpProcessor httpProcessor = HttpProcessorBuilder.create()
@@ -146,6 +149,12 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
             try {
                 this.interrupt();
                 this.serversocket.close();
+                while (this.isAlive() || !this.serversocket.isClosed()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
             } catch (IOException e) {
                 log.warn("Error while shutting down echo server", e);
             }

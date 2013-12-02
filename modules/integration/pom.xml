@@ -295,6 +295,10 @@
                         <timeStamp>${maven.build.timestamp}</timeStamp>
                     </systemPropertyVariables>
                     <argLine>-Xms128m -Xmx384m -XX:MaxPermSize=128m</argLine>
+                    <!-- The working directory must be set to the root directory of the Synapse project because the
+                         test cases use the configuration files in the repository directory (repository/conf/sample/*.xml)
+                         and some of these configuration files contain URLs that are relative to the current working
+                         directory (file:repository/...). -->
                     <workingDirectory>../..</workingDirectory>
                     <!--redirectTestOutputToFile>true</redirectTestOutputToFile-->
                     <forkMode>pertest</forkMode>

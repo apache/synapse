@@ -21,21 +21,25 @@ package org.apache.synapse.util.jaxp;
 
 import java.nio.charset.Charset;
 
+import javax.xml.transform.sax.SAXResult;
+
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMContainer;
+import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.jaxp.OMResult;
 
 /**
- * {@link ResultBuilder} implementation that relies on {@link OMResult}.
+ * {@link ResultBuilder} implementation that relies on {@link OMContainer#getSAXResult()}.
  */
 public class AXIOMResultBuilder implements ResultBuilder {
-    private final OMResult result = new OMResult();
+	private final OMDocument document = OMAbstractFactory.getOMFactory().createOMDocument();
     
-    public OMResult getResult() {
-        return result;
+    public SAXResult getResult() {
+        return document.getSAXResult();
     }
 
     public OMElement getNode(Charset charset) {
-        return result.getRootElement();
+        return document.getOMDocumentElement();
     }
 
     public void release() {

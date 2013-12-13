@@ -1312,6 +1312,12 @@
             <organization>ANU</organization>
             <url>http://www.apache.org/~sadeep</url>
         </developer>
+        <developer>
+            <name>Isuru Udana</name>
+            <id>isudana</id>
+            <email>isudana AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
     </developers>
 
     <contributors>

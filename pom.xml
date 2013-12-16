@@ -585,13 +585,6 @@
                 <version>${axiom.version}</version>
             </dependency>
 
-            <!-- XML Schema -->
-            <dependency>
-                <groupId>org.apache.ws.commons.schema</groupId>
-                <artifactId>XmlSchema</artifactId>
-                <version>${xml_schema.version}</version>
-            </dependency>
-
             <!-- Apache Commons -->
             <dependency>
                 <groupId>commons-dbcp</groupId>
@@ -1072,7 +1065,6 @@
         <axis2.version>1.7.0-SNAPSHOT</axis2.version>
         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>
         <axiom.version>1.2.15-SNAPSHOT</axiom.version>
-        <xml_schema.version>1.4.3</xml_schema.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
 
         <!-- addressing, rampart, neethi -->

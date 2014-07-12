@@ -244,12 +244,14 @@
         </parameter>
     </transportReceiver>-->
 
-    <transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/>
+    <!--Uncomment this for VFS transport support
+    <transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/> -->
 
-    <transportReceiver name="mailto" class="org.apache.axis2.transport.mail.MailTransportListener">
+    <!--Uncomment this for Mail transport support
+    <transportReceiver name="mailto" class="org.apache.axis2.transport.mail.MailTransportListener"> -->
         <!-- configure any optional POP3/IMAP properties
         check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
-    </transportReceiver>
+    <!-- </transportReceiver> -->
 
     <!--Uncomment this for FIX transport support
     <transportReceiver name="fix" class="org.apache.synapse.transport.fix.FIXTransportListener">

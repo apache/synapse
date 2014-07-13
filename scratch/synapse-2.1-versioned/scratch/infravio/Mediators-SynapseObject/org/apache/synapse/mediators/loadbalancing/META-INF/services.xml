@@ -1,0 +1,8 @@
+<service name="LoadBalancingMediator">
+    <parameter name="ServiceClass" locked="false">
+        org.apache.synapse.mediators.loadbalancing.LoadBalancingMediator</parameter>
+    <operation name="mediate">
+        <messageReceiver
+                class="org.apache.synapse.axis2.ServiceMediatorMessageReceiver"/>
+    </operation>
+</service>

@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Synapse Userguide</title>
+</head>
+
+<body>
+<h1>UserGuide</h1>
+
+<p>Apache Synapse is a mediation framework for Web Services. Synapse allows
+    messages flowing through, into, or out of an organization to be mediated,
+    including aspects such as:</p>
+<ul>
+    <li><p>Logging, service lookup, performance mediation</p>
+    </li>
+    <li><p>Versioning, failover, monitoring</p>
+    </li>
+    <li><p>Fault management, tracing</p>
+    </li>
+</ul>
+
+<h3>Getting started</h3>
+
+<p>Although there is a clearly defined division between Synapse and Axis2,
+    the Synapse system relies on Axis2 to run. Firstly, it uses the AXIOM object
+    model, and secondly it uses Axis2 as a listener and sender for Web service
+    requests. There are two ways to set up the Synapse server.</p>
+<ol>
+    <li><p>synapse.war : Deploy the WAR file into your favorite servlet
+        container. Once it's expanded, you will see in <tt>WEB-INF</tt> the
+        axis2.xml which has been configured to execute Synapse properly and
+        synapse.xml, which will hold the rules pertaining to messages passing
+        through Synapse.</p>
+    </li>
+    <li><p>A lightweight server which runs with its own HTTP server : This uses
+        Axis2's SimpleHTTPServer which is a simple lightweight HTTP server
+        option
+        that does not require a Servlet Engine. First unzip the
+        Synapse-M1.zip. In the bin directory you will find scripts
+        called:</p>
+        <pre>synapse [.sh or .bat]</pre>
+
+        <p>You should also see a directory called <tt>synapse-repository</tt>.
+            There you will find the axis2.xml and synapse.xml config files. The
+            axis2.xml need not be modified, but you can do so if you want to.
+        </p>
+
+        <p>The command line for synapse-lightweight takes the repository
+            directory and listening port. Change directory to bin/</p>
+        <pre>sh synapse.sh ../synapse-repository -p [Linux]
+
+            synapse ../synapse-repository -p [Win]</pre>
+
+        <p>which will start the SimpleHTTPServer at port 8080. If it's needed
+            to be started at any other port use -p[port_number]. Ex:
+        </p>
+        <pre>
+            ./synapse.sh ../synapse-repository -p5043
+        </pre>
+    </li>
+</ol>
+
+<p>Note that you can also build them using Maven: Build the WAR file by using
+    the command,</p>
+<pre> maven dist-bin</pre>
+
+<p>This creates both the WAR and binary distribution JARs.</p>
+
+<p></p>
+
+<h3>Deployment models</h3>
+
+<p>Synapse can intermediate in a number of different modes:</p>
+<ul>
+    <li>Transparent mode
+        <ol>
+            <li>Synapse acts as an HTTP Proxy.</li>
+            <li>Clients are configured with the Synapse endpoint URL as the HTTP
+                Proxy URL.</li>
+            <li>Synapse can work with both WS-A and non-WS-A SOAP messages.</li>
+        </ol>
+    </li>
+    <li>Gateway mode
+        <ol>
+            <li>The client explicitly sends a message to Synapse (with or
+                without
+                WS-A headers)</li>
+            <li>The synapse.xml must include enough routing information to
+                correctly set the WS-A To and then Synapse forwards the
+                message</li>
+        </ol>
+    </li>
+    <li>Smart client mode
+        <ol>
+            <li>The client sends the message to Synapse but sets the WSA headers
+                to
+                the ultimate destination</li>
+        </ol>
+    </li>
+</ul>
+
+<h3>Processing model</h3>
+
+<p>Synapse has an overall model under which there are two ways to extend the
+    framework.</p>
+<ol>
+    <li><p>Using the SPI: Developers can build Synapse Extensions, which extend
+        both the functionality and the XML configuration syntax of Synapse.</p>
+    </li>
+    <li><p>Using the API: Developers can build Mediators, which extend the
+        functionality of Synapse but use the existing XML syntax.</p>
+    </li>
+</ol>
+
+<p>There are also built-in mediators that do common tasks like logging,
+    redirection etc. Typically users of Synapse extend the function using
+    mediators, while the Synapse development team can extend the core by
+    building
+    extensions.</p>
+
+<p>A synapse deployment attaches to one or more transport listeners, and
+    mediates messages from those listeners. One of the key decisions is how to
+    "attach" mediators to messages.</p>
+
+<h4>Rules</h4>
+
+<p>By default Synapse will execute all defined mediators against a given
+    message, but this can be affected by using simple rules. Synapse has two
+    predefined rules: <tt>&lt;xpath&gt;</tt> and <tt>&lt;regex&gt;</tt>. xpath
+    evaluates a XPath expression against the message, while regex matches a
+    regular expression against one of the message headers (such as the
+    <tt>wsa:To</tt> address).</p>
+
+<p>Synapse also has two simple rules <tt>&lt;in&gt;</tt> and
+    <tt>&lt;out&gt;</tt> which process only request or response messages (as
+    seen
+    by the target service).</p>
+
+<h4>Stages</h4>
+
+<p>As a message goes through the Synapse engine, it can pass through multiple
+    stages. Each stage is a way of grouping and organizing mediators and rules.
+    A
+    stage simply gives the group a name.</p>
+
+<h4>An example</h4>
+
+<p></p>
+<pre>&lt;stage name="stage1-all"&gt;
+    &lt;!--This enables the addressing module which looks at wsa headers --&gt;
+    &lt;engage-addressing-in/&gt;
+
+    &lt;!--Logs the message --&gt;
+    &lt;log/&gt;
+
+    &lt;/stage&gt;
+
+    &lt;stage name="stage2-service-specific" &gt;
+    &lt;regex message-address="to" pattern="http://xmethods.*"&gt;
+    &lt;header type="to" value="http://64.124.140.30:9090/soap"/&gt;
+    &lt;/regex&gt;
+    &lt;/stage&gt;
+
+    &lt;stage name="stage3-send-all"&gt;
+    &lt;send/&gt;
+    &lt;/stage&gt;</pre>
+
+<p>This example demonstrates <em>stage</em>, <em>regex</em> and some built in
+    mediators: <em>log</em>, <em>addressing</em> and <em>header</em>. It does
+    not
+    demonstrate the <em>xpath</em>, <em>in</em> or <em>out</em> rules.</p>
+
+<p>Every stage will be executed for each message. The first stage does
+    initial processing including parsing the addressing headers and logging the
+    message.</p>
+
+<p>The next stage is using a regex rule to redirect every message addresses
+    to xmethods.com and xmethods.net to the real SOAP address of the XMethods
+    quote service.</p>
+
+<p>Finally the last stage sends the message on. For responses, the messages
+    come back through the same stages. This time the message will not be
+    redirected because the "to" address on the response will not match
+    xmethods.</p>
+
+<h4>User Mediators</h4>
+
+<p>Synapse allows users to extend the built in mediators and add their own.
+    The mediators use the Synapse API. The API has three interfaces.</p>
+
+<h4>SynapseMessage</h4>
+
+<p>The primary interface is the <a>SynapseMessage</a> interface:</p>
+<pre>public interface SynapseMessage {
+
+    public SOAPEnvelope getEnvelope();
+    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;
+
+    public EndpointReference getTo();
+    public void setTo(EndpointReference reference);
+    // lots more header get/setters not shown
+    // and a few other things ... see the real code
+
+    public Object getProperty(String key);
+    public void setProperty(String key, Object value);
+
+    public void setResponse(boolean b);
+    public boolean isResponse();
+    }</pre>
+
+<p>The <a>SynapseMessage</a> interface is based on the Axis2
+    <a>MessageContext</a> interface. It uses the Axis2 <a>EndpointReference</a>
+    and SOAPEnvelope classes/interfaces.</p>
+
+<p>The purpose of this interface is to capture a message as it flows through
+    the system. As you will see the messages are represented using the SOAP
+    infoset. Binary messages can be embedded in the Envelope using the MTOM
+    support built into Axis2's AXIOM object model.</p>
+
+<h4>Mediator interface</h4>
+
+<p>The second key interface for mediator writers is the Mediator
+    interface:</p>
+<pre>package org.apache.synapse.api;
+
+    import org.apache.synapse.SynapseMessage;
+
+    public interface Mediator {
+    public boolean mediate(SynapseMessage sm);
+    }</pre>
+
+<p>The mediator can modify the <a>SynapseMessage</a> in any way it likes -
+    adjusting the routing headers or changing the message. If it returns false,
+    that signals to the Synapse processing model to stop processing further. For
+    example, if the mediator is a security agent it may decide that this message
+    is dangerous and should not be processed further. This is generally the
+    exception as mediators are usually designed to co-operate to process the
+    message onwards.</p>
+
+<h4>EnvironmentAware</h4>
+
+<p>The final aspect of the API is the <a>EnvironmentAware</a> interface. If
+    the mediator implements this, then it will have the
+    <a>SynapseEnvironment</a>
+    injected into it:</p>
+<pre>package org.apache.synapse.api;
+
+    import org.apache.synapse.SynapseEnvironment;
+
+    public interface EnvironmentAware {
+    public void setSynapseEnvironment(SynapseEnvironment se);
+    public void setClassLoader(ClassLoader cl);
+
+    }</pre>
+
+<p>The <a>SynapseEnvironment</a> allows the mediator access to the underlying
+    engine:</p>
+<pre>package org.apache.synapse;
+
+
+    public interface SynapseEnvironment {
+    public void injectMessage(SynapseMessage smc);
+    public ClassLoader getClassLoader();
+    public void send(SynapseMessage smc);
+    public Processor lookupProcessor(String name);
+    public void addProcessor(Processor p);
+    public Processor getMasterProcessor();
+    public void setMasterProcessor(Processor p);
+    }</pre>
+
+<h4>Mediator configuration</h4>
+
+<p>Mediators can be configured in different ways which include</p>
+<ol>
+    <li>They can be loaded as simple classes:
+        <pre>&lt;classmediator name="optional-name"
+            class="org.apache.sample.MyLogger"/&gt;</pre>
+
+        <p>This will load a class named <tt>org.apache.sample.MyLogger</tt> and
+            use it to mediate messages.</p>
+    </li>
+    <li>As deployed Axis2 Services: This will direct the message through a
+        deployed Axis2 service which implements the mediate interface:
+        <pre>&lt;servicemediator name="optional-name" service="service-name"/&gt;
+        </pre>
+    </li>
+    <li>Using IoC containers such as Spring: This model is supported by an
+        optional extension, and requires that you have the <tt>spring-core</tt>,
+        <tt>spring-context</tt> and <tt>spring-beans</tt> libraries from the <a
+            href="http://www.springframework.org/">Spring framework</a> website,
+        as
+        well as the <tt>springmediator.jar</tt> in your classpath. The Spring
+        mediator model uses a spring assembly to configure an assembly of beans.
+        The bean assembly must produce as one bean which implements the mediator
+        interface.
+        <pre>
+            &lt;synapse-spring:springmediator name="optional-name"
+            bean="name-of-bean-which-implements-mediator"&gt;
+            &lt;beans&gt;
+            &lt;bean .... spring bean assembly configuration goes here &gt;
+            &lt;/beans&gt;
+            &lt;/synapse-spring:springmediator&gt;
+        </pre>
+    </li>
+</ol>
+
+<h3>In and Out </h3>
+
+<p>Redirection is only designed to apply to "in" messages by using the
+    &lt;in&gt; rule. If we use &lt;out&gt; then you have to explictley use the
+    &lt;in&gt; rule. </p>
+<pre>&lt;stage name="stage1-all"&gt;
+    ...
+    &lt;/stage&gt;
+
+    &lt;in name="stage2-service-specific" &gt;
+    &lt;regex message-address="to" pattern="http://xmethods.*"&gt;
+    ...
+    &lt;/in&gt;
+
+    &lt;stage name="stage3-send-all"&gt;
+    ...
+    &lt;/stage&gt;</pre>
+
+<p>There is a corresponding <tt>&lt;out&gt;</tt> rule.</p>
+
+<h4>References</h4>
+
+<p>In order to make the configuration more re-usable, every rule, stage or
+    mediator can be named:</p>
+<pre>        &lt;stage name="thisname"&gt;</pre>
+
+<p>The name can then be used to "refer" to the mediator.</p>
+
+<p>So</p>
+<pre>&lt;ref ref="thisname"/&gt;</pre>
+
+<p>will cause the same processing to happen as if the stage had been included
+    at that point.</p>
+
+<p>For example:</p>
+<pre>&lt;in&gt;
+    &lt;stage name="both"&gt;
+
+    . . .
+    &lt;/stage&gt;
+    &lt;stage name="inonly"&gt; ...&lt;/stage&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+    &lt;ref ref="both"/&gt;
+
+    &lt;/out&gt;</pre>
+
+<p>Please note this is one area where we expect to do considerable work</p>
+
+<h4>Never</h4>
+
+<p>This is a stage where none of the children get executed. Its purpose is to
+    allow you to place rules and mediations and have them not executed but
+    instead refer to them from one or more other places.</p>
+
+<p>So the following may be deemed equivalent to the previous example</p>
+<pre>&lt;in&gt;
+    &lt;ref ref="both"/&gt;
+
+    &lt;stage name="inonly"&gt; ...&lt;/stage&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+    &lt;ref ref="both"/&gt;
+    &lt;out&gt;
+    &lt;never&gt;
+
+    &lt;stage name="both"&gt; ...&lt;/stage&gt;
+    &lt;/never&gt;</pre>
+
+<h4>Content based routing</h4>
+
+<p>We can further improve our example by adding some "content-based" routing.
+    Using an &lt;xpath&gt; rule we can make tests within the XML. For example,
+    we
+    could decide not to allow stock ticker queries against certain companies
+    whose share prices we were jealous of - MSFT say :-).</p>
+
+<p>To do this we can add a rule:</p>
+<pre>&lt;xpath expr="//*[Symbol='MSFT']"&gt;
+    &lt;fault/&gt;
+    &lt;/xpath&gt;</pre>
+
+<p>This rule identifies any messages with a tag <tt>Symbol</tt> whose content
+    is MSFT. The <tt>&lt;fault&gt;</tt> mediator returns a fault to the
+    client.</p>
+
+<p>We can place this rule under the regex rule, so it only applies to
+    requests aimed at xmethods.*:</p>
+<pre>&lt;regex message-address="to" pattern="http://xmethods.*"&gt;
+    &lt;header type="to" value="http://64.124.140.30:9090/soap"/&gt;
+    &lt;xpath expr="//*[Symbol='MSFT']"&gt;
+    &lt;fault/&gt;
+    &lt;/xpath&gt;
+
+    &lt;/regex&gt;</pre>
+
+<p>Note that the rules, like the stages, can have more than one child. While
+    it isn't fixed in Synapse, the built-in rules and mediators all use the same
+    "plan" to execute their children, which involves executing in the lexical
+    order that they occur in the synapse.xml.</p>
+
+<h3>XML Configuration Elements</h3>
+
+<p>Every element in the Synapse configuration file maps to a instance of a
+    Processor. There are two types of elements - <strong>nodes</strong> that
+    "contain" sub-elements (ex: <tt>&lt;regex/&gt;</tt>, <tt>&lt;stage/&gt;</tt>
+    and <tt>&lt;xpath/&gt;</tt>) and <strong>leaves</strong> which only contain
+    configuration for that element or have no xml children (ex:
+    <tt>&lt;engage-addressing-in/&gt;</tt>).</p>
+
+<h4>Grouping and Referencing elements</h4>
+<ol>
+    <li><p><tt>&lt;stage/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;in/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;out/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;never/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;ref/&gt;</tt></p>
+    </li>
+</ol>
+
+<h4>Rule elements</h4>
+<ol>
+    <li><p><tt>&lt;regex/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;xpath/&gt;</tt></p>
+    </li>
+</ol>
+
+<h4>Built-in mediators</h4>
+<ol>
+    <li><p><tt>&lt;engage-addressing-in/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;log/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;fault/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;send/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;header/&gt;</tt></p>
+    <li><p><tt>&lt;xslt/&gt;</tt></p>
+    </li>
+</ol>
+
+<h4>User mediator types</h4>
+<ol>
+    <li><p><tt>&lt;servicemediator/&gt;</tt></p>
+    </li>
+    <li><p><tt>&lt;classmediator/&gt;</tt></p>
+    </li>
+</ol>
+
+<h3>Samples</h3>
+
+<p><h4>Note:</h4></p>
+
+<p><i>If you are running the samples using 0.94 distributions, please follow <a
+        href="http://ws.apache.org/axis2/download.cgi" target="_blank">this</a> before running the samples.</i></p>
+
+<h4>Logging</h4>
+
+<p>The system ships with a couple of samples. These include sample clients
+    and appropriate synapse.xml intermediary configurations.</p>
+
+<p>The first sample demonstrates the logging facility. Here is a simple
+    synapse.xml:</p>
+<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;engage-addressing-in/&gt;
+    &lt;log/&gt;
+    &lt;send/&gt;
+
+    &lt;/synapse&gt;</pre>
+
+<p>The logging uses the Log4J/Commons Logging support in Apache. You can
+    configure it using <tt>log4j.properties</tt>.</p>
+
+<p>The sample client is a standard Axis2 client built to run against the
+    XMethods Quote Service. However, it has been modified to use a different
+    transport address from the Web Services Addressing TO header. In other
+    words,
+    the SOAP envelope is addressed to the XMethods service, but the actual HTTP
+    request goes to Synapse. The sample client has three (optional)
+    parameters:</p>
+<pre>StockQuoteClient SYMBOL webservicexURL TransportURL</pre>
+
+<p>e.g.</p>
+<pre>StockQuoteClient IBM http://www.webservicex.net/stockquote.asmx
+    http://localhost:8080</pre>
+
+<p>The sample synapse.xml can be used to demonstrate a few simple behaviours.
+    1) Firstly try this:</p>
+<pre>StockQuoteClient IBM http://www.webservicex.net/stockquote.asmx
+    http://www.webservicex.net/stockquote.asmx</pre>
+
+<p>This will bypass Synapse and simply call XMethods.</p>
+
+<p>2) Now start Synapse on port 8080 and try</p>
+<pre>StockQuoteClient</pre>
+
+<p>on its own. You should see the messages being logged as they pass through
+    Synapse.</p>
+
+<p>3) This time try</p>
+<pre>StockQuoteClient IBM urn:xmethods-delayed-quotes</pre>
+
+<p>This should hit a regex rule which replaces the "virtual URI" that is in
+    the wsa:To header with the real URL.</p>
+
+<p>4) Now try</p>
+<pre>StockQuoteClient MSFT </pre>
+
+<p>which should hit a "content-based" xpath rule.</p>
+
+<p>ProxyStockQuoteClient illutstrates how Synapse working as Proxy</p>
+<a></a> <!-- end page -->
+</body>
+</html>

@@ -1,0 +1,15 @@
+<SynapseObject name="loadBalancing">
+    <SynapseObject name="stock1">
+        <Attribute name="url" type="STRING">http://localhost:8080/loadBalancingService</Attribute>
+        <Attribute name="strategy" type="STRING">roundrobin</Attribute>
+        <Attribute name="enabled" type="BOOLEAN">true</Attribute>
+        <SynapseObject name="service0">
+                <Attribute name="url" type="STRING">http://host:9080/Service1</Attribute>
+                <Attribute name="active" type="BOOLEAN">true</Attribute>
+        </SynapseObject>
+        <SynapseObject name="service1">
+                <Attribute name="url" type="STRING">http://www.webservicex.net/stockquote.asmx</Attribute>
+                <Attribute name="active" type="BOOLEAN">true</Attribute>
+        </SynapseObject>
+    </SynapseObject>
+</SynapseObject>

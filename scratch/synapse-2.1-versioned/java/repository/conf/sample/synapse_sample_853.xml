@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+        
+<!-- Introduction to Synapse Scatter-Gather eip function template -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
+<sequence name="enr">
+        <log level="custom">
+            <property name="text" value="seqhit"/>
+        </log>
+        <enrich>
+            <source xmlns:m0="http://services.samples" clone="true" xpath="//m0:return[not(preceding-sibling::m0:return/m0:last &lt;= m0:last) and not(following-sibling::m0:return/m0:last &lt; m0:last)]"/>
+            <target type="body"/>
+        </enrich>
+        <send/>
+    </sequence>
+    <sequence name="main">
+        <call-template target="synapse.lang.eip.scatter_gather">
+            <with-param name="sequence_ref" value="enr"/>
+            <with-param xmlns:m0="http://services.samples" name="aggregator_exp" value="{{//m0:return}}"/>
+            <with-param name="oncomplete_seq_enabled" value="true"/>
+            <with-param name="recipient_list" value="http://localhost:9001/services/SimpleStockQuoteService,http://localhost:9002/services/SimpleStockQuoteService,http://localhost:9003/services/SimpleStockQuoteService"/>
+        </call-template>
+    </sequence>
+</definitions>

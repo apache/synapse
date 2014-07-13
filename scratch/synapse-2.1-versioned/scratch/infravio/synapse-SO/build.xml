@@ -1,0 +1,85 @@
+<?xml version = '1.0' encoding = 'windows-1252'?>
+
+<project name="Test" default="usage" basedir=".">
+
+
+   <!--Set the output directories-->
+   <property name="compile.outdir" value="classes"/>
+   <property name="javadoc.outdir" value="javadoc"/>
+
+   <!--Set the classpath-->
+   <path id="classpath">
+      <pathelement location="lib/xercesImpl.jar"/>
+      <pathelement location="${compile.outdir}"/>
+   </path>
+
+   <!--Set the source path-->
+   <property name="src.dir" value="src"/>
+   <path id="srcpath">
+      <pathelement location="${src.dir}"/>
+   </path>
+
+   <target name="usage">
+    <echo>
+        ant compile
+            Compiles the source code and creates a classes directory at the same level as src
+        ant Sample
+            Runs the com.infravio.core.Sample which demonstrates building a SynapseObject through 
+            API and displays the its xml fragment.
+        ant TestSample
+            Runs the com.infravio.utils.TestSample which creates a SynapseObject from an xml fragment. Displays the xml fragment for that synapse object.
+    </echo>
+   </target>
+
+   <target name="Sample">
+       <java classname="com.infravio.core.Sample">
+               <classpath refid="classpath"/>
+       </java>
+   </target>
+
+   <target name="TestSample">
+       <java classname="com.infravio.utils.TestSample">
+           <classpath refid="classpath"/>
+        </java>
+   </target>
+
+   <target name="init">
+      <tstamp/>
+   </target>
+
+   <target name="compile" depends="init">
+      <mkdir dir="${compile.outdir}"/>
+      <!--Compile Java source files-->
+      <javac destdir="${compile.outdir}" debug="on" encoding="Cp1252">
+         <classpath refid="classpath"/>
+         <src refid="srcpath"/>
+         <include name="com/infravio/utils/TestSample.java"/>
+         <include name="com/infravio/utils/UtilConstants.java"/>
+         <include name="com/infravio/core/SynapseObjectArray.java"/>
+         <include name="com/infravio/utils/Utils.java"/>
+         <include name="com/infravio/core/Sample.java"/>
+         <include name="com/infravio/core/GenericObject.java"/>
+         <include name="com/infravio/core/SynapseObject.java"/>
+      </javac>
+   </target>
+
+   <target name="doc" depends="init">
+      <mkdir dir="${javadoc.outdir}"/>
+      <!--Create Javadoc-->
+      <javadoc sourcepathref="srcpath" classpathref="classpath" destdir="${javadoc.outdir}" version="false" author="false" encoding="Cp1252" additionalparam="-J-Xmx32m">
+         <package name="com.infravio.utils"/>
+         <package name="com.infravio.core"/>
+      </javadoc>
+   </target>
+
+   <target name="clean">
+      <!--Delete output directories-->
+      <delete dir="${compile.outdir}"/>
+      <delete dir="${javadoc.outdir}"/>
+   </target>
+
+   <target name="rebuild" depends="clean,compile"/>
+
+   <target name="all" depends="compile,doc"/>
+
+</project>

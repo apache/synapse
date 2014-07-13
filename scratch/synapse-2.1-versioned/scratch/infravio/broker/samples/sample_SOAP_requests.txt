@@ -1,0 +1,48 @@
+These are the SOAP requests for the calculator service...
+The example uses the values 7 and 3 on the multiplicatio/division/addition/subtraction operations.
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+<soapenv:Header>
+</soapenv:Header>
+<soapenv:Body>
+<division:division xmlns:division="http://infravio.com/infravioapi" division:echo="7" division:echo1="3">
+</division:division>
+</soapenv:Body>
+</soapenv:Envelope>
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+<soapenv:Header>
+</soapenv:Header>
+<soapenv:Body>
+<multiplication:multiplication xmlns:multiplication="http://infravio.com/infravioapi" multiplication:echo="7" multiplication:echo1="3">
+</multiplication:multiplication>
+</soapenv:Body>
+</soapenv:Envelope>
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+<soapenv:Header>
+</soapenv:Header>
+<soapenv:Body>
+<addition:addition xmlns:addition="http://infravio.com/infravioapi" addition:echo="7" addition:echo1="3">
+</addition:addition>
+</soapenv:Body>
+</soapenv:Envelope>
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+<soapenv:Header>
+</soapenv:Header>
+<soapenv:Body>
+<subtraction:subtraction xmlns:subtraction="http://infravio.com/infravioapi" subtraction:echo="7" subtraction:echo1="3">
+</subtraction:subtraction>
+</soapenv:Body>
+</soapenv:Envelope>
+
+---------------------------------------------------------------------------------------------------------------------------

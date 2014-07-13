@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ * Copyright 2001-2004 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ -->
+
+<!--
+     | The main goals for multi project build are:
+     |
+     | default
+     |    Build all the modules
+     |
+     | clean
+     |    Deletes the 'target' directory in all projects
+
+     | clean-repo
+     |    Deletes the 'target' directory in all projects
+     |
+   -->
+
+<project default="jar"
+         xmlns:j="jelly:core"
+         xmlns:u="jelly:util"
+         xmlns:deploy="deploy"
+         xmlns:modules="local:modules"
+         xmlns:ant="jelly:ant"
+         xmlns:plugin="plugin"
+         xmlns:macros="macros"
+         xmlns:maven="jelly:maven"
+         xmlns:define="jelly:define">
+
+    <j:set var="dist.name" value="${pom.artifactId}-${pom.currentVersion}"/>
+    <j:set var="dist.dir" value="target/dist"/>
+    <j:set var="bin.dist.dir" value="target/dist-bin/synapse"/>
+    <j:set var="mediators.dist.dir" value="target/dist-mediators/synapse"/>
+    <j:set var="extensions.dist.dir" value="target/dist-extensions/synapse"/>
+
+    <tstamp>
+        <format property="release_date" pattern="MMMM d, yyyy" locale="en"/>
+    </tstamp>
+
+    <j:set var="modules" value="*"/>
+
+    <preGoal name="build:start">
+        <property name="modules" value="core"/>
+    </preGoal>
+
+    <!-- ======= -->
+    <!-- Modules -->
+    <!-- ======= -->
+    <goal name="modules:reactor:init">
+        <!--
+           | Determine the includes which the reactor will use.
+           |
+           | Uses 4 properties to control which modules will be include:
+           |
+           | module.types      Comma seperated list of module types (ie. specs or modules)
+           | module.includes   Comma seperated list of module names (ie. common, core, ...)
+           | modules           Same as module.includes, module.includes initializes to this value
+           | module.excludes   Comma seperated list of module names to exclude
+           |
+           | The end result is that modules.reactor.includes is set to the project.xml files
+           | to include.  This is the value the reactor will use.
+           |
+           | Example, to only build the common and core modules:
+           |
+           | maven -Dmodules=common,core
+         -->
+
+        <j:if test="${context.getVariable('module.types') == null}">
+            <j:set var="module.types" value="modules,applications,plugins"/>
+        </j:if>
+
+        <j:if test="${context.getVariable('modules') == null}">
+            <!-- The default is to build everything -->
+            <j:set var="modules" value="*"/>
+        </j:if>
+
+        <j:if test="${context.getVariable('module.includes') == null}">
+            <j:set var="module.includes" value="${modules}"/>
+        </j:if>
+
+        <j:if test="${context.getVariable('module.excludes') == null}">
+            <j:set var="module.excludes" value=""/>
+        </j:if>
+
+        <u:tokenize var="types" delim=",">${module.types}</u:tokenize>
+
+        <ant:fileScanner var="scanner">
+            <ant:fileset dir="${basedir}">
+                <j:forEach var="type" items="${types}">
+                    <j:choose>
+                        <j:when test="${context.getVariable('module.includes') == '*'}">
+                            <ant:include name="${type}/*/project.xml"/>
+                        </j:when>
+                        <j:otherwise>
+                            <u:tokenize var="includes" delim=",">
+                                ${module.includes}</u:tokenize>
+                            <j:forEach var="include" items="${includes}">
+                                <u:available
+                                        file="${basedir}/${type}/${include}/project.xml">
+                                    <ant:include
+                                            name="${type}/${include}/project.xml"/>
+                                </u:available>
+                            </j:forEach>
+                        </j:otherwise>
+                    </j:choose>
+
+                    <j:choose>
+                        <j:when test="${context.getVariable('module.excludes') == '*'}">
+                            <ant:exclude name="${type}/*/project.xml"/>
+                        </j:when>
+                        <j:otherwise>
+                            <u:tokenize var="excludes" delim=",">
+                                ${module.excludes}</u:tokenize>
+                            <j:forEach var="exclude" items="${excludes}">
+                                <u:available
+                                        file="${basedir}/${type}/${exclude}/project.xml">
+                                    <ant:exclude
+                                            name="${type}/${exclude}/project.xml"/>
+                                </u:available>
+                            </j:forEach>
+                        </j:otherwise>
+                    </j:choose>
+                </j:forEach>
+            </ant:fileset>
+        </ant:fileScanner>
+
+        <!-- Setup the includes which will be used by the reactor -->
+        <j:forEach var="file" items="${scanner.iterator()}">
+            <!--
+               | Would be nice if reactor would take a file set, but for now just remove
+               | the baseddir portion of the file's name.  So this will essentially strip off
+               | ${basedir}
+             -->
+            <j:set var="directory"
+                   value="${file.parentFile.parentFile.name}/${file.parentFile.name}"/>
+            <j:set var="filename" value="${directory}/${file.name}"/>
+            <j:choose>
+                <j:when test="${context.getVariable('modules.reactor.includes') == null}">
+                    <j:set var="modules.directories" value="${directory}"/>
+                    <j:set var="modules.reactor.includes" value="${filename}"/>
+                </j:when>
+                <j:otherwise>
+                    <j:set var="modules.directories"
+                           value="${modules.directories},${directory}"/>
+                    <j:set var="modules.reactor.includes"
+                           value="${modules.reactor.includes},${filename}"/>
+                </j:otherwise>
+            </j:choose>
+        </j:forEach>
+    </goal>
+
+    <!-- Helper tags for modules -->
+    <define:taglib uri="local:modules">
+        <define:tag name="reactor">
+            <attainGoal name="modules:reactor:init"/>
+
+            <j:choose>
+                <j:when test="${goals != null}">
+                    <maven:reactor
+                            basedir="${basedir}"
+                            includes="${modules.reactor.includes}"
+                            banner="Executing (${goals}):"
+                            ignoreFailures="false"
+                            goals="${goals}"
+                            postProcessing="true"
+                            />
+                </j:when>
+                <j:when test="${goals == null}">
+                    <maven:reactor
+                            basedir="${basedir}"
+                            includes="${modules.reactor.includes}"
+                            banner="Executing (${goals}):"
+                            ignoreFailures="false"
+                            postProcessing="true"
+                            />
+                </j:when>
+            </j:choose>
+
+            <!-- Set reactor projects in parent scope so goals have access to it -->
+            <j:set var="reactorProjects" value="${reactorProjects}"
+                   scope="parent"/>
+        </define:tag>
+    </define:taglib>
+
+    <goal name="m:init">
+        <ant:fileScanner var="scanner">
+            <ant:fileset dir="${basedir}">
+                <u:tokenize var="includes" delim=",">
+                    ${maven.multiproject.includes}</u:tokenize>
+                <j:forEach var="include" items="${includes}">
+                    <ant:include name="${include}"/>
+                </j:forEach>
+                <u:tokenize var="excludes" delim=",">
+                    ${maven.multiproject.excludes}</u:tokenize>
+                <j:forEach var="exclude" items="${excludes}">
+                    <ant:exclude name="${exclude}"/>
+                </j:forEach>
+            </ant:fileset>
+        </ant:fileScanner>
+
+        <j:set var="maven.multiproject.includes" value=""/>
+        <j:set var="maven.multiproject.excludes" value=""/>
+        <j:set var="modules.directories" value=""/>
+
+        <u:tokenize var="moduleList" delim=",">${modules}</u:tokenize>
+        <j:set var="currentDir" value="${basedir}/"/>
+        <j:forEach var="file" items="${scanner.iterator()}">
+            <j:set var="directory" value="${file.parentFile.absolutePath}"/>
+            <j:set var="include"
+                   value="${file.absolutePath.substring(currentDir.length())}"/>
+            <j:if test="${moduleList.isEmpty() || moduleList.contains(file.parentFile.name)}">
+                <j:choose>
+                    <j:when test="${context.getVariable('maven.multiproject.includes') == ''}">
+                        <j:set var="modules.directories" value="${directory}"/>
+                        <j:set var="maven.multiproject.includes"
+                               value="${include}"/>
+                    </j:when>
+                    <j:otherwise>
+                        <j:set var="modules.directories"
+                               value="${modules.directories},${directory}"/>
+                        <j:set var="maven.multiproject.includes"
+                               value="${maven.multiproject.includes},${include}"/>
+                    </j:otherwise>
+                </j:choose>
+            </j:if>
+        </j:forEach>
+    </goal>
+
+    <goal name="jar:jar">
+        <attainGoal name="create-jar"/>
+        <ant:copy file="target/lib/${pom.artifactId}-${pom.currentVersion}.jar"
+                  toDir="target/"/>
+    </goal>
+
+    <goal name="jar">
+        <attainGoal name="multiproject:install"/>
+        <attainGoal name="jar:install"/>
+    </goal>
+
+    <goal name="init">
+        <ant:mkdir dir="target"/>
+        <ant:mkdir dir="${dist.dir}"/>
+        <ant:mkdir dir="target/lib"/>
+
+        <uptodate property="jars.uptodate"
+                  targetfile="target/${pom.artifactId}-${pom.currentVersion}.war">
+            <srcfiles dir="modules">
+                <include name="**/*.java"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.wsdl"/>
+                <exclude name="**/target/**"/>
+            </srcfiles>
+        </uptodate>
+        <echo message="the files are up to date = ${jars.uptodate}"></echo>
+    </goal>
+
+    <goal name="modules:clean">
+        <attainGoal name="modules:reactor:init"/>
+        <u:tokenize var="directories" delim=",">
+            ${modules.directories}</u:tokenize>
+        <j:forEach var="directory" items="${directories}">
+            <ant:echo>+----------------------------------------</ant:echo>
+            <ant:echo>| Cleaning: ${directory}</ant:echo>
+            <ant:echo>+----------------------------------------</ant:echo>
+            <ant:delete dir="${directory}/target"/>
+            <ant:delete quiet="false" failonerror="false">
+                <ant:fileset dir="${directory}">
+                    <ant:include name="maven.log"/>
+                    <ant:include name="velocity.log*"/>
+                    <ant:include name="junit*.properties"/>
+                    <!--<ant:include name="axis.log"/>-->
+                    <ant:include name="junit*.properties"/>
+                    <ant:include name="temp.properties"/>
+                </ant:fileset>
+            </ant:delete>
+            <ant:echo></ant:echo>
+        </j:forEach>
+        <ant:echo>+----------------------------------------</ant:echo>
+        <ant:echo>| Cleaning: target and etc/target</ant:echo>
+        <ant:echo>+----------------------------------------</ant:echo>
+        <ant:delete dir="target"/>
+        <ant:delete dir="etc/target"/>
+    </goal>
+
+    <goal name="clean">
+        <attainGoal name="modules:clean"/>
+    </goal>
+
+    <goal name="cleanse-sources">
+        <modules:reactor goals="cleanse-sources"/>
+    </goal>
+
+    <!-- <goal name="clover">
+        <modules:reactor goals="clover:on,jar:install,test"/>
+        <attainGoal name="clover:merge"/>
+        <attainGoal name="clover:report"/>
+    </goal> -->
+
+    <goal name="create-jar" prereqs="init">
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar">
+            <fileset dir="modules/core/target/classes"/>
+        </jar>
+    </goal>
+
+    <goal name="create-lib">
+        <macros:copy-deps copyToDir="${target/lib}"/>
+    </goal>
+
+    <!-- ================================================================ -->
+    <!--- Create the Distro -->
+    <!-- ================================================================ -->
+    <goal name="dist-bin" prereqs="war,create-jar,javadocs">
+        <ant:echo>+----------------------------------------------</ant:echo>
+        <ant:echo>| Creating: Synapse Binary Distribution</ant:echo>
+        <ant:echo>+----------------------------------------------</ant:echo>
+
+        <ant:mkdir dir="${bin.dist.dir}"/>
+        <ant:mkdir dir="${bin.dist.dir}/bin"/>
+        <ant:mkdir dir="${bin.dist.dir}/lib"/>
+        <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
+        <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
+        <ant:mkdir dir="${bin.dist.dir}/samples"/>
+        <ant:mkdir dir="${bin.dist.dir}/mediators"/>
+
+        <ant:mkdir dir="target/temp/"/>
+
+        <ant:copy todir="${bin.dist.dir}/xdocs">
+            <ant:fileset dir="xdocs">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy todir="${bin.dist.dir}/lib" flatten="true">
+            <ant:fileset dir="target/lib">
+                <ant:include name="*.jar"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy file="bin/synapse.sh"
+                  tofile="${bin.dist.dir}/bin/synapse.sh"/>
+        <ant:copy file="bin/synapse.bat"
+                  tofile="${bin.dist.dir}/bin/synapse.bat"/>
+        <ant:copy file="README.txt"
+                  tofile="${bin.dist.dir}/README.txt"/>
+
+        <ant:copy todir="${bin.dist.dir}/synapse_repository" flatten="false">
+            <ant:fileset dir="modules/core/target/synapse-repository"/>
+        </ant:copy>
+
+        <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
+            <ant:fileset dir="modules/samples/target/dist-bin/samples"/>
+        </ant:copy>
+
+        <ant:copy todir="${bin.dist.dir}/mediators" flatten="false">
+            <ant:fileset dir="modules/mediators/target/dist-bin/mediators"/>
+        </ant:copy>
+
+        <ant:copy todir="target/temp/">
+            <ant:fileset dir="target/dist-bin/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
+
+        <ant:zip file="${dist.dir}/${dist.name}-bin.zip"
+                 basedir="target/temp"/>
+
+        <ant:delete dir="target/temp"/>
+        <ant:delete dir="target/dist-bin"/>
+    </goal>
+
+    <goal name="init-dist">
+        <ant:mkdir dir="target/dist"/>
+    </goal>
+
+    <goal name="cache-min-deps" prereqs="init-dist">
+        <ant:mkdir dir="${min_dep_cache}"/>
+        <j:if test="${minDeps.uptodate != 'yes'}">
+            <macros:copy-deps copyToDir="${min_dep_cache}"
+                              mods="core"/>
+            <property name="minDeps.uptodate" value="yes"/>
+        </j:if>
+    </goal>
+
+    <!-- ================================================================ -->
+    <!--- Create the Java Docs -->
+    <!-- ================================================================ -->
+
+    <goal name="javadocs" prereqs="init">
+        <deploy:copy-deps todir="target/lib"/>
+        <ant:javadoc packagenames="org.apache.synapse.*"
+                     defaultexcludes="yes"
+                     destdir="target/apidocs"
+                     author="true"
+                     version="true"
+                     use="true"
+                     windowtitle="Synapse API">
+            <ant:sourcepath>
+                <ant:pathelement location="modules/core/src"/>
+                <ant:pathelement location="modules/mediators/src"/>
+            </ant:sourcepath>
+            <ant:classpath>
+                <ant:fileset dir="target/lib">
+                    <ant:include name="**/*.jar"/>
+                </ant:fileset>
+            </ant:classpath>
+        </ant:javadoc>
+    </goal>
+
+    <!-- ================================================================ -->
+    <!--- Reports -->
+    <!-- ================================================================ -->
+    <!-- Conditionally disable linkcheck based on a property. -->
+
+    <postGoal name="xdoc:register-reports">
+        <j:if test="${maven.allreports.disable}">
+            <echo>Reports are disabled. Deregistering all the reports
+                ....</echo>
+            <attainGoal name="maven-linkcheck-plugin:deregister"/>
+            <echo>linkcheck is disabled.</echo>
+            <attainGoal name="maven-checkstyle-plugin:deregister"/>
+            <echo>checkstyle is disabled.</echo>
+            <attainGoal name="maven-changes-plugin:deregister"/>
+            <echo>changes is disabled.</echo>
+            <attainGoal name="maven-changelog-plugin:deregister"/>
+            <echo>changelog is disabled.</echo>
+            <attainGoal name="maven-license-plugin:deregister"/>
+            <echo>license is disabled.</echo>
+            <attainGoal name="maven-javadoc-plugin:deregister"/>
+            <echo>javadoc is disabled.</echo>
+            <attainGoal name="maven-junit-report-plugin:deregister"/>
+            <echo>junit-report is disabled.</echo>
+            <attainGoal name="maven-tasklist-plugin:deregister"/>
+            <echo>tasklist is disabled.</echo>
+        </j:if>
+
+    </postGoal>
+
+
+    <!-- ================================================================ -->
+    <!--- Create JUnit test reports -->
+    <!-- ================================================================ -->
+    <goal name="test-reports">
+        <mkdir dir="${basedir}/target/test-reports"/>
+        <ant:junitreport todir="${basedir}/target/test-reports">
+            <ant:fileset dir="${basedir}/">
+                <ant:include name="**/test-reports/TEST-*.xml"/>
+                <ant:include name="**/itest-reports/TEST-*.xml"/>
+            </ant:fileset>
+            <ant:report format="frames" todir="${basedir}/target/test-reports"
+                        styledir="${basedir}/etc"/>
+        </ant:junitreport>
+    </goal>
+
+    <define:taglib uri="macros">
+        <define:tag name="copy-deps">
+            <j:set var="modules" value="${mods}"/>
+
+            <!-- ######################### REACTOR INIT ##########################################-->
+
+            <j:if test="${context.getVariable('module.types') == null}">
+                <j:set var="module.types" value="modules,applications,plugins"/>
+            </j:if>
+
+            <j:set var="module.includes" value="${modules}"/>
+
+            <j:if test="${context.getVariable('module.excludes') == null}">
+                <j:set var="module.excludes" value=""/>
+            </j:if>
+
+            <u:tokenize var="types" delim=",">${module.types}</u:tokenize>
+
+            <ant:fileScanner var="scanner">
+                <ant:fileset dir="${basedir}">
+                    <j:forEach var="type" items="${types}">
+                        <j:choose>
+                            <j:when test="${context.getVariable('module.includes') == '*'}">
+                                <ant:include name="${type}/*/project.xml"/>
+                            </j:when>
+                            <j:otherwise>
+                                <u:tokenize var="includes" delim=",">
+                                    ${module.includes}</u:tokenize>
+                                <j:forEach var="include" items="${includes}">
+                                    <u:available
+                                            file="${basedir}/${type}/${include}/project.xml">
+                                        <ant:include
+                                                name="${type}/${include}/project.xml"/>
+                                    </u:available>
+                                </j:forEach>
+                            </j:otherwise>
+                        </j:choose>
+
+                        <j:choose>
+                            <j:when test="${context.getVariable('module.excludes') == '*'}">
+                                <ant:exclude name="${type}/*/project.xml"/>
+                            </j:when>
+                            <j:otherwise>
+                                <u:tokenize var="excludes" delim=",">
+                                    ${module.excludes}</u:tokenize>
+                                <j:forEach var="exclude" items="${excludes}">
+                                    <u:available
+                                            file="${basedir}/${type}/${exclude}/project.xml">
+                                        <ant:exclude
+                                                name="${type}/${exclude}/project.xml"/>
+                                    </u:available>
+                                </j:forEach>
+                            </j:otherwise>
+                        </j:choose>
+                    </j:forEach>
+                </ant:fileset>
+            </ant:fileScanner>
+
+            <j:set var="modules.reactor.includes" value=""/>
+
+            <!-- Setup the includes which will be used by the reactor -->
+            <j:forEach var="file" items="${scanner.iterator()}">
+                <j:set var="directory"
+                       value="${file.parentFile.parentFile.name}/${file.parentFile.name}"/>
+                <j:set var="filename" value="${directory}/${file.name}"/>
+                <j:choose>
+                    <j:when test="${context.getVariable('modules.reactor.includes') == null}">
+                        <j:set var="modules.directories" value="${directory}"/>
+                        <j:set var="modules.reactor.includes"
+                               value="${filename}"/>
+                    </j:when>
+                    <j:otherwise>
+                        <j:set var="modules.directories"
+                               value="${modules.directories},${directory}"/>
+                        <j:set var="modules.reactor.includes"
+                               value="${modules.reactor.includes},${filename}"/>
+                    </j:otherwise>
+                </j:choose>
+            </j:forEach>
+            <!-- #################### END OF REACTOR INIT #######################################-->
+
+            <ant:echo
+                    message="Fetching Dependencies for modules: ${modules.reactor.includes}"/>
+            <maven:reactor
+                    basedir="${basedir}"
+                    postProcessing="true"
+                    includes="${modules.reactor.includes}"
+                    banner="Executing (${goals}):"
+                    ignoreFailures="false"/>
+            <j:forEach var="x" items="${reactorProjects}">
+                <ant:echo message="Copying ${x} to ${copyToDir}"/>
+                <deploy:copy-deps todir="${copyToDir}"
+                                  projectDescriptor="${x.getFile()}"/>
+            </j:forEach>
+            <property name="modules" value="*"/>
+        </define:tag>
+    </define:taglib>
+
+    <goal name="war" prereqs="init">
+        <j:if test="${jars.uptodate != 'yes'}">
+            <attainGoal name="jar"/>
+        </j:if>
+        <!-- jar the test classes -->
+        <deploy:copy-deps todir="target/lib"/>
+        <ant:war destfile="target/synapse.war" webxml="bin/web.xml">
+            <ant:lib dir="target/lib">
+                <ant:include name="**"/>
+                <ant:exclude name="**servlet**"/>
+                <ant:exclude name="ant*.jar"/>
+            </ant:lib>
+            <ant:webinf dir="modules/core/target/synapse-repository/"/>
+        </ant:war>
+    </goal>
+
+    <goal name="dist-src">
+        <ant:mkdir dir="${dist.dir}"/>
+        <ant:zip file="${dist.dir}/${dist.name}-src.zip">
+            <ant:fileset dir=".">
+                <ant:include name="**"/>
+                <ant:exclude name="**/target/**"/>
+                <ant:exclude name="**/.svn/**"/>
+                <ant:exclude name="**/bin/**"/>
+                <ant:exclude name="**/*.log"/>
+                <ant:exclude name=".*"/>
+                <ant:exclude name="**/*.license"/>
+            </ant:fileset>
+        </ant:zip>
+        <ant:tar tarfile="target/${dist.name}-src.tar" longfile="gnu">
+            <ant:tarfileset dir=".">
+                <ant:include name="**"/>
+                <ant:exclude name="**/target/**"/>
+                <ant:exclude name="**/.svn/**"/>
+                <ant:exclude name="**/bin/**"/>
+                <ant:exclude name="**/*.log"/>
+                <ant:exclude name=".*"/>
+                <ant:exclude name="**/*.license"/>
+            </ant:tarfileset>
+        </ant:tar>
+        <gzip src="target/${dist.name}-src.tar"
+              zipfile="${dist.dir}/${dist.name}-src.tar.gz"/>
+        <ant:delete file="target/${dist.name}-src.tar"/>
+    </goal>
+
+    <goal name="dep-test">
+        <macros:copy-deps copyToDir="target/lib" mods="core"/>
+    </goal>
+
+    <!-- ================================================================ -->
+    <!--- Create the Mediator Distribution -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-mediators" prereqs="jar,create-jar,javadocs">
+        <ant:echo>+----------------------------------------------</ant:echo>
+        <ant:echo>| Creating: Synapse Mediator Distribution</ant:echo>
+        <ant:echo>+----------------------------------------------</ant:echo>
+
+        <ant:mkdir dir="target/temp/"/>
+
+        <ant:copy todir="${mediators.dist.dir}/mediators" flatten="false">
+            <ant:fileset dir="modules/mediators/target/dist-bin/mediators"/>
+        </ant:copy>
+
+        <ant:copy todir="target/temp/">
+            <ant:fileset dir="target/dist-mediators/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
+
+        <ant:zip file="${dist.dir}/Mediators-Synapse-${pom.currentVersion}-bin.zip"
+                 basedir="target/temp"/>
+
+        <ant:delete dir="target/temp"/>
+        <ant:delete dir="target/dist-mediators"/>
+
+    </goal>
+    <!-- ================================================================ -->
+    <!--- Create the Mediator Distribution -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-extensions" prereqs="jar,create-jar,javadocs">
+        <ant:echo>+----------------------------------------------</ant:echo>
+        <ant:echo>| Creating: Synapse Extensions Distribution</ant:echo>
+        <ant:echo>+----------------------------------------------</ant:echo>
+        <!-- todo fill up the  distribution-->
+        <ant:mkdir dir="target/temp/"/>
+
+        <ant:copy todir="${extensions.dist.dir}/extensions" flatten="false">
+            <ant:fileset dir="modules/extensions/target/extensions"/>
+        </ant:copy>
+
+        <ant:copy todir="target/temp/">
+            <ant:fileset dir="target/dist-extensions/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
+
+        <ant:zip file="${dist.dir}/Extensions-Synapse-${pom.currentVersion}-bin.zip"
+                 basedir="target/temp"/>
+
+        <ant:delete dir="target/temp"/>
+        <ant:delete dir="target/dist-extensions"/>
+
+    </goal>
+</project>
+

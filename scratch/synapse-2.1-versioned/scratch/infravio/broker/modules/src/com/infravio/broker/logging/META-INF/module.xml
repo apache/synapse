@@ -1,0 +1,13 @@
+<module name="Logging" class="com.infravio.broker.modules.logging.LoggingModule">
+    <inflow>
+        <handler name="InFlowLogHandler" class="com.infravio.broker.modules.logging.LogInOutHandler">
+            <order phase="LoggingPhase"/>
+        </handler>
+    </inflow>
+
+    <outflow>
+        <handler name="OutFlowLogHandler" class="com.infravio.broker.modules.logging.LogInOutHandler">
+            <order phase="LoggingPhase"/>
+        </handler>
+    </outflow>
+</module>

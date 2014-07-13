@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 256</title>
+    </properties>
+    <body>
+        <section name="Sample 256: Proxy Services with the Mail Transport">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="StockQuoteProxy" transports="mailto"&gt;
+
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name="senderAddress" expression="get-property('transport', 'From')"/&gt;
+                &lt;log level="full"&gt;
+                    &lt;property name="Sender Address" expression="get-property('senderAddress')"/&gt;
+                &lt;/log&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;property name="Subject" value="Custom Subject for Response" scope="transport"/&gt;
+                &lt;header name="To" expression="fn:concat('mailto:', get-property('senderAddress'))"/&gt;
+                &lt;log level="full"&gt;
+                    &lt;property name="message" value="Response message"/&gt;
+                    &lt;property name="Sender Address" expression="get-property('senderAddress')"/&gt;
+                &lt;/log&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+
+        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
+        &lt;parameter name="transport.mail.Protocol"&gt;pop3&lt;/parameter&gt;
+        &lt;parameter name="transport.PollInterval"&gt;5&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.host"&gt;pop.gmail.com&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.port"&gt;995&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.1&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.password"&gt;mailpassword&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.class"&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.fallback"&gt;false&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.socketFactory.port"&gt;995&lt;/parameter&gt;
+        &lt;parameter name="transport.mail.ContentType"&gt;application/xml&lt;/parameter&gt;
+
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    This sample show cases the mail transport of Synapse. The mail transport allows
+                    Synapse to receive and send e-mails using common protocols like POP, IMAP and
+                    SMTP.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            You need access to an e-mail account to try out this sample
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Enable the mail transport listener and mail transport sender for Synapse
+                            (refer  <a href="setup/mail.html#mailTransportSender">Mail transport setup</a>
+                            guide for more details)
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 256 (repository/conf/sample/synapse_sample_256.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 256<br/>
+                                Windows: synapse.bat -sample 256
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Send an e-mail to <a href="mailto:synapse.demo.1@gmail.com">synapse.demo.1@gmail.com</a>
+                    with the following payload.
+                </p>
+                <div class="xmlConf">&lt;getQuote xmlns=&quot;http://services.samples&quot;&gt;
+   &lt;request&gt;
+       &lt;symbol&gt;IBM&lt;/symbol&gt;
+   &lt;/request&gt;
+&lt;/getQuote&gt;</div>
+                <p>
+                    Synapse will be polling on the above e-mail account for any incoming requests. When
+                    your mail arrives at this account, Synapse will pick it up and send the payload to
+                    Axis2 over HTTP. The response will be mailed back to your e-mail account. Synapse
+                    retrieves the sender information from the original request to determine the recipient
+                    of the response mail.
+                </p>
+                <p>
+                    Note that in this sample we used the transport.mail.ContentType property to make
+                    sure that the transport parses the request message as POX. If you remove this
+                    property, you may still be able to send requests using a standard mail client if
+                    instead of writing the XML in the body of the message, you add it as an attachment.
+                    In that case, you should use .xml as a suffix for the attachment and format the
+                    request as a SOAP 1.1 message. Indeed, for a file with suffix .xml the mail client
+                    will most likely use text/xml as the content type, exactly as required for SOAP 1.1.
+                    Sending a POX message using this approach will be a lot trickier, because most
+                    standard mail clients don't allow the user to explicitly set the content type.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

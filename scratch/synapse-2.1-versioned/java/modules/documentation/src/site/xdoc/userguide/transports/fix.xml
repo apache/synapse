@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Financial Information eXchange Transport</title>
+    </properties>
+    <body>
+        <section name="Financial Information eXchange (FIX) Transport" id="Contents">
+            <ul>
+                <li>
+                    <a href="#Introduction">Introduction</a>
+                </li>
+                <li>
+                    <a href="#Configuration">Transport Configuration</a>
+                    <ul>
+                        <li><a href="#Listener">FIX Transport Listener</a></li>
+                        <li><a href="#Sender">FIX Transport Sender</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#Mediation">Mediation FIX Messages</a>
+                </li>
+            </ul>
+        </section>
+        <section name="Introduction" id="Introduction">
+            <p>
+                <a href="http://www.fixtradingcommunity.org">FIX</a> is a public-domain messaging
+                standard developed specifically for the real-time electronic exchange of securities
+                transactions. It has a large user base, and the protocol specifications are
+                developed by the collaborative effort of banks, broker-dealers, exchanges, industry
+                utilities, institutional investors, and IT providers around the world.
+            </p>
+            <p>
+                The FIX protocol specifications can be divided into two sections - the FIX session
+                protocol and the FIX application protocol. The session protocol is concerned with
+                the delivery of data, while the application protocol defines business-related data
+                content.
+            </p>
+            <p>
+                Apache Synapse supports sending and receiving FIX messages via its FIX transport.
+                This transport is based on <a href="http://www.quickfixj.org">Quickfix/J</a>, a
+                popular open source library used to develop applications based on the FIX protocol.
+                The FIX transport enables Synapse to operate as both a FIX acceptor and a FIX
+                initiator. If you have some prior experience working with Quickfix/J, you will realize
+                that most of the features and configuration options available in Quickfix/J are
+                applicable to the Synapse FIX transport as well.
+            </p>
+            <p>
+                To learn more about the FIX protocol and the Synapse FIX transport, please refer
+                the following articles:
+            </p>
+            <ul>
+                <li>
+                    <a class="externalLink" href="http://wso2.org/library/3449">Apache Synapse FIX'ed</a>
+                </li>
+                <li>
+                    <a class="externalLink" href="http://wso2.org/library/3837">Using the WSO2 ESB and FIX</a>
+                    (also applies to Synapse)
+                </li>
+            </ul>
+        </section>
+        <section name="Transport Configuration" id="Configuration">
+            <p>
+                Synapse binary distribution does not contain the Quickfix/J libraries. To use the
+                FIX transport, you must <a href="http://www.quickfixj.org/downloads/">download Quickfix/J</a>
+                separately, and deploy the necessary jar files into the Synapse installation. We
+                recommend using Quickfix/J 1.4.0 with Synapse. Copy the following jar files from the
+                Quickfix/J binary distribution to the <strong>SYNAPSE_HOME/lib</strong> directory.
+            </p>
+            <ul>
+                <li>quickfixj-core.jar</li>
+                <li>quickfixj-msg-fix40.jar</li>
+                <li>quickfixj-msg-fix41.jar</li>
+                <li>quickfixj-msg-fix42.jar</li>
+                <li>quickfixj-msg-fix43.jar</li>
+                <li>quickfixj-msg-fix44.jar</li>
+                <li>mina-core.jar</li>
+                <li>slf4j-api.jar</li>
+                <li>slf4j-jdk14.jar</li>
+            </ul>
+            <p>
+                Similar to the <a href="vfs.html">file transport</a>, the FIX transport is also mostly
+                configured at the proxy service and endpoint level. To receive FIX messages, we
+                expose a proxy service over the FIX transport, and specify the FIX connection settings
+                as proxy service parameters. To send FIX messages, we define an address endpoint
+                with a URL containing the FIX connection settings.
+            </p>
+            <subsection name="FIX Transport Listener" id="Listener">
+                <p>
+                    FIX transport listener enables Synapse to receive FIX messages from remote
+                    applications. Synapse may operate as a FIX acceptor or as an initiator
+                    when receiving FIX messages. To enable the FIX transport listener, uncomment
+                    the following transport receiver configuration in the <strong>SYNAPSE_HOME/repository/conf/axis2.xml</strong>
+                    file.
+                </p>
+                <div class="xmlConf">&lt;transportReceiver name="fix" class="org.apache.synapse.transport.fix.FIXTransportListener"&gt;
+    &lt;parameter name="non-blocking"&gt;true&lt;/parameter&gt;
+&lt;/transportReceiver&gt;</div>
+                <p>
+                    Now you may expose proxy services over the FIX transport by setting the "transports"
+                    attribute on the proxy service element to "fix":
+                </p>
+                <div class="xmlConf">&lt;proxy name=&quot;MyFIXService&quot; transports=&quot;fix&quot;&gt;
+...
+&lt;/proxy&gt;</div>
+                <p>
+                    It's also possible to expose a proxy service on FIX transport and several other
+                    transports. Simply specify the required transports as a space-separated list in
+                    the "transports" attribute:
+                </p>
+                <div class="xmlConf">&lt;proxy name=&quot;MyFIXService&quot; transports=&quot;fix http https&quot;&gt;
+...
+&lt;/proxy&gt;</div>
+                <p>
+                    Exposing a proxy service over FIX is not sufficient. We must configure the proxy
+                    service with FIX session and connection details. This is done by setting
+                    a number of parameters on the proxy service configuration. Please refer <a href="../samples/sample257.html">sample 257</a>
+                    for an example that demonstrates how this is done. Following table lists all the
+                    FIX-specific parameters that can be set on a Synapse proxy service.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.AcceptorConfigURL</td>
+                        <td>
+                            If a proxy service wishes to listen to incoming FIX messages from a remote
+                            initiator, then Synapse needs to start a FIX acceptor. This parameter
+                            specifies the URL to a file, which contains the FIX configuration
+                            for the acceptor. The URL may point to a file in the local file system
+                            or a remotely hosted file accessible over a standard protocol such as HTTP.
+                            The file itself should be a standard <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Sample%20Settings%20File">.cfg file</a>,
+                            typically used to
+                            configure FIX acceptors in Quickfix/J. Parameter is required if the proxy
+                            service should receive FIX traffic as an acceptor.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.AcceptorConfigURL"&gt;file:conf/acceptor.cfg&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.InitiatorConfigURL</td>
+                        <td>
+                            If a proxy service wishes to listen to incoming FIX messages from a remote
+                            acceptor, then Synapse needs to start a FIX initiator. This parameter
+                            specifies the URL to a file, which contains the FIX configuration
+                            for the initiator. The URL may point to a file in the local file system
+                            or a remotely hosted file accessible over a standard protocol such as HTTP.
+                            The file itself should be a standard <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Sample%20Settings%20File">.cfg file</a>,
+                            typically used to
+                            configure FIX initiators in Quickfix/J. Parameter is required if the proxy
+                            service should receive FIX traffic as an initiator.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.InitiatorConfigURL"&gt;file:conf/initiator.cfg&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.AcceptorMessageStore</td>
+                        <td>
+                            The type of message store to be used with the acceptor. Allowed values for
+                            this parameter are 'file', 'jdbc', 'memory' and 'sleepycat'. Additional
+                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Storage">parameters</a>
+                            required to configure the message store should be specified in the
+                            acceptor configuration file. Ignored if the proxy service is not operating
+                            in the acceptor mode.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.AcceptorMessageStore"&gt;file&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>memory</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.InitiatorMessageStore</td>
+                        <td>
+                            The type of message store to be used with the initiator. Allowed values for
+                            this parameter are 'file', 'jdbc', 'memory' and 'sleepycat'. Additional
+                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Storage">parameters</a>
+                            required to configure the message store should be specified in the
+                            initiator configuration file. Ignored if the proxy service is not operating
+                            in the initiator mode.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>memory</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.AcceptorLogFactory</td>
+                        <td>
+                            Specifies the type of FIX log factory to be used to log messages going
+                            through the acceptor. FIX messages are logged without putting them in SOAP
+                            envelopes at this level. Accepted values are 'console', 'file' and 'jdbc'.
+                            If not specified no logging will be done at the transport level. Additional
+                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Logging">parameters</a>
+                            required to configure each of the lof factories should be specified
+                            in the acceptor configuration file. Ignored if the proxy service is not
+                            operating in the acceptor mode.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.AcceptorLogFactory"&gt;file&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.InitiatorLogFactory</td>
+                        <td>
+                            Specifies the type of FIX log factory to be used to log messages going
+                            through the initiator. FIX messages are logged without putting them in SOAP
+                            envelopes at this level. Accepted values are 'console', 'file' and 'jdbc'.
+                            If not specified no logging will be done at the transport level. Additional
+                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Logging">parameters</a>
+                            required to configure each of the lof factories should be specified
+                            in the initiator configuration file. Ignored if the proxy service is not
+                            operating in the initiator mode.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.InitiatorLogFactory"&gt;file&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.UseThreadedConnectors</td>
+                        <td>
+                            Use multi-threaded acceptors and initiators. Setting this parameter to
+                            true is equivalent to setting both transport.fix.UseThreadedAcceptor and
+                            transport.fix.UseThreadedInitiator to true.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.UseThreadedConnectors"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.UseThreadedAcceptor</td>
+                        <td>
+                            Run the FIX acceptor in the multi-threaded mode. That is use separate
+                            threads for each acceptor session. Allowed values are true or false.
+                            Has more priority than transport.fix.UseThreadedConnectors.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.UseThreadedAcceptor"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.UseThreadedInitiator</td>
+                        <td>
+                            Run the FIX initiator in the multi-threaded mode. That is use separate
+                            threads for each initiator session. Allowed values are true or false.
+                            Has more priority than transport.fix.UseThreadedConnectors.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.UseThreadedInitiator"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.UseThreadedInitiator</td>
+                        <td>
+                            Run the FIX initiator in the multi-threaded mode. That is use separate
+                            threads for each initiator session. Allowed values are true or false.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.UseThreadedInitiator"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.ProcessSingleThreaded</td>
+                        <td>
+                            Mediate all received FIX messages on the same thread used by Quickfix/J
+                            to perform network I/O. Use this parameter to ensure that Synapse
+                            mediates the FIX messages in the received order. By default Synapse
+                            uses a pool of threads to process received FIX messages in parallel, which
+                            may change their order. Also, using a single thread has the side effect
+                            of forcing the FIX transport to control the request intake based on how
+                            fast Synapse processes them. In some cases this turns out to be the
+                            preferred behavior.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.ProcessSingleThreaded"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.AcceptorSingleThreaded</td>
+                        <td>
+                            Mediate all FIX messages received as an acceptor on the same thread used
+                            by Quickfix/J to perform network I/O. This has more priority over
+                            transport.fix.ProcessSingleThreaded.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.AcceptorSingleThreaded"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.InitiatorSingleThreaded</td>
+                        <td>
+                            Mediate all FIX messages received as an initiator on the same thread used
+                            by Quickfix/J to perform network I/O. This has more priority over
+                            transport.fix.ProcessSingleThreaded.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.InitiatorSingleThreaded"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.AcceptorSessionEventHandler</td>
+                        <td>
+                            Use this parameter to register a custom acceptor session event handler.
+                            Can be used when it's required to inject some custom logic into the way
+                            how the FIX transport handles key FIX session events. The value of this
+                            parameter should be the full qualified name of a class that implements the
+                            <a href="https://synapse.apache.org/apidocs/org/apache/synapse/transport/fix/SessionEventHandler.html">org.apache.synapse.transport.fix.SessionEventHandler</a> interface.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.AcceptorSessionEventHandler"&gt;foo.bar.MyEventHandler&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.InitiatorSessionEventHandler</td>
+                        <td>
+                            Use this parameter to register a custom initiator session event handler.
+                            Can be used when it's required to inject some custom logic into the way
+                            how the FIX transport handles key FIX session events. The value of this
+                            parameter should be the full qualified name of a class that implements the
+                            <a href="https://synapse.apache.org/apidocs/org/apache/synapse/transport/fix/SessionEventHandler.html">org.apache.synapse.transport.fix.SessionEventHandler</a> interface.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.AcceptorSessionEventHandler"&gt;foo.bar.MyEventHandler&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                </table>
+            </subsection>
+            <subsection name="FIX Transport Sender" id="Sender">
+                <p>
+                    To enable the FIX transport sender, uncomment the following transport sender
+                    configuration in the <strong>SYNAPSE_HOME/repository/conf/axis2.xml</strong> file.
+                </p>
+                <div class="xmlConf">&lt;transportSender name="fix" class="org.apache.synapse.transport.fix.FIXTransportSender"&gt;
+    &lt;parameter name="non-blocking"&gt;true&lt;/parameter&gt;
+&lt;/transportSender&gt;</div>
+                <p>
+                    To send a message using the FIX transport, define a Synapse endpoint with an
+                    address that starts with the prefix 'fix://'. The rest of the address should
+                    specify the target hostname, port and other FIX session settings. An example is
+                    shown below:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    The above endpoint describes a FIX 4.0 session with the SenderCompID set to
+                    'SYNAPSE' and the TargetCompID set to 'EXEC'. If this session already exists
+                    (created earlier by the proxy service), the message will be sent using that
+                    session. Otherwise, the FIX transport sender will create a new initiator
+                    session using the available session information and send the message using this
+                    new session.
+                </p>
+                <p>
+                    Following list shows all the FIX session settings that can be configured at
+                    the endpoint level, as URL query parameters.
+                </p>
+                <ul>
+                    <li>BeginString</li>
+                    <li>SenderCompID</li>
+                    <li>SenderSubID</li>
+                    <li>SenderLocationID</li>
+                    <li>TargetCompID</li>
+                    <li>TargetSubID</li>
+                    <li>TargetLocationID</li>
+                    <li>DeliverToCompID</li>
+                    <li>DeliverToSubID</li>
+                    <li>DeliverToLocationID</li>
+                    <li>SessionQualifier</li>
+                </ul>
+                <p>
+                    The DeliverTo* fields will be actually set on the messages, as the messages are
+                    forwarded to the remote FIX endpoint.
+                </p>
+                <p>
+                    There are several parameters that can be set at the proxy service level to
+                    configure the behavior of the FIX transport sender. A complete list is given
+                    below.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.BeginStringValidation</td>
+                        <td>
+                            Use this parameter to enable BeginString validation for all outgoing
+                            FIX messages. That is the BeginString value currently set on the message
+                            (typically this is set by the original source application that sent the
+                            message to Synapse), must match with the BeginString field of the target
+                            FIX session. Allowed values are true or false.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.BeginStringValidation"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.DropExtraResponses</td>
+                        <td>
+                            Sometimes FIX endpoints respond to requests with multiple responses. This
+                            could be problematic, if Synapse received the original request via a protocol
+                            like HTTP. In situations such as these, this parameter can be used to
+                            force Synapse to only mediate the first response received from the remote
+                            endpoint and discard the others. Allowed values are true or false.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.DropExtraResponses"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.SendAllToInSequence</td>
+                        <td>
+                            In some integration scenarios it becomes necessary treat all received
+                            FIX messages (both requests and responses) as a single message stream
+                            and mediate them through the in-sequence of the proxy service. This parameter
+                            enables doing that. Allowed values are true or false.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.SendAllToInSequence"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.ResponseDeliverToCompID</td>
+                        <td>
+                            Configure the DeliverToCompID value that should be set on the response
+                            messages sent by the proxy service. To set the DeliverToCompID on
+                            requests, set the DeliverToCompID directly on the target FIX endpoint
+                            as a query parameter.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.ResponseDeliverToCompID"&gt;APP&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.ResponseDeliverToSubID</td>
+                        <td>
+                            Configure the DeliverToSubID value that should be set on the response
+                            messages sent by the proxy service. To set the DeliverToSubID on
+                            requests, set the DeliverToSubID directly on the target FIX endpoint
+                            as a query parameter.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.ResponseDeliverToSubID"&gt;APP&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.fix.ResponseDeliverToLocationID</td>
+                        <td>
+                            Configure the DeliverToLocationID value that should be set on the response
+                            messages sent by the proxy service. To set the DeliverToLocationID on
+                            requests, set the DeliverToLocationID directly on the target FIX endpoint
+                            as a query parameter.
+                            <div class="xmlConf">&lt;parameter name="transport.fix.ResponseDeliverToLocationID"&gt;APP&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                </table>
+            </subsection>
+        </section>
+        <section name="Mediating FIX Messages" id="Mediation">
+            <p>
+                The FIX transport converts all received messages into SOAP (XML). Therefore, you can
+                treat a FIX message as any other XML message at the mediation level. You may use
+                XPath to extract individual fields from the FIX messages, and use XSLT or XQuery to
+                transform them into other formats. An example FIX message and its equivalent SOAP
+                infoset as constructed by the FIX transport are shown below.
+            </p>
+            <div class="xmlConf">8=FIX.4.0[SOH]9=105[SOH]35=D[SOH]34=2[SOH]49=BANZAI[SOH]52=20080711-06:42:26[SOH]56=SYNAPSE[SOH]11=1215758546278[SOH]21=1[SOH]38=9000000040=154=155=DEL59=010=121</div>
+            <div class="xmlConf">&lt;message&gt;
+    &lt;header&gt;
+        &lt;field id="8"&gt;FIX.4.0&lt;/field&gt;
+        &lt;field id="9"&gt;105&lt;/field&gt;
+        &lt;field id="34"&gt;2&lt;/field&gt;
+        &lt;field id="35"&gt;D&lt;/field&gt;
+        &lt;field id="49"&gt;BANZAI&lt;/field&gt;
+        &lt;field id="52"&gt;20080711-06:42:26&lt;/field&gt;
+        &lt;field id="56"&gt;SYNAPSE&lt;/field&gt;
+    &lt;/header&gt;
+    &lt;body&gt;
+        &lt;field id="11"&gt;1215758546278&lt;/field&gt;
+        &lt;field id="21"&gt;1&lt;/field&gt;
+        &lt;field id="38"&gt;90000000&lt;/field&gt;
+        &lt;field id="40"&gt;1&lt;/field&gt;
+        &lt;field id="54"&gt;1&lt;/field&gt;
+        &lt;field id="55"&gt;DEL&lt;/field&gt;
+        &lt;field id="59"&gt;0&lt;/field&gt;
+    &lt;/body&gt;
+    &lt;trailer&gt;
+        &lt;field id="10"&gt;121&lt;/field&gt;
+    &lt;/trailer&gt;
+&lt;/message&gt;</div>
+            <p>
+                Notice how the FIX header, body and trailer sections are grouped under separate
+                parent XML elements. To extract the BeginString field (field no. 8), you may use
+                the following XPath expression:
+            </p>
+            <div class="xmlConf">//header/field[@id='8']</div>
+            <p>
+                Similarly to extract the value of field 55 from the FIX message body, you may use
+                the following XPath expression:
+            </p>
+            <div class="xmlConf">//body/field[@id='55']</div>
+            <p>
+                Representing FIX messages as XML enables you to use some of the most powerful
+                mediation features of Synapse with FIX message flows. This includes content-based
+                routing, message transformation and protocol switching.
+            </p>
+        </section>
+    </body>
+</document>

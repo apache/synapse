@@ -1,0 +1,11 @@
+<!-- The time format is dd/mm/yyyy:H:m and its with respect to UTC.
+TimeZone is that of the system, offset from UTC is calculated internally -->
+<deprecationConfig>
+    <deprecationService Id="http://www.webservicex.net/stockquote.asmx">
+        <parameterSet>
+            <deprecationFromdate>06/09/2005:00:00</deprecationFromdate>
+            <deprecationTodate>07/02/2006:00:00</deprecationTodate>
+            <deprecationEnabled>true</deprecationEnabled>
+        </parameterSet>
+    </deprecationService>
+</deprecationConfig>

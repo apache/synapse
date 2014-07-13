@@ -1,0 +1,18 @@
+<SynapseObject name="failover">
+    <SynapseObject name="Contract0">
+        <Attribute name="url" type="STRING">http://somehost:8080/failoverService</Attribute>
+        <Attribute name="timeoutEnabled" type="BOOLEAN">true</Attribute>
+        <Attribute name="soapFaultEnabled" type="BOOLEAN">true</Attribute>
+        <Attribute name="networkErrorEnabled" type="BOOLEAN">true</Attribute>
+        <SynapseObject name="service0">
+            <Attribute name="url" type="STRING">http://ost:8080/service1</Attribute>
+            <Attribute name="active" type="BOOLEAN">true</Attribute>
+            <Attribute name="timeout" type="LONG">5000</Attribute>
+        </SynapseObject>
+        <SynapseObject name="service1">
+            <Attribute name="url" type="STRING">http://www.webservicex.net/stockquote.asmx</Attribute>
+            <Attribute name="active" type="BOOLEAN">true</Attribute>
+            <Attribute name="timeout" type="LONG">10000</Attribute>
+        </SynapseObject>
+    </SynapseObject>
+</SynapseObject>

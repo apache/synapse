@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 53</title>
+    </properties>
+    <body>
+        <section name="Sample 53: Fail-over Routing Among 3 Endpoints">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;failover&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/failover&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate the fail-over routing capabilities of Synapse. In fail-over routing
+                    messages are sent to a designated primary endpoint. When the primary endpoint
+                    fails, Synapse fails over to the one of the backup endpoints.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the LoadbalanceFailoverService in the sample Axis2 server (go to
+                            samples/axis2Server/src/LoadbalanceFailoverService and run 'ant')
+                        </li>
+                        <li>
+                            Start 3 instances of the Axis2 server on different ports as follows
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1<br/>
+./axis2server.sh -http 9002 -https 9006 -name MyServer2<br/>
+./axis2server.sh -http 9003 -https 9007 -name MyServer3</div>
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 53 (repository/conf/sample/synapse_sample_53.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 53<br/>
+                                Windows: synapse.bat -sample 53
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Above configuration sends messages with the fail-over behavior. Initially the
+                    server at port 9001 is treated as primary and other two are treated as backups.
+                    Messages are always directed only to the primary server. If the primary server
+                    fails, next listed server is selected as the primary. Thus, messages are sent
+                    successfully as long as there is at least one active server. To test this, run
+                    the loadbalancefailover client to send infinite requests as follows:
+                </p>
+                <div class="command">ant loadbalancefailover</div>
+                <p>
+                    You can see that all requests are processed by MyServer1. Now shutdown MyServer1
+                    and inspect the console output of the client. You will observe that all subsequent
+                    requests are processed by MyServer2. (MyServer 1 was shutdown after request 127)
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 125 ==&gt; Response from server: MyServer1
+[java] Request: 126 ==&gt; Response from server: MyServer1
+[java] Request: 127 ==&gt; Response from server: MyServer1
+[java] Request: 128 ==&gt; Response from server: MyServer2
+[java] Request: 129 ==&gt; Response from server: MyServer2
+[java] Request: 130 ==&gt; Response from server: MyServer2
+...</div>
+                <p>
+                    You can keep on shutting servers down like this. Client will get a response untill
+                    you shutdown all listed servers. Once all servers are shutdown, the error sequence
+                    is triggered and a fault message is sent to the client as follows.
+                </p>
+                <div class="consoleOutput">[java] COULDN'T SEND THE MESSAGE TO THE SERVER.</div>
+                <p>
+                    Once a server is detected as failed, it will be added to the active servers
+                    list again after 60 seconds (specified in &lt;suspendDurationOnFailure&gt; in
+                    the configuration). Therefore, if you have restarted any of the stopped servers,
+                    messages will be directed to the newly started server within 60 seconds.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

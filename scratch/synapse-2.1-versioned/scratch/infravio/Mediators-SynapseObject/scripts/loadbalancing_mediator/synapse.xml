@@ -1,0 +1,33 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+        <engage-addressing-in/>
+        <log/>
+
+
+        <!-- this matches the gateway case -->
+        <regex message-address="to" pattern="/StockQuote.*">
+            <ref ref="stockquote"/>
+        </regex>
+        <!-- this matches the virtual url case for either the proxy or ws-add case -->
+        <regex message-address="to" pattern="http://stockquote.*">
+            <ref ref="stockquote"/>
+        </regex>
+
+
+        <regex message-address="to" pattern="http://localhost:8080/loadBalancingService">
+            <servicemediator name="loadbalancing" service="LoadBalancingMediator"/>
+        </regex>
+
+         <send/>
+
+    <!-- these are only called if referenced above-->
+    <never>
+        <stage name="stockquote">
+            <header type="to" value="http://www.webservicex.net/stockquote.asmx" />
+            <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+                <fault/>
+            </xpath>
+        </stage>
+    </never>
+</synapse>
+

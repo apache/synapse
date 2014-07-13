@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 362</title>
+    </properties>
+    <body>
+        <section name="Sample 362: Perform Database Lookups and Updates in the Same Mediation Sequence">
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+
+    <sequence name="main">
+        <in>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
+
+        <out>
+            <log level="custom">
+                <property name="text" value="** Reporting to the Database **"/>
+            </log>
+
+            <dbreport>
+                <connection>
+                    <pool>
+                        <driver>org.apache.derby.jdbc.ClientDriver</driver>
+                        <url>jdbc:derby://localhost:1527/synapsedb;create=false</url>
+                        <user>synapse</user>
+                        <password>synapse</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>update company set price=? where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:last/child::text()" type="DOUBLE"/>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <driver>org.apache.derby.jdbc.ClientDriver</driver>
+                        <url>jdbc:derby://localhost:1527/synapsedb;create=false</url>
+                        <user>synapse</user>
+                        <password>synapse</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>select * from company where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                    <result name="stock_price" column="price"/>
+                </statement>
+            </dblookup>
+            <log level="custom">
+                <property name="text"
+                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/>
+            </log>
+            <send/>
+        </out>
+    </sequence>
+
+</definitions>]]></div>
+            <subsection name="Objective">
+                <p>
+                    <a href="sample360.html">Sample 360</a> and <a href="sample361.html">sample 361</a>
+                    shows how to use the dblookup mediator and dbreport mediator separately. This sample
+                    combines them in a single mediation sequence to perform both database lookup and
+                    update operations.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Setup a Derby database as described in the <a href="setup/db.html">database setup guide</a>
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 362 (repository/conf/sample/synapse_sample_362.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 362<br/>
+                                Windows: synapse.bat -sample 362
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    In this sample, the dbreport mediator works the same way as in
+                    <a href="sample361.html">sample 361</a>. It updates the price for the given company
+                    using the response messages content. Then the dblookup mediator reads the last
+                    updated value from the company database and logs it to the console.
+                </p>
+                <p>
+                    Run the sample client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</div>
+                <p>
+                    Synapse will update the database using the stock quote value available in the
+                    response sent by Axis2. Then the same value will be retrieved from the database
+                    and logged as follows.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Reporting to the Database **
+...
+INFO LogMediator text = ** Looking up from the Database **
+...
+INFO LogMediator text = Stock price - 153.47886496064808</div>                
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

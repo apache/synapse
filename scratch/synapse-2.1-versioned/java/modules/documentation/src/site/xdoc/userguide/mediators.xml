@@ -1,0 +1,1139 @@
+<document>
+    <properties>
+        <title>Apache Synapse - Mediators Catalog</title>
+    </properties>
+    <body>
+        <section name="Mediators Catalog">
+            <p>
+                This document lists all the built-in mediators of Synapse and describes their
+                usage, functionality and configuration syntax.
+            </p>
+        </section>
+        <section name="Contents">
+            <ul>
+                <li><a href="#Intro">Introduction</a></li>
+                <li><a href="#Categories">Mediator Categories</a></li>
+                <li>
+                    <a href="#CoreMediators">Core Mediators</a>
+                    <ul>
+                        <li><a href="#Drop">Drop Mediator</a></li>
+                        <li><a href="#Log">Log Mediator</a></li>
+                        <li><a href="#Property">Property Mediator</a></li>
+                        <li><a href="#Send">Send Mediator</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#FilterMediators">Filter Mediators</a>
+                    <ul>
+                        <li><a href="#Filter">Filter Mediator</a></li>
+                        <li><a href="#InOut">In/Out Mediator</a></li>
+                        <li><a href="#Switch">Switch Mediator</a></li>
+                        <li><a href="#Validate">Validate Mediator</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#TransformationMediators">Transformation Mediators</a>
+                    <ul>
+                        <li><a href="#Header">Header Mediator</a></li>
+                        <li><a href="#MakeFault">MakeFault Mediator</a></li>
+                        <li><a href="#PayloadFactory">Payload Factory Mediator</a></li>
+                        <li><a href="#URLRewrite">URL Rewrite Mediator</a></li>
+                        <li><a href="#XSLT">XSLT Mediator</a></li>
+                        <li><a href="#XQuery">XQuery Mediator</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#ExtensionMediators">Extension Mediators</a>
+                    <ul>
+                        <li><a href="#Clazz">Class Mediator</a></li>
+                        <li><a href="#POJOCommand">POJO Command Mediator</a></li>
+                        <li><a href="#Script">Script Mediator</a></li>
+                        <li><a href="#Spring">Spring Mediator</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#AdvancedMediators">Advanced Mediators</a>
+                    <ul>
+                        <li><a href="#Aggregate">Aggregate Mediator</a></li>
+                        <li><a href="#Cache">Cache Mediator</a></li>
+                        <li><a href="#Callout">Callout Mediator</a></li>
+                        <li><a href="#Clone">Clone Mediator</a></li>
+                        <li><a href="#DBLookup">DBLookup Mediator</a></li>
+                        <li><a href="#DBReport">DBReport Mediator</a></li>
+                        <li><a href="#Iterate">Iterate Mediator</a></li>
+                        <li><a href="#RMSequence">RMSequence Mediator</a></li>
+                        <li><a href="#Store">Store Mediator</a></li>
+                        <li><a href="#Throttle">Throttle Mediator</a></li>
+                        <li><a href="#Transaction">Transaction Mediator</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="Introduction" id="Intro">
+            <p>
+                Mediator is the basic message processing unit in Synapse. A mediator takes an
+                input message, carries out some processing on it, and provides an output message.
+                Mediators can be linked up and arranged into chains to implement complex message
+                flows (sequences). Mediators can manipulate message content (payload), properties,
+                headers and if needed can also execute additional tasks such as database lookup,
+                service invocation and script execution.
+            </p>
+            <p>
+                Apache Synapse ships with an array of useful mediators that can be used out of the
+                box to implement message flows, services and integration patterns. Rest of this
+                article describes these mediators in detail, along with their use cases and
+                configuration syntax.
+            </p>
+        </section>
+        <section name="Mediator Categories" id="Categories">
+            <p>
+                Built-in mediators of Synapse can be classified into several groups depending
+                on the nature of their functionality and use cases.
+            </p>
+            <ul>
+                <li>
+                    Core mediators - Utility mediators that are useful in a variety of scenarios
+                </li>
+                <li>
+                    Filter mediators - Mediators used to filter out messages
+                </li>
+                <li>
+                    Transform mediators - Mediators used to transform message content, headers and
+                    attributes
+                </li>
+                <li>
+                    Extension mediators - Mediators used to extend the Synapse mediation engine by
+                    plugging in custom developed code
+                </li>
+                <li>
+                    Advanced mediators - Mediators used to implement advanced integration scenarios
+                    and patterns
+                </li>
+            </ul>
+            <p>
+                Rest of this article is structured according to the above classification. Mediators
+                in each section are arranged in the alphabetical order.
+            </p>
+        </section>
+        <section name="Core Mediators" id="CoreMediators">
+            <subsection name="Drop Mediator" id="Drop">
+                <p>
+                    Drop mediator can be used to drop the current message being processed and
+                    terminate a message flow. This mediator is configured as follows and it
+                    does not take any additional parameters or arguments.
+                </p>
+                <div class="xmlConf">&lt;drop/&gt;</div>
+            </subsection>
+            <subsection name="Log Mediator" id="Log">
+                <p>
+                    Log mediator can be used in any sequence or proxy service to log the messages
+                    being mediated. Log entries generated by the log mediator will go into the
+                    standard Synapse log files. This can be further configured using the
+                    log4j.properties file.
+                </p>
+                <p>
+                    By default the log mediator only logs a minimalistic set of details to avoid
+                    the message content being parsed. But if needed it can be configured to log the
+                    full message payload, headers and even custom user defined properties. The log
+                    mediator configuration takes the following general form.
+                </p>
+                <div class="xmlConf">&lt;log [level="simple|full|headers|custom"] [separator="string"]
+                    [category="INFO|DEBUG|WARN|ERROR|TRACE|FATAL"]&gt;
+    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+&lt;/log&gt;</div>
+                <p>
+                    The 'level' attribute is used to specify how much information should be logged
+                    by the log mediator. This attribute can take one of following four values.
+                </p>
+                <ul>
+                    <li>
+                        simple - Logs a set of standard headers (To, From, WSAction, SOAPAction,
+                        ReplyTo and MessageID). If no log level is specified, this level will be
+                        used by default.
+                    </li>
+                    <li>
+                        full - Logs all standard headers logged in the log level 'simple' and also
+                        the full payload of the message. This log level causes the message content
+                        to be parsed and hence incurs a performance overhead.
+                    </li>
+                    <li>
+                        headers - Logs all SOAP header blocks
+                    </li>
+                    <li>
+                        custom - Only logs the user defined properties (see the next section)
+                    </li>
+                </ul>
+                <p>
+                    Users can define custom attributes and properties to be logged by the log mediator
+                    by specifying some 'property' elements. Each property must be named, and can
+                    have a constant value or an XPath expression. If a constant value is specified,
+                    that value will be logged with each and every entry logged by the mediator. If
+                    an XPath is specified instead, that XPath will be evaluated on the message being
+                    mediated and the outcome will be included in the generated log entry.
+                </p>
+                <p>
+                    By default all properties and attributes logged by the log mediator are separated
+                    by commas (,). This can be configured using the 'separator' attribute. Further
+                    all logs generated by the mediator are logged at log4j log level 'INFO' by default.
+                    This behavior can also be configured using the 'category' attribute.
+                </p>
+            </subsection>
+            <subsection name="Property Mediator" id="Property">
+                <p>
+                    Every message mediated through Synapse can have a set of associated properties.
+                    Synapse engine and the underlying transports set a number of properties on
+                    each message processed which can be manipulated by the user to modify the
+                    runtime behavior of the message flows. In addition, user can set his/her own
+                    properties on the message which is very helpful when it comes to managing
+                    message flow state and storing scenario specific variables. For an example in
+                    some situations a user might want to access a particular value in the request
+                    payload while processing a response. This can be easily achieved by setting the
+                    required value to a property in the request (in) sequence and then later accessing
+                    that property in the response (out) sequence.
+                </p>
+                <p>
+                    Property mediator is used to manipulate the properties of a message. This
+                    mediator can be used to set and remove property values. When it comes to setting
+                    property values, the input could be a constant or a variable value generated
+                    by an XPath expression. The syntax for configuring the property mediator is as
+                    follows.
+                </p>
+                <div class="xmlConf">&lt;property name="string" [action=set|remove] [type="string"] (value="literal" | expression="xpath") [scope=default|transport|axis2|axis2-client] [pattern="regex" [group="integer"]]&gt;
+    &lt;xml-element/&gt;?
+&lt;/property&gt;</div>
+                <p>
+                    The 'name' attribute specifies the name of the property which needs to be either
+                    set or removed  while the 'action' attribute specifies the exact action that needs
+                    to be carried out by the mediator. If not specified action will default to 'set'.
+                </p>
+                <p>
+                    When setting a property value, either the 'value' or the 'expression' attribute
+                    must be specified. The 'value' attribute can be used to set a constant as
+                    the property value whereas the 'expression' attribute can be used to specify an
+                    XPath expression. If an XPath expression is specified, Synapse will evaluate that
+                    on the message to determine the value that needs to be assigned to the property.
+                </p>
+                <p>
+                    Synapse properties are scoped. Therefore when using this mediator the user should
+                    specify the scope at which the property will be set or removed from. If not
+                    specified, property mediator will work at the 'default' scope. Properties set in
+                    this scope last as long as the transaction (request-response) exists. Properties
+                    set on scope 'axis2' has a shorter life span and it's mainly used for passing
+                    parameters to the underlying Axis2 engine. Properties set in the 'transport'
+                    scope will be treated as transport headers. For an example if it is required to
+                    send an HTTP header named 'CustomHeader' with an outgoing request, one may use
+                    the property mediator configuration.
+                </p>
+                <div class="xmlConf">&lt;property name="CustomHeader" value="some value" scope="transport" type="type name"/&gt;</div>
+                <p>
+                    This will force Synapse to send a transport header named 'CustomHeader' along
+                    with the outgoing message. Property mediator also supports a scope named
+                    'axis2-client'. Properties set in this scope will be treated as Axis2 client
+                    options.
+                </p>
+                <p>
+                    When using properties to store user or scenario specific information it is
+                    recommended to always use the 'default' scope. Other scopes should not be used
+                    for custom development or mediation work since they have the potential to
+                    alter the behavior of the underlying Axis2 engine and transports framework.
+                </p>
+                <p>
+                    By default property mediator sets all property values as strings. It is possible
+                    to set properties in other types by specifying the 'type' attribute. This attribute
+                    can accept one of following values.
+                </p>
+                <ul>
+                    <li>STRING</li>
+                    <li>BOOLEAN</li>
+                    <li>DOUBLE</li>
+                    <li>FLOAT</li>
+                    <li>INTEGER</li>
+                    <li>LONG</li>
+                    <li>SHORT</li>
+                    <li>OM</li>
+                </ul>
+                <p>
+                    The type names are case sensitive. Type 'OM' can be used to set XML property
+                    values on the message context. This becomes useful when the expression associated
+                    with the property mediator evaluates to an XML node during mediation. With the
+                    type attribute set to 'OM' the resulting XML will be converted to an AXIOM
+                    OMElement before assigning it to a property.
+                </p>
+                <p>
+                    It is also possible to use the property mediator to set some static XML content
+                    as a property value. To do this specify the static XML content as a child node
+                    of the 'property' element instead of using the 'value' attribute.
+                </p>
+            </subsection>
+            <subsection name="Send Mediator" id="Send">
+                <p>
+                    Send mediator is used to send requests to endpoints. The same can be used
+                    to send response messages back to clients. The send mediator is configured using
+                    the following XML syntax.
+                </p>
+                <div class="xmlConf">&lt;send [receive="string"]&gt;
+    (endpointref | endpoint)?
+&lt;/send&gt;</div>
+                <p>
+                    Messages are sent to the endpoint specified as the child of the
+                    'send' element. An optional receiving sequence can be configured using the
+                    'receive' attribute. When specified, response messages from the endpoint will
+                    be dispatched to the referred sequence. This makes it easier to implement
+                    complex service chaining scenarios, where the response from one service needs
+                    to be processed and directed to another service.
+                </p>
+                <p>
+                    The send mediator can be configured without any child endpoints. For an example
+                    following is a perfectly valid send mediator configuration.
+                </p>
+                <div class="xmlConf">&lt;send/&gt;</div>
+                <p>
+                    In this case the messages will be sent to an implicit endpoint. If the message
+                    is a request from a client, Synapse will lookup the 'To' header of the request and
+                    simply forward it to the service addressed by that header. If it is a response
+                    from a back-end service, Synapse will simply send it back to the original
+                    client who initiated the original message flow.
+                </p>
+                <p>
+                    The service invocations done by the send mediator may or may not be
+                    synchronous based on the underlying transport used. If the default non-blocking
+                    HTTP transport is used, the send mediator will make an asynchronous invocation
+                    and release the calling thread as soon as possible. Synapse will asynchronously
+                    handle the response from the endpoint while the giving the illusion that Synapse
+                    is making blocking service calls.
+                </p>
+            </subsection>
+        </section>
+        <section name="Filter Mediators" id="FilterMediators">
+            <subsection name="Filter Mediator" id="Filter">
+                <p>
+                    Filter mediator adds 'if-else' like semantics to the Synapse configuration language.
+                    It can be used to evaluate a condition on a message and take some action
+                    based on the outcome. The configuration of the filter mediator takes the
+                    following form.
+                </p>
+                <div class="xmlConf">&lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+    mediator+
+&lt;/filter&gt;</div>
+                <p>
+                    The filter mediator either tests the given XPath expression as a boolean
+                    expression, or matches the result of the source XPath expression as a string
+                    against the given regular expression. If the condition evaluates to true, the
+                    filter mediator will execute the enclosed child mediators.
+                </p>
+                <p>
+                    Alternatively one can use the following syntax to configure the filter mediator.
+                </p>
+                <div class="xmlConf">&lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+    &lt;then [sequence="string"]&gt;
+        mediator+
+    &lt;/then&gt;
+    &lt;else [sequence="string"]&gt;
+        mediator+
+    &lt;/else&gt;
+&lt;/filter&gt;</div>
+                <p>
+                    In this case too the filter condition is evaluated in the same manner as
+                    described above. Messages for which the condition evaluates to true will be
+                    mediated through the mediators enclosed by the 'then' element. Failed messages
+                    will be mediated through the mediators enclosed by the 'else' element.
+                </p>
+            </subsection>
+            <subsection name="In/Out Mediators" id="InOut">
+                <p>
+                    In mediator and Out mediator are used to filter out traffic based on the
+                    direction of the messages. As their names imply, In mediator processes only
+                    the requests (in messages) while ignoring the responses (out messages). The
+                    out mediator does the exact opposite by processing only the responses while
+                    ignoring the requests. In many occasions these two mediators are deployed
+                    together to create separate flows for requests and responses. The syntax
+                    outline for the two mediators is given below.
+                </p>
+                <div class="xmlConf">&lt;in&gt;
+    mediator+
+&lt;/in&gt;
+
+&lt;out&gt;
+    mediator+
+&lt;/out&gt;</div>
+                <p>
+                    In mediator will process requests through the child mediators anf the Out
+                    mediator will process responses through the child mediators.
+                </p>
+            </subsection>
+            <subsection name="Switch Mediator" id="Switch">
+                <p>
+                    Switch mediator provides switch-case semantics in the Synapse configuration
+                    language.
+                </p>
+                <div class="xmlConf">&lt;switch source="xpath"&gt;
+    &lt;case regex="string"&gt;
+        mediator+
+    &lt;/case&gt;+
+    &lt;default&gt;
+        mediator+
+    &lt;/default&gt;?
+&lt;/switch&gt;</div>
+                <p>
+                    The source XPath is executed on the messages. The resulting value is then
+                    tested against the regular expressions defined in each 'case' element. When
+                    a matching case is found the message will be mediated through its child
+                    mediators. If none of the cases match, the message will handed to the 'default'
+                    case (if available).
+                </p>
+            </subsection>
+            <subsection name="Validate Mediator" id="Validate">
+                <p>
+                    The validate mediator validates the XML node selected by
+                    the source xpath expression, against the specified XML schema. If the source
+                    attribute is not specified, the validation is performed against the first
+                    child of the SOAP body of the current message. If the validation fails,
+                    the on-fail sequence of mediators is executed. Feature elements could be used to
+                    turn on/off some of the underlying features of the schema validator (See <a
+                    href="http://xerces.apache.org/xerces2-j/features.html">http://xerces.apache.org/xerces2-j/features.html</a>).
+                    The schema can be specified as a static or dynamic key. When
+                    needed, imports can be specified using additional resources.
+                </p>
+                <div class="xmlConf">&lt;validate [source="xpath"]&gt;
+    &lt;schema key="string" /&gt;+
+    &lt;resource location="&lt;external-schema&gt;" key="string"&gt;*
+    &lt;feature name="&lt;validation-feature-name&gt;" value="true|false"/&gt;*
+    &lt;on-fail&gt;
+        mediator+
+    &lt;/on-fail&gt;
+&lt;/validate&gt;</div>
+            </subsection>
+        </section>
+        <section name="Transformation Mediators" id="TransformationMediators">
+            <subsection name="Header Mediator" id="Header">
+                <p>
+                    Header mediator sets or removes a specified header from the current SOAP
+                    infoset. The optional 'action' attribute specifies whether the mediator should
+                    set or remove the header. If omitted, it defaults to 'set' action.
+                </p>
+                <div class="xmlConf">&lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
+&lt;header name="qname" action="remove"/&gt;</div>
+                <p>
+                    The value of the 'name' attribute must be one of the following aliases or
+                    a valid QName with a namespace prefix. In the latter case the namespace prefix
+                    must be mapped to a valid namespace URI using the standard 'xmlns' attribute.
+                </p>
+                <ul>
+                    <li>To</li>
+                    <li>From</li>
+                    <li>Action</li>
+                    <li>FaultTo</li>
+                    <li>ReplyTo</li>
+                    <li>RelatesTo</li>
+                </ul>
+            </subsection>
+            <subsection name="MakeFault Mediator" id="MakeFault">
+                <p>
+                    MakeFault mediator transforms the current message into a fault message.
+                    It should be noted that makeFault mediator does NOT send the message after
+                    transforming it. A send mediator needs to be invoked separately to send
+                    a fault message created by this mediator.
+                </p>
+                <div class="xmlConf">&lt;makefault [version="soap11|soap12|pox"] [response="true|false"]&gt;
+    &lt;code (value="literal" | expression="xpath")/&gt;
+    &lt;reason (value="literal" | expression="xpath")/&gt;
+    &lt;node&gt;...&lt;/node&gt;?
+    &lt;role&gt;...&lt;/role&gt;?
+   (&lt;detail expression="xpath"/&gt; | &lt;detail&gt;...&lt;/detail&gt;)?
+&lt;/makefault&gt;</div>
+                <p>
+                    The To header of the fault message is set to the 'Fault-To' of the original message
+                    if such a header exists on the original message. Depending on the 'version'
+                    attribute, the fault message is created as a SOAP 1.1, SOAP 1.2
+                    or POX fault. If the optional response attribute value is set as 'true',
+                    makefault mediator marks the message as a response. Optional 'node',
+                    'role' and 'detail' sub-elements in the mediator configuration can
+                    be used to set the corresponding elements in the resulting SOAP fault.
+                </p>
+            </subsection>
+            <subsection name="Payload Factory Mediator" id="PayloadFactory">
+                <p>
+                    Payload-factory mediator creates a new SOAP payload for the message, replacing
+                    the existing one. <tt>printf()</tt> style formatting is used to configure the
+                    transformation performed by this mediator.
+                </p>
+                <div class="xmlConf">&lt;payloadFactory&gt;
+    &lt;format&gt;&quot;xmlstring&quot;&lt;/format&gt;
+    &lt;args&gt;
+        &lt;arg (value=&quot;literal&quot; | expression=&quot;xpath&quot;)/&gt;*
+    &lt;/args&gt;
+&lt;/payloadFactory&gt;</div>
+
+                <p>
+                    'format' sub-element of the mediator configuration specifies the format of the
+                    new payload. All $n occurrences in the format will be replaced by the value of
+                    the n th argument at runtime. Each argument in the mediator configuration could
+                    be a static value or an XPath expression. When an expression is used, value is
+                    fetched at runtime by evaluating the provided XPath expression against the
+                    existing SOAP message/message context.
+                </p>
+            </subsection>
+            <subsection name="URL Rewrite Mediator" id="URLRewrite">
+                <p>
+                    URL Rewrite mediator can be used to modify and transform the URL values
+                    available in the message. By default, this mediator takes the 'To' header of the
+                    message and apples the provided rewrite rules on it. Alternatively, one can
+                    specify a property name in the 'inProperty' attribute, in which case the
+                    mediator takes the value of the specified property as the input URL.
+                </p>
+                <p>
+                    Similarly the mediator by default sets the transformed URL as the 'To' header of
+                    the message and alternatively you can use the 'outProperty' attribute to
+                    instruct the mediator to set the resulting URL as a property.
+                </p>
+                <div class="xmlConf">&lt;rewrite [inProperty="string"] [outProperty="string"]&gt;
+    &lt;rewriterule&gt;
+        &lt;condition&gt;
+        ...
+        &lt;/condition&gt;?
+        &lt;action [type="append|prepend|replace|remove|set"] [value="string"]
+          [xpath="xpath"] [fragment="protocol|host|port|path|query|ref|user|full"] [regex="regex"]&gt;+
+    &lt;/rewriterule&gt;+
+&lt;/rewrite&gt;</div>
+                <p>
+                    The mediator applies URL transformations by evaluating a set of rules on
+                    the message. Rules are specified using the 'rewriterule' element. Rules are
+                    evaluated in the order in which they are specified. A rule can consist of an
+                    optional condition and one or more rewrite actions. If the condition is provided,
+                    it is evaluated first and specified rewrite actions are executed only if the
+                    condition evaluates to true. If no condition is specified, the provided rewrite
+                    actions will be always executed. The condition should be wrapped in a 'condition'
+                    element within the 'rewriterule' element. Rewrite actions are specified using
+                    'action' elements.
+                </p>
+            </subsection>
+            <subsection name="XQuery Mediator" id="XQuery">
+                <p>
+                    The XQuery mediator can be used to perform an XQuery transformation. 'key'
+                    attribute specifies the XQuery transformation, and the optional 'target'
+                    attribute specifies the node of the message that should be transformed.
+                    This defaults to the first child of the SOAP body of the payload. 'variable'
+                    element defines a variable that could be bound to the dynamic context of the
+                    XQuery engine in order to access those variables through the XQuery script.
+                </p>
+                <div class="xmlConf">&lt;xquery key="string" [target="xpath"]&gt;
+    &lt;variable name="string" type="string" [key="string"] [expression="xpath"] [value="string"]/&gt;?
+&lt;/xquery&gt;</div>
+                <p>
+                    It is possible to specify just a literal 'value', or an XPath expression
+                    over the payload, or even specify a registry key or a registry key
+                    combined with an XPath expression that selects the variable. The name of
+                    the variable corresponds to the name of variable declaration in the XQuery
+                    script. The 'type' of the variable must be a valid type defined by the
+                    JSR-000225 (XQJ API).
+                </p>
+                <p>
+                    The supported types are:
+                </p>
+                <ul>
+                    <li>
+                        XQItemType.XQBASETYPE_INT -&gt; INT
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_INTEGER -&gt; INTEGER
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_BOOLEAN -&gt; BOOLEAN
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_BYTE - &gt; BYTE
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_DOUBLE -&gt; DOUBLE
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_SHORT -&gt; SHORT
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_LONG -&gt; LONG
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_FLOAT -&gt; FLOAT
+                    </li>
+                    <li>
+                        XQItemType.XQBASETYPE_STRING -&gt; STRING
+                    </li>
+                    <li>
+                        XQItemType.XQITEMKIND_DOCUMENT -&gt; DOCUMENT
+                    </li>
+                    <li>
+                        XQItemType.XQITEMKIND_DOCUMENT_ELEMENT -&gt; DOCUMENT_ELEMENT
+                    </li>
+                    <li>
+                        XQItemType.XQITEMKIND_ELEMENT -&gt; ELEMENT
+                    </li>
+                </ul>
+            </subsection>
+            <subsection name="XSLT Mediator" id="XSLT">
+                <p>
+                    XSLT mediator applies the specified XSLT transformation to the selected
+                    element of the current message payload. 'source' attribute selects the source
+                    element to apply the transformation on. Where not specified, it defaults to the
+                    first child of the SOAP body. Output of the transformation replaces the source
+                    element when 'target' attribute is not specified. Otherwise, the output is
+                    stored in the property specified by the 'target' attribute.
+                </p>
+                <div class="xmlConf">&lt;xslt key="string" [source="xpath"] [target="string"]&gt;
+    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+    &lt;feature name="string" value="true | false" /&gt;*
+    &lt;attribute name="string" value="string" /&gt;*
+    &lt;resource location="..." key="..."/&gt;*
+&lt;/xslt&gt;</div>
+                <p>
+                    If the output method specified by the stylesheet is text (i.e. the stylesheet
+                    has the <tt>&lt;xsl:output method="text"/&gt;</tt> directive),
+                    then the output of the transformation is wrapped in an element with name
+                    <tt>{http://ws.apache.org/commons/ns/payload}text</tt>. Note that when an
+                    element with this name is present as the first child of the SOAP body of an
+                    outgoing message, JMS and VFS transports automatically unwrap the
+                    content and send it out as plain text. XSLT mediator can therefore be used for
+                    integration with systems relying on plain text messages.
+                </p>
+                <p>
+                    Usage of sub-elements of XSLT mediator configuration is as follows:
+                </p>
+                <ul>
+                    <li>
+                        property - Stylesheet parameters can be passed into the transformations
+                        using 'property' elements.
+                    </li>
+                    <li>
+                        feature - Defines any features which should be explicitly set to the
+                        TransformerFactory. For example,
+                        <tt>'http://ws.apache.org/ns/synapse/transform/feature/dom'</tt> feature
+                        enables DOM based transformations instead of serializing elements into byte
+                        streams and/or temporary files. Although enabling this feature could improve
+                        performance of the transformation, it might not work for all transformations.
+                    </li>
+                    <li>
+                        attribute - Defines attributes which should be explicitly set on the
+                        TransformerFactory.
+                    </li>
+                    <li>
+                        resource - Can be used to resolve XSLT imports and includes from the
+                        repository. It works in exactly the same way as the corresponding element in
+                        a &lt;proxy&gt; definition.
+                    </li>
+                </ul>
+            </subsection>
+        </section>
+        <section name="Extension Mediators" id="ExtensionMediators">
+            <subsection name="Class Mediator" id="Clazz">
+                <p>
+                    The class mediator makes it possible to use a custom class as a mediator. The
+                    class must implement the org.apache.synapse.api.Mediator interface. If any properties are
+                    specified, the corresponding setter methods are invoked on the class,
+                    once, during initialization.
+                </p>
+                <div class="xmlConf">&lt;class name="class-name"&gt;
+    &lt;property name="string" value="literal"&gt;
+        (either literal or XML child)
+    &lt;/property&gt;
+&lt;/class&gt;</div>
+                <p>
+                    This mediator creates an instance of a specified class and sets it as a
+                    mediator. If any properties are specified, the corresponding setter methods are
+                    invoked on the class with the given values, once, during initialization.
+                </p>
+            </subsection>
+            <subsection name="POJO Command Mediator" id="POJOCommand">
+                <p>
+                    POJO Command mediator implements the popular Command design pattern and can be
+                    used to invoke an object which encapsulates a method call.
+                </p>
+                <div class="xmlConf">&lt;pojoCommand name="class-name"&gt;
+    (
+    &lt;property name="string" value="string"/&gt; |
+    &lt;property name="string" context-name="literal" [action=(ReadContext | UpdateContext | ReadAndUpdateContext)]&gt;
+        (either literal or XML child)
+    &lt;/property&gt; |
+    &lt;property name="string" expression="xpath" [action=(ReadMessage | UpdateMessage | ReadAndUpdateMessage)]/&gt;
+    )*
+&lt;/pojoCommand&gt;</div>
+                <p>
+                    POJO Command mediator creates an instance of the specified command class,
+                    which may implement the org.apache.synapse.Command interface or should have a
+                    method with "public void execute()" signature. If any properties are specified,
+                    the corresponding setter methods are invoked on the class before each message is
+                    executed. It should be noted that a new instance of the POJO Command class is
+                    created to process each message processed. After execution of the POJO Command
+                    mediator, depending on the 'action' attribute of the property, the new value
+                    returned by a call to the corresponding getter method is stored back to the
+                    message or to the context. The 'action' attribute may specify whether this
+                    behaviour is expected or not via the Read, Update and ReadAndUpdate values.
+                </p>
+            </subsection>
+            <subsection name="Script Mediator" id="Script">
+                <p>
+                    Synapse supports mediators implemented in a variety of scripting languages such
+                    as JavaScript, Python and Ruby. There are two ways of defining a script mediator,
+                    either with the script program statements stored in a separate file which is
+                    referenced via the local or remote registry entry, or with the script program
+                    statements embedded in-line within the Synapse configuration. A script mediator
+                    using a script off the registry (local or remote) is defined as follows:
+                </p>
+                <div class="xmlConf">&lt;script key="string" language="string" [function="script-function-name"]/&gt;</div>
+                <p>
+                    The property key is the registry key to load the script. The language
+                    attribute specifies the scripting language of the script code (e.g. "js"
+                    for Javascript, "rb" for ruby, "groovy" for Groovy, "py" for Python..).
+                    The function is an optional attribute defining the name of the script
+                    function to invoke, if not specified it defaults to a function named
+                    'mediate'. The function is passed a single parameter - which is the
+                    Synapse MessageContext. The function may return a boolean, if it does not,
+                    then true is assumed, and the script mediator returns this value. An
+                    inline script mediator has the script source embedded in the configuration
+                    as follows:
+                </p>
+                <div class="xmlConf">&lt;script language="string"&gt;...script source code...&lt;script/&gt;</div>
+                <p>
+                    If the specified script calls a function defined in another script, then the
+                    latter script should also be included in the script mediator configuration.
+                    It's done using the 'include' sub-element of the mediator configuration. The key
+                    attribute of the 'include' element should point to the script which has to be
+                    included. The included script could be stored as a local entry or in the remote
+                    registry. Script includes are defined as follows:
+                </p>
+                <div class="xmlConf">&lt;script key="string" language="string" [function="script-function-name"]&gt;
+    &lt;include key="string"/&gt;
+&lt;/script&gt;</div>
+                <p>
+                    The execution context environment of the script has access to the Synapse
+                    MessageContext predefined in a script variable named 'mc' . An example of
+                    an inline mediator using JavaScript/E4X which returns false if the SOAP
+                    message body contains an element named 'symbol' which has a value of 'IBM'
+                    would be:
+                </p>
+                <div class="xmlConf">&lt;script language="js"&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script/&gt;</div>
+                <p>
+                    Synapse uses the Apache
+                    <a href="http://jakarta.apache.org/bsf/">Bean Scripting Framework</a>
+                    for the scripting language support, any script language supported by BSF may be
+                    used to implement a Synapse mediator.
+                </p>
+                <p>
+                    Implementing a mediator with a script language can have advantages over
+                    using the built in Synapse mediator types or implementing a custom Java
+                    class mediator. Script mediators have all the flexibility of a class
+                    mediator with access to the Synapse MessageContext and SynapseEnvironment
+                    APIs, and the ease of use and dynamic nature of scripting languages allows
+                    rapid development and prototyping of custom mediators. An additional
+                    benefit of some scripting languages is that they have very simple and
+                    elegant XML manipulation capabilities, for example JavaScript E4X or Ruby
+                    REXML, so this makes them well suited for use in the Synapse mediation
+                    environment. For both types of script mediator definition the
+                    MessageContext passed into the script has additional methods over the
+                    standard Synapse MessageContext to enable working with the XML in a way
+                    natural to the scripting language. For example when using JavaScript
+                    getPayloadXML and setPayloadXML, E4X XML objects, and when using Ruby,
+                    REXML documents.
+                </p>
+                <p>
+                    The complete list of available methods can be found in the
+                    <a href="../apidocs/org/apache/synapse/mediators/bsf/ScriptMessageContext.html">
+                        ScriptMessageContext Javadoc</a>.
+                </p>
+            </subsection>
+            <subsection name="Spring Mediator" id="Spring">
+                <p>
+                    The Spring mediator exposes a spring bean as a mediator. In other terms, it
+                    creates an instance of a mediator, which is managed by Spring. This Spring bean
+                    must implement org.apache.synapse.api.Mediator interface.
+                </p>
+                <div class="xmlConf">&lt;spring:spring bean="string" key="string" xmlns:spring="http://ws.apache.org/ns/synapse/spring"/&gt;</div>
+                <p>
+                    'key' attribute refers to the Spring ApplicationContext/Configuration
+                    (i.e. spring configuration XML) used for the bean. This key can be a registry
+                    key or local entry key. The bean attribute is used for looking up a Spring bean
+                    from the spring Application Context. Therefore, a bean with same name must be in
+                    the given spring configuration. In addition to that, that bean must implement
+                    the Mediator interface.
+                </p>
+            </subsection>
+        </section>
+        <section name="Advanced Mediators" id="AdvancedMediators">
+            <subsection name="Aggregate Mediator" id="Aggregate">
+                <p>
+                    Aggregate mediator implements the Message Aggregator EIP by aggregating the
+                    messages or responses for split messages generated using either the clone or
+                    iterate mediator.
+                </p>
+                <div class="xmlConf">&lt;aggregate [id="string"]&gt;
+    &lt;correlateOn expression="xpath"/&gt;?
+    &lt;completeCondition [timeout="time-in-seconds"]&gt;
+        &lt;messageCount min="int-min" max="int-max"/&gt;?
+    &lt;/completeCondition&gt;?
+    &lt;onComplete expression="xpath" [sequence="sequence-ref"]&gt;
+        (mediator +)?
+    &lt;/onComplete&gt;
+&lt;/aggregate&gt;</div>
+                <p>
+                    This mediator can also aggregate messages on the presence of matching elements
+                    specified by the correlateOn XPath expression. Aggregate will collect the
+                    messages coming into it until the messages collected on the aggregation
+                    satisfies the complete condition. The completion condition can specify a minimum
+                    or maximum number of messages to be collected, or a timeout value in seconds,
+                    after which the aggregation terminates. On completion of the aggregation it will
+                    merge all of the collected messages and invoke the onComplete sequence on it.
+                    The merged message would be created using the XPath expression specified by the
+                    attribute 'expression' on the 'onComplete' element.
+                </p>
+            </subsection>
+            <subsection name="Cache Mediator" id="Cache">
+                <p>
+                    Cache mediator is used for simple response message caching in Synapse. When a
+                    message reaches the cache mediator, it checks weather an equivalent message is
+                    already cached using a hash value.
+                </p>
+                <p>
+                    When the cache mediator detects that the message is a cached message, it fetches
+                    the cached response and prepares Synapse for sending the response. If a sequence
+                    is specified for a cache hit, user can send back the response message within
+                    this sequence using a send mediator. If a sequence is not specified, then cached
+                    response is sent back to the client.
+                </p>
+                <div class="xmlConf">&lt;cache [id="string"] [hashGenerator="class"] [timeout="seconds"] [scope=(per-host | per-mediator)]
+        collector=(true | false) [maxMessageSize="in-bytes"]&gt;
+    &lt;onCacheHit [sequence="key"]&gt;
+        (mediator)+
+    &lt;/onCacheHit&gt;?
+    &lt;implementation type=(memory | disk) maxSize="int"/&gt;
+&lt;/cache&gt;</div>
+                <p>
+                    This mediator will evaluate the hash value of an incoming message as described
+                    in the optional hash generator implementation (which should be a class
+                    implementing the org.wso2.caching.digest.DigestGenerator interface). The default
+                    hash generator is 'org.wso2.caching.digest.DOMHashGenerator'. If the generated
+                    hash value has been found in the cache then the cache mediator will execute the
+                    onCacheHit sequence which can be specified inline or referenced. The cache
+                    mediator must be specified with an 'id' and two instances with this same 'id'
+                    that correlates the response message into the cache for the request message
+                    hash. The optional 'timeout' specifies the valid duration for cached elements,
+                    and the scope defines if mediator instances share a common cache per every host
+                    instance, or per every cache mediator pair (i.e. 'id') instance. 'collector'
+                    attribute value 'true' specifies that the mediator instance is a response
+                    collection instance, and 'false' specifies that its a cache serving instance.
+                    The maximum size of a message to be cached could be specified with the optional
+                    'maxMessageSize' attributes in bytes and defaults to unlimited. Finally,
+                    'implementation' element may define if the cache is disk or memory based, and
+                    'maxSize' attribute defines the maximum number of elements to be cached.
+                </p>
+            </subsection>
+            <subsection name="Callout Mediator" id="Callout">
+                <p>
+                    Callout mediator performs a blocking external service invocation during mediation.
+                    The target external service can be configured either using a child endpoint element
+                    or using the 'serviceURL' attribute. When serviceURL is specified, it is used as
+                    the EPR of the external service. We can specify the endpoint element if we want to
+                    leverage endpoint functionality like format conversions, security, etc.
+                    The target endpoint can be defined inline or we can refer to an existing named
+                    endpoint in the configuration.
+                    Only Leaf endpoint types (Address/WSDL/Default) are supported.
+                    When both serviceURL and endpoint is not present, 'To' header on the request is
+                    used as the target endpoint.
+                </p>
+                <div class="xmlConf">&lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"] [initAxis2ClientOptions="true|false"] &gt;
+    &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+    &lt;endpoint/&gt;?
+    &lt;source xpath="expression" | key="string"&gt;?
+    &lt;target xpath="expression" | key="string"/&gt;?
+    &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
+&lt;/callout&gt;</div>
+                <p>
+                    'action' attribute can be used to specify the SOAP Action of the external service
+                    call. When 'initAxis2ClientOptions' is set to false, axis2 client options available
+                    in the incoming message context is reused for the service invocation.
+                    When 'passHeaders' is set to true, SOAP Headers of the received message is parsed
+                    to the external service.
+                </p>
+                <p>
+                    The source element specifies the payload for the request message using an XPath
+                    expression or a registry key.
+                    When source element is not defined, entire SOAP Envelope arrived at the Callout
+                    mediator is treated as the source.
+                    The target element specifies a node, at which the response payload will be
+                    attached into the current message, or the name of a key/property using which the
+                    response would be attached to the current message context as a property.
+                    When target element is not specified, entire SOAP Envelope arrived to the
+                    Callout mediator is replaced from the response received from the external service
+                    invocation.
+
+                </p>
+                <p>
+                    Since the callout mediator performs a blocking call, it cannot use the default
+                    non-blocking http/s transports based on Java NIO, and thus defaults to
+                    using the repository/conf/axis2_blocking_client.xml as the
+                    Axis2 configuration, and repository/ as the client repository
+                    unless these are specified inside the 'configuration' sub-element.
+                </p>
+                <p>
+                    To invoke secured services, Callout mediator can be configured to enable WS-Security
+                    using the 'enableSec' element. Security policy should be specified using the 'policy'
+                    attribute which may point to a registry key or a local entry. You can also specify
+                    two different policies for inbound and outbound messages (flows). This is done by
+                    using the 'inboundPolicy' and 'outboundPolicy' attributes. These security
+                    configurations will not get activated if we configure the external service using
+                    the endpoint element. When endpoint is defined, security settings can be
+                    configured at the endpoint.
+                </p>
+            </subsection>
+            <subsection name="Clone Mediator" id="Clone">
+                <p>
+                    Clone mediator can be used to create several clones or copies of a message. This
+                    mediator implements the Message Splitter EIP by splitting the message into
+                    number of identical messages which will be processed in parallel. They can also
+                    be set to process sequentially by setting the value of the optional 'sequential'
+                    attribute to 'true'.
+                </p>
+                <div class="xmlConf">&lt;clone [id="string"] [sequential=(true | false)] [continueParent=(true | false)]&gt;
+    &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"] [endpoint="endpoint_ref"]&gt;
+        &lt;sequence&gt;
+            (mediator)+
+        &lt;/sequence&gt;?
+        &lt;endpoint&gt;
+            endpoint
+        &lt;/endpoint&gt;?
+    &lt;/target&gt;+
+&lt;/clone&gt;</div>
+                <p>
+                    The original message can be continued or dropped depending on the boolean value
+                    of the optional 'continueParent' attribute. Optionally a custom 'To' address
+                    and/or a 'Action' may be specified for cloned messages. The optional 'id'
+                    attribute can be used to identify the clone mediator which created a particular
+                    split message when nested clone mediators are used. This is particularly useful
+                    when aggregating responses of messages that were created using nested clone
+                    mediators.
+                </p>
+            </subsection>
+            <subsection name="DBLookup" id="DBLookup">
+                <p>
+                    DB Lookup mediator is capable of executing an arbitrary SQL SELECT statement,
+                    and then set some resulting values as local message properties on the message
+                    context. The DB connection used maybe looked up from an external DataSource or
+                    specified in-line, in which case an Apache DBCP connection pool is established
+                    and used.
+                </p>
+                <div class="xmlConf">&lt;dblookup&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+        (
+            &lt;driver/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+            &lt;property name="name" value="value"/&gt;*
+        |
+            &lt;dsName/&gt;
+            &lt;inClass/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+        )
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;statement&gt;
+        &lt;sql&gt;SELECT something FROM table WHERE something_else = ?&lt;/sql&gt;
+        &lt;parameter [value="" | expression=""] type="CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP"/&gt;*
+        &lt;result name="string" column="int|string"/&gt;*
+    &lt;/statement&gt;+
+&lt;/dblookup&gt;</div>
+                <p>
+                    For in-lined data sources the following parameters have to be specified.
+                </p>
+                <ul>
+                    <li>driver: Fully qualified class name of the database driver.</li>
+                    <li>url: Database URL.</li>
+                    <li>user: Username for database access.</li>
+                    <li>password: Password for database access.</li>
+                </ul>
+                <p>
+                    This new data source is based on Apache DBCP connection pools. This connection
+                    pool support the following configuration properties:
+                </p>
+                <ul>
+                    <li>autocommit = true | false</li>
+                    <li>isolation = Connection.TRANSACTION_NONE | Connection.TRANSACTION_READ_COMMITTED | Connection.TRANSACTION_READ_UNCOMMITTED |
+                        Connection.TRANSACTION_REPEATABLE_READ | Connection.TRANSACTION_SERIALIZABLE</li>
+                    <li>initialsize = int</li>
+                    <li>maxactive = int</li>
+                    <li>maxidle = int</li>
+                    <li>maxopenstatements = int</li>
+                    <li>maxwait = long</li>
+                    <li>minidle = int</li>
+                    <li>poolstatements = true | false</li>
+                    <li>testonborrow = true | false</li>
+                    <li>testonreturn = true | false</li>
+                    <li>testwhileidle = true | false</li>
+                    <li>validationquery = String</li>
+                </ul>
+                <p/>
+                <p>
+                    When an external data source is used the following parameters have to be
+                    specified.
+                </p>
+                <ul>
+                    <li>dsName: The name of the data source to be looked up.</li>
+                    <li>icClass: Initial context factory class. The corresponding Java environment property is java.naming.factory.initial</li>
+                    <li>url: The naming service provider URL. The corresponding Java environment property is java.naming.provider.url</li>
+                    <li>user: Username corresponding to the Java environment property java.naming.security.principal</li>
+                    <li>password: Password corresponding to the Java environment property java.naming.security.credentials</li>
+                </ul>
+                <p>
+                    More than one statement can be included in the mediator configuration. SQL
+                    statement may specify parameters which could be specified as values or XPath
+                    expressions. The type of a parameter could be any valid SQL type. 'result'
+                    sub-element contains 'name' and 'column' attributes which define the name
+                    under which the result is stored in the Synapse message context, and a column
+                    number or name respectively.
+                </p>
+            </subsection>
+            <subsection name="DBReport" id="DBReport">
+                <p>
+                    DB Report mediator is quite similar to the
+                    <a href="#DBReport">DB Lookup</a>
+                    mediator, but writes data into a database instead of reading data from a
+                    database.
+                </p>
+                <div class="xmlConf">&lt;dbreport useTransaction=(true|false)&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+        (
+            &lt;driver/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+            &lt;property name="name" value="value"/&gt;*
+        |
+            &lt;dsName/&gt;
+            &lt;icClass/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+        )
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;statement&gt;
+        &lt;sql&gt;INSERT INTO table VALUES (?, ?, ?, ?)&lt;/sql&gt;
+        &lt;parameter [value="" | expression=""] type="CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP"/&gt;*
+    &lt;/statement&gt;+
+&lt;/dblreport&gt;</div>
+
+                <p>
+                    This mediator executes the specified SQL INSERT on the database specified
+                    in-line or as an external data source. For information on configuring database
+                    related mediators, refer<a href="#DBReport">DB Lookup mediator guide</a>.
+                </p>
+            </subsection>
+            <subsection name="Iterate Mediator" id="Iterate">
+                <p>
+                    Iterate mediator splits the message into number of different messages
+                    derived from the parent message by finding matching elements for the XPath
+                    expression specified. New messages will be created for each matching element and
+                    processed in parallel (default behavior) using either the specified sequence or
+                    endpoint.
+                </p>
+                <div class="xmlConf">&lt;iterate [id="string"] [continueParent=(true | false)] [preservePayload=(true | false)] [sequential=(true | false)]
+        (attachPath="xpath")? expression="xpath"&gt;
+    &lt;target [to="uri"] [soapAction="qname"] [sequence="sequence_ref"] [endpoint="endpoint_ref"]&gt;
+        &lt;sequence&gt;
+            (mediator)+
+        &lt;/sequence&gt;?
+        &lt;endpoint&gt;
+            endpoint
+        &lt;/endpoint&gt;?
+    &lt;/target&gt;+
+ &lt;/iterate&gt;</div>
+                <p>
+                    Created messages can also be set to process sequentially by setting the optional
+                    'sequential' attribute to 'true'. Parent message can be continued or dropped in
+                    the same way as in the clone mediator. The 'preservePayload' attribute specifies
+                    if the original message should be used as a template when creating the split
+                    messages, and defaults to 'false', in which case the split messages would
+                    contain the split elements as the SOAP body. The optional 'id' attribute can be
+                    used to identify the iterator which created a particular split message when
+                    nested iterate mediators are used. This is particularly useful when aggregating
+                    responses of messages that are created using nested iterate mediators.
+                </p>
+            </subsection>
+            <subsection name="RMSequence" id="RMSequence">
+                <p>
+                    RM Sequence mediator can be used to create a sequence of messages to communicate
+                    via WS-Reliable Messaging with a WS-RM enabled endpoint.
+                </p>
+                <div class="xmlConf">&lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</div>
+                <p>
+                    The simplest use case of this mediator sets 'single' attribute to "true",
+                    which means that only one message is involved in the same sequence. However, if
+                    multiple messages should be sent in the same sequence, 'correlation' attribute
+                    should be used with an XPath expression that selects a unique element value from
+                    the incoming message. With the result of the XPath expression, Synapse can group
+                    messages together that belong to the same sequence. To close the sequence
+                    neatly, an XPath expression should be specified for the last message of the
+                    sequence as well. The optional 'version' attribute, which specifies the WS-RM
+                    specification version as 1.0 or 1.1, defaults to 1.0.
+                </p>
+            </subsection>
+            <subsection name="Store" id="Store">
+                <p>
+                    Store mediator can be used to store the current message in a specific message
+                    store.
+                </p>
+                <div class="xmlConf">&lt;store messageStore="string" [sequence="sequence-ref"]&gt;</div>
+                <p>
+                    In the mediator configuration 'messageStore' attribute is used to specify the
+                    message store to store the message in. The optional 'sequence' attribute
+                    specifies a sequence through which the message is sent before storing it.
+                </p>
+            </subsection>
+            <subsection name="Throttle Mediator" id="Throttle">
+                 <p>
+                     Throttle mediator can be used for rate limiting as well as concurrency based
+                     limiting. A WS-Policy dictates the throttling configuration and can be
+                     specified inline or loaded from the registry. Please refer to the samples
+                     document for sample throttling policies.
+                 </p>
+                <div class="xmlConf">&lt;throttle [onReject="string"] [onAccept="string"] id="string"&gt;
+    (&lt;policy key="string"/&gt; | &lt;policy&gt;..&lt;/policy&gt;)
+    &lt;onReject&gt;..&lt;/onReject&gt;?
+    &lt;onAccept&gt;..&lt;/onAccept&gt;?
+&lt;/throttle&gt;</div>
+                 <p>
+                     The throttle mediator could be used in the request path for rate limiting and
+                     concurrent access limiting. When it's used for concurrent access limitation,
+                     the same throttle mediator 'id' must be triggered on the response flow so that
+                     completed responses are deducted from the available limit. (i.e. two instances
+                     of the throttle mediator with the same 'id' attribute in the request and
+                     response flows). 'onReject' and 'onAccept' sequence references or inline
+                     sequences define how accepted and rejected messages are handled.
+                 </p>
+            </subsection>
+            <subsection name="Transaction Mediator" id="Transaction">
+                <p>
+                    Transaction mediator can provide transaction facility for a set of mediators
+                    defined as its child mediators. A transaction mediator with the action "new"
+                    indicates the entry point for the transaction. A transaction is marked completed
+                    by a transaction mediator with the action "commit". The suspend and resume
+                    actions are used to pause a transaction at some point and start it again later.
+                    Additionally, the transaction mediator supports three other actions, i.e.
+                    use-existing-or-new, fault-if-no-tx, rollback.
+                </p>
+                <div class="xmlConf">&lt;transaction action="new|use-existing-or-new|fault-if-no-tx|commit|rollback|suspend|resume"/&gt;</div>
+                <ul>
+                    <li>new: Initiate a new transaction.</li>
+                    <li>use-existing-or-new: If a transaction already exists
+                        continue it, otherwise create a new transaction.</li>
+                    <li>fault-if-no-tx: Go to the error handler if no transaction exists.</li>
+                    <li>commit: End the transaction.</li>
+                    <li>rollback: Rollback a transaction.</li>
+                    <li>suspend: Pause a transaction.</li>
+                    <li>resume: Resume a paused transaction.</li>
+                </ul>
+            </subsection>
+        </section>
+    </body>
+</document>

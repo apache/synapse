@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+    <pomVersion>3</pomVersion>
+    <extend>../../etc/project.xml</extend>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+    <name>Apache Synapse - Extensions</name>
+    <id>synapse-extensions</id>
+    <groupId>synapse</groupId>
+
+    <dependencies>
+        <dependency>
+            <groupId>synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <version>${pom.currentVersion}</version>
+        </dependency>
+
+        <!-- external JARs -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+            <version>${spring.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <!--<excludes>-->
+                <!--<exclude>**/*Test.java</exclude>-->
+            <!--</excludes>-->
+            <resources>
+                <resource>
+                    <directory>src</directory>
+                    <includes>
+                        <include>**/org.apache.synapse.xml.MediatorFactory</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+
+    </build>
+</project>
+

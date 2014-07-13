@@ -1,0 +1,24 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+  
+  <definitions>
+    
+    <set-property name="xmethodsStockquote" src="file:synapse_repository/conf/sample/xmethodsStockquote.js"/>
+    
+  </definitions>
+
+  <rules>
+
+    <in>
+       <script key="xmethodsStockquote" function="mediateIn"/>
+       <header name="To" value="http://64.124.140.30:9090/soap"/>
+    </in>
+
+    <out>
+       <script key="xmethodsStockquote" function="mediateOut"/>
+    </out>
+
+    <send/>
+
+  </rules>
+
+</synapse> 

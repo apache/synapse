@@ -1,0 +1,2 @@
+protocol=test-transport; type=transport; class=org.apache.synapse.transport.mail.TestTransport
+protocol=test-store; type=store; class=org.apache.synapse.transport.mail.TestStore

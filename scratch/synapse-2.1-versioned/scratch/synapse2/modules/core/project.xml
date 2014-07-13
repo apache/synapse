@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	
+    <pomVersion>3</pomVersion>
+    <extend>../../etc/project.xml</extend>
+
+
+    <name>Apache Synapse - Core</name>
+    <id>synapse-core</id>
+    <groupId>synapse</groupId>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+
+    <dependencies/>
+    
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <!--<excludes>-->
+                <!--<exclude>**/*Test.java</exclude>-->
+            <!--</excludes>-->
+            <resources>
+                <resource>
+                    <directory>test-resources</directory>
+                </resource>
+            </resources>
+        </unitTest>
+
+        <resources>
+			<resource>
+				<directory>conf</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+        </resources>
+
+    </build>
+</project>
+

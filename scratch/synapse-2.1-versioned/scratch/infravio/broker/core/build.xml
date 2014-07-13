@@ -1,0 +1,30 @@
+<project name="core" default="pkg" basedir=".">
+    <property file="../build.properties"/>
+    <import file="../classpath.xml"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <echo message="Compiling Core"/>
+
+        <mkdir dir="build/classes"/>
+
+        <javac
+
+            srcdir="src"
+            destdir="build/classes"
+            compiler="${javac.compiler}"
+            debug="${javac.debug}"
+            deprecation="${javac.deprecation}"
+            nowarn="on">
+            <classpath refid="broker.classpath"/>
+        </javac>
+    </target>
+
+    <target name="pkg" depends="compile">
+        <jar destfile="build/parser.jar" basedir="build/classes" includes="**/parser/**/*.class" index="true"/>
+        <jar destfile="build/receiver.jar" basedir="build/classes" includes="**/receivers/**/*.class" index="true"/>
+    </target>
+</project>

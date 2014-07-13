@@ -1,0 +1,24 @@
+<SynapseObject name="SLA">
+    <SynapseObject name="service0">
+        <Attribute name="url" type="STRING">http://</Attribute>
+        <SynapseObject name="consumer0">
+            <Attribute name="identifier" type="STRING">someID</Attribute>
+            <Attribute name="priority" type="INTEGER">2</Attribute>
+        </SynapseObject>
+        <SynapseObject name="consumer1">
+            <Attribute name="identifier" type="STRING">someID</Attribute>
+            <Attribute name="priority" type="INTEGER">6</Attribute>
+        </SynapseObject>
+    </SynapseObject>
+    <SynapseObject name="service1">
+        <Attribute name="url" type="STRING">http://</Attribute>
+        <SynapseObject name="consumer0">
+            <Attribute name="identifier" type="STRING">someID</Attribute>
+            <Attribute name="priority" type="INTEGER">2</Attribute>
+        </SynapseObject>
+        <SynapseObject name="consumer1">
+            <Attribute name="identifier" type="STRING">someID</Attribute>
+            <Attribute name="priority" type="INTEGER">6</Attribute>
+        </SynapseObject>
+    </SynapseObject>
+</SynapseObject>

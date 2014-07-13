@@ -1,0 +1,172 @@
+<axisconfig name="AxisJava2.0">
+    <!-- ================================================= -->
+    <!-- Parameters -->
+    <!-- ================================================= -->
+    <parameter name="hotdeployment" locked="false">true</parameter>
+    <parameter name="hotupdate" locked="false">false</parameter>
+    <parameter name="enableMTOM" locked="false">true</parameter>
+    <!-- Uncomment this to enable REST support -->
+    <!--    <parameter name="enableREST" locked="false">true</parameter>-->
+
+    <parameter name="SynapseConfiguration" locked="false">
+        synapse.xml</parameter>
+    <parameter name="userName" locked="false">admin</parameter>
+    <parameter name="password" locked="false">axis2</parameter>
+
+    <parameter name="seralizeLocation" locked="false">.</parameter>
+    <hostConfiguration>
+        <ip>127.0.0.1</ip>
+        <port>5555</port>
+    </hostConfiguration>
+
+
+    <!--if you want to extract the service archive file and work with that please uncomment this-->
+    <!--else , it wont extract archive file or does not take into consideration if someone drop-->
+    <!--exploded directory into /service directory-->
+    <!--<parameter name="extractServiceArchive" locked="false">true</parameter>-->
+
+
+    <!--    The way of adding listener to the system-->
+    <!--    <listener class="org.apache.axis2.ObserverIMPL">-->
+    <!--        <parameter name="RSS_URL" locked="false">http://127.0.0.1/rss</parameter>-->
+    <!--    </listener>-->
+
+    <!-- ================================================= -->
+    <!-- Message Receivers -->
+    <!-- ================================================= -->
+    <!-- This is the Deafult Message Receiver for the Request Response style Operations -->
+    <messageReceiver mep="INOUT"
+                     class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+
+    <!-- ================================================= -->
+    <!-- Transport Ins -->
+    <!-- ================================================= -->
+    <transportReceiver name="http"
+                       class="org.apache.axis2.transport.http.SimpleHTTPServer">
+        <parameter name="port" locked="false">6060</parameter>
+    </transportReceiver>
+
+    <!-- Uncomment this one with the appropriate papameters to enable the SMTP transport Receiver
+    <transportReceiver name="mail" class="org.apache.axis2.transport.mail.SimpleMailListener">
+          <parameter name="transport.mail.pop3.host" locked="false">127.0.0.1</parameter>
+          <parameter name="transport.mail.pop3.user" locked="false">axis2</parameter>
+          <parameter name="transport.mail.pop3.password" locked="false">axis2</parameter>
+          <parameter name="transport.mail.pop3.port" locked="false">110</parameter>
+          <parameter name="transport.mail.replyToAddress" locked="false">axis2@127.0.0.1</parameter>
+      </transportReceiver> -->
+
+    <transportReceiver name="tcp"
+                       class="org.apache.axis2.transport.tcp.TCPServer">
+        <parameter name="port" locked="false">6060</parameter>
+    </transportReceiver>
+
+    <transportReceiver name="jms"
+                       class="org.apache.axis2.transport.jms.SimpleJMSListener">
+        <parameter name="transport.jms.Destination" locked="false">
+            dynamicQueues/FOO</parameter>
+        <parameter name="java.naming.factory.initial" locked="false">
+            org.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        <parameter name="java.naming.provider.url" locked="false">
+            tcp://localhost:61616</parameter>
+    </transportReceiver>
+
+    <!-- ================================================= -->
+    <!-- Transport Outs -->
+    <!-- ================================================= -->
+
+    <transportSender name="tcp"
+                     class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
+    <transportSender name="local"
+                     class="org.apache.axis2.transport.local.LocalTransportSender"/>
+    <transportSender name="jms"
+                     class="org.apache.axis2.transport.jms.JMSSender"/>
+    <transportSender name="http"
+                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+        <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
+    </transportSender>
+    <transportSender name="https"
+                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+        <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
+    </transportSender>
+
+    <!-- Uncomment this one with the appropriate papameters to enable the SMTP transport Receiver
+   <transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender">
+       <parameter name="transport.mail.smtp.host" locked="false">127.0.0.1</parameter>
+       <parameter name="transport.mail.smtp.user" locked="false">axis2</parameter>
+       <parameter name="transport.mail.smtp.password" locked="false">axis2</parameter>
+       <parameter name="transport.mail.smtp.port" locked="false">25</parameter>
+   </transportSender>
+   -->
+
+    <!-- ================================================= -->
+    <!-- Global Modules  -->
+    <!-- ================================================= -->
+    <!-- Comment this to disable Addressing -->
+    <module ref="addressing"/>
+
+
+    <!--Configuring module , providing parameters for modules whether they refer or not-->
+    <!--<moduleConfig name="addressing">-->
+    <!--<parameter name="addressingPara" locked="false">N/A</parameter>-->
+    <!--</moduleConfig>-->
+
+    <!-- ================================================= -->
+    <!-- Phases  -->
+    <!-- ================================================= -->
+    <phaseOrder type="inflow">
+        <!--  System pre defined phases       -->
+        <phase name="TransportIn"/>
+        <phase name="PreDispatch"/>
+        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
+            <handler name="SynapseDispatcher"
+                     class="org.apache.synapse.axis2.SynapseDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            <!--<handler name="AddressingBasedDispatcher"-->
+                     <!--class="org.apache.axis2.engine.AddressingBasedDispatcher">-->
+                <!--<order phase="Dispatch"/>-->
+            <!--</handler>-->
+
+            <!--<handler name="RequestURIBasedDispatcher"-->
+                     <!--class="org.apache.axis2.engine.RequestURIBasedDispatcher">-->
+                <!--<order phase="Dispatch"/>-->
+            <!--</handler>-->
+
+            <!--<handler name="SOAPActionBasedDispatcher"-->
+                     <!--class="org.apache.axis2.engine.SOAPActionBasedDispatcher">-->
+                <!--<order phase="Dispatch"/>-->
+            <!--</handler>-->
+
+            <!--<handler name="SOAPMessageBodyBasedDispatcher"-->
+                     <!--class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">-->
+                <!--<order phase="Dispatch"/>-->
+            <!--</handler>-->
+            <handler name="InstanceDispatcher"
+                     class="org.apache.axis2.engine.InstanceDispatcher">
+                <order phase="PostDispatch"/>
+            </handler>
+        </phase>
+        <!--  System pre defined phases       -->
+        <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
+        <phase name="userphase1"/>
+    </phaseOrder>
+    <phaseOrder type="outflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="userphase1"/>
+        <!--system predefined phase-->
+        <!--these phase will run irrespective of the service-->
+        <phase name="PolicyDetermination"/>
+        <phase name="MessageOut"/>
+    </phaseOrder>
+    <phaseOrder type="INfaultflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="userphase1"/>
+    </phaseOrder>
+    <phaseOrder type="Outfaultflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="userphase1"/>
+        <phase name="PolicyDetermination"/>
+        <phase name="MessageOut"/>
+    </phaseOrder>
+</axisconfig>
+

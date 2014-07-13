@@ -1,0 +1,95 @@
+<project name="deploy" default="deploy" basedir=".">
+
+    <property file="build.properties"/>
+    <property name="temp" value="${deploy.dir}/axis2"/>
+
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask"
+        classpath="lib/xmltask-v1.11.jar"/>
+
+    <target name="deploy">
+
+        <antcall target="copy-axis2-war"/>
+
+        <echo message="#### Deploying into: ${axis2.home}"/>
+
+        <antcall target="configure-axis2-xml"/>
+
+        <!-- Copy broker related jars into axis2 -->
+        <copy file="lib/SJT.Mgmt.jar" todir="${temp}/WEB-INF/lib" overwrite="true"/>
+        <copy file="lib/parser.jar" todir="${temp}/WEB-INF/lib" overwrite="true"/>
+        <copy file="lib/receiver.jar" todir="${temp}/WEB-INF/lib" overwrite="true"/>
+        <copy file="lib/brokerConfig.jar" todir="${temp}/WEB-INF/lib" overwrite="true"/>
+
+        <!-- Copy configuration file into axis2 -->
+        <copy file="resources/broker-configuration.xml"
+            todir="${temp}/WEB-INF" overwrite="true"/>
+
+        <mkdir dir="unpack-module"/>
+        <unzip src="modules/AdminModule.jar" dest="unpack-module"/>
+        <copy file="build.properties" tofile="unpack-module/META-INF/module.properties" overwrite="true"/>
+        <delete dir="unpack-module"/>
+
+        <!-- Copy broker related modules to axis2 -->
+        <mkdir dir="${temp}/WEB-INF/modules"/>
+        <copy todir="${temp}/WEB-INF/modules" overwrite="true" failonerror="true">
+            <fileset dir="modules"/>
+        </copy>
+
+        <!-- Copy broker related services to axis2 -->
+        <mkdir dir="${temp}/WEB-INF/services"/>
+        <copy todir="${temp}/WEB-INF/services" overwrite="true" failonerror="true">
+            <fileset dir="services"/>
+            <fileset dir="samples"/>
+        </copy>
+
+        <!--
+                <zip destfile="${deploy.dir}/axis2.war" basedir="${temp}"/>
+                <delete dir="${temp}"/>
+        -->
+    </target>
+
+    <target name="copy-axis2-war">
+
+        <!-- Cleanup exising axis2 wars -->
+        <delete dir="${deploy.dir}/axis2"/>
+        <delete file="${deploy.dir}/axis2.war"/>
+
+        <!-- Copy fresh Axis2 -->
+        <copy file="${axis2.home}/webapps/axis2.war"
+            todir="${deploy.dir}" overwrite="true"/>
+        <mkdir dir="${temp}"/>
+
+        <!-- Extract Axis2 since Tomcat needs this format -->
+        <unzip src="${deploy.dir}/axis2.war" dest="${temp}"/>
+        <delete file="${deploy.dir}/axis2.war"/>
+
+    </target>
+    <target name="configure-axis2-xml">
+        <xmltask outputter="simple" source="${temp}/WEB-INF/axis2.xml" dest="${temp}/WEB-INF/axis2.xml">
+            <insert path="/axisconfig[@name='AxisJava2.0']/phaseOrder[@type='inflow']/phase[@name='PostDispatch']" position="after"
+                xml="&lt;phase name=&quot;LoggingPhase&quot;/&gt;
+                     &lt;phase name=&quot;EngagePhase&quot;/&gt;
+                     &lt;phase name=&quot;ChkPhase&quot;/&gt;
+                     &lt;phase name=&quot;RoutingPhase&quot;/&gt;"
+                />
+
+            <insert path="/axisconfig[@name='AxisJava2.0']/phaseOrder[@type='outflow']/phase[@name='userphase1']" position="after"
+                xml="&lt;phase name=&quot;LoggingPhase&quot;/&gt;"
+                />
+        </xmltask>
+
+        <replaceregexp file="${temp}/WEB-INF/axis2.xml"
+            match='&lt;messageReceiver class=&quot;org.apache.axis2.receivers.RawXMLINOutMessageReceiver&quot; mep=&quot;INOUT&quot;&gt;&lt;/messageReceiver&gt;'
+            replace='&lt;messageReceiver mep=&quot;INOUT&quot; class=&quot;org.apache.axis2.receivers.RawXMLINOutMessageReceiver&quot;/&gt;'
+            byline="true"/>
+
+
+    </target>
+    <target name="deploy-samples">
+        <antcall target="deploy"/>
+        <copy todir="${temp}/WEB-INF/services" overwrite="true" failonerror="true">
+            <fileset dir="samples"/>
+        </copy>
+    </target>
+
+</project>

@@ -1,0 +1,18 @@
+<synapseSample>
+    <sampleID>10002</sampleID>
+    <sampleName>Pass Through Transport and Deferred Building Sanity Checks</sampleName>
+    <synapseConfig>
+        <!--if we don't specify the optional values, framework will use defaults-->
+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10002.xml</synapseXml>
+    </synapseConfig>
+    <backEndServerConfig>
+        <echoServer id="0">
+            <httpPort>9000</httpPort>
+        </echoServer>
+    </backEndServerConfig>
+    <clientConfig>
+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
+    </clientConfig>
+</synapseSample>

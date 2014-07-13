@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 370</title>
+    </properties>
+    <body>
+        <section name="Sample 370: Introduction to Throttle Mediator and Concurrency Throttling">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;throttle id="A"&gt;
+                &lt;policy&gt;
+                    &lt;!-- define throttle policy --&gt;
+                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
+                        &lt;throttle:ThrottleAssertion&gt;
+                            &lt;throttle:MaximumConcurrentAccess&gt;10&lt;/throttle:MaximumConcurrentAccess&gt;
+                        &lt;/throttle:ThrottleAssertion&gt;
+                    &lt;/wsp:Policy&gt;
+                &lt;/policy&gt;
+                &lt;onAccept&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Accept**"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/onAccept&gt;
+                &lt;onReject&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Denied**"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault response="true"&gt;
+                        &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope"
+                              value="tns:Receiver"/&gt;
+                        &lt;reason value="**Access Denied**"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/onReject&gt;
+            &lt;/throttle&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;throttle id="A"/&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Showcase the ability of Synapse to throttle incoming requests based on the
+                    concurrency level
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 370 (repository/conf/sample/synapse_sample_370.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 370<br/>
+                                Windows: synapse.bat -sample 370
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Above configuration specifies a throttle mediator inside the in mediator.
+                    Therefore, all request messages directed to the main sequence will be subjected
+                    to throttling. Throttle mediator has 'policy', 'onAccept' and 'onReject' tags at
+                    top level. The 'policy' tag specifies the throttling policy for throttling messages.
+                    This sample policy only contains a component called 'MaximumConcurrentAccess'.
+                    This indicates the maximum number of concurrent requests that can pass through
+                    Synapse on a single unit of time. To test concurrency throttling, it is required
+                    to send concurrent requests to Synapse. With this configuration if Synapse receives
+                    20 requests concurrently from clients, then approximately half of those will succeed
+                    while the others being throttled. The client command to try this is as follows.
+                </p>
+                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/</div>
+                <p>
+                    It's not that easy to try this sample out using the sample Axis2 client. For
+                    better results, consider using a load testing tool like Apache Bench or Java Bench.
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

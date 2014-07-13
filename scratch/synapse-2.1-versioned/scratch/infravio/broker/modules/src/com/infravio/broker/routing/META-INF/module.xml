@@ -1,0 +1,7 @@
+<module name="Routing" class="com.infravio.broker.modules.routing.RoutingModule">
+    <inflow>
+        <handler name="InFlowRoutingHandler" class="com.infravio.broker.modules.routing.RoutingInHandler">
+            <order phase="RoutingPhase"/>
+        </handler>
+    </inflow>
+</module>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Down the Memory Lane</title>
+    </properties>
+    <body>
+        <section name="History of Synapse">
+            <p>
+                Synapse started out as an Apache Incubator project co-proposed by a number of
+                companies. The real key starting point was a face-to-face meeting held in the
+                Bay Area in September 2005 hosted at Infravio's offices. In that meeting the
+                overall approach for Synapse was hammered out, and then we set out to coding.
+            </p>
+            <p>
+                The first real usable build followed early in January 2006. Known as M1, this was a
+                real runnable release, but only providing very simple functionality. Other releases
+                throughout 2006 lead to the 0.90 release in December 2006, and in December 2006, the
+                Board voted to approve Synapse as a graduate from the Incubator and a member of the
+                Web Services project. The namespace URL (http://ws.apache.org/ns/synapse) used in
+                the Synapse configuration language is a remnant from our Apache Web Services heritage.
+            </p>
+            <p>
+                A year later, in December 2007, Synapse became an Apache top level project (TLP),
+                and since then has released 3 versions.
+            </p>
+            <p>
+                Here are some more interesting resources that show the growth and development
+                of Synapse from its humble beginnings.
+            </p>
+            <ul>
+                <li><a href="http://wiki.apache.org/incubator/SynapseProposal">Project proposal</a></li>
+                <li><a href="http://markmail.org/message/ac27hfeyvj4bbgde">What's available in Synapse M1?</a></li>
+                <li><a href="http://markmail.org/message/ueoox6fgpu5zwsrn">1.1 release announcement</a></li>
+                <li><a href="http://markmail.org/message/7wuu2jfsk2qfwhdp">1.1.1 release announcement</a></li>
+                <li><a href="http://markmail.org/message/od5si63jdjhj3mhc">1.2 release announcement</a></li>
+                <li><a href="http://apache-synapse.blogspot.com/">Old Apache Synapse blog</a></li>
+                <li><a href="http://www.slideshare.net/pizak/fast-soa-with-apache-synapse">Synapse at ApacheCon EU 2008</a></li>
+                <li><a href="http://www.slideshare.net/guest60ed0b/aceu2009-synapse-scalability-availability">Synapse at ApacheCon EU 2009</a></li>
+                <li><a href="http://www.slideshare.net/hiranya911/introduction-to-apache-synapse">Synapse at Apache Asia Roadshow 2009</a></li>
+                <li><a href="http://en.wikipedia.org/wiki/Apache_Synapse">Synapse on Wikipedia</a></li>
+            </ul>
+        </section>
+    </body>
+</document>

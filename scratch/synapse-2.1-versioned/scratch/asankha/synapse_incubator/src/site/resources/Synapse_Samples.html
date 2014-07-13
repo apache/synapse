@@ -1,0 +1,1215 @@
+<!--
+~  Licensed to the Apache Software Foundation (ASF) under one
+~  or more contributor license agreements.  See the NOTICE file
+~  distributed with this work for additional information
+~  regarding copyright ownership.  The ASF licenses this file
+~  to you under the Apache License, Version 2.0 (the
+~  "License"); you may not use this file except in compliance
+~  with the License.  You may obtain a copy of the License at
+~
+~   http://www.apache.org/licenses/LICENSE-2.0
+~
+~  Unless required by applicable law or agreed to in writing,
+~  software distributed under the License is distributed on an
+~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~  KIND, either express or implied.  See the License for the
+~  specific language governing permissions and limitations
+~  under the License.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="">
+  <title></title>
+</head>
+
+<body>
+<h1>Running the Synapse Samples</h1>
+
+<h2><a name="TOC">Contents</a></h2>
+
+<div class="section-content">
+<ul>
+  <li><a href="#Overview">Overview</a></li>
+  <li><a href="#Axis2Server">Starting the Axis2 Server</a></li>
+  <li><a href="#MediationSamples">Message mediation samples</a>
+    <ul>
+      <li><a href="#Sample0">Sample 0: Introduction to Synapse - log a
+        message</a></li>
+      <li><a href="#Sample1">Sample 1: Content based routing</a></li>
+      <li><a href="#Sample2">Sample 2: Switch-case mediator and writing and
+        reading of message properties</a></li>
+      <li><a href="#Sample3">Sample 3: Simple properties, and reusable
+        endpoints and sequences</a></li>
+      <li><a href="#Sample4">Sample 4: Error handling with the try and
+        makefault mediators</a></li>
+      <li><a href="#Sample5">Sample 5: Error handling within a sequence using
+        the 'onError' sequence</a></li>
+      <li><a href="#Sample6">Sample 6: Header, in and out mediators</a></li>
+      <li><a href="#Sample7">Sample 7: Extension mediators, static XML
+        properties and the validate mediator</a></li>
+      <li><a href="#Sample8">Sample 8: URL source properties, registry based
+        properties and the XSLT mediator</a></li>
+      <li><a href="#Sample9">Sample 9: Dynamic sequences with a
+      Registry</a></li>
+      <li><a href="#Sample10">Sample 10: Dynamic endpoints with a
+      Registry</a></li>
+      <li><a href="#Sample11">Sample 11: A full registry based
+        configuration</a></li>
+    </ul>
+  </li>
+  <li><a href="#WSSecurity">WS-Security</a>
+    <ul>
+      <li><a href="#Sample50">Sample 50: Connecting to endpoints with
+        WS-Security</a></li>
+    </ul>
+  </li>
+  <li><a href="#ProxyServices">Synapse Proxy service samples</a>
+    <ul>
+      <li><a href="#Sample100">Sample 100: Introduction to Synapse proxy
+        services</a></li>
+      <li><a href="#Sample101">Sample 101: Custom sequences and endpoints for
+        message mediation with proxy services</a></li>
+      <li><a href="#Sample102">Sample 102: Attaching service level
+        WS-Security policies to proxy services</a></li>
+      <li><a href="#Sample103">Sample 103: Using WS-Security signing and
+        encryption with proxy services through WS-Policy</a></li>
+      <li><a href="#Sample104">Sample 104: Explicit out sequence in proxy
+        service level to mediate proxy response</a></li>
+      <li><a href="#Sample105">Sample 105: Pure POX/Text and Binary JMS Proxy
+        services - including MTOM</a></li>
+    </ul>
+  </li>
+  <li><a href="#ProxyServices">Transport samples</a>
+    <ul>
+      <li><a href="#Sample110">Sample 110: Introduction to switching
+        transports with proxy services</a></li>
+      <li><a href="#Sample111">Sample 111: Demonstrate switching from HTTP to
+        JMS</a></li>
+      <li><a href="#Sample112">Sample 112: Demonstrate one way messaging /
+        fireAndForget</a></li>
+    </ul>
+  </li>
+  <li><a href="#ScriptMediators">Script Mediators</a>
+    <ul>
+      <li><a href="#ScriptSetup">Setting up Script Mediator support in Synapse</a></li>
+      <ul>
+        <li><a href="#ScriptSetupJavaScript">JavaScript</a></li>
+        <li><a href="#ScriptSetupRuby">Ruby</a></li>
+      </ul>
+    </ul>
+    <ul>
+      <li><a href="#Sample500">Sample 500: Introduction to script
+        mediators</a></li>
+      <li><a href="#Sample501">Sample 501: In-line script mediators</a></li>
+      <li><a href="#Sample503">Sample 503: Ruby script mediators</a></li>
+    </ul>
+  </li>
+</ul>
+</div>
+
+<h2><a name="Overview">Overview</a></h2>
+
+<p>To run the samples bundled with the Synapse distribution you will need Ant
+1.5 or later. Ant can be downloaded from http://ant.apache.org. The samples
+now come with a built in Axis2 server to host the service endpoints used in
+the samples, along with simple ant scripts to build and deploy the services
+into this Axis2 instance.</p>
+
+<h2><a name="Axis2Server">Starting the Axis2 Server</a></h2>
+
+<p>To start the bundled Axis2 server, go to the samples/axis2Server directory
+and execute the axis2server.sh or axis2server.bat script. This starts the
+Axis2 server with the HTTP transport listener on port 9000.</p>
+
+<p>Please note that the script picks up the correct config from the AXIS2_HOME directory, so please 
+ensure this isn't set, or points to the samples/axis2Server directory.</p>
+
+<p>The sample services are available in the samples/axis2Server/src
+directory. To deploy these services go the the selected directory and run
+'ant'. This will build the service archive file (aar) and deploy it into the
+Axis2 server. (i.e. copy it to the
+samples/axis2Server/repository\services)</p>
+
+<p>For example, to deploy the SimpleStockQuoteService service go to the
+samples/axis2Server/src/SimpleStockQuoteService and execute 'ant' without any
+arguments as follows:</p>
+<pre>C:\Java\synapse-0.90-SNAPSHOT\samples\axis2Server\src\SimpleStockQuoteService&gt;ant<br>Buildfile: build.xml
+...
+[jar] Building jar: C:\Java\synapse-0.90-SNAPSHOT\samples\axis2Server\repository\services\SimpleStockQuoteService.aar
+BUILD SUCCESSFUL</pre>
+
+<h2><a name="SampleServices">Descriptions of sample Services</a></h2>
+<ol>
+  <li>SimpleStockQuoteService - This service has two operations, getQuote
+    (in/out) and placeOrder (in-only). It will generate a sample stock quote
+    for a given symbol.</li>
+  <li>SimpleStockQuoteService1 - This has the same functionality as the
+    SimpleStockQuoteService service, but exists to make available a different
+    service instance/EPR to demonstrating routing</li>
+  <li>SecureStockQuoteService1 - Simple stock quote service using WS-Security
+    with timestamps and username token authentication</li>
+  <li>SecureStockQuoteService3 - Stock quote service using WS-Security
+    signatures and encryption</li>
+</ol>
+
+<h2><a name="StartingSynapse">Starting Synapse</a></h2>
+
+<p>To start Synapse with the default configuration execute the synapse.bat or
+synapse.sh script in the bin directory. This starts up an instance of Synapse
+using the Synapse and Axis2 configuration files located at repository/conf</p>
+
+<p>To start specific sample configurations of Synapse, use the -sample
+&lt;number&gt; switch as follows: <br>
+</p>
+<pre>bin\synapse.bat -sample &lt;number&gt;</pre>
+
+<p>The above on a Windows system will use the sample synapse.xml
+configuration file located at
+repository\conf\sample\synapse_sample_&lt;number&gt;.xml</p>
+
+<h2><a name="SampleClients">Invoking the sample clients</a></h2>
+
+<p>The clients are located in the samples/axis2Client directory, and should
+be executed with the ant script supplied. (e.g. ant stockquote) The ant
+script expects an argument to select the client scenario to be executed. The
+samples/axis2Client/client_repo directory contains an Axis2 client repository
+along with the necessary modules and dependencies to make available
+WS-Addressing, WS-Security (Rampart) and WS-Reliable Messaging (Sandesha2) on
+the client side.</p>
+
+<h1><a name="MediationSamples">Message Mediation Samples</a></h1>
+
+<h2><a name="Sample0">Sample 0:</a></h2>
+
+<p><strong>Objective: Introduction to Synapse. Shows how a message could be
+made to pass through Synapse </strong><strong>and logged before it is
+delivered to its ultimate receiver.</strong></p>
+
+<p>A client could interact with Synapse in one of three modes as follows:</p>
+<ol>
+  <li>Smart Client mode</li>
+
+  <p>In this mode, the client addresses its messages to the ultimate receiver
+  of the message using WS-Addressing, but specifies the transport URL to
+  Synapse. This results in the messages reaching Synapse with the
+  WS-Addressing information which could be used to route the message as
+  appropriate.</p>
+  <li>Synapse as a Proxy</li>
+
+  <p>In this mode, the client sets Synapse as an HTTP Proxy but sets the
+  destination EPR to indicate the ultimate receiver of the message. This
+  forces all outgoing HTTP messages to flow into Synapse, which will then
+  send the messages as appropriate.</p>
+  <li>Dumb Client</li>
+
+  <p>In this mode, the client expects Synapse to decide on the destination of
+  the message through appropriate routing rules using the content of the
+  message.</p>
+</ol>
+
+<p><strong>Pre-Requisites:<br>
+</strong>Start the Synapse configuration numbered 0: i.e. synapse -sample
+0<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p><strong>Execute the Smart Client as 'ant stockquote'<br>
+</strong>Client: samples.userguide.StockQuoteClient</p>
+
+<p>If you follow through the execution of Synapse mediation rules while
+looking at the configuration used synapse_sample_0.xml you will notice that
+the client request arrived at Synapse with a WS-Addressing 'To' EPR of
+http://localhost:9000/axis2/services/SimpleStockQuoteService</p>
+
+<p>The Synapse configuration logs the message at the highest log level as the
+configuration specifies the log level as 'full'. Then Synapse sends the
+message using the implicit 'To' address of the message - which is
+http://localhost:9000/axis2/services/SimpleStockQuoteService</p>
+
+<p>Then you will see on the Axis2 server console, a message similar to the
+following<br>
+</p>
+<pre>Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</pre>
+
+<p>This shows that Synapse forwarded the message to the intended recepient
+after logging the message and then the actual service received and processed
+it. The response message generated is again received at Synapse, and flows
+through the same mediation rules, which logs the message and then sends it -
+this time back to the client.</p>
+
+<p>On the client console you should see an output similar to the following
+based on the message received by the client.</p>
+<pre>Standard :: Stock price = $95.26454380258552</pre>
+
+<p><strong>Execute the Proxy client as 'ant proxystockquote'</strong><br>
+Client: samples.userguide.ProxyStockQuoteClient</p>
+
+<p>You will see the exact same behaviour as per the previous example when you
+run this scenario. However this time the difference is at the client and
+would be noticable only if one looks at the source code of the example class
+samples.userguide.ProxyStockQuoteClient</p>
+
+<p><strong>Execute the Proxy client as 'ant proxystockquote'</strong><br>
+Client: samples.userguide.ProxyStockQuoteClient</p>
+
+<p>You will see the exact same behaviour as per the previous example when you
+run this scenario. However this time the difference is at the client and
+would be noticable only if one looks at the source code of the example class
+samples.userguide.ProxyStockQuoteClient</p>
+
+<h2><a name="Sample1">Sample 1:</a></h2>
+
+<p><strong>Objective: Introduction to simple content based routing. Shows how
+a message could be made to pass through Synapse using the Dumb Client mode,
+where Synapse acts as a gateway to accept all messages and then perform
+mediation and routing.</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 1: i.e. synapse -sample 1<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)<br>
+</p>
+
+<p>Execute the Dumb Client as 'ant dumbstockquote'<br>
+Client: samples.userguide.DumbStockQuoteClient<br>
+</p>
+
+<p>This time you will notice that Synapse received a message for which
+Synapse was set as the ultimate receiver of the message. Based on the 'To'
+EPR, Synapse performed a match to the given path '/StockQuote' and as the
+request matched the XPath expression of the filter mediator, the filter
+mediators' child mediators executes, and thereby semding the message to a
+different endpoint as specified by the [reusable] endpoint definition.</p>
+
+<h2><a name="Sample2">Sample 2:</a></h2>
+
+<p><strong>Objective: Introduce switch-case mediator and writing and reading
+of local properties on a message</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 2: i.e. synapse -sample 2<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>Execute the 'ant stockquote' request again, and by following through the
+mediation rules executed you will see that the case statements' first case
+for 'IBM' executed and a local property named 'symbol' was set to 'Great
+stock - IBM'. Subsequently this local property value is looked up by the log
+mediator and logged. The message flowes through to Axis2 and then the reply
+back to the client.</p>
+
+<h2><a name="Sample3">Sample 3:</a></h2>
+
+<p><strong>Objective: Illustrates simple properties, and reusable endpoints
+and sequences</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 3: i.e. synapse -sample 3<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>Execute the 'ant stockquote' request again. Following through the
+mediation logs you will see that once the filter and switch statments are
+through, the sequence named 'stockquote' is referenced and invoked. Also the
+log mediator dumps a string property, and two XPath evaluation results. The
+first expression fetches a local static string lieral property named
+'version'. This is a global property applicable to all messages passing
+through Synapse, and available for reading from any reusable sequence or the
+main rules. The second expression fetches the local message property named
+'symbol' which was set within the switch mediator, using the set-property
+mediator. However, for both expressions the 'get-property()' XPath extension
+function has been used. This function will first look for a given property
+within the local message, and if a property with the name cannot be found, it
+performs a lookup over all global properties. In addition, the get-property()
+function supports the special cases 'To', 'From', 'Action', 'FaultTo' and
+'ReplyTo', which fetches the appropriate values from the current message
+context.</p>
+
+<h2><a name="Sample4">Sample 4:</a></h2>
+
+<p><strong>Objective: Introduction to error handling with the try and
+makefault mediators</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 4: i.e. synapse -sample 4<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>When you execute 'ant stockquote', the default stock symbol queried is
+'IBM'. However you could use the 'symbol' system property and pass it into
+the above (e.g. ant stockquote -Dsymbol=MSFT) to query another symbol.</p>
+
+<p>When the IBM stock quote is requested, the configuration routes it to the
+endpoint defined as the 'simple' endpoint, which routes the message to the
+SimpleStockQuoteService on the local Axis2 instance. Hence a valid response
+message is shown at the client.</p>
+
+<p>If you lookup a stock quote for 'MSFT', Synapse is instructed to route the
+message to the endpoint defined as the 'bogus' endpoint, which tries to
+deliver the message to a non existing service. Hence the method encounters a
+connection exception, which gets handled by the enclosing try mediator. When
+an error is encountered within the scope of a try mediator, it executes the
+mediation logic specified in its 'onError' segment. In this example, the
+sequence named 'errorHandler' is invoked, and it logs the error message as
+well as the error detail, and then creates a custom fault message reading the
+property named 'ERROR_MESSAGE' which is set on the current message by the try
+mediator on encountering an exception. At the client end, you would see the
+custom SOAP fault message instead of a stock quote.</p>
+
+<h2><a name="Sample5">Sample 5:</a></h2>
+
+<p><strong>Objective: Introduction to error handling within a sequence using
+the 'onError' sequence</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 5: i.e. synapse -sample 5<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This sample demonstrates the ability to assign an existing sequence as the
+error handling sequence of another. The 'onError' attribute of a sequence
+calls on the named sequence specified when an exception is encountered during
+the processing. You could request for IBM and MSFT quotes using the same
+client and experience the same behaviour from Synapse.</p>
+
+<h2><a name="Sample6">Sample 6:</a></h2>
+
+<p><strong>Objective: Introduction to header, in and out
+mediators</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 6: i.e. synapse -sample 6<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService1 (Refer steps
+above)</p>
+
+<p>In this example we use the same stockquote client which sets the 'To' EPR
+of the message to the SimpleStockQuoteService service. However, if this
+request is for the IBM stock, the configuration invokes the header mediator
+and sets the 'To' value to the SimpleStockQuoteService1. Hence if you request
+for the IBM stock, you should see the header mediator changing the
+WS-Addressing header in the log message, and on the Axis2 server console you
+would notice that the SimpleStockQuoteService1 service indeed received and
+processed the response. You will also see that the mediation rules now use
+the in and out mediators - which executes the mediators within them depending
+on whether the message is an incoming request from a client, or a response
+message being sent to a client from Synapse. The log message 'sending back
+the response' prints only during the processing of the response message.</p>
+
+<p>If a request is made for any other stock, Synapse is instructed to drop
+the message and hence the client will not receive any response. The drop
+mediator aborts further processing of a message and may be used to discard
+and reject unwanted messages.</p>
+
+<h2><a name="Sample7">Sample 7:</a></h2>
+
+<p><strong>Objective: Introduction to the extension mediators, static XML
+properties and the validate mediator</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Download Xerces2-j 2.8.0 or later, and copy the xml-apis.jar and
+xercesImpl.jar into the lib/endorsed folder<br>
+Start the Synapse configuration numbered 7: i.e. synapse -sample 7<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>The validate mediator is bundled as an extension mediator as it depends on
+the Xerces2-j parser for schema validation, to keep the core Synapse
+distribution compact. Hence to try this example you will first need to
+download the Xerces parser and place its jar files into the lib folder to
+make it available to the validate mediator.</p>
+
+<p>This example shows how an XML fragment could be made available to Synapse
+as a property. Such a property is called an inline XML property and is static
+since its content never changes after initiation. Hence a Schema is made
+available to the configuration as a property named 'validate_schema'.</p>
+
+<p>Synapse supports string, inline text, inline xml and URL source properties
+which are static properties. In addition it supports dynamic registry based
+properties as introduced later.</p>
+
+<p>In this example the request messages are filtered using a boolean XPath
+expression which checks if the request is a getQuote request. If so the
+'customsequence' sequence is invoked, which in-turn calls on the validate
+mediator passing it the property key 'validate_schema'. The validate mediator
+by default operates on the first child element of the SOAP body. You may
+specify an XPath expression using an attribute 'source' to override this
+behaviour. The validate mediator now uses the 'validate_schema' property to
+validate the incoming message, and if the message is in error invokes on the
+'on-fail' sequence of mediators.</p>
+
+<p>If you send a standard stockquote request using 'ant stockquote' you will
+now get a fault back with a message 'Invalid custom quote request' as the
+schema validation failed. This is because the schema used in the example
+expects a slightly different message than what is created by the stock quote
+client. (i.e. expects a 'stocksymbol' element instead of 'symbol' to specify
+thestock symbol)</p>
+
+<h2><a name="Sample8">Sample 8:</a></h2>
+
+<p><strong>Objective: Introduction to URL source properties, registry based
+properties and the XSLT mediator</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Download Xalan-J version 2.7.0 or later, and copy xalan.jar and
+serializer.jar into the Synapse lib folder. Copy xercesImpl.jar and
+xml-apis.jar (of Xerces-J) into the lib/endorsed folder.<br>
+Start the Synapse configuration numbered 8: i.e. synapse -sample 8<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This example uses the XSLT mediator to perform transformations, and the
+xslt tranformation is specified as a property, similar to the way the a
+schema was specified to the validate mediator. The first resource
+'xslt-key-req' is specified by specifying its URL. The URL could be any valid
+URL, for e.g. http://someserver/path/resource.xslt or a file:// URL etc. The
+second resource 'xslt-key-resp' is specified using a 'key' attribute.</p>
+
+<p>In this example you will notice the new 'registry' definition. Synapse
+comes with a simple URL based registry called SimpleURLRegistry. During
+initialization of the registry, the SimpleURLRegistry expects to find a
+property named 'root', which specifies a prefix for the registry keys used
+later. When the SimpleURLRegistry is used, this root is prefixed to the
+property key to form the complete URL for the resource being looked up. The
+registry caches a resource once requested, and caches it internally for a
+specified duration. Once this period expires, it will reload the meta
+information about the resource and reload its cached copy if required, the
+next time the resource is requested.</p>
+
+<p>Hence the second XSLT resource key 'transform/transform_back.xslt'
+concatenated with the 'root' of the SimpleUTLRegistry
+'file:repository/conf/sample/resources/' forms the complete URL of the
+resource as
+'file:repository/conf/sample/resources/transform/transform_back.xslt' and
+caches its value for a period of 15000 seconds.</p>
+
+<p>Execute the custom quote client as 'ant customquote' and check analyze the
+the Synapse debug log output as shown below</p>
+<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
+&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
+DEBUG XSLTMediator - Transformation result :
+&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
+&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
+
+<p>The incoming message is now transformed into a standard stock quote
+request as expected by the SimpleStockQuoteService deployed on the local
+Axis2 instance by the XSLT mediator. The XSLT mediator uses Xalan-J to
+perform the transformations, and hence the necessary Xalan-J and Xerces-J
+libraries needs to be made available to Synapse. The response from the
+SimpleStockQuoteService is converted into the custom format as expected by
+the client during the out message processing.</p>
+
+<p>During the response processing you could notice the SimpleURLRegistry
+fetching the resource as shown by the debug logs below</p>
+<pre>INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
+
+<p>If you re-run the client again immidiately (i.e within 15 seconds of the
+first request) you will not see the resource being re-loaded by the registry
+as the cached value would be still valid.</p>
+
+<p>However if you leave the system idle for 15 seconds or more and then retry
+the same request, you will now notice that the registry noticed the cache
+expiry and checked the meta information about the resource to check if the
+resource itself has changes and requires a fresh fetch from the source
+URL.</p>
+<pre></pre>
+<pre>DEBUG AbstractRegistry - Cached object has expired for key : transform/transransform_back.xslt
+DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt
+DEBUG AbstractRegistry - Expired version number is same as current version in registry
+DEBUG AbstractRegistry - Renew cache lease for another 15s</pre>
+
+<p>Now edit the
+repository/conf/sample/resources/transform/transform_back.xslt file and add a
+blank line at the end. Now when you run the client again, and if the cache is
+expired, the resource would be re-fetched from its URL by the registry and
+this can be seen by the following debug log messages</p>
+<pre></pre>
+<pre>DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt
+DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt
+INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
+
+<p>Thus the SimpleURLRegistry allows resource to be cached, and updates
+detected so that changes could be reloaded without restarting the Synapse
+instance.</p>
+
+<p></p>
+
+<h2><a name="Sample9">Sample 9:</a></h2>
+
+<p><strong>Objective: Introduction to dynamic sequences with a
+Registry</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 9: i.e. synapse -sample 9<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This example introduces the dynamic behaviour of Synapse through the use
+of a Registry. Synapse supports dynamic definitions for sequences, the main
+rules, endpoints and as seen before resources and properties. In this example
+we define a Synapse configuration which references a sequence definition
+specified as a registry key. The registry key resolves to the actual content
+of the sequence which would be loaded dynamically by Synapse at runtime, and
+cached accordingly as per its registry definition. Once the cache expires,
+Synapse would recheck the meta information for the definition and re-load the
+sequence definition if necessary and re-cache it again.</p>
+
+<p>Once Synapse is started, execute the stock quote client as 'ant
+stockquote'. You will notice that that Synapse fetches the definition of the
+sequence from the registry and executes its rules as follows:</p>
+<pre>DEBUG SequenceMediator - Sequence mediator &lt;anonymous&gt; :: mediate()<br>INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml<br>.....<br>INFO LogMediator - message = *** Test Message 1 ***<br>...</pre>
+
+<p>Now if you execute the client immidiately (i.e. within 15 seconds of the
+last execution) you will notice that the sequence was not reloaded. If you
+now edit the repository/conf/sample/resources/sequence/dynamic_seq_1.xml and
+edit the log message to read as "*** Test Message 2 ***" and execute the
+client again, you will notice that the new message is not yet visible (i.e.
+if you execute this within 15 seconds of loading the resource for the first
+time) However, after 15 seconds have elapsed since the original caching of
+the sequence, you will notice that the new sequence is loaded and executed by
+Synapse from the following log messages:</p>
+<pre>DEBUG SequenceMediator - Sequence mediator &lt;anonymous&gt; :: mediate()<br>DEBUG AbstractRegistry - Cached object has expired for key : sequence/dynamic_seq_1.xml<br>DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : sequence/dynamic_seq_1.xml<br>INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml<br>...<br>INFO LogMediator - message = *** Test Message 2 ***<br>...</pre>
+
+<p>The cache timeout could be tuned appropriately by configuring the URL
+registry to suite the environment and the needs.</p>
+
+<h2><a name="Sample10">Sample 10:</a></h2>
+
+<p><strong>Objective: Introduction to dynamic endpoints with a
+Registry</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 10: i.e. synapse -sample 10<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService and the
+SimpleStockQuoteervice1 (Refer steps above)</p>
+
+<p>This example introduces dynamic endpoints, where the definition of an
+endpoint is stored in a Registry. To follow this example execute the stock
+quote client as 'ant stockquote' and see that the message is routed to the
+SimpleStockQuoteService on the Axis2 instance. Repeat the above example and
+notice that the endpoint is cached and reused by Synapse - similarly to
+example # 8.</p>
+<pre>SimpleStockQuoteService :: Generating quote for : IBM</pre>
+
+<p>Now edit the repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml
+definition and update the address to
+"http://localhost:9000/axis2/services/SimpleStockQuoteService1". After the
+cached value expires, the Registry loads the new definition of the endpoint,
+and then the messages can be seen being routed to the
+SimpleStockQuoteService1.</p>
+<pre>SimpleStockQuoteService 1 :: Generating quote for : IBM</pre>
+
+<p></p>
+
+<h2><a name="Sample11">Sample 11:</a></h2>
+
+<p><strong>Objective: A full registry based configuration</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 11: i.e. synapse -sample 11<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This example shows a full registry based Synapse configuration. The
+Synapse configuration held on a node hosting Synapse simply points to the
+registry and looks up the actual configuration by requesting the key
+''synapse.xml'. This could be used to host a configuration on a file system
+or http server based registry, and allow a cluster of Synapse instances to
+load the configuration from this registry.</p>
+
+<p>Using 'ant stockquote' you would notice that the 'synapse.xml'
+configuration has been loaded from the root of the Simple URL based
+registry.</p>
+
+<p></p>
+
+<h1><a name="WSSecurity">WS-Security</a></h1>
+
+<h2><a name="Sample50">Sample 50:</a></h2>
+
+<p><strong>Objective: Connecting to endpoints with WS-Security for outgoing
+messages</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Download and copy the BouncyCastle JAR file into your Synapse lib directory.
+(Note: the exact JAR you need to install depends on your JDK - for JDK 1.4 I
+have used bcprov-jdk13-132.jar)<br>
+Start the Synapse configuration numbered 50: i.e. synapse -sample 50<br>
+Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
+modules directory of the sample Axis2 server
+samples/axis2Server/repository/modules. The Rampart module could be found at
+repository\modules and is not duplicated within the distributions due to its
+large file size.<br>
+Start the Axis2 server and deploy the SecureStockQuoteService3 (Refer steps
+above)</p>
+
+<p></p>
+
+<p>Use the stock quote client to send a request without WS-Security. Synapse
+is configured to enable WS-Security policy 'policy_3.xml' to the outgoing
+message when sent to the SecureStockQuoteService3 service endpoint hosted on
+the Axis2 instance. The debug log messages on Synapse shows the encrypted
+message flowing to the service and the encrypted response being received by
+Synapse. The wsse:Security header is then removed from the decrypted message
+and the response is delivered back to the client as it expects.</p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<h1><a name="ProxyServices">Proxy services</a></h1>
+
+<h2><a name="Sample100">Sample 100:</a></h2>
+
+<p><strong>Objective: Introduction to Synapse proxy services</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 100: i.e. synapse -sample 100<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>Once Synapse starts, you could go to
+http://localhost:8080/axis2/services/StockQuoteProxy?wsdl and view the WSDL
+for the proxy service defined in the configuration. This WSDL is based on the
+source WSDL supplied in the proxy service definition, and is updated to
+reflect the proxy service EPR. If a proxy service definition does not specify
+a target for its messages, the Synapse mediation rules are applied to route
+messages.</p>
+
+<p>Execute the stock quote client by requesting for a stock quote on the
+proxy service as follows:</p>
+<pre>ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy</pre>
+
+<p>You will now notice that the Synapse mediation rules were applied and the
+request was routed to the SimpleStockQuoteService service on the local Axis2
+instance. The response message is mediated using the same rules, as an
+outgoing sequence is not specified in this example either. The client should
+receive a stock quote reply from the proxy service. Also the client could get
+the WSDL for the proxy service by requesting for
+http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
+
+<h2><a name="Sample101">Sample 101:</a></h2>
+
+<p><strong>Objective: Using custom sequences and endpoints for message
+mediation with proxy services</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 101: i.e. synapse -sample 101<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This configuration creates two proxy services with different behaviour.
+The first proxy service 'StockQuoteProxy1' uses the sequence named 'proxy_1'
+as its main mediation sequence for messages it receives. The second proxy
+service 'StockQuoteProxy2' is set to directly forward messages that are
+received to the endpoint named 'proxy_2_endpoint' without any mediation.</p>
+
+<p>You could send a stock quote request to each of these proxy services and
+receive the reply generated by the actual service hosted on the Axis2
+instance. Use the -Durl=&lt;EPR&gt; property when executing the client as per
+example 100, to request on the two proxy services.</p>
+
+<h2><a name="Sample102">Sample 102:</a></h2>
+
+<p><strong>Objective: Attaching service level WS-Security policies to proxy
+services</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 102: i.e. synapse -sample 102</p>
+
+<p>Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
+modules directories of both the sample Axis2 client and server:
+samples/axis2Client/client_repo/modules and
+samples/axis2Server/repository/modules. The Rampart module could be found at
+repository\modules and is not duplicated in the distributions due to its
+large file size.</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>To execute the sample use the stock quote client with the 'secpolicy' and
+'url' system properties passed in as follows:</p>
+
+<p>e.g.</p>
+<pre>ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy</pre>
+<pre>-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml</pre>
+
+<p>The sample security policy policy_1.xml uses timestamps and username token
+tuhentication on the stock quote request. Following the debug logs on the
+Synapse server you could notice the presence of WS-Security headers on the
+incoming message. By requesting the WSDL of the proxy service you could also
+see that the supplied policy file has been attached to the specified WSDL as
+well.</p>
+
+<p>e.g. http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
+
+<p>A proxy service with an attached policy - such as a WS-Security policy -
+ensures that messages which goes through mediation have satisfied the
+constraints as specified by the supplied policy. i.e. for example, if any
+WS-Security validations fail, the message will not reach Synapse mediation,
+but the client would get an appropriate error message from the Apache Rampart
+module directly.</p>
+
+<p>The mediation shows the header mediator used to strip out the
+wsse:Security header from the current message before being forwarded to the
+SimpleStockQuoteService. Hence the message sent to the stock quote service
+EPR is without any WS-Security headers as can be seen from the log
+messages.</p>
+
+<p>Note: If you wish to engage the default WS-Security policy of Rampart on a
+proxy service, you could use the &lt;enableSec/&gt; option on a proxy service
+alone. This will be similar in function to 'engaging' Rampart on an Axis2
+service.</p>
+
+<h2><a name="Sample103">Sample 103:</a></h2>
+
+<p><strong>Objective: Using WS-Security signing and encryption with proxy
+services through WS-Policy</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Download and copy the BouncyCastle JAR file into your Synapse lib directory.
+(Note: the exact JAR you need to install depends on your JDK - for JDK 1.4 I
+have used bcprov-jdk13-132.jar)<br>
+Start the Synapse configuration numbered 103: i.e. synapse -sample 103<br>
+Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
+modules directory of the sample Axis2 client
+samples/axis2Client/client_repo/modules. The Rampart module could be found at
+repository\modules and is not duplicated within the distributions due to its
+large file size.<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>To execute the sample use the dumb stock quote client with the 'secpolicy'
+and 'gatewayurl' system properties passed in as follows:</p>
+
+<p>e.g.</p>
+<pre>ant dumbstockquote -Dsecpolicy=..\..\repository\conf\sample\resources\policy\client_policy_3.xml</pre>
+<pre>-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy</pre>
+
+<p>The sample security policy client_policy_3.xml ensures signed and
+encrypted messages which request for the stock quotes. Following the debug
+logs on the Synapse server you could notice the presence of WS-Security
+headers on the incoming message. By requesting the WSDL of the proxy service
+you could also see that the supplied policy file has been attached to the
+specified WSDL as well.</p>
+
+<p>e.g. http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
+
+<p>By following through the Synapse log messages you could see that the proxy
+service received and decrypted the secured SOAP envelope. (If you sent the
+client request to Synapse through a TCP monitor you would be able to see the
+raw encrypted message in transit) and forwarded this to the simple stockquote
+service, and once the response was received, signed it and encrypted it
+before sending it back to the client.</p>
+
+<p>Using TCPMon, a sample request sent from the client to the WS-Security
+enabled proxy service has been captured as follows: <a
+href="sample_103_1.txt">sample_103_1.txt</a></p>
+
+<p>Synapse removes the wsse:Security header from this message and forwards it
+to the endpoint. The response received is now signed and encrypted and sent
+back to the client as follows: <a
+href="sample_103_2.txt">sample_103_2.txt</a></p>
+<pre></pre>
+
+<h2><a name="Sample104">Sample 104:</a></h2>
+
+<p><strong>Objective: Using an explicit out sequence in proxy service level
+to mediate proxy response</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 104: i.e. synapse -sample 104 <br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This configuration creates a proxy service with the name StockQuoteProxy.
+This proxy service specifies both inSequence and the outSequence for that
+service. This will add a proxy level out sequence to be used for the response
+message mediation of that particular proxy service. You could leave the whole
+target element not specified or one of the sequences of in and out
+unspecified, so that the corresponding message will be mediated using main
+mediator.</p>
+
+<p>You could send a stock quote request to this proxy services and receive
+the reply generated by the actual service hosted on the Axis2 instance. Use
+the -Durl=&lt;EPR&gt; property when executing the client as per example 100,
+to request on this proxy service.</p>
+
+<p>You can observe the synapse log to see the response message mediation
+using the specified outSequence, unlike using MainMediator in the sample 100
+case. The log should be as follows</p>
+<pre>DEBUG SequenceMediator - Sequence mediator &lt;proxy_out&gt; :: mediate()
+DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
+DEBUG LogMediator - Log mediator :: mediate()
+INFO  LogMediator - message = Executing inside the out sequence
+</pre>
+
+<h2>Sample 105:</h2>
+
+<p><strong>Objective: Pure POX/Text and Binary JMS Proxy services - including
+MTOM</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Configure JMS for Synapse (Refer notes above)<br>
+Configure the script mediator runtime (Refer notes below)<br>
+i.e. make bsf-2.4.0.jar, xbean-2.2.0.jar and js-1.6R2.jar available in lib
+folder)<br>
+Configure Synapse and the sample Axis2 server to use MTOM (i.e. set
+enableMTOM parameter to true)<br>
+Start the Synapse configuration numbered 105: i.e. synapse -sample 105<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService and the
+MTOMSampleService (Refer steps above)</p>
+
+<p>This configuration creates three JMS proxy services named
+JMSFileUploadProxy, JMSTextProxy and JMSPoxProxy exposed over JMS queues with
+the same names. The first part of this example demonstrates the pure text
+message support with JMS, where a user sends a text JMS message of the form
+"&lt;price&gt; &lt;qty&gt; &lt;symbol&gt;". Synapse converts this message
+into a SOAP message and sends this to the SimpleStockQuoteServices'
+placeOrder operation. The mediation uses the script mediator to transform the
+text message into a XML payload. The proxy service property named
+"transport.jms.Wrapper" defines the wrapper element QName, to be used when
+wrapping text/binary content into a SOAP envelope.</p>
+
+<p></p>
+
+<p>Execute 'ant jmsclient' which executes the first scenario. The client
+sends a JMS text message with the specified payload to the specified
+destination. Though the debug logs, you could see that Synapse received a
+text message over JMS and converted this to a SOAP message and sent it to the
+SimpleStockQuoteService as follows</p>
+
+<p></p>
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSTextProxy received a new message...</pre>
+<pre>..</pre>
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body :</pre>
+<pre>&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Header /&gt;&lt;soapenv:Body&gt;&lt;axis2ns3:text xmlns:axis2ns3="http://services.samples/xsd"&gt;65.05119159089897 6079 IBM&lt;/axis2ns3:text&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</pre>
+<pre>..<br></pre>
+<pre>[JMSWorker-1] DEBUG SendMediator - Sending message to endpoint :: name = null resolved address = http://localhost:9000/axis2/services/SimpleStockQuoteService
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Header /&gt;&lt;soapenv:Body&gt;&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;&lt;m:order&gt;&lt;m:price&gt;65.05119159089897&lt;/m:price&gt;&lt;m:quantity&gt;6079&lt;/m:quantity&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:order&gt;&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</pre>
+
+<p>The next section uses the 'ant jmsclient -Dtype=binary
+-Ddest=dynamicQueues/JMSFileUploadProxy
+-Dpayload=.\..\..\repository\conf\sample\resources\mtom\asf-logo.gif" which
+sends a JMS bytes message to the defined destination with the content of the
+payload file as its body. Synapse receives the bytes message and creates a
+SOAP envelope. If the axis2.xml used by Synapse enables MTOM optimization
+(through the 'enableMTOM' parameter), then Synapse sends an MTOM optimized
+message to the endpoint as follows, else it encodes the content as Base64:</p>
+
+<p></p>
+<pre>POST /axis2/services/MTOMSampleService HTTP/1.1</pre>
+<pre>SOAPAction: "urn:uploadFileUsingMTOM"</pre>
+<pre>User-Agent: Axis2</pre>
+<pre>Host: 127.0.0.1</pre>
+<pre>Content-Length: 8528</pre>
+<pre>Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465; type="application/xop+xml"; start="&lt;0.urn:uuid:3FE7ADC48E69671C2211646391275466@apache.org&gt;"; start-info="text/xml"; charset=UTF-8--MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465content-type: application/xop+xml; charset=UTF-8; type="text/xml";content-transfer-encoding: binarycontent-id:</pre>
+<pre>&lt;0.urn:uuid:3FE7ADC48E69671C2211646391275466@apache.org&gt;</pre>
+<pre>&lt;?xml version='1.0' encoding='UTF-8'?&gt;</pre>
+<pre>&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;</pre>
+<pre>&lt;soapenv:Header&gt;...&lt;/soapenv:Header&gt;</pre>
+<pre>&lt;soapenv:Body&gt;</pre>
+<pre>&lt;axis2ns2:element xmlns:axis2ns2="http://services.samples/xsd"&gt;</pre>
+<pre>&lt;xop:Include href="cid:1.urn:uuid:3FE7ADC48E69671C2211646391275464@apache.org" xmlns:xop="http://www.w3.org/2004/08/xop/include" /&gt;</pre>
+<pre>&lt;/axis2ns2:element&gt;</pre>
+<pre>&lt;/soapenv:Body&gt;</pre>
+<pre>&lt;/soapenv:Envelope&gt;--MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465content-type: application/octet-streamcontent-transfer-encoding: binarycontent-id:</pre>
+<pre>&lt;1.urn:uuid:3FE7ADC48E69671C2211646391275464@apache.org&gt;GIF89a&#x192;d.... ;--MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465-</pre>
+<pre></pre>
+
+<p>The final section of this example shows a POX JMS message received by
+Synapse and sent to the SimpleStockQuoteService as a SOAP message. Execute
+this scenario as 'ant jmsclient -Dtype=xml -Ddest=dynamicQueues/JMSPoxProxy
+-Dpayload=MSFT' and notice that since the message received by Synapse is POX,
+you need to force a SOAP message out through the endpoint in-order for the
+SimpleStockQuoteService to properly receive its response. In this example
+Synapse wraps the received POX message in a SOAP envelope and processes it
+and routes it to the real endpoint.</p>
+
+<h1><a name="Transports1" id="Transports1">Transports</a></h1>
+
+<h2><a name="Sample110">Sample 110:</a></h2>
+
+<p><strong>Objective: Introduction to switching transports with proxy
+services</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)<br>
+Download, install and start a JMS server, and configure Synapse to listen on
+JMS (refer notes below)<br>
+Start the Synapse configuration numbered 110: i.e. synapse -sample 110<br>
+For this example we would use ActiveMQ as the JMS provider. Once ActiveMQ is
+installed and started you should get a message as follows:</p>
+<pre>INFO BrokerService - ActiveMQ JMS Message Broker (localhost) started</pre>
+
+<p>You will now need to configure the Axis2 instance used by Synapse (not the
+sample Axis2 server) to enable JMS support using the above provider. Refer to
+the Axis2 documentation on setting up JMS for more details
+(http://ws.apache.org/axis2/1_1/jms-transport.html). You will also need to
+copy the ActiveMQ client jar files activeio-core-3.0-beta1.jar,
+activemq-core-4.0-RC2.jar, geronimo-jms_1.1_spec-1.0.jar and
+geronimo-j2ee-management_1.0_spec-1.0.jar into the lib directory to allow
+Synapse to connect to the JMS provider.</p>
+
+<p>For a default ActiveMQ v4.0 installation, you may uncomment the Axis2
+transport listener configuration found at repository/conf/axis2.xml as</p>
+<pre>&lt;transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"&gt; ...</pre>
+
+<p>Once you start the Synapse configuration and request for the WSDL of the
+proxy service you will notice that its exposed only on the JMS transport.
+This is because the configuration specified this requirement in the proxy
+service definition.</p>
+
+<p>Now lets send a stock quote request on JMS, using the dumb stock quote
+client as follows:</p>
+<pre></pre>
+<pre>ant dumbstockquote -Dgatewayurl="jms:/StockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=
+QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.
+ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"</pre>
+
+<p>On the Synapse debug log you will notice that the JMS listener received
+the request message as:</p>
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver -Proxy Service StockQuoteProxy received a new message...</pre>
+
+<p>Synapse forwarded this message to the HTTP EPR of the simple stock quote
+service hosted on the sample Axis2 server, and returned the reply back to the
+client through a JMS temporary queue.</p>
+
+<p>Note: It is possible to instruct a JMS proxy service to listen to an
+already existing destination without creating a new one. To do this, use the
+property elements on the proxy service definition to specify the destination
+and connection factory etc.</p>
+
+<p>e.g.</p>
+<pre>&lt;property name="transport.jms.Destination" value="dynamicTopics/something.TestTopic"/&gt;</pre>
+
+<h2><a name="Sample111">Sample 111:</a></h2>
+
+<p><strong>Objective: Demonstrate switching from HTTP to JMS</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Download, install and start a JMS server, and configure Synapse to listen on
+JMS (refer notes below)<br>
+Configure sample Axis2 server for JMS (refer notes above)<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)<br>
+Configure JMS transport for Synapse (refer notes above - sample 110)<br>
+Start the Synapse configuration numbered 111: i.e. synapse -sample 111</p>
+
+<p>To switch from HTTP to JMS, edit the
+samples/axis2Server/repository/conf/axis2.xml for the sample Axis2 server and
+enable JMS (refer notes above), and restart the server. You should now see
+that the simple stock quote service is available over JMS as well at an
+address as the one shown below, by looking at the WSDL of the service.</p>
+<pre>jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=
+QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
+java.naming.provider.url=tcp://localhost:61616</pre>
+
+<p>This Synapse configuration creates a proxy service over HTTP and forwards
+received messages to the above EPR using JMS, and sends back the response to
+the client over HTTP once the simple stock quote service responds with the
+stock quote reply over JMS to the Synapse server.</p>
+
+<p></p>
+
+<h2><a name="Sample112">Sample 112:</a></h2>
+
+<p><strong>Objective: Demonstrate one way messaging /
+fireAndForget()</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)<br>
+Start the Synapse configuration numbered 1: i.e. synapse -sample 1</p>
+
+<p>This example invokes the one-way 'placeOrder' operation on the
+SimpleStockQuoteService using the custom client which uses the Axis2
+ServiceClient.fireAndForget() API. To test this, use 'ant placeorder' and you
+will notice the one way message flowing through Synapse into the sample Axis2
+server instance, which reports the acceptance of the order as follows:</p>
+<pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
+
+<p>If you send your client request through TCPmon, you will notice that the
+SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
+Synapse in-turn replies to the client with a HTTP 202 acknowledgement.</p>
+
+<h1><a name="ScriptMediators">Script mediators</a></h1>
+
+<p>Synapse supports Mediators implemented in a variety of scripting languages
+such as JavaScript, Python or Ruby.</p>
+
+<p>Implementing a Mediator with a script language can have advantages over
+using the built in Synapse Mediator types or implementing a custom Java class
+Mediator. Script Mediators have all the flexibility of a class Mediator with
+access to the Synapse MessageContext and SynapseEnvironment APIs, and the
+ease of use and dynamic nature of scripting languages allows rapid
+development and prototyping of custom mediators. An additional benefit of
+some scripting languages is that they have very simple and elegant XML
+manipulation capabilities, for example JavaScript E4X or Ruby REXML, so this
+makes them well suited for use in the Synapse mediation environment.</p>
+
+<h2><a name="ScriptSetup">Configuring Synapse for Script Mediator support</a></h2>
+
+<p>The Synapse Script Mediator is a Synapse extension so all its pre-reqs are
+not installed by default. Before you use script mediators you need to manually
+add the required jars to the Synapse lib directory and do any other installation 
+that may be required by the individual scripting languages. This is detailed in the
+following sections. 
+</p>
+
+<h3><a name="ScriptSetupJavaScript">JavaScript support</a></h3>
+
+<p>For JavaScript/E4X support you need to copy the following jars to the Synapse lib directory:</p>
+
+    <ul>
+      <li><a href="http://repo1.maven.org/maven2/bsf/bsf/2.4.0/bsf-2.4.0.jar">Apache BSF</a></li>
+      <li><a href="http://repo1.maven.org/maven2/rhino/js/1.6R5/js-1.6R5.jar">Mozilla Rhino</a></li>
+      <li><a href="http://repo1.maven.org/maven2/xmlbeans/xbean/2.2.0/xbean-2.2.0.jar">XmlBeans xbean</a></li>
+    </ul>
+
+<p>(Note: You should be able to right click on those links and save the jars directly to your Synapse lib directory)</p>
+
+<h3><a name="ScriptSetupRuby">Ruby support</a></h3>
+
+<p>For Ruby support you need to copy the following jars to the Synapse lib directory:</p>
+
+    <ul>
+      <li><a href="http://repo1.maven.org/maven2/bsf/bsf/2.4.0/bsf-2.4.0.jar">Apache BSF</a></li>
+      <li><a href="http://repo1.maven.org/maven2/org/jruby/jruby/0.9.1/jruby-0.9.1.jar">JRuby</a></li>
+    </ul>
+
+<p>(Note: You should be able to right click on those links and save the jars directly to your Synapse lib directory)</p>
+
+<p>In addition to those jars, to use the REXML capabilities of Ruby requires a complete JRuby installation. 
+Download and install JRuby from <a href="http://dist.codehaus.org/jruby/">JRuby Home</a>.
+Once installed you need to tell Synapse about the instalation by setting a system property when starting Synapse.
+Right now this requires manually editing the Synapse startup script (this will be improved in
+a future Synapse release). Edit the bin\synapse.bat file and at the bottom find the line starting 
+""%_JAVACMD%" %_SYNAPSE_XML%" and insert the system property -Djruby.home="&lt;path to your JRuby install directory&gt;". 
+Note the quote characters around the JRuby directory which are required.
+</P>  
+
+<h2><a name="Sample500">Sample 500:</a></h2>
+
+<p><strong>Objective: Introduction to script mediators</strong></p>
+
+<p>This sample is similar to sample 8 but instead of using XSLT the
+transformation is done with JavaScript and E4X</p>
+
+<p>The Synapse config XML for this is <a href="../repository/conf/sample/synapse_sample_500.xml" type="text/txt">synapse_sample_500.xml</a>
+ and the associated JavaScript program is <a href="../repository/conf/sample/resources/script/stockquoteTransform.js" type="text/txt">stockquoteTransform.js</a>.</p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>
+This sample uses JavaScript/E4X so first setup support for this in Synapse 
+as described at <a href="#ScriptSetupJavaScript">Configuring JavaScript</a>.
+</p>
+
+<p>Start the Synapse configuration numbered 500: i.e. synapse -sample 500<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>The JavaScript script is in a separate file which the Synapse xml
+references by using a static property named 'stockquoteScript'. The script
+has two functions, 'transformRequest' and 'transformResponse', and the
+Synapse xml script element uses the function attribute to specify which
+function to use for the in and out rules.</p>
+
+<p>Execute the custom quote client as 'ant customquote' and check analyze the
+the Synapse debug log output as shown below</p>
+<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
+&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
+DEBUG XSLTMediator - Transformation result :
+&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
+&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
+
+<p>The incoming message is now transformed into a standard stock quote
+request as expected by the SimpleStockQuoteService deployed on the local
+Axis2 instance by the JavaScript mediator. The JavaScript mediator uses E4X
+to perform the transformations. The response from the SimpleStockQuoteService
+is converted into the custom format as expected by the client during the out
+message processing.</p>
+
+<h2><a name="Sample501">Sample 501:</a></h2>
+
+<p><strong>Objective: Introduction to in-line script mediators</strong></p>
+
+<p>This sample is the same as sample 500 but instead of having the JavaScript
+source defined in a separate file it is defined in-line within the Synapse
+XML.</p>
+
+<p>The Synapse config XML for this is <a href="../repository/conf/sample/synapse_sample_501.xml" type="text/txt">synapse_sample_501.xml</a>.</p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>
+This sample uses JavaScript/E4X so first setup support for this in Synapse 
+as described at <a href="#ScriptSetupJavaScript">Configuring JavaScript</a>.
+</p>
+
+<p>Start the Synapse configuration numbered 501: i.e. synapse -sample 501<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>Execute the custom quote client as 'ant customquote' and check analyze the
+the Synapse debug log output as shown below</p>
+<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
+&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
+DEBUG XSLTMediator - Transformation result :
+&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
+&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
+
+<p>The incoming message is now transformed into a standard stock quote
+request as expected by the SimpleStockQuoteService deployed on the local
+Axis2 instance by the JavaScript mediator. The JavaScript mediator uses E4X
+to perform the transformations. The response from the SimpleStockQuoteService
+is converted into the custom format as expected by the client during the out
+message processing.</p>
+
+<h2><a name="Sample503">Sample 503:</a></h2>
+
+<p><strong>Objective: Script mediators using Ruby</strong></p>
+
+<p>This sample is similar to sample 500 but instead of using JavaScript the
+script language is Ruby using the JRuby interpreter.</p>
+
+<p>The Synapse config XML for this is <a href="../repository/conf/sample/synapse_sample_503.xml" type="text/txt">synapse_sample_503.xml</a>
+ and the associated JavaScript program is <a href="../repository/conf/sample/resources/script/stockquoteTransform.rb" type="text/txt">stockquoteTransform.rb</a>.</p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>
+This sample uses Ruby so first setup support for this in Synapse 
+as described at <a href="#ScriptSetupRuby">Configuring JRuby</a>.
+</p>
+
+<p>Start the Synapse configuration numbered 503: i.e. bin/synapse -sample 503<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>The Ruby script is in a separate file which the Synapse xml
+references by using a static property named 'stockquoteScript'. The script
+has two functions, 'transformRequest' and 'transformResponse', and the
+Synapse xml script element uses the function attribute to specify which
+function to use for the in and out rules.</p>
+
+<p>Execute the custom quote client as 'ant customquote' and check analyze the
+the Synapse debug log output as shown below</p>
+<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
+&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
+DEBUG XSLTMediator - Transformation result :
+&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
+&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
+
+<p>The incoming message is now transformed into a standard stock quote
+request as expected by the SimpleStockQuoteService deployed on the local
+Axis2 instance by the Ruby mediator. The Ruby mediator uses REXML to perform
+XML transformations. The response from the SimpleStockQuoteService
+is converted into the custom format as expected by the client during the out
+message processing.</p>
+
+</body>
+</html>

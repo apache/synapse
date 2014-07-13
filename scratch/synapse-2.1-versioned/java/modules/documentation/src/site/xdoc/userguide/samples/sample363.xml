@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 363</title>
+    </properties>
+    <body>
+        <section name="Sample 363: Reusable Database Connection Pools">
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+
+    <sequence name="myFaultHandler">
+        <makefault response="true">
+            <code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/>
+            <reason expression="get-property('ERROR_MESSAGE')"/>
+        </makefault>
+        <send/>
+        <drop/>
+    </sequence>
+
+    <sequence name="main" onError="myFaultHandler">
+        <in>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <dsName>lookupdb</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>select * from company where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:getQuote/m0:request/m0:symbol" type="VARCHAR"/>
+                    <result name="company_id" column="id"/>
+                </statement>
+            </dblookup>
+
+            <switch source="get-property('company_id')">
+                <case regex="c1">
+                    <log level="custom">
+                        <property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <case regex="c2">
+                    <log level="custom">
+                        <property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <case regex="c3">
+                    <log level="custom">
+                        <property name="text"
+                                  expression="fn:concat('Company ID - ',get-property('company_id'))"/>
+                    </log>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </case>
+                <default>
+                    <log level="custom">
+                        <property name="text" value="** Unrecognized Company ID **"/>
+                    </log>
+                    <makefault response="true">
+                        <code xmlns:tns="http://www.w3.org/2003/05/soap-envelope"
+                              value="tns:Receiver"/>
+                        <reason value="** Unrecognized Company ID **"/>
+                    </makefault>
+                    <send/>
+                    <drop/>
+                </default>
+            </switch>
+            <drop/>
+        </in>
+
+        <out>
+            <log level="custom">
+                <property name="text" value="** Reporting to the Database **"/>
+            </log>
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>reportdb</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>update company set price=? where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:last/child::text()" type="DOUBLE"/>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <log level="custom">
+                <property name="text" value="** Looking up from the Database **"/>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <dsName>reportdb</dsName>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>select * from company where name =?</sql>
+                    <parameter xmlns:m0="http://services.samples"
+                               expression="//m0:return/m0:symbol/child::text()" type="VARCHAR"/>
+                    <result name="stock_price" column="price"/>
+                </statement>
+            </dblookup>
+            <log level="custom">
+                <property name="text"
+                          expression="fn:concat('Stock price - ',get-property('stock_price'))"/>
+            </log>
+            <send/>
+
+        </out>
+
+    </sequence>
+
+</definitions>]]></div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate how to setup reusable connection pools for the dblookup and dbreport
+                    mediators
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Setup a Derby database and the Synapse data sources as described in the
+                            <a href="setup/db.html">database setup guide</a>
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 363 (repository/conf/sample/synapse_sample_363.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 363<br/>
+                                Windows: synapse.bat -sample 363
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This sample employs two instances of the dblookup mediator and a single instance
+                    of the dbreport mediator. The two dblookup mediators are sharing the same database
+                    connection pool named 'lookupdb'. The dbreport mediator makes use of a different
+                    connection pool named 'dbreport'. Synapse uses Apache DBCP to create and manage
+                    the corresponding data sources and connection pools.
+                </p>
+                <p>
+                    Run this sample by invoking the client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dsymbol=IBM</div>
+                <p>
+                    Synapse will log the following output as it reads from and writes to the database.
+                </p>
+                <div class="consoleOutput">INFO LogMediator text = ** Looking up from the Database ** ...
+INFO LogMediator text = Company ID - c1 ...
+INFO LogMediator text = ** Reporting to the Database ** ...
+INFO LogMediator text = ** Looking up from the Database ** ...
+INFO LogMediator text = Stock price - 183.3635460215262</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

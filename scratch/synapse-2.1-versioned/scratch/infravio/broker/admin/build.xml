@@ -1,0 +1,39 @@
+<project name="admin" default="pkg" basedir=".">
+    <property file="../build.properties"/>
+    <import file="../classpath.xml"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <echo message="#### Compiling Admin module ####"/>
+
+        <mkdir dir="build/classes"/>
+        <copy file="src/com/infravio/broker/modules/engage/META-INF/module.xml"
+            todir="build/classes/META-INF" overwrite="true"/>
+
+        <copy file="../build.properties"
+            tofile="build/classes/META-INF/module.properties" overwrite="true"/>
+
+        <copy file="src/com/infravio/broker/services/engage/META-INF/services.xml"
+            todir="build/classes/META-INF" overwrite="true"/>
+        <javac
+            srcdir="src"
+            destdir="build/classes"
+            compiler="${javac.compiler}"
+            debug="${javac.debug}"
+            deprecation="${javac.deprecation}"
+            nowarn="on">
+            <classpath refid="broker.classpath"/>
+        </javac>
+    </target>
+
+    <target name="pkg" depends="compile">
+        <jar destfile="build/AdminModule.jar" basedir="build/classes"
+            includes="**/modules/**/*.class,**/META-INF/module.xml,**/META-INF/module.properties" index="true"/>
+
+        <jar destfile="build/AdminService.aar" basedir="build/classes"
+            includes="**/services/**/*.class,**/META-INF/services.xml" index="true"/>
+    </target>
+</project>

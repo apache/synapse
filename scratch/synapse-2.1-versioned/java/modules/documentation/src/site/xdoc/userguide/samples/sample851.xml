@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 851</title>
+    </properties>
+    <body>
+        <section name="Sample 851: Introduction to Synapse Splitter and Aggregator eip function templates">
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
+ <proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable">
+        <target>
+        <inSequence>
+            <log level="custom">
+                <property name="text" value="splitterAggrigator"/>
+            </log>
+            <call-template target="synapse.lang.eip.splitter">
+                <with-param xmlns:m0="http://services.samples" name="iterate_exp" value="{{//m0:getQuote/m0:request}}"/>
+                <with-param xmlns:m0="http://services.samples" name="attach_path" value="{{//m0:getQuote}}"/>
+                <with-param name="attach_path_enabled" value="true"/>
+                <with-param name="endpoint_uri" value="http://localhost:9000/services/SimpleStockQuoteService"/>
+            </call-template>
+        </inSequence>
+        <outSequence>
+            <call-template target="synapse.lang.eip.aggregator">
+                <with-param name="sequence_ref" value="enr"/>
+                <with-param xmlns:m0="http://services.samples" name="aggregator_exp" value="{{//m0:return}}"/>
+                <with-param name="oncomplete_seq_enabled" value="true"/>
+            </call-template>
+        </outSequence>
+    </target>
+    </proxy>
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="enr">
+    <log level="custom">
+        <property name="text" value="seqhit"/>
+    </log>
+    <enrich>
+        <source xmlns:m0="http://services.samples" clone="true"
+                xpath="//m0:return[not(preceding-sibling::m0:return/m0:last &lt;= m0:last) and not(following-sibling::m0:return/m0:last &lt; m0:last)]"/>
+        <target type="body"/>
+    </enrich>
+    <send/>
+</sequence>
+</definitions>]]></div>
+            <subsection name="Objective">
+                <p>
+This sample is an introduction to Synapse Splitter and Aggregator eip function templates. This showcase the combined functionality of Splitter and Aggregator patterns.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 851 (repository/conf/sample/synapse_sample_851.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 851<br/>
+                                Windows: synapse.bat -sample 851
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+<p>
+In this sample, the message sent to Synapse will be splitted according to the given Xpath expression and does a synchronized call for the given endpoint and aggregates replies. Then mediates to the defined target sequence which filter the response which contains the best quote and send back to the client. Here it uses Splitter and Aggregator function templates.
+</p> 
+<p>
+                    Invoke the client as follows.
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280/services/StockQuoteProxy -Ditr=4</div>
+<p>
+The above command will send a request containing four fragments in it.
+</p>
+                
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 55</title>
+    </properties>
+    <body>
+        <section name="Sample 55: Session Affinity Load Balancing Between Fail-over Endpoints">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;!-- specify the session as the simple client session provided by Synapse for
+                                     testing purpose --&gt;
+                    &lt;session type="simpleClientSession"/&gt;
+
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;failover&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9001/services/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9002/services/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/failover&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;failover&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9003/services/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9004/services/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/failover&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate session aware load balancing in conjunction with fail-over 
+                    routing.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the LoadbalanceFailoverService in the sample Axis2 server (go to
+                            samples/axis2Server/src/LoadbalanceFailoverService and run 'ant')
+                        </li>
+                        <li>
+                            Start 4 instances of the Axis2 server on different ports as follows
+                            <div class="command">./axis2server.sh -http 9001 -https 9005 -name MyServer1<br/>
+./axis2server.sh -http 9002 -https 9006 -name MyServer2<br/>
+./axis2server.sh -http 9003 -https 9007 -name MyServer3<br/>
+./axis2server.sh -http 9004 -https 9008 -name MyServer4</div>
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 55 (repository/conf/sample/synapse_sample_55.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 55<br/>
+                                Windows: synapse.bat -sample 55
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    This configuration also uses 'simpleClientSession' to bind session ID values to
+                    servers as in <a href="sample54.html">sample 54</a>. But fail-over endpoints are
+                    specified as the child endpoints of the load balance endpoint. Therefore sessions
+                    are bound to the fail-over endpoints. Session information has to be replicated
+                    among the servers listed under each failover endpoint using some clustering
+                    mechanism. Therefore, if one endpoint bound to a session failed, successive requets
+                    for that session will be directed to the next endpoint in that failover group.
+                    Run the client using the following command to observe this behaviour.
+                </p>
+                <div class="command">ant loadbalancefailover -Dmode=session</div>
+                <p>
+                    You can see a client output as shown below.
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 222 Session number: 0 Response from server: MyServer1
+[java] Request: 223 Session number: 0 Response from server: MyServer1
+[java] Request: 224 Session number: 1 Response from server: MyServer1
+[java] Request: 225 Session number: 2 Response from server: MyServer3
+[java] Request: 226 Session number: 0 Response from server: MyServer1
+[java] Request: 227 Session number: 1 Response from server: MyServer1
+[java] Request: 228 Session number: 2 Response from server: MyServer3
+[java] Request: 229 Session number: 1 Response from server: MyServer1
+[java] Request: 230 Session number: 1 Response from server: MyServer1
+[java] Request: 231 Session number: 2 Response from server: MyServer3
+...</div>
+                <p>
+                    Note that session 0 is always directed to MyServer1 and session 2 is directed to
+                    MyServer3. No requests are directed to MyServer2 and MyServer4 as they are kept
+                    as backups by fail-over endpoints. Now shutdown the server named MyServer1 while
+                    running the sample. You will observe that all successive requests for session 0
+                    is now directed to MyServer2, which is the backup server for MyServer1's group.
+                    This is shown below, where MyServer1 was shutdown after the request 534.
+                </p>
+                <div class="consoleOutput">...
+[java] Request: 529 Session number: 2 Response from server: MyServer3
+[java] Request: 530 Session number: 1 Response from server: MyServer1
+[java] Request: 531 Session number: 0 Response from server: MyServer1
+[java] Request: 532 Session number: 1 Response from server: MyServer1
+[java] Request: 533 Session number: 1 Response from server: MyServer1
+[java] Request: 534 Session number: 1 Response from server: MyServer1
+[java] Request: 535 Session number: 0 Response from server: MyServer2
+[java] Request: 536 Session number: 0 Response from server: MyServer2
+[java] Request: 537 Session number: 0 Response from server: MyServer2
+[java] Request: 538 Session number: 2 Response from server: MyServer3
+[java] Request: 539 Session number: 0 Response from server: MyServer2
+...</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

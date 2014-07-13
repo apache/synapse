@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 380</title>
+    </properties>
+    <body>
+        <section name="Sample 380: Writing Custom Mediation Logic in Java">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="fault"&gt;
+        &lt;makefault&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="Mediation failed."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="main" onError="fault"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint name="stockquote"&gt;
+                    &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;class name="samples.mediators.DiscountQuoteMediator"&gt;
+                &lt;property name="discountFactor" value="10"/&gt;
+                &lt;property name="bonusFor" value="5"/&gt;
+            &lt;/class&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate the use of class mediator to extend the mediation functionality of
+                    Synapse
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 380 (repository/conf/sample/synapse_sample_380.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 380<br/>
+                                Windows: synapse.bat -sample 380
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    In this configuration, Synapse hands over the request message to the specified
+                    endpoint, which sends it to the Axis2 server running on port 9000. But the response
+                    message is passed through the class mediator before sending it back to the client.
+                    Class mediator in turns hands over the message to the specified Java class for
+                    further processing. In that regard, the class mediator acts as a delegating
+                    mediator which delegates the message to a custom Java class for processing.
+                    Two parameters named 'discountFactor' and 'bonusFor' are passed to the mediator
+                    implementation class (i.e. samples.mediators.DiscountQuoteMediator) before each
+                    invocation. Source of the mediator implementation class is shown below. 
+                </p>
+                <div class="consoleOutput">package samples.mediators;
+
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.xml.namespace.QName;
+
+public class DiscountQuoteMediator implements Mediator {
+
+    private static final Log log = LogFactory.getLog(DiscountQuoteMediator.class);
+
+    private String discountFactor=&quot;10&quot;;
+
+    private String bonusFor=&quot;10&quot;;
+
+    private int bonusCount=0;
+
+    public DiscountQuoteMediator(){}
+
+    public boolean mediate(MessageContext mc) {
+
+        String price= mc.getEnvelope().getBody().getFirstElement().getFirstElement().
+                getFirstChildWithName(new QName(&quot;http://services.samples&quot;,&quot;last&quot;)).getText();
+
+        //converting String properties into integers
+        int discount=Integer.parseInt(discountFactor);
+        int bonusNo=Integer.parseInt(bonusFor);
+        double currentPrice=Double.parseDouble(price);
+
+        //discounting factor is deducted from current price form every response
+        Double lastPrice = new Double(currentPrice - currentPrice * discount / 100);
+
+        //Special discount of 5% offers for the first responses as set in the bonusFor property
+        if (bonusCount &lt;= bonusNo) {
+            lastPrice = new Double(lastPrice.doubleValue() - lastPrice.doubleValue() * 0.05);
+            bonusCount++;
+        }
+
+        String discountedPrice = lastPrice.toString();
+
+        mc.getEnvelope().getBody().getFirstElement().getFirstElement().getFirstChildWithName
+                (new QName(&quot;http://services.samples&quot;,&quot;last&quot;)).setText(discountedPrice);
+
+        System.out.println(&quot;Quote value discounted.&quot;);
+        System.out.println(&quot;Original price: &quot; + price);
+        System.out.println(&quot;Discounted price: &quot; + discountedPrice);
+
+        return true;
+    }
+
+    public String getType() {
+        return null;
+    }
+
+    public void setTraceState(int traceState) {
+        traceState = 0;
+    }
+
+    public int getTraceState() {
+        return 0;
+    }
+
+    public void setDiscountFactor(String discount) {
+        discountFactor=discount;
+    }
+
+    public String getDiscountFactor() {
+        return discountFactor;
+    }
+
+    public void setBonusFor(String bonus){
+        bonusFor=bonus;
+    }
+
+    public String getBonusFor(){
+        return bonusFor;
+    }
+}</div>
+                <p>
+                    All classes developed for the class mediator should implement the 'Mediator'
+                    interface, which contains the mediate(...) method. The mediate(...) method of the
+                    above class is invoked for each response message mediated through the main
+                    sequence, with the message context of the current message as the parameter. All
+                    details of the message including the SOAP headers, SOAP body and properties of
+                    the context hierarchy can be accessed from the message context. In this sample,
+                    the body of the message is retrieved and the discount percentage is subtracted
+                    from the quote price. If the quote request number is less than the number specified
+                    in the 'bonusFor' property in the configuration, a special discount is given.
+                </p>
+                <p>
+                    To test the custom code and the class mediator, invoke the test client as
+                    follows.
+                </p>
+                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</div>
+                <p>
+                    You will see the below output in the client console with the discounted quote value.
+                </p>
+                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+                <p>
+                    If you check the Synapse console, you will notice the messages printed by the
+                    custom mediator during mediation.
+                </p>
+                <div class="consoleOutput">Quote value discounted.
+Original price: 162.30945327447262
+Discounted price: 138.77458254967408</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

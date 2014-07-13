@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - File Transport</title>
+    </properties>
+    <body>
+        <section name="File Transport" id="Contents">
+            <ul>
+                <li>
+                    <a href="#Introduction">Introduction</a>
+                </li>
+                <li>
+                    <a href="#Configuration">Transport Configuration</a>
+                    <ul>
+                        <li><a href="#Listener">File Transport Listener (VFS Listener)</a></li>
+                        <li>
+                            <a href="#Sender">File Transport Sender (VFS Sender)</a>
+                            <ul>
+                                <li><a href="#Locking">File Locking</a></li>
+                                <li><a href="#Passive">FTP Passive Mode</a></li>
+                                <li><a href="#Retry">Retrying on Error</a></li>
+                                <li><a href="#transport.vfs.UseTempFile">Using Temporary Files</a></li>
+                                <li><a href="#Append">Appending to Files</a></li>
+                                <li><a href="#OutOnly">Out-only Message Exchange Pattern</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#SFTP">Using SFTP</a>
+                </li>
+                <li>
+                    <a href="#Issues">Known Issues</a>
+                </li>
+            </ul>
+        </section>
+        <section name="Introduction" id="Introduction">
+            <p>
+                The file transport, also known as the VFS (Virtual File System) transport, can be
+                used to read, mediate and write file content using Synapse. This transport allows
+                Synapse to interface with the local file system and remote file systems via
+                file transfer protocols such as FTP.
+            </p>
+            <p>
+                The file transport is based on <a href="http://commons.apache.org/proper/commons-vfs/">Apache Commons VFS</a>,
+                and supports all the file transfer protocols supported by Commons VFS. This includes
+                interactions with the local file system, HTTP, HTTPS, FTP and SFTP (i.e. file transfer
+                over SSH).
+            </p>
+            <p>
+                There is a fundamental difference between the file transport and transports such as
+                HTTP, and it is important to understand this difference to be able to use the file
+                transport correctly. The HTTP transport binds to a single protocol endpoint, i.e. a
+                TCP port on which it accepts incoming HTTP requests. These requests are then
+                dispatched to the appropriate service based on the request URI. On the other hand,
+                the file transport only receives the payload of a message (i.e. the file), but no
+                additional information that could be used to dispatch the message to a service. This
+                means that file system locations must be explicitly mapped to services. This is done
+                using a set of service parameters. For Synapse this means that the VFS transport
+                listener can only be used in conjunction with proxy services. The relevant service
+                parameters are specified in the proxy service configuration as follows:
+            </p>
+            <div class="xmlConf">&lt;proxy name=&quot;MyVFSService&quot; transports=&quot;vfs&quot;&gt;
+    &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;file:///var/spool/synapse/in&lt;/parameter&gt;
+    &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;application/xml&lt;/parameter&gt;
+    ...
+    &lt;target&gt;
+    ...
+    &lt;/target&gt;
+&lt;/proxy&gt;</div>
+            <p>
+                In the above example the file system location file:///var/spool/synapse/in is
+                explicitly bound to MyVFSService. Any file dropped in that location will be
+                pre-dispatched to MyVFSService, bypassing any other configured dispatch mechanisms
+                that would normally apply to messages received via HTTP.
+            </p>
+            <p><a href="#Contents">[Back to top]</a></p>
+        </section>
+        <section name="Transport Configuration" id="Configuration">
+            <p>
+                The file transport consists of a transport listener component and a transport sender
+                component. Proxy services can read files using the file transport listener, and they
+                can write file content using the file transport sender. Following sections describe
+                how to configure these two components of the transport.
+            </p>
+            <subsection name="File Transport Listener (VFS Listener)" id="Listener">
+                <p>
+                    Before a proxy service can read files, the VFS listener must be enabled in the
+                    <string>SYNAPSE_HOME/repository/conf/axis2.xml</string> file of Synapse. Look
+                    for the following XML configuration in the axis2.xml file, and uncomment it if
+                    it's commented out.
+                </p>
+                <div class="xmlConf">&lt;transportReceiver name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportListener"/&gt;</div>
+                <p>
+                    To configure a proxy service to receive messages via the VFS listener (i.e. read
+                    files from some local or remote location), set the "transports" attribute on the
+                    proxy service element to "vfs":
+                </p>
+                <div class="xmlConf">&lt;proxy name=&quot;MyVFSService&quot; transports=&quot;vfs&quot;&gt;
+    ...
+&lt;/proxy&gt;</div>
+                <p>
+                    It's also possible to expose a proxy service on VFS transport and several other
+                    transports. Simply specify the required transports as a space-separated list in
+                    the "transports" attribute:
+                </p>
+                <div class="xmlConf">&lt;proxy name=&quot;MyVFSService&quot; transports=&quot;vfs http https&quot;&gt;
+    ...
+&lt;/proxy&gt;</div>
+                <p>
+                    A proxy service configured with the VFS listener, can be further customized by
+                    setting a number of parameters (some of which are required). Following table
+                    lists all the supported service parameters. Please refer <a href="../samples/sample254.html">sample 254</a>
+                    for an example that demonstrates how to use some of these settings.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FileURI</td>
+                        <td>
+                            The primary location to read the file contents from. This must be
+                            specified as a valid URI and it may point to a file or a directory. If
+                            a directory location is specified, the transport will attempt to read
+                            any file dropped into the directory.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FileURI"&gt;file:///home/user/test/in&lt;/parameter&gt;</div>
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FileURI"&gt;sftp://bob:password@example.com/logs&lt;/parameter&gt;</div>
+                        </td>
+                        <td>Yes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ContentType</td>
+                        <td>
+                            The expected content type for files retrieved for this service. The VFS
+                            transport uses this information to select the appropriate message builder.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ContentType"&gt;text/xml&lt;/parameter&gt;</div>
+                        </td>
+                        <td>Yes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FileNamePattern</td>
+                        <td>
+                            A file name regex pattern to match when fetching files from a directory
+                            specified by the FileURI.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FileNamePattern"&gt;.*.xml&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.PollInterval</td>
+                        <td>
+                            The polling interval in seconds.
+                            <div class="xmlConf">&lt;parameter name="transport.PollInterval"&gt;10&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>300</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ActionAfterProcess</td>
+                        <td>
+                            Once a file has been read and successfully processed by Synapse (i.e.
+                            without any errors and runtime exceptions), the file should be
+                            either moved or deleted to prevent Synapse from processing the file for
+                            a second time. This parameter specifies which of the above actions
+                            should be taken. Allowed values are MOVE or DELETE.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ActionAfterProcess"&gt;MOVE&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>DELETE</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveAfterProcess</td>
+                        <td>
+                            Specify the location to which the files should be moved after successfully
+                            processing them. Required if transport.vfs.ActionAfterProcess is set to
+                            MOVE. Ignored otherwise. Value must be a valid URI (local or remote).
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveAfterProcess"&gt;file:///home/test/original&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ActionAfterFailures</td>
+                        <td>
+                            If Synapse encounters an error while processing a file, the file should be
+                            either moved or deleted to prevent Synapse from processing the file for
+                            a second time. This parameter specifies which of the above actions
+                            should be taken. Allowed values are MOVE or DELETE.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ActionAfterFailure"&gt;MOVE&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>DELETE</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveAfterFailure</td>
+                        <td>
+                            Specify the location to which the files should be moved after a failure. R
+                            equired if transport.vfs.ActionAfterFailure is set to
+                            MOVE. Ignored otherwise. Value must be a valid URI (local or remote).
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveAfterFailure"&gt;file:///home/user/test/error&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ReplyFileURI</td>
+                        <td>
+                            Specify the reply file location as a URI, in case the proxy service
+                            should generate a response message (file) after processing an input file.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ReplyFileURI"&gt;file:///home/user/test/out&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ReplyFileName</td>
+                        <td>
+                            Name of the response file that should be generated by the proxy service.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ReplyFileName"&gt;file:///home/user/test/out&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>response.xml or response.dat depending on the content type of the response</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveTimestampFormat</td>
+                        <td>
+                            Must be a timestamp format string compatible with
+                            <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">java.text.SimpleDateFormat</a>.
+                            If specified, Synapse will append a timestamp in the specified format to
+                            all the file names, whenever a file is moved to a new location (i.e. when
+                            moving a file after processing it or after a failure).
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveTimestampFormat"&gt;yy-MM-dd:HHmmss&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.Locking</td>
+                        <td>
+                            File locking makes sure that each file is accessed by only one proxy
+                            service at any given instant. This is important when multiple proxy
+                            services are reading files from the same location or when one proxy service
+                            is configured to read the files written by another proxy service.
+                            By default file locking is globally enabled in the VFS transport, and
+                            this parameter lets you configure the locking behavior on a per service
+                            basis. Possible values are enable or disable, and both these values are
+                            important because locking can be disabled at the global level by
+                            specifying that at the transport receiver configuration (in axis2.xml) and
+                            selectively enable locking only for a set of services. To configure
+                            global locking behavior, set this parameter in the axis2.xml under the
+                            VFS transport receiver configuration.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.Locking"&gt;disable&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>enable</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.Streaming</td>
+                        <td>
+                            If this parameter is set to true, the transport will attempt to use a
+                            javax.activation.DataSource (instead of a java.io.InputStream ) object
+                            to pass the content of the file to the message builder. Note that this
+                            is only supported by some message builders, e.g. for plain text and binary.
+                            This allows processing of the message without storing the entire content in memory.
+                            It also has two other side effects:
+                            <ul>
+                                <li>
+                                    The incoming file (or connection in case of a remote file)
+                                    will only be opened on demand.
+                                </li>
+                                <li>
+                                    Since the data is not cached, the file might be read several
+                                    times.
+                                </li>
+                            </ul>
+                            This option can be used to achieve streaming of large payloads. Note
+                            that this feature is still somewhat experimental and might be superseded
+                            by a more flexible mechanism in a future release.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.Streaming"&gt;true&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MaxRetryCount</td>
+                        <td>
+                            If the file transport listener encounters an error while trying to
+                            read a file, it will try to read the file again after some time. This
+                            parameter sets the maximum number of times the listener should retry
+                            before giving up. Use the <a href="#transport.vfs.ReconnectTimeout">transport.vfs.ReconnectTimeout</a>
+                            parameter to set the time duration between retries.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MaxRetryCount"&gt;3&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ReconnectTimeout <a name="transport.vfs.ReconnectTimeout"/></td>
+                        <td>
+                            The amount of time (in seconds) the current polling task should be
+                            suspended for after a failed attempt to resolve a file.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.ReconnectTimeout"&gt;30000&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>30</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FailedRecordsFileName <a name="transport.vfs.FailedRecordsFileName"/></td>
+                        <td>
+                            Once a file has been fully processed, it will be moved to a new
+                            location or deleted. If this operation fails, a log entry with the
+                            failure details can be written to a separate log file. This parameter
+                            controls the name of this failure log file.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileName"&gt;move-errors.txt&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>vfs-move-failed-records.properties</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FailedRecordsFileDestination</td>
+                        <td>
+                            Once a file has been fully processed, it will be moved to a new
+                            location or deleted. If this operation fails, a log entry with the
+                            failure details can be written to a separate log file. This parameter
+                            controls the location (directory path) of this failure log file. To set
+                            the name of the log file use the <a href="#transport.vfs.FailedRecordsFileName">transport.vfs.FailedRecordsFileName</a>
+                            parameter.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordsFileDestination"&gt;logs/&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>repository/conf</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.FailedRecordNextRetryDuration</td>
+                        <td>
+                            When a move operation has failed, the operation will be retried after this
+                            amount of time (configured in milliseconds).
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.FailedRecordNextRetryDuration"&gt;5000&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>3000</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveAfterFailedMove</td>
+                        <td>
+                            The destination to move the file after a failed move attempt.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveAfterFailedMove"&gt;repository/move-errors&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MoveFailedRecordTimestampFormat</td>
+                        <td>
+                            The time stamp format to use when reporting failed move operations in
+                            the log.
+                            <div class="xmlConf">&lt;parameter name="transport.vfs.MoveFailedRecordTimestampFormat"&gt;HH:mm:ss&lt;/parameter&gt;</div>
+                        </td>
+                        <td>No</td>
+                        <td>dd/MM/yyyy/ HH:mm:ss</td>
+                    </tr>
+                </table>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+            <subsection name="File Transport Sender (VFS Sender)" id="Sender">
+                <p>
+                    The file transport sender allows writing outgoing messages to local or remote
+                    files. To activate the file transport sender, simply uncomment the following
+                    transport sender configuration in the <strong>SYNAPSE_HOME/repository/conf/axis2.xml</strong>
+                    file.
+                </p>
+                <div class="xmlConf">&lt;transportSender name="vfs" class="org.apache.synapse.transport.vfs.VFSTransportSender"/&gt;</div>
+                <p>
+                    To send a message using the file transport, define a Synapse endpoint with an
+                    address that starts with the prefix 'vfs:'. The rest of the address should be a
+                    valid local or remote file URI. An example is shown below:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    Some more example file URIs are listed below. Remember to prefix each
+                    URI with the string 'vfs:' when using these to define Synapse endpoints.
+                    Refer <a class="externalLink" href="http://commons.apache.org/vfs/filesystems.html">http://commons.apache.org/vfs/filesystems.html</a>
+                    for a complete list of Commons VFS supported protocols and their corresponding
+                    URI formats.
+                </p>
+                <ul>
+                    <li>
+                        <tt>file:///directory/filename.ext</tt>
+                    </li>
+                    <li>
+                        <tt>file:////somehost/someshare/afile.txt</tt>
+                    </li>
+                    <li>
+                        <tt>jar:../lib/classes.jar!/META-INF/manifest.mf</tt>
+                    </li>
+                    <li>
+                        <tt>jar:zip:outer.zip!/nested.jar!/somedir</tt>
+                    </li>
+                    <li>
+                        <tt>ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz</tt>
+                    </li>
+                </ul>
+
+                <h4>File Locking <a name="Locking"/></h4>
+                <p>
+                    By default file locking is globally enabled for the file transport sender.
+                    This behavior can be overridden at the endpoint level by specifying
+                    <tt>transport.vfs.Locking</tt> as a URL query parameter with the appropriate value
+                    (enable/disable) on a given endpoint:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out?transport.vfs.Locking=disable&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    You may also change the global locking behavior by setting the <tt>transport.vfs.Locking</tt>
+                    parameter in the file transport sender configuration in axis2.xml file.
+                </p>
+
+                <h4>FTP Passive Mode <a name="Passive"/></h4>
+                <p>
+                    When writing to remote file locations using a protocol such as FTP, you might
+                    want Synapse to communicate with the FTP server in the passive mode. To
+                    configure this behavior, simply add the query parameter <tt>vfs.passive</tt> to the
+                    endpoint address:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz?vfs.passive=true&quot;/&gt;
+&lt;/endpoint&gt;</div>
+
+                <h4>Retrying on Error <a name="Retry"/></h4>
+                <p>
+                    When the file transport sender encounters an error while trying to write a file,
+                    it can retry after some time. This is useful to recover from certain types of
+                    transient I/O errors and network connectivity issues. Following parameters
+                    can be configured as URL query parameters on the file (vfs) endpoints to
+                    make use of this feature.
+                </p>
+                <table>
+                    <tr>
+                        <th>Parameter Name</th>
+                        <th>Description/Example</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.MaxRetryCount</td>
+                        <td>
+                            Maximum number of retries to perform before giving up.
+                        </td>
+                        <td>No</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>transport.vfs.ReconnectTimeout</td>
+                        <td>
+                            Time duration (in seconds) between retry attempts.
+                        </td>
+                        <td>No</td>
+                        <td>30</td>
+                    </tr>
+                </table>
+
+                <h4>Using Temporary Files <a name="transport.vfs.UseTempFile"/></h4>
+                <p>
+                    The file transport sender does not write file content atomically. Therefore a
+                    process reading a file updated by Synapse, may read partial
+                    content. To get around this limitation, the temporary file support can be
+                    activated on the target file (vfs) endpoint:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out?transport.vfs.UseTempFile=true&quot;/&gt;
+&lt;/endpoint&gt;</div>
+                <p>
+                    This forces the file transport sender to write the data to a temporary file and
+                    then move the temporary file to the actual destination configured in the file
+                    endpoint. On most operating systems (e.g. Unix/Linux, Windows), this delivers the
+                    desired atomic file update behavior. When the file endpoint points to a remote
+                    file system, the temporary files will be created on the remote file system, thus
+                    preserving the atomic update behavior.
+                </p>
+
+                <h4>Appending to Files <a name="Append"/></h4>
+                <p>
+                    When updating an existing file, the file transport sender usually overwrites the
+                    old content. To get append behavior instead, set transport.vfs.Append parameter
+                    on the target endpoint:
+                </p>
+                <div class="xmlConf">&lt;endpoint&gt;
+    &lt;address uri=&quot;vfs:file:///var/spool/synapse/out?transport.vfs.Append=true&quot;/&gt;
+&lt;/endpoint&gt;</div>
+
+                <h4>Out-only Message Exchange Pattern <a name="OutOnly"/></h4>
+                <p>
+                    It should be noted that by its nature, the file transport sender doesn't support
+                    synchronous responses and should only be invoked using the out-only message
+                    exchange pattern. In a Synapse mediation (sequence/proxy/API), this can be forced
+                    using the following mediator:
+                </p>
+                <div class="xmlConf">&lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;</div>
+                <p><a href="#Contents">[Back to top]</a></p>
+            </subsection>
+        </section>
+        <section name="Using SFTP" id="SFTP">
+            <p>
+                To avoid man-in-the-middle attacks, SSH clients will only connect to hosts with
+                a known host key. When connecting for the first time to an SSH server, a typical
+                command line SSH client would request confirmation from the user to add the
+                server and its fingerprint to the list of known hosts.
+            </p>
+            <p>
+                The VFS transports supports SFTP through the
+                <a class="externalLink" href="http://www.jcraft.com/jsch/">JSch</a>
+                library and this library also requires a list of known hosts. Since Synapse is
+                not an interactive process, it can't request confirmation from the user and is
+                therefore unable to automatically add a host to the list. This implies that the
+                list of known hosts must be set up manually before the transport can connect.
+            </p>
+            <p>
+                JSch loads the list of known hosts from a file called <tt>known_hosts</tt> in
+                the <tt>.ssh</tt> sub-directory of the user's home directory, i.e. <tt>$HOME/.ssh</tt>
+                in Unix and <tt>%HOMEPATH%\.ssh</tt> in Windows. The location and format of this
+                file are compatible with the <a class="externalLink" href="http://www.openssh.com/">OpenSSH</a>
+                client.
+            </p>
+            <p>
+                Since the file not only contains a list of host names but also the fingerprints
+                of their host keys, the easiest way to add a new host to that file is to simply
+                use the OpenSSH client to open an SSH session on the target host. The client will
+                then ask to add the credentials to the <tt>known_hosts</tt> file. Note that if
+                the SSH server is configured to only allow SFTP sessions, but no interactive
+                sessions, the connection will actually fail. Since this doesn't rollback the
+                change to the <tt>known_hosts</tt> file, this error can be ignored.
+            </p>
+        </section>
+        <section name="Known issues" id="Issues">
+            <p>
+                The VFS listener will start reading a file as soon as it appears in the configured
+                location. To avoid processing half written files, the creation of these files should
+                be made atomic. On most platforms this can be achieved by writing the data to a
+                temporary file and then moving the file to the target location. Note however that
+                a move operation is only atomic if the source and destination are on the same
+                physical file system. The location for the temporary file should be chosen with
+                that constraint in mind.
+            </p>
+            <p>
+                It should also be noted that the VFS transport sender doesn't create files atomically.
+                Use the <a href="#transport.vfs.UseTempFile">transport.vfs.UseTempFile</a> endpoint
+                parameter to get around this issue.
+            </p>
+        </section>
+    </body>
+</document>

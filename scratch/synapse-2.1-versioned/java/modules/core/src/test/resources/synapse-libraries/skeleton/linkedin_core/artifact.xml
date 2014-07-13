@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifact name="linkedin_core" type="synapse/template" >
+
+    <subArtifacts> 
+	<artifact name="post_status">
+    		<file>post_status.xml</file>
+    		<description>sample synapse library</description>
+	</artifact>
+	<artifact name="show_headline">
+    		<file>show_headline.xml</file>
+    		<description>sample synapse library</description>
+	</artifact>
+	<artifact name="send_message">
+    		<file>send_message.xml</file>
+    		<description>sample synapse library</description>
+	</artifact>
+	<artifact name="register_user">
+    		<file>register_user.xml</file>
+    		<description>sample synapse library</description>
+	</artifact>
+    </subArtifacts>
+    
+</artifact>

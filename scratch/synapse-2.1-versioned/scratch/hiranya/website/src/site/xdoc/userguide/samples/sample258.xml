@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 258</title>
+    </properties>
+    <body>
+        <section name="Sample 258: Switching from HTTP to FIX">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="FIXProxy" transports="http"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address
+                        uri="fix://localhost:19876?BeginString=FIX.4.0&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC"/&gt;
+            &lt;/endpoint&gt;
+
+            &lt;inSequence&gt;
+                &lt;property name="transport.fix.ServiceName" value="FIXProxy" scope="axis2-client"/&gt;
+                &lt;log level="full"/&gt;
+            &lt;/inSequence&gt;
+
+            &lt;outSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+
+        &lt;parameter name="transport.fix.InitiatorConfigURL"&gt;
+            file:repository/conf/sample/resources/fix/synapse-sender.cfg
+        &lt;/parameter&gt;
+        &lt;parameter name="transport.fix.InitiatorMessageStore"&gt;file&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.SendAllToInSequence"&gt;false&lt;/parameter&gt;
+        &lt;parameter name="transport.fix.DropExtraResponses"&gt;true&lt;/parameter&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrates how to use the FIX transport in a transport switching scenario with
+                    HTTP.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            You need a <a href="http://www.quickfixj.org">Quickfix/J</a> installation
+                            to try out FIX samples. Please download and extract a Quickfix/J distribution
+                            into your local machine.
+                        </li>
+                        <li>
+                            Configure the Executor sample FIX application (shipped with Quickfix/J)
+                            to receive messages from Synapse and start it (refer
+                            <a href="setup/fix.html#exec">FIX setup guide</a> for more details).
+                        </li>
+                        <li>
+                            Enable the FIX transport sender for Synapse (refer
+                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details).
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 258 (repository/conf/sample/synapse_sample_258.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 258<br/>
+                                Windows: synapse.bat -sample 258
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Go to the samples/axis2Client directory and invoke the sample FIX/HTTP client as
+                    follows.
+                </p>
+                <div class="command">ant fixclient -Dsymbol=IBM -Dqty=5 -Dmode=buy -Daddurl=http://localhost:8280/services/FIXProxy</div>
+                <p>
+                    This command sends a HTTP request to the FIXProxy on Synapse. The message is
+                    converted into a FIX message and sent to the Executor sample application. Executor
+                    will send two responses for this request (receive ack and the execution report) and
+                    Synapse will send the first response back to the HTTP client. (Synapse can't send
+                    both responses back, since HTTP does not allow sending two responses to the same
+                    request)
+                </p>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

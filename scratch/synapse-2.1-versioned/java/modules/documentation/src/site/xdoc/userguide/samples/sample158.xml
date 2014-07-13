@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 158</title>
+    </properties>
+    <body>
+        <section name="Sample 158: Exposing a SOAP service over JSON">
+            <div class="xmlConf"><![CDATA[<definitions xmlns="http://ws.apache.org/ns/synapse">
+
+    <proxy name="JSONProxy" transports="http https">
+        <target>
+            <endpoint>
+                <address uri="http://localhost:9000/services/SimpleStockQuoteService" format="soap11"/>
+            </endpoint>
+            <inSequence>
+                <log level="full"/>
+                <xslt key="in_transform"/>
+            </inSequence>
+            <outSequence>
+                <log level="full"/>
+                <xslt key="out_transform"/>
+                <send/>
+            </outSequence>
+        </target>
+    </proxy>
+
+    <localEntry key="in_transform">
+        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                        xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
+                        xmlns:m0="http://services.samples" version="2.0" exclude-result-prefixes="m0 fn">
+            <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
+            <xsl:template match="*">
+                <xsl:element name="{local-name()}" namespace="http://services.samples">
+                    <xsl:copy-of select="attribute::*"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:template>
+        </xsl:stylesheet>
+    </localEntry>
+
+    <localEntry key="out_transform">
+        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8"/>
+            <xsl:template match="*">
+                <xsl:element name="{local-name()}">
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:template>
+        </xsl:stylesheet>
+    </localEntry>
+
+</definitions>]]></div>
+            <subsection name="Objective">
+                <p>
+ 					Demonstrate the ability to switch between JSON and XML/SOAP content interchange formats
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href="setup/script.html#json">Samples Setup Guide</a> for details)
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 158 (repository/conf/sample/synapse_sample_158.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 158<br/>
+                                Windows: synapse.bat -sample 158
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <div class="command">ant jsonclient -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/services/JSONProxy</div>
+ 				<p>JSON client will send a stockquote request to Synapse using the
+					JSON content interchange format. Synapse will transform it into a SOAP
+					request and forward to the Axis2 server. The SOAP response from the
+					Axis2 server will be converted into a JSON message and sent back to the
+					JSON client.</p>
+				<p>You may use a tool like TCPMon to monitor the JSON requests sent
+						over the wire. A sample JSON request and response is shown below:</p>
+
+                <div class="consoleOutput">{"getQuote":{"request":{"symbol":"IBM"}}}</div>
+
+                <div class="consoleOutput">{"getQuoteResponse":{"return":{"change":3.853593376681722,"earnings":12.802850763714854,"high":67.92488310190126,"last":66.14619264746406,"lastTradeTimestamp":"Mon Aug 23 16:48:40 IST 2010","low":-66.04000424423522,"marketCap":-9334516.42324327,"name":"IBM Company","open":-64.61950137150009,"peRatio":-19.78600441437058,"percentageChange":5.411779328273005,"prevClose":71.2075112994578,"symbol":"IBM","volume":16842}}}</div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

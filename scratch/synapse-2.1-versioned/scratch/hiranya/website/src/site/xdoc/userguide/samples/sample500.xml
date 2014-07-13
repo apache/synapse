@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 500</title>
+    </properties>
+    <body>
+        <section name="Sample 500: Introduction to Eventing">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;eventSource name="SampleEventSource"&gt;
+        &lt;subscriptionManager
+                class="org.apache.synapse.eventing.managers.DefaultInMemorySubscriptionManager"&gt;
+            &lt;!--property name="registryURL" value="http://localhost:8180/wso2registry"/&gt;
+          &lt;property name="username" value="admin"/&gt;
+          &lt;property name="password" value="admin"/--&gt;
+            &lt;property name="topicHeaderName" value="Topic"/&gt;
+            &lt;property name="topicHeaderNS" value="http://apache.org/aip"/&gt;
+        &lt;/subscriptionManager&gt;
+    &lt;/eventSource&gt;
+
+    &lt;sequence name="PublicEventSource"&gt;
+        &lt;log level="full"/&gt;
+        &lt;eventPublisher eventSourceName="SampleEventSource"/&gt;
+    &lt;/sequence&gt;
+
+    &lt;proxy name="EventingProxy"&gt;
+        &lt;target inSequence="PublicEventSource"/&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Demonstrate the use of the Eventing functionality built into Synapse
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 500 (repository/conf/sample/synapse_sample_500.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 500<br/>
+                                Windows: synapse.bat -sample 500
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    In this sample an event source is creted based on the provided configuration. Event
+                    subscriber subscribes for the events, Event sender publishes events and the
+                    SimpleStockQuoteService acts as the Event Sink.
+                </p>
+                <p>
+                    First, invoke the sample client (Subscriber) as follows.
+                </p>
+                <div class="command">ant eventsubscriber</div>
+                <p>
+                    This will create a new subscription with the SimpleStockQuoteService deployed on
+                    the sample Axis2 server acting as the sink. Whenever a new event is published,
+                    SimpleStockQuoteService will receive a message with that event. You should see a
+                    message like this on the client console confirming the subscription.
+                </p>
+                <div class="consoleOutput">[java] Subscription identifier: urn:uuid:6989F66706E73C69F5259116575749162017010321</div>
+                <p>
+                    You will need this identifier to modify the subscription in the next steps. Now,
+                    invoke the client (Sender) as follows.
+                </p>
+                <div class="command">ant eventsender</div>
+                <p>
+                    This will send a placeOrder request to the EventingProxy. You should see a
+                    message in the Synapse logs. Note the presence of the following SOAP header
+                    in the request.
+                </p>
+                <div class="consoleOutput">&lt;aip:Topic xmlns:aip="http://apache.org/aip">synapse/event/test&lt;/aip:Topic></div>
+                <p>
+                    Since there is a single subscription with SimpleStockQuoteService as the sink,
+                    Synapse will send the message to the sample Axis2 server and you should see the
+                    following message in its logs:
+                </p>
+                <div class="consoleOutput">Accepted order for : 1000 stocks of GOOG at $ 10.1</div>
+                <p>
+                    You can also send various other WS-Eventing messages from the sample client to
+                    modify the subscription details. To get the current status of the subscription,
+                    invoke the client as follows.
+                </p>
+                <div class="command">ant eventsubscriber -Dmode=getstatus -Didentifier=<i>&lt;identifier></i></div>
+                <p>
+                    To renew the subscription, invoke the client as follows.
+                </p>
+                <div class="command">ant eventsubscriber -Dmode=renew -Didentifier=<i>&lt;identifier></i> -Dexpires=2012-12-31T21:07:00.000-08:00</div>
+                <p>
+                    Finally, in order to unsubscribe, use the following command.
+                </p>
+                <div class="command">ant eventsubscriber -Dmode=unsubscribe -Didentifier=<i>&lt;identifier></i></div>
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

@@ -1,0 +1,7 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+    <stage name="xpath">
+        <xpath expr="//ns:text" xmlns:ns="urn:text-body">
+            <fault/>
+        </xpath>
+    </stage>
+</synapse>

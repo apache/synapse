@@ -1,0 +1,40 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+    <stage name="logall">
+        <engage-addressing-in/>
+        <log/>
+    </stage>
+
+    <stage name="service-specific">
+        <!-- this matches the gateway case -->
+        <regex message-address="to" pattern="/StockQuote.*">
+            <ref ref="stockquote"/>
+        </regex>
+        <!-- this matches the virtual url case for either the proxy or ws-add case -->
+        <regex message-address="to" pattern="http://stockquote.*">
+            <ref ref="stockquote"/>
+        </regex>
+    </stage>
+
+    <stage name="check-sla" >
+        <regex message-address="to" pattern="http://www.webservicex.net/stockquote.asmx">
+            <servicemediator name="SLA" service="SLAMediator"/>
+        </regex>
+    </stage>
+
+    <stage name="sender">
+        <send/>
+    </stage>
+
+    <!-- these are only called if referenced above-->
+    <never>
+        <stage name="stockquote">
+            <header type="to" value="http://www.webservicex.net/stockquote.asmx" />
+            <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+                <fault/>
+            </xpath>
+        </stage>
+    </never>
+</synapse>
+
+

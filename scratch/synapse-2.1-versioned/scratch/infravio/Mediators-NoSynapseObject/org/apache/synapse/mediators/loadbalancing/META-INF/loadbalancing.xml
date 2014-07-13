@@ -1,0 +1,41 @@
+<!--
+    <loadBalancingService Id="ServiceEPR to distnguish this set when the request comes in">
+        <strategy>
+            Specifies the load-balancing criteria. [performance/round-robin]
+        </strategy>
+        <count>
+            number of last requests on which to evaluate performance criteria
+        </count>
+        <parameterSet>
+            <service>SomeServiceEPR</service>
+            <active>A boolean to denote if the service is active</active>
+            <requestCount>Number of requests it has received till now</requestCount>
+            <averageResponseTime>
+                Average response time for 'count' requests in milliseconds
+            </averageResponseTime>
+            <lastResponseTime>
+                Last response time for the service in milliseconds
+            </lastResponseTime>
+        </parameterSet>
+    </loadBalancingService>
+-->
+<loadBalancingConfig>
+    <loadBalancingService Id="http://localhost:8080/loadBalancingService">
+        <strategy>roundrobin</strategy>
+        <count>10</count>
+        <parameterSet>
+            <service>"http://host:9080/Service1"</service>
+            <active>true</active>
+            <requestCount>18</requestCount>
+            <averageResponseTime>900</averageResponseTime>
+            <lastResponseTime>920</lastResponseTime>
+        </parameterSet>
+        <parameterSet>
+            <service>http://www.webservicex.net/stockquote.asmx</service>
+            <active>true</active>
+            <requestCount>15</requestCount>
+            <averageResponseTime>980</averageResponseTime>
+            <lastResponseTime>900</lastResponseTime>
+        </parameterSet>
+    </loadBalancingService>
+</loadBalancingConfig>

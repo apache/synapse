@@ -1,0 +1,6 @@
+Hello everyone,
+
+Since this is a scratch area, the code committed might break or may not be feature complete.. 
+Feel free to comment and make suggestions..
+Keeping in-line with the ASF way of developing code :-)
+

@@ -1,0 +1,39 @@
+    <project name="build-properties" basedir=".">
+        <property file="build.properties"/>
+
+        <path id="axis.classpath">
+            <pathelement location="${axis2.home}/lib/axis-wsdl4j-1.2.jar"/>
+            <pathelement location="${axis2.home}/lib/axis2-0.92.jar"/>
+            <pathelement location="${axis2.home}/lib/ bcprov-jdk13-128.jar"/>
+            <pathelement location="${axis2.home}/lib/ commons-codec-1.3.jar"/>
+            <pathelement location="${axis2.home}/lib/ commons-discovery-0.2.jar"/>
+            <pathelement location="${axis2.home}/lib/commons-httpclient-3.0-rc3.jar"/>
+            <pathelement location="${axis2.home}/lib/commons-logging-1.0.3.jar"/>
+            <pathelement location="${axis2.home}/lib/geronimo-spec-activation-1.0.2-rc4.jar"/>
+            <pathelement location="${axis2.home}/lib/geronimo-spec-javamail-1.3.1-rc5.jar"/>
+            <pathelement location="${axis2.home}/lib/groovy-all-1.0-jsr-01.jar"/>
+            <pathelement location="${axis2.home}/lib/jaxen-1.1-beta-7.jar"/>
+            <pathelement location="${axis2.home}/lib/junit-3.8.1.jar"/>
+            <pathelement location="${axis2.home}/lib/log4j-1.2.8.jar"/>
+            <pathelement location="${axis2.home}/lib/maven-itest-plugin-1.0.jar"/>
+            <pathelement location="${axis2.home}/lib/opensaml-1.0.1.jar"/>
+            <pathelement location="${axis2.home}/lib/stax-1.1.2-dev.jar"/>
+            <pathelement location="${axis2.home}/lib/stax-api-1.0.jar"/>
+            <pathelement location="${axis2.home}/lib/wss4j-SNAPSHOT.jar"/>
+            <pathelement location="${axis2.home}/lib/xbean-2.0.0.jar"/>
+            <pathelement location="${axis2.home}/lib/xercesImpl-2.6.2.jar"/>
+            <pathelement location="${axis2.home}/lib/xmlParserAPIs-2.6.2.jar"/>
+            <pathelement location="${axis2.home}/lib/XmlSchema-SNAPSHOT.jar"/>
+            <pathelement location="${axis2.home}/lib/xmlsec-1.2.1.jar"/>
+            <pathelement location="${axis2.home}/lib/xmlunit-1.0.jar"/>
+        </path>
+
+        <path id="broker.classpath">
+            <path refid="axis.classpath"/>
+            <pathelement location="${broker.home}/lib/SJT.Mgmt.jar"/>
+            <pathelement location="${broker.home}/lib/xbean.jar"/>
+            <pathelement location="${broker.home}/lib/brokerConfig.jar"/>
+            <pathelement location="${broker.home}/core/build/parser.jar"/>
+            <pathelement location="${broker.home}/core/build/receiver.jar"/>
+        </path>
+    </project>

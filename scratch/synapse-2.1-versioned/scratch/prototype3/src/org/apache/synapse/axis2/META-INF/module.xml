@@ -1,0 +1,7 @@
+<module name="synapse">
+    <inflow>
+        <handler name="SynapseDispatcher" class="org.apache.synapse.axis2.SynapseDispatcher">
+            <order phaseFirst="true" phase="Dispatch"/>
+        </handler>
+    </inflow>
+</module>

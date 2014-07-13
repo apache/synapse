@@ -1,0 +1,1335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~ 
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>9</version>
+    </parent>
+
+    <groupId>org.apache.synapse</groupId>
+    <artifactId>Apache-Synapse</artifactId>
+    <version>2.2.0-SNAPSHOT</version>
+
+    <name>Apache Synapse</name>
+    <description>Apache Synapse</description>
+
+    <packaging>pom</packaging>
+    <url>http://synapse.apache.org/</url>
+
+    <issueManagement>
+        <url>http://issues.apache.org/jira/browse/SYNAPSE</url>
+    </issueManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>Apache Synapse Developer List</name>
+            <subscribe>dev-subscribe@synapse.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@synapse.apache.org</unsubscribe>
+            <post>dev@synapse.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/synapse-dev/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Apache Synapse User List</name>
+            <subscribe>user-subscribe@synapse.apache.org</subscribe>
+            <unsubscribe>user-unsubscribe@synapse.apache.org</unsubscribe>
+            <post>user@synapse.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Apache Synapse Commits List</name>
+            <subscribe>commits-subscribe@synapse.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>
+            <post>commits@synapse.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/synapse-commits/</archive>
+        </mailingList>
+    </mailingLists>
+
+    <inceptionYear>2005</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
+    </scm>
+
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+    </organization>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <attach>true</attach>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <activation>
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>hudson</id>
+            <activation>
+                <property>
+                    <name>hudson</name>
+                </property>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>wso2-m2</id>
+                    <name>WSO2 Maven 2 Repository</name>
+                    <url>http://dist.wso2.org/maven2/</url>
+                    <releases>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>wso2-m2-snapshots</id>
+                    <name>WSO2 Maven 2 SNAPSHOTS Repository</name>
+                    <url>http://dist.wso2.org/snapshots/maven2/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>interval:60</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
+            <id>apache-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- Override the execution defined in org.apache:apache
+                                so that the source-release assembly is not built.
+                                We define our own source distribution in modules/distribution. -->
+                                <id>source-release-assembly</id>
+                                <configuration>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>single</goal>
+                                    </goals>
+                                    <skipAssembly>true</skipAssembly>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.4.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Extension-Name>${project.groupId}</Extension-Name>
+                                <Specification-Title>${project.artifactId}</Specification-Title>
+                                <Specification-Vendor>Apache Software Foundation</Specification-Vendor>
+                                <Specification-Version>${project.version}</Specification-Version>
+                                <Implementation-Title>Apache Synapse</Implementation-Title>
+                                <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+                                <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
+                                <Implementation-Version>${project.version}</Implementation-Version>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.11</version>
+                    <configuration>
+                        <argLine>-Xms128m -Xmx256m</argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-report-plugin</artifactId>
+                    <version>2.11</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.3.6</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.7</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <!-- The latest version (2.2.2) has a problem with file permissions -->
+                    <version>2.2-beta-2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.7</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <inherited>false</inherited>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>javadoc-aggregate</id>
+                        <configuration>
+                            <links>
+                                <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                                <link>http://java.sun.com/j2ee/1.4/docs/api/</link>
+                                <link>http://jaxen.codehaus.org/apidocs/</link>
+                                <link>http://ws.apache.org/commons/axiom/apidocs/</link>
+                                <link>http://ws.apache.org/axis2/1_5_1/api/</link>
+                            </links>
+                        </configuration>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Synapse Child Modules -->
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-config-migrator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-documentation</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <classifier>docs</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-core</artifactId>
+                <!-- Synapse core tests library -->
+                <classifier>tests</classifier>
+                <scope>test</scope>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-experimental</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-extensions</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-fix-transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-nhttp-transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-patches</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-patches</artifactId>
+                <version>${project.version}</version>
+                <classifier>jars</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-samples</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-securevault</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-tasks</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-vfs-transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-amqp-transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Apache Axis2 -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-kernel</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-http</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-local</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-base</artifactId>
+                <version>${axis2.transport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-jms</artifactId>
+                <version>${axis2.transport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-mail</artifactId>
+                <version>${axis2.transport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-adb</artifactId>
+                <version>${axis2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-clustering</artifactId>
+                <version>${axis2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.axis2</groupId>
+                        <artifactId>axis2-kernel</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-codegen</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-saaj</artifactId>
+                <version>${axis2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-mtompolicy</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>mex</artifactId>
+                <version>${axis2.version}</version>
+                <classifier>impl</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>addressing</artifactId>
+                <version>${addressing.version}</version>
+                <type>mar</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-jaxws</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+
+            <!-- Apache Rampart -->
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-policy</artifactId>
+                <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>log4j-over-slf4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.xmlbeans</groupId>
+                        <artifactId>xmlbeans</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-trust</artifactId>
+                <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-core</artifactId>
+                <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart</artifactId>
+                <version>${rampart.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden-core</artifactId>
+                    </exclusion>
+                </exclusions>
+                <type>mar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.neethi</groupId>
+                <artifactId>neethi</artifactId>
+                <version>${neethi.version}</version>
+            </dependency>
+
+            <!-- Apache Axiom -->
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-api</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-impl</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-dom</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+
+            <!-- Apache Commons -->
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${commons.dbcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>${commons.pool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-vfs2</artifactId>
+                <version>${commons.vfs.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-svnexe</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <!-- For VFS (FTP) Transport -->
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons.net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${commons.cli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons.codec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons.collections.version}</version>
+            </dependency>
+
+            <!-- Caching -->
+            <dependency>
+                <groupId>org.wso2.caching</groupId>
+                <artifactId>wso2caching-core</artifactId>
+                <version>${wso2caching.version}</version>
+                <type>jar</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.neethi</groupId>
+                        <artifactId>neethi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Eventing -->
+            <dependency>
+                <groupId>org.wso2.eventing</groupId>
+                <artifactId>wso2eventing-api</artifactId>
+                <version>${wso2eventing-api.version}</version>
+            </dependency>
+
+            <!-- Secure Vault -->
+            <dependency>
+                <groupId>jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>${jline.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${activation.version}</version>
+            </dependency>
+
+            <!-- Throttling -->
+            <dependency>
+                <groupId>org.wso2.throttle</groupId>
+                <artifactId>wso2throttle-core</artifactId>
+                <version>${wso2throttle.version}</version>
+                <type>jar</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-nodeps</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- HTTP Core -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.nio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-nio</artifactId>
+                <version>${httpcore.nio.version}</version>
+            </dependency>
+
+            <!-- Bouncy Castle Library for OCSP/CRL Certificate Validation in HTTP Transports -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bcprov.nhttp.version}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>${xmlunit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-testkit</artifactId>
+                <version>${axis2.transport.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.schlichtherle.io</groupId>
+                <artifactId>truezip</artifactId>
+                <version>${truezip.version}</version>
+                <optional>true</optional>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derby.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyclient</artifactId>
+                <version>${derby.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbynet</artifactId>
+                <version>${derby.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jruby</groupId>
+                <artifactId>jruby-complete</artifactId>
+                <version>${jruby.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${http.client.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-core</artifactId>
+                <version>${activemq.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+
+            <!-- Saxon -->
+            <dependency>
+                 <groupId>net.sf.saxon</groupId>
+                 <artifactId>saxon</artifactId>
+                 <version>${saxon.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>net.sf.saxon</groupId>
+                 <artifactId>saxon-dom</artifactId>
+                 <version>${saxon.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>net.sf.saxon</groupId>
+                 <artifactId>saxon-xqj</artifactId>
+                 <version>${saxon.version}</version>
+            </dependency>
+
+            <!-- Spring Framework -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <!-- Scripting -->
+            <dependency>
+                <groupId>xmlbeans</groupId>
+                <artifactId>xbean</artifactId>
+                <version>${xbean.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.bsf</groupId>
+                <artifactId>bsf-all</artifactId>
+                <version>${bsf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>rhino</groupId>
+                <artifactId>js</artifactId>
+                <version>${rhino.version}</version>
+            </dependency>
+
+            <!-- Maven Tools -->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-project</artifactId>
+                <version>${maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact</artifactId>
+                <version>${maven.artifact.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-archiver</artifactId>
+                <version>${maven.archiver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>${plexus.utils.version}</version>
+            </dependency>
+
+            <!-- Quickfix/J (FIX Transport) -->
+            <dependency>
+                <groupId>quickfixj</groupId>
+                <artifactId>quickfixj-all</artifactId>
+                <version>${qfj.version}</version>
+            </dependency>
+
+            <!-- Quartz (Scheduled Tasks) -->
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${quartz.version}</version>
+            </dependency>
+
+            <!-- Miscellaneous -->
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <!-- For REST API Support -->
+                <groupId>org.wso2.uri.template</groupId>
+                <artifactId>wso2-uri-templates</artifactId>
+                <version>${wso2uri-template.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>${xalan.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_1.1_spec</artifactId>
+                <version>${jms-1.1-spec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>wrapper</groupId>
+                <artifactId>wrapper</artifactId>
+                <version>${wrapper.version}</version>
+            </dependency>
+            <dependency>
+                <!-- For VFS (SFTP) Transport -->
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>${jsch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.woden</groupId>
+                <artifactId>woden-core</artifactId>
+                <version>${woden.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>wsdl4j</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>${wsdl4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.maven</groupId>
+                        <artifactId>maven-plugin-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven</groupId>
+                        <artifactId>maven-artifact</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven</groupId>
+                        <artifactId>maven-project</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xerces.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.snmp4j</groupId>
+                <artifactId>snmp4j-agent</artifactId>
+                <version>${snmp4j.agent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.snmp4j</groupId>
+                <artifactId>snmp4j</artifactId>
+                <version>${snmp4j.version}</version>
+            </dependency>
+            <dependency>
+                <!-- For AMQP transport -->
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>${rabbitmq.version}</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.0</version>
+                <inherited>false</inherited>
+            </plugin>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <!-- These features are disabled since they cause "mvn site" to hang -->
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <repositories>
+        <repository>
+            <id>wso2-m2</id>
+            <name>WSO2 Maven 2 Repository</name>
+            <url>http://dist.wso2.org/maven2/</url>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>wso2-m2-snapshots</id>
+            <name>WSO2 Maven 2 SNAPSHOTS Repository</name>
+            <url>http://dist.wso2.org/snapshots/maven2/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>interval:10080</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>snmp4j-repo</id>
+            <name>SNMP4J Repository</name>
+            <url>https://oosnmp.net/dist/release/</url>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>modules/securevault</module>
+        <module>modules/commons</module>
+        <module>modules/transports</module>
+        <module>modules/tasks</module>
+        <module>modules/core</module>
+        <module>modules/extensions</module>
+        <module>modules/samples</module>
+        <module>modules/patches</module>
+        <module>modules/war</module>
+        <module>modules/handler</module>
+        <module>modules/xar-maven-plugin</module>
+        <module>modules/experimental</module>
+        <module>modules/migrator</module>
+        <module>modules/distribution</module>
+        <module>modules/packaging/package-skeleton</module>
+        <module>modules/packaging/package-archetype</module>
+        <module>modules/integration</module>
+        <module>modules/documentation</module>
+    </modules>
+
+    <properties>
+        <!-- Sets the source encoding to UTF-8 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <!-- The Java version used to build Synapse. This property is used in the configuration
+             of the maven-compiler-plugin as well as certain ant tasks executed using
+             maven-antrun-plugin. -->
+        <java.version>1.6</java.version>
+
+        <synapse.version>2.2.0-SNAPSHOT</synapse.version>
+
+        <!-- Apache Commons -->
+        <commons.dbcp.version>1.3</commons.dbcp.version> <!-- We need this version to support JDK 5 -->
+        <commons.pool.version>1.5.7</commons.pool.version>
+        <commons.vfs.version>2.0</commons.vfs.version>
+        <commons.net.version>3.0.1</commons.net.version>
+        <commons.collections.version>3.2.1</commons.collections.version>
+        <commons.io.version>2.1</commons.io.version>
+        <commons.cli.version>1.2</commons.cli.version>
+        <commons.lang.version>2.6</commons.lang.version>
+        <commons.codec.version>1.6</commons.codec.version>
+
+        <!-- Axis2 and its dependencies -->
+        <axis2.version>1.7.0-SNAPSHOT</axis2.version>
+        <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>
+        <axiom.version>1.2.15-SNAPSHOT</axiom.version>
+        <wsdl4j.version>1.6.2</wsdl4j.version>
+
+        <!-- addressing, rampart, neethi -->
+        <addressing.version>${axis2.version}</addressing.version>
+        <rampart.version>1.7.0-SNAPSHOT</rampart.version>
+        <neethi.version>3.0.4-SNAPSHOT</neethi.version>
+        <jruby.version>1.3.0</jruby.version>
+        <bcprov.jdk15.version>140</bcprov.jdk15.version>
+
+        <!-- startup, quartz -->
+        <quartz.version>2.2.0</quartz.version>
+        <geronimo-spec.version>1.1</geronimo-spec.version>
+
+        <!-- misc -->
+        <junit.version>3.8.2</junit.version>
+        <!-- Warning: log4j versions above 1.2.14 introduce additional transitive dependencies,
+             some of which are not available from the Maven central repository. -->
+        <log4j.version>1.2.14</log4j.version>
+        <xmlunit.version>1.3</xmlunit.version>
+        <derby.version>10.4.2.0</derby.version>
+        <wrapper.version>3.2.3</wrapper.version>
+        <saxon.version>8.9</saxon.version>
+        <jline.version>0.9.94</jline.version>
+        <xalan.version>2.7.1</xalan.version>
+        <xerces.version>2.9.1</xerces.version>
+        <truezip.version>6.6</truezip.version>
+        <jsch.version>0.1.31</jsch.version>
+        <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
+        <httpcore.nio.version>4.3</httpcore.nio.version>
+        <http.client.version>4.3.1</http.client.version>
+        <aspectj.version>1.6.1</aspectj.version>
+        <qfj.version>1.4.0</qfj.version>
+        <wso2uri-template.version>1.0.0</wso2uri-template.version>
+        <woden.version>1.0-SNAPSHOT</woden.version>
+        <activemq.version>5.2.0</activemq.version>
+        <snmp4j.version>2.0.3</snmp4j.version>
+        <snmp4j.agent.version>2.0.5</snmp4j.agent.version>
+        <rabbitmq.version>3.1.2</rabbitmq.version>
+        <bcprov.nhttp.version>1.49</bcprov.nhttp.version>
+
+        <!-- dependencies of Synapse extensions module -->
+        <wso2commons.version>1.2</wso2commons.version>
+        <wso2caching.version>3.5.0</wso2caching.version>
+        <wso2throttle.version>3.2.1</wso2throttle.version>
+        <wso2eventing-api.version>2.1</wso2eventing-api.version>
+        <xbean.version>2.2.0</xbean.version>
+        <bsf.version>3.0</bsf.version>
+        <groovy.version>1.1-rc-1</groovy.version>
+        <spring.version>1.2.8</spring.version>
+        <rhino.version>1.6R5</rhino.version>
+        <activation.version>1.1</activation.version>
+
+        <!-- Maven Tools -->
+        <maven.version>2.0.7</maven.version>
+        <maven.artifact.version>2.0.8</maven.artifact.version>
+        <maven.archiver.version>2.2</maven.archiver.version>
+        <plexus.utils.version>1.5.4</plexus.utils.version>
+    </properties>
+
+    <developers>
+        <!-- If you are a committer and your name is not listed here, please include/edit -->
+        <developer>
+            <name>Saminda Abeyruwan</name>
+            <id>saminda</id>
+            <email>saminda AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Afkham Azeez</name>
+            <id>azeez</id>
+            <email>azeez AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://afkham.org/</url>
+        </developer>
+        <developer>
+            <name>Paul Fremantle</name>
+            <id>pzf</id>
+            <email>paul AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://pzf.fremantle.org/</url>
+        </developer>
+        <developer>
+            <name>Eran Chinthaka</name>
+            <id>chinthaka</id>
+            <email>chinthaka AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~chinthaka</url>
+        </developer>
+        <developer>
+            <name>Ant Elder</name>
+            <id>antelder</id>
+            <email>ant.elder AT gmail.com</email>
+            <organization>IBM</organization>
+        </developer>
+        <developer>
+            <name>Glen Daniels</name>
+            <id>gdaniels</id>
+            <email>gdaniels AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Deepal Jayasinghe</name>
+            <id>deepal</id>
+            <email>deepal AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~deepal</url>
+        </developer>
+        <developer>
+            <name>Davanum Srinivas</name>
+            <id>dims</id>
+            <email>davanum@gmail.com</email>
+            <organization></organization>
+        </developer>
+        <developer>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Ruwan Linton</name>
+            <id>ruwan</id>
+            <email>ruwan AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Jaliya Ekanayake</name>
+            <id>jaliya</id>
+            <email>jnekanayake AT gmail.com</email>
+        </developer>
+        <developer>
+            <name>Indika Kumara</name>
+            <id>indika</id>
+            <email>indika@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Chathura Ekanayake</name>
+            <id>chathura_ce</id>
+            <email>chathura@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Kasun Samarasinghe</name>
+            <id>kasun</id>
+            <email>kasun2010@gmail.com</email>
+            <organization>University of Colombo</organization>
+        </developer>
+        <developer>
+            <name>Tijs Rademakers</name>
+            <id>tijs</id>
+            <email>t.rademakers@chello.nl</email>
+            <organization>Atos Origin</organization>
+        </developer>
+        <developer>
+            <name>Asankha Perera</name>
+            <id>asankha</id>
+            <email>asankha AT apache.org</email>
+            <organization>AdroitLogic</organization>
+            <url>http://adroitlogic.org</url>
+        </developer>
+        <developer>
+            <name>Upul Godage</name>
+            <id>upul</id>
+            <email>upul AT apache.org</email>
+            <organization>Apache</organization>
+        </developer>
+        <developer>
+            <name>Oleg Kalnichevski</name>
+            <id>olegk</id>
+            <email>OlegK AT apache.org</email>
+            <organization>Apache</organization>
+        </developer>
+        <developer>
+            <name>Andreas Veithen</name>
+            <id>veithen</id>
+            <email>veithen AT apache.org</email>
+            <url>http://www.linkedin.com/in/aveithen</url>
+        </developer>
+        <developer>
+            <name>Asanka Abeysinghe</name>
+            <id>asanka</id>
+            <email>asankaa AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Supun Kamburugamuva</name>
+            <id>supun</id>
+            <email>supun AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Hiranya Jayathilaka</name>
+            <id>hiranya</id>
+            <email>hiranya AT apache.org</email>
+            <organization>UC Santa Barbara</organization>
+        </developer>
+        <developer>
+            <name>Charith Wickramarachchi</name>
+            <id>charith</id>
+            <email>charith AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Heshan Suriyaarachchi</name>
+            <id>heshan</id>
+            <email>heshan AT apache.org</email>
+            <organization>WSO2</organization>
+            <url>http://heshans.blogspot.com/</url>
+        </developer>
+        <developer>
+            <name>Rajika Kumarasiri</name>
+            <id>rajikak</id>
+            <email>rajikak AT apache.org</email>
+        </developer>
+        <developer>
+            <name>Kasun Indrasiri</name>
+            <id>kasun</id>
+            <email>kasun AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer> 
+        <developer>
+            <name>Udayanga Wickramasinghe</name>
+            <id>uswick</id>
+            <email>uswick AT apache.org</email>
+        </developer>
+        <developer>
+            <name>Miyuru Wanninayaka</name>
+            <id>miyuru</id>
+            <email>miyuru AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Sadeep Jayasumana</name>
+            <id>sadeep</id>
+            <email>sadeep AT apache.org</email>
+            <organization>ANU</organization>
+            <url>http://www.apache.org/~sadeep</url>
+        </developer>
+        <developer>
+            <name>Isuru Udana</name>
+            <id>isudana</id>
+            <email>isudana AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+	<developer>
+            <name>Dushan Abeyruwan</name>
+            <id>dushan</id>
+            <email>dushan AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Eric Hubert</name>
+        </contributor>
+        <contributor>
+            <name>Hadrian Zbarcea</name>
+        </contributor>
+        <contributor>
+            <name>Sanjesh Pathak</name>
+        </contributor>
+        <contributor>
+            <name>Dave Irving</name>
+        </contributor>
+    </contributors>
+</project>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>src/test/resources/synapse-libraries/synapse-eipcore-lib</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target/classes/org/apache/synapse/libraries/eip</directory>
+            <outputDirectory>org/apache/synapse/libraries/eip</outputDirectory>
+            <excludes>
+                <exclude>**/metrics_module.xml</exclude>
+                <exclude>**/META-INF/*</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+</assembly>

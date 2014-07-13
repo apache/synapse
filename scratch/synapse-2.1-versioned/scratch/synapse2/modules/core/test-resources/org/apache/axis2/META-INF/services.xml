@@ -1,0 +1,23 @@
+<service name="npe">
+    <description>
+        This sample stimulate the Native Provider Endpoint
+    </description>
+    <parameter name="ServiceClass" locked="false">
+        org.apache.axis2.test.Echo</parameter>
+    <operation name="echo">
+        <messageReceiver
+                class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+        <actionMapping>urn:synapse/sendon</actionMapping>
+    </operation>
+    <operation name="fault" locked="false">
+        <actionMapping>urn:synapse/sendon-fault</actionMapping>
+    </operation>
+    <operation name="echo_addressing" locked="false">
+        <actionMapping>urn:synapse/sendon-addressing-engage</actionMapping>
+    </operation>
+    <operation name="ping">
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+        <actionMapping>urn:synapse/ping</actionMapping>
+    </operation>
+    <operation name="simple_resources"/>
+</service>

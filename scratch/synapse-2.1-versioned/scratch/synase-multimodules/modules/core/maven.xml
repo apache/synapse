@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Revision: 1.21 $ $Date: 2004-10-27 20:54:09 +0600 (Wed, 27 Oct 2004) $ -->
+
+<project default="jar"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:maven="jelly:maven"
+    xmlns:deploy="deploy"
+    xmlns:ant="jelly:ant">
+    <postGoal name="test:compile">
+        <mkdir dir="target/repository"/>
+        <ant:copy todir="target/repository">
+            <ant:fileset dir="../../repository">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        <attainGoal name="synapse_core"/>
+    </postGoal>
+    <goal name="synapse_core">
+        <j:set var="class_test.dir" value="target/test-classes"/>
+        <!--<mkdir dir="target/lib"/>-->
+        <!--<deploy:copy-deps todir="target/lib"/>-->
+
+        <echo message="----------------Creating First Dispatching aar----------------"/>
+        <mkdir dir="target/services/synapse/META-INF"/>
+        <copy file="test-resources/axis2/services/synapse/META-INF/services.xml"
+              tofile="target/services/synapse/META-INF/services.xml"/>
+        <jar jarfile="target/synapse.aar"
+             basedir="target/services/synapse">
+            <include name="**"/>
+        </jar>
+        <echo message="----------------Creating Empty Mediator aar----------------"/>
+        <mkdir dir="target/services/emptymediator/META-INF"/>
+        <copy file="test-resources/axis2/services/emptymediator/META-INF/services.xml"
+              tofile="target/services/emptymediator/META-INF/services.xml"/>
+        <jar jarfile="target/emptymediator.aar"
+             basedir="target/services/emptymediator">
+            <include name="**"/>
+        </jar>
+
+
+        <echo message="----------------Creating NPE aar----------------"/>
+        <mkdir dir="target/services/npe/META-INF"/>
+        <mkdir dir="target/services/npe/org/apache/axis2/test"/>
+        <copy file="test-resources/org/apache/axis2/META-INF/services.xml"
+              tofile="target/services/npe/META-INF/services.xml"/>
+        <copy file="target/test-classes/org/apache/axis2/test/Echo.class"
+              tofile="target/services/npe/org/apache/axis2/test/Echo.class"/>
+        <jar jarfile="target/npe.aar"
+             basedir="target/services/npe">
+            <include name="**"/>
+        </jar>
+        <echo message="----------------Creating test-mediator aar----------------"/>
+        <mkdir dir="target/services/test-mediator/META-INF"/>
+        <mkdir dir="target/services/test-mediator/org/apache/axis2/test"/>
+        <copy file="test-resources/org/apache/axis2/META-INF/service-mediator.xml"
+              tofile="target/services/test-mediator/META-INF/services.xml"/>
+        <copy file="target/test-classes/org/apache/axis2/test/TestMediator.class"
+              tofile="target/services/test-mediator/org/apache/axis2/test/TestMediator.class"/>
+        <jar jarfile="target/test-mediator.aar"
+             basedir="target/services/test-mediator">
+            <include name="**"/>
+        </jar>
+
+        <echo message="----------------Creating EnvironmentAware-Mediator aar----------------"/>
+        <mkdir dir="target/services/environmentaware-mediator/META-INF"/>
+        <mkdir dir="target/services/environmentaware-mediator/org/apache/axis2/test"/>
+        <copy file="test-resources/org/apache/axis2/META-INF/environmentaware-service.xml"
+              tofile="target/services/environmentaware-mediator/META-INF/services.xml"/>
+        <copy file="target/test-classes/org/apache/axis2/test/EnvironmentAwareMediator.class"
+              tofile="target/services/environmentaware-mediator/org/apache/axis2/test/EnvironmentAwareMediator.class"/>
+        <jar jarfile="target/environmentaware-mediator.aar"
+             basedir="target/services/environmentaware-mediator">
+            <include name="**"/>
+        </jar>
+
+        <echo message="-----------Creating Testing Repository - SendOn ----------"/>
+        <mkdir dir="target/synapse-repository-sendon"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-sendon/services/synapse.aar"/>
+        <copy file="target/npe.aar"
+              tofile="target/synapse-repository-sendon/services/npe.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-sendon/modules"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-sendon/modules/addressing-0.94.mar"/>
+        <copy file="../../repository/axis2.xml"
+              tofile="target/synapse-repository-sendon/axis2.xml"/>
+        <copy file="test/rules/synapse-sendon.xml"
+              tofile="target/synapse-repository-sendon/synapse.xml"/>
+
+
+        <echo message="-----------Creating Testing Repository - SendNow ----------"/>
+            <mkdir dir="target/synapse-repository-sendnow"/>
+            <copy file="target/synapse.aar"
+                  tofile="target/synapse-repository-sendnow/services/synapse.aar"/>
+            <copy file="target/npe.aar"
+                  tofile="target/synapse-repository-sendnow/services/npe.aar"/>
+            <copy file="target/emptymediator.aar"
+                  tofile="target/synapse-repository-sendnow/services/emptymediator.aar"/>
+            <mkdir dir="target/synapse-repository-sendnow/modules"/>
+            <copy file="../../repository/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-sendnow/modules/addressing-0.94.mar"/>
+            <copy file="../../repository/axis2.xml"
+                  tofile="target/synapse-repository-sendnow/axis2.xml"/>
+            <copy file="test/rules/synapse-sendnow.xml"
+                  tofile="target/synapse-repository-sendnow/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - SendOnAxis2 ----------"/>
+        <mkdir dir="target/synapse-repository-sendonAxis2"/>
+
+        <copy file="target/npe.aar"
+              tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>
+        <copy file="target/test-mediator.aar"
+              tofile="target/synapse-repository-sendonAxis2/services/test-mediator.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-sendonAxis2/services/emptymediator.aar"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-sendonAxis2/modules/addressing-0.94.mar"/>
+        <copy file="test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
+
+        <echo message="-----------Creating Testing Repository - SendonAxis2Tcp ----------"/>
+        <mkdir dir="target/synapse-repository-sendonAxis2"/>
+
+        <copy file="target/npe.aar"
+              tofile="target/synapse-repository-sendonAxis2Tcp/services/npe.aar"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-sendonAxis2Tcp/modules/addressing-0.94.mar"/>
+        <copy file="test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-sendonAxis2Tcp/axis2.xml"/>
+
+        <echo message="-----------Creating Testing Repository - HttpTcp ----------"/>
+        <mkdir dir="target/synapse-repository-httptcp"/>
+
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-httptcp/services/emptymediator.aar"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-httptcp/services/synapse.aar"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-httptcp/modules/addressing-0.94.mar"/>
+        <copy file="../../repository/axis2.xml"
+              tofile="target/synapse-repository-httptcp/axis2.xml"/>
+        <copy file="test/rules/synapse-httptcp.xml"
+              tofile="target/synapse-repository-httptcp/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - EnvironmentAware ----------"/>
+        <mkdir dir="target/synapse-repository-environmentaware"/>
+
+        <copy file="target/environmentaware-mediator.aar"
+              tofile="target/synapse-repository-environmentaware/services/environmentaware-mediator.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-environmentaware/services/synapse.aar"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-environmentaware/modules/addressing-0.94.mar"/>
+        <copy file="../../repository/axis2.xml"
+              tofile="target/synapse-repository-environmentaware/axis2.xml"/>
+        <copy file="test/rules/synapse-environmentaware.xml"
+              tofile="target/synapse-repository-environmentaware/synapse.xml"/>
+
+        <ant:delete file="target/npe.aar"/>
+        <ant:delete file="target/test-mediator.aar"/>
+        <ant:delete dir="target/test-mediator"/>
+        <ant:delete dir="target/environmentaware-mediator.aar"/>
+        <ant:delete dir="target/environmentaware-mediator"/>
+
+
+        <echo message="-----------Creating Testing Repository - Genral----------"/>
+        <mkdir dir="target/synapse-repository"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository/modules"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository/modules/addressing-0.94.mar"/>
+        <copy file="../../repository/axis2.xml"
+              tofile="target/synapse-repository/axis2.xml"/>
+        <copy file="../../repository/synapse.xml"
+              tofile="target/synapse-repository/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
+        <mkdir dir="target/synapse-repository-fault"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-fault/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-fault/modules"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-fault/modules/addressing-0.94.mar"/>
+        <copy file="../../repository/axis2.xml"
+              tofile="target/synapse-repository-fault/axis2.xml"/>
+        <copy file="test/rules/synapse-fault-return.xml"
+              tofile="target/synapse-repository-fault/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - Send ----------"/>
+        <mkdir dir="target/synapse-repository-send"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-send/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-send/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-send/modules"/>
+        <copy file="../../repository/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-send/modules/addressing-0.94.mar"/>
+        <copy file="../../repository/axis2.xml"
+              tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
+        <copy file="test/rules/synapse-send.xml"
+              tofile="target/synapse-repository-send/synapse.xml"/>
+
+        <ant:delete dir="target/modules"/>
+        <ant:delete dir="target/services"/>
+        <ant:delete file="target/emptymediator.aar"/>
+        <ant:delete file="target/synapse.aar"/>
+        <ant:delete file="target/environmentaware-mediator.aar"/>
+
+        <ant:path id="classes_test.dir" location="${class_test.dir}"/>
+        <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
+    </goal>
+
+</project>

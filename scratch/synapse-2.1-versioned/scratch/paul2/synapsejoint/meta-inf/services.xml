@@ -1,0 +1,10 @@
+  <service name="dummysq">
+
+    <parameter name="ServiceClass" locked="xsd:false">redirect.Redirect</parameter>
+
+    <operation name="mediate" > 
+          <messageReceiver class="org.apache.synapse.mediator.MediatorMessageReceiver" />
+    </operation>
+    
+  </service>
+  

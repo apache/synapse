@@ -1,0 +1,76 @@
+<project name="synapse" default="compile" basedir=".">
+
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="./lib"/>
+    <property name="classes.dir" value="./classes"/>
+    <property name="jardrop.dir" value="${build.dir}/services"/>
+
+    <path id="classpath.library">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="prepare">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${jardrop.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${classes.dir}"/>
+        <delete dir="${jardrop.dir}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}">
+            <classpath refid="classpath.library"/>
+        </javac>
+
+        <jar destfile="${jardrop.dir}/mediation.aar">
+            <fileset dir="${classes.dir}">
+                <include name="**/SimpleLoggingMediator.class"/>
+                <include name="**/DependencyManager.class"/>
+                <include name="**/SimpleDummyMediator.class"/>
+                <include name="**/SynapseAbstractMessageReceiver.class"/>
+                <include name="**/SynapseMessageReceiver.class"/>
+                <include name="**/RuleBean.class"/>
+            </fileset>
+            <fileset dir="${src.dir}/org/apache/synapse/mediators">
+                <include name="META-INF/services.xml"/>
+                <include name="META-INF/synapse.xml"/>
+            </fileset>
+        </jar>
+
+        <jar destfile="${jardrop.dir}/synapse_dispatch.jar">
+            <fileset dir="${classes.dir}">
+                <include name="**/SynapseBaseDispatcher.class"/>
+                <include name="**/SynapseRuleReader.class"/>
+                <include name="**/SynapseRuleEngine.class"/>
+                <include name="**/RuleBean.class"/>
+            </fileset>
+        </jar>
+
+
+        <jar destfile="${jardrop.dir}/LoggingModule.mar">
+            <fileset dir="${classes.dir}">
+                <include name="**/LoggingModule.class"/>
+                <include name="**/LoggingHandler.class"/>
+            </fileset>
+            <fileset dir="${src.dir}/org/apache/synapse/handlers">
+                <include name="META-INF/module.xml"/>
+            </fileset>
+        </jar>
+
+        <copy file="/home/saminda/myprojects/synapse/build/services/LoggingModule.mar"
+        todir="/home/saminda/myprojects/synapse/server/modules" overwrite="true"/>
+        <copy file="/home/saminda/myprojects/synapse/build/services/mediation.aar"
+        todir="/home/saminda/myprojects/synapse/server/services" overwrite="true"/>
+        <copy file="/home/saminda/myprojects/synapse/build/services/synapse_dispatch.jar"
+        todir="/home/saminda/myprojects/synapse/server/lib" overwrite="true"/>
+
+    </target>
+
+</project>

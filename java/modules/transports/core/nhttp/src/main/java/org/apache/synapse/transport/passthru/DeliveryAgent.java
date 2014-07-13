@@ -157,8 +157,9 @@ public class DeliveryAgent {
      *
      * @param host name of the remote host
      * @param port remote port number
+     * @param conn connection made available to process the request
      */
-    public void connected(String host, int port) {
+    public void connected(String host, int port, NHttpClientConnection conn) {
         Queue<MessageContext> queue = null;
         lock.lock();
         try {
@@ -168,13 +169,19 @@ public class DeliveryAgent {
         }
 
         while (queue.size() > 0) {
-            NHttpClientConnection conn = targetConnections.getConnection(host, port);
+            if (conn == null) {
+                // Try to get an existing connection from pool. Here we should not ask to create
+                // new connections as it may ended up with extra connections. New connections are
+                // created upon request submission.
+                conn = targetConnections.getExistingConnection(host, port);
+            }
             if (conn != null) {
                 MessageContext messageContext = queue.poll();
 
                 if (messageContext != null) {
                     tryNextMessage(messageContext, conn);
                 }
+                conn = null;
             } else {
                 break;
             }

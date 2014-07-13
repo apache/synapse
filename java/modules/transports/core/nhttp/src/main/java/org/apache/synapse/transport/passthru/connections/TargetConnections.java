@@ -104,6 +104,23 @@ public class TargetConnections {
     }
 
     /**
+     * Return an existing connection to the host:port pair from connection pool.
+     * If a connection is not available, return <code>null</code>
+     *
+     * @param host host
+     * @param port port
+     * @return returns a connection if already available in the pool
+     */
+    public NHttpClientConnection getExistingConnection(String host, int port) {
+        if (log.isDebugEnabled()) {
+            log.debug("Trying to get an existing connection to the " + host + ":" + port);
+        }
+
+        HostConnections pool = getConnectionPool(host, port);
+        return pool.getConnection();
+    }
+
+    /**
      * This connection is no longer needed. So we need to close connection.
      *
      * @param conn connection to shutdownConnection
@@ -188,17 +205,16 @@ public class TargetConnections {
 
     private HostConnections getConnectionPool(String host, int port) {
         String key = host + ":" + port;
-        // see weather a pool already exists for this host:port
-        HostConnections pool = poolMap.get(key);
+        HostConnections pool;
         synchronized (poolMap) {
+            // see weather a pool already exists for this host:port
+            pool = poolMap.get(key);
             if (pool == null) {
                 pool = new HostConnections(host, port, maxConnections);
                 poolMap.put(key, pool);
             }
         }
-
         return pool;
     }
-
 
 }

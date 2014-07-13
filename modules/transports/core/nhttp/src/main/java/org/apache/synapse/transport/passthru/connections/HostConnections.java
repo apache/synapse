@@ -118,7 +118,9 @@ public class HostConnections {
         }
         lock.lock();
         try {
-            freeConnections.add(conn);
+            // Adding to busyConnections to make sure the first requester get it.
+            // Otherwise someone else might acquire it.
+            busyConnections.add(conn);
         } finally {
             lock.unlock();
         }

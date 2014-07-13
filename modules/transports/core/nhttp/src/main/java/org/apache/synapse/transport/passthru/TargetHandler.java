@@ -19,8 +19,6 @@
 
 package org.apache.synapse.transport.passthru;
 
-import java.io.IOException;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.WSDL2Constants;
@@ -32,11 +30,17 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.nio.DefaultNHttpClientConnection;
-import org.apache.http.nio.*;
+import org.apache.http.nio.ContentDecoder;
+import org.apache.http.nio.ContentEncoder;
+import org.apache.http.nio.NHttpClientConnection;
+import org.apache.http.nio.NHttpClientEventHandler;
+import org.apache.http.nio.NHttpServerConnection;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.connections.HostConnections;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
+
+import java.io.IOException;
 
 /**
  * This class is handling events from the transport -- > client.
@@ -77,7 +81,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         targetConfiguration.getConnections().addConnection(conn);
 
         // notify about the new connection
-        deliveryAgent.connected(pool.getHost(), pool.getPort());
+        deliveryAgent.connected(pool.getHost(), pool.getPort(), conn);
         
         conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
                 System.currentTimeMillis());

@@ -1,6 +1,0 @@
-<service name="emptymediator">
-    <operation name="mediate" > 
-          <messageReceiver class="org.apache.synapse.axis2.EmptyMessageReceiver" />
-    </operation>
-</service>
-  

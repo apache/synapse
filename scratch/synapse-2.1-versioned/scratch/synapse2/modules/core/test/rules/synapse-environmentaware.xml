@@ -1,7 +1,0 @@
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-    <stage name="test-environmentaware">
-        <engage-addressing-in/>
-        <servicemediator name="environmentaware-mediator"
-                         service="environmentaware-mediator"/>
-    </stage>
-</synapse>

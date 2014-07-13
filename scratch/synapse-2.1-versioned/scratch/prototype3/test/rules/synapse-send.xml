@@ -1,8 +1,0 @@
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-    <stage name="xpath">
-        <xpath expr="//ns:text" xmlns:ns="urn:text-body">
-            <classmediator name="sendBackHelper" class="sampleMediators.SendBack"/>
-            <send/>
-        </xpath>
-    </stage>
-</synapse>

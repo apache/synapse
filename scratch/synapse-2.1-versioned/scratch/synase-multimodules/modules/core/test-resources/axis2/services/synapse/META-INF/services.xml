@@ -1,8 +1,0 @@
-  <service name="synapse">
-
-    <operation name="mediate" > 
-          <messageReceiver class="org.apache.synapse.axis2.SynapseMessageReceiver" />
-    </operation>
-    
-  </service>
-  

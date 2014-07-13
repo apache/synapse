@@ -205,16 +205,16 @@ public class TargetConnections {
 
     private HostConnections getConnectionPool(String host, int port) {
         String key = host + ":" + port;
-        HostConnections pool;
-        synchronized (poolMap) {
-            // see weather a pool already exists for this host:port
-            pool = poolMap.get(key);
-            if (pool == null) {
-                pool = new HostConnections(host, port, maxConnections);
-                poolMap.put(key, pool);
+        if (!poolMap.containsKey(key)) {
+            synchronized (poolMap) {
+                // see weather a pool already exists for this host:port
+                if (!poolMap.containsKey(key)) {
+                    HostConnections pool = new HostConnections(host, port, maxConnections);
+                    poolMap.put(key, pool);
+                }
             }
         }
-        return pool;
+        return poolMap.get(key);
     }
 
 }

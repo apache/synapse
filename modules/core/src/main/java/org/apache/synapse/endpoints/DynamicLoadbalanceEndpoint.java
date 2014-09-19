@@ -40,13 +40,7 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents a dynamic load balance endpoint. The application membership is not static,
@@ -462,7 +456,10 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
             if (currentMember == null) {
                 return;
             }
-            synCtx.getFaultStack().pop(); // Remove the LoadbalanceFaultHandler
+            Stack faultStack = synCtx.getFaultStack();
+            if (!faultStack.empty()) {
+                faultStack.pop(); // Remove the LoadbalanceFaultHandler
+            }
             currentMember = lbMembershipHandler.getNextApplicationMember(algorithmContext);
             if(currentMember == null){
                 String msg = "No application members available";

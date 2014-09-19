@@ -42,6 +42,7 @@
             <item name="Configuration Language" href="userguide/config.html"/>
             <item name="Mediators Catalog" href="userguide/mediators.html"/>
             <item name="Transports Catalog" href="userguide/transports.html"/>
+            <item name="XPath functions and Variables" href="userguide/xpath.html"/>
             <item name="Extending Synapse" href="userguide/extending.html"/>
             <item name="Synapse Template Libraries" href="userguide/template_library.html"/>
             <item name="Upgrading" href="userguide/upgrading.html"/>

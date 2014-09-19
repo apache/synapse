@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - XPath Functions and Variables</title>
+    </properties>
+    <body>
+        <section name="Introduction" id="Intro">
+            <p>
+                Apache Synapse supports standard XPath functions and variables through its
+                underlying XPath
+                engine. Apart from standard XPath functions, there are several custom XPath
+                functions
+                and variables defined by Synapse to retrieve various message context properties.
+            </p>
+        </section>
+        <section name="Contents">
+            <ul>
+                <li>
+                    <a href="#functions">Functions</a>
+                    <ul>
+                        <li>
+                            <a href="#get_prop">get-property</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#get_prop">base64Encode</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#var">Variables</a>
+                    <ul>
+                        <li>
+                            <a href="#axis2">axis2</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#trp">trp</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#ctx">ctx</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#url">url</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#body">body</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#header">header</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section name="Custom Functions" id="functions">
+            <subsection name="get-property function" id="get_prop">
+                <p>
+                    Get property function retrieves a property from the message context at the given
+                    scope.
+                    If the scope is not specified, property is retrieved from the default synapse
+                    scope.
+                </p>
+                <p>Syntax:</p>
+                <div class="xmlConf">get-property(String scope, String propertyName)
+get-property(String propertyName)</div>
+
+                <h4>
+                    Supported Scopes
+                </h4>
+                <ul>
+                    <li>default</li>
+                    <li>axis2</li>
+                    <li>transport</li>
+                    <li>registry</li>
+                    <li>system</li>
+                </ul>
+
+                <h4 id="default_scope">Default scope</h4>
+                <p>
+                    Message context properties residing in Synapse scope can be retrieved from the
+                    default scope. These are the properties directly set on the Synapse MessageContext
+                    instance.
+                    Apart from user defined properties, following special properties can also be
+                    retrieved from the default scope.
+                </p>
+                <table border="1" cellpadding="1" cellspacing="1">
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>Return Value</td>
+                        </tr>
+                        <tr>
+                            <td>To</td>
+                            <td>Incoming URL as a String or empty string if a To address is
+                                not defined.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>From</td>
+                            <td>From address as a String or empty string if a From address
+                                is not defined
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Action</td>
+                            <td>SOAP Action header value as a String or empty string
+                                if a Action is not defined
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>FaultTo</td>
+                            <td>SOAP FautTo header value as a String or empty string if a
+                                FaultTo address is not defined
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ReplyTo</td>
+                            <td>ReplyTo header value as a String or empty string if a
+                                ReplyTo address is not defined
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MessageID</td>
+                            <td>A unique identifier (UUID) for the message as a String .
+                                This id is guaranteed to be unique.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>FAULT</td>
+                            <td>TRUE if the message has a fault or empty string if message doesn't
+                                have a
+                                fault
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MESSAGE_FORMAT</td>
+                            <td>Returns pox, get, soap11, soap12 depending on the message. If a
+                                message type
+                                is unknown this returns soap12
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>OperationName</td>
+                            <td>Operation name corresponding to the message.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 id="axis2_scope">Axis2 scope</h4>
+                <p>
+                    Message context properties residing in axis2 scope can be retrieved from the axis2
+                    scope. These are the properties set on the underlying Axis2 MessageContext object.
+                </p>
+
+                <h4 id="transport_scope">Transport scope</h4>
+                <p>
+                    Message context properties residing in transport scope can be retrieved from the
+                    transport scope. These are the transport headers set on the MessageContext.
+                </p>
+
+                <h4 id="reg_scope">Registry scope</h4>
+                <p>Properties residing in registry can be retrieved from the registry scope.</p>
+
+                <h4 id="system_scope">System scope</h4>
+                <p>Java System properties can be retrieved from the system scope.</p>
+
+            </subsection>
+            <subsection name="base64Encode function" id="base64">
+                <p>Returns the base64 encoded value of the argument.</p>
+                <p>Syntax:</p>
+                <div class="xmlConf">base64Encode(String value)</div>
+            </subsection>
+        </section>
+        <section name="Variables" id="var">
+            <p>There are several XPath variables supported by Synapse. These are used for
+                accessing
+                various
+                properties from the message context
+            </p>
+            <ul>
+                <li>$axis2</li>
+                <li>$trp</li>
+                <li>$ctx</li>
+                <li>$url</li>
+                <li>$body</li>
+                <li>$header</li>
+            </ul>
+
+            <p>These XPath variables get the properties at various scopes.</p>
+
+            <h4 id="ctx">$ctx</h4>
+            <p>Variable prefix for accessing the MessageContext properties in default scope.</p>
+            <p>i.e To get the property named 'foo' at the default scope use the following XPath
+                expression
+            </p>
+            <div class="xmlConf">$ctx:foo</div>
+
+            <h4 id="axis2">$axis2</h4>
+            <p>Variable prefix for accessing the axis2 MessageContext properties</p>
+            <p>i.e. To get the property named 'messageType' use the following XPath expression</p>
+            <div class="xmlConf">$axis2:messageType</div>
+
+            <h4 id="trp">$trp</h4>
+            <p>Variable prefix for accessing transport headers of the message</p>
+            <p>i.e. To get the transport header named Content-Type use the following XPath
+                expression
+            </p>
+            <div class="xmlConf">$trp:Content-Type</div>
+
+            <h4 id="url">$url</h4>
+            <p>Variable prefix for accessing URL parameters of the message</p>
+
+            <p>i.e. To get the URL parameter named 'bar' use the following XPth expression</p>
+            <div class="xmlConf">$url:bar</div>
+
+            <h4 id="body">$body</h4>
+            <p>Get the message body</p>
+
+            <h4 id="header">$header</h4>
+            <p>Get the soap header</p>
+        </section>
+    </body>
+</document>

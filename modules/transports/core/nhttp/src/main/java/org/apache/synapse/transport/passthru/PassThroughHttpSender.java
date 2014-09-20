@@ -408,10 +408,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 						formatter.writeTo(msgContext, format, out, false);
 					}
 					
-					if ((msgContext.getProperty(
-                            PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
-						    (Boolean) msgContext.getProperty(
-                                    PassThroughConstants.REST_GET_DELETE_INVOKE))) {
+					if (isCompleteWithoutData(msgContext)) {
 							pipe.setSerializationCompleteWithoutData(true);
 					} else {
 						pipe.setSerializationComplete(true);
@@ -420,6 +417,15 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 			}
 		}
 	}
+
+    private boolean isCompleteWithoutData(MessageContext msgContext) {
+        if (Boolean.TRUE.equals(msgContext.getProperty(
+                PassThroughConstants.REST_GET_DELETE_INVOKE))) {
+            return true;
+        }
+
+        return Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY));
+    }
 
     /**
      * Return the IOEventDispatch implementation to be used. This is overridden by the

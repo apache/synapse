@@ -120,8 +120,8 @@ public class TargetRequest {
             TargetContext.get(conn).setWriter(pipe);
         }
 
-        String path = fullUrl ?
-                    url.toString() : url.getPath() +
+        String path = fullUrl ? url.toString() :
+                ("".equals(url.getPath()) ? "/" : url.getPath()) +
                     (url.getQuery() != null ? "?" + url.getQuery() : "");
 
         long contentLength = -1;

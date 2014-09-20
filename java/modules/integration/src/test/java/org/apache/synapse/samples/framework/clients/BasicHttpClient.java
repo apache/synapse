@@ -20,6 +20,7 @@
 package org.apache.synapse.samples.framework.clients;
 
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -46,6 +47,23 @@ public class BasicHttpClient {
         try {
             HttpGet get = new HttpGet(url);
             return new HttpResponse(client.execute(get));
+        } finally {
+            client.close();
+        }
+    }
+
+    /**
+     * Make a HTTP OPTIONS request on the specified URL.
+     *
+     * @param url A valid HTTP URL
+     * @return A HttpResponse object
+     * @throws Exception If an error occurs while making the HTTP call
+     */
+    public HttpResponse doOptions(String url) throws Exception {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        try {
+            HttpOptions options = new HttpOptions(url);
+            return new HttpResponse(client.execute(options));
         } finally {
             client.close();
         }

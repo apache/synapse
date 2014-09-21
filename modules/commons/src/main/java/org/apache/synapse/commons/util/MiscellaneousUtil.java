@@ -30,6 +30,8 @@ import java.util.Properties;
  */
 public class MiscellaneousUtil {
 
+	private static final String CONF_LOCATION = "conf.location";
+	
     private static Log log = LogFactory.getLog(MiscellaneousUtil.class);
 
     private MiscellaneousUtil() {
@@ -105,12 +107,12 @@ public class MiscellaneousUtil {
     }
 
     /**
-     * Loads the properties from a given property file path
-     *
-     * @param filePath Path of the property file
-     * @return Properties loaded from given file
-     */
-    public static Properties loadProperties(String filePath) {
+	 * Loads the properties from a given property file path
+	 * 
+	 * @param filePath Path of the property file
+	 * @return Properties loaded from given file
+	 */
+	public static Properties loadProperties(String filePath) {
 
         Properties properties = new Properties();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -118,15 +120,32 @@ public class MiscellaneousUtil {
         if (log.isDebugEnabled()) {
             log.debug("Loading a file '" + filePath + "' from classpath");
         }
-
-        InputStream in = cl.getResourceAsStream(filePath);
+        
+        InputStream in  = null;
+        
+        // if we reach this point assume that we may have to look into the user provided
+        // external location for the given properties
+		if (System.getProperty(CONF_LOCATION) != null) {
+			try {
+				in = new FileInputStream(System.getProperty(CONF_LOCATION) + File.separator + filePath);
+			} catch (FileNotFoundException e) {
+				log.warn("Error loading properties from a file at the System " +
+                        "defined location: " + filePath, e);
+			}
+		}
+		
+		if (in == null){
+			// if cannot find with system path definition look into the class path for the
+			// given property file
+			in = cl.getResourceAsStream(filePath);
+		}
+       
         if (in == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to load file  '" + filePath + "'");
             }
 
-            filePath = "conf" +
-                    File.separatorChar + filePath;
+            filePath = "conf" + File.separatorChar + filePath;
             if (log.isDebugEnabled()) {
                 log.debug("Loading a file '" + filePath + "' from classpath");
             }
@@ -138,6 +157,7 @@ public class MiscellaneousUtil {
                 }
             }
         }
+
         if (in != null) {
             try {
                 properties.load(in);

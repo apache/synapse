@@ -52,7 +52,6 @@ public class VFSOutTransportInfo implements OutTransportInfo {
      * @param outFileURI URI of the file to which the message is delivered
      */
     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {
-
         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
             this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
         } else {
@@ -69,7 +68,7 @@ public class VFSOutTransportInfo implements OutTransportInfo {
 
         if (properties.containsKey(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE)) {
             String useTempFile = properties.get(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE);
-            isUseTempFile = Boolean.valueOf(useTempFile).booleanValue();
+            isUseTempFile = Boolean.valueOf(useTempFile);
         }
 
         if (properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {
@@ -82,17 +81,16 @@ public class VFSOutTransportInfo implements OutTransportInfo {
         if (properties.containsKey(VFSConstants.TRANSPORT_FILE_LOCKING)) {
             String strFileLocking = properties.get(VFSConstants.TRANSPORT_FILE_LOCKING);
             if (VFSConstants.TRANSPORT_FILE_LOCKING_ENABLED.equals(strFileLocking)) {
-                fileLocking = true;
+                this.fileLocking = true;
             } else if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strFileLocking)) {
-                fileLocking = false;
+                this.fileLocking = false;
             }
         } else {
             this.fileLocking = fileLocking;
         }
 
         if (properties.containsKey(VFSConstants.APPEND)) {
-            String strAppend = properties.get(VFSConstants.APPEND);
-            append = Boolean.parseBoolean(strAppend);
+            append = Boolean.parseBoolean(properties.get(VFSConstants.APPEND));
         }
 
         if (log.isDebugEnabled()) {

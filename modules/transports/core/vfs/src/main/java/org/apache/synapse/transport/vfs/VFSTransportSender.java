@@ -16,6 +16,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
+
 package org.apache.synapse.transport.vfs;
 
 import org.apache.axiom.om.OMOutputFormat;
@@ -38,7 +39,6 @@ import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -49,15 +49,13 @@ import java.io.IOException;
  */
 public class VFSTransportSender extends AbstractTransportSender implements ManagementSupport {
 
-    public static final String TRANSPORT_NAME = "vfs";
-
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
 
     /**
      * By default file locking in VFS transport is turned on at a global level
      *
-     * NOTE: DO NOT USE THIS FLAG, USE PollTableEntry#isFileLockingEnabled() TO CHECK WHETHR
+     * NOTE: DO NOT USE THIS FLAG, USE PollTableEntry#isFileLockingEnabled() TO CHECK WHETHER
      * FILE LOCKING IS ENABLED
      */
     private boolean globalFileLockingFlag = true;
@@ -122,7 +120,6 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
         if (vfsOutInfo != null) {
             FileObject replyFile = null;
             try {
-                
                 boolean wasError = true;
                 int retryCount = 0;
                 int maxRetryCount = vfsOutInfo.getMaxRetryCount();
@@ -132,7 +129,6 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 String tempTargetFileName, actualTargetFileName = null;
 
                 while (wasError) {
-                    
                     try {
                         retryCount++;
                         replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
@@ -161,7 +157,6 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 }
                 
                 if (replyFile.exists()) {
-
                     if (replyFile.getType() == FileType.FOLDER) {
                         if (isUseTempFile) {
                             tempTargetFileName = VFSUtils.generateTempFileName();

@@ -21,9 +21,9 @@ package org.apache.synapse.format.syslog;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.impl.llom.factory.OMLinkedListImplFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
@@ -125,7 +125,7 @@ public class SyslogMessageBuilder implements Builder {
             throw new AxisFault("I/O error", ex);
         }
         
-        OMFactory factory = new OMLinkedListImplFactory();
+        OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement message = factory.createOMElement(SyslogConstants.MESSAGE);
         message.addAttribute(factory.createOMAttribute(SyslogConstants.FACILITY, null, facility));
         message.addAttribute(factory.createOMAttribute(SyslogConstants.SEVERITY, null, severity));

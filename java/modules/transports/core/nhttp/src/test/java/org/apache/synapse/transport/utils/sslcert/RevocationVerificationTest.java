@@ -45,15 +45,7 @@ public class RevocationVerificationTest extends TestCase {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         Utils utils = new Utils();
         X509Certificate[] certificates = utils.getRealCertificateChain();
-        Throwable throwable = null;
-        try {
-            crlPathValidation(certificates);
-        } catch (CertificateVerificationException e) {
-            //Path Verification Should Pass. This catch block should not be called
-            throwable = e;
-        }
-        assertNull(throwable);
-
+        crlPathValidation(certificates);
     }
 
     /**
@@ -89,14 +81,7 @@ public class RevocationVerificationTest extends TestCase {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         Utils utils = new Utils();
         X509Certificate[] certificates = utils.getRealCertificateChain();
-        Throwable throwable = null;
-        try {
-            ocspPathValidation(certificates);
-        } catch (CertificateVerificationException e) {
-            //Path Verification Should Pass. This catch block should not be called
-            throwable = e;
-        }
-        assertNull(throwable);
+        ocspPathValidation(certificates);
     }
 
     /**

@@ -1098,7 +1098,7 @@
         <aspectj.version>1.8.2</aspectj.version>
         <qfj.version>1.4.0</qfj.version>
         <wso2uri-template.version>1.0.0</wso2uri-template.version>
-        <woden.version>1.0-SNAPSHOT</woden.version>
+        <woden.version>1.0M11-SNAPSHOT</woden.version>
         <activemq.version>5.2.0</activemq.version>
         <snmp4j.version>2.0.3</snmp4j.version>
         <snmp4j.agent.version>2.0.5</snmp4j.agent.version>

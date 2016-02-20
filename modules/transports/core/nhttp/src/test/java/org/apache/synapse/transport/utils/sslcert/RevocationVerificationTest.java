@@ -18,17 +18,19 @@
  */
 package org.apache.synapse.transport.utils.sslcert;
 
-import junit.framework.TestCase;
 import org.apache.synapse.transport.utils.sslcert.crl.CRLCache;
 import org.apache.synapse.transport.utils.sslcert.crl.CRLVerifier;
 import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPCache;
 import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPVerifier;
 import org.apache.synapse.transport.utils.sslcert.pathvalidation.CertificatePathValidator;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.security.Security;
 import java.security.cert.X509Certificate;
 
-public class RevocationVerificationTest extends TestCase {
+public class RevocationVerificationTest extends Assert {
 
     /**
      * Tests CRL Path Validation with the use of a real certificate chain. The verification process
@@ -40,6 +42,8 @@ public class RevocationVerificationTest extends TestCase {
      *
      * @throws Exception
      */
+    @Test
+    @Ignore("Unit tests with builtin expiration date are bad")
     public void testCRLPathValidation() throws Exception {
         //Add BouncyCastle as Security Provider.
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -54,6 +58,7 @@ public class RevocationVerificationTest extends TestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testCRLPathValidationWithFakeCerts() throws Exception {
         //Add BouncyCastle as Security Provider.
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -76,6 +81,8 @@ public class RevocationVerificationTest extends TestCase {
      *
      * @throws Exception
      */
+    @Test
+    @Ignore("Unit tests with builtin expiration date are bad")
     public void testOCSPPathValidation() throws Exception {
         //Add BouncyCastle as Security Provider.
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -91,6 +98,7 @@ public class RevocationVerificationTest extends TestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testOCSPPathValidationWithFakeCerts() throws Exception {
 
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());

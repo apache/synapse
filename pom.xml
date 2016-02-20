@@ -1069,7 +1069,7 @@
 
         <!-- addressing, rampart, neethi -->
         <addressing.version>${axis2.version}</addressing.version>
-        <rampart.version>1.7.0-SNAPSHOT</rampart.version>
+        <rampart.version>1.7.0</rampart.version>
         <neethi.version>3.0.4-SNAPSHOT</neethi.version>
         <jruby.version>1.3.0</jruby.version>
         <bcprov.jdk15.version>140</bcprov.jdk15.version>

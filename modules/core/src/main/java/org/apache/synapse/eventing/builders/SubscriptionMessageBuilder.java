@@ -57,10 +57,6 @@ public class SubscriptionMessageBuilder {
     private static final QName RENEW =
             new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_RENEW);
 
-    private static String errorSubCode = null;
-    private static String errorReason = null;
-    private static String errorCode = null;
-
     /**
      * (01) <s12:Envelope
      * (02)     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
@@ -336,34 +332,10 @@ public class SubscriptionMessageBuilder {
         throw new SynapseException(message);
     }
 
-    public static String getErrorSubCode() {
-        return errorSubCode;
-    }
-
-    public static void setErrorSubCode(String errorCode) {
-        errorSubCode = errorCode;
-    }
-
-    public static String getErrorReason() {
-        return errorReason;
-    }
-
-    public static void setErrorReason(String errorReasons) {
-        errorReason = errorReasons;
-    }
-
-    public static String getErrorCode() {
-        return errorCode;
-    }
-
-    public static void setErrorCode(String errorCodes) {
-        errorCode = errorCodes;
-    }
-
     private static void setExpirationFault(SynapseSubscription subscription) {
-        setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);
-        setErrorSubCode("InvalidExpirationTime");
-        setErrorReason("The expiration time requested is invalid");
+        subscription.setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);
+        subscription.setErrorSubCode("InvalidExpirationTime");
+        subscription.setErrorReason("The expiration time requested is invalid");
         subscription.setId(null);
     }
 

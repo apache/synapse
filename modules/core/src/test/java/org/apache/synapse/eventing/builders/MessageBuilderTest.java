@@ -81,9 +81,9 @@ public class MessageBuilderTest extends TestCase {
             assertEquals(filterDialect, sub.getFilterDialect());
             assertEquals(filter, sub.getFilterValue());
             assertEquals(date, sub.getExpires().getTime());
-            assertNull(SubscriptionMessageBuilder.getErrorCode());
-            assertNull(SubscriptionMessageBuilder.getErrorReason());
-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
+            assertNull(sub.getErrorCode());
+            assertNull(sub.getErrorReason());
+            assertNull(sub.getErrorSubCode());
         } catch (Exception e) {
             fail("Error while constructing the sample subscription request: " + e.getMessage());
         }
@@ -102,9 +102,9 @@ public class MessageBuilderTest extends TestCase {
             SynapseSubscription sub = SubscriptionMessageBuilder.createUnSubscribeMessage(msgCtx);
             assertEquals(id, sub.getId());
             assertEquals(addressUrl, sub.getAddressUrl());
-            assertNull(SubscriptionMessageBuilder.getErrorCode());
-            assertNull(SubscriptionMessageBuilder.getErrorReason());
-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
+            assertNull(sub.getErrorCode());
+            assertNull(sub.getErrorReason());
+            assertNull(sub.getErrorSubCode());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,9 +133,9 @@ public class MessageBuilderTest extends TestCase {
             assertEquals(id, sub.getId());
             assertEquals(addressUrl, sub.getAddressUrl());
             assertEquals(date, sub.getExpires().getTime());
-            assertNull(SubscriptionMessageBuilder.getErrorCode());
-            assertNull(SubscriptionMessageBuilder.getErrorReason());
-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
+            assertNull(sub.getErrorCode());
+            assertNull(sub.getErrorReason());
+            assertNull(sub.getErrorSubCode());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,9 +157,9 @@ public class MessageBuilderTest extends TestCase {
             SynapseSubscription sub = SubscriptionMessageBuilder.createGetStatusMessage(msgCtx);
             assertEquals(id, sub.getId());
             assertEquals(addressUrl, sub.getAddressUrl());
-            assertNull(SubscriptionMessageBuilder.getErrorCode());
-            assertNull(SubscriptionMessageBuilder.getErrorReason());
-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
+            assertNull(sub.getErrorCode());
+            assertNull(sub.getErrorReason());
+            assertNull(sub.getErrorSubCode());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -184,9 +184,9 @@ public class MessageBuilderTest extends TestCase {
                     createRenewSubscribeMessage(msgCtx);
             assertNull(id, sub.getId());
             assertEquals(addressUrl, sub.getAddressUrl());
-            assertNotNull(SubscriptionMessageBuilder.getErrorCode());
-            assertNotNull(SubscriptionMessageBuilder.getErrorReason());
-            assertNotNull(SubscriptionMessageBuilder.getErrorSubCode());
+            assertNotNull(sub.getErrorCode());
+            assertNotNull(sub.getErrorReason());
+            assertNotNull(sub.getErrorSubCode());
 
         } catch (Exception e) {
             e.printStackTrace();

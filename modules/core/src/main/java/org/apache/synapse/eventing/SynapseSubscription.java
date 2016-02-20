@@ -32,6 +32,10 @@ import org.wso2.eventing.SubscriptionData;
 public class SynapseSubscription extends Subscription {
 
 
+    private String errorSubCode = null;
+    private String errorReason = null;
+    private String errorCode = null;
+
     public SynapseSubscription() {
         this.setId(UIDGenerator.generateURNString());
         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
@@ -43,5 +47,29 @@ public class SynapseSubscription extends Subscription {
     public SynapseSubscription(String deliveryMode) {
         this.setId(UIDGenerator.generateURNString());
         this.setDeliveryMode(deliveryMode);
+    }
+
+    public String getErrorSubCode() {
+        return errorSubCode;
+    }
+
+    public void setErrorSubCode(String errorCode) {
+        errorSubCode = errorCode;
+    }
+
+    public String getErrorReason() {
+        return errorReason;
+    }
+
+    public void setErrorReason(String errorReasons) {
+        errorReason = errorReasons;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(String errorCodes) {
+        errorCode = errorCodes;
     }
 }

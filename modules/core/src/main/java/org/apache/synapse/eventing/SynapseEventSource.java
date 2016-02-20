@@ -273,9 +273,9 @@ public class SynapseEventSource extends SynapseMessageReceiver {
                 log.debug("SynapseSubscription Failed, sending fault response");
             }
             SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
-                    SubscriptionMessageBuilder.getErrorCode(),
-                    SubscriptionMessageBuilder.getErrorSubCode(),
-                    SubscriptionMessageBuilder.getErrorReason(), "");
+                                                                        subscription.getErrorCode(),
+                                                                        subscription.getErrorSubCode(),
+                                                                        subscription.getErrorReason(), "");
             dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc,
                     true);
         }
@@ -402,9 +402,9 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             }
         } else {
             SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
-                    SubscriptionMessageBuilder.getErrorCode(),
-                    SubscriptionMessageBuilder.getErrorSubCode(),
-                    SubscriptionMessageBuilder.getErrorReason(), "");
+                                                                        subscription.getErrorCode(),
+                                                                        subscription.getErrorSubCode(),
+                                                                        subscription.getErrorReason(), "");
             dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc, true);
         }
     }

@@ -21,6 +21,8 @@ package org.apache.synapse.eventing.builders;
 
 import junit.framework.TestCase;
 import org.apache.synapse.mediators.TestUtils;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 import org.apache.synapse.eventing.SynapseSubscription;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
@@ -32,9 +34,10 @@ import javax.xml.namespace.QName;
 import java.util.Calendar;
 import java.util.Date;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MessageBuilderTest extends TestCase {
 
-    public void testSubscriptionMessageBuilderScenarioOne() {
+    public void testSubscriptionMessageBuilderScenario1() {
         String subManUrl = "http://synapse.test.com/eventing/subscriptions";
         String addressUrl = "http://www.other.example.com/OnStormWarning";
         String filterDialect = "http://www.example.org/topicFilter";
@@ -86,7 +89,7 @@ public class MessageBuilderTest extends TestCase {
         }
     }
 
-    public void testSubscriptionMessageBuilderScenarioTwo() {
+    public void testSubscriptionMessageBuilderScenario2() {
         String addressUrl = "http://synapse.test.com/eventing/subscriptions";
 
         String message = "<wse:Unsubscribe xmlns:wse=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\"/>";
@@ -109,7 +112,7 @@ public class MessageBuilderTest extends TestCase {
         }
     }
 
-    public void testSubscriptionMessageBuilderScenarioThree() {
+    public void testSubscriptionMessageBuilderScenario3() {
         String addressUrl = "http://synapse.test.com/eventing/subscriptions";
         Date date = new Date(System.currentTimeMillis() + 3600000);
         Calendar cal = Calendar.getInstance();
@@ -140,7 +143,7 @@ public class MessageBuilderTest extends TestCase {
         }
     }
 
-    public void testSubscriptionMessageBuilderScenarioFour() {
+    public void testSubscriptionMessageBuilderScenario4() {
         String addressUrl = "http://synapse.test.com/eventing/subscriptions";
 
         String message =
@@ -164,7 +167,7 @@ public class MessageBuilderTest extends TestCase {
         }
     }
 
-    public void testSubscriptionMessageBuilderScenarioFive() {
+    public void testSubscriptionMessageBuilderScenario5() {
         String addressUrl = "http://synapse.test.com/eventing/subscriptions";
 
         String message =

@@ -1079,7 +1079,7 @@
         <geronimo-spec.version>1.1</geronimo-spec.version>
 
         <!-- misc -->
-        <junit.version>3.8.2</junit.version>
+        <junit.version>4.12</junit.version>
         <!-- Warning: log4j versions above 1.2.14 introduce additional transitive dependencies,
              some of which are not available from the Maven central repository. -->
         <log4j.version>1.2.14</log4j.version>

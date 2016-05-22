@@ -237,6 +237,47 @@ public class ScriptMessageContext implements MessageContext {
         }
     }
 
+    /**
+     * Remove property from message context
+     * Scope: Default
+     *
+     * @param key Property name
+     */
+    public void removeProperty(String key) {
+        Set pros = mc.getPropertyKeySet();
+        if (pros != null) {
+            pros.remove(key);
+        }
+    }
+
+    /**
+     * Remove property from message context
+     *
+     * @param key   Property name
+     * @param scope Property scope
+     */
+    public void removeProperty(String key, String scope) {
+        if (scope == null || XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
+            // Removing property from default scope
+            removeProperty(key);
+        } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)) {
+            // Removing property from the Axis2 Message Context
+            Axis2MessageContext axis2smc = (Axis2MessageContext) mc;
+            org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+            axis2MessageCtx.removeProperty(key);
+
+        } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)) {
+            // Removing transport headers
+            Axis2MessageContext axis2smc = (Axis2MessageContext) mc;
+            org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+            Object headers = axis2MessageCtx.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            if (headers != null && headers instanceof Map) {
+                Map headersMap = (Map) headers;
+                headersMap.remove(key);
+            }
+        }
+    }
+
     public Set getPropertyKeySet() {
         return mc.getPropertyKeySet();
     }

@@ -28,6 +28,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -88,6 +89,43 @@ public class ScriptMediatorTest extends TestCase {
 
     }
 
+    public void testRemoveProperty() throws Exception {
+        MessageContext mc = TestUtils.getAxis2MessageContext("<empty/>", null);
+
+        // Setting properties
+        mc.setProperty("PROP_DEFAULT", "PROP_DEFAULT_VAL");
+
+        Axis2MessageContext axis2smc = (Axis2MessageContext) mc;
+        org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+        axis2MessageCtx.setProperty("PROP_AXIS2", "PROP_AXIS2_VAL");
+
+        Map headersMap = new HashMap();
+        headersMap.put("PROP_TRP", "PROP_TRP_VAL");
+        axis2MessageCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headersMap);
+
+        // For default scope
+        String removalScript = "mc.removeProperty(\"PROP_DEFAULT\");";
+        ScriptMediator mediator = new ScriptMediator("js", removalScript, null);
+        mediator.mediate(mc);
+        assertNull(mc.getProperty("PROP_DEFAULT"));
+
+        // For Axis2 scope
+        removalScript = "mc.removeProperty(\"PROP_AXIS2\",\"axis2\");";
+        mediator = new ScriptMediator("js", removalScript, null);
+        mediator.mediate(mc);
+        assertNull(axis2MessageCtx.getProperty("PROP_AXIS2"));
+
+        // For Transport scope
+        removalScript = "mc.removeProperty(\"PROP_TRP\",\"transport\");";
+        mediator = new ScriptMediator("js", removalScript, null);
+        mediator.mediate(mc);
+        Object headers = axis2MessageCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        headersMap = (Map) headers;
+        assertNull(headersMap.get("PROP_TRP"));
+    }
+
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(new ScriptMediatorTest("testInlineMediator"));
@@ -95,6 +133,7 @@ public class ScriptMediatorTest extends TestCase {
             suite.addTest(new RepeatedTest(new ScriptMediatorTest("testThreadSafety"), 10));
         }
         suite.addTest(new ScriptMediatorTest("testSetProperty"));
+        suite.addTest(new ScriptMediatorTest("testRemoveProperty"));
         return suite;
     }
 

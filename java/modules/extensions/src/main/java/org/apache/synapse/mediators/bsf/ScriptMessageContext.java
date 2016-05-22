@@ -19,6 +19,7 @@
 
 package org.apache.synapse.mediators.bsf;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
@@ -42,7 +43,9 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -197,6 +200,40 @@ public class ScriptMessageContext implements MessageContext {
             }
         } else {
             mc.setProperty(key, value);
+        }
+    }
+
+    /**
+     * Set Property to the message context
+     *
+     * @param key   property name
+     * @param value property value
+     * @param scope scope of the property
+     */
+    public void setProperty(String key, Object value, String scope) {
+        if (scope == null || XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
+            // Setting property into default scope
+            setProperty(key, value);
+        } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)) {
+            // Setting property into the  Axis2 Message Context
+            Axis2MessageContext axis2smc = (Axis2MessageContext) mc;
+            org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+            axis2MessageCtx.setProperty(key, value);
+        } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)) {
+            // Setting Transport Headers
+            Axis2MessageContext axis2smc = (Axis2MessageContext) mc;
+            org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+
+            Object headers = axis2MessageCtx.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            if (headers == null) {
+                Map headersMap = new HashMap();
+                headersMap.put(key, value);
+                axis2MessageCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headersMap);
+            } else if (headers instanceof Map) {
+                Map headersMap = (Map) headers;
+                headersMap.put(key, value);
+            }
+
         }
     }
 

@@ -322,6 +322,9 @@ public class Pipe {
             try {
                 if (!hasData(buffer, inBufferInputMode)) {
                     waitForData();
+                    if (producerError) {
+                        return -1;
+                    }
                 }
                 if (isEndOfStream()) {
                     return -1;
@@ -362,6 +365,9 @@ public class Pipe {
             try {
                 try {
                     while (!hasData(buffer, inBufferInputMode) && !producerCompleted) {
+                        if (producerError) {
+                            break;
+                        }
                         producerIoControl.requestInput();
                         readCondition.await();
                     }
@@ -406,6 +412,10 @@ public class Pipe {
                 while (remaining > 0) {
                     if (!outputBuffer.hasRemaining()) {
                         flushContent();
+                        if (consumerError) {
+                            buffer.clear();
+                            break;
+                        }
                         setInputMode(outputBuffer, outBufferInputMode);
                     }
                     int chunk = Math.min(remaining, outputBuffer.remaining());
@@ -428,6 +438,9 @@ public class Pipe {
             try {
                 try {
 					while (hasData(outputBuffer, outBufferInputMode)) {
+                        if(consumerError) {
+                            break;
+                        }
 						if (consumerIoControl != null && writeCondition != null) {
 							consumerIoControl.requestOutput();
 							writeCondition.await();

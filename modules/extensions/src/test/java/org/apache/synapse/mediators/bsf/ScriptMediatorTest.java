@@ -25,8 +25,10 @@ import junit.framework.TestSuite;
 import junit.extensions.RepeatedTest;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 
+import java.util.Map;
 import java.util.Random;
 
 public class ScriptMediatorTest extends TestCase {
@@ -53,12 +55,46 @@ public class ScriptMediatorTest extends TestCase {
                 Integer.parseInt(randomno) * 2);
     }
 
+    public void testSetProperty() throws Exception {
+        MessageContext mc = TestUtils.getAxis2MessageContext("<empty/>", null);
+
+        // For default scope
+        String script = "mc.setProperty(\"PROP_DEFAULT\", \"PROP_DEFAULT_VAL\");";
+        ScriptMediator mediator = new ScriptMediator("js", script, null);
+        mediator.mediate(mc);
+        assertEquals("PROP_DEFAULT_VAL", mc.getProperty("PROP_DEFAULT").toString());
+
+        // For Axis2 scope
+        script = "mc.setProperty(\"PROP_AXIS2\", \"PROP_AXIS_VAL\", \"axis2\");";
+        mediator = new ScriptMediator("js", script, null);
+        mediator.mediate(mc);
+        Axis2MessageContext axis2smc = (Axis2MessageContext) mc;
+        org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+        assertEquals("PROP_AXIS_VAL", axis2MessageCtx.getProperty("PROP_AXIS2").toString());
+
+        // For Transport scope
+        script = "mc.setProperty(\"PROP_TRP\", \"PROP_TRP_VAL\", \"transport\");";
+        mediator = new ScriptMediator("js", script, null);
+        mediator.mediate(mc);
+        Object headers = axis2MessageCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        String trpHeader = null;
+        if (headers != null && headers instanceof Map) {
+            Map headersMap = (Map) headers;
+            trpHeader = (String) headersMap.get("PROP_TRP");
+        }
+        assertEquals("PROP_TRP_VAL", trpHeader);
+
+    }
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
+        suite.addTest(new ScriptMediatorTest("testInlineMediator"));
         for (int i = 0; i < 10; i++) {
             suite.addTest(new RepeatedTest(new ScriptMediatorTest("testThreadSafety"), 10));
         }
+        suite.addTest(new ScriptMediatorTest("testSetProperty"));
         return suite;
     }
 

@@ -85,4 +85,34 @@ public class EnrichMediatorTest extends TestCase {
         String result = element.getAttributeValue(new QName("gender"));
         assertEquals("male", result);
     }
+
+    /**
+     * Test for SYNAPSE-1007. Check whether message enrichment works when source is set to PROPERTY and
+     * source is not cloned.
+     *
+     * @throws Exception
+     */
+    public void testEnrich4() throws Exception {
+
+        String xml = "<student gender=\"female\"><name>John</name><age>15</age></student>";
+        OMElement omElement = TestUtils.createOMElement(xml);
+
+        EnrichMediator mediator = new EnrichMediator();
+        Source source = new Source();
+        source.setSourceType(EnrichMediator.PROPERTY);
+        source.setProperty("msg_body");
+        source.setClone(false);
+
+        Target target = new Target();
+        target.setTargetType(EnrichMediator.BODY);
+        mediator.setSource(source);
+        mediator.setTarget(target);
+
+        MessageContext msgContext = TestUtils.getTestContext("<empty/>");
+        msgContext.setProperty("msg_body", omElement);
+
+        mediator.mediate(msgContext);
+        OMElement element = msgContext.getEnvelope().getBody().getFirstElement();
+        assertEquals("student", element.getLocalName());
+    }
 }

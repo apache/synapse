@@ -30,6 +30,9 @@ public final class SynapseXPathConstants {
     /** base64Encode XPath extension function name */
     public static final String BASE64_ENCODE_FUNCTION = "base64Encode";
 
+    /** base64Decode XPath extension function name */
+    public static final String BASE64_DECODE_FUNCTION = "base64Decode";
+
     /** Body relative XPath variale name for the SOAPBody */
     public static final String SOAP_BODY_VARIABLE = "body";
 
@@ -50,4 +53,8 @@ public final class SynapseXPathConstants {
 
     /** Variable prefix for accessing URL parameters of the message through XPath variables */
     public static final String URL_VARIABLE_PREFIX = "url";
+
+    public static final String DEFAULT_CHARSET = "UTF-8";
+
+    public static final String NULL_STRING = "";
 }

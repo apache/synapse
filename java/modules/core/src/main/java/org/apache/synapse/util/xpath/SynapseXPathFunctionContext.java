@@ -82,6 +82,10 @@ public class SynapseXPathFunctionContext implements FunctionContext {
                 SynapseXPathConstants.BASE64_ENCODE_FUNCTION.equals(localName)) {
             // create a base64Encode function and set it to the XPath
             return new Base64EncodeFunction();
+        } else if (localName != null &&
+                   SynapseXPathConstants.BASE64_DECODE_FUNCTION.equals(localName)) {
+            // create a base64Decode function and set it to the XPath
+            return new Base64DecodeFunction();
         }
         //We check if custom Xpath extensions are available
         Function extensionFunction = XpathExtensionUtil.getFunctionContext(

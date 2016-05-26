@@ -19,26 +19,27 @@
 
 package org.apache.synapse.util.xpath;
 
-import org.jaxen.Function;
-import org.jaxen.Context;
-import org.jaxen.FunctionCallException;
-import org.jaxen.function.StringFunction;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.codec.binary.Base64;
+import org.jaxen.Context;
+import org.jaxen.Function;
+import org.jaxen.FunctionCallException;
+import org.jaxen.function.StringFunction;
 
-import java.util.List;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
- * Implements the XPath extension function synapse:base64Encode(string)
+ * Implements the XPath extension function synapse:base64Decode(string)
  */
-public class Base64EncodeFunction implements Function {
+public class Base64DecodeFunction implements Function {
 
-    private static final Log log = LogFactory.getLog(Base64EncodeFunction.class);
+    private static final Log log = LogFactory.getLog(Base64DecodeFunction.class);
 
     /**
-     * Returns the base64 encoded string value of the first argument.
+     * Returns the base64 decoded string value of the first argument.
      *
      * @param context the context at the point in the expression when the function is called
      * @param args  arguments of the functions
@@ -46,10 +47,8 @@ public class Base64EncodeFunction implements Function {
      * @throws FunctionCallException
      */
     public Object call(Context context, List args) throws FunctionCallException {
-        boolean debugOn = log.isDebugEnabled();
-
         if (args == null || args.size() == 0) {
-            if (debugOn) {
+            if (log.isDebugEnabled()) {
                 log.debug("Property key value for lookup is not specified");
             }
             return SynapseXPathConstants.NULL_STRING;
@@ -58,60 +57,54 @@ public class Base64EncodeFunction implements Function {
         int size = args.size();
         if (size == 1) {
             // get the first argument, it can be a function returning a string as well
-            String value = StringFunction.evaluate(args.get(0), context.getNavigator());
-
-            // use the default UTF-8 encoding
-            return encode(debugOn, SynapseXPathConstants.DEFAULT_CHARSET, value);
+            String encodedValue = StringFunction.evaluate(args.get(0), context.getNavigator());
+            // use the default UTF-8 decoding.
+            return decode(log.isDebugEnabled(), SynapseXPathConstants.DEFAULT_CHARSET, encodedValue);
         } else if (size == 2) {
             // get the first argument, it can be a function returning a string as well
-            String value = StringFunction.evaluate(args.get(0), context.getNavigator());
-
-            // encoding is in the second argument
-            String encoding = StringFunction.evaluate(args.get(1), context.getNavigator());
-            
-            return encode(debugOn, encoding, value);
-        } else {
-            if (debugOn) {
-                log.debug("base64Encode function expects only one argument, returning empty string");
-            }
+            String encodedValue = StringFunction.evaluate(args.get(0), context.getNavigator());
+            // charset is in the second argument
+            String charset = StringFunction.evaluate(args.get(1), context.getNavigator());
+            return decode(log.isDebugEnabled(), charset, encodedValue);
+        } else if (log.isDebugEnabled()) {
+            log.debug("base64Decode function expects only two arguments maximum, returning empty string");
         }
         // return empty string if the arguments are wrong
         return SynapseXPathConstants.NULL_STRING;
     }
 
-    private Object encode(boolean debugOn, String encoding, String value)
-            throws FunctionCallException {
-        if (value == null || "".equals(value)) {
-            if (debugOn) {
-                log.debug("Non emprty string value should be provided for encoding");
-            }
 
+    private Object decode(boolean debugOn, String charset, String value) throws FunctionCallException {
+        if (value == null || value.isEmpty()) {
+            if (debugOn) {
+                log.debug("Non empty string value should be provided for decode");
+            }
             return SynapseXPathConstants.NULL_STRING;
         }
 
-        byte[] encodedValue;
+        byte[] decodedValue;
         try {
-            encodedValue = new Base64().encode(value.getBytes(encoding));
+            decodedValue = new Base64().decode(value.getBytes(charset));
         } catch (UnsupportedEncodingException e) {
-            String msg = "Unsupported Encoding";
+            String msg = "Unsupported Charset";
             log.error(msg, e);
             throw new FunctionCallException(msg, e);
         }
 
-        String encodedString;
+        String decodedString;
         try {
-            encodedString = new String(encodedValue, encoding);
+            decodedString = new String(decodedValue, charset).trim();
         } catch (UnsupportedEncodingException e) {
-            String msg = "Unsupported Encoding";
+            String msg = "Unsupported Charset";
             log.error(msg, e);
             throw new FunctionCallException(msg, e);
         }
 
         if (debugOn) {
-            log.debug("Converted string: " + value + " with encoding: " + encoding +
-                    " to base64 encoded value: " + encodedString);
+            log.debug("Decoded base64 encoded value: " + value + " with charset: " + charset +
+                      " to String: " + decodedString);
         }
 
-        return encodedString;
+        return decodedString;
     }
 }

@@ -17,6 +17,9 @@ import java.io.Reader;
 public class SchemaResourceLSInput implements LSInput {
 
     InputStream byteStream = null;
+    String systemId = null;
+    String publicId = null;
+    String baseURI = null;
 
     public Reader getCharacterStream() {
         return null;
@@ -43,27 +46,27 @@ public class SchemaResourceLSInput implements LSInput {
     }
 
     public String getSystemId() {
-        return null;
+        return systemId;
     }
 
     public void setSystemId(String systemId) {
-
+        this.systemId = systemId;
     }
 
     public String getPublicId() {
-        return null;
+        return publicId;
     }
 
     public void setPublicId(String publicId) {
-
+        this.publicId = publicId;
     }
 
     public String getBaseURI() {
-        return null;
+        return baseURI;
     }
 
     public void setBaseURI(String baseURI) {
-
+        this.baseURI = baseURI;
     }
 
     public String getEncoding() {

@@ -19,7 +19,6 @@
 
 package org.apache.synapse.util.xpath;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.jaxen.Context;
 import org.jaxen.ContextSupport;

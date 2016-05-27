@@ -519,10 +519,6 @@
                         <artifactId>log4j-over-slf4j</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-core</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.xmlbeans</groupId>
                         <artifactId>xmlbeans</artifactId>
                     </exclusion>
@@ -532,34 +528,16 @@
                 <groupId>org.apache.rampart</groupId>
                 <artifactId>rampart-trust</artifactId>
                 <version>${rampart.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-core</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.rampart</groupId>
                 <artifactId>rampart-core</artifactId>
                 <version>${rampart.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-core</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.rampart</groupId>
                 <artifactId>rampart</artifactId>
                 <version>${rampart.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.woden</groupId>
-                        <artifactId>woden-core</artifactId>
-                    </exclusion>
-                </exclusions>
                 <type>mar</type>
             </dependency>
             <dependency>
@@ -914,11 +892,6 @@
                 <version>${jsch.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.woden</groupId>
-                <artifactId>woden-core</artifactId>
-                <version>${woden.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>wsdl4j</groupId>
                 <artifactId>wsdl4j</artifactId>
                 <version>${wsdl4j.version}</version>
@@ -1097,7 +1070,6 @@
         <aspectj.version>1.8.2</aspectj.version>
         <qfj.version>1.4.0</qfj.version>
         <wso2uri-template.version>1.0.0</wso2uri-template.version>
-        <woden.version>1.0M11-SNAPSHOT</woden.version>
         <activemq.version>5.2.0</activemq.version>
         <snmp4j.version>2.0.3</snmp4j.version>
         <snmp4j.agent.version>2.0.5</snmp4j.agent.version>

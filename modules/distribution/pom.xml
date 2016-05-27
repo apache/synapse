@@ -141,10 +141,6 @@
             <classifier>jars</classifier>
             <type>zip</type>
         </dependency>
-        <dependency>
-            <groupId>org.apache.woden</groupId>
-            <artifactId>woden-core</artifactId>
-        </dependency>
         <!--dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>

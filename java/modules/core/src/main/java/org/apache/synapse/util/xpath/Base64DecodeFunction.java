@@ -82,15 +82,7 @@ public class Base64DecodeFunction implements Function {
             return SynapseXPathConstants.NULL_STRING;
         }
 
-        byte[] decodedValue;
-        try {
-            decodedValue = new Base64().decode(value.getBytes(charset));
-        } catch (UnsupportedEncodingException e) {
-            String msg = "Unsupported Charset";
-            log.error(msg, e);
-            throw new FunctionCallException(msg, e);
-        }
-
+        byte[] decodedValue = new Base64().decode(value);
         String decodedString;
         try {
             decodedString = new String(decodedValue, charset).trim();

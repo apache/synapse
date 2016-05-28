@@ -407,16 +407,25 @@
         <section name="Transformation Mediators" id="TransformationMediators">
             <subsection name="Header Mediator" id="Header">
                 <p>
-                    Header mediator sets or removes a specified header from the current SOAP
-                    infoset. The optional 'action' attribute specifies whether the mediator should
+                    Header mediator sets or removes a specified header from the message.
+                    The optional 'scope' attribute specifies the scope of the header.
+                    Scope can be either 'soap' or 'transport'.
+                    If the scope is set to 'soap', header is treated as a soap header and if it is 'transport',
+                    header is treated as a transport header.
+                    If the scope is omitted, header is treated as a soap header or one of the below mentioned known headers.
+                    The optional 'action' attribute specifies whether the mediator should
                     set or remove the header. If omitted, it defaults to 'set' action.
                 </p>
-                <div class="xmlConf">&lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
-&lt;header name="qname" action="remove"/&gt;</div>
+                <div class="xmlConf">&lt;header [name="qname"] (value="literal" | expression="xpath") [action="set"] [scope="soap | transport"]&gt;
+        [&lt;embeddedxml/&gt;]
+&lt;/header&gt;</div>
+
+                <div class="xmlConf">&lt;header name="qname" action="remove" [scope="soap | transport"]/&gt;</div>
                 <p>
                     The value of the 'name' attribute must be one of the following aliases or
                     a valid QName with a namespace prefix. In the latter case the namespace prefix
                     must be mapped to a valid namespace URI using the standard 'xmlns' attribute.
+                    When setting an embedded xml element as a soap header, 'name' attribute is not required.
                 </p>
                 <ul>
                     <li>To</li>

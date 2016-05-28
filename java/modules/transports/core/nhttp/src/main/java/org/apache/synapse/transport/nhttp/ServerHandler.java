@@ -29,6 +29,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.nio.*;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.nio.util.ContentOutputBuffer;
@@ -204,6 +205,17 @@ public class ServerHandler implements NHttpServerEventHandler {
                         new EvaluatorContext(request.getRequestLine().getUri(), headers);
                 int priority = parser.parse(evaluatorContext);
                 executor.execute(worker, priority);
+            }
+            
+            // See if the client expects a 100-Continue
+            Header expect = request.getFirstHeader(HTTP.EXPECT_DIRECTIVE);
+            if (expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue())) {
+                HttpResponse ack = new BasicHttpResponse(request.getProtocolVersion(), HttpStatus.SC_CONTINUE, "Continue");
+                conn.submitResponse(ack);
+                if (log.isDebugEnabled()) {
+                 log.debug("Expect :100 Continue hit sending ack back to the server");
+                }
+                return;
             }
 
         } catch (Exception e) {

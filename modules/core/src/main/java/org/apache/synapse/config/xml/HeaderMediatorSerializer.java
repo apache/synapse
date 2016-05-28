@@ -76,6 +76,10 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
 
+        if (mediator.getScope() != null) {
+            header.addAttribute(fac.createOMAttribute("scope", nullNS, mediator.getScope()));
+        }
+
         if (mediator.hasEmbeddedXml()) {
             for (OMElement e : mediator.getEmbeddedXml()) {
                 header.addChild(e);

@@ -47,9 +47,14 @@ public class XMLConfigConstants {
     public static final String SCOPE_TRANSPORT = "transport";
     /** The scope name for registry properties */
     public static final String SCOPE_REGISTRY = "registry";
-
     /** The scope name for the system properties  */
     public static final String SCOPE_SYSTEM = "system";
+
+    //-- HeaderMediator --
+    /** The scope name for SOAP headers */
+    public static final String HEADER_SCOPE_SOAP = "soap";
+    /** The scope name for Transport headers */
+    public static final String HEADER_SCOPE_TRANSPORT = "transport";
 
     public static final String KEY = "key";
     public static final String RECEIVE = "receive";

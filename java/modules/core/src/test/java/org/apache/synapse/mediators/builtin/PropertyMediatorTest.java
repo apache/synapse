@@ -209,6 +209,24 @@ public class PropertyMediatorTest extends TestCase {
             "value".equals(medProp.getEvaluatedExpression(synCtx)));
     }
 
+    public void testPropertyURLEncoding() throws Exception {
+        // Evaluate url-encode function
+        PropertyMediator propMediator = new PropertyMediator();
+        propMediator.setName("name");
+        propMediator.setValue("this/is+a/synapse test?for=url+encoding");
+
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        propMediator.mediate(synCtx);
+
+        // read property through a mediator property
+        MediatorProperty mediatorProperty = new MediatorProperty();
+        mediatorProperty.setExpression(new SynapseXPath("url-encode($ctx:name)"));
+
+        assertEquals("this/is%2Ba/synapse%20test?for=url+encoding",
+                mediatorProperty.getEvaluatedExpression(synCtx));
+
+    }
+
     public void testPropertyRegexTest() throws Exception {
         String outputProperty = "regexProperty";
 

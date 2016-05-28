@@ -139,20 +139,14 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
     private void setSOAPHeader(HeaderMediator headerMediator, OMElement elem, OMAttribute name) {
         String nameAtt = name.getAttributeValue();
-        int colonPos = nameAtt.indexOf(":");
-        if (colonPos != -1) {
-            // has a NS prefix.. find it and the NS it maps into
-            String prefix = nameAtt.substring(0, colonPos);
-            String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, elem);
-            if (namespaceURI == null) {
-                handleException("Invalid namespace prefix '" + prefix + "' in name attribute");
-            } else {
-                headerMediator.setQName(new QName(namespaceURI, nameAtt.substring(colonPos+1),
-                                                  prefix));
-            }
-        } else {
+        QName qname = elem.resolveQName(nameAtt);
+        if (qname == null) {
+            handleException("Invalid QName '" + nameAtt + "' in name attribute");
+        } else if (qname.getNamespaceURI().isEmpty()) {
             handleException("Invalid SOAP header: " + nameAtt + " specified at the " +
-                            "header mediator. All SOAP headers must be namespace qualified.");
+                    "header mediator. All SOAP headers must be namespace qualified.");
+        } else {
+            headerMediator.setQName(qname);
         }
     }
 

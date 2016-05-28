@@ -31,7 +31,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
 
     public void testNamespaceUnqualifiedScenarioOne() {
         try {
-            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" value=\"MyValue\"/>";
+            String inputXml = "<s:header xmlns:s=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" value=\"MyValue\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");
@@ -42,7 +42,7 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         }
 
         try {
-            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" action=\"remove\"/>";
+            String inputXml = "<s:header xmlns:s=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" action=\"remove\"/>";
             HeaderMediatorFactory fac = new HeaderMediatorFactory();
             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
             fail("HeaderMediator created with namespace unqualified SOAP header");

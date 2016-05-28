@@ -106,19 +106,14 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
             if (value != null) {
                 String strValue = value.getAttributeValue();
-                String prefix = null;
-                String name = null;
-                if (strValue.indexOf(":") != -1) {
-                    prefix = strValue.substring(0, strValue.indexOf(":"));
-                    name = strValue.substring(strValue.indexOf(":")+1);
-                } else {
+                QName qname = code.resolveQName(strValue);
+                if (qname == null) {
+                    handleException("Invalid QName '" + strValue + "' in code attribute");
+                } else if (qname.getNamespaceURI().isEmpty()) {
                     handleException("A QName is expected for fault code as prefix:name");
+                } else {
+                    faultMediator.setFaultCodeValue(qname);
                 }
-                String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, code);
-                if (namespaceURI == null) {
-                    handleException("Invalid namespace prefix '" + prefix + "' in code attribute");
-                }
-                faultMediator.setFaultCodeValue(new QName(namespaceURI, name, prefix));
             } else if (expression != null) {
                 try {
                     faultMediator.setFaultCodeExpr(

@@ -45,4 +45,10 @@ public class HeaderMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, headerMediatorFactory, headerMediatorSerializer));
         assertTrue(serialization(inputXml, headerMediatorSerializer));
     }
+
+    public void testHeaderMediatorSerializationSenarioThree() throws Exception {
+        String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"User-Agent\" value=\"SynapseUser\" scope=\"transport\"/>";
+        assertTrue(serialization(inputXml, headerMediatorFactory, headerMediatorSerializer));
+        assertTrue(serialization(inputXml, headerMediatorSerializer));
+    }
 }

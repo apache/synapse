@@ -22,13 +22,17 @@ package org.apache.synapse.mediators.transform;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.http.protocol.HTTP;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.HeaderMediatorFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
+import java.util.Map;
 import java.util.Properties;
 
 public class HeaderMediatorTest extends TestCase {
@@ -144,5 +148,46 @@ public class HeaderMediatorTest extends TestCase {
         result = synCtx.getEnvelope().getHeader().getFirstElement();
         assertEquals("complexHeader", result.getLocalName());
         assertEquals("TEST", result.getText());
+    }
+
+    public void testTransportHeaderSetAndRemove() throws Exception {
+
+        String SYNAPSE_USER = "SynapseUser";
+
+        HeaderMediator headerMediator = new HeaderMediator();
+        headerMediator.setQName(new QName(HTTP.USER_AGENT));
+        headerMediator.setValue(SYNAPSE_USER);
+        headerMediator.setScope(XMLConfigConstants.HEADER_SCOPE_TRANSPORT);
+
+        // invoke transformation, with static envelope
+        MessageContext synCtx = TestUtils.createLightweightSynapseMessageContext("<empty/>");
+        headerMediator.mediate(synCtx);
+
+        // get transport header and assert
+        org.apache.axis2.context.MessageContext axisCtx =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        Object transportHeaders = axisCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        if (transportHeaders == null || !(transportHeaders instanceof Map)) {
+            fail("HeaderMediator Transport headers not found");
+        } else {
+            assertTrue(SYNAPSE_USER.equals(((Map) transportHeaders).get(HTTP.USER_AGENT)));
+        }
+
+        // Removing headers
+        headerMediator.setAction(HeaderMediator.ACTION_REMOVE);
+        headerMediator.mediate(synCtx);
+
+        // get transport header and assert
+        org.apache.axis2.context.MessageContext axisCtx2 =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        transportHeaders = axisCtx2.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        if (transportHeaders == null || !(transportHeaders instanceof Map)) {
+            fail("HeaderMediator Transport headers not found");
+        } else {
+            assertTrue(((Map)transportHeaders).get(HTTP.USER_AGENT) == null);
+        }
+
     }
 }

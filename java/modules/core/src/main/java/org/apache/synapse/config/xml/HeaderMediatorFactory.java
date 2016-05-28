@@ -48,6 +48,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
     private static final QName HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "header");
     private static final QName ATT_ACTION = new QName("action");
+    private static final QName ATT_SCOPE = new QName("scope");
 
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
@@ -56,40 +57,44 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
         OMAttribute value  = elem.getAttribute(ATT_VALUE);
         OMAttribute exprn  = elem.getAttribute(ATT_EXPRN);
         OMAttribute action = elem.getAttribute(ATT_ACTION);
+        OMAttribute scope = elem.getAttribute(ATT_SCOPE);
 
+        // Setting Header Name
         if (name == null || name.getAttributeValue() == null) {
-            if (elem.getChildElements() == null || !elem.getChildElements().hasNext()) {
-                String msg = "A valid name attribute is required for the header mediator";
-                log.error(msg);
-                throw new SynapseException(msg);
+            // Name is required unless otherwise we are setting an embedded XML
+            if (!isEmbeddedXML(elem)) {
+                handleException("A valid name attribute is required for the header mediator");
             }
         } else {
-            String nameAtt = name.getAttributeValue();
-            int colonPos = nameAtt.indexOf(":");
-            if (colonPos != -1) {
-                // has a NS prefix.. find it and the NS it maps into
-                String prefix = nameAtt.substring(0, colonPos);
-                String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, elem);
-                if (namespaceURI == null) {
-                    handleException("Invalid namespace prefix '" + prefix + "' in name attribute");
-                } else {
-                	headerMediator.setQName(new QName(namespaceURI, nameAtt.substring(colonPos+1),
-                            prefix));
-                }
-            } else {
-                // no prefix
+
+            if (scope == null) {
+                String nameAtt = name.getAttributeValue();
+
+                // Known Headers
                 if (SynapseConstants.HEADER_TO.equals(nameAtt) ||
-                        SynapseConstants.HEADER_FROM.equals(nameAtt) ||
-                        SynapseConstants.HEADER_ACTION.equals(nameAtt) ||
-                        SynapseConstants.HEADER_FAULT.equals(nameAtt) ||
-                        SynapseConstants.HEADER_REPLY_TO.equals(nameAtt) ||
-                        SynapseConstants.HEADER_RELATES_TO.equals(nameAtt)) {
+                    SynapseConstants.HEADER_FROM.equals(nameAtt) ||
+                    SynapseConstants.HEADER_ACTION.equals(nameAtt) ||
+                    SynapseConstants.HEADER_FAULT.equals(nameAtt) ||
+                    SynapseConstants.HEADER_REPLY_TO.equals(nameAtt) ||
+                    SynapseConstants.HEADER_RELATES_TO.equals(nameAtt)) {
 
                     headerMediator.setQName(new QName(nameAtt));
                 } else {
-                    handleException("Invalid SOAP header: " + nameAtt + " specified at the " +
-                            "header mediator. All SOAP headers must be namespace qualified.");
+                    // SOAP Headers
+                    setSOAPHeader(headerMediator, elem, name);
                 }
+            } else {
+                String scopeAttValue = scope.getAttributeValue();
+
+                if (XMLConfigConstants.HEADER_SCOPE_SOAP.equalsIgnoreCase(scopeAttValue)) {
+                    setSOAPHeader(headerMediator, elem, name);
+                } else if (XMLConfigConstants.HEADER_SCOPE_TRANSPORT.equalsIgnoreCase(scopeAttValue)) {
+                    headerMediator.setQName(new QName(name.getAttributeValue()));
+                } else {
+                    handleException("Unsupported Scope : " + scopeAttValue + " . Only " + XMLConfigConstants.HEADER_SCOPE_SOAP
+                                    + " and " + XMLConfigConstants.HEADER_SCOPE_TRANSPORT + " allowed");
+                }
+                headerMediator.setScope(scopeAttValue);
             }
         }
 
@@ -130,6 +135,29 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
             }
         }
         return headerMediator;
+    }
+
+    private void setSOAPHeader(HeaderMediator headerMediator, OMElement elem, OMAttribute name) {
+        String nameAtt = name.getAttributeValue();
+        int colonPos = nameAtt.indexOf(":");
+        if (colonPos != -1) {
+            // has a NS prefix.. find it and the NS it maps into
+            String prefix = nameAtt.substring(0, colonPos);
+            String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, elem);
+            if (namespaceURI == null) {
+                handleException("Invalid namespace prefix '" + prefix + "' in name attribute");
+            } else {
+                headerMediator.setQName(new QName(namespaceURI, nameAtt.substring(colonPos+1),
+                                                  prefix));
+            }
+        } else {
+            handleException("Invalid SOAP header: " + nameAtt + " specified at the " +
+                            "header mediator. All SOAP headers must be namespace qualified.");
+        }
+    }
+
+    private boolean isEmbeddedXML(OMElement elem) {
+        return (elem.getChildElements() != null && elem.getChildElements().hasNext());
     }
 
     public QName getTagQName() {

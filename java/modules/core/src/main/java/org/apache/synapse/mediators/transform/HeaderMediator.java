@@ -29,12 +29,16 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The header mediator is able to set a given value as a SOAP header, or remove a given
@@ -58,6 +62,8 @@ public class HeaderMediator extends AbstractMediator {
     private List<OMElement> embeddedXmlContent = new ArrayList<OMElement>();
     /** An expression which should be evaluated, and the result set as the header value */
     private SynapseXPath expression = null;
+    /** The scope that decides which header should be updated: SOAP or Transport. */
+    private String scope = null;
 
     /**
      * Sets/Removes a SOAP header on the current message
@@ -77,16 +83,30 @@ public class HeaderMediator extends AbstractMediator {
             }
         }
 
+        if (XMLConfigConstants.HEADER_SCOPE_TRANSPORT.equals(scope)) {
+            alterTransportHeader(synCtx);
+        } else {
+            alterSOAPOrKnownHeader(synCtx);
+        }
+
+        synLog.traceOrDebug("End : Header mediator");
+        return true;
+    }
+
+    private void alterSOAPOrKnownHeader(MessageContext synCtx) {
+
+        SynapseLog synLog = getLog(synCtx);
+
         if (action == ACTION_SET) {
 
-            String value = (getExpression() == null ? getValue() :
-                    expression.stringValueOf(synCtx));
+            String value = (getExpression() == null ? getValue() : expression.stringValueOf(synCtx));
 
             if (synLog.isTraceOrDebugEnabled()) {
-                synLog.traceOrDebug("Set SOAP header : " + qName + " to : " + value);
+                synLog.traceOrDebug("Setting header : " + qName + " to : " + value);
             }
 
-            if (!isImplicit() && (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI()))) {
+            if (!isImplicit() &&
+                (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI()))) {
 
                 // is this a "well known" Synapse header?
                 if (SynapseConstants.HEADER_TO.equals(qName.getLocalPart())) {
@@ -111,7 +131,7 @@ public class HeaderMediator extends AbstractMediator {
         } else {
 
             if (synLog.isTraceOrDebugEnabled()) {
-                synLog.traceOrDebug("Removing SOAP Header : " + qName);
+                synLog.traceOrDebug("Removing Header : " + qName);
             }
 
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
@@ -151,9 +171,55 @@ public class HeaderMediator extends AbstractMediator {
                 }
             }
         }
+    }
 
-        synLog.traceOrDebug("End : Header mediator");
-        return true;
+    private void alterTransportHeader(MessageContext synCtx) {
+
+        SynapseLog synLog = getLog(synCtx);
+        String headerName = qName.getLocalPart();
+
+        String value = (getExpression() == null ? getValue() : expression.stringValueOf(synCtx));
+
+        if (action == ACTION_SET) {
+
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Setting Transport header : " + headerName + " to : " + value);
+            }
+
+            //Setting Transport Headers
+            Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                    axis2smc.getAxis2MessageContext();
+            Object headers = axis2MessageCtx.
+                    getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+            if (headers != null && headers instanceof Map) {
+                Map headersMap = (Map) headers;
+                headersMap.put(headerName, value);
+            } else if (headers == null) {
+                Map headersMap = new HashMap();
+                headersMap.put(headerName, value);
+                axis2MessageCtx.setProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headersMap);
+            }
+        } else {
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Removing Transport Header : " + qName);
+            }
+
+            // Removing transport headers
+            Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                    axis2smc.getAxis2MessageContext();
+            Object headers = axis2MessageCtx.getProperty(
+                    org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            if (headers != null && headers instanceof Map) {
+                Map headersMap = (Map) headers;
+                headersMap.remove(headerName);
+            } else {
+                synLog.traceOrDebug("No transport headers found");
+            }
+        }
     }
 
     private void addCustomHeader(MessageContext synCtx, String value) {
@@ -243,5 +309,22 @@ public class HeaderMediator extends AbstractMediator {
 
     public void setExpression(SynapseXPath expression) {
         this.expression = expression;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    @Override
+    public boolean isContentAware() {
+        if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

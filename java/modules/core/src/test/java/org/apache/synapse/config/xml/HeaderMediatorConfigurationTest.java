@@ -122,4 +122,40 @@ public class HeaderMediatorConfigurationTest extends TestCase {
         }
     }
 
+    public void testTransportScope() {
+        try {
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"User-Agent\" value=\"SynapseUser\" scope=\"transport\"/>";
+            HeaderMediatorFactory fac = new HeaderMediatorFactory();
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
+        } catch (XMLStreamException e) {
+            fail("Error while parsing header mediator configuration");
+        }
+
+        try {
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"User-Agent\" action=\"remove\" scope=\"transport\"/>";
+            HeaderMediatorFactory fac = new HeaderMediatorFactory();
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
+        } catch (XMLStreamException e) {
+            fail("Error while parsing header mediator configuration");
+        }
+    }
+
+    public void testSOAPScopeScenario() {
+        try {
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" value=\"MyValue\" scope=\"soap\"/>";
+            HeaderMediatorFactory fac = new HeaderMediatorFactory();
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
+        } catch (XMLStreamException e) {
+            fail("Error while parsing header mediator configuration");
+        }
+
+        try {
+            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" xmlns:m=\"http://synapse.apache.org\" name=\"m:MyHeader\" action=\"remove\" scope=\"soap\"/>";
+            HeaderMediatorFactory fac = new HeaderMediatorFactory();
+            fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
+        } catch (XMLStreamException e) {
+            fail("Error while parsing header mediator configuration");
+        }
+    }
+
 }

@@ -141,6 +141,10 @@ public class ClientWorker implements Runnable {
             headerMap.put(headerEntry.getKey(), headerEntry.getValue());
         }
         responseMsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
+        if (headerMap.get(HTTP.CONTENT_LEN) != null){
+            responseMsgCtx.setProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH,
+                    headerMap.get(HTTP.CONTENT_LEN));
+        }
 
         if (response.getStatus() == 202) {
             responseMsgCtx.setProperty(AddressingConstants.

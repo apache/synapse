@@ -126,4 +126,6 @@ public class PassThroughConstants {
 	
 	public static final String GET_REQUEST_HANDLED = "GET_REQUEST_HANDLED";
 
+    public static final String COPY_CONTENT_LENGTH_FROM_INCOMING="COPY_CONTENT_LENGTH_FROM_INCOMING";
+    public static final String ORIGINAL_CONTENT_LENGTH ="ORIGINAL_CONTENT_LENGTH";
 }

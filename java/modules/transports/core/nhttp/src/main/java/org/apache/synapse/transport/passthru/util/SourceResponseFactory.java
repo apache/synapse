@@ -29,6 +29,7 @@ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.SourceResponse;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+import org.apache.synapse.transport.passthru.PassThroughConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,14 @@ public class SourceResponseFactory {
 
         // set any transport headers
         Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+
+        if (msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_CONTENT_LENGTH) &&
+                msgContext.isPropertyTrue(PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING) &&
+                msgContext.getProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH) != null) {
+            sourceResponse.addHeader(HTTP.CONTENT_LEN,
+                    (String) msgContext.getProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH));
+        }
+
         if (transportHeaders != null) {
             addResponseHeader(sourceResponse, transportHeaders);
         } else {

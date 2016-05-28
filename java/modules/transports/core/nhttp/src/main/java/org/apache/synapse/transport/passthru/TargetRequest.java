@@ -163,11 +163,19 @@ public class TargetRequest {
 
             BasicHttpEntity entity = new BasicHttpEntity();
 
-            if (contentLength != -1) {
+            if (requestMsgCtx.isPropertyTrue(NhttpConstants.FORCE_HTTP_CONTENT_LENGTH)) {
                 entity.setChunked(false);
-                entity.setContentLength(contentLength);
+                if (requestMsgCtx.isPropertyTrue(PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING)
+                        && contentLength > 0) {
+                    entity.setContentLength(contentLength);
+                }
             } else {
-                entity.setChunked(chunk);
+                if (contentLength != -1) {
+                    entity.setChunked(false);
+                    entity.setContentLength(contentLength);
+                } else {
+                    entity.setChunked(chunk);
+                }
             }
             ((BasicHttpEntityEnclosingRequest) request).setEntity(entity);
            

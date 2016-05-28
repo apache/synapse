@@ -279,14 +279,15 @@ public class ClientHandler implements NHttpClientEventHandler {
 
         if (axis2Request != null && !axis2Request.isCompleted()) {
             checkAxisRequestComplete(conn, NhttpConstants.CONNECTION_CLOSED, message, null);
+            shutdownConnection(conn, true, "Connection closed before response is received");
         } else {
             if (log.isDebugEnabled()) {
                 log.debug(getErrorMessage("Keep-alive connection closed", conn));
             }
+            shutdownConnection(conn, false, null);
         }
 
         HttpContext context = conn.getContext();
-        shutdownConnection(conn);
         context.removeAttribute(RESPONSE_SINK_BUFFER);
         context.removeAttribute(REQUEST_SOURCE_BUFFER);
         metrics.disconnected();
@@ -309,14 +310,15 @@ public class ClientHandler implements NHttpClientEventHandler {
 
         if (axis2Request != null && !axis2Request.isCompleted()) {
             checkAxisRequestComplete(conn, NhttpConstants.CONNECTION_TIMEOUT, message, null);
+            shutdownConnection(conn, true, "Connection timeout before response is received");
         } else {
             if (log.isDebugEnabled()) {
                 log.debug(getErrorMessage("Keep-alive connection timed out", conn));
             }
+            shutdownConnection(conn, false, null);
         }
 
         HttpContext context = conn.getContext();
-        shutdownConnection(conn);
         context.removeAttribute(RESPONSE_SINK_BUFFER);
         context.removeAttribute(REQUEST_SOURCE_BUFFER);
     }
@@ -332,7 +334,7 @@ public class ClientHandler implements NHttpClientEventHandler {
             exception(conn, (IOException) e);
         } else {
             log.error(e.getMessage(), e);
-            shutdownConnection(conn);
+            shutdownConnection(conn, true, "Error occurred : " + e.getMessage());
         }
     }
 
@@ -346,7 +348,7 @@ public class ClientHandler implements NHttpClientEventHandler {
         String message = getErrorMessage("HTTP protocol violation : " + e.getMessage(), conn);
         log.error(message, e);
     	checkAxisRequestComplete(conn, NhttpConstants.PROTOCOL_VIOLATION, message, e);
-        shutdownConnection(conn);
+        shutdownConnection(conn, true, "HTTP protocol violation : " + e.getMessage());
     }
 
     /**
@@ -363,7 +365,7 @@ public class ClientHandler implements NHttpClientEventHandler {
             log.error(message, e);
         }
         checkAxisRequestComplete(conn, NhttpConstants.SND_IO_ERROR_SENDING, message, e);
-        shutdownConnection(conn);
+        shutdownConnection(conn, true, "I/O error : " + e.getMessage());
     }
 
     /**
@@ -547,12 +549,12 @@ public class ClientHandler implements NHttpClientEventHandler {
                     try {
                         // this is a connection we should not re-use
                         ConnectionPool.forget(conn);
-                        shutdownConnection(conn);
+                        shutdownConnection(conn, false, null);
                         context.removeAttribute(RESPONSE_SINK_BUFFER);
                         context.removeAttribute(REQUEST_SOURCE_BUFFER);
                     } catch (Exception ignore) {}
                 } else if (!connStrategy.keepAlive(response, context)) {
-                    shutdownConnection(conn);
+                    shutdownConnection(conn, false, null);
                     context.removeAttribute(RESPONSE_SINK_BUFFER);
                     context.removeAttribute(REQUEST_SOURCE_BUFFER);
                 } else {
@@ -957,7 +959,7 @@ public class ClientHandler implements NHttpClientEventHandler {
                 try {
                     // this is a connection we should not re-use
                     ConnectionPool.forget(conn);
-                    shutdownConnection(conn);
+                    shutdownConnection(conn, false, null);
                     context.removeAttribute(RESPONSE_SINK_BUFFER);
                     context.removeAttribute(REQUEST_SOURCE_BUFFER);
                 } catch (Exception ignore) {}
@@ -976,19 +978,28 @@ public class ClientHandler implements NHttpClientEventHandler {
         workerPool.execute(task);        
     }
 
+
     /**
      * Shutdown the connection ignoring any IO errors during the process
-     * 
+     *
      * @param conn the connection to be shutdown
+     * @param isError whether shutdown is due to an error
+     * @param errorMsg error message if shutdown happens on error
      */
-    private void shutdownConnection(final NHttpClientConnection conn) {
+    private void shutdownConnection(final NHttpClientConnection conn, boolean isError, String errorMsg) {
         if (conn instanceof HttpInetConnection) {
             HttpInetConnection inetConnection = (HttpInetConnection) conn;
-            if (log.isDebugEnabled()) {
-                log.debug("Connection to remote address : " + inetConnection.getRemoteAddress()
+            if (log.isWarnEnabled() && (isError || log.isDebugEnabled())) {
+                String msg = "Connection to remote address : " + inetConnection.getRemoteAddress()
                         + ":" + inetConnection.getRemotePort() + " from local address : "
                         + inetConnection.getLocalAddress() + ":" + inetConnection.getLocalPort() +
-                        " is closed!");
+                        " is closed!"
+                        + (errorMsg != null ? " - On error : " + errorMsg : "");
+                if (isError) {
+                    log.warn(msg);
+                } else {
+                    log.debug(msg);
+                }
             }
             
             if (countConnections) {
@@ -1131,7 +1142,7 @@ public class ClientHandler implements NHttpClientEventHandler {
             log.error(msg, e);
         }
         if (conn != null) {
-            shutdownConnection(conn);
+            shutdownConnection(conn, true, msg);
         }
     }
 

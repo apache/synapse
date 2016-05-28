@@ -53,6 +53,9 @@ public class NhttpConstants {
     public static final String REQUEST_CONTENT_TYPE = "DEFAULT_REQUEST_CONTENT_TYPE";
     public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
+    public static final String CLIENT_REMOTE_ADDR = "CLIENT_REMOTE_ADDR";
+    public static final String CLIENT_REMOTE_PORT = "CLIENT_REMOTE_PORT";
+
     public static final String SEND_TIMEOUT = "SEND_TIMEOUT";
 
     public static final String HIDDEN_SERVICE_PARAM_NAME = "hiddenService";

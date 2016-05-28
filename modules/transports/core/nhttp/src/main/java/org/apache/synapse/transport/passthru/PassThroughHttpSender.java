@@ -359,6 +359,20 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
     }
 
 	private void sendRequestContent(final MessageContext msgContext) throws AxisFault {
+        // NOTE:this a special case where, when the backend service expects content-length but,
+        // we don't want the message to be built. If FORCE_HTTP_CONTENT_LENGTH and
+        // COPY_CONTENT_LENGTH_FROM_INCOMING, we assume that the content coming from the
+        // client side has not changed.
+        boolean forceContentLength = msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_CONTENT_LENGTH);
+        boolean copyContentLength = msgContext.isPropertyTrue(PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
+
+        if (forceContentLength && copyContentLength &&
+                msgContext.getProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH) != null) {
+            long contentLength = Long.parseLong((String) msgContext.getProperty(
+                    PassThroughConstants.ORIGINAL_CONTENT_LENGTH));
+            msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH, contentLength);
+        }
+
 		if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
 			synchronized (msgContext) {
 				while (!Boolean.TRUE.equals(msgContext.getProperty("READY2ROCK")) &&

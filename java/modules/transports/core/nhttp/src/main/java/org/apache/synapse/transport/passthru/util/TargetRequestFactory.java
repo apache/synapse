@@ -129,17 +129,17 @@ public class TargetRequestFactory {
                 request.setFullUrl(true);                
             }
             
-            // Add excess respsonse header.
-            String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
-            Map excessHeaders = (Map) msgContext.getProperty(excessProp);
-            if (excessHeaders != null) {
-                    for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
-                            String key = (String) iterator.next();
-                            for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
-                                    request.addHeader(key, (String) excessVal);
-                            }
-                    }
-            }
+			// Add excess respsonse header.
+			String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
+			Map excessHeaders = (Map) msgContext.getProperty(excessProp);
+			if (excessHeaders != null) {
+				for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
+					String key = (String) iterator.next();
+					for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
+						request.addHeader(key, (String) excessVal);
+					}
+				}
+			}
 
             return request;
         } catch (MalformedURLException e) {

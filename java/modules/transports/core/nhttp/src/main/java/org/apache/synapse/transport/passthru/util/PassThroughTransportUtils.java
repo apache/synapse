@@ -118,8 +118,7 @@ public class PassThroughTransportUtils {
                                              boolean preserveServerHeader,
                                              boolean preserveUserAgentHeader) {
         Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-        Map excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
-
+		Map excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
 
         if (headers == null || headers.isEmpty()) {
             return;

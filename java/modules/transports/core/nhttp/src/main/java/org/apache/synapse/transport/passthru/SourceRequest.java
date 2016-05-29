@@ -67,9 +67,8 @@ public class SourceRequest {
     /** The connection from the client */
     private NHttpServerConnection connection = null;
     
-    /** Excess headers of the request */
-    private Map excessHeaders = new MultiValueMap();
-
+	/** Excess headers of the request */
+	private Map excessHeaders = new MultiValueMap();
 
     public SourceRequest(SourceConfiguration sourceConfiguration,
                          HttpRequest request,
@@ -89,16 +88,16 @@ public class SourceRequest {
             this.version = HttpVersion.HTTP_1_1;
         }
 
-        Header[] headers = request.getAllHeaders();
-        if (headers != null) {
-            for (Header header : headers) {
-                if(this.headers.containsKey(header.getName())) {
-	                 addExcessHeader(header);
-	            } else {
-	                 this.headers.put(header.getName(), header.getValue());
-	            }
-	        }
-	    }
+		Header[] headers = request.getAllHeaders();
+		if (headers != null) {
+			for (Header header : headers) {
+				if (this.headers.containsKey(header.getName())) {
+					addExcessHeader(header);
+				} else {
+					this.headers.put(header.getName(), header.getValue());
+				}
+			}
+		}
     }
 
     /**
@@ -191,11 +190,11 @@ public class SourceRequest {
         return entityEnclosing;
     }
     
-    public Map getExcessHeaders() {
-        return this.excessHeaders;
-   }
+	public Map getExcessHeaders() {
+		return this.excessHeaders;
+	}
     
-    public void addExcessHeader(Header h) {
-        this.excessHeaders.put(h.getName(), h.getValue());
-   }
+	public void addExcessHeader(Header h) {
+		this.excessHeaders.put(h.getName(), h.getValue());
+	}
 }

@@ -846,7 +846,7 @@
 
             <!-- Quickfix/J (FIX Transport) -->
             <dependency>
-                <groupId>quickfixj</groupId>
+                <groupId>org.quickfixj</groupId>
                 <artifactId>quickfixj-all</artifactId>
                 <version>${qfj.version}</version>
             </dependency>
@@ -1068,7 +1068,7 @@
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <http.client.version>4.3.6</http.client.version>
         <aspectj.version>1.8.2</aspectj.version>
-        <qfj.version>1.4.0</qfj.version>
+        <qfj.version>1.6.2</qfj.version>
         <wso2uri-template.version>1.0.0</wso2uri-template.version>
         <activemq.version>5.2.0</activemq.version>
         <snmp4j.version>2.0.3</snmp4j.version>

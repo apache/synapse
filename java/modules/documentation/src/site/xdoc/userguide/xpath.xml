@@ -43,7 +43,17 @@
                     </ul>
                     <ul>
                         <li>
-                            <a href="#get_prop">base64Encode</a>
+                            <a href="#base64_encode">base64Encode</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#base64_decode">base64Decode</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#url_encode">url-encode</a>
                         </li>
                     </ul>
                 </li>
@@ -197,10 +207,20 @@ get-property(String propertyName)</div>
                 <p>Java System properties can be retrieved from the system scope.</p>
 
             </subsection>
-            <subsection name="base64Encode function" id="base64">
+            <subsection name="base64Encode function" id="base64_encode">
                 <p>Returns the base64 encoded value of the argument.</p>
                 <p>Syntax:</p>
                 <div class="xmlConf">base64Encode(String value)</div>
+            </subsection>
+            <subsection name="base64Decode function" id="base64_decode">
+                <p>Returns the base64 decoded value of the argument.</p>
+                <p>Syntax:</p>
+                <div class="xmlConf">base64Decode(String value)</div>
+            </subsection>
+            <subsection name="url-encode function" id="url_encode">
+                <p>Returns the URL encoded value of the argument.</p>
+                <p>Syntax:</p>
+                <div class="xmlConf">url-encode(String value)</div>
             </subsection>
         </section>
         <section name="Variables" id="var">

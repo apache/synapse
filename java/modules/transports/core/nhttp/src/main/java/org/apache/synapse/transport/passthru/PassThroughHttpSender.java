@@ -375,8 +375,8 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
 		if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
 			synchronized (msgContext) {
-				while (!Boolean.TRUE.equals(msgContext.getProperty("READY2ROCK")) &&
-				       !Boolean.TRUE.equals(msgContext.getProperty("PASSTHRU_CONNECT_ERROR"))) {
+				while (!Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE)) &&
+	 				       !Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {
 					try {
 						msgContext.wait();
 					} catch (InterruptedException e) {

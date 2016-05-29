@@ -216,8 +216,8 @@ public class DeliveryAgent {
                     PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
                 synchronized (msgContext) {
                     OutputStream out = pipe.getOutputStream();
-                    msgContext.setProperty("GET_ME_OUT", out);
-                    msgContext.setProperty("READY2ROCK", Boolean.TRUE);
+                    msgContext.setProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM, out);
+                    msgContext.setProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE, Boolean.TRUE);
                     msgContext.notifyAll();
                 }
                 return;

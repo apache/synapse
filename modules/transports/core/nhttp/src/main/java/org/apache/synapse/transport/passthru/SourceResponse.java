@@ -40,8 +40,8 @@ public class SourceResponse {
 
     private Pipe pipe = null;
 
-    /** Transport headers */
-    private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
+	/** Transport headers */
+	private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
 
     /** Status of the response */
     private int status = HttpStatus.SC_OK;
@@ -122,17 +122,17 @@ public class SourceResponse {
 
         response.setEntity(entity);
 
-        // set any transport headers
-        Set<Map.Entry<String, TreeSet<String>>> entries = headers.entrySet();
+		// set any transport headers
+		Set<Map.Entry<String, TreeSet<String>>> entries = headers.entrySet();
 
-        for (Map.Entry<String, TreeSet<String>> entry : entries) {
-            if (entry.getKey() != null) {     
-            	Iterator<String> i = entry.getValue().iterator();
-                while(i.hasNext()) {
-                	response.addHeader(entry.getKey(), i.next());
-                }   
-            }
-        }
+		for (Map.Entry<String, TreeSet<String>> entry : entries) {
+			if (entry.getKey() != null) {
+				Iterator<String> i = entry.getValue().iterator();
+				while (i.hasNext()) {
+					response.addHeader(entry.getKey(), i.next());
+				}
+			}
+		}
         
 
         SourceContext.updateState(conn, ProtocolState.RESPONSE_HEAD);

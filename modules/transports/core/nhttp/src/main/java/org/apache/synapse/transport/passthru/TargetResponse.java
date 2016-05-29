@@ -78,16 +78,16 @@ public class TargetResponse {
         this.status = response.getStatusLine().getStatusCode();
         this.statusLine = response.getStatusLine().getReasonPhrase();
 
-        Header[] headers = response.getAllHeaders();
-        if (headers != null) {
-            for (Header header : headers) {
-            	if(this.headers.containsKey(header.getName())) {
-            		addExcessHeader(header);
-            	} else {
-            		this.headers.put(header.getName(), header.getValue());
-            	}
-             }        
-        }   
+		Header[] headers = response.getAllHeaders();
+		if (headers != null) {
+			for (Header header : headers) {
+				if (this.headers.containsKey(header.getName())) {
+					addExcessHeader(header);
+				} else {
+					this.headers.put(header.getName(), header.getValue());
+				}
+			}
+		}
 
         this.expectResponseBody = expectResponseBody;
     }    

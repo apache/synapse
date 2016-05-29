@@ -62,9 +62,9 @@ public class TargetRequest {
 
     private Pipe pipe = null;
 
-    /** Headers map */
-    private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
-    
+	/** Headers map */
+	private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
+
     /** URL */
     private URL url;
 
@@ -129,14 +129,14 @@ public class TargetRequest {
         long contentLength = -1;
         String contentLengthHeader = null;
         
-        if(headers.get(HTTP.CONTENT_LEN) != null && headers.get(HTTP.CONTENT_LEN).size() > 0) {
-	        contentLengthHeader = headers.get(HTTP.CONTENT_LEN).first();
-	    }
-         
-        if (contentLengthHeader != null) {
-            contentLength = Integer.parseInt(contentLengthHeader);
-            headers.remove(HTTP.CONTENT_LEN);
-        }
+		if (headers.get(HTTP.CONTENT_LEN) != null && headers.get(HTTP.CONTENT_LEN).size() > 0) {
+			contentLengthHeader = headers.get(HTTP.CONTENT_LEN).first();
+		}
+
+		if (contentLengthHeader != null) {
+			contentLength = Integer.parseInt(contentLengthHeader);
+			headers.remove(HTTP.CONTENT_LEN);
+		}
   
         
         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
@@ -193,15 +193,15 @@ public class TargetRequest {
         }
 
         
-        Set<Map.Entry<String, TreeSet<String>>> entries = headers.entrySet();
-        for (Map.Entry<String, TreeSet<String>> entry : entries) {
-             if (entry.getKey() != null) {
-                Iterator<String> i = entry.getValue().iterator();
-                 while(i.hasNext()) {
-                        request.addHeader(entry.getKey(), i.next());
-                 }
-             }
-         }
+		Set<Map.Entry<String, TreeSet<String>>> entries = headers.entrySet();
+		for (Map.Entry<String, TreeSet<String>> entry : entries) {
+			if (entry.getKey() != null) {
+				Iterator<String> i = entry.getValue().iterator();
+				while (i.hasNext()) {
+					request.addHeader(entry.getKey(), i.next());
+				}
+			}
+		}
         
         //setup wsa action..
         if (request != null){
@@ -250,7 +250,7 @@ public class TargetRequest {
     }
 
     
-    public void addHeader(String name, String value) {
+	public void addHeader(String name, String value) {
 		if (headers.get(name) == null) {
 			TreeSet<String> values = new TreeSet<String>();
 			values.add(value);

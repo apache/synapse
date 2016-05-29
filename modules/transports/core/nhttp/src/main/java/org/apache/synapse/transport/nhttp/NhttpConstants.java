@@ -167,9 +167,9 @@ public class NhttpConstants {
     //property name of nhttp log directory
     public static final String NHTTP_LOG_DIRECTORY = "nhttp.log.directory";
     
-    /**
-     * This holds a MultiValue Map, which keeps transport headers' values other than last value
-     * (in order they appear) against the transport header.
-     */
-    public static final String EXCESS_TRANSPORT_HEADERS = "EXCESS_TRANSPORT_HEADERS";
+	/**
+	 * This holds a MultiValue Map, which keeps transport headers' values other
+	 * than last value (in order they appear) against the transport header.
+	 */
+	public static final String EXCESS_TRANSPORT_HEADERS = "EXCESS_TRANSPORT_HEADERS";
 }

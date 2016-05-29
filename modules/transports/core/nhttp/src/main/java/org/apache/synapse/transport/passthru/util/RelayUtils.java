@@ -42,6 +42,7 @@ import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.BufferedInputStream;
@@ -88,10 +89,20 @@ public class RelayUtils {
         }
 
         SOAPEnvelope envelope = messageContext.getEnvelope();
-        OMElement contentEle = envelope.getBody().getFirstChildWithName(
-                RelayConstants.BINARY_CONTENT_QNAME);
 
-        if (contentEle != null) {
+        QName firstElementQName;
+        if (envelope.getSOAPBodyFirstElementNS() != null) {
+            firstElementQName = new QName(
+                    envelope.getSOAPBodyFirstElementNS().getNamespaceURI(),
+                    envelope.getSOAPBodyFirstElementLocalName());
+        } else if (envelope.getSOAPBodyFirstElementLocalName() != null){
+            firstElementQName = new QName(envelope.getSOAPBodyFirstElementLocalName());
+        } else {
+            firstElementQName = null;
+        }
+
+        if (RelayConstants.BINARY_CONTENT_QNAME.equals(firstElementQName)) {
+            OMElement contentEle = envelope.getBody().getFirstElement();
             OMNode node = contentEle.getFirstOMChild();
             if (node != null && (node instanceof OMText)) {
                 OMText binaryDataNode = (OMText) node;

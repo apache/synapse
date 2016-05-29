@@ -110,7 +110,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>quickfixj</groupId>
+            <groupId>org.quickfixj</groupId>
             <artifactId>quickfixj-all</artifactId>
         </dependency>
         <dependency>

@@ -69,6 +69,7 @@ public class ClientWorker implements Runnable {
         this.expectEntityBody = response.isExpectResponseBody();
 
         Map<String,String> headers = response.getHeaders();
+        Map excessHeaders = response.getExcessHeaders();
       
 		String oriURL = headers.get(PassThroughConstants.LOCATION);
 		
@@ -141,6 +142,7 @@ public class ClientWorker implements Runnable {
             headerMap.put(headerEntry.getKey(), headerEntry.getValue());
         }
         responseMsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
+        responseMsgCtx.setProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS, excessHeaders);
         if (headerMap.get(HTTP.CONTENT_LEN) != null){
             responseMsgCtx.setProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH,
                     headerMap.get(HTTP.CONTENT_LEN));

@@ -430,6 +430,7 @@ public class ServerWorker implements Runnable {
      * @return the Axis2 message context created
      */
     private MessageContext createMessageContext(SourceRequest request) {
+    	Map excessHeaders = request.getExcessHeaders();
         ConfigurationContext cfgCtx = sourceConfiguration.getConfigurationContext();
         MessageContext msgContext =
                 new MessageContext();
@@ -477,6 +478,8 @@ public class ServerWorker implements Runnable {
             headers.put(entry.getKey(), entry.getValue());
         }
         msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
+        msgContext.setProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS, excessHeaders);
+        
         if (headers.get(HTTP.CONTENT_LEN) != null){
             msgContext.setProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH,
                     headers.get(HTTP.CONTENT_LEN));

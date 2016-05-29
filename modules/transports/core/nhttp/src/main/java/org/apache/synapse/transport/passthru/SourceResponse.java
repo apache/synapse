@@ -31,15 +31,17 @@ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class SourceResponse {
 
     private Pipe pipe = null;
 
     /** Transport headers */
-    private Map<String, String> headers = new HashMap<String, String>();
+    private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
 
     /** Status of the response */
     private int status = HttpStatus.SC_OK;
@@ -58,6 +60,7 @@ public class SourceResponse {
 
     private SourceRequest request = null;
 
+    
     public SourceResponse(SourceConfiguration config, int status, SourceRequest request) {
         this(config, status, null, request);
     }
@@ -99,7 +102,11 @@ public class SourceResponse {
         BasicHttpEntity entity = new BasicHttpEntity();
 
         int contentLength = -1;
-        String contentLengthHeader = headers.get(HTTP.CONTENT_LEN);
+    	String contentLengthHeader = null; 
+        if(headers.get(HTTP.CONTENT_LEN) != null && headers.get(HTTP.CONTENT_LEN).size() > 0) {
+        	contentLengthHeader = headers.get(HTTP.CONTENT_LEN).first();
+        } 
+
         if (contentLengthHeader != null) {
             contentLength = Integer.parseInt(contentLengthHeader);
 
@@ -116,13 +123,17 @@ public class SourceResponse {
         response.setEntity(entity);
 
         // set any transport headers
-        Set<Map.Entry<String, String>> entries = headers.entrySet();
+        Set<Map.Entry<String, TreeSet<String>>> entries = headers.entrySet();
 
-        for (Map.Entry<String, String> entry : entries) {
-            if (entry.getKey() != null) {
-                response.addHeader(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, TreeSet<String>> entry : entries) {
+            if (entry.getKey() != null) {     
+            	Iterator<String> i = entry.getValue().iterator();
+                while(i.hasNext()) {
+                	response.addHeader(entry.getKey(), i.next());
+                }   
             }
         }
+        
 
         SourceContext.updateState(conn, ProtocolState.RESPONSE_HEAD);
 
@@ -163,10 +174,18 @@ public class SourceResponse {
     }
 
     public void addHeader(String name, String value) {
-        headers.put(name, value);
+    	if(headers.get(name) == null) {
+    		TreeSet<String> values = new TreeSet<String>(); 
+    		values.add(value);
+    		headers.put(name, values);
+    	} else {
+    		TreeSet<String> values = headers.get(name);
+    		values.add(value);
+    	}
     }
 
     public void setStatus(int status) {
         this.status = status;
-    }        
+    } 
+
 }

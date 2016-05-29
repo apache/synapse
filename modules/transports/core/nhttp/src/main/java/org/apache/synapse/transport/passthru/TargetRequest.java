@@ -45,8 +45,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -61,8 +63,8 @@ public class TargetRequest {
     private Pipe pipe = null;
 
     /** Headers map */
-    private Map<String, String> headers = new HashMap<String, String>();
-
+    private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
+    
     /** URL */
     private URL url;
 
@@ -125,11 +127,17 @@ public class TargetRequest {
                     (url.getQuery() != null ? "?" + url.getQuery() : "");
 
         long contentLength = -1;
-        String contentLengthHeader = headers.get(HTTP.CONTENT_LEN);
+        String contentLengthHeader = null;
+        
+        if(headers.get(HTTP.CONTENT_LEN) != null && headers.get(HTTP.CONTENT_LEN).size() > 0) {
+	        contentLengthHeader = headers.get(HTTP.CONTENT_LEN).first();
+	    }
+         
         if (contentLengthHeader != null) {
             contentLength = Integer.parseInt(contentLengthHeader);
             headers.remove(HTTP.CONTENT_LEN);
         }
+  
         
         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
         Long lengthValue = (Long) requestMsgCtx.getProperty(
@@ -152,7 +160,7 @@ public class TargetRequest {
                     !requestMsgCtx.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) {
                     // If the message is multipart/related but it hasn't been built
                     // we can copy the content-type header of the request
-                    headers.put(HTTP.CONTENT_TYPE, trpContentType);
+                	addHeader(HTTP.CONTENT_TYPE, trpContentType);
                 }
             }
         }
@@ -184,10 +192,16 @@ public class TargetRequest {
                     version != null ? version : HttpVersion.HTTP_1_1);
         }
 
-        Set<Map.Entry<String, String>> entries = headers.entrySet();
-        for (Map.Entry<String, String> entry : entries) {
-            request.setHeader(entry.getKey(), entry.getValue());
-        }
+        
+        Set<Map.Entry<String, TreeSet<String>>> entries = headers.entrySet();
+        for (Map.Entry<String, TreeSet<String>> entry : entries) {
+             if (entry.getKey() != null) {
+                Iterator<String> i = entry.getValue().iterator();
+                 while(i.hasNext()) {
+                        request.addHeader(entry.getKey(), i.next());
+                 }
+             }
+         }
         
         //setup wsa action..
         if (request != null){
@@ -235,6 +249,29 @@ public class TargetRequest {
         }
     }
 
+    
+    public void addHeader(String name, String value) {
+		if (headers.get(name) == null) {
+			TreeSet<String> values = new TreeSet<String>();
+			values.add(value);
+			if (HTTP.CONTENT_TYPE.equalsIgnoreCase(name)) {
+				headers.put(HTTP.CONTENT_TYPE, values);
+			} else {
+				headers.put(name, values);
+			}
+		} else {
+			if (HTTP.CONTENT_TYPE.equalsIgnoreCase(name)) {
+				headers.remove(HTTP.CONTENT_TYPE);
+				TreeSet<String> values = new TreeSet<String>();
+				values.add(value);
+				headers.put(HTTP.CONTENT_TYPE, values);
+			} else {
+				TreeSet<String> values = headers.get(name);
+				values.add(value);
+			}
+		}
+	}
+    
 	/**
 	 * Handles the chunking messages in PassThough context, create a temporary buffer and
      * calculate the message size before writing to the external buffer, which is required the
@@ -312,9 +349,6 @@ public class TargetRequest {
         return hasEntityBody;
     }
 
-	public void addHeader(String name, String value) {
-        headers.put(name, value);
-    }
 
     public String getMethod() {
         return method;

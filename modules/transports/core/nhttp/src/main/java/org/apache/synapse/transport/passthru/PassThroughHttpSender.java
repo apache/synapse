@@ -385,11 +385,11 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 				}
 			}
 
-			if (Boolean.TRUE.equals(msgContext.getProperty("PASSTHRU_CONNECT_ERROR"))) {
+			if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {
 				return;
 			}
 
-			OutputStream out = (OutputStream) msgContext.getProperty("GET_ME_OUT");
+			OutputStream out = (OutputStream) msgContext.getProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM);
 			if (out != null) {
 				String disableChunking = (String) msgContext.getProperty(
                         PassThroughConstants.DISABLE_CHUNKING);

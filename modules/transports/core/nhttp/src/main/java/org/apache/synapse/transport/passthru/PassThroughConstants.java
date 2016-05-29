@@ -125,7 +125,14 @@ public class PassThroughConstants {
 	public static final String FORCE_PASS_THROUGH_BUILDER = "force.passthrough.builder";
 	
 	public static final String GET_REQUEST_HANDLED = "GET_REQUEST_HANDLED";
+	
+	public static final String WAIT_BUILDER_IN_STREAM_COMPLETE="WAIT_BUILDER_IN_STREAM_COMPLETE"; 
+ 	
+	public static final String BUILDER_OUTPUT_STREAM="BUILDER_OUTPUT_STREAM";
+	
+	public static final String PASSTHRU_CONNECT_ERROR="PASSTHRU_CONNECT_ERROR";
 
     public static final String COPY_CONTENT_LENGTH_FROM_INCOMING="COPY_CONTENT_LENGTH_FROM_INCOMING";
+    
     public static final String ORIGINAL_CONTENT_LENGTH ="ORIGINAL_CONTENT_LENGTH";
 }

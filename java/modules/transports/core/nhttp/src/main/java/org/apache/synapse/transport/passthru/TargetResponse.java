@@ -29,6 +29,7 @@ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.collections.map.MultiValueMap;
 
 /**
  * This class represents a response coming from the target server.
@@ -40,6 +41,9 @@ public class TargetResponse {
 
     /** Headers of the response */
     private Map<String, String> headers = new HashMap<String, String>();
+    
+    /** Excess headers of the response */ 
+    private Map excessHeaders = new MultiValueMap();
 
     /** The status of the response */
     private int status = HttpStatus.SC_OK;
@@ -77,9 +81,13 @@ public class TargetResponse {
         Header[] headers = response.getAllHeaders();
         if (headers != null) {
             for (Header header : headers) {
-                this.headers.put(header.getName(), header.getValue());
-            }
-        }
+            	if(this.headers.containsKey(header.getName())) {
+            		addExcessHeader(header);
+            	} else {
+            		this.headers.put(header.getName(), header.getValue());
+            	}
+             }        
+        }   
 
         this.expectResponseBody = expectResponseBody;
     }    
@@ -138,6 +146,14 @@ public class TargetResponse {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public Map getExcessHeaders() {
+    	return this.excessHeaders;
+    }
+    
+    public void addExcessHeader(Header h) {
+    	this.excessHeaders.put(h.getName(), h.getValue());
     }
 
     public Pipe getPipe() {

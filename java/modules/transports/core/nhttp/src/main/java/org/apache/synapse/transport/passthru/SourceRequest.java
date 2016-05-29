@@ -20,6 +20,7 @@
 
 package org.apache.synapse.transport.passthru;
 
+import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.http.*;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.nio.ContentDecoder;
@@ -65,6 +66,10 @@ public class SourceRequest {
 
     /** The connection from the client */
     private NHttpServerConnection connection = null;
+    
+    /** Excess headers of the request */
+    private Map excessHeaders = new MultiValueMap();
+
 
     public SourceRequest(SourceConfiguration sourceConfiguration,
                          HttpRequest request,
@@ -87,9 +92,13 @@ public class SourceRequest {
         Header[] headers = request.getAllHeaders();
         if (headers != null) {
             for (Header header : headers) {
-                this.headers.put(header.getName(), header.getValue());
-            }
-        }
+                if(this.headers.containsKey(header.getName())) {
+	                 addExcessHeader(header);
+	            } else {
+	                 this.headers.put(header.getName(), header.getValue());
+	            }
+	        }
+	    }
     }
 
     /**
@@ -181,4 +190,12 @@ public class SourceRequest {
     public boolean isEntityEnclosing() {
         return entityEnclosing;
     }
+    
+    public Map getExcessHeaders() {
+        return this.excessHeaders;
+   }
+    
+    public void addExcessHeader(Header h) {
+        this.excessHeaders.put(h.getName(), h.getValue());
+   }
 }

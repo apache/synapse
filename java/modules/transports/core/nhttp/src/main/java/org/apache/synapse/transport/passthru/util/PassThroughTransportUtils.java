@@ -33,6 +33,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
@@ -117,6 +118,8 @@ public class PassThroughTransportUtils {
                                              boolean preserveServerHeader,
                                              boolean preserveUserAgentHeader) {
         Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        Map excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+
 
         if (headers == null || headers.isEmpty()) {
             return;
@@ -141,6 +144,7 @@ public class PassThroughTransportUtils {
                 iter.remove();
             }
         }
+
     }
 
     /**

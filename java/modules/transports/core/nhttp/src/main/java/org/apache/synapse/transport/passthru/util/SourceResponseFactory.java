@@ -26,12 +26,15 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.SourceResponse;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class SourceResponseFactory {
@@ -54,7 +57,6 @@ public class SourceResponseFactory {
             sourceResponse.addHeader(HTTP.CONTENT_LEN,
                     (String) msgContext.getProperty(PassThroughConstants.ORIGINAL_CONTENT_LENGTH));
         }
-
         if (transportHeaders != null) {
             addResponseHeader(sourceResponse, transportHeaders);
         } else {
@@ -70,8 +72,21 @@ public class SourceResponseFactory {
              }
         	 
         }
-        return sourceResponse;
-    }
+
+		// Add excess response header.
+		String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
+		Map excessHeaders = (Map) msgContext.getProperty(excessProp);
+		if (excessHeaders != null) {
+			for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
+				String key = (String) iterator.next();
+				for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
+					sourceResponse.addHeader(key, (String) excessVal);
+				}
+			}
+		}
+		
+		return sourceResponse;
+	}
 
 	private static void addResponseHeader(SourceResponse sourceResponse, Map transportHeaders) {
 	    for (Object entryObj : transportHeaders.entrySet()) {

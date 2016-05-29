@@ -135,4 +135,7 @@ public class PassThroughConstants {
     public static final String COPY_CONTENT_LENGTH_FROM_INCOMING="COPY_CONTENT_LENGTH_FROM_INCOMING";
     
     public static final String ORIGINAL_CONTENT_LENGTH ="ORIGINAL_CONTENT_LENGTH";
+    
+    //Http method type constants to be used in synapse
+    public static final String HTTP_HEAD = "HEAD";
 }

@@ -39,6 +39,8 @@ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 public class TargetRequestFactory {
@@ -125,6 +127,18 @@ public class TargetRequestFactory {
             String fullUrl = (String) msgContext.getProperty(PassThroughConstants.FULL_URI);
             if ("true".equals(fullUrl)) {
                 request.setFullUrl(true);                
+            }
+            
+            // Add excess respsonse header.
+            String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
+            Map excessHeaders = (Map) msgContext.getProperty(excessProp);
+            if (excessHeaders != null) {
+                    for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
+                            String key = (String) iterator.next();
+                            for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
+                                    request.addHeader(key, (String) excessVal);
+                            }
+                    }
             }
 
             return request;

@@ -29,8 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class HttpResponse {
 
@@ -79,5 +78,22 @@ public class HttpResponse {
 
     public String getBodyAsString() {
         return new String(this.body);
+    }
+
+    public Map<String,List<String>> getBodyAsMap() {
+        String body = getBodyAsString();
+        Map<String,List<String>> map = new HashMap<String,List<String>>();
+        for (String line : body.split("\n")) {
+            int index = line.indexOf(':');
+            String key = line.substring(0, index).trim();
+            String value = line.substring(index + 1).trim();
+            List<String> values = map.get(key);
+            if (values == null) {
+                values = new ArrayList<String>();
+                map.put(key, values);
+            }
+            values.add(value);
+        }
+        return map;
     }
 }

@@ -48,7 +48,8 @@ public class SampleConfigConstants {
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = "httpsPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = "counterEnabled";
 
-    public static final String TAG_BE_SERVER_CONF_ECHO_HTTP_PORT = "port";
+    public static final String TAG_BE_SERVER_CONF_ECHO_HTTP_PORT = "httpPort";
+    public static final String TAG_BE_SERVER_CONF_ECHO_HEADERS = "echoHeaders";
 
     public static final String TAG_BE_SERVER_CONF_DERBY_PORT = "dbPort";
 

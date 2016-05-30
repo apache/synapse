@@ -1,0 +1,29 @@
+<syn:definitions xmlns:syn="http://ws.apache.org/ns/synapse">
+    <syn:api name="TestAPI" context="/test">
+        <syn:resource methods="POST" url-mapping="/content_length">
+            <syn:inSequence>
+                <syn:property name="DISABLE_CHUNKING" value="true" scope="axis2"/>
+                <syn:send>
+                    <syn:endpoint>
+                        <syn:address uri="http://localhost:9000/services/EchoService"/>
+                    </syn:endpoint>
+                </syn:send>
+            </syn:inSequence>
+            <syn:outSequence>
+                <syn:send/>
+            </syn:outSequence>
+        </syn:resource>
+        <syn:resource methods="POST" url-mapping="/chunked">
+            <syn:inSequence>
+                <syn:send>
+                    <syn:endpoint>
+                        <syn:address uri="http://localhost:9000/services/EchoService"/>
+                    </syn:endpoint>
+                </syn:send>
+            </syn:inSequence>
+            <syn:outSequence>
+                <syn:send/>
+            </syn:outSequence>
+        </syn:resource>
+    </syn:api>
+</syn:definitions>

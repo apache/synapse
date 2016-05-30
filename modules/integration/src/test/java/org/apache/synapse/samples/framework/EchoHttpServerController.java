@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultBHttpServerConnection;
 import org.apache.http.impl.DefaultBHttpServerConnectionFactory;
 import org.apache.http.protocol.*;
@@ -38,22 +39,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A simple HTTP server implementation which is capable of echoing back the body
+ * or the headers of an HTTP request.
+ */
 public class EchoHttpServerController extends AbstractBackEndServerController {
 
     private static final Log log = LogFactory.getLog(EchoHttpServerController.class);
 
-    private int port;
+    private final int port;
+    private final boolean echoHeaders;
     private RequestListenerThread requestListener;
 
     public EchoHttpServerController(OMElement element) {
         super(element);
         port = Integer.parseInt(SynapseTestUtils.getParameter(element,
-                SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT, "9000"));
+                SampleConfigConstants.TAG_BE_SERVER_CONF_ECHO_HTTP_PORT, "9000"));
+        echoHeaders = Boolean.parseBoolean(SynapseTestUtils.getParameter(element,
+                SampleConfigConstants.TAG_BE_SERVER_CONF_ECHO_HEADERS, "false"));
     }
 
     public boolean startProcess() {
         try {
-            requestListener = new RequestListenerThread(port);
+            requestListener = new RequestListenerThread(port, echoHeaders);
             requestListener.start();
             return true;
         } catch (IOException e) {
@@ -70,23 +78,39 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
 
     static class EchoHttpHandler implements HttpRequestHandler {
 
+        private final boolean echoHeaders;
+
+        EchoHttpHandler(boolean echoHeaders) {
+            this.echoHeaders = echoHeaders;
+        }
+
         public void handle(HttpRequest request, HttpResponse response,
                            HttpContext context) throws HttpException, IOException {
 
             if (log.isDebugEnabled()) {
                 log.debug(request.getRequestLine().toString());
             }
-            if (request instanceof HttpEntityEnclosingRequest) {
-                HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-                byte[] entityContent = EntityUtils.toByteArray(entity);
-                if (log.isDebugEnabled()) {
-                	log.debug("Request entity read; size=" + entityContent.length);
+
+            if (echoHeaders) {
+                StringBuilder body = new StringBuilder();
+                for (Header header : request.getAllHeaders()) {
+                    body.append(header.getName()).append(": ").append(header.getValue()).append("\n");
                 }
                 response.setStatusCode(HttpStatus.SC_OK);
-                response.setEntity(new ByteArrayEntity(entityContent,
-                        ContentType.create(entity.getContentType().getValue())));
+                response.setEntity(new StringEntity(body.toString(), ContentType.TEXT_PLAIN));
             } else {
-                response.setStatusCode(HttpStatus.SC_NO_CONTENT);
+                if (request instanceof HttpEntityEnclosingRequest) {
+                    HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+                    byte[] entityContent = EntityUtils.toByteArray(entity);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Request entity read; size=" + entityContent.length);
+                    }
+                    response.setStatusCode(HttpStatus.SC_OK);
+                    response.setEntity(new ByteArrayEntity(entityContent,
+                            ContentType.create(entity.getContentType().getValue())));
+                } else {
+                    response.setStatusCode(HttpStatus.SC_NO_CONTENT);
+                }
             }
         }
     }
@@ -97,7 +121,7 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
         private final ServerSocket serversocket;
         private final HttpService httpService;
 
-        public RequestListenerThread(final int port) throws IOException {
+        public RequestListenerThread(final int port, final boolean echoHeaders) throws IOException {
             this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;
             this.serversocket = new ServerSocket();
             this.serversocket.setReuseAddress(true);
@@ -112,7 +136,7 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
 
             // Set up request handlers
             UriHttpRequestHandlerMapper registry = new UriHttpRequestHandlerMapper();
-            registry.register("*", new EchoHttpHandler());
+            registry.register("*", new EchoHttpHandler(echoHeaders));
 
             // Set up the HTTP service
             this.httpService = new HttpService(httpProcessor, registry);

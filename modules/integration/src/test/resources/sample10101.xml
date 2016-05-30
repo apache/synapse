@@ -1,0 +1,18 @@
+<synapseSample>
+    <sampleID>10101</sampleID>
+    <sampleName>Pass Through Transport Chunked Encoding Support</sampleName>
+    <synapseConfig>
+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10101.xml</synapseXml>
+    </synapseConfig>
+    <backEndServerConfig>
+        <echoServer id="0">
+            <httpPort>9000</httpPort>
+            <echoHeaders>true</echoHeaders>
+        </echoServer>
+    </backEndServerConfig>
+    <clientConfig>
+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
+    </clientConfig>
+</synapseSample>

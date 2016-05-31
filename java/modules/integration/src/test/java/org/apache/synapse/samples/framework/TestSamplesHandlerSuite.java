@@ -207,7 +207,7 @@ public class TestSamplesHandlerSuite extends TestSuite {
         sampleClassRepo.put("155", Sample155.class);
         sampleClassRepo.put("156", Sample156.class);
         sampleClassRepo.put("157", Sample157.class);
-
+        sampleClassRepo.put("161", Sample161.class);
         //Transport switching
         sampleClassRepo.put("250", Sample250.class);
         sampleClassRepo.put("251", Sample251.class);

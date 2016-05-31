@@ -1286,6 +1286,12 @@
             <id>dushan</id>
             <email>dushan AT apache.org</email>
             <organization>WSO2</organization>
+    	</developer>
+	<developer>
+            <name>Ravi Undupitiya</name>
+            <id>ravi</id>
+            <email>ravi AT apache.org</email>
+            <organization>WSO2</organization>
         </developer>
     </developers>
 

@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.eventing.EventPublisherMediatorSerializer;
+import org.apache.synapse.mediators.builtin.RespondMediator;
 import sun.misc.Service;
 
 import java.util.HashMap;
@@ -70,7 +71,8 @@ public class MediatorSerializerFinder {
         URLRewriteMediatorSerializer.class,
         PayloadFactoryMediatorSerializer.class,
         BeanMediatorSerializer.class,
-        EJBMediatorSerializer.class
+        EJBMediatorSerializer.class,
+        RespondMediatorSerializer.class
     };
 
     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();

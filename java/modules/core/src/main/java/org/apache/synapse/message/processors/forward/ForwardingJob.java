@@ -158,7 +158,7 @@ public class ForwardingJob implements StatefulJob {
 
                                 if (maxDeliverAttempts > 0) {
                                     if(processor.getSendAttemptCount() >= maxDeliverAttempts) {
-                                        processor.deactivate();
+                                        deactivate(processor, messageContext, parameters);
                                     }
                                 }
                                 errorStop = true;
@@ -199,7 +199,7 @@ public class ForwardingJob implements StatefulJob {
                             if (maxDeliverAttempts > 0) {
                                 processor.incrementSendAttemptCount();
                                 if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
-                                    processor.deactivate();
+                                    deactivate(processor, messageContext, parameters);
                                 }
                             }
                             errorStop = true;
@@ -260,4 +260,19 @@ public class ForwardingJob implements StatefulJob {
         }
     }
 
+    private void deactivate(ScheduledMessageForwardingProcessor processor,
+                            MessageContext msgContext, Map<String, Object> parameters) {
+        processor.deactivate();
+        if (parameters != null && parameters.get(ForwardingProcessorConstants.DEACTIVATE_SEQUENCE) != null) {
+            if (msgContext != null) {
+                String seq = (String) parameters.get(ForwardingProcessorConstants.DEACTIVATE_SEQUENCE);
+                Mediator mediator = msgContext.getSequence(seq);
+                if (mediator != null) {
+                    mediator.mediate(msgContext);
+                } else {
+                    log.warn("Deactivate sequence: " + seq + " does not exist");
+                }
+            }
+        }
+    }
 }

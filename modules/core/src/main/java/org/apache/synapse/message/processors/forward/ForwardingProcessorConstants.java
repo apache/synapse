@@ -55,5 +55,9 @@ public final class ForwardingProcessorConstants {
      */
     public static final String FAULT_SEQUENCE = "message.processor.fault.sequence";
 
+    /**
+     * used for forward in case of scheduled message processor deactivation
+     */
+    public static final String DEACTIVATE_SEQUENCE = "message.processor.deactivate.sequence";
 
 }

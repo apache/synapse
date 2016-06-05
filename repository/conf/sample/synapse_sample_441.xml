@@ -18,11 +18,23 @@
   ~  under the License.
   -->
 
-<!-- Respond Mediator with proxy services -->
+<!-- Mock Service using Respond Mediator with proxy services -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-    <proxy name="EchoService">
+    <proxy name="MockService">
         <target>
             <inSequence>
+                <log level="full"/>
+                <payloadFactory>
+                    <format>
+                        <m:Sample xmlns:m="http://services.samples">
+                            <m:Response>
+                                <m:value>foo</m:value>
+                            </m:Response>
+                        </m:Sample>
+                    </format>
+                    <args>
+                    </args>
+                </payloadFactory>
                 <respond/>
             </inSequence>
         </target>

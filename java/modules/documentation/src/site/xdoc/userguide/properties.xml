@@ -1,0 +1,897 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Properties Catalog</title>
+    </properties>
+    <body>
+        <section name="Properties Catalog" id="Introduction">
+            <p>
+                Properties provide the means of accessing various types of information
+                regarding a message that passes through the ESB. Furthermore, it is also
+                possible to use properties to control the behavior of the ESB on a given message flow.
+            </p>
+        </section>
+        <section name="Content" id="Content">
+            <ul>
+                <li>
+                    <a href="#Introduction">Introduction</a>
+                </li>
+                <li>
+                    <a href="#Contents">Contents</a>
+                </li>
+                <li>
+                    <a href="#Generic_Properties">Generic Properties</a>
+                    <ul>
+                        <li>
+                            <a href="#PRESERVE_WS_ADDRESSING">PRESERVE_WS_ADDRESSING</a>
+                        </li>
+                        <li>
+                            <a href="#RESPONSE">RESPONSE</a>
+                        </li>
+                        <li>
+                            <a href="#OUT_ONLY">OUT_ONLY</a>
+                        </li>
+                        <li>
+                            <a href="#ERROR_CODE">ERROR_CODE</a>
+                        </li>
+                        <li>
+                            <a href="#ERROR_MESSAGE">ERROR_MESSAGE</a>
+                        </li>
+                        <li>
+                            <a href="#ERROR_DETAIL">ERROR_DETAIL</a>
+                        </li>
+                        <li>
+                            <a href="#ERROR_EXCEPTION">ERROR_EXCEPTION</a>
+                        </li>
+                        <li>
+                            <a href="#TRANSPORT_HEADERS">TRANSPORT_HEADERS</a>
+                        </li>
+                        <li>
+                            <a href="#messageType">messageType</a>
+                        </li>
+                        <li>
+                            <a href="#ContentType">ContentType</a>
+                        </li>
+                        <li>
+                            <a href="#preserveProcessedHeaders">preserveProcessedHeaders</a>
+                        </li>
+                        <li>
+                            <a href="#SERVER_IP">SERVER_IP</a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li>
+                    <a href="#HTTP_Transport_Properties">HTTP Transport Properties</a>
+                    <ul>
+                        <li>
+                            <a href="#POST_TO_URI">POST_TO_URI</a>
+                        </li>
+                        <li>
+                            <a href="#FORCE_SC_ACCEPTED">FORCE_SC_ACCEPTED</a>
+                        </li>
+                        <li>
+                            <a href="#DISABLE_CHUNKING">DISABLE_CHUNKING</a>
+                        </li>
+                        <li>
+                            <a href="#NO_ENTITY_BODY">NO_ENTITY_BODY</a>
+                        </li>
+                        <li>
+                            <a href="#FORCE_HTTP_1.0">FORCE_HTTP_1.0</a>
+                        </li>
+                        <li>
+                            <a href="#HTTP_SC.0">HTTP_SC</a>
+                        </li>
+                        <li>
+                            <a href="#FAULTS_AS_HTTP_200">FAULTS_AS_HTTP_200</a>
+                        </li>
+                        <li>
+                            <a href="#NO_KEEPALIVE">NO_KEEPALIVE</a>
+                        </li>
+                        <li>
+                            <a href="#REST_URL_POSTFIX">REST_URL_POSTFIX</a>
+                        </li>
+                        <li>
+                            <a href="#REQUEST_HOST_HEADER">REQUEST_HOST_HEADER</a>
+                        </li>
+                        <li>
+                            <a href="#FORCE_POST_PUT_NOBODY">FORCE_POST_PUT_NOBODY</a>
+                        </li>
+                        <li>
+                            <a href="#FORCE_HTTP_CONTENT_LENGTH">FORCE_HTTP_CONTENT_LENGTH</a>
+                        </li>
+                        <li>
+                            <a href="#COPY_CONTENT_LENGTH_FROM_INCOMING">COPY_CONTENT_LENGTH_FROM_INCOMING</a>
+                        </li>
+                        <li>
+                            <a href="#COPY_CONTENT_LENGTH_FROM_INCOMING">COPY_CONTENT_LENGTH_FROM_INCOMING</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#Synapse_Message_Context_Properties">Synapse Message Context Properties</a>
+                    <ul>
+                        <li>
+                            <a href='#SYSTEM_DATE'>SYSTEM_DATE</a>
+                        </li>
+                        <li>
+                            <a href='#SYSTEM_TIME'>SYSTEM_TIME</a>
+                        </li>
+                        <li>
+                            <a href='#MESSAGE_FORMAT'>MESSAGE_FORMAT</a>
+                        </li>
+                        <li>
+                            <a href='#OperationName'>OperationName</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="Generic Properties" id="Generic_Properties">
+           <p>Generic properties allow to configure or change the behavior of the message flow as they are processed by the ESB.</p>
+            <p/>
+            <subsection name="PRESERVE_WS_ADDRESSING" id="PRESERVE_WS_ADDRESSING">
+                <p>
+                    By default, the ESB adds a new set of WS-Addressing headers to the messages
+                    forwarded from the ESB. If this property is set to "true" on a message,
+                    the ESB will forward it without altering its existing WS-Addressing headers.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;PRESERVE_WS_ADDRESSING&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="RESPONSE" id="RESPONSE">
+                <p>
+                    Once this property is set to 'true' on a message, the ESB will
+                    start treating it as a response message. It is generally used to
+                    route a request message back to its source as the response.
+                    However, currently respond mediator perform the same functionality.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="OUT_ONLY" id="OUT_ONLY">
+                <p>
+                    Set this property to "true" on a message to indicate that no response
+                    message is expected for it once it is forwarded from the ESB. In other
+                    words, the ESB will do an out-only invocation with such messages.
+
+                    It is very important to set this property on messages that are involved
+                    in out-only invocations to prevent the ESB from registering unnecessary
+                    callbacks for response handling and eventually running out of memory.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="ERROR_CODE" id="ERROR_CODE">
+                <p>Use this property to set a custom error code on a message which can be later
+                    processed by a Synapse fault handler. If the Synapse encounters an error during
+                    mediation or routing, this property will be automatically populated.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>String</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;error-code&quot; expression=&quot;get-property(&#39;ERROR_CODE&#39;)&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="ERROR_MESSAGE" id="ERROR_MESSAGE">
+                <p>
+                    Use this property to set a custom error message on a message which can be
+                    later processed by a Synapse fault handler. If the Synapse encounters an error
+                    during mediation or routing, this property will be automatically populated.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>String</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;Cause&quot; expression=&quot;get-property(&#39;ERROR_MESSAGE&#39;)&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="ERROR_DETAIL" id="ERROR_DETAIL">
+                <p>
+                  Use this property to set the exception stacktrace in case of an error.
+                  If the ESB encounters an error during mediation or routing, this property
+                  will be automatically populated.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>String</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;Trace&quot; expression=&quot;get-property(&#39;ERROR_DETAIL&#39;)&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="ERROR_EXCEPTION" id="ERROR_EXCEPTION">
+                <p>
+                  Contains the actual exception thrown in case of a runtime error.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>String</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;error-exception&quot; expression=&quot;get-property(&#39;ERROR_EXCEPTION&#39;)&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="TRANSPORT_HEADERS" id="TRANSPORT_HEADERS">
+                <p>Contains the map of transport headers. Automatically populated.
+                    Individual values of this map can be accessed using the property
+                    mediator in the transport scope.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>java.util.Map</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>Populated with the transport headers of the incoming request.</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;TRANSPORT_HEADERS&quot; action=&quot;remove&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="messageType" id="messageType">
+                <p>Message formatter is selected based on this property.
+                    This property should have the content type, such as text/xml,
+                    application/xml, or application/json.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>Content type of incoming request.</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;messageType&quot; value=&quot;text/xml&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="ContentType" id="ContentType">
+                <p>This property will be in effect only if the messageType property is set.
+                    If the messageType is set, the value of Content-Type HTTP header of the
+                    outgoing request will be chosen based on this property. Note that this property
+                    is required to be set only if the message formatter seeks it in the
+                    message formatter implementation.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>Value of the Content-type header of the incoming request.</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;ContentType&quot; value=&quot;text/xml&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="preserveProcessedHeaders" id="preserveProcessedHeaders">
+                <p>By default, Synapse removes the SOAP headers of incoming requests that have been processed.
+                    If we set this property to 'true', Synapse preserves the SOAP headers.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>Preserving SOAP headers</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;preserveProcessedHeaders&quot; value=&quot;true&quot; scope=&quot;default&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="SERVER_IP" id="SERVER_IP">
+                <p>Server IP/Host name of hosted server
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>Set automatically by the mediation engine upon startup with IP address or
+                        hostname of the ESB host
+                    </dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;StringServerIp&quot; expression=&quot;get-property(&#39;SERVER_IP&#39;)&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+
+        </section>
+        <section name="HTTP Transport Properties" id="HTTP_Transport_Properties">
+          <p>HTTP transport properties allow to control and configure how the HTTP transport processes the ongoing messages.
+          </p>
+            <subsection name="POST_TO_URI" id="POST_TO_URI">
+                <p>This property makes the outgoing URL of the ESB a complete URL.
+                    This is important when we talk through a Proxy Server.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;POST_TO_URI&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="FORCE_SC_ACCEPTED" id="FORCE_SC_ACCEPTED">
+                <p>
+                    When set to true, this property forces a 202 HTTP response to the client so that it stops waiting
+                    for a response.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;FORCE_SC_ACCEPTED&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="DISABLE_CHUNKING" id="DISABLE_CHUNKING">
+                <p>Disables the HTTP chunking for outgoing messaging.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;DISABLE_CHUNKING&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="NO_ENTITY_BODY" id="NO_ENTITY_BODY">
+                <p>This property should be removed if a user want to generate a
+                    response from the ESB to a request without an entity body, for example, GET request.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;NO_ENTITY_BODY&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="FORCE_HTTP_1.0" id="FORCE_HTTP_1.0">
+                <p>
+                  Force HTTP 1.0 for outgoing HTTP messages.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;FORCE_HTTP_1.0&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="HTTP_SC" id="HTTP_SC">
+                <p>
+                  Set the HTTP status code.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>HTTP status code number</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;HTTP_SC&quot; value=&quot;500&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="FAULTS_AS_HTTP_200" id="FAULTS_AS_HTTP_200">
+                <p>Set the HTTP status code.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;FAULTS_AS_HTTP_200&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="NO_KEEPALIVE" id="NO_KEEPALIVE">
+                <p>Disables HTTP keep alive for corresponded connection flow. This Can be use in both inflow and outflow.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;NO_KEEPALIVE&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="REST_URL_POSTFIX" id="REST_URL_POSTFIX">
+                <p>The value of this property will be appended to the target URL when sending messages
+                    out in a RESTful manner through an address endpoint. This is useful when you need to
+                    append a context to the target URL in case of RESTful invocations. If you are using an
+                    HTTP endpoint instead of an address endpoint, specify variables in the format of "uri.var.*"
+                    instead of using this property.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>A URL fragment starting with "/"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>In the case of GET requests through an address endpoint, this contains the query string.</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;REST_URL_POSTFIX&quot; value=&quot;/context&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="REQUEST_HOST_HEADER" id="REQUEST_HOST_HEADER">
+                <p>
+                    The value of this property will be set as the HTTP host header of outgoing request.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>ESB will set hostname of target endpoint and port as the HTTP host header</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;REQUEST_HOST_HEADER&quot; value=&quot;www.wso2.org&quot; scope=&quot;axis2&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="FORCE_HTTP_CONTENT_LENGTH" id="FORCE_HTTP_CONTENT_LENGTH">
+                <p>
+                    This property allows the content length to be sent when the ESB sends a
+                    request to a back end server. When HTTP 1.1 is used, this property disables
+                    chunking and sends the content length. When HTTP 1.0 is used, the property
+                    only sends the content length. This property should be set in scenarios where
+                    the backend server is not able to accept chunked content.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;FORCE_HTTP_CONTENT_LENGTH&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="COPY_CONTENT_LENGTH_FROM_INCOMING" id="COPY_CONTENT_LENGTH_FROM_INCOMING">
+                <p>
+                    This property allows the HTTP content length to be copied from an incoming message.
+                    It is only valid when the FORCE_HTTP_CONTENT_LENGTH property is used.
+                    The COPY_CONTENT_LENGTH_FROM_INCOMING avoids buffering the message in memory for calculating
+                    the content length, thus reducing the risk of performance degradation.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>"true", "false"</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>false</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>axis2</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;COPY_CONTENT_LENGTH_FROM_INCOMING&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+        </section>
+        <section name="Synapse Message Context Properties" id="Synapse_Message_Context_Properties">
+          <p>Synapse Message Context Properties allow to retrieve the data related to synapse
+            mediation engine information for current message flow.</p>
+            <subsection name="SYSTEM_DATE" id="SYSTEM_DATE">
+                <p>
+                    Returns the current date as a String. Optionally, a date format as per the standard
+                    date format may be supplied. e.g. synapse:get-property("SYSTEM_DATE", "yyyy.MM.dd G 'at' HH:mm:ss
+                    z")
+                    or get-property('SYSTEM_DATE').
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;StringDateVal&quot; expression=&quot;get-property(&#39;SYSTEM_DATE&#39;)&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="SYSTEM_TIME" id="SYSTEM_TIME">
+                <p>
+                    Returns the current time in milliseconds.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;StringTimeVal&quot; expression=&quot;get-property(&#39;SYSTEM_TIME&#39;)&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="MESSAGE_FORMAT" id="MESSAGE_FORMAT">
+                <p>Returns pox, soap11, soap12 depending on the message.
+                    If a message type is unknown this returns soap12.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;StringMessageFormat&quot; expression=&quot;get-property(&#39;MESSAGE_FORMAT&#39;)&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+            <subsection name="OperationName" id="OperationName">
+                <p>
+                    Returns the operation name corresponding to the message.
+                </p>
+                <dl>
+                    <dt>
+                        <tt>Possible Values</tt>
+                    </dt>
+                    <dd>string</dd>
+                    <dt>
+                        <tt>Default Behavior</tt>
+                    </dt>
+                    <dd>none</dd>
+                    <dt>
+                        <tt>Scope</tt>
+                    </dt>
+                    <dd>synapse</dd>
+                    <dt>
+                        <tt>Example</tt>
+                    </dt>
+                    <dd>
+                        <div class="xmlConf">&lt;property name=&quot;StringOperationName&quot; expression=&quot;get-property(&#39;OperationName&#39;)&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;</div>
+                    </dd>
+                </dl>
+            </subsection>
+        </section>
+    </body>
+</document>

@@ -585,9 +585,14 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
     }
 
     public void destroy() {
+        if (metricsMBean != null) {
+            metricsMBean.destroy();
+        }
+
         if (enableMBeanStats) {
             MBeanRegistrar.getInstance().unRegisterMBean("Endpoint", endpointName);
         }
+        metricsMBean = null;
         this.initialized = false;
     }
 

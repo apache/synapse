@@ -26,16 +26,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.XMLToObjectMapper;
-import sun.misc.Service;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  * This class is based on J2SE Service Provider model
@@ -106,22 +105,22 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
         initialized = true;
     }
     /**
-     * Register plugable mediator factories from the classpath
+     * Register pluggable mediator factories from the classpath
      * <p/>
      * This looks for JAR files containing a META-INF/services that adheres to the following
-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html
      */
     private static void registerExtensions() {
 
+        Iterator<ConfigurationFactory> factories = ServiceLoader.load(ConfigurationFactory.class).iterator();
         // register MediatorFactory extensions
-        Iterator it = Service.providers(ConfigurationFactory.class);
-        while (it.hasNext()) {
-            ConfigurationFactory cf = (ConfigurationFactory) it.next();
-            QName tag = cf.getTagQName();
-            factoryMap.put(tag, cf.getClass());
-            serializerMap.put(tag, cf.getSerializerClass());
+        while (factories.hasNext()) {
+            ConfigurationFactory factory = factories.next();
+            QName tag = factory.getTagQName();
+            factoryMap.put(tag, factory.getClass());
+            serializerMap.put(tag, factory.getSerializerClass());
             if (log.isDebugEnabled()) {
-                log.debug("Added MediatorFactory " + cf.getClass() + " to handle " + tag);
+                log.debug("Added MediatorFactory " + factory.getClass() + " to handle " + tag);
             }
         }
     }

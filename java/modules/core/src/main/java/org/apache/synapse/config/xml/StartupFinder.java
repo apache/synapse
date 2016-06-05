@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 import javax.xml.namespace.QName;
 
@@ -33,8 +34,6 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Startup;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.startup.quartz.SimpleQuartzFactory;
-
-import sun.misc.Service;
 
 public class StartupFinder implements XMLToObjectMapper {
 
@@ -100,27 +99,22 @@ public class StartupFinder implements XMLToObjectMapper {
     }
 
     /**
-     * Register pluggable mediator factories from the classpath
+     * Register pluggable startup factories from the classpath
      * <p/>
-     * This looks for JAR files containing a META-INF/services that adheres to
-     * the following
-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
+     * This looks for JAR files containing a META-INF/services that adheres to the following
+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html
      */
     private static void registerExtensions() {
 
-        // log.debug("Registering mediator extensions found in the classpath : "
-        // + System.getResource("java.class.path"));
-
         // register MediatorFactory extensions
-        Iterator<?> it = Service.providers(StartupFactory.class);
-        while (it.hasNext()) {
-            StartupFactory sf = (StartupFactory) it.next();
-            QName tag = sf.getTagQName();
-            factoryMap.put(tag, sf.getClass());
-            serializerMap.put(tag, sf.getSerializerClass());
+        Iterator<StartupFactory> factories = ServiceLoader.load(StartupFactory.class).iterator();
+        while (factories.hasNext()) {
+            StartupFactory factory = factories.next();
+            QName tag = factory.getTagQName();
+            factoryMap.put(tag, factory.getClass());
+            serializerMap.put(tag, factory.getSerializerClass());
             if (log.isDebugEnabled()) {
-                log.debug("Added StartupFactory " + sf.getClass()
-                        + " to handle " + tag);
+                log.debug("Added StartupFactory " + factory.getClass() + " to handle " + tag);
             }
         }
     }

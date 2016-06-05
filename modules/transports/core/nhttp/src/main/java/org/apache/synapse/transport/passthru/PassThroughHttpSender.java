@@ -19,8 +19,9 @@
 
 package org.apache.synapse.transport.passthru;
 
+import org.apache.axiom.blob.Blobs;
+import org.apache.axiom.blob.OverflowableBlob;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -38,6 +39,7 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.threads.NativeThreadFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.util.MessageProcessorSelector;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
@@ -397,21 +399,27 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                         PassThroughConstants.FORCE_HTTP_1_0);
 				Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
 				
-				if("true".equals(disableChunking) || "true".equals(forceHttp10) ){
-					ByteArrayOutputStream _out = new ByteArrayOutputStream();
+				if ("true".equals(disableChunking) || "true".equals(forceHttp10) ){
 					MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(
                             msgContext);
 					OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
-					formatter.writeTo(msgContext, format, _out, false);
+                    OverflowableBlob serialized = null;
                     try {
-                        long messageSize = setStreamAsTempData(formatter, msgContext, format);
-                        msgContext.setProperty(
-                                PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH, messageSize);
-                        formatter.writeTo(msgContext, format, out, false);
+                        serialized = setStreamAsTempData(formatter, msgContext, format);
+                        msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,
+                                serialized.getSize());
+                        serialized.writeTo(out);
                     } catch (IOException e) {
                     	 handleException("I/O error while serializing message", e);
+                    } finally {
+                        if (serialized != null) {
+                            try {
+                                serialized.release();
+                            } catch (IOException ignored) {
+                            }
+                        }
                     }
-                	pipe.setSerializationComplete(true);
+                    pipe.setSerializationComplete(true);
 				} else {
 					if ((disableChunking == null || !"true".equals(disableChunking)) ||
 					    (forceHttp10 == null || !"true".equals(forceHttp10))) {
@@ -423,7 +431,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 					}
 					
 					if (isCompleteWithoutData(msgContext)) {
-							pipe.setSerializationCompleteWithoutData(true);
+                        pipe.setSerializationCompleteWithoutData(true);
 					} else {
 						pipe.setSerializationComplete(true);
 					}
@@ -603,7 +611,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
     }
 
     /**
-     * Write the stream to a temporary storage and calculate the content length
+     * Write the stream to a temporary storage and return a handle to the temporary storage
      *
      * @param messageFormatter Formatter used to serialize the message
      * @param msgContext Message to be serialized
@@ -611,18 +619,19 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
      *
      * @throws IOException if an exception occurred while writing data
      */
-    private long setStreamAsTempData(MessageFormatter messageFormatter,
+    private OverflowableBlob setStreamAsTempData(MessageFormatter messageFormatter,
                                      MessageContext msgContext,
                                      OMOutputFormat format) throws IOException {
 
-        OverflowBlob serialized = new OverflowBlob(256, 4096, "http-nio_", ".dat");
+        OverflowableBlob serialized = Blobs.createOverflowableBlob(4096, "http-nio_",
+                ".dat", FileUtils.getTempDirectory());
         OutputStream out = serialized.getOutputStream();
         try {
             messageFormatter.writeTo(msgContext, format, out, true);
         } finally {
             out.close();
         }
-        return serialized.getLength();
+        return serialized;
     }
 
     private boolean isBypass(String hostName) {

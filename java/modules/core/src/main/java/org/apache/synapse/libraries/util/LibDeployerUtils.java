@@ -434,14 +434,14 @@ public class LibDeployerUtils {
             if (entry.getName().startsWith("META-INF/")) {
                 continue;
             }
-            // if the entry is a directory, create a new dir
+            // Skip directories
             if (entry.isDirectory()) {
-                createDir(destPath + entry.getName());
                 continue;
             }
-            // if the entry is a file, write the file
+            File dest = new File(destPath, entry.getName());
+            dest.getParentFile().mkdirs();
             copyInputStream(zipFile.getInputStream(entry),
-                            new BufferedOutputStream(new FileOutputStream(destPath + entry.getName())));
+                            new BufferedOutputStream(new FileOutputStream(dest)));
         }
         zipFile.close();
     }

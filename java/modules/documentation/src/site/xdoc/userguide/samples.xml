@@ -202,6 +202,14 @@
                         <li><a href="samples/sample434.html">Sample 434: Callout Mediator - Invoke a service using an inline Endpoint</a></li>
                     </ul>
                 </p>
+                <h4>Respond Mediator</h4>
+                <p>
+                    <ul>
+                        <li><a href="samples/sample440.html">Sample 440: Respond Mediator - Echo Service with a Proxy service</a></li>
+                        <li><a href="samples/sample441.html">Sample 441: Respond Mediator - Mock Service with a Proxy service</a></li>
+
+                    </ul>
+                </p>
                 <h4>URL Rewrite Mediator</h4>
                 <p>
                     <ul>

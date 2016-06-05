@@ -20,6 +20,7 @@
                         <li><a href="#Log">Log Mediator</a></li>
                         <li><a href="#Property">Property Mediator</a></li>
                         <li><a href="#Send">Send Mediator</a></li>
+                        <li><a href="#Respond">Respond Mediator</a></li>
                     </ul>
                 </li>
                 <li>
@@ -302,6 +303,13 @@
                     handle the response from the endpoint while the giving the illusion that Synapse
                     is making blocking service calls.
                 </p>
+            </subsection>
+            <subsection name="Respond Mediator" id="Respond">
+                <p>
+                    The Respond Mediator stops the processing on the current message flow and sends
+                    the message back to the client as a response.
+                </p>
+                <div class="xmlConf">&lt;respond/&gt;</div>
             </subsection>
         </section>
         <section name="Filter Mediators" id="FilterMediators">

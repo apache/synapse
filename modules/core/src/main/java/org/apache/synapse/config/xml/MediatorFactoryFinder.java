@@ -28,13 +28,13 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.xml.eventing.EventPublisherMediatorFactory;
-import sun.misc.Service;
 
 import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  *
@@ -133,18 +133,18 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      * Register pluggable mediator factories from the classpath
      *
      * This looks for JAR files containing a META-INF/services that adheres to the following
-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html
      */
     private static void registerExtensions() {
 
         // register MediatorFactory extensions
-        Iterator it = Service.providers(MediatorFactory.class);
-        while (it.hasNext()) {
-            MediatorFactory mf = (MediatorFactory) it.next();
-            QName tag = mf.getTagQName();
-            factoryMap.put(tag, mf.getClass());
+        Iterator<MediatorFactory> factories = ServiceLoader.load(MediatorFactory.class).iterator();
+        while (factories.hasNext()) {
+            MediatorFactory factory = factories.next();
+            QName tag = factory.getTagQName();
+            factoryMap.put(tag, factory.getClass());
             if (log.isDebugEnabled()) {
-                log.debug("Added MediatorFactory " + mf.getClass() + " to handle " + tag);
+                log.debug("Added MediatorFactory " + factory.getClass() + " to handle " + tag);
             }
         }
     }

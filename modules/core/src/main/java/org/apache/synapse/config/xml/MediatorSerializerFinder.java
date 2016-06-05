@@ -25,11 +25,11 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.eventing.EventPublisherMediatorSerializer;
 import org.apache.synapse.mediators.builtin.RespondMediator;
-import sun.misc.Service;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 public class MediatorSerializerFinder {
 
@@ -108,26 +108,27 @@ public class MediatorSerializerFinder {
      * Register pluggable mediator serializers from the classpath
      *
      * This looks for JAR files containing a META-INF/services that adheres to the following
-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html
      */
     private void registerExtensions() {
         if (log.isDebugEnabled()) {
             log.debug("Registering mediator extensions found in the classpath.. ");
         }
         // register MediatorSerializer extensions
-        Iterator it = Service.providers(MediatorSerializer.class);
-        while (it.hasNext()) {
-            MediatorSerializer ms = (MediatorSerializer) it.next();
-            String name = ms.getMediatorClassName();
+        Iterator<MediatorSerializer> serializers = ServiceLoader.load(MediatorSerializer.class).iterator();
+
+        while (serializers.hasNext()) {
+            MediatorSerializer serializer = serializers.next();
+            String name = serializer.getMediatorClassName();
             try {
-                serializerMap.put(name, ms.getClass().newInstance());
+                serializerMap.put(name, serializer.getClass().newInstance());
             } catch (InstantiationException e) {
-                handleException("Error instantiating mediator serializer : " + ms);
+                handleException("Error instantiating mediator serializer : " + serializer);
             } catch (IllegalAccessException e) {
-                handleException("Error instantiating mediator serializer : " + ms);
+                handleException("Error instantiating mediator serializer : " + serializer);
             }
             if (log.isDebugEnabled()) {
-                log.debug("Added MediatorSerializer " + ms.getClass().getName() + " to handle " + name);
+                log.debug("Added MediatorSerializer " + serializer.getClass().getName() + " to handle " + name);
             }
         }
     }

@@ -57,7 +57,7 @@
                     for Synapse.
                 </li>
                 <li>
-                    The maximum number of characters in a single line should not exceed 100. Please
+                    The maximum number of characters in a single line should not exceed 120. Please
                     configure your IDE to properly enforce this restriction on all source files.
                 </li>
                 <li>

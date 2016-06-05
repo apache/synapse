@@ -114,6 +114,8 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
 
     public void destroy() {
         future.cancel(true);
+        suspensionCounts.clear();
+        timeoutCounts.clear();
     }
 
     // --- endpoint control ---

@@ -84,7 +84,7 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <finalName>synapse-test-lib</finalName>	
+                            <finalName>synapse</finalName>	
                             <filters>
                                 <filter>
                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
@@ -103,7 +103,7 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <finalName>synapse-eiptest-lib</finalName>
+                            <finalName>synapse</finalName>
                             <filters>
                                 <filter>
                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
@@ -122,7 +122,7 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <finalName>synapse-eipcore-lib</finalName>
+                            <finalName>synapse</finalName>
                             <filters>
                                 <filter>
                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties

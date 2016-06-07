@@ -288,6 +288,10 @@ public class Pipe {
         return buffer;
     }
 
+    public synchronized boolean isSerializationComplete(){
+        return serializationComplete;
+    }
+
     private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {
         if (inputMode.compareAndSet(false, true)) {
             if (buffer.hasRemaining()) {

@@ -74,9 +74,9 @@ public class PassThroughConstants {
 
     protected static final String PASS_THROUGH_TRANSPORT_WORKER_POOL =
             "PASS_THROUGH_TRANSPORT_WORKER_POOL";
-    protected static final String PASS_THROUGH_SOURCE_CONFIGURATION =
+    public static final String PASS_THROUGH_SOURCE_CONFIGURATION =
             "PASS_THROUGH_SOURCE_CONFIGURATION";
-    protected static final String PASS_THROUGH_SOURCE_CONNECTION = "pass-through.Source-Connection";
+    public static final String PASS_THROUGH_SOURCE_CONNECTION = "pass-through.Source-Connection";
     protected static final String PASS_THROUGH_SOURCE_REQUEST = "pass-through.Source-Request";
 
     protected static final String PASS_THROUGH_TARGET_CONNECTION = "pass-through.Target-Connection";
@@ -138,4 +138,7 @@ public class PassThroughConstants {
     
     //Http method type constants to be used in synapse
     public static final String HTTP_HEAD = "HEAD";
+
+    //use to create source buffer in passthrough transport
+    public static final String SOURCE ="source";
 }

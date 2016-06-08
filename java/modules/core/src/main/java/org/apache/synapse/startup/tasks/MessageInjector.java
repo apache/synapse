@@ -39,6 +39,7 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.util.PayloadHelper;
+import org.apache.axiom.util.UIDGenerator;
 
 /**
  * Injects a Message into a named sequence or a proxy service configured in the Synapse
@@ -209,6 +210,7 @@ public class MessageInjector implements Task, ManagedLifecycle {
             axis2MsgCtx.setConfigurationContext(configurationContext);
             axis2MsgCtx.setIncomingTransportName(Constants.TRANSPORT_LOCAL);
             axis2MsgCtx.setServerSide(true);
+            axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
 
             try {
                 AxisService axisService = configurationContext.getAxisConfiguration().
@@ -266,6 +268,7 @@ public class MessageInjector implements Task, ManagedLifecycle {
 
         } else {
             MessageContext mc = synapseEnvironment.createMessageContext();
+            mc.setMessageID(UIDGenerator.generateURNString());
             mc.pushFaultHandler(new MediatorFaultHandler(mc.getFaultSequence()));
             if (to != null) {
                 mc.setTo(new EndpointReference(to));

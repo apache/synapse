@@ -2,6 +2,7 @@ package org.apache.synapse.util;
 
 import org.apache.axiom.attachments.Attachments;
 import org.apache.axiom.om.*;
+import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.soap.*;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
@@ -17,10 +18,13 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.aspects.statistics.ErrorLog;
+import org.apache.synapse.aspects.statistics.StatisticsLog;
 import org.apache.synapse.aspects.statistics.StatisticsRecord;
 import org.apache.synapse.aspects.statistics.StatisticsRecordFactory;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.eip.EIPConstants;
+import org.apache.synapse.mediators.template.TemplateContext;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.ServerWorker;
@@ -77,10 +81,26 @@ public class MessageHelper {
 
         // copy all the synapse level properties to the newCtx
         for (Object o : synCtx.getPropertyKeySet()) {
-            // If there are non String keyed properties neglect them rather than trow exception
-            if (o instanceof String) {
-                newCtx.setProperty((String) o, synCtx.getProperty((String) o));
+            String key = (String) o;                    // MessageContext API enforce key to be a String
+            Object obj = synCtx.getProperty(key);
+            if (obj instanceof String || obj instanceof Integer) {  // For immutable
+                // Do nothing
+            } else if (obj instanceof ArrayList) {
+                obj = cloneArrayList((ArrayList) obj);
+            } else if (obj instanceof Stack
+                    && key.equals(SynapseConstants.SYNAPSE__FUNCTION__STACK)) {
+                obj = getClonedTemplateStack((Stack<TemplateContext>) obj);
+            } else if (obj instanceof StatisticsRecord) {
+                obj = getClonedStatisticRecord((StatisticsRecord) obj);
+            } else if (obj instanceof OMElement) {
+                obj = ((OMElement) obj).cloneOMElement();
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Deep clone not happened for property : " + key + ". Class type : "
+                             + obj.getClass().getName());
+                }
             }
+            newCtx.setProperty(key, obj);
         }
         
         // Make deep copy of fault stack so that parent will not be lost it's fault stack
@@ -408,6 +428,108 @@ public class MessageHelper {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    /*
+     * This method will deep clone array list by creating a new ArrayList and cloning and adding each element in it
+     */
+    private static ArrayList<Object> cloneArrayList(ArrayList<Object> originalArrayList) {
+        ArrayList<Object> clonedArrayList = null;
+        if (originalArrayList != null) {
+            clonedArrayList = new ArrayList<Object>();
+            for (Object obj : originalArrayList) {
+                if (obj instanceof SOAPHeaderBlock) {
+                    SOAPFactory fac = (SOAPFactory) ((SOAPHeaderBlock) obj).getOMFactory();
+                    obj = ((SOAPHeaderBlock) obj).cloneOMElement();
+                    try {
+                        obj = ElementHelper.toSOAPHeaderBlock((OMElement) obj, fac);
+                    } catch (Exception e) {
+                        handleException(e.getLocalizedMessage());
+                    }
+                } else if (obj instanceof SOAPEnvelope) {
+                    SOAPEnvelope env = (SOAPEnvelope) obj;
+                    obj = MessageHelper.cloneSOAPEnvelope(env);
+                } else if (obj instanceof OMElement) {
+                    obj = ((OMElement) obj).cloneOMElement();
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Array List deep clone not implemented for Class type : " + obj.getClass().getName());
+                    }
+                }
+                clonedArrayList.add(obj);
+            }
+        }
+        return clonedArrayList;
+    }
+
+    /**
+     * Get a clone of a Template Function stack
+     *
+     * @param oriTemplateStack original template function stack to be cloned
+     * @return clone of a Template Function stack
+     */
+    private static Stack<TemplateContext> getClonedTemplateStack(Stack<TemplateContext> oriTemplateStack) {
+
+        Stack<TemplateContext> clonedTemplateStack = new Stack<TemplateContext>();
+
+        for (TemplateContext oriTemplateCtx : oriTemplateStack) {
+            TemplateContext clonedTemplateCtx =
+                    new TemplateContext(oriTemplateCtx.getName(), oriTemplateCtx.getParameters());
+
+            Map oriValueMap = oriTemplateCtx.getMappedValues();
+            Map clonedValueMap = new HashMap();
+            for (Object key : oriValueMap.keySet()) {
+                Object value = oriValueMap.get(key);
+                if (value instanceof ArrayList) {
+                    value = cloneArrayList((ArrayList<Object>) value);
+                }
+                clonedValueMap.put(key, value);
+            }
+            clonedTemplateCtx.setMappedValues(clonedValueMap);
+            clonedTemplateStack.push(clonedTemplateCtx);
+        }
+        return clonedTemplateStack;
+    }
+
+
+    /**
+     * Get clone of Statistic Record
+     *
+     * @param oriRecord original statistic record
+     * @return clone of Statistic Record
+     */
+    private static StatisticsRecord getClonedStatisticRecord (StatisticsRecord oriRecord) {
+
+        StatisticsRecord clonedRecord =
+                new StatisticsRecord(oriRecord.getId(), oriRecord.getClientIP(), oriRecord.getClientHost());
+
+        clonedRecord.setOwner(oriRecord.getOwner());
+        clonedRecord.setEndReported(oriRecord.isEndReported());
+
+        // Clone stats logs
+        List<StatisticsLog> oriStatisticsLogs = oriRecord.getAllStatisticsLogs();
+        for (StatisticsLog oriLog : oriStatisticsLogs) {
+
+            StatisticsLog clonedLog = new StatisticsLog(oriLog.getId(), oriLog.getComponentType());
+            clonedLog.setTime(oriLog.getTime());
+            clonedLog.setResponse(oriLog.isResponse());
+            clonedLog.setFault(oriLog.isFault());
+            clonedLog.setEndAnyLog(oriLog.isEndAnyLog());
+
+            // Error Log
+            ErrorLog oriErrorLog = oriLog.getErrorLog();
+            if (oriErrorLog != null) {
+                ErrorLog clonedErrorLog = new ErrorLog(oriErrorLog.getErrorCode());
+                if (oriErrorLog.getException() != null) {
+                    clonedErrorLog.setException(oriErrorLog.getException());
+                }
+                clonedErrorLog.setErrorMessage(oriErrorLog.getErrorMessage());
+                clonedErrorLog.setErrorDetail(oriErrorLog.getErrorDetail());
+                clonedLog.setErrorLog(clonedErrorLog);
+            }
+            clonedRecord.collect(clonedLog);
+        }
+        return clonedRecord;
     }
 
 }

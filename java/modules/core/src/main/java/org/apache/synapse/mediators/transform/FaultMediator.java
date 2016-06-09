@@ -29,6 +29,7 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.util.POXUtils;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -392,7 +393,10 @@ public class FaultMediator extends AbstractMediator {
                     }
                 }
             } else {
-                soapFaultDetail.setText(faultDetailExpr.stringValueOf(synCtx));
+                OMElement om = POXUtils.getOMFromXML(faultDetailExpr.stringValueOf(synCtx));
+                if (om != null) {
+                    soapFaultDetail.addChild(om);
+                }
             }
             fault.setDetail(soapFaultDetail);
         } else if (!faultDetailElements.isEmpty()) {

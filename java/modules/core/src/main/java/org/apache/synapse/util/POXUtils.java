@@ -20,7 +20,9 @@
 package org.apache.synapse.util;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axis2.context.MessageContext;
@@ -28,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  *
@@ -52,8 +55,10 @@ public class POXUtils {
                 if (log.isDebugEnabled()) {
                     log.debug("Setting the fault detail : " + faultDetail + " as athe POX Fault");
                 }
-                faultPayload.setText(faultDetail);
-
+                OMElement om = POXUtils.getOMFromXML(faultDetail);
+                if(om != null) {
+                    faultPayload.addChild(om);
+                }
             } else if (fault.getReason() != null && !fault.getReason().getText().equals("")) {
 
                 String faultReasonValue = fault.getReason().getText();
@@ -87,6 +92,18 @@ public class POXUtils {
             }
 
             body.addChild(faultPayload);
+        }
+    }
+
+    /**
+     * If the input string is valid xml, this method will convert it into an OMElement and
+     * return back. Otherwise returns null.
+     */
+    public static OMElement getOMFromXML(String text) {
+        try {
+            return AXIOMUtil.stringToOM(text);
+        } catch (Exception ignore) {
+            return null;
         }
     }
 }

@@ -25,14 +25,14 @@ import org.apache.synapse.samples.framework.clients.BasicHttpClient;
 import org.apache.synapse.samples.framework.clients.HttpResponse;
 
 public class Sample161 extends SynapseTestCase {
-    private String requestXml = "<test>foo</test>";
+
+    private static final String requestXml = "<test>foo</test>";
 
     public Sample161() {
         super(161);
     }
 
     public void testRespondMediator() throws Exception {
-
         String url = "http://localhost:8280/services/EchoService";
         BasicHttpClient client = new BasicHttpClient();
         HttpResponse response = client.doPost(url, requestXml.getBytes(), "application/xml");

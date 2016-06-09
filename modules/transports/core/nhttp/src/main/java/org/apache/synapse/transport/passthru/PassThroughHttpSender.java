@@ -519,6 +519,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         SourceResponse sourceResponse = SourceResponseFactory.create(msgContext,
                 sourceRequest, sourceConfiguration);
 
+        sourceResponse.processChunkingOptions(msgContext);
         SourceContext.setResponse(conn, sourceResponse);
 
         Boolean noEntityBody = (Boolean) msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);

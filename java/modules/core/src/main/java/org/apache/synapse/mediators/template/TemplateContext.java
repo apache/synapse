@@ -47,7 +47,7 @@ public class TemplateContext {
      */
     private Map mappedValues;
 
-    TemplateContext(String name, Collection<TemplateParameter> parameters) {
+    public TemplateContext(String name, Collection<TemplateParameter> parameters) {
         this.fName = name;
         this.parameters = parameters;
         mappedValues = new HashMap();
@@ -114,6 +114,14 @@ public class TemplateContext {
         if (keys != null) {
             keys.remove(deletedMapping);
         }
+    }
+
+    public Map getMappedValues() {
+        return mappedValues;
+    }
+
+    public void setMappedValues(Map map) {
+        this.mappedValues = map;
     }
 
     public Object getParameterValue(String paramName) {

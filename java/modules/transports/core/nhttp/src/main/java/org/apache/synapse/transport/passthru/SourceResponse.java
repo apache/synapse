@@ -28,6 +28,12 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.util.MessageProcessorSelector;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.apache.commons.io.output.CountingOutputStream;
+import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -60,7 +66,8 @@ public class SourceResponse {
 
     private SourceRequest request = null;
 
-    
+    private boolean versionChangeRequired =false;
+
     public SourceResponse(SourceConfiguration config, int status, SourceRequest request) {
         this(config, status, null, request);
     }
@@ -93,7 +100,9 @@ public class SourceResponse {
                 request.getVersion(), HttpStatus.SC_OK,
                 request.getConnection().getContext());
 
-        if (statusLine != null) {
+        if (versionChangeRequired) {
+            response.setStatusLine(version, status);
+        } else if (statusLine != null) {
             response.setStatusLine(version, status, statusLine);
         } else {
             response.setStatusCode(status);
@@ -182,6 +191,55 @@ public class SourceResponse {
     		TreeSet<String> values = headers.get(name);
     		values.add(value);
     	}
+    }
+
+    /**
+     * Process the disable chunking option in response path.
+     */
+    public void processChunkingOptions(MessageContext responseMsgContext) throws IOException {
+        boolean forceHttp10 = responseMsgContext.isPropertyTrue(
+                PassThroughConstants.FORCE_HTTP_1_0, false);
+        boolean disableChunking = responseMsgContext.isPropertyTrue(
+                PassThroughConstants.DISABLE_CHUNKING, false);
+        if (!forceHttp10 && !disableChunking) {
+            return;
+        }
+        if (!responseMsgContext.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED, false)) {
+            try {
+                RelayUtils.buildMessage(responseMsgContext, false);
+                responseMsgContext.getEnvelope().buildWithAttachments();
+            } catch (Exception e) {
+                throw new AxisFault(e.getMessage(), e);
+            }
+        }
+        if (forceHttp10) {
+            version = HttpVersion.HTTP_1_0;
+            versionChangeRequired = true;
+        }
+        Boolean noEntityBody =
+                (Boolean) responseMsgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);
+        if (Boolean.TRUE.equals(noEntityBody)) {
+            headers.remove(HTTP.CONTENT_TYPE);
+            return;
+        }
+        TreeSet<String> contentLength = new TreeSet<String>();
+        contentLength.add(Long.toString(getStreamLength(responseMsgContext)));
+        headers.put(HTTP.CONTENT_LEN, contentLength);
+    }
+
+    /**
+     * Write the stream to a temporary storage and calculate the content length
+     */
+    private long getStreamLength(MessageContext msgContext) throws IOException {
+        CountingOutputStream counter = new CountingOutputStream(
+                NullOutputStream.NULL_OUTPUT_STREAM);
+        try {
+            MessageProcessorSelector.getMessageFormatter(msgContext).writeTo(msgContext,
+                     PassThroughTransportUtils.getOMOutputFormat(msgContext), counter, true);
+        } finally {
+            counter.close();
+        }
+        return counter.getCount();
     }
 
     public void setStatus(int status) {

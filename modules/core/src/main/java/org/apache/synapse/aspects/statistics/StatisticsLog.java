@@ -64,6 +64,7 @@ public class StatisticsLog {
     public void setTime(long time) {
         this.time = time;
     }
+
     public boolean isResponse() {
         return isResponse;
     }

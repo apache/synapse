@@ -24,7 +24,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TemplateParameter;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.eip.EIPUtils;
-import org.jaxen.JaxenException;
 
 import java.util.*;
 

@@ -37,4 +37,8 @@ public class AccessHandler {
     public static Access getAccess() {
         return access;
     }
+
+    public static Log getAccessLog() {
+        return accessLog;
+    }
 }

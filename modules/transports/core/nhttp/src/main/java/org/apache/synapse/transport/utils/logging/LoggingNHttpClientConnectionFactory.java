@@ -37,6 +37,7 @@ import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.SessionInputBuffer;
 import org.apache.http.nio.reactor.SessionOutputBuffer;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
+import org.apache.synapse.transport.nhttp.AccessHandler;
 
 import java.io.IOException;
 
@@ -125,11 +126,17 @@ public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFacto
         }
 
         public void write(final HttpRequest request) throws IOException, HttpException {
-            if (request != null && targetHeaderLog.isDebugEnabled()) {
-                targetHeaderLog.debug(">> " + request.getRequestLine().toString());
-                Header[] headers = request.getAllHeaders();
-                for (Header header : headers) {
-                    targetHeaderLog.debug(">> " + header.toString());
+            if (request != null) {
+                if (targetHeaderLog.isDebugEnabled()) {
+                    targetHeaderLog.debug(">> " + request.getRequestLine().toString());
+                    Header[] headers = request.getAllHeaders();
+                    for (Header header : headers) {
+                        targetHeaderLog.debug(">> " + header.toString());
+                    }
+                }
+
+                if (AccessHandler.getAccessLog().isInfoEnabled()) {
+                    AccessHandler.getAccess().addAccessToQueue(request);
                 }
             }
             super.write(request);
@@ -145,11 +152,17 @@ public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFacto
 
         public HttpResponse parse() throws IOException, HttpException {
             HttpResponse response = super.parse();
-            if (response != null && targetHeaderLog.isDebugEnabled()) {
-                targetHeaderLog.debug("<< " + response.getStatusLine().toString());
-                Header[] headers = response.getAllHeaders();
-                for (Header header : headers) {
-                    targetHeaderLog.debug("<< " + header.toString());
+            if (response != null) {
+                if (targetHeaderLog.isDebugEnabled()) {
+                    targetHeaderLog.debug("<< " + response.getStatusLine().toString());
+                    Header[] headers = response.getAllHeaders();
+                    for (Header header : headers) {
+                        targetHeaderLog.debug("<< " + header.toString());
+                    }
+                }
+
+                if (AccessHandler.getAccessLog().isInfoEnabled()) {
+                    AccessHandler.getAccess().addAccessToQueue(response);
                 }
             }
             return response;

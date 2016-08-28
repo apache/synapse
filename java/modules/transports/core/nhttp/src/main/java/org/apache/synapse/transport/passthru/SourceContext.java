@@ -21,6 +21,7 @@ package org.apache.synapse.transport.passthru;
 
 import org.apache.http.nio.NHttpConnection;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;
 
 import java.nio.ByteBuffer;
 
@@ -85,7 +86,7 @@ public class SourceContext {
         }
 
         if (writer != null) {
-            ByteBuffer buffer = writer.getBuffer();
+            ControlledByteBuffer buffer = writer.getBuffer();
             buffer.clear();
             sourceConfiguration.getBufferFactory().release(buffer);
         }

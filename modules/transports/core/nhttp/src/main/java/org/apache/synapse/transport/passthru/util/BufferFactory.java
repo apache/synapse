@@ -21,13 +21,12 @@ package org.apache.synapse.transport.passthru.util;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class BufferFactory {
 
-    private volatile ByteBuffer [] buffers;
+    private volatile ControlledByteBuffer [] buffers;
 
     private volatile int marker = -1;
 
@@ -45,34 +44,36 @@ public class BufferFactory {
             this.allocator = HeapByteBufferAllocator.INSTANCE;
         }
 
-        buffers = new ByteBuffer[size];
+        buffers = new ControlledByteBuffer[size];
     }
 
-    public ByteBuffer getBuffer() {
+    public ControlledByteBuffer getBuffer() {
         if (marker == -1) {
-            return allocator.allocate(bufferSize);
+            return new ControlledByteBuffer(allocator.allocate(bufferSize));
         } else {
             try {
                 lock.lock();
                 if (marker >= 0) {
-                    ByteBuffer b = buffers[marker];
-                    b.clear();
+                    ControlledByteBuffer controlledByteBuffer = buffers[marker];
+                    controlledByteBuffer.clear();
+                    controlledByteBuffer.forceSetInputMode();
                     buffers[marker] = null;
                     marker--;
-                    return b;
+                    return controlledByteBuffer;
                 }
             } finally {
                 lock.unlock();
             }
         }
-        return allocator.allocate(bufferSize);
+        return new ControlledByteBuffer(allocator.allocate(bufferSize));
     }
 
-    public void release(ByteBuffer buffer) {
+    public void release(ControlledByteBuffer buffer) {
         try {
             lock.lock();
             if (marker < buffers.length - 1) {
                 buffer.clear();
+                buffer.forceSetInputMode();
                 buffers[++marker] = buffer;
             }
         } finally {

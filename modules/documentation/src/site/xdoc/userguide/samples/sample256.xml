@@ -52,12 +52,12 @@
         &lt;/target&gt;
         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
 
-        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
+        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.mail1@gmail.com&lt;/parameter&gt;
         &lt;parameter name="transport.mail.Protocol"&gt;pop3&lt;/parameter&gt;
         &lt;parameter name="transport.PollInterval"&gt;5&lt;/parameter&gt;
         &lt;parameter name="mail.pop3.host"&gt;pop.gmail.com&lt;/parameter&gt;
         &lt;parameter name="mail.pop3.port"&gt;995&lt;/parameter&gt;
-        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.1&lt;/parameter&gt;
+        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.mail1&lt;/parameter&gt;
         &lt;parameter name="mail.pop3.password"&gt;mailpassword&lt;/parameter&gt;
         &lt;parameter name="mail.pop3.socketFactory.class"&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
         &lt;parameter name="mail.pop3.socketFactory.fallback"&gt;false&lt;/parameter&gt;
@@ -100,7 +100,7 @@
             </subsection>
             <subsection name="Executing the Client">
                 <p>
-                    Send an e-mail to <a href="mailto:synapse.demo.1@gmail.com">synapse.demo.1@gmail.com</a>
+                    Send an e-mail to <a href="mailto:synapse.demo.mail1@gmail.com">synapse.demo.mail1@gmail.com</a>
                     with the following payload.
                 </p>
                 <div class="xmlConf">&lt;getQuote xmlns=&quot;http://services.samples&quot;&gt;

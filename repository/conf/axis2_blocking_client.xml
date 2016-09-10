@@ -250,9 +250,9 @@
         <parameter name="mail.smtp.port">587</parameter>
         <parameter name="mail.smtp.starttls.enable">true</parameter>
         <parameter name="mail.smtp.auth">true</parameter>
-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
+        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
         <parameter name="mail.smtp.password">mailpassword</parameter>
-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
+        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
     </transportSender>
 
     <!-- ================================================= -->

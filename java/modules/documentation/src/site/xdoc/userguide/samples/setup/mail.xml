@@ -45,9 +45,9 @@
         &lt;parameter name=&quot;mail.smtp.port&quot;&gt;587&lt;/parameter&gt;
         &lt;parameter name=&quot;mail.smtp.starttls.enable&quot;&gt;true&lt;/parameter&gt;
         &lt;parameter name=&quot;mail.smtp.auth&quot;&gt;true&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.0&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.mail1&lt;/parameter&gt;
         &lt;parameter name=&quot;mail.smtp.password&quot;&gt;mailpassword&lt;/parameter&gt;
-        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.0@gmail.com&lt;/parameter&gt;
+        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.mail1@gmail.com&lt;/parameter&gt;
 &lt;/transportSender&gt;</div>
 			</p>
 		</section>

@@ -511,6 +511,10 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 }
             }
 
+            // remove CLIENT_API_NON_BLOCKING to avoid Thread switching at the Sender level and allow
+            // same Thread to be used till the message is delivered through the endpoint
+            msgContext.removeProperty(msgContext.CLIENT_API_NON_BLOCKING);
+
             // does the service specify a default reply file URI ?
             String replyFileURI = entry.getReplyFileURI();
             if (replyFileURI != null) {

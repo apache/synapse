@@ -145,6 +145,11 @@ public class DeliveryAgent {
                 }
                 targetErrorHandler.handleError(msgCtx, errorCode, errorMessage,
                         null, ProtocolState.REQUEST_READY);
+                synchronized (msgCtx) {
+                    msgCtx.setProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE,
+                                       Boolean.TRUE);
+                    msgCtx.notifyAll();
+                }
             }
         } else {
             throw new IllegalStateException("Queue cannot be null for: " + key);

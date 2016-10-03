@@ -5,11 +5,11 @@
         <!--if we don't specify the optional values, framework will use defaults-->
         <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
         <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_jms.xml</axis2Xml>
-        <synapseXml>repository/conf/sample/synapse_sample_251.xml</synapseXml>
+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_251.xml</synapseXml>
     </synapseConfig>
     <backEndServerConfig>
         <jmsBroker id='0'>
-            <providerURL>tcp://localhost:61616</providerURL>
+            <providerURL>tcp://localhost:62626</providerURL>
             <initialNamingFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</initialNamingFactory>
         </jmsBroker>
         <axis2Server id='1'>

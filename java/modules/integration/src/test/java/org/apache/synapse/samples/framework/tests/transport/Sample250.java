@@ -11,6 +11,7 @@ public class Sample250 extends SynapseTestCase {
     }
 
     public void testPlaceOrder() throws Exception {
+        System.setProperty("java.naming.provider.url", "tcp://localhost:62626");
         Axis2BackEndServerController axis2Server = getAxis2Server();
         if (axis2Server == null) {
             fail("Failed to load the Axis2BackEndServerController");

@@ -234,7 +234,7 @@ public final class SynapseConstants {
          * this is the timeout for otherwise non-expiring callbacks
          * to ensure system stability over time
          */
-        public static final long DEFAULT_GLOBAL_TIMEOUT = 24 * 60 * 60 * 1000;
+        public static final long DEFAULT_GLOBAL_TIMEOUT = 3 * 60 * 1000;
 
         /**
          * don't do anything for response timeouts. this means infinite timeout. this is the default

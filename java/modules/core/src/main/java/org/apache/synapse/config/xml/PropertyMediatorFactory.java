@@ -81,7 +81,8 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         if (value != null) {
             propMediator.setValue(value.getAttributeValue(), dataType);
         } else if (valueElement != null) {
-            propMediator.setValueElement(valueElement);
+            propMediator.setValueElement(valueElement.cloneOMElement()); // Need to clone,
+            // otherwise same reference getting modified at the message flow
         } else if (expression != null) {
             try {
                 propMediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN),

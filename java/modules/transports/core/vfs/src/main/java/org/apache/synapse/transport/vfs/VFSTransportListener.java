@@ -234,8 +234,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                 metrics.incrementMessagesReceived();
 
                             } catch (AxisFault e) {
-                                logException("Error processing File URI : "
-                                        + fileObject.getName(), e);
+                                logException("Error processing File URI : " +
+                                             VFSUtils.maskURLPassword(fileObject.getName().getURI()), e);
                                 entry.setLastPollState(PollTableEntry.FAILED);
                                 metrics.incrementFaultsReceiving();
                             }
@@ -259,8 +259,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                               }
                             }
                         } else if (log.isDebugEnabled()) {
-                            log.debug("Couldn't get the lock for processing the file : "
-                                    + fileObject.getName());
+                            log.debug("Couldn't get the lock for processing the file : " +
+                                      VFSUtils.maskURLPassword(fileObject.getName().getURI()));
                         } else if (isFailedRecord) {
                             if (entry.isFileLockingEnabled()) {
                                 VFSUtils.releaseLock(fsManager, fileObject);
@@ -313,7 +313,8 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                                     metrics.incrementMessagesReceived();
 
                                 } catch (Exception e) {
-                                    logException("Error processing File URI : " + child.getName(), e);
+                                    logException("Error processing File URI : " +
+                                                 VFSUtils.maskURLPassword(child.getName().getURI()), e);
                                     failCount++;
                                     // tell moveOrDeleteAfterProcessing() file failed
                                     entry.setLastPollState(PollTableEntry.FAILED);
@@ -424,7 +425,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 FileObject dest = moveToDirectory.resolveFile(
                         prefix + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
-                    log.debug("Moving to file :" + dest.getName().getURI());
+                    log.debug("Moving to file :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
                 }
                 try {
                     fileObject.moveTo(dest);
@@ -713,7 +714,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                 FileObject dest = moveToDirectory.resolveFile(
                         prefix + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
-                    log.debug("The failed file is moving to :" + dest.getName().getURI());
+                    log.debug("The failed file is moving to :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
                 }
                 try {
                     fileObject.moveTo(dest);

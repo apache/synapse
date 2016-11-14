@@ -85,7 +85,8 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
         PayloadFactoryMediatorFactory.class,
         BeanMediatorFactory.class,
         EJBMediatorFactory.class,
-        RespondMediatorFactory.class
+        RespondMediatorFactory.class,
+        LoopbackMediatorFactory.class
     };
 
     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();

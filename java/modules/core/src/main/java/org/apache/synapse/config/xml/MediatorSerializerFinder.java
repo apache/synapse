@@ -72,7 +72,8 @@ public class MediatorSerializerFinder {
         PayloadFactoryMediatorSerializer.class,
         BeanMediatorSerializer.class,
         EJBMediatorSerializer.class,
-        RespondMediatorSerializer.class
+        RespondMediatorSerializer.class,
+        LoopbackMediatorSerializer.class
     };
 
     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();

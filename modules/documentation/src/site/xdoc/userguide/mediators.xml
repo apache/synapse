@@ -21,6 +21,7 @@
                         <li><a href="#Property">Property Mediator</a></li>
                         <li><a href="#Send">Send Mediator</a></li>
                         <li><a href="#Respond">Respond Mediator</a></li>
+                        <li><a href="#Loopback">Loopback Mediator</a></li>
                     </ul>
                 </li>
                 <li>
@@ -310,6 +311,13 @@
                     the message back to the client as a response.
                 </p>
                 <div class="xmlConf">&lt;respond/&gt;</div>
+            </subsection>
+            <subsection name="Loopback Mediator" id="Loopback">
+                <p>
+                    The Loopback Mediator moves the message from the In flow to the Out flow.
+                    All the configuration in the In flow that appears after the Loopback mediator is skipped.
+                </p>
+                <div class="xmlConf">&lt;loopback/&gt;</div>
             </subsection>
         </section>
         <section name="Filter Mediators" id="FilterMediators">

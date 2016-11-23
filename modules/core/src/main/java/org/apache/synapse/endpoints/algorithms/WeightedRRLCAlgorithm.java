@@ -237,6 +237,7 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         return WeightedRRLCAlgorithm.class.getName();
     }
 
+    @Override
     public LoadbalanceAlgorithm clone() {
         return null;
     }
@@ -392,13 +393,7 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         public void reCalcuateWeight() {
             if (totalConnections > 0) {
                 double weightRatio = (double) fixedWeight / totalWeight;
-                double connectionRatio;
-                if (totalConnections != 0) {
-                    connectionRatio = (double) currentConnectionCount / totalConnections;
-                } else {
-                    connectionRatio = 0;
-                }
-
+                double connectionRatio = (double) currentConnectionCount / totalConnections;
                 double diff = weightRatio - connectionRatio;
                 double multiple = diff * totalConnections;
                 double floor = Math.floor(multiple);

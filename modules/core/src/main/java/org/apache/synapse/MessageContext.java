@@ -156,6 +156,14 @@ public interface MessageContext {
     public Object getEntry(String key);
 
     /**
+     * Get the value of a property set on the message instance or from the local registry
+     *
+     * @param key key to look up property
+     * @return value for the given key
+     */
+    public Object getLocalEntry(String key);
+
+    /**
      * Set a custom (local) property with the given name on the message instance
      * @param key key to be used
      * @param value value to be saved

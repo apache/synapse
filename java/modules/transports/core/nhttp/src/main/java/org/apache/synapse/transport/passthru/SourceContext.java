@@ -23,8 +23,6 @@ import org.apache.http.nio.NHttpConnection;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;
 
-import java.nio.ByteBuffer;
-
 /**
  * This class represents the information about a TCP Connection at a given point in time.
  * In a Single TCP Connection there can be multiple HTTP Requests.
@@ -76,7 +74,24 @@ public class SourceContext {
         this.response = response;
     }
 
+    /**
+     * Reset the resources associated with this context
+     */
     public void reset() {
+        reset(false);
+    }
+
+    /**
+     * Reset the resources associated with this context
+     *
+     * @param isError whether an error is causing this shutdown of the connection.
+     *                It is very important to set this flag correctly.
+     *                When an error causing the shutdown of the connections we should not
+     *                release associated writer buffer to the pool as it might lead into
+     *                situations like same buffer is getting released to both source and target
+     *                buffer factories
+     */
+    public void reset(boolean isError) {
         this.request = null;
         this.response = null;
         if (this.state != ProtocolState.CLOSED) {
@@ -85,7 +100,7 @@ public class SourceContext {
             this.state = ProtocolState.REQUEST_READY;
         }
 
-        if (writer != null) {
+        if (writer != null && !isError) {    // If there is an error we do not release the buffer to the factory
             ControlledByteBuffer buffer = writer.getBuffer();
             buffer.clear();
             sourceConfiguration.getBufferFactory().release(buffer);

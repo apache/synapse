@@ -239,6 +239,12 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
             } finally {
                 if (replyFile != null) {
                     try {
+                        if (fsManager!= null &&
+                            replyFile.getName() != null && replyFile.getName().getScheme() != null &&
+                            replyFile.getName().getScheme().startsWith("file") &&
+                            replyFile.getParent() != null && replyFile.getParent().getFileSystem() != null) {
+                            fsManager.closeFileSystem(replyFile.getParent().getFileSystem());
+                        }
                         replyFile.close();
                     } catch (FileSystemException ignore) {}
                 }

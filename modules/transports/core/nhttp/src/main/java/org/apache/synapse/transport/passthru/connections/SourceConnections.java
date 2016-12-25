@@ -117,12 +117,27 @@ public class SourceConnections {
      * @param conn the connection that needs to be shut down
      */
     public void shutDownConnection(NHttpServerConnection conn) {
+        shutDownConnection(conn, false);
+    }
+
+    /**
+     * Shutdown a connection
+     *
+     * @param conn the connection that needs to be shut down
+     * @param isError whether an error is causing this shutdown of the connection
+     *                It is very important to set this flag correctly.
+     *                When an error causing the shutdown of the connections we should not
+     *                release associated writer buffer to the pool as it might lead into
+     *                situations like same buffer is getting released to both source and target
+     *                buffer factories
+     */
+    public void shutDownConnection(NHttpServerConnection conn, boolean isError) {
         if (log.isDebugEnabled()) {
             log.debug("Shutting down connection forcefully " + conn);
         }
         lock.lock();
         try {
-            SourceContext.get(conn).reset();
+            SourceContext.get(conn).reset(isError);
 
             if (!busyConnections.remove(conn)) {
                 freeConnections.remove(conn);

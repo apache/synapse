@@ -34,6 +34,8 @@ import org.apache.axis2.engine.Handler;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
@@ -153,11 +155,14 @@ public class RelayUtils {
 		}
 	   
 	    OMElement element = null;
-	    try{
-	        element = messageBuilder.getDocument(messageContext, bufferedInputStream);
-	    }catch (Exception e) {
-	    	log.error("Error while building PassThrough stream",e);
-	    }
+        try {
+            element = messageBuilder.getDocument(messageContext, bufferedInputStream);
+        } catch (Exception e) {
+            //Clearing the buffer when there is an exception occurred.
+            consumeAndDiscardMessage(messageContext);
+            messageContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
+            handleException("Error while building Passthrough stream", e);
+        }
 
 	    if (element != null) {
 	        messageContext.setEnvelope(TransportUtils.createSOAPEnvelope(element));
@@ -272,5 +277,37 @@ public class RelayUtils {
 
     private static boolean isOneWay(String mepString) {
         return WSDL2Constants.MEP_URI_IN_ONLY.equals(mepString);
+    }
+
+    /**
+     * Consumes the data in pipe completely in the given message context and discard it
+     *
+     * @param msgContext Axis2 Message context which contains the data
+     * @throws AxisFault
+     */
+    private static void consumeAndDiscardMessage(MessageContext msgContext) throws AxisFault {
+        final Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+        if (pipe != null) {
+            InputStream in = pipe.getInputStream();
+            if (in != null) {
+                try {
+                    IOUtils.copy(in, new NullOutputStream());
+                } catch (IOException exception) {
+                    handleException("Error when consuming the input stream to discard ", exception);
+                }
+            }
+        }
+    }
+
+    /**
+     * Perform an error log message to all logs @ ERROR and throws a AxisFault
+     *
+     * @param msg the log message
+     * @param e   an Exception encountered
+     * @throws AxisFault
+     */
+    private static void handleException(String msg, Exception e) throws AxisFault {
+        log.error(msg, e);
+        throw new AxisFault(msg, e);
     }
 }

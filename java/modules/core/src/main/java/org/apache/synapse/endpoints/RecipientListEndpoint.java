@@ -26,6 +26,7 @@ import java.util.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clustering.Member;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -155,7 +156,8 @@ public class RecipientListEndpoint extends AbstractEndpoint {
         }
         List<Endpoint> children = new ArrayList<Endpoint>();
         for (String url : dynamicUrlSet) {
-            if (url != null && !"".equals(url.trim())) {
+            url = StringUtils.deleteWhitespace(url);
+            if (StringUtils.isNotEmpty(url)) {
                 //get an Endpoint from the pool
                 Endpoint epFromPool = dynamicEndpointPool.get(url);
                 if (epFromPool == null) {

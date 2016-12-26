@@ -38,6 +38,7 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.TargetContext;
+import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.connections.SourceConnections;
 import org.apache.synapse.transport.passthru.connections.TargetConnections;
 
@@ -111,12 +112,9 @@ public class PassThroughTransportUtils {
      * copied from the request messages
      * 
      * @param msgContext the Axis2 Message context from which these headers should be removed
-     * @param preserveServerHeader if true preserve the original server header
-     * @param preserveUserAgentHeader if true preserve the original user-agent header
+     * @param targetConfiguration configuration for the passThrough handler
      */
-    public static void removeUnwantedHeaders(MessageContext msgContext,
-                                             boolean preserveServerHeader,
-                                             boolean preserveUserAgentHeader) {
+    public static void removeUnwantedHeaders(MessageContext msgContext, TargetConfiguration targetConfiguration) {
         Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
 		Map excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
 
@@ -128,18 +126,32 @@ public class PassThroughTransportUtils {
         while (iter.hasNext()) {
             String headerName = (String) iter.next();
             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
-                HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
-                HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
-                HTTP.CONTENT_LEN.equalsIgnoreCase(headerName) ||
-                HTTP.CONN_KEEP_ALIVE.equalsIgnoreCase(headerName)) {
+                HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName)) {
                 iter.remove();
             }
 
-            if (!preserveServerHeader && HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)) {
+            if (HTTP.DATE_HEADER.equalsIgnoreCase(headerName)
+                && !targetConfiguration.isPreserveHttpHeader(HTTP.DATE_HEADER)) {
                 iter.remove();
             }
 
-            if (!preserveUserAgentHeader && HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {
+            if (HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)
+                && !targetConfiguration.isPreserveHttpHeader(HTTP.CONTENT_LEN)) {
+                iter.remove();
+            }
+
+            if (HTTP.CONN_KEEP_ALIVE.equalsIgnoreCase(headerName)
+                && !targetConfiguration.isPreserveHttpHeader(HTTP.CONN_KEEP_ALIVE)) {
+                iter.remove();
+            }
+
+            if (HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)
+                && !targetConfiguration.isPreserveHttpHeader(HTTP.SERVER_HEADER)) {
+                iter.remove();
+            }
+
+            if (HTTP.USER_AGENT.equalsIgnoreCase(headerName)
+                && !targetConfiguration.isPreserveHttpHeader(HTTP.USER_AGENT)) {
                 iter.remove();
             }
         }

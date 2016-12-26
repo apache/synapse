@@ -248,9 +248,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         // remove unwanted HTTP headers (if any from the current message)
-        PassThroughTransportUtils.removeUnwantedHeaders(msgContext,
-                targetConfiguration.isPreserveServerHeader(),
-                targetConfiguration.isPreserveUserAgentHeader());
+        PassThroughTransportUtils.removeUnwantedHeaders(msgContext, targetConfiguration);
 
         if (AddressingHelper.isReplyRedirected(msgContext)
                 && !msgContext.getReplyTo().hasNoneAddress()) {

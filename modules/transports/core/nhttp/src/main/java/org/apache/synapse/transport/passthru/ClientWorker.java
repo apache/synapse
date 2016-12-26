@@ -36,6 +36,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -49,8 +50,8 @@ public class ClientWorker implements Runnable {
 
     private static final Log log = LogFactory.getLog(ClientWorker.class);
 
-    /** the Axis2 configuration context */
-    private ConfigurationContext cfgCtx = null;
+    /** the Http connectors configuration context */
+    private TargetConfiguration targetConfiguration = null;
 
     /** the response message context that would be created */
     private MessageContext responseMsgCtx = null;
@@ -61,10 +62,10 @@ public class ClientWorker implements Runnable {
     /** weather a body is expected or not */
     private boolean expectEntityBody = true;
 
-    public ClientWorker(ConfigurationContext cfgCtx,
+    public ClientWorker(TargetConfiguration targetConfiguration,
                         MessageContext outMsgCtx,
                         TargetResponse response) {
-        this.cfgCtx = cfgCtx;
+        this.targetConfiguration = targetConfiguration;
         this.response = response;
         this.expectEntityBody = response.isExpectResponseBody();
 
@@ -75,7 +76,8 @@ public class ClientWorker implements Runnable {
 		
 		// Special casing 302 scenario in following section. Not sure whether it's the correct fix,
 		// but this fix makes it possible to do http --> https redirection.
-		if (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY) {
+		if (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY && !targetConfiguration
+                .isPreserveHttpHeader(PassThroughConstants.LOCATION)) {
 			URL url;
 			try {
 				url = new URL(oriURL);
@@ -242,7 +244,7 @@ public class ClientWorker implements Runnable {
             return cTypeProperty.toString();
         }
         // Try to get the content type from the axis configuration
-        Parameter cTypeParam = cfgCtx.getAxisConfiguration().getParameter(
+        Parameter cTypeParam = targetConfiguration.getConfigurationContext().getAxisConfiguration().getParameter(
                 PassThroughConstants.CONTENT_TYPE);
         if (cTypeParam != null) {
             return cTypeParam.getValue().toString();

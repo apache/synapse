@@ -69,9 +69,7 @@ public class TargetRequestFactory {
                     noEntityBody == null || !noEntityBody);
 
             // headers
-            PassThroughTransportUtils.removeUnwantedHeaders(msgContext,
-                    configuration.isPreserveServerHeader(),
-                    configuration.isPreserveUserAgentHeader());
+            PassThroughTransportUtils.removeUnwantedHeaders(msgContext, configuration);
 
             Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
             if (o != null && o instanceof Map) {
@@ -81,14 +79,14 @@ public class TargetRequestFactory {
                     Map.Entry entry = (Map.Entry) entryObj;
                     if (entry.getValue() != null && entry.getKey() instanceof String &&
                             entry.getValue() instanceof String) {
-                        if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())) {
-                            request.addHeader((String) entry.getKey(), (String) entry.getValue());
-                        } else {
+                        if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
+                            && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                             if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                            	request.addHeader((String) entry.getKey(),
-                                        (String) msgContext.getProperty(
-                                                NhttpConstants.REQUEST_HOST_HEADER));
+                                request.addHeader((String) entry.getKey(),
+                                                  (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                             }
+                        } else {
+                            request.addHeader((String) entry.getKey(), (String) entry.getValue());
                         }
                     }
                 }

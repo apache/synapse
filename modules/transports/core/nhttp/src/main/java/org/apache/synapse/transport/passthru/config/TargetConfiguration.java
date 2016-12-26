@@ -25,6 +25,10 @@ import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.http.protocol.*;
 import org.apache.synapse.transport.passthru.connections.TargetConnections;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This class stores configuration specific to HTTP Connectors (Senders)
  */
@@ -37,6 +41,9 @@ public class TargetConfiguration extends BaseConfiguration {
 
     /** Whether Server header coming from server should be preserved */
     private boolean preserveServerHeader = true;
+
+    /** Http headers which should be preserved */
+    private List<String> preserveHttpHeaders;
 
     private TargetConnections connections = null;
 
@@ -51,6 +58,7 @@ public class TargetConfiguration extends BaseConfiguration {
                 PassThroughConfigPNames.USER_AGENT_HEADER_PRESERVE, false);
         preserveServerHeader = conf.getBooleanProperty(
                 PassThroughConfigPNames.SERVER_HEADER_PRESERVE, true);
+        populatePreserveHttpHeaders(conf.getPreserveHttpHeaders());
     }
 
     @Override
@@ -70,12 +78,18 @@ public class TargetConfiguration extends BaseConfiguration {
         return maxConnections;
     }
 
-    public boolean isPreserveUserAgentHeader() {
-        return preserveUserAgentHeader;
-    }
+    /**
+     * Check preserving status of the given http header name
+     *
+     * @param headerName http header name which need to check preserving status
+     * @return preserving status of the given http header
+     */
+    public boolean isPreserveHttpHeader(String headerName) {
 
-    public boolean isPreserveServerHeader() {
-        return preserveServerHeader;
+        if (preserveHttpHeaders == null || preserveHttpHeaders.isEmpty() || headerName == null) {
+            return false;
+        }
+        return preserveHttpHeaders.contains(headerName.toUpperCase());
     }
 
     public TargetConnections getConnections() {
@@ -85,4 +99,29 @@ public class TargetConfiguration extends BaseConfiguration {
     public void setConnections(TargetConnections connections) {
         this.connections = connections;
     }
+
+    /**
+     * Populate preserve http headers from comma separate string
+     *
+     * @param preserveHeaders Comma separated preserve enable http headers
+     */
+    private void populatePreserveHttpHeaders(String preserveHeaders) {
+
+        preserveHttpHeaders = new ArrayList<String>();
+        if (preserveHeaders != null && !preserveHeaders.isEmpty()) {
+            String[] presHeaders = preserveHeaders.trim().toUpperCase().split(",");
+            if (presHeaders != null && presHeaders.length > 0) {
+                preserveHttpHeaders.addAll(Arrays.asList(presHeaders));
+            }
+        }
+
+        if (preserveServerHeader && !preserveHttpHeaders.contains(HTTP.SERVER_HEADER.toUpperCase())) {
+            preserveHttpHeaders.add(HTTP.SERVER_HEADER.toUpperCase());
+        }
+
+        if (preserveUserAgentHeader && !preserveHttpHeaders.contains(HTTP.USER_AGENT.toUpperCase())) {
+            preserveHttpHeaders.add(HTTP.USER_AGENT.toUpperCase());
+        }
+    }
+
 }

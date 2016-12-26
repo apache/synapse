@@ -71,4 +71,8 @@ public class PassThroughConfiguration extends HttpTransportConfiguration {
                 DEFAULT_IO_THREADS_PER_REACTOR);
     }
 
+    public String getPreserveHttpHeaders() {
+        return getStringProperty(PassThroughConfigPNames.HTTP_HEADERS_PRESERVE, "");
+    }
+
 }

@@ -224,8 +224,7 @@ public class TargetHandler implements NHttpClientEventHandler {
             }
                        
             targetConfiguration.getWorkerPool().execute(
-                    new ClientWorker(targetConfiguration.getConfigurationContext(),
-                            requestMsgContext, targetResponse));
+                    new ClientWorker(targetConfiguration, requestMsgContext, targetResponse));
 
             metrics.incrementMessagesReceived();
             

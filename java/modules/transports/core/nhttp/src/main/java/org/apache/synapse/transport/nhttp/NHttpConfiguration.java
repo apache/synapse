@@ -19,9 +19,11 @@
 
 package org.apache.synapse.transport.nhttp;
 
+import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.utils.config.HttpTransportConfiguration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,7 +59,8 @@ public final class NHttpConfiguration extends HttpTransportConfiguration {
 
     private static NHttpConfiguration _instance = new NHttpConfiguration();
     private List<String> methods;
-
+    //Preserve HTTP headers
+    private List<String> preserveHeaders;
     /** Comma separated list of blocked uris*/
     public static final String BLOCK_SERVICE_LIST = "http.block_service_list";
     /** Default value for BLOCK_SERVICE_LIST*/
@@ -65,6 +68,7 @@ public final class NHttpConfiguration extends HttpTransportConfiguration {
     
     private NHttpConfiguration() {
         super("nhttp");
+        populatePreserveHttpHeaders();
     }
 
     @Override
@@ -116,14 +120,6 @@ public final class NHttpConfiguration extends HttpTransportConfiguration {
         return getIntProperty(NhttpConstants.DISABLE_KEEPALIVE, 0) == 1;
     }
 
-    public boolean isPreserveUserAgentHeader() {
-        return getBooleanProperty(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false);
-    }
-
-    public boolean isPreserveServerHeader() {
-        return getBooleanProperty(NhttpConstants.SERVER_HEADER_PRESERVE, true);
-    }
-
     public boolean isCountConnections() {
         return getBooleanProperty(NhttpConstants.COUNT_CONNECTIONS, false);
     }
@@ -143,4 +139,42 @@ public final class NHttpConfiguration extends HttpTransportConfiguration {
         return methods.contains(method);
     }
 
+    /**
+     * Check preserving status of the http header field
+     *
+     * @param httpHeader http header name
+     * @return return true if preserve else false
+     */
+    public boolean isPreserveHttpHeader(String httpHeader) {
+        if (preserveHeaders == null || preserveHeaders.isEmpty() || httpHeader == null) {
+            return false;
+        } else {
+            return preserveHeaders.contains(httpHeader.toUpperCase());
+        }
+    }
+
+    private void populatePreserveHttpHeaders() {
+        if (preserveHeaders == null) {
+            preserveHeaders = new ArrayList<String>();
+            String presHeaders = getStringProperty(NhttpConstants.HTTP_HEADERS_PRESERVE, "");
+
+            if (presHeaders != null && !presHeaders.isEmpty()) {
+                String[] splitHeaders = presHeaders.toUpperCase().trim().split(",");
+
+                if (splitHeaders != null && splitHeaders.length > 0) {
+                    preserveHeaders.addAll(Arrays.asList(splitHeaders));
+                }
+            }
+
+            if (getBooleanProperty(NhttpConstants.SERVER_HEADER_PRESERVE, true)
+                && !preserveHeaders.contains(HTTP.SERVER_HEADER.toUpperCase())) {
+                preserveHeaders.add(HTTP.SERVER_HEADER.toUpperCase());
+            }
+
+            if (getBooleanProperty(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false)
+                && !preserveHeaders.contains(HTTP.USER_AGENT.toUpperCase())) {
+                preserveHeaders.add(HTTP.USER_AGENT.toUpperCase());
+            }
+        }
+    }
 }

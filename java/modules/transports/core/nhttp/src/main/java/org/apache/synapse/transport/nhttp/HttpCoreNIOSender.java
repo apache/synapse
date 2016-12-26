@@ -102,10 +102,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private List<String> knownDirectHosts = new ArrayList<String>();
     /** The list of known hosts to go via proxy */
     private List<String> knownProxyHosts = new ArrayList<String>();
-    /** Weather User-Agent header coming from client should be preserved */
-    private boolean preserveUserAgentHeader = false;
-    /** Weather Server header coming from server should be preserved */
-    private boolean preserveServerHeader = true;
+    /** NHttp transporter base configurations */
+    private NHttpConfiguration cfg;
+
     /**
      * Initialize the transport sender, and execute reactor in new separate thread
      * @param cfgCtx the Axis2 configuration context
@@ -116,6 +115,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         // is this an SSL Sender?
         sslContext = getSSLContext(transportOut);
         SSLSetupHandler sslSetupHandler = getSSLSetupHandler(transportOut);
+        cfg = NHttpConfiguration.getInstance();
 
         // configure proxy settings - only supports HTTP right now (See SYNAPSE-418)
         if (sslContext == null) {
@@ -151,9 +151,6 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             String[] warnOnHttp500 = ((String) param.getValue()).split("\\|");
             cfgCtx.setNonReplicableProperty("warnOnHTTP500", warnOnHttp500);
         }
-
-        preserveUserAgentHeader = NHttpConfiguration.getInstance().isPreserveUserAgentHeader();
-        preserveServerHeader = NHttpConfiguration.getInstance().isPreserveServerHeader();
 
         try {
             String prefix = (sslContext == null ? "http" : "https") + "-Sender I/O dispatcher";
@@ -321,17 +318,23 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             String headerName = (String) iter.next();
             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
                 HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
-                HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)) {
                 iter.remove();
             }
 
-            if (!preserveServerHeader && HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)) {
+            if (HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)
+                && !cfg.isPreserveHttpHeader(HTTP.SERVER_HEADER)) {
                 iter.remove();
             }
 
-            if (!preserveUserAgentHeader && HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {
+            if (HTTP.USER_AGENT.equalsIgnoreCase(headerName)
+                && !cfg.isPreserveHttpHeader(HTTP.USER_AGENT)) {
+                iter.remove();
+            }
+
+            if (HTTP.DATE_HEADER.equalsIgnoreCase(headerName)
+                && !cfg.isPreserveHttpHeader(HTTP.DATE_HEADER)) {
                 iter.remove();
             }
         }

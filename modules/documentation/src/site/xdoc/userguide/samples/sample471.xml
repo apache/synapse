@@ -66,9 +66,7 @@
                         &lt;arg expression=&quot;get-property(&apos;TOTAL&apos;)&quot;/&gt;
                     &lt;/args&gt;
                 &lt;/payloadFactory&gt;
-                &lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;
-                &lt;header name=&quot;To&quot; action=&quot;remove&quot;/&gt;
-                &lt;send/&gt;
+                &lt;respond/&gt;
             &lt;/onComplete&gt;
         &lt;/aggregate&gt;
     &lt;/sequence&gt;

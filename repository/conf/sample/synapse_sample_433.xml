@@ -31,10 +31,7 @@
                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
         </callout>
-        <property name="RESPONSE" value="true"/>
-        <header name="To" action="remove"/>
-        <send/>
-        <drop/>
+        <respond/>
     </sequence>
 
     <endpoint name="StockQuoteServiceEndpoint">

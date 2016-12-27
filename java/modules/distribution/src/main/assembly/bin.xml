@@ -86,10 +86,16 @@
             <directory>../../modules/distribution/src/main/conf</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>log4j.properties</include>
                 <include>providers.xml</include>
                 <include>identity.jks</include>
                 <include>trust.jks</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/distribution/src/main/conf</directory>
+            <outputDirectory>synapse-${synapse.version}/repository/conf</outputDirectory>
+            <includes>
+                <include>log4j.properties</include>
             </includes>
         </fileSet>
         <fileSet>

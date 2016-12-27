@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.logging;
+package org.apache.synapse.transport.utils.conn.logging;
 
 public class LoggingConstants {
 

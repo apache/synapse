@@ -63,10 +63,9 @@ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsColl
 import org.apache.synapse.transport.passthru.jmx.TransportView;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
-import org.apache.synapse.transport.utils.logging.LoggingUtils;
+import org.apache.synapse.transport.utils.conn.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;

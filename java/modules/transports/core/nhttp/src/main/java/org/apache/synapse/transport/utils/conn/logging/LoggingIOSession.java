@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.logging;
+package org.apache.synapse.transport.utils.conn.logging;
 
 import org.apache.commons.logging.Log;
 import org.apache.http.nio.reactor.IOSession;

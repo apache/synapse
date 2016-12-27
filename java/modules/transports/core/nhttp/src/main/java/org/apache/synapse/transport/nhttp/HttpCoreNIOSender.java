@@ -59,7 +59,7 @@ import org.apache.synapse.transport.nhttp.debug.ServerConnectionDebug;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
-import org.apache.synapse.transport.utils.logging.LoggingUtils;
+import org.apache.synapse.transport.utils.conn.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;

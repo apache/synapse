@@ -498,6 +498,15 @@ public class TargetHandler implements NHttpClientEventHandler {
         }
     }
 
+    /**
+     * Get the associated configuration of the {@code TargetHandler}
+     *
+     * @return associated {@code TargetConfiguration}
+     */
+    public TargetConfiguration getTargetConfiguration() {
+        return targetConfiguration;
+    }
+
     private boolean isResponseHaveBodyExpected(
             final String method, final HttpResponse response) {
 

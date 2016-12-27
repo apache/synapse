@@ -30,6 +30,7 @@ import org.apache.http.nio.NHttpMessageParserFactory;
 import org.apache.http.nio.NHttpMessageWriterFactory;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.util.ByteBufferAllocator;
+import org.apache.synapse.transport.passthru.TargetHandler;
 
 import java.io.IOException;
 import java.nio.charset.CharsetDecoder;
@@ -40,6 +41,8 @@ import java.nio.charset.CharsetEncoder;
  * additional stuff related to synapse NHttp transport implementation
  */
 public class SynapseNHttpClientConnection extends DefaultNHttpClientConnection {
+
+    private boolean markedForRelease = false;
 
     public SynapseNHttpClientConnection(IOSession session,
                                         int bufferSize,
@@ -75,10 +78,30 @@ public class SynapseNHttpClientConnection extends DefaultNHttpClientConnection {
     @Override
     public void consumeInput(final NHttpClientEventHandler handler) {
         super.consumeInput(handler);
+        if (markedForRelease) {
+            if (handler instanceof TargetHandler) {
+                resetState();
+                ((TargetHandler) handler).getTargetConfiguration().getConnections().releaseConnection(this);
+            }
+        }
     }
 
     @Override
     public void produceOutput(final NHttpClientEventHandler handler) {
         super.produceOutput(handler);
+    }
+
+    /**
+     * Mark this connection to be released to the pool.
+     * <p>
+     * This needs to be called after finishing work related to a particular request/response,
+     * and only when keep-alive is enabled
+     */
+    public void markForRelease() {
+        this.markedForRelease = true;
+    }
+
+    private void resetState() {
+        markedForRelease = false;
     }
 }

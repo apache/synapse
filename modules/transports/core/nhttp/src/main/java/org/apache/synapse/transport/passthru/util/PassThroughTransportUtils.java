@@ -41,6 +41,7 @@ import org.apache.synapse.transport.passthru.TargetContext;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.connections.SourceConnections;
 import org.apache.synapse.transport.passthru.connections.TargetConnections;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnection;
 
 import java.net.InetAddress;
 import java.util.Map;
@@ -262,7 +263,11 @@ public class PassThroughTransportUtils {
             TargetContext.updateState(conn, ProtocolState.CLOSING);
             connections.closeConnection(conn);
         } else {
-            connections.releaseConnection(conn);
+            if (conn instanceof SynapseNHttpClientConnection) {
+                ((SynapseNHttpClientConnection) conn).markForRelease();
+            } else {
+                connections.releaseConnection(conn);
+            }
         }
     }
 

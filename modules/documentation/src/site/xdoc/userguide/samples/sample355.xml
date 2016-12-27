@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 355</title>
+    </properties>
+    <body>
+        <section name="Sample 355: Using Python Scripts for Mediation">
+            <div class="xmlConf">
+                &lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+
+                    &lt;registry provider=&quot;org.apache.synapse.registry.url.SimpleURLRegistry&quot;&gt;
+                        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+                        &lt;parameter name=&quot;root&quot;&gt;file:repository/conf/sample/resources/&lt;/parameter&gt;
+                        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+                        &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
+                    &lt;/registry&gt;
+
+                    &lt;localEntry key=&quot;stockquoteScript&quot;
+                                src=&quot;file:repository/conf/sample/resources/script/stockquoteTransformRequest.py&quot;/&gt;
+
+                    &lt;sequence name=&quot;main&quot;&gt;
+                        &lt;in&gt;
+                            &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
+                            &lt;script language=&quot;py&quot; key=&quot;stockquoteScript&quot; function=&quot;transformRequest&quot;/&gt;
+                            &lt;send&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/send&gt;
+                        &lt;/in&gt;
+                        &lt;out&gt;
+                            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+                            &lt;script language=&quot;py&quot; key=&quot;script/stockquoteTransformResponse.py&quot;
+                                    function=&quot;transformResponse&quot;/&gt;
+                            &lt;send/&gt;
+                        &lt;/out&gt;
+                    &lt;/sequence&gt;
+
+                &lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Shows how to embed Python scripts in the Synapse configuration itself.
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                     	<li>
+                            This sample uses Jython, so first setup support for this in Synapse as described at
+							<a href="setup/script.html#python">Configuring Jython</a>
+                        </li>
+                        <li>
+                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                        </li>
+                        <li>
+                            Synapse does not ship with a Jython engine by default. Therefore you should
+                            download the Jython engine from Jython site and copy the downloaded jar file
+                            to the 'lib' directory of Synapse.
+                        </li>
+                        <li>
+                            Start Synapse using the configuration numbered 355 (repository/conf/sample/synapse_sample_355.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 355<br/>
+                                Windows: synapse.bat -sample 355
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Run the sample client as follows.
+                </p>
+                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=customquote</div>
+                <p>
+                    The Python scripts will transform the requests and responses.
+                </p>                
+            </subsection>
+        </section>
+        <p><a href="../samples.html">Back to Catalog</a></p>        
+    </body>
+</document>

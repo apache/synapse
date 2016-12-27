@@ -35,6 +35,9 @@
 				<li>
 					<a href="#ruby">Ruby Support</a>
 				</li>
+                <li>
+					<a href="#python">Python Support</a>
+				</li>
 				<li>
 					<a href="#json">JSON Support</a>
 				</li>
@@ -69,6 +72,18 @@
 					</a>
 				</p>
 			</subsection>
+			<subsection name="Python Support" id="python">
+				<p>
+					For Python support you need to download the 'jython.jar'
+					from the Maven repository for Jython, and copy it into the 'lib'
+					folder of Synapse . The Jython JAR can be downloaded from
+					<a class="externalLink"
+						href="http://central.maven.org/maven2/org/python/jython/2.2.1/jython-2.2.1.jar">
+						here
+					</a>
+				</p>
+			</subsection>
+
 			<subsection name="JSON Support" id="json">
 				<p>
 					<a class="externalLink" href="http://json.org">JSON</a>

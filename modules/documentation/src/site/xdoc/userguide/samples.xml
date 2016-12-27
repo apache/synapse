@@ -140,6 +140,7 @@
                         <li><a href="samples/sample352.html">Sample 352: Accessing Synapse MessageContext API through scripts</a></li>
                         <li><a href="samples/sample353.html">Sample 353: Using Ruby scripts for mediation</a></li>
                         <li><a href="samples/sample354.html">Sample 354: Using In-lined Ruby scripts for mediation</a></li>
+                        <li><a href="samples/sample355.html">Sample 355: Using Python scripts for mediation</a></li>
                     </ul>
                 </p>
                 <h4>Database Mediators (Interacting with Databases)</h4>

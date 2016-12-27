@@ -31,7 +31,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.base.ParamUtils;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.transport.utils.logging.LoggingUtils;
+import org.apache.synapse.transport.utils.conn.logging.LoggingUtils;
 import org.apache.synapse.transport.utils.sslcert.CertificateVerificationConfig;
 import org.apache.synapse.transport.utils.sslcert.CertificateVerificationException;
 import org.apache.synapse.transport.utils.sslcert.adaptor.SynapseAdaptorForOcspCrl;

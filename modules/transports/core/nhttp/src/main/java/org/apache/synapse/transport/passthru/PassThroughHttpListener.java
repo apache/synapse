@@ -49,7 +49,7 @@ import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
 import org.apache.synapse.transport.passthru.jmx.TransportView;
-import org.apache.synapse.transport.utils.logging.LoggingUtils;
+import org.apache.synapse.transport.utils.conn.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;

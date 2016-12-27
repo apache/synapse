@@ -43,7 +43,7 @@ import org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
-import org.apache.synapse.transport.utils.logging.LoggingUtils;
+import org.apache.synapse.transport.utils.conn.logging.LoggingUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;

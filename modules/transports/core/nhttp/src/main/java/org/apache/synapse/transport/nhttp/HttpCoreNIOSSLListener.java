@@ -46,7 +46,7 @@ import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
-import org.apache.synapse.transport.utils.logging.LoggingUtils;
+import org.apache.synapse.transport.utils.conn.logging.LoggingUtils;
 
 public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
 

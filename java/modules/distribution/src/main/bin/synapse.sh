@@ -169,7 +169,7 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
+$JAVA_HOME/bin/java -server -Xms512M -Xmx512M \
     $XDEBUG \
     $TEMP_PROPS \
     -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \

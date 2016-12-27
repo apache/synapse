@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.conn.logging;
+package org.apache.synapse.transport.utils.conn;
 
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.DefaultNHttpClientConnection;
@@ -31,18 +31,18 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 /**
- * The SSL-enabled version of the LoggingNHttpClientConnectionFactory. Identical in behavior
+ * The SSL-enabled version of the SynapseNHttpClientConnectionFactory. Identical in behavior
  * to the parent class, but wraps IOSession instances with SSLIOSession instances. This
  * implementation also supports using different SSLContext instances for different target
  * I/O sessions.
  */
-public class LoggingNHttpSSLClientConnectionFactory extends LoggingNHttpClientConnectionFactory {
+public class SynapseNHttpSSLClientConnectionFactory extends SynapseNHttpClientConnectionFactory {
 
     private SSLContext sslContext;
     private SSLSetupHandler sslSetupHandler;
     private Map<String,SSLContext> customContexts;
 
-    public LoggingNHttpSSLClientConnectionFactory(ConnectionConfig config,
+    public SynapseNHttpSSLClientConnectionFactory(ConnectionConfig config,
                                                   SSLContext sslContext,
                                                   SSLSetupHandler sslSetupHandler,
                                                   Map<String, SSLContext> customContexts) {

@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.conn.logging;
+package org.apache.synapse.transport.utils.conn;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +38,9 @@ import org.apache.http.nio.reactor.SessionInputBuffer;
 import org.apache.http.nio.reactor.SessionOutputBuffer;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.synapse.transport.nhttp.AccessHandler;
+import org.apache.synapse.transport.utils.conn.logging.LoggingConstants;
+import org.apache.synapse.transport.utils.conn.logging.LoggingIOSession;
+import org.apache.synapse.transport.utils.conn.logging.LoggingNHttpServerConnection;
 
 import java.io.IOException;
 
@@ -48,7 +51,7 @@ import java.io.IOException;
  * objects. Also, depending on the logging configuration, this factory may choose to
  * wrap IOSession instances in LoggingIOSession objects.
  */
-public class LoggingNHttpServerConnectionFactory implements NHttpConnectionFactory<DefaultNHttpServerConnection> {
+public class SynapseNHttpServerConnectionFactory implements NHttpConnectionFactory<DefaultNHttpServerConnection> {
 
     private static final Log sourceConnLog = LogFactory.getLog(
             LoggingConstants.SOURCE_CONNECTION_LOG_ID);
@@ -66,14 +69,14 @@ public class LoggingNHttpServerConnectionFactory implements NHttpConnectionFacto
 
     private final ConnectionConfig config;
 
-    public LoggingNHttpServerConnectionFactory(ConnectionConfig config) {
+    public SynapseNHttpServerConnectionFactory(ConnectionConfig config) {
         this.config = config;
     }
 
     public DefaultNHttpServerConnection createConnection(IOSession session) {
         if (sourceSessionLog.isDebugEnabled() || sourceWireLog.isDebugEnabled()) {
             session = new LoggingIOSession(sourceSessionLog, sourceWireLog,
-                    session, "http-listener");
+                                           session, "http-listener");
         }
 
         if (sourceConnLog.isDebugEnabled()) {

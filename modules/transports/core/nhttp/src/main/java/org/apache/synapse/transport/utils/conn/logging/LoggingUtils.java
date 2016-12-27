@@ -27,6 +27,10 @@ import org.apache.http.impl.nio.DefaultHttpServerIODispatch;
 import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnectionFactory;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpSSLClientConnectionFactory;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpSSLServerConnectionFactory;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpServerConnectionFactory;
 
 import javax.net.ssl.SSLContext;
 import java.util.Map;
@@ -45,7 +49,7 @@ public class LoggingUtils {
     public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
                                                                   final ConnectionConfig config) {
         return new DefaultHttpServerIODispatch(decorate(handler),
-                new LoggingNHttpServerConnectionFactory(config));
+                new SynapseNHttpServerConnectionFactory(config));
     }
 
     /**
@@ -64,7 +68,7 @@ public class LoggingUtils {
                                                                   final SSLContext sslContext,
                                                                   final SSLSetupHandler sslSetupHandler) {
         return new DefaultHttpServerIODispatch(decorate(handler),
-                new LoggingNHttpSSLServerConnectionFactory(config, sslContext, sslSetupHandler));
+                new SynapseNHttpSSLServerConnectionFactory(config, sslContext, sslSetupHandler));
     }
 
     /**
@@ -79,7 +83,7 @@ public class LoggingUtils {
     public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
                                                                   final ConnectionConfig config) {
         return new DefaultHttpClientIODispatch(decorate(handler),
-                new LoggingNHttpClientConnectionFactory(config));
+                new SynapseNHttpClientConnectionFactory(config));
     }
 
     /**
@@ -100,7 +104,7 @@ public class LoggingUtils {
                                                                   final SSLSetupHandler sslSetupHandler,
                                                                   Map<String, SSLContext> customContexts) {
         return new DefaultHttpClientIODispatch(decorate(handler),
-                new LoggingNHttpSSLClientConnectionFactory(config, sslContext, sslSetupHandler, customContexts));
+                new SynapseNHttpSSLClientConnectionFactory(config, sslContext, sslSetupHandler, customContexts));
     }
 
     private static NHttpClientEventHandler decorate(NHttpClientEventHandler handler) {

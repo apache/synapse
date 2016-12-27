@@ -35,10 +35,7 @@
                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
             <enableSec outboundPolicy="sec_policy_outbound" inboundPolicy="sec_policy_inbound"/>
         </callout>
-        <property name="RESPONSE" value="true"/>
-        <header name="To" action="remove"/>
-        <send/>
-        <drop/>
+	<respond/>
     </sequence>
 
 </definitions>

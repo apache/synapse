@@ -39,10 +39,7 @@
                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
             &lt;enableSec policy="sec_policy"/&gt;
         &lt;/callout&gt;
-        &lt;property name="RESPONSE" value="true"/&gt;
-        &lt;header name="To" action="remove"/&gt;
-        &lt;send/&gt;
-        &lt;drop/&gt;
+        &lt;respond/&gt;
     &lt;/sequence&gt;
 
 &lt;/definitions&gt;</div>

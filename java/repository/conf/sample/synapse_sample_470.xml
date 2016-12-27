@@ -55,9 +55,7 @@
                 <bean action="GET_PROPERTY" var="store" property="name" target="{//store/name/text()}"/>
                 <bean action="GET_PROPERTY" var="store" property="address" target="{//store/address/text()}"/>
                 <bean action="GET_PROPERTY" var="store" property="phoneNo" target="{//store/phone/text()}"/>
-                <header name="To" action="remove"/>
-                <property name="RESPONSE" value="true"/>
-                <send/>
+		<respond/>
             </inSequence>
         </target>
     </proxy>

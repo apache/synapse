@@ -65,9 +65,7 @@
                         <arg expression="get-property('TOTAL')"/>
                     </args>
                 </payloadFactory>
-                <property name="RESPONSE" value="true"/>
-                <header name="To" action="remove"/>
-                <send/>
+                <respond/>
             </onComplete>
         </aggregate>
     </sequence>

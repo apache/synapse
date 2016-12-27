@@ -59,9 +59,7 @@
                 &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;address&quot; target=&quot;{//store/address/text()}&quot;/&gt;
                 &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;phoneNo&quot; target=&quot;{//store/phone/text()}&quot;/&gt;
                 &lt;!-- Send the response back to the client of the ESB. --&gt;
-                &lt;header name=&quot;To&quot; action=&quot;remove&quot;/&gt;
-                &lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;
-                &lt;send/&gt;
+                &lt;respond/&gt;
             &lt;/inSequence&gt;
         &lt;/target&gt;
     &lt;/proxy&gt;

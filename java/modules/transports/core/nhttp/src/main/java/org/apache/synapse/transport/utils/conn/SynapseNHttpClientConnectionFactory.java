@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.conn.logging;
+package org.apache.synapse.transport.utils.conn;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,17 +38,21 @@ import org.apache.http.nio.reactor.SessionInputBuffer;
 import org.apache.http.nio.reactor.SessionOutputBuffer;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.synapse.transport.nhttp.AccessHandler;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnection;
+import org.apache.synapse.transport.utils.conn.logging.LoggingConstants;
+import org.apache.synapse.transport.utils.conn.logging.LoggingIOSession;
+import org.apache.synapse.transport.utils.conn.logging.LoggingNHttpClientConnection;
 
 import java.io.IOException;
 
 /**
  * A connection factory implementation for DefaultNHttpClientConnection instances.
  * Based on the current logging configuration, this factory decides whether to create
- * regular DefaultNHttpClientConnection objects or to create LoggingNHttpClientConnection
+ * regular SynapseNHttpClientConnection objects or to create LoggingNHttpClientConnection
  * objects. Also, depending on the logging configuration, this factory may choose to
  * wrap IOSession instances in LoggingIOSession objects.
  */
-public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFactory<DefaultNHttpClientConnection> {
+public class SynapseNHttpClientConnectionFactory implements NHttpConnectionFactory<DefaultNHttpClientConnection> {
 
     private static final Log targetConnLog = LogFactory.getLog(
             LoggingConstants.TARGET_CONNECTION_LOG_ID);
@@ -66,14 +70,14 @@ public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFacto
 
     private final ConnectionConfig config;
 
-    public LoggingNHttpClientConnectionFactory(ConnectionConfig config) {
+    public SynapseNHttpClientConnectionFactory(ConnectionConfig config) {
         this.config = config;
     }
 
     public DefaultNHttpClientConnection createConnection(IOSession session) {
         if (targetSessionLog.isDebugEnabled() || targetWireLog.isDebugEnabled()) {
             session = new LoggingIOSession(targetSessionLog, targetWireLog,
-                    session, "http-sender");
+                                           session, "http-sender");
         }
 
         if (targetConnLog.isDebugEnabled() || targetHeaderLog.isDebugEnabled()) {
@@ -91,7 +95,7 @@ public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFacto
                     responseParserFactory,
                     targetConnLog);
         } else {
-            return new DefaultNHttpClientConnection(
+            return new SynapseNHttpClientConnection(
                     session,
                     config.getBufferSize(),
                     config.getFragmentSizeHint(),

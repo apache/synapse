@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.conn.logging;
+package org.apache.synapse.transport.utils.conn;
 
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.nio.DefaultNHttpServerConnection;
@@ -29,15 +29,15 @@ import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
 import javax.net.ssl.SSLContext;
 
 /**
- * The SSL-enabled version of the LoggingNHttpServerConnectionFactory. Identical in behavior
+ * The SSL-enabled version of the SynapseNHttpServerConnectionFactory. Identical in behavior
  * to the parent class, but wraps IOSession instances with SSLIOSession instances.
  */
-public class LoggingNHttpSSLServerConnectionFactory extends LoggingNHttpServerConnectionFactory {
+public class SynapseNHttpSSLServerConnectionFactory extends SynapseNHttpServerConnectionFactory {
 
     private SSLContext sslContext;
     private SSLSetupHandler sslSetupHandler;
 
-    public LoggingNHttpSSLServerConnectionFactory(ConnectionConfig config, SSLContext sslContext,
+    public SynapseNHttpSSLServerConnectionFactory(ConnectionConfig config, SSLContext sslContext,
                                                   SSLSetupHandler sslSetupHandler) {
         super(config);
         this.sslContext = sslContext;

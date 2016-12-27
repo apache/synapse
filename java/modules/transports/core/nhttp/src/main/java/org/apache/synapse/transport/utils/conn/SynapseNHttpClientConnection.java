@@ -17,35 +17,31 @@
  *  under the License.
  */
 
-package org.apache.synapse.transport.utils.conn.logging;
+package org.apache.synapse.transport.utils.conn;
 
-import org.apache.commons.logging.Log;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.config.MessageConstraints;
 import org.apache.http.entity.ContentLengthStrategy;
+import org.apache.http.impl.nio.DefaultNHttpClientConnection;
 import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.NHttpMessageParserFactory;
 import org.apache.http.nio.NHttpMessageWriterFactory;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.util.ByteBufferAllocator;
-import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnection;
 
 import java.io.IOException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
 /**
- * An extension of the DefaultNHttpClientConnection class, that provides some
- * additional logging features. This implementation enhances the default connection
- * class by logging all the major events that occur on the connection instance.
+ * An extension of the DefaultNHttpClientConnection class, that has some
+ * additional stuff related to synapse NHttp transport implementation
  */
-public class LoggingNHttpClientConnection extends SynapseNHttpClientConnection {
+public class SynapseNHttpClientConnection extends DefaultNHttpClientConnection {
 
-    private final Log log;
-
-    public LoggingNHttpClientConnection(IOSession session,
+    public SynapseNHttpClientConnection(IOSession session,
                                         int bufferSize,
                                         int fragmentSizeHint,
                                         ByteBufferAllocator allocator,
@@ -55,43 +51,34 @@ public class LoggingNHttpClientConnection extends SynapseNHttpClientConnection {
                                         ContentLengthStrategy incomingContentStrategy,
                                         ContentLengthStrategy outgoingContentStrategy,
                                         NHttpMessageWriterFactory<HttpRequest> requestWriterFactory,
-                                        NHttpMessageParserFactory<HttpResponse> responseParserFactory,
-                                        Log log) {
+                                        NHttpMessageParserFactory<HttpResponse> responseParserFactory) {
         super(session, bufferSize, fragmentSizeHint, allocator,
-                charDecoder, charEncoder, constraints, incomingContentStrategy,
-                outgoingContentStrategy, requestWriterFactory, responseParserFactory);
-        this.log = log;
+              charDecoder, charEncoder, constraints, incomingContentStrategy,
+              outgoingContentStrategy, requestWriterFactory, responseParserFactory);
     }
 
     @Override
     public void close() throws IOException {
-        this.log.debug("Close connection");
         super.close();
     }
 
     @Override
     public void shutdown() throws IOException {
-        this.log.debug("Shutdown connection");
         super.shutdown();
     }
 
     @Override
     public void submitRequest(final HttpRequest request) throws IOException, HttpException {
-        if (this.log.isDebugEnabled()) {
-            this.log.debug("HTTP connection " + this + ": "  + request.getRequestLine().toString());
-        }
         super.submitRequest(request);
     }
 
     @Override
     public void consumeInput(final NHttpClientEventHandler handler) {
-        this.log.debug("Consume input");
         super.consumeInput(handler);
     }
 
     @Override
     public void produceOutput(final NHttpClientEventHandler handler) {
-        this.log.debug("Produce output");
         super.produceOutput(handler);
     }
 }

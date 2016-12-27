@@ -37,7 +37,7 @@
             <p>
                 Apache Synapse is free and open source software distributed under the
                 <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License 2.0</a>.
-                The latest version of Synaspe is <a href="download/2.1/download.cgi">v2.1</a>.
+                The latest version of Synaspe is <a href="download/3.0.0/download.cgi">v3.0.0</a>.
                 This release comes with a horde of new features, bug fixes, performance and
                 stability improvements.
             </p>
@@ -47,35 +47,54 @@
                 Foundation</a>
             </p>
         </section>
-        <section name="New in Version 2.1">
+        <section name="New in Version 3.0.0">
             <ul>
                 <li>
-                    Support for creating and managing REST APIs with URL patterns and URI templates
+                    High-performing PassThrough HTTP transport support for all mediation scenarios
                 </li>
                 <li>
-                    Define sequences and endpoints as templates and reuse seamlessly across the
-                    whole configuration
+                    OCSP/CRL certificate validation support for HTTP transports
                 </li>
                 <li>
-                    Payload factory mediator for constructing custom XML payloads
+                    Respond Mediator - A Mediator for responding back to the client from anywhere in the mediation flow
                 </li>
                 <li>
-                    Recipient list endpoint
+                    Loopback Mediator - A Mediator for jumping from IN sequence to OUT sequence
                 </li>
                 <li>
-                    HTTPD like access logging capability in the NHTTP transport
+                    Header Mediator improvements
+                    <ul><li>Support for adding/removing transport headers</li></ul>
                 </li>
                 <li>
-                    Message stores and message processors for implementing complex integration
-                    patterns and advanced messaging scenarios
+                    New xpath functions
+                    <ul><li>url-encode xpath function</li></ul>
+                    <ul><li>Access system properties from get-property function</li></ul>
+                    <ul><li>base64 decode function</li></ul>
                 </li>
                 <li>
-                    Receiving sequence support in the send mediator to make service chaining
-                    easier
+                    Message Processor improvements
+                    <ul><li>Resequencing Message Processor</li></ul>
+                    <ul><li>New blocking client implementation</li></ul>
                 </li>
                 <li>
-                    Conditional router mediator for implementing complex routing scenarios with
-                    many conditions and rules
+                    Message Injector task improvements
+                    <ul><li>Support for injecting a message to Proxy services</li></ul>
+                    <ul><li>Support for injecting a message to named sequences</li></ul>
+                </li>
+                <li>
+                    Callout Mediator improvements
+                    <ul><li>Support for WS-Security</li></ul>
+                    <ul><li>Inline Endpoint support</li></ul>
+                    <ul><li>Ability to dynamically set the EPR using 'To' header</li></ul>
+                    <ul><li>NTLM support</li></ul>
+                </li>
+                <li>
+                    Script Mediator improvements
+                    <ul><li>Support for removing properties</li></ul>
+                </li>
+                <li>
+                    REST API improvements
+                    <ul><li>Transport level access restriction</li></ul>
                 </li>
             </ul>
         </section>

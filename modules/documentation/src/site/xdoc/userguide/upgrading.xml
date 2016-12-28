@@ -26,16 +26,28 @@
 	<body>
         <section name="Upgrading to the Latest Version">
             <p>
-                If you are using an older version of Synapse (1.x) and now looking to migrate to
-                the latest versions (2.x) this document would be a good starting point. This
+                If you are using an older version of Synapse (1.x/2.x) and now looking to migrate to
+                the latest versions (3.x) this document would be a good starting point. This
                 article provides information on steps that need to be carried out to smoothly
-                migrate from an older release of Synapse to the latest version.
+                migrate from an older release of Synapse to the latest version. If you are migrating from 1.x version
+				to 3.x we recommend you follow the 1.x -> 2.x migration followed by the 2.x -> 3.x.
             </p>
         </section>
 		<section name="Contents">
 				<ul>
 					<li>
 						<a href="#General_comments">General comments</a>
+					</li>
+					<li>
+						<a href="#Upgrading_from_2.1_to_3.0">Upgrading from 2.1 to 3.0</a>
+						<ul>
+							<li>
+								<a href="#Custom_Extensions_3.0">Custom Extensions</a>
+							</li>
+							<li>
+								<a href="#New_mediators_3.0">Respond and Loopback Mediators</a>
+							</li>
+						</ul>
 					</li>
 					<li>
 						<a href="#Upgrading_from_1.2_to_2.1">Upgrading from 1.2 to 2.1</a>
@@ -81,7 +93,7 @@
 				</li>
 				<li>
                     Recompile and test the extension with the libraries from the new Synapse release.
-					We try to avoid to introduce incompatible changes to Synapse's core APIs between
+					We try to avoid introducing incompatible changes to Synapse's core APIs between
 					releases (except if the related classes or methods were deprecated in the previous
 					release). However, it is not always possible to maintain compatibility. In addition
 					your code might depend on features that are not part of the core API. Therefore,
@@ -98,6 +110,47 @@
                 want to go through the first step for all the intermediate releases. This will make
                 the migration easier.
 			</p>
+		</section>
+
+		<section name="Upgrading from 2.1 to 3.0" id="Upgrading_from_2.1_to_3.0">
+			<subsection name="Custom Extensions" id="Custom_Extensions_3.0">
+				<p>
+					Synapse 3.0 introduces the PassThrough HTTP Transport which improves HTTP transport performance by removing
+					intermediary buffer use when there is no requirement to read an HTTP payload (i.e. message is merely passed
+					through). If you have custom extensions that depend on accessing or reading buffers directly, you
+					may require to change your code to trigger the PassThrough transport to build the payload. This can
+					be done using the
+					<a herf="../apidocs/org/apache/synapse/transport/passthrough/util/RelayUtils.html">
+						RelayUtils.buildMessage(MessageContext messageContext, boolean earlyBuild)</a> static method.
+				</p>
+			</subsection>
+			<subsection name="Respond and Loopback Mediators" id="New_mediators_3.0">
+				<p>
+					<a href="mediators.html#Respond">Respond</a> and <a href="mediators.html#Loopback">Loopback</a>
+					are new mediators introduced in Apache Synapse 3.0. <a href="mediators.html#Respond">Respond</a> provides
+					a mechanism to send a message back to the client as a response. In older versions of Apache Synapse
+					we would use the <a href="mediators.html#Send">Send</a> mediator to respond back to a client either
+					after a message is received from a backend in an out sequence or force a response back to the client
+					using a series of mediators as follows:
+				</p>
+					<div class="xmlConf">
+&lt;header name="To" action="remove"/&gt;
+&lt;property name="RESPONSE" value="true" scope="default" type="STRING"/&gt;
+&lt;property name="NO_ENTITY_BODY" scope="axis2" action="remove"/&gt;
+&lt;send/&gt;
+					</div>
+				<p>
+					We can replace above methods with the <a href="mediators.html#Respond">Respond</a> mediator anywhere
+					in the mediation flow to respond back to the client with the current message. Any mediators residing
+					after the <a href="mediators.html#Respond">Respond</a> mediator will be ignored.
+				</p>
+
+				<p>Similarly the <a href="mediators.html#Loopback">Loopback</a> mediator is used to jump the flow from
+				an in sequence to the out sequence ignoring any mediators residing after the
+				<a href="mediators.html#Loopback">Loopback</a> mediator. <a href="mediators.html#Loopback">Loopback</a>
+					mediator has no effect from inside an out sequence.
+				</p>
+			</subsection>
 		</section>
 		
 		<section name="Upgrading from 1.2 to 2.1" id="Upgrading_from_1.2_to_2.1">
@@ -124,8 +177,8 @@
 	 fault.xml
   /tasks
   /templates
-	 registry.xml
-	 synapse.xml</div>
+  registry.xml
+  synapse.xml</div>
 				<p>
                     As you can see in the above sketch of the repository though it is a repository based
 					configuration, it also supports the old style single flat synapse.xml file in which

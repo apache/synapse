@@ -432,7 +432,18 @@
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-json</artifactId>
                 <version>${axis2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.jettison</groupId>
+                        <artifactId>jettison</artifactId>
+                    </exclusion>
+                </exclusions>
 	    </dependency>
+            <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>${jettison.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-adb</artifactId>

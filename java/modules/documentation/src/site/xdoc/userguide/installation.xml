@@ -37,7 +37,7 @@
                     <a href="#Installing">Installing Synapse</a>
                     <ul>
                         <li>
-                            <a href="#InstallingLinux">Installing on Linux/Unix</a>
+			    <a href="#InstallingLinux">Installing on *nix (Linux/macOS/Solaris)</a>
                         </li>
                         <li>
                             <a href="#InstallingWin">Installing on MS Windows</a>
@@ -64,7 +64,7 @@
                             </a>
                         </td>
                         <td>
-                            1.6.0_23 or higher (For instructions on setting up the JDK on different
+                            1.7.0_55 or higher (For instructions on setting up the JDK on different
                             operating systems, visit<a
                                 href="http://www.oracle.com/technetwork/java/index.html">
                             Java homepage.
@@ -91,7 +91,7 @@
                         </td>
                         <td>
                             To build Apache Synapse from its source distribution, you will need
-                            Maven 2.2.0 or later.
+                            Maven 3.2.x or later.
                         </td>
                     </tr>
                     <tr>
@@ -119,10 +119,10 @@
                             Operating System
                         </td>
                         <td>
-                            Linux, Solaris, MS Windows - XP/2003/2008 (Not fully tested on Windows
-                            Vista or Windows 7). Since Apache Synapse is a Java application, it will
+                            Linux, Solaris, macOS, MS Windows - XP/2003/2008 (Not fully tested on Windows
+			    Vista/7/8/10). Since Apache Synapse is a Java application, it will
                             generally be possible to run it on other operating systems with a
-                            JDK 1.6.x runtime. Linux/Solaris is recommended for production
+                            JDK 1.7.x runtime. Linux is recommended for production
                             deployments.
                         </td>
                     </tr>
@@ -137,13 +137,13 @@
             </p>
             <ol>
                 <li>
-                    Binary Distribution: Includes binary files for both Linux and
+                    Binary Distribution: Includes binary files for Linux, macOS and
                     MS Windows operating systems, compressed into a single a zip file. Recommended
                     for normal users.
                 </li>
                 <p/>
                 <li>
-                    Source Distribution: Includes the source code for both Linux and MS Windows
+                    Source Distribution: Includes the source code for Linux, macOS and MS Windows
                     operating systems, compressed into a single zip file which can be used to build
                     the binaries. Recommended for advanced users.
                 </li>
@@ -155,7 +155,7 @@
                 The following guide will take you through the binary distribution installation
                 on different platforms.
             </p>
-            <subsection name="Installing on Linux/Unix" id="InstallingLinux">
+	    <subsection name="Installing on *nix (Linux/macOS/Solaris)" id="InstallingLinux">
                 <ol>
                     <li>
                         <a href="http://synapse.apache.org/download.html">Download</a> Apache
@@ -214,10 +214,10 @@
         <section name="Building Synapse Using the Source Distribution" id="Building">
             <p>
                 Apache Synapse build is based on <a href="http://maven.apache.org/"> Apache
-                Maven 2</a>. Hence, it is a prerequisite to have Maven (version 2.2.0 or later)
+                Maven 3</a>. Hence, it is a prerequisite to have Maven (version 3.2.0 or later)
                 installed in order to build Synapse from the source distribution. Instructions on
-                installing Maven 2 are available on the <a href="http://maven.apache.org/"> Maven
-                website</a>. Follow these steps to build Synapse after setting up Maven 2.
+                installing Maven 3 are available on the <a href="http://maven.apache.org/"> Maven
+                website</a>. Follow these steps to build Synapse after setting up Maven 3.
             </p>
             <ol>
                 <li>

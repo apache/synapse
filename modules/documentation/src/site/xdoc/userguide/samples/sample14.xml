@@ -17,7 +17,7 @@
 	</properties>
 	<body>
 		<section name="Sample 14: Sequences and Endpoints as local registry items">
-			<div class="xmlConf"><pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+			<div class="xmlConf">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
              xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
              xsi:schemaLocation=&quot;http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd&quot;&gt;
 
@@ -44,7 +44,7 @@
         &lt;/out&gt;
     &lt;/sequence&gt;
 
-&lt;/definitions&gt;</pre></div>
+&lt;/definitions&gt;</div>
 			<subsection name="Objective">
 				<p>
 					Objective: Sequence and Endpoints as local registry entries

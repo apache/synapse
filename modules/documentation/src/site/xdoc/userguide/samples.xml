@@ -50,7 +50,10 @@
                         <li><a href="samples/sample10.html">Sample 10: Introduction to dynamic endpoints with registry</a></li>
                         <li><a href="samples/sample11.html">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
                         <li><a href="samples/sample12.html">Sample 12: One-way messaging / fire-and-forget through Synapse</a></li>
-                        <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li>
+                        <li><a href="samples/sample14.html">Sample 14: Sequences and Endpoints as local registry items</a></li>
+                        <li><a href="samples/sample15.html">Sample 15: Message Copying and Content Enriching with Enrich Mediator</a></li>
+                        <li><a href="samples/sample16.html">Sample 16: Introduction to dynamic and static keys</a></li>
+                        <li><a href="samples/sample17.html">Sample 17: Introduction to the payloadFactory mediator</a></li>
                     </ul>
                 </p>
             </subsection>
@@ -66,6 +69,9 @@
                         <li><a href="samples/sample56.html">Sample 56: WSDL endpoint</a></li>
                         <li><a href="samples/sample57.html">Sample 57: Dynamic load balancing between 3 nodes</a></li>
                         <li><a href="samples/sample58.html">Sample 58: Static load balancing between 3 nodes</a></li>
+                        <li><a href="samples/sample59.html">Sample 59: Weighted Round-Robin loadbalancing between 3 endpoints</a></li>
+                        <li><a href="samples/sample61.html">Sample 61: Routing message to 3 static recipients</a></li>
+                        <li><a href="samples/sample62.html">Sample 62: Routing message to dynamic recipients</a></li>
                     </ul>
                 </p>
             </subsection>

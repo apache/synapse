@@ -110,6 +110,12 @@
             <artifactId>axis2-codegen</artifactId>
         </dependency>
 
+	<!-- JSON Support --> 
+	<dependency>
+		<groupId>org.apache.axis2</groupId>
+		<artifactId>axis2-json</artifactId>
+	</dependency>
+
         <!-- Additional transports -->
         <dependency>
             <groupId>org.apache.axis2</groupId>

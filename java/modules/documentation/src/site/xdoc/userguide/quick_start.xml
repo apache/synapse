@@ -27,7 +27,7 @@
             <p>
                 Welcome to Apache Synapse quick start guide. This tutorial demonstrates two
                 sample applications covering the fundamental usage scenarios of Synapse, namely
-                message mediation and service mediation. It starts from the absolute begining and
+                message mediation and service mediation. It starts from the absolute beginning and
                 walks you through a series of steps while giving a firm grasp on the Synapse
                 messaging model.
             </p>
@@ -40,7 +40,8 @@
             </p>
             <ul>
                 <li>
-                    A Java 2 SE - JDK or JRE of version 1.5.x or higher (JDK 1.6.0_21 recommended)
+                    A Java runtime - JDK or JRE of version 1.6.x or higher
+                    (1.6.x or 1.7.x is recommended. 1.8.x is not tested enough)
                 </li>
                 <li>
                     Apache Ant <a href="http://ant.apache.org">http://ant.apache.org</a>
@@ -81,25 +82,25 @@
                 'ant'. You will see an output similar to the following as the service is built
                 and deployed to the sample Axis2 server.
             </p>
-            <div class="consoleOutput">user@domain:/opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService$ ant
+            <div class="consoleOutput">user@domain:/opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService$ ant
 Buildfile: build.xml
 
 clean:
 
 init:
-[mkdir] Created dir: /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp
-[mkdir] Created dir: /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
-[mkdir] Created dir: /opt/synapse-2.0.0/samples/axis2Server/repository/services
+[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp
+[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/repository/services
 
 compile-all:
-[javac] Compiling 9 source files to /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+[javac] Compiling 9 source files to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
 
 build-service:
-[mkdir] Created dir: /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-[mkdir] Created dir: /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-[copy] Copying 1 file to /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-[copy] Copying 9 files to /opt/synapse-2.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-[jar] Building jar: /opt/synapse-2.0.0/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
+[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+[copy] Copying 1 file to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+[copy] Copying 9 files to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+[jar] Building jar: /opt/synapse-3.0.0/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
 
 BUILD SUCCESSFUL
 Total time: 1 second</div>
@@ -144,41 +145,40 @@ Total time: 1 second</div>
                 above configuration.
             </p>
             <div class="consoleOutput">Starting Synapse/Java ...
-Using SYNAPSE_HOME:    /opt/synapse-2.0.0
-Using JAVA_HOME:       /opt/jdk1.6.0_16
-Using SYNAPSE_XML:     /opt/synapse-2.0.0/repository/conf/sample/synapse_sample_0.xml
-2010-11-26 01:33:03,651 [-] [main]  INFO SynapseServer Starting Apache Synapse...
-2010-11-26 01:33:03,683 [-] [main]  INFO SynapseControllerFactory Using Synapse home : /opt/synapse-2.0.0
-2010-11-26 01:33:03,683 [-] [main]  INFO SynapseControllerFactory Using Axis2 repository : /opt/synapse-2.0.0/repository
-2010-11-26 01:33:03,683 [-] [main]  INFO SynapseControllerFactory Using axis2.xml location : /opt/synapse-2.0.0/repository/conf/axis2.xml
-2010-11-26 01:33:03,683 [-] [main]  INFO SynapseControllerFactory Using synapse.xml location : /opt/synapse-2.0.0/repository/conf/sample/synapse_sample_0.xml
-2010-11-26 01:33:03,683 [-] [main]  INFO SynapseControllerFactory Using server name : localhost
-2010-11-26 01:33:03,698 [-] [main]  INFO SynapseControllerFactory The timeout handler will run every : 15s
-2010-11-26 01:33:03,808 [-] [main]  INFO Axis2SynapseController Initializing Synapse at : Fri Nov 26 01:33:03 IST 2010
-2010-11-26 01:33:04,536 [-] [main] ERROR SandeshaModule Could not load module policies. Using default values.
-2010-11-26 01:33:04,560 [-] [main]  INFO HttpCoreNIOSSLSender Loading Identity Keystore from : lib/identity.jks
-2010-11-26 01:33:04,576 [-] [main]  INFO HttpCoreNIOSSLSender Loading Trust Keystore from : lib/trust.jks
-2010-11-26 01:33:04,668 [-] [main]  INFO HttpCoreNIOSender HTTPS Sender starting
-2010-11-26 01:33:04,674 [-] [main]  INFO HttpCoreNIOSender HTTP Sender starting
-2010-11-26 01:33:04,675 [-] [main]  INFO JMSSender JMS Sender started
-2010-11-26 01:33:04,677 [-] [main]  INFO JMSSender JMS Transport Sender initialized...
-2010-11-26 01:33:04,681 [-] [main]  INFO VFSTransportSender VFS Sender started
-2010-11-26 01:33:04,828 [-] [main]  WARN JmxAdapter Using unsecured JMX remote access!
-2010-11-26 01:33:04,959 [-] [main]  INFO HttpCoreNIOSSLListener Loading Identity Keystore from : lib/identity.jks
-2010-11-26 01:33:04,961 [-] [main]  INFO HttpCoreNIOSSLListener Loading Trust Keystore from : lib/trust.jks
-2010-11-26 01:33:04,976 [-] [main]  INFO Axis2SynapseController Loading mediator extensions...
-2010-11-26 01:33:05,013 [-] [main]  INFO XMLConfigurationBuilder Generating the Synapse configuration model by parsing the XML configuration
-2010-11-26 01:33:05,114 [-] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-2.0.0/repository/conf/sample/synapse_sample_0.xml
-2010-11-26 01:33:05,158 [-] [main]  INFO Axis2SynapseController Deploying the Synapse service...
-2010-11-26 01:33:05,175 [-] [main]  INFO Axis2SynapseController Deploying Proxy services...
-2010-11-26 01:33:05,175 [-] [main]  INFO Axis2SynapseController Deploying EventSources...
-2010-11-26 01:33:05,190 [-] [main]  INFO MailTransportListener MAILTO Listener started
-2010-11-26 01:33:05,212 [-] [main]  INFO HttpCoreNIOListener HTTPS Listener started on port : 8243
-2010-11-26 01:33:05,215 [-] [main]  INFO HttpCoreNIOListener HTTP Listener started on port : 8280
-2010-11-26 01:33:05,215 [-] [main]  INFO VFSTransportListener VFS Listener started
-2010-11-26 01:33:05,215 [-] [main]  INFO Axis2SynapseController Management using JMX available via: service:jmx:rmi:///jndi/rmi://hiranya.wso2.com:1099/synapse
-2010-11-26 01:33:05,215 [-] [main]  INFO ServerManager Server ready for processing...
-2010-11-26 01:33:05,216 [-] [main]  INFO SynapseServer Apache Synapse started successfully</div>
+Using SYNAPSE_HOME:    /opt/synapse-3.0.0
+Using JAVA_HOME:       /opt/jdk1.7.0_79
+Using SYNAPSE_XML:     /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml
+2016-12-28 10:38:00,456 [-] [main]  INFO SynapseServer Starting Apache Synapse...
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Synapse home : /opt/synapse-3.0.0
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Axis2 repository : /opt/synapse-3.0.0/repository
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using axis2.xml location : /opt/synapse-3.0.0/repository/conf/axis2.xml
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using synapse.xml location : /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using server name : localhost
+2016-12-28 10:38:00,493 [-] [main]  INFO SynapseControllerFactory The timeout handler will run every : 15s
+2016-12-28 10:38:00,566 [-] [main]  INFO Axis2SynapseController Initializing Synapse at : Wed Dec 28 10:38:00 IST 2016
+2016-12-28 10:38:01,140 [-] [main]  INFO PassThroughHttpSSLSender Loading Identity Keystore from : lib/identity.jks
+2016-12-28 10:38:01,174 [-] [main]  INFO PassThroughHttpSSLSender Loading Trust Keystore from : lib/trust.jks
+2016-12-28 10:38:01,242 [-] [main]  INFO PassThroughHttpSSLSender Pass-through HTTPS sender started...
+2016-12-28 10:38:01,243 [-] [main]  INFO PassThroughHttpSender Pass-through HTTP sender started...
+2016-12-28 10:38:01,249 [-] [main]  INFO JMSSender JMS Sender started
+2016-12-28 10:38:01,250 [-] [main]  INFO JMSSender JMS Transport Sender initialized...
+2016-12-28 10:38:01,251 [-] [main]  INFO VFSTransportSender VFS Sender started
+2016-12-28 10:38:01,428 [-] [main]  INFO PassThroughHttpSSLListener Loading Identity Keystore from : lib/identity.jks
+2016-12-28 10:38:01,429 [-] [main]  INFO PassThroughHttpSSLListener Loading Trust Keystore from : lib/trust.jks
+2016-12-28 10:38:01,443 [-] [main]  INFO Axis2SynapseController Loading mediator extensions...
+2016-12-28 10:38:01,451 [-] [main]  INFO XMLConfigurationBuilder Generating the Synapse configuration model by parsing the XML configuration
+2016-12-28 10:38:01,506 [-] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml
+2016-12-28 10:38:01,542 [-] [main]  INFO Axis2SynapseController Deploying the Synapse service...
+2016-12-28 10:38:01,563 [-] [main]  INFO Axis2SynapseController Deploying Proxy services...
+2016-12-28 10:38:01,563 [-] [main]  INFO Axis2SynapseController Deploying EventSources...
+2016-12-28 10:38:01,584 [-] [main]  INFO PassThroughHttpSSLListener Starting pass-through HTTPS listener...
+2016-12-28 10:38:01,601 [-] [main]  INFO PassThroughHttpSSLListener Pass-through HTTPS listener started on port: 8243
+2016-12-28 10:38:01,601 [-] [main]  INFO PassThroughHttpListener Starting pass-through HTTP listener...
+2016-12-28 10:38:01,603 [-] [main]  INFO PassThroughHttpListener Pass-through HTTP listener started on port: 8280
+2016-12-28 10:38:01,603 [-] [main]  INFO Axis2SynapseController Management using JMX available via: service:jmx:rmi:///jndi/rmi://localhost:1099/synapse
+2016-12-28 10:38:01,606 [-] [main]  INFO TimeoutHandler This engine will expire all callbacks after : 180 seconds, irrespective of the timeout action, after the specified or optional timeout
+2016-12-28 10:38:01,607 [-] [main]  INFO ServerManager Server ready for processing...
+2016-12-28 10:38:01,608 [-] [main]  INFO SynapseServer Apache Synapse started successfully</div>
             <p>
                 Note that by default Synapse listens for HTTP requests on port 8280.
             </p>
@@ -198,17 +198,16 @@ Using SYNAPSE_XML:     /opt/synapse-2.0.0/repository/conf/sample/synapse_sample_
                 <div class="consoleOutput">Buildfile: build.xml
 
 init:
-    [mkdir] Created dir: /opt/synapse-2.0.0/samples/axis2Client/target/classes
+    [mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Client/target/classes
 
 compile:
-    [javac] Compiling 22 source files to /opt/synapse-2.0.0/samples/axis2Client/target/classes
-    [javac] Note: /opt/synapse-2.0.0/samples/axis2Client/src/samples/userguide/PWCallback.java uses or overrides a deprecated API.
+    [javac] Compiling 22 source files to /opt/synapse-3.0.0/samples/axis2Client/target/classes
+    [javac] Note: /opt/synapse-3.0.0/samples/axis2Client/src/samples/userguide/PWCallback.java uses or overrides a deprecated API.
     [javac] Note: Recompile with -Xlint:deprecation for details.
-    [javac] Note: /opt/synapse-2.0.0/samples/axis2Client/src/samples/userguide/LoadbalanceFailoverClient.java uses unchecked or unsafe operations.
+    [javac] Note: /opt/synapse-3.0.0/samples/axis2Client/src/samples/userguide/LoadbalanceFailoverClient.java uses unchecked or unsafe operations.
     [javac] Note: Recompile with -Xlint:unchecked for details.
 
 stockquote:
-     [java] 2010-11-26 01:35:16,414 [-] [main] ERROR SandeshaModule Could not load module policies. Using default values.
      [java] 2010-11-26 01:35:16,485 [-] [main]  INFO MailTransportSender MAILTO Sender started
      [java] 2010-11-26 01:35:16,496 [-] [main]  INFO JMSSender JMS Sender started
      [java] 2010-11-26 01:35:16,497 [-] [main]  INFO JMSSender JMS Transport Sender initialized...

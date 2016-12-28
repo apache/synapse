@@ -64,7 +64,7 @@
                             </a>
                         </td>
                         <td>
-                            1.7.0_55 or higher (For instructions on setting up the JDK on different
+                            1.6.0_23 or higher - recommended JDK 1.7.x, untested on JDK 1.8.x (For instructions on setting up the JDK on different
                             operating systems, visit<a
                                 href="http://www.oracle.com/technetwork/java/index.html">
                             Java homepage.
@@ -122,7 +122,7 @@
                             Linux, Solaris, macOS, MS Windows - XP/2003/2008 (Not fully tested on Windows
 			    Vista/7/8/10). Since Apache Synapse is a Java application, it will
                             generally be possible to run it on other operating systems with a
-                            JDK 1.7.x runtime. Linux is recommended for production
+                            JDK 1.6.x or higher runtime. Linux is recommended for production
                             deployments.
                         </td>
                     </tr>

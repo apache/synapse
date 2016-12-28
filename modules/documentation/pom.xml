@@ -33,7 +33,7 @@
     <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-documentation</artifactId>
     <packaging>pom</packaging>
-    <name>Apache Synapse - Documentation</name>
+    <name>Apache Synapse</name>
     <description>Apache Synapse - Documentation Pack</description>
 
     <scm>

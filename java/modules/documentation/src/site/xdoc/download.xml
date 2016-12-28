@@ -25,7 +25,7 @@
     <body>
         <section name="Download Latest Stable Release">
             <p>
-                The latest stable release of Apache Synapse is 2.1. It is highly recommended
+                The latest stable release of Apache Synapse is 3.0. It is highly recommended
                 to use the latest stable release so that you can use our newest features
                 while benefiting from all the recent bug fixes and improvements.
             </p>
@@ -35,8 +35,8 @@
                     <th>Release Date</th>
                 </tr>
                 <tr>
-                    <td><a href="download/2.1/download.cgi">2.1</a></td>
-                    <td>22-Dec-2011</td>
+                    <td><a href="download/3.0/download.cgi">3.0</a></td>
+                    <td>01-Jan-2017</td>
                 </tr>
             </table>
         </section>
@@ -45,6 +45,10 @@
                 <tr>
                     <th>Version</th>
                     <th>Release Date</th>
+                </tr>
+                <tr>
+                    <td><a href="download/2.1/download.cgi">2.1</a></td>
+                    <td>22-Dec-2011</td>
                 </tr>
                 <tr>
                     <td><a href="download/2.0.0/download.cgi">2.0.0</a></td>

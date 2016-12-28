@@ -119,9 +119,8 @@
 					intermediary buffer use when there is no requirement to read an HTTP payload (i.e. message is merely passed
 					through). If you have custom extensions that depend on accessing or reading buffers directly, you
 					may require to change your code to trigger the PassThrough transport to build the payload. This can
-					be done using the
-					<a herf="../apidocs/org/apache/synapse/transport/passthrough/util/RelayUtils.html">
-						RelayUtils.buildMessage(MessageContext messageContext, boolean earlyBuild)</a> static method.
+					be done using the <a href="../apidocs/org/apache/synapse/transport/passthru/util/RelayUtils.html">RelayUtils#buildMessage()</a>
+					static methods.
 				</p>
 			</subsection>
 			<subsection name="Respond and Loopback Mediators" id="New_mediators_3.0">

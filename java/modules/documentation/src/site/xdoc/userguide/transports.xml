@@ -105,7 +105,21 @@
 					<a href="#Contents">Contents</a>
 				</li>
 				<li>
-					<a href="#Non-blocking_HTTP_transport">Non-blocking HTTP transport</a>
+					<a href="#Passthrough_HTTP_transport">Passthrough HTTP transport</a>
+					<ul>
+						<li>
+							<a href="#Example_configurations">Example configurations</a>
+						</li>
+						<li>
+							<a href="#Transport_listener_parameters">Transport listener parameters</a>
+						</li>
+						<li>
+							<a href="#Transport_sender_parameters">Transport sender parameters</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#Non-blocking_HTTP(NHTTP)_transport">Non-blocking HTTP(NHTTP) transport</a>
 					<ul>
 						<li>
 							<a href="#Example_configurations">Example configurations</a>
@@ -162,7 +176,254 @@
                 </li>
 			</ul>
 		</section>
-	    <section name="Non-blocking HTTP transport" id="Non-blocking_HTTP_transport">
+		<section name="Passthrough HTTP transport" id="Passthrough_HTTP_transport">
+			<subsection name="Example configuration" id="Example_configurations">
+				<div class="xmlConf">&lt;transportReceiver name=&quot;http&quot; class=&quot;org.apache.synapse.transport.passthru.PassThroughHttpListener&quot;&gt;
+	&lt;parameter name=&quot;port&quot;&gt;8280&lt;/parameter&gt;
+	&lt;parameter name=&quot;httpGetProcessor&quot;locked=&quot;org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor&quot;&gt;true&lt;/parameter&gt;
+&lt;/transportReceiver&gt;
+
+&lt;transportReceiver name=&quot;https&quot; class=&quot;org.apache.synapse.transport.passthru.PassThroughHttpSSLListener&quot;&gt;
+	&lt;parameter name=&quot;port&quot; locked=&quot;false&quot;&gt;8243&lt;/parameter&gt;
+	&lt;parameter name=&quot;httpGetProcessor&quot;locked=&quot;org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor&quot;&gt;true&lt;/parameter&gt;
+	&lt;parameter name=&quot;keystore&quot; locked=&quot;false&quot;&gt;
+		&lt;KeyStore&gt;
+			&lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+			&lt;Type&gt;JKS&lt;/Type&gt;
+			&lt;Password&gt;password&lt;/Password&gt;
+			&lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+		&lt;/KeyStore&gt;
+	&lt;/parameter&gt;
+	&lt;parameter name=&quot;truststore&quot; locked=&quot;false&quot;&gt;
+		&lt;TrustStore&gt;
+			&lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+			&lt;Type&gt;JKS&lt;/Type&gt;
+			&lt;Password&gt;password&lt;/Password&gt;
+		&lt;/TrustStore&gt;
+	&lt;/parameter&gt;
+&lt;/transportReceiver&gt;
+
+&lt;transportSender name=&quot;http&quot;  class=&quot;org.apache.synapse.transport.passthru.PassThroughHttpSender&quot;&gt;
+&lt;/transportSender&gt;
+
+&lt;transportSender name=&quot;https&quot; class=&quot;org.apache.synapse.transport.passthru.PassThroughHttpSSLSender&quot;&gt;
+	&lt;parameter name=&quot;keystore&quot; locked=&quot;false&quot;&gt;
+		&lt;KeyStore&gt;
+			&lt;Location&gt;lib/identity.jks&lt;/Location&gt;
+			&lt;Type&gt;JKS&lt;/Type&gt;
+			&lt;Password&gt;password&lt;/Password&gt;
+			&lt;KeyPassword&gt;password&lt;/KeyPassword&gt;
+		&lt;/KeyStore&gt;
+	&lt;/parameter&gt;
+	&lt;parameter name=&quot;truststore&quot; locked=&quot;false&quot;&gt;
+		&lt;TrustStore&gt;
+			&lt;Location&gt;lib/trust.jks&lt;/Location&gt;
+			&lt;Type&gt;JKS&lt;/Type&gt;
+			&lt;Password&gt;password&lt;/Password&gt;
+		&lt;/TrustStore&gt;
+	&lt;/parameter&gt;
+	&lt;parameter name="CertificateRevocationVerifier"&gt;
+		&lt;CacheSize&gt;50&lt;/CacheSize&gt;
+	&lt;CacheDurationMins&gt;5&lt;/CacheDurationMins&gt;
+	&lt;/parameter&gt;
+&lt;/transportSender&gt;</div>
+			</subsection>
+			<subsection name="Transport listener parameters" id="Transport_listener_parameters">
+				<p>The following parameters are supported by both the HTTP and the HTTPS listener:</p>
+				<dl>
+					<dt>
+						<tt>port</tt>
+					</dt>
+					<dd>The TCP port to bind the listener to.</dd>
+					<dt>
+						<tt>bind-address</tt>
+					</dt>
+					<dd>
+						The IP address to bind the listener to. This can be used on hosts that have
+						more than one network interface or IP address to run multiple Synapse instances
+						listening to the same port. If this parameter is not specified, the
+						listener will accept connections on any IP address.
+					</dd>
+					<dt>
+						<tt>hostname</tt>
+					</dt>
+					<dd>
+						The host name to use when computing endpoint references in generated WSDL files.
+						The default value is the host name as provided by the operation system or
+						<tt>localhost</tt> if the host name can't be determined. The value of this
+						parameter is ignored if <tt>WSDLEPRPrefix</tt> is specified.
+					</dd>
+					<dt>
+						<tt>WSDLEPRPrefix</tt>
+					</dt>
+					<dd>
+						The URL prefix to use when computing endpoint references in generated WSDL files.
+						The value must be a valid URL with at least a protocol and host. If this value
+						is unspecified, endpoint references will be computed based on the listener type
+						(HTTP or HTTPS) and <tt>hostname</tt> and <tt>port</tt> parameters.
+						<p>
+							This parameter should be used if clients connect to Synapse through a frontend
+							server, e.g. a (load balancing) Apache, and these clients rely on the address
+							information in the WSDL documents exposed through <tt>...?wsdl</tt> URLs.
+						</p>
+					</dd>
+				</dl>
+				<p>The following parameters are specific to the HTTPS listener: </p>
+				<dl>
+					<dt>
+						<tt>keystore</tt>
+					</dt>
+					<dd>
+						The keystore configuration. The value of this parameter must be a
+						<tt>&lt;KeyStore&gt;</tt>
+						element as shown in the example configurations above.
+					</dd>
+					<dt>
+						<tt>truststore</tt>
+					</dt>
+					<dd>
+						The truststore configuration. The value of this parameter must be a
+						<tt>&lt;TrustStore&gt;</tt>
+						element as shown in the example configurations above.
+					</dd>
+					<dt>
+						<tt>SSLVerifyClient</tt>
+					</dt>
+					<dd>
+						This parameter has the same meaning as the corresponding
+						<a class="externalLink" href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">mod_ssl directive</a>
+						and sets the desired certificate verification level for client authentication:
+						<ul>
+							<li>
+								<tt>none</tt> (default): no client certificate is required at all
+							</li>
+							<li>
+								<tt>optional</tt>: the client may present a valid certificate, but is
+								not required to do so
+							</li>
+							<li>
+								<tt>require</tt>: the client has to present a valid certificate,
+								otherwise the connection request will be terminated during SSL handshake
+							</li>
+						</ul>
+					</dd>
+				</dl>
+			</subsection>
+			<subsection name="Transport sender parameters" id="Transport_sender_parameters">
+				<p>
+					The following property can be used to control based on content-types whether the
+					HTTP/HTTPS sender shall output a warning for responses with HTTP status code 500.
+				</p>
+				<dl>
+					<dt>
+						<tt>warnOnHTTP500</tt>
+					</dt>
+					<dd>
+						A list of content-types for which Synapse shall output a warning when receiving
+						an HTTP 500 response (each value each separated by a |). By default Synapse
+						outputs a warning for any HTTP 500 response, irrespective of the content-type.
+						Consequently, also for each SOAP fault a warning will be logged. If only for
+						specific content-types a warning shall be logged, please provide a |-separated
+						list. To output the warning for messages which do not have a content-type set,
+						please use the value 'none'.
+						<p>
+							Example value: x-application/hessian|none
+						</p>
+					</dd>
+				</dl>
+				<p>
+					The following properties can be used to configure the HTTP sender to use a proxy.
+					They can be specified either as transport parameters in declared in
+					<tt>&lt;transportSender&gt;</tt> or as system properties.
+				</p>
+				<dl>
+					<dt>
+						<tt>http.proxyHost</tt>
+					</dt>
+					<dd>The host name or address of the proxy server.</dd>
+					<dt>
+						<tt>http.proxyPort</tt>
+					</dt>
+					<dd>The TCP port of the proxy server.</dd>
+					<dt>
+						<tt>http.nonProxyHosts</tt>
+					</dt>
+					<dd>
+						The hosts to which the HTTP sender should connect directly and not through
+						the proxy server. The value can be a list of hosts, each separated by a |, and
+						in addition a wildcard character (*) can be used for matching.
+						<p>
+							Example value:
+							<tt>*.foo.com|localhost</tt>
+						</p>
+					</dd>
+				</dl>
+				<p>Note that the HTTPS sender has no proxy support yet.</p>
+				<p>The following parameters are specific to the HTTPS sender:</p>
+				<dl>
+					<dt>
+						<tt>keystore</tt>
+					</dt>
+					<dd>
+						The keystore configuration. The value of this parameter must be a
+						<tt>&lt;KeyStore&gt;</tt> element as shown in the example configurations
+						above.
+					</dd>
+					<dt>
+						<tt>truststore</tt>
+					</dt>
+					<dd>
+						The truststore configuration. The value of this parameter must be a
+						<tt>&lt;TrustStore&gt;</tt>
+						element as shown in the example configurations above.
+					</dd>
+					<dt>
+						<tt>novalidatecert</tt>
+					</dt>
+					<dd>
+						When set to <tt>true</tt>, this parameter disables server certificate
+						validation (trust). The default value is <tt>false</tt>. This parameter will
+						be ignored if <tt>truststore</tt> is set.
+						<p>
+							Setting his parameter to <tt>true</tt>
+							is useful in development and test environments, but should not be used in
+							production environments. If validation is disabled, a warning message will
+							be logged at startup.
+						</p>
+					</dd>
+					<dt>
+						<tt>HostnameVerifier</tt>
+					</dt>
+					<dd>
+						This optional parameter specifies the policy to apply when checking that the
+						hostname of the server matches the names stored inside the X.509 certificate
+						presented by the server. Possible values are <tt>Strict</tt>, <tt>AllowAll</tt>
+						and <tt>DefaultAndLocalhost</tt>. See the
+						<a href="../apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier Javadoc</a>
+						for more details.
+					</dd>
+					<dt>
+						<tt>CertificateRevocationVerifier</tt>
+					</dt>
+					<dd>
+						This is an optional parameter to validate the revocation status of the host
+						certificates using <a href="http://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
+						<a href="http://www.ietf.org/rfc/rfc5280.txt">CRL</a> when making HTTPS connections.
+						Simply uncomment this parameter in the axis2.xml file to enable the feature.
+						Two LRU caches are used to cache CRLs and OCSP responses until they are expired. "CacheSize"
+						property defines the maximum size of a cache. When this limit is reached, the
+						old values will be automatically removed and updated with new values. "CacheDurationMins"
+						is used to configure the time duration (in minutes) between two consecutive
+						runs of the CacheManager task which periodically performs housekeeping work
+						in each cache. Refer the example configuration above to see how to configure
+						these properties. The scheduled CacheManager tasks for OCSP and CRL caches can
+						be manually controlled using the JMX MBeans registered under the "CacheController"
+						category.
+					</dd>
+				</dl>
+			</subsection>
+		</section>
+	    <section name="Non-blocking HTTP (NHTTP) transport" id="Non-blocking_HTTP(NHTTP)_transport">
 			<subsection name="Example configuration" id="Example_configurations">
 				<div class="xmlConf">&lt;transportReceiver name=&quot;http&quot; class=&quot;org.apache.synapse.transport.nhttp.HttpCoreNIOListener&quot;&gt;
     &lt;parameter name=&quot;port&quot;&gt;8280&lt;/parameter&gt;

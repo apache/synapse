@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more
+	contributor license agreements. See the NOTICE file ~ distributed with this
+	work for additional information ~ regarding copyright ownership. The ASF
+	licenses this file ~ to you under the Apache License, Version 2.0 (the ~
+	"License"); you may not use this file except in compliance ~ with the License.
+	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0
+	~ ~ Unless required by applicable law or agreed to in writing, ~ software
+	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT
+	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the
+	License for the ~ specific language governing permissions and limitations
+	~ under the License. -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 16</title>
+    </properties>
+    <body>
+        <section name="Sample 16: Introduction to dynamic and static registry keys">
+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
+    &lt;registry provider="org.wso2.carbon.mediation.registry.ESBRegistry"&gt;
+        &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
+        &lt;parameter name="root"&gt;file:repository/samples/resources/&lt;/parameter&gt;
+        &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
+        &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;!-- define the request processing XSLT resource as a property value --&gt;
+            &lt;property name="symbol" value="transform/transform.xslt"/&gt;
+            &lt;!-- {} denotes that this key is a dynamic one and it is not a static key --&gt;
+            &lt;!-- use Xpath expression "get-property()" to evaluate real key from property --&gt;
+            &lt;xslt key="{get-property('symbol')}"/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+            &lt;!-- the key is looked up in the remote registry using a static key --&gt;
+            &lt;xslt key="transform/transform_back.xslt"/&gt;
+        &lt;/out&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Objective: Introduction to dynamic and static keys
+                </p>
+            </subsection>
+
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Start the Synapse configuration numbered 16: i.e. synapse -sample 16
+                        </li>
+                        <li>
+                            Start the Axis2 server and deploy the SimpleStockQuoteService if
+                            not already done
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Execute the client as follows.
+                </p>
+                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280/services/StockQuote</div>
+                <p>This Sample demonstrates the use of dynamic keys with mediators. XSLT mediator is used as an
+                    example for that and deference between static and dynamic usage of keys are shown with that.
+                </p>
+                <p>The first registry resource "transform/transform.xslt" is set as a property value. Inside the
+                    XSLT mediator the local property value is lookup using the Xpath expression "get-property()".
+                    Likewise any Xpath expression can be enclosed inside "{ }" to denote that it is a dynamic key.
+                    Then the mediator will evaluate the real value for that expression.
+                </p>
+                <p>The second XSLT resource "transform/transform_back.xslt" is used simply as a static key as
+                    usual. It is not included inside "{ }" and because of the mediator directly use the static
+                    value as the key.
+                </p>
+                <p>Execute the custom quote client as 'ant stockquote -Dmode=customquote' and analys the output
+                    which is similar to the Sample 8.
+                </p>
+
+            </subsection>
+
+        </section>
+        <p>
+            <a href="../samples.html">Back to Catalog</a>
+        </p>
+    </body>
+</document>

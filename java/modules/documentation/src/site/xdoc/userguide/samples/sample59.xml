@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 59</title>
+    </properties>
+    <body>
+        <section name="Sample 59: Weighted Round-Robin loadbalancing between 3 endpoints">
+            <div class="xmlConf">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;loadbalance
+                            algorithm="org.apache.synapse.endpoints.algorithms.WeightedRoundRobin"&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendOnFailure&gt;
+                                    &lt;initialDuration&gt;20000&lt;/initialDuration&gt;
+                                    &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                                &lt;/suspendOnFailure&gt;
+                            &lt;/address&gt;
+                            &lt;property name="loadbalance.weight" value="1"/&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendOnFailure&gt;
+                                    &lt;initialDuration&gt;20000&lt;/initialDuration&gt;
+                                    &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                                &lt;/suspendOnFailure&gt;
+                            &lt;/address&gt;
+                            &lt;property name="loadbalance.weight" value="2"/&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/services/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendOnFailure&gt;
+                                    &lt;initialDuration&gt;20000&lt;/initialDuration&gt;
+                                    &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                                &lt;/suspendOnFailure&gt;
+                            &lt;/address&gt;
+                            &lt;property name="loadbalance.weight" value="3"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+    &lt;sequence name="errorHandler"&gt;
+        &lt;makefault response="true"&gt;
+            &lt;code xmlns:tns="http://www.w3.org/2003/05/soap-envelope" value="tns:Receiver"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</div>
+            <subsection name="Objective">
+                <p>
+                    Objective: Demonstrate the weighted load balancing among a set of
+endpoints
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                    <li>Start ESB with sample configuration 59. (i.e. wso2esb-samples -sn 59) </li>
+
+                    <li>Deploy the LoadbalanceFailoverService and start three instances of sample Axis2 server as mentioned in sample 52.</li>
+
+                    <li>Above configuration sends messages with the weighted loadbalance behaviour. Weight of each leaf
+                        address endpoint is defined by integer value of "loadbalance.weight" property associated with each endpoint.
+                        If weight of a endpoint is x, x number of requests will send to that endpoint before switch to next active endpoint.
+                        <br/>To test this, run the loadbalancefailover client to send 100 requests as follows: </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Invoke the sample client as follows
+                </p>
+                <div class="command">ant loadbalancefailover -Di=100</div>
+                <p>This client sends 100 requests to the LoadbalanceFailoverService through
+                    ESB. ESB will distribute the load among the three endpoints mentioned in the
+                    configuration in weighted round-robin manner. LoadbalanceFailoverService appends the
+                    name of the server to the response, so that client can determine which server
+                    has processed the message. If you examine the console output of the client,
+                    you can see that requests are processed by three servers as follows: </p>
+                <div class="consoleOutput">[java] Request: 1 ==&gt; Response from server: MyServer1
+                    [java] Request: 2 ==&gt; Response from server: MyServer2
+                    [java] Request: 3 ==&gt; Response from server: MyServer2
+                    [java] Request: 4 ==&gt; Response from server: MyServer3
+                    [java] Request: 5 ==&gt; Response from server: MyServer3
+                    [java] Request: 6 ==&gt; Response from server: MyServer3
+                    [java] Request: 7 ==&gt; Response from server: MyServer1
+                    [java] Request: 8 ==&gt; Response from server: MyServer2
+                    [java] Request: 9 ==&gt; Response from server: MyServer2
+                    [java] Request: 10 ==&gt; Response from server: MyServer3
+                    [java] Request: 11 ==&gt; Response from server: MyServer3
+                    [java] Request: 12 ==&gt; Response from server: MyServer3
+                    ...
+                </div>
+                <p>As logs, endpoint with weight 1 received a 1 request and endpoint with weight 2 received 2
+                    requests and etc... in a cycle</p>
+             </subsection>
+        </section>
+        <p>
+            <a href="../samples.html">Back to Catalog</a>
+        </p>
+    </body>
+</document>

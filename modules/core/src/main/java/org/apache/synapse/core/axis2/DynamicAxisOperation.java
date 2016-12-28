@@ -235,12 +235,14 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 
                     if (resenvelope != null) {
                         responseMessageContext.setEnvelope(resenvelope);
-                        AxisEngine.receive(responseMessageContext);
-                        if (responseMessageContext.getReplyTo() != null) {
-                            sc.setTargetEPR(responseMessageContext.getReplyTo());
+                        try {
+                            AxisEngine.receive(responseMessageContext);
+                            if (responseMessageContext.getReplyTo() != null) {
+                                sc.setTargetEPR(responseMessageContext.getReplyTo());
+                            }
+                        } finally {
+                            complete(msgctx);
                         }
-
-                        complete(msgctx);
                     } else {
                         throw new AxisFault(
                                 Messages.getMessage("blockingInvocationExpectsResponse"));

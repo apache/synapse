@@ -92,10 +92,24 @@
                 files which can be found in the 'lib' directory of ActiveMQ installation, should be
                 copied into the 'lib' directory of Synapse.
             </p>
+            <p> ActiveMQ 5.8.0 and above </p>
             <ul>
-                <li>activemq-core.jar</li>
-                <li>geronimo-jms.jar</li>
-                <li>geronimo-j2ee-management.jar</li>
+                <li>activemq-broker-x.x.x.jar</li>
+                <li>activemq-client-x.x.x.jar</li>
+                <li>activemq-kahadb-store-x.x.x.jar </li>
+                <li>geronimo-jms_1.1_spec-1.1.1.jar</li>
+                <li>geronimo-j2ee-management_1.1_spec-1.0.1.jar</li>
+                <li>geronimo-jta_1.0.1B_spec-1.0.1.jar</li>
+                <li>hawtbuf-1.9.jar</li>
+                <li>Slf4j-api-1.6.6.jar</li>
+                <li>activeio-core-x.x.x.jar (available in AMQ_HOME/lib/optional folder)</li>
+            </ul>
+
+            <p> Earlier version of ActiveMQ </p>
+            <ul>
+                <li>activemq-core-x.x.x.jar</li>
+                <li>geronimo-j2ee-management_1.0_spec-1.0.jar</li>
+                <li>geronimo-jms_1.1_spec-1.1.1.jar</li>
             </ul>
             <p>
                 Now we are all set to enable the JMS transport receiver and sender for Synapse and

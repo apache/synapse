@@ -49,7 +49,8 @@
                 Please make sure you have them properly installed and configured in your system.
             </p>
             <ul>
-                <li>Java Development Kit version 1.5 or higher (1.6 recommended)</li>
+                <li>A Java runtime - JDK or JRE of version 1.6.x or higher
+                    (1.6.x or 1.7.x is recommended. 1.8.x has not been tested enough)</li>
                 <li><a href="http://ant.apache.org">Apache Ant</a> version 1.6.5 or higher</li>
                 <li>
                     A command line interface such as 'Command Prompt' on Windows and the Bash shell

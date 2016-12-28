@@ -43,6 +43,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.DebugResolutionListener;
+import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
@@ -358,15 +359,10 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
         logArtifacts(synapseRuntimeDeps);
         
         log.debug("Resolving transitive dependencies for " + synapseCore + " ...");
-        try {
-            synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,
-                    synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),
-                    localRepository, remoteArtifactRepositories, artifactMetadataSource, null,
-                    Collections.singletonList(new DebugResolutionListener(logger))).getArtifacts();
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Unable to resolve transitive dependencies for "
-                    + synapseCore);
-        }
+        synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,
+                synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),
+                localRepository, remoteArtifactRepositories, artifactMetadataSource, null,
+                Collections.<ResolutionListener>singletonList(new DebugResolutionListener(logger))).getArtifacts();
         log.debug("All runtime dependencies for " + synapseCore + " :");
         logArtifacts(synapseRuntimeDeps);
         

@@ -840,13 +840,18 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
-                <artifactId>maven-project</artifactId>
+                <artifactId>maven-core</artifactId>
                 <version>${maven.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-artifact</artifactId>
-                <version>${maven.artifact.version}</version>
+                <version>${maven.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-compat</artifactId>
+                <version>${maven.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
@@ -1105,8 +1110,7 @@
         <activation.version>1.1</activation.version>
 
         <!-- Maven Tools -->
-        <maven.version>2.0.7</maven.version>
-        <maven.artifact.version>2.0.8</maven.artifact.version>
+        <maven.version>3.0</maven.version>
         <maven.archiver.version>2.2</maven.archiver.version>
         <plexus.utils.version>1.5.4</plexus.utils.version>
     </properties>

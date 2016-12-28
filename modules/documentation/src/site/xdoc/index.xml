@@ -51,6 +51,14 @@
             <ul>
                 <li>
                     High-performing PassThrough HTTP transport support for all mediation scenarios
+                    <ul><li>Ultra-fast, low latency mediation of HTTP requests</li></ul>
+                    <ul><li>Supporting a very large number of inbound (client -> ESB)
+                        and outbound (ESB -> server) connections concurrently</li></ul>
+                    <ul><li>Intelligently handle message content and content awareness
+                        built into the engine with shared buffer for handling data</li></ul>
+                    <ul><li>Automatic throttling and graceful performance
+                        degradation in the presence of slow or faulty clients and
+                        servers</li></ul>
                 </li>
                 <li>
                     OCSP/CRL certificate validation support for HTTP transports

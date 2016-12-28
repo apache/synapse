@@ -110,11 +110,22 @@
             <artifactId>axis2-codegen</artifactId>
         </dependency>
 
-	<!-- JSON Support --> 
-	<dependency>
-		<groupId>org.apache.axis2</groupId>
-		<artifactId>axis2-json</artifactId>
-	</dependency>
+	    <!-- JSON Support -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-json</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.jettison</groupId>
+                    <artifactId>jettison</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>${jettison.version}</version>
+        </dependency>
 
         <!-- Additional transports -->
         <dependency>

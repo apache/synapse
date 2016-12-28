@@ -18,9 +18,9 @@
   -->
 
 <project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
@@ -102,7 +102,7 @@
             <artifactId>addressing</artifactId>
             <type>mar</type>
         </dependency>
-        
+
         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required
              to deploy some modules => include this explicitly. -->
         <dependency>
@@ -110,7 +110,7 @@
             <artifactId>axis2-codegen</artifactId>
         </dependency>
 
-	    <!-- JSON Support -->
+        <!-- JSON Support -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-json</artifactId>
@@ -143,7 +143,7 @@
             <artifactId>xmltask</artifactId>
             <version>1.14</version>
         </dependency>
-        
+
         <!-- Patches -->
         <dependency>
             <groupId>org.apache.synapse</groupId>
@@ -155,7 +155,7 @@
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency-->
-        
+
         <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->
         <dependency>
             <groupId>org.apache.axis2</groupId>

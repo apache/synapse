@@ -39,7 +39,10 @@
 					<a href="#python">Python Support</a>
 				</li>
 				<li>
-					<a href="#json">JSON Support</a>
+					<a href="#json-syn3">JSON Support on Synapse 3.0.0</a>
+				</li>
+				<li>
+					<a href="#json">JSON Support Prior to Synapse 3.0.0</a>
 				</li>
 			</ul>
 		</section>
@@ -84,12 +87,20 @@
 				</p>
 			</subsection>
 
-			<subsection name="JSON Support" id="json">
+			<subsection name="JSON Support on Synapse 3.0.0" id="json-syn3">
 				<p>
 					<a class="externalLink" href="http://json.org">JSON</a>
 					is a lightweight data-interchange format.
-					It can be used as an alternative to XML or SOAP. To enable the JSON
-					support in Synapse, following two jar files should be deployed into the 'lib'
+					It can be used as an alternative to XML or SOAP. From Synapse 3.0.0 onward, there are no additional
+					steps required to enable JSON.
+
+				</p>
+			</subsection>
+
+			<subsection name="JSON Support Prior to Synapse 3.0.0" id="json">
+				<p>
+					To enable JSON
+					support on Synpase versions prior to 3.0.0, the following two jar files should be deployed into the 'lib'
 					directory of Synapse.
 				</p>
 				<ul>
@@ -97,7 +108,7 @@
 						<a class="externalLink" href="http://repo1.maven.org/maven2/org/apache/axis2/axis2-json">axis2-json.jar</a>
 					</li>
 					<li>
-						<a class="externalLink" href="http://jettison.codehaus.org/Download">jettison.jar</a>
+						<a class="externalLink" href="http://central.maven.org/maven2/org/codehaus/jettison/jettison/">jettison.jar</a>
 					</li>
 				</ul>
                 <p>

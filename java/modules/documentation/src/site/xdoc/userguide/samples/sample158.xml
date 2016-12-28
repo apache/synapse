@@ -78,9 +78,6 @@
                 <p>
                     <ul>
                         <li>
-                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href="setup/script.html#json">Samples Setup Guide</a> for details)
-                        </li>
-                        <li>
                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
                         </li>
                         <li>

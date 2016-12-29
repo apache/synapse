@@ -32,7 +32,7 @@
 			</p>
 			<ul>
 				<li>
-                    A non blocking HTTP transport that gives better performance in a highly
+                    A non-blocking HTTP transport that gives better performance in a highly
                     asynchronous environment like Synapse.
 				</li>
 				<li>
@@ -320,7 +320,7 @@
 					</dt>
 					<dd>
 						A list of content-types for which Synapse shall output a warning when receiving
-						an HTTP 500 response (each value each separated by a |). By default Synapse
+						an HTTP 500 response (each value each separated by a |). By default, Synapse
 						outputs a warning for any HTTP 500 response, irrespective of the content-type.
 						Consequently, also for each SOAP fault a warning will be logged. If only for
 						specific content-types a warning shall be logged, please provide a |-separated
@@ -571,7 +571,7 @@
 					</dt>
 					<dd>
                         A list of content-types for which Synapse shall output a warning when receiving
-                        an HTTP 500 response (each value each separated by a |). By default Synapse
+                        an HTTP 500 response (each value each separated by a |). By default, Synapse
                         outputs a warning for any HTTP 500 response, irrespective of the content-type.
                         Consequently, also for each SOAP fault a warning will be logged. If only for
                         specific content-types a warning shall be logged, please provide a |-separated
@@ -683,7 +683,7 @@
                     file or a directory. The transport listener will periodically poll the specified
                     location and process any file(s) found. After a file has been processed it will be
 					deleted or moved to another location. Note that this is absolutely mandatory to
-                    prevent the listener from processing files multiple times. Therefore the VFS transport
+                    prevent the listener from processing files multiple times. Therefore, the VFS transport
                     listener can only be used in situations where it has write access to the file system
                     location and where deleting or moving the dropped files is acceptable.
 				</p>
@@ -953,7 +953,7 @@
 				<p>
                     The VFS listener will start reading a file as soon as it appears in the configured
                     location. To avoid processing half written files, the creation of these files should
-                    be made atomic. On most platforms this can be achieved by writing the data to a
+                    be made atomic. On most platforms, this can be achieved by writing the data to a
                     temporary file and then moving the file to the target location. Note however that
                     a move operation is only atomic if the source and destination are on the same
                     physical file system. The location for the temporary file should be chosen with
@@ -987,7 +987,7 @@
                     To enable the FIX transport, you need to uncomment the FIX transport sender and
                     FIX transport receiver configurations in the SYNAPSE_HOME/repository/conf/axis2.xml.
                     Simply locate and uncomment the FIXTransportSender and FIXTransportListener sample
-                    configurations. Also add the following jars to the Synapse class path
+                    configurations. Also, add the following jars to the Synapse class path
 					(SYNAPSE_HOME/lib directory).
 				</p>
 				<ul>
@@ -1013,7 +1013,7 @@
 						<tt>transport.fix.AcceptorConfigURL</tt>
 					</dt>
 					<dd>
-                        If a service needs to listen to incoming FIX messages from a remote initiator
+                        If a service needs to listen to incoming FIX messages from a remote initiator,
                         then Synapse needs to create an acceptor. This parameter should contain the
                         URL of the file which contains the FIX configuration for the acceptor.
 						(See sample 257)
@@ -1069,7 +1069,7 @@
 					</dt>
 					<dd>
                         If a response FIX message sent from Synapse to a remote FIX engine should be
-                        forwarded from the remote engine to another party this parameter can be used
+                        forwarded from the remote engine to another party, this parameter can be used
                         to set the DeliverToCompID field of the messages at Synapse.
 					</dd>
 					<dt>
@@ -1077,7 +1077,7 @@
 					</dt>
 					<dd>
                         If a response FIX message sent from Synapse to a remote FIX engine should be
-                        forwarded from the remote engine to another party this parameter can be used
+                        forwarded from the remote engine to another party, this parameter can be used
                         to set the DeliverToSubID field of the messages at Synapse.
 					</dd>
 					<dt>
@@ -1085,7 +1085,7 @@
 					</dt>
 					<dd>
                         If a response FIX message sent from Synapse to a remote FIX engine should be
-                        forwarded from the remote engine to another party this parameter can be used
+                        forwarded from the remote engine to another party, this parameter can be used
                         to set the DeliverToLocationID field of the messages at Synapse.
 					</dd>
 					<dt>
@@ -1191,7 +1191,7 @@
                     <dt>
                         <tt>transport.amqp.ConsumerTx</tt>
                     </dt>
-                    <dd>Use transactions at consumer side if set to true. By default this will be
+                    <dd>Use transactions at consumer side if set to true. By default, this will be
                         considered false and explicit acknowledgement will be done</dd>
                     <dt>
                         <tt>transport.amqp.QueueName</tt>
@@ -1215,7 +1215,7 @@
                     </dt>
                     <dd>True if the polling task should wait until it process  the accepted
                         messages. This can be used in conjunction with a single thread polling
-                        task(in the whole transport, i.e. only a single AMQP proxy per flow)
+                        task (in the whole transport, i.e. only a single AMQP proxy per flow)
                         to achieve in order delivery</dd>
                     <dt>
                         <tt>transport.amqp.ConnectionFactoryName</tt>
@@ -1224,16 +1224,16 @@
                     <dt>
                         <tt>transport.amqp.ResponseConnectionFactoryName</tt>
                     </dt>
-                    <dd>In a two-way scenario which connection factory of the senders' should be used
+                    <dd>In a two-way scenario, which connection factory of the senders' should be used
                         to send the response</dd>
                     <dt>
                         <tt>transport.amqp.ScheduledTaskInitialDelay</tt>
                     </dt>
-                    <dd>The initial delay(in milliseconds) that the polling task should delay before initial attempt</dd>
+                    <dd>The initial delay (in milliseconds) that the polling task should delay before initial attempt</dd>
                     <dt>
                         <tt>transport.amqp.ScheduledTaskDelay</tt>
                     </dt>
-                    <dd>The delay(in milliseconds) that the polling task should delay before next attempt.</dd>
+                    <dd>The delay (in milliseconds) that the polling task should delay before next attempt.</dd>
                     <dt>
                         <tt>transport.amqp.ScheduledTaskTimeUnit</tt>
                     </dt>
@@ -1312,7 +1312,7 @@
                     <dt>
                         <tt>semaphore-time-out</tt>
                     </dt>
-                    <dd>A system property to set the time out(in seconds) of semaphore which waits for
+                    <dd>A system property to set the timeout (in seconds) of semaphore which waits for
                     a response.
                     </dd>
                     <dt>
@@ -1321,11 +1321,11 @@
                     <dd>If a polling task encounter an exception due to some reason(most probably
                         due to broker outage) it will be suspended until a successful re-connect.
                         This system property defines the initial duration that the re-connection
-                        check task should should be suspended(1000 ms by default) before next re-try.</dd>
+                        check task should be suspended (1000 ms by default) before next re-try.</dd>
                     <dt>
                         <tt>reconnection-progression-factor</tt>
                     </dt>
-                    <dd>A system property to define the factor(2.0 by default) to multiply the initial
+                    <dd>A system property to define the factor (2.0 by default) to multiply the initial
                         suspended duration to calculate the next suspending duration for the
                         re-connection check task.</dd>
                     <dt>

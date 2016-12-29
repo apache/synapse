@@ -40,8 +40,7 @@
             </p>
             <ul>
                 <li>
-                    A Java runtime - JDK or JRE of version 1.6.x or higher
-                    (1.6.x or 1.7.x is recommended. 1.8.x is not tested enough)
+                    A Java runtime - JDK or JRE of version 1.6.0_23 or higher
                 </li>
                 <li>
                     Apache Ant <a href="http://ant.apache.org">http://ant.apache.org</a>

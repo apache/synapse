@@ -59,8 +59,8 @@
 
             <p>
                 Synapse requires Java 1.6 or higher and has been tested on Java runtime environments
-                from Sun, IBM and Apple. Note that the recommended Java version is 1.7. Synapse is
-                used on various operation systems, including Linux, Mac OS X, Solaris, Windows and AIX,
+                from Sun, IBM and Apple.Synapse is used on various operation systems,
+                including Linux, Mac OS X, Solaris, Windows and AIX,
                 as well as mainframe environments. The recommended operation system for production use
                 is Linux since it offers a wider range of options to tune the TCP/IP stack. This is
                 important to optimize the performance of the NIO HTTP transport.

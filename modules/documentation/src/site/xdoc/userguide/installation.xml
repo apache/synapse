@@ -64,7 +64,7 @@
                             </a>
                         </td>
                         <td>
-                            1.6.0_23 or higher - recommended JDK 1.7.x, untested on JDK 1.8.x (For instructions on setting up the JDK on different
+                            1.6.0_23 or higher (For instructions on setting up the JDK on different
                             operating systems, visit<a
                                 href="http://www.oracle.com/technetwork/java/index.html">
                             Java homepage.

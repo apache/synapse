@@ -55,7 +55,7 @@
 
 						object gives access to the underlying SOAP implementation used -
 						Axis2. A typical mediator would need to manipulate the
-						MessageContext by referring to the SynapseConfiguration. However it
+						MessageContext by referring to the SynapseConfiguration. However, it
 						is strongly recommended that the SynapseConfiguration is not
 						updated by mediator instances as it is shared by all messages, and
 						may be updated by Synapse administration or configuration modules.
@@ -84,7 +84,7 @@ public interface MessageContext {
 
     /**
      * Set or replace the Synapse Configuration instance to be used. May be used to
-     * programatically change the configuration at runtime etc.
+     * programmatically change the configuration at runtime etc.
      *
      * @param cfg The new synapse configuration instance
      */
@@ -476,7 +476,7 @@ public interface MediatorSerializer {
             </p>
             <p>
                 Synapse also comes with a built-in task implementation known as
-                the	MessageInjector.This task can be used to inject messages into
+                the	MessageInjector. This task can be used to inject messages into
                 the service bus	periodically. Refer	sample 300 to see how to use the
                 MessageInjector task.
             </p>

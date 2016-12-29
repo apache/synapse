@@ -36,7 +36,7 @@
             <p>
                 If you are an experienced Synapse developer or already a committer
                 for Synapse, this document might still contain useful information on setting up
-                your working copy of the source code and committing code changes. So feel free to
+                your working copy of the source code and committing code changes. So, feel free to
                 read all the way through.
             </p>
         </section>
@@ -70,7 +70,7 @@
         </section>
         <section name="Interacting with the Code Base Using Subversion" id="subversion">
             <p>
-                Synapse code base is maintained in a Subversion repository. Therefore anybody willing
+                Synapse code base is maintained in a Subversion repository. Therefore, anyone willing
                 to go through the Synapse source code in the development trunk and make contributions
                 should use a Subversion client to interact with the Synapse code base. To learn more
                 about using Subversion or to download the latest client distributions, please visit
@@ -132,13 +132,13 @@
                 <p>
                     Developers and committers making changes to the Synapse code base are highly
                     recommended to always build the source 'WITH' the tests. This will ensure that
-                    changes do not introduce any obvious regression errors. However running all the
+                    changes do not introduce any obvious regression errors. However, running all the
                     tests does not guarantee that a particular change will not introduce any
-                    regressions. Therefore care must be exercised whenever making changes to the
+                    regressions. Therefore, care must be exercised whenever making changes to the
                     existing code.
                 </p>
                 <p>
-                    Synapse source tree is organized into several modules. If required you can build
+                    Synapse source tree is organized into several modules. If required, you can build
                     only a selected module by going into the appropriate module and executing one
                     of the above build commands.
                 </p>
@@ -169,7 +169,7 @@ For Eclipse: mvn eclipse:eclipse</div>
                     run the usual Maven build command.
                 </p>
                 <p>
-                    Synapse integration test suite uses the Maven Surefire plugin. Therefore all
+                    Synapse integration test suite uses the Maven Surefire plugin. Therefore, all
                     tests will generate a report which will be available in the
                     modules/integration/target/surefire-reports directory. If you ever encounter
                     a failure while running the integration tests, this is the first place to check.

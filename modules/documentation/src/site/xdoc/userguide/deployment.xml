@@ -58,8 +58,8 @@
         <section name="Platform requirements" id="Platform_requirements">
 
             <p>
-                Synapse requires Java 1.5 or higher and has been tested on Java runtime environments
-                from Sun, IBM and Apple. Note that the recommended Java version is 1.6. Synapse is
+                Synapse requires Java 1.6 or higher and has been tested on Java runtime environments
+                from Sun, IBM and Apple. Note that the recommended Java version is 1.7. Synapse is
                 used on various operation systems, including Linux, Mac OS X, Solaris, Windows and AIX,
                 as well as mainframe environments. The recommended operation system for production use
                 is Linux since it offers a wider range of options to tune the TCP/IP stack. This is
@@ -145,7 +145,7 @@
             <subsection name="Using the standard binary distribution" id="Using_the_standard_binary_distribution">
                 <p>
                     The easiest way to get started with a stand-alone deployment is using the standard
-                    binary distribution ZIP or tarball (see <a href="download.html">download.html</a>).
+                    binary distribution ZIP or tarball (see <a href="../download.html">download.html</a>).
                     It already contains everything that is needed to run Synapse stand-alone and you
                     only need to customize it according to your requirements:
                 </p>
@@ -322,7 +322,7 @@
                     for released versions.
                 </li>
                 <li>
-                    <a class="externalLink" href="http://hudson.zones.apache.org/hudson/job/Synapse%20-%20Trunk/org.apache.synapse$synapse-war/">http://hudson.zones.apache.org/hudson/job/Synapse%20-%20Trunk/org.apache.synapse$synapse-war/
+                    <a class="externalLink" href="https://builds.apache.org/view/All/job/Synapse%20-%20Trunk/lastBuild/org.apache.synapse$synapse-war/">https://builds.apache.org/view/All/job/Synapse%20-%20Trunk/lastBuild/org.apache.synapse$synapse-war/
                     </a>
                     for snapshot versions.
                 </li>

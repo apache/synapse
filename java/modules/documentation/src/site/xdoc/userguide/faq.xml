@@ -258,11 +258,24 @@
                 </li>
                 <p/>
                 <li>
+                    What is the Passthrough transport?
+                    <ul>
+                        <li>
+                            This is the default HTTP transport used by Apache Synapse. HTTP PassThrough Transport
+                            is a non-blocking HTTP transport implementation based on HTTP Core NIO and specially
+                            designed for streaming messages. It is similar to the old message relay transport,
+                            but it does not care about the content type and simply streams all received messages
+                            through. It also has a simpler and cleaner model for forwarding messages back and forth.
+                            It can be used as an alternative to the NHTTP transport.
+                        </li>
+                    </ul>
+                </li>
+                <p/>
+                <li>
                     What is the NHTTP transport?
                     <ul>
                         <li>
-                           This is the default HTTP transport used by Apache Synapse. NHTTP stands for
-                            non-blocking HTTP. NHTTP transport uses the Java Non-blocking I/O API.
+                            NHTTP stands for non-blocking HTTP. NHTTP transport uses the Java Non-blocking I/O API.
                             This allows the NHTTP transport to scale into handling hundreds of connections
                             without blocking the threads. The server worker threads used by the NHTTP
                             transport do not get blocked on I/O until the Synapse receives responses
@@ -273,7 +286,7 @@
                 </li>
                 <p/>
                 <li>
-                    What is the underlying HTTP library used by the NHTTP transport?
+                    What is the underlying HTTP library used by the NHTTP/Passthrough transport?
                     <ul>
                         <li>
                            NHTTP transport uses the Apache Http Core NIO library underneath. This

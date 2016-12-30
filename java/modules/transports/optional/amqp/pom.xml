@@ -18,15 +18,13 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
 	<parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>synapse-transports</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -42,9 +40,9 @@ under the License.
 
 
 	<scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/amqp</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/amqp</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/amqp</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/amqp</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/amqp</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/transports/core/optional/amqp</url>
     </scm>
 
     <build>
@@ -69,7 +67,7 @@ under the License.
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package></Private-Package>
+                        <Private-Package />
                         <Export-Package>org.apache.synapse.transport.amqp.*</Export-Package>
                         <Import-Package>
                             *;resolution:=optional

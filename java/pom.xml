@@ -1048,7 +1048,7 @@
              maven-antrun-plugin. -->
         <java.version>1.6</java.version>
 
-        <synapse.version>3.0.1-SNAPSHOT</synapse.version>
+	<synapse.version>${project.version}</synapse.version>
 
         <!-- Apache Commons -->
         <commons.dbcp.version>1.3</commons.dbcp.version> <!-- We need this version to support JDK 5 -->

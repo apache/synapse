@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>9</version>
+        <version>18</version>
     </parent>
 
     <groupId>org.apache.synapse</groupId>
@@ -79,9 +79,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
+	<connection>scm:svn:http://svn.apache.org/repos/asf/synapse/branches/3.0</connection>
+	<developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/branches/3.0</developerConnection>
+	<url>http://svn.apache.org/viewvc/synapse/branches/3.0</url>
     </scm>
 
     <organization>

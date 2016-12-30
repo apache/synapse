@@ -18,15 +18,12 @@
   ~  under the License.
   -->
 
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -39,9 +36,9 @@
     <url>http://synapse.apache.org</url>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/core</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/core</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/core</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/core</url>
     </scm>
 
     <build>
@@ -146,16 +143,16 @@
                         <phase>generate-test-resources</phase>
                         <configuration>
                             <tasks>
-                                <echo message="*** Creating a testing repository ***"/>
-                                <mkdir dir="target/test_repos"/>
-                                <mkdir dir="target/test_repos/synapse/modules"/>
-                                <mkdir dir="target/test_repos/synapse/services"/>
-                                <mkdir dir="target/test_repos/client/modules"/>
-                                <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
-                                <mkdir dir="target/library_repos"/>
-                                <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
-                                <copy file="target/synapse-eiptest-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
-                                <copy file="target/synapse-eipcore-lib.zip" todir="target/library_repos"/>
+                                <echo message="*** Creating a testing repository ***" />
+                                <mkdir dir="target/test_repos" />
+                                <mkdir dir="target/test_repos/synapse/modules" />
+                                <mkdir dir="target/test_repos/synapse/services" />
+                                <mkdir dir="target/test_repos/client/modules" />
+                                <mkdir dir="target/test_repos/synapse/synapse-libraries" />
+                                <mkdir dir="target/library_repos" />
+                                <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries" />
+                                <copy file="target/synapse-eiptest-lib.zip" todir="target/test_repos/synapse/synapse-libraries" />
+                                <copy file="target/synapse-eipcore-lib.zip" todir="target/library_repos" />
                             </tasks>
                         </configuration>
                         <goals>

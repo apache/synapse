@@ -24,7 +24,7 @@ under the License.
 	<parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>synapse-transports</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -40,9 +40,9 @@ under the License.
 
 
 	<scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/amqp</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/amqp</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/transports/core/optional/amqp</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/amqp</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/amqp</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/amqp</url>
     </scm>
 
     <build>

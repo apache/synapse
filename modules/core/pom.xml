@@ -162,20 +162,6 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>remove_test_lib</id>
-                        <phase>install</phase>
-                        <configuration>
-                            <tasks>
-                                <delete file="target/synapse-test-lib.zip"/>
-                                <delete file="target/synapse-eiptest-lib.zip"/>
-                                <delete file="target/synapse-eipcore-lib.zip"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>

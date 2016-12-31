@@ -52,7 +52,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>./jars</outputDirectory>
+                            <outputDirectory>./target/jars</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -68,7 +68,7 @@
                         <configuration>
                             <target>
                                 <unjar dest="${project.build.outputDirectory}">
-                                    <fileset dir="${basedir}/jars">
+                                    <fileset dir="${basedir}/target/jars">
                                         <include name="**/*.jar" />
                                     </fileset>
                                 </unjar>

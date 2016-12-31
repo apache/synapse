@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -34,9 +34,9 @@
     <packaging>bundle</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/tasks</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/tasks</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/tasks</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/tasks</url>
     </scm>
 
     <build>

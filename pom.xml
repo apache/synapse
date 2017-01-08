@@ -871,7 +871,12 @@
             <!-- Quickfix/J (FIX Transport) -->
             <dependency>
                 <groupId>org.quickfixj</groupId>
-                <artifactId>quickfixj-all</artifactId>
+                <artifactId>quickfixj-core</artifactId>
+                <version>${qfj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.quickfixj</groupId>
+                <artifactId>quickfixj-messages-all</artifactId>
                 <version>${qfj.version}</version>
             </dependency>
 

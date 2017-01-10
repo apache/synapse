@@ -82,11 +82,6 @@
                         </goals>
                         <configuration>
                             <finalName>synapse</finalName>	
-                            <filters>
-                                <filter>
-                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
-                                </filter>
-                            </filters>
                             <descriptors>
                                 <descriptor>src/test/resources/synapse-libraries/assembly/assemble-lib.xml
                                 </descriptor>
@@ -101,11 +96,6 @@
                         </goals>
                         <configuration>
                             <finalName>synapse</finalName>
-                            <filters>
-                                <filter>
-                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
-                                </filter>
-                            </filters>
                             <descriptors>
                                 <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eiptest-lib.xml
                                 </descriptor>
@@ -120,11 +110,6 @@
                         </goals>
                         <configuration>
                             <finalName>synapse</finalName>
-                            <filters>
-                                <filter>
-                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
-                                </filter>
-                            </filters>
                             <descriptors>
                                 <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml
                                 </descriptor>

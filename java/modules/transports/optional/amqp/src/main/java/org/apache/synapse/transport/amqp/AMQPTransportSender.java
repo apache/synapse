@@ -27,7 +27,6 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.base.AbstractTransportSender;
 import org.apache.axis2.util.MessageContextBuilder;
-import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;
 import org.apache.synapse.transport.amqp.pollingtask.AMQPSimpleConsumerTask;
 import org.apache.synapse.transport.amqp.sendertask.AMQPSender;
@@ -291,7 +290,7 @@ public class AMQPTransportSender extends AbstractTransportSender {
             }
             responseMsgCtx.setProperty(
                     Constants.Configuration.CHARACTER_SET_ENCODING,
-                    contentType.indexOf(HTTP.CHARSET_PARAM) > 0
+                    contentType.indexOf("; charset=") > 0
                             ? charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);
             responseMsgCtx.setProperty(
                     MessageContext.TRANSPORT_HEADERS, message.getHeaders());

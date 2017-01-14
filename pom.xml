@@ -1056,17 +1056,6 @@
                 <updatePolicy>interval:10080</updatePolicy>
             </snapshots>
         </repository>
-        <repository>
-            <id>snmp4j-repo</id>
-            <name>SNMP4J Repository</name>
-            <url>https://oosnmp.net/dist/release/</url>
-            <releases>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
     <modules>
@@ -1150,8 +1139,8 @@
         <qfj.version>1.6.2</qfj.version>
         <wso2uri-template.version>1.0.0</wso2uri-template.version>
         <activemq.version>5.2.0</activemq.version>
-        <snmp4j.version>2.0.3</snmp4j.version>
-        <snmp4j.agent.version>2.0.5</snmp4j.agent.version>
+        <snmp4j.version>2.5.4</snmp4j.version>
+        <snmp4j.agent.version>2.5.3</snmp4j.agent.version>
         <rabbitmq.version>3.1.2</rabbitmq.version>
         <bcprov.nhttp.version>1.49</bcprov.nhttp.version>
 

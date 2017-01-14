@@ -27,8 +27,8 @@ import org.snmp4j.agent.CommandProcessor;
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.ManagedObject;
 import org.snmp4j.agent.io.ImportModes;
-import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.agent.mo.snmp.*;
+import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB.SnmpCommunityEntryRow;
 import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.mp.MPv3;
 import org.snmp4j.mp.SnmpConstants;
@@ -252,7 +252,7 @@ class SNMPAgent extends BaseAgent {
                 new Integer32(StorageType.nonVolatile),  // storage type
                 new Integer32(RowStatus.active)          // row status
         };
-        MOTableRow row =
+        SnmpCommunityEntryRow row =
                 communityMIB.getSnmpCommunityEntry().createRow(
                         new OctetString(COMMUNITY_RECORD).toSubIndex(true), com2sec);
         communityMIB.getSnmpCommunityEntry().addRow(row);

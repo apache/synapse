@@ -110,7 +110,7 @@ public class SimpleURLRegistryTest extends TestCase {
         props.put("cachableDuration", "1500");
         reg.init(props);
         
-        OMNode node = reg.lookup(FILE2);
+        OMContainer node = (OMContainer)reg.lookup(FILE2);
         node.serialize(new NullOutputStream());
     }
 

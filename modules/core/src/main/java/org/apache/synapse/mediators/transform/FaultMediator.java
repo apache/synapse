@@ -358,7 +358,7 @@ public class FaultMediator extends AbstractMediator {
     private void setFaultNode(SOAPFactory factory, SOAPFault fault) {
         if (faultNode != null) {
             SOAPFaultNode soapfaultNode = factory.createSOAPFaultNode();
-            soapfaultNode.setNodeValue(faultNode.toString());
+            soapfaultNode.setFaultNodeValue(faultNode.toString());
             fault.setNode(soapfaultNode);
         }
     }

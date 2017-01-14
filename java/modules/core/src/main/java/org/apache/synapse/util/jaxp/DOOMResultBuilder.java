@@ -27,7 +27,7 @@ import javax.xml.transform.dom.DOMResult;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.dom.jaxp.DOOMDocumentBuilderFactory;
+import org.apache.axiom.om.dom.DOMMetaFactory;
 import org.apache.axiom.om.util.ElementHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,8 +45,10 @@ public class DOOMResultBuilder implements ResultBuilder {
     private Document document;
 
     public Result getResult() {
+        DOMMetaFactory domMetaFactory
+                = ((DOMMetaFactory)OMAbstractFactory.getMetaFactory(OMAbstractFactory.FEATURE_DOM));
         try {
-            document = new DOOMDocumentBuilderFactory().newDocumentBuilder().newDocument();
+            document = domMetaFactory.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
             handleException("Unable to create empty DOOM document", e);
         }

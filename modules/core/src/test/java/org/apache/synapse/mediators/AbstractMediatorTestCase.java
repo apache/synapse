@@ -21,13 +21,7 @@ package org.apache.synapse.mediators;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.config.SynapseConfigUtils;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import java.io.StringReader;
 
 public abstract class AbstractMediatorTestCase extends TestCase {
 

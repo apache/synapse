@@ -1361,6 +1361,13 @@
 	    <organization>WSO2</organization>
 	    <url>https://linkedin.com/in/rundupitiya</url>
         </developer>
+        <developer>
+            <name>Vanjikumaran Sivajothy</name>
+            <id>vanji</id>
+            <email>vanji AT apache.org</email>
+            <organization>WSO2</organization>
+            <url>https://www.linkedin.com/in/vanjikumaran</url>
+        </developer>
     </developers>
 
     <contributors>
@@ -1375,9 +1382,6 @@
         </contributor>
         <contributor>
             <name>Dave Irving</name>
-        </contributor>
-        <contributor>
-            <name>Vanjikumaran Sivajothy</name>
         </contributor>
         <contributor>
             <name>Prabath Ariyarathna</name>

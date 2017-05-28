@@ -31,10 +31,9 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.soap.SOAP11Version;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPVersion;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -99,13 +98,7 @@ public class PayloadHelper {
 		SOAPBody body = envelope.getBody();
 		if (body == null) {
 
-			SOAPVersion version = envelope.getVersion();
-			if (version.getEnvelopeURI().equals(
-					SOAP11Version.SOAP_ENVELOPE_NAMESPACE_URI)) {
-				body = OMAbstractFactory.getSOAP11Factory().createSOAPBody();
-			} else {
-				body = OMAbstractFactory.getSOAP12Factory().createSOAPBody();
-			}
+			body = ((SOAPFactory)envelope.getOMFactory()).createSOAPBody();
 			if (envelope.getHeader() != null) {
 				envelope.getHeader().insertSiblingAfter(body);
 			} else {

@@ -276,6 +276,7 @@
                         <li><a href="samples/sample702.html">Sample 702: Introduction to Message Forwarding Processor</a></li>
                         <li><a href="samples/sample703.html">Sample 703: Introduction to Message Resequencing Processor</a></li>
                         <li><a href="samples/sample704.html">Sample 704: Invoke Secured Services with Scheduled Message Forwarding Processor</a></li>
+                        <li><a href="samples/sample705.html">Sample 705: Introduction to Message Forwarding Processor With Advance Parameters</a></li>
                     </ul>
                 </p>
             </subsection>

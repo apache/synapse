@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<document>
+    <properties>
+        <title>Apache Synapse - Sample 705</title>
+    </properties>
+    <body>
+        <section name="Sample 705: Introduction to Message Forwarding Processor With Advance Parameters">
+            <div class="xmlConf">&lt;!-- Introduction to Message Forwarding Processor With max deliver attempt and drop
+                the message after max deliver attempt--&gt;
+                &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+                &lt;endpoint name="StockQuoteServiceEp"&gt;
+                &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"&gt;
+                &lt;suspendOnFailure&gt;
+                &lt;errorCodes&gt;-1&lt;/errorCodes&gt;
+                &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt;
+                &lt;/suspendOnFailure&gt;
+                &lt;/address&gt;
+                &lt;/endpoint&gt;
+                &lt;sequence name="fault"&gt;
+                &lt;log level="full"&gt;
+                &lt;property name="MESSAGE" value="Executing default 'fault' sequence"/&gt;
+                &lt;property name="ERROR_CODE" expression="get-property('ERROR_CODE')"/&gt;
+                &lt;property name="ERROR_MESSAGE" expression="get-property('ERROR_MESSAGE')"/&gt;
+                &lt;/log&gt;
+                &lt;drop/&gt;
+                &lt;/sequence&gt;
+                &lt;sequence name="main"&gt;
+                &lt;in&gt;
+                &lt;log level="full"/&gt;
+                &lt;property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/&gt;
+                &lt;property name="OUT_ONLY" value="true"/&gt;
+                &lt;property name="target.endpoint" value="StockQuoteServiceEp"/&gt;
+                &lt;store messageStore="MyStore"/&gt;
+                &lt;/in&gt;
+                &lt;description&gt;The main sequence for the message mediation&lt;/description&gt;
+                &lt;/sequence&gt;
+                &lt;messageStore name="MyStore"/&gt;
+                &lt;messageProcessor
+                class="org.apache.synapse.message.processors.forward.ScheduledMessageForwardingProcessor"
+                name="ScheduledProcessor" messageStore="MyStore"&gt;
+                &lt;parameter name="interval"&gt;10000&lt;/parameter&gt;
+                &lt;parameter name="max.deliver.attempts"&gt;3&lt;/parameter&gt;
+                &lt;parameter name="max.deliver.drop"&gt;true&lt;/parameter&gt;
+                &lt;/messageProcessor&gt;
+                &lt;/definitions&gt;
+            </div>
+            <subsection name="Objective">
+                <p>
+                    Introduction to Synapse Scheduled Message Forwarding Processor with advance parameters (max deliver
+                    attempt and drop the message after max deliver attempt)
+                </p>
+            </subsection>
+            <subsection name="Pre-requisites">
+                <p>
+                    <ul>
+                        <li>
+                            Start Synapse using the configuration numbered 705 (repository/conf/sample/synapse_sample_705.xml)
+                            <div class="command">
+                                Unix/Linux: sh synapse.sh -sample 705<br/>
+                                Windows: synapse.bat -sample 705
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </subsection>
+            <subsection name="Executing the Client">
+                <p>
+                    Execute the sample client a few times with the following command.
+                </p>
+                <div class="command">
+                    ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/ -Dmode=placeorder
+                </div>
+
+                <p>
+                    When you start to send request to synapse from client, you will see message forwarding processor without
+                    getting deactivate it keep on processing. This is due to the message will be dropped from the message store after
+                    the maximum number of delivery attempts are made, and the message processor will remain activated.
+
+                    "max.deliver.drop" parameter would have no effect when no value is specified for the Maximum Delivery Attempts parameter.
+                    If this parameter is disabled, the undeliverable message will not be dropped and the message processor will be deactivated.
+                </p>
+            </subsection>
+        </section>
+        <p>
+            <a href="../samples.html">Back to Catalog</a>
+        </p>
+    </body>
+</document>

@@ -60,4 +60,9 @@ public final class ForwardingProcessorConstants {
      */
     public static final String DEACTIVATE_SEQUENCE = "message.processor.deactivate.sequence";
 
+    /**
+     * Used to determine the message drop after maximum delivery
+     */
+    public static final String MAX_DELIVER_DROP = "max.deliver.drop";
+
 }

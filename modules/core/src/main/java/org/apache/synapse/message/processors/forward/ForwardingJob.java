@@ -62,6 +62,9 @@ public class ForwardingJob implements StatefulJob {
                 ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
 
         int maxDeliverAttempts = -1;
+
+        boolean isMaxDeliverAttemptDropEnabled = false;
+
         String mdaParam = null;
         if (parameters != null) {
             mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);
@@ -74,6 +77,13 @@ public class ForwardingJob implements StatefulJob {
             if(maxDeliverAttempts == 0) {
                 processor.deactivate();
             }
+        }
+        if (maxDeliverAttempts > 0 && parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP) != null &&
+                parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP).toString()
+                        .equalsIgnoreCase("true")) {
+	        //Configuration to continue the message processor even without stopping the message processor
+	        // after maximum number of delivery
+            isMaxDeliverAttemptDropEnabled = true;
         }
 
         // WE do not try to process if the processor is inactive or
@@ -199,7 +209,14 @@ public class ForwardingJob implements StatefulJob {
                             if (maxDeliverAttempts > 0) {
                                 processor.incrementSendAttemptCount();
                                 if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
-                                    deactivate(processor, messageContext, parameters);
+                                    if (isMaxDeliverAttemptDropEnabled) {
+                                        //Since explicitly enabled the message drop after max delivery attempt
+                                        // message has been removed and reset the delivery attempt count of the processor
+                                        processor.resetSentAttemptCount();
+                                        messageStore.poll();
+                                    } else {
+                                        deactivate(processor, messageContext, parameters);
+                                    }
                                 }
                             }
                             errorStop = true;

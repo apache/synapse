@@ -1095,7 +1095,7 @@
         <commons.pool.version>1.5.7</commons.pool.version>
         <commons.vfs.version>2.0</commons.vfs.version>
         <commons.net.version>3.0.1</commons.net.version>
-        <commons.collections.version>3.2.1</commons.collections.version>
+        <commons.collections.version>3.2.2</commons.collections.version>
         <commons.io.version>2.1</commons.io.version>
         <commons.cli.version>1.2</commons.cli.version>
         <commons.lang.version>2.6</commons.lang.version>

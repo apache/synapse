@@ -1368,6 +1368,12 @@
             <organization>WSO2</organization>
             <url>https://www.linkedin.com/in/vanjikumaran</url>
         </developer>
+        <developer>
+            <name>Prabath Ariyarathna</name>
+            <id>prabathar</id>
+            <email>prabathar AT apache.org</email>
+            <organization>Apache</organization>
+        </developer>
     </developers>
 
     <contributors>
@@ -1382,9 +1388,6 @@
         </contributor>
         <contributor>
             <name>Dave Irving</name>
-        </contributor>
-        <contributor>
-            <name>Prabath Ariyarathna</name>
         </contributor>
         <contributor>
             <name>Senduran Balasubramaniyam</name>

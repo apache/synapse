@@ -81,25 +81,25 @@
                 'ant'. You will see an output similar to the following as the service is built
                 and deployed to the sample Axis2 server.
             </p>
-            <div class="consoleOutput">user@domain:/opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService$ ant
+            <div class="consoleOutput">user@domain:/opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService$ ant
 Buildfile: build.xml
 
 clean:
 
 init:
-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp
-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/repository/services
+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp
+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/repository/services
 
 compile-all:
-[javac] Compiling 9 source files to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
+[javac] Compiling 9 source files to /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes
 
 build-service:
-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-[copy] Copying 1 file to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
-[copy] Copying 9 files to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
-[jar] Building jar: /opt/synapse-3.0.0/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+[copy] Copying 1 file to /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF
+[copy] Copying 9 files to /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote
+[jar] Building jar: /opt/synapse-3.0.1/samples/axis2Server/repository/services/SimpleStockQuoteService.aar
 
 BUILD SUCCESSFUL
 Total time: 1 second</div>
@@ -144,14 +144,14 @@ Total time: 1 second</div>
                 above configuration.
             </p>
             <div class="consoleOutput">Starting Synapse/Java ...
-Using SYNAPSE_HOME:    /opt/synapse-3.0.0
+Using SYNAPSE_HOME:    /opt/synapse-3.0.1
 Using JAVA_HOME:       /opt/jdk1.7.0_79
-Using SYNAPSE_XML:     /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml
+Using SYNAPSE_XML:     /opt/synapse-3.0.1/repository/conf/sample/synapse_sample_0.xml
 2016-12-28 10:38:00,456 [-] [main]  INFO SynapseServer Starting Apache Synapse...
-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Synapse home : /opt/synapse-3.0.0
-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Axis2 repository : /opt/synapse-3.0.0/repository
-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using axis2.xml location : /opt/synapse-3.0.0/repository/conf/axis2.xml
-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using synapse.xml location : /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Synapse home : /opt/synapse-3.0.1
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Axis2 repository : /opt/synapse-3.0.1/repository
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using axis2.xml location : /opt/synapse-3.0.1/repository/conf/axis2.xml
+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using synapse.xml location : /opt/synapse-3.0.1/repository/conf/sample/synapse_sample_0.xml
 2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using server name : localhost
 2016-12-28 10:38:00,493 [-] [main]  INFO SynapseControllerFactory The timeout handler will run every : 15s
 2016-12-28 10:38:00,566 [-] [main]  INFO Axis2SynapseController Initializing Synapse at : Wed Dec 28 10:38:00 IST 2016
@@ -166,7 +166,7 @@ Using SYNAPSE_XML:     /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_
 2016-12-28 10:38:01,429 [-] [main]  INFO PassThroughHttpSSLListener Loading Trust Keystore from : lib/trust.jks
 2016-12-28 10:38:01,443 [-] [main]  INFO Axis2SynapseController Loading mediator extensions...
 2016-12-28 10:38:01,451 [-] [main]  INFO XMLConfigurationBuilder Generating the Synapse configuration model by parsing the XML configuration
-2016-12-28 10:38:01,506 [-] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml
+2016-12-28 10:38:01,506 [-] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-3.0.1/repository/conf/sample/synapse_sample_0.xml
 2016-12-28 10:38:01,542 [-] [main]  INFO Axis2SynapseController Deploying the Synapse service...
 2016-12-28 10:38:01,563 [-] [main]  INFO Axis2SynapseController Deploying Proxy services...
 2016-12-28 10:38:01,563 [-] [main]  INFO Axis2SynapseController Deploying EventSources...
@@ -197,13 +197,13 @@ Using SYNAPSE_XML:     /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_
                 <div class="consoleOutput">Buildfile: build.xml
 
 init:
-    [mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Client/target/classes
+    [mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Client/target/classes
 
 compile:
-    [javac] Compiling 22 source files to /opt/synapse-3.0.0/samples/axis2Client/target/classes
-    [javac] Note: /opt/synapse-3.0.0/samples/axis2Client/src/samples/userguide/PWCallback.java uses or overrides a deprecated API.
+    [javac] Compiling 22 source files to /opt/synapse-3.0.1/samples/axis2Client/target/classes
+    [javac] Note: /opt/synapse-3.0.1/samples/axis2Client/src/samples/userguide/PWCallback.java uses or overrides a deprecated API.
     [javac] Note: Recompile with -Xlint:deprecation for details.
-    [javac] Note: /opt/synapse-3.0.0/samples/axis2Client/src/samples/userguide/LoadbalanceFailoverClient.java uses unchecked or unsafe operations.
+    [javac] Note: /opt/synapse-3.0.1/samples/axis2Client/src/samples/userguide/LoadbalanceFailoverClient.java uses unchecked or unsafe operations.
     [javac] Note: Recompile with -Xlint:unchecked for details.
 
 stockquote:

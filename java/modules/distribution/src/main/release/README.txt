@@ -1,4 +1,4 @@
-Apache Synapse 3.0 build  (December 2016) - http://synapse.apache.org/
+Apache Synapse 3.0.1 build  (December 2017) - http://synapse.apache.org/
 ------------------------------------------------------------------------------------------
 
 -------------------

@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -32,9 +32,9 @@
     <description>Maven 2 plugin to create Synapse extension archives</description>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/xar-maven-plugin</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/Apache-Synapse-3.0.1/modules/xar-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/Apache-Synapse-3.0.1/modules/xar-maven-plugin</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/tags/Apache-Synapse-3.0.1/modules/xar-maven-plugin</url>
     </scm>
     
     <dependencies>

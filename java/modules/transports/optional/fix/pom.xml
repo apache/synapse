@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>synapse-transports</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -34,9 +34,9 @@
     <packaging>bundle</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/Apache-Synapse-3.0.1/modules/transports/optional/fix</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/Apache-Synapse-3.0.1/modules/transports/optional/fix</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/tags/Apache-Synapse-3.0.1/transports/core/optional/fix</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>
+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>
     </scm>
 
     <build>

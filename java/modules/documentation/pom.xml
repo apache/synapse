@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -34,10 +34,10 @@
     <description>Apache Synapse - Documentation Pack</description>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation
+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/Apache-Synapse-3.0.1/modules/documentation</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/Apache-Synapse-3.0.1/modules/documentation
         </developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/documentation</url>
+        <url>http://svn.apache.org/viewvc/synapse/tags/Apache-Synapse-3.0.1/modules/documentation</url>
     </scm>
 
     <build>

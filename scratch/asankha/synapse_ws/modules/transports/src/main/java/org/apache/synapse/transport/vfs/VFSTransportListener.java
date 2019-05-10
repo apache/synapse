@@ -352,8 +352,9 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
             } catch (FileSystemException ignore) {}
 
             // compute the unique message ID
-            String messageId = filePath + "_" + fileName +
-                "_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
+            Random rand = new Random();
+	    String messageId = filePath + "_" + fileName +
+                "_" + System.currentTimeMillis() + "_" + (int) rand.nextDouble()  * 1000;
 
             String contentType = entry.getContentType();
             if (!BaseUtils.isValid(contentType)) {

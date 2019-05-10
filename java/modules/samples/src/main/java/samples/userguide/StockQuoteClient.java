@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-
+import java.util.Random;
 /**
  * See build.xml for options
  */
@@ -255,7 +255,8 @@ public class StockQuoteClient {
     }
 
     private static double getRandom(double base, double variance, boolean onlyPositive) {
-        double rand = Math.random();
+	Random r = new Random();
+        double rand = r.nextDouble();
         return (base + ((rand > 0.5 ? 1 : -1) * variance * base * rand))
                 * (onlyPositive ? 1 : (rand > 0.5 ? 1 : -1));
     }

@@ -32,6 +32,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 
 import java.io.IOException;
+import java.util.Random;
 
 /**
  * A generic client for RabbitMQ
@@ -124,7 +125,8 @@ public class RabbitMQAMQPClient {
     }
 
     private static double getRandom(double base, double varience, boolean onlypositive) {
-        double rand = Math.random();
+        Random r = new Random();
+	double rand = r.nextDouble();
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
                 * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
     }

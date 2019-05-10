@@ -18,6 +18,7 @@
  */
 package samples.userguide;
 
+import java.util.Random;
 import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -120,7 +121,8 @@ public class GenericJMSClient {
     }
 
     private static double getRandom(double base, double varience, boolean onlypositive) {
-        double rand = Math.random();
+	Random r = new Random();
+        double rand = r.nextDouble();
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
             * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
     }

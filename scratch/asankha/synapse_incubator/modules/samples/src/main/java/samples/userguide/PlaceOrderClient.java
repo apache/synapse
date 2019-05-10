@@ -18,6 +18,8 @@
  */
 package samples.userguide;
 
+import java.util.Random;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -60,7 +62,8 @@ public class PlaceOrderClient {
     }
 
     private static double getRandom(double base, double varience, boolean onlypositive) {
-        double rand = Math.random();
+	Random r = new Random();
+        double rand = r.nextDouble();
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
             * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
     }

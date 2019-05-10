@@ -36,6 +36,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.util.UUIDGenerator;
 import samples.common.StockQuoteHandler;
 
+import java.util.Random;
 import java.net.URL;
 import java.io.File;
 
@@ -229,7 +230,8 @@ public class StockQuoteClient {
     }
 
     private static double getRandom(double base, double varience, boolean onlypositive) {
-        double rand = Math.random();
+	Random r = new Random();
+        double rand = r.nextDouble();
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
                 * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
     }

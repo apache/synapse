@@ -38,7 +38,7 @@
                 </property>
             </activation>
             <repositories>
-                <repository>
+                <!--repository>
                     <id>apache-snapshots</id>
                     <name>Apache Maven 2 Snapshot Repository</name>
                     <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
@@ -46,9 +46,9 @@
                         <updatePolicy>never</updatePolicy>
                     </releases>
                     <snapshots>
-                        <updatePolicy>interval:10080</updatePolicy> <!-- i.e. refresh weekly -->
+                        <updatePolicy>interval:10080</updatePolicy>
                     </snapshots>
-                </repository>
+                </repository-->
             </repositories>
         </profile>
     </profiles>

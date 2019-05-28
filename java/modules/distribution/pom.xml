@@ -158,7 +158,7 @@
 
     <repositories>
         <!-- This is for xmltask -->
-        <repository>
+        <!--repository>
             <id>atlassian-developer-site</id>
             <name>Atlassian Maven 2 Contributor Repository</name>
             <url>http://maven.atlassian.com/repository/public</url>
@@ -168,7 +168,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
+        </repository-->
     </repositories>
 
     <build>

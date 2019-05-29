@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.message.processors.MessageProcessorConsents;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
@@ -79,7 +80,12 @@ public class SamplingJob implements Job {
                                 if (processingSequence != null) {
                                     processingSequence.mediate(messageContext);
                                 }
-                            } catch (Throwable t) {
+                            } catch (SynapseException synError){
+                                if (!messageContext.getFaultStack().isEmpty()) {
+                                    messageContext.getFaultStack().pop().handleFault(messageContext,synError);
+                                }
+                                log.error("Error occurred while executing the message", synError);
+                            }catch (Throwable t) {
                                 log.error("Error occurred while executing the message", t);
                             }
                         }

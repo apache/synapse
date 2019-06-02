@@ -53,6 +53,10 @@ import java.util.Iterator;
  */
 public class RESTUtil {
 
+   private static RequestURIOperationDispatcher requestURIOperationDispatcher = new RequestURIOperationDispatcher();
+   private static HTTPLocationBasedDispatcher httpLocationBasedDispatcher = new HTTPLocationBasedDispatcher();
+   private static RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
+
     /**
      * This method will return the URI part for the GET HTTPRequest by converting
      * the SOAP infoset to the URL-encoded GET format
@@ -295,16 +299,11 @@ public class RESTUtil {
     }
     
     public static void dispatchAndVerify(MessageContext msgContext) throws AxisFault {
-        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
         requestDispatcher.invoke(msgContext);
         AxisService axisService = msgContext.getAxisService();
         if (axisService != null) {
-            HTTPLocationBasedDispatcher httpLocationBasedDispatcher =
-                    new HTTPLocationBasedDispatcher();
             httpLocationBasedDispatcher.invoke(msgContext);
             if (msgContext.getAxisOperation() == null) {
-                RequestURIOperationDispatcher requestURIOperationDispatcher =
-                        new RequestURIOperationDispatcher();
                 requestURIOperationDispatcher.invoke(msgContext);
             }
 

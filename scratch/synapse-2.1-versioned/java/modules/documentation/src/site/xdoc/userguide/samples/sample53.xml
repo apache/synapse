@@ -124,7 +124,7 @@
 [java] Request: 130 ==&gt; Response from server: MyServer2
 ...</div>
                 <p>
-                    You can keep on shutting servers down like this. Client will get a response untill
+                    You can keep on shutting servers down like this. Client will get a response until
                     you shutdown all listed servers. Once all servers are shutdown, the error sequence
                     is triggered and a fault message is sent to the client as follows.
                 </p>

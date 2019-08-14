@@ -36,7 +36,7 @@ public class MediatorPropertySerializer {
 
     /**
      * Serialize all the properties to the given paren element. For each and every
-     * property ther will be a seperate property element created inside the parent element.
+     * property ther will be a separate property element created inside the parent element.
      * 
      * @param parent element to which property elements should be added
      * @param props <code>Collection</code> of propertis

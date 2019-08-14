@@ -25,7 +25,7 @@ import java.util.Collection;
 
 /**
  * This inteface makes an entity to have properties. Usually properties are specified
- * in the XML configuration langugae.
+ * in the XML configuration language.
  */
 public interface PropertyInclude {
     /**

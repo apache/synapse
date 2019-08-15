@@ -1,9 +1,0 @@
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-    
-    <stage name="a" rule-type="all">
-        <rule>
-            <mediator type="class" name="logger" class="logbean.Logger"/>
-            <mediator type="class" name="logger2" class="logbean.Logger"/> 
-        </rule>
-    </stage>
-</synapse>

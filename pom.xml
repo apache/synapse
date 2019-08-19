@@ -76,9 +76,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
+        <connection>scm:git:https://github.com/apache/synapse.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/synapse.git</developerConnection>
+        <url>https://github.com/apache/synapse.git/</url>
     </scm>
 
     <organization>

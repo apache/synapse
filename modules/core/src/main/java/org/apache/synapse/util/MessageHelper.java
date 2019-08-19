@@ -238,6 +238,7 @@ public class MessageHelper {
         // do not copy options from the original
         newMC.setConfigurationContext(ori.getConfigurationContext());
         newMC.setMessageID(UIDGenerator.generateURNString());
+        newMC.setFrom(ori.getFrom());
         newMC.setTo(ori.getTo());
         newMC.setSoapAction(ori.getSoapAction());
 

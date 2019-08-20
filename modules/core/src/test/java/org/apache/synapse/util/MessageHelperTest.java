@@ -47,4 +47,15 @@ public class MessageHelperTest extends TestCase {
         assertNotNull(dh);
         assertEquals("test", dh.getContent());
     }
+
+    // Test for SYNAPSE-1109
+    public void testClonePartiallyWithFrom() throws Exception {
+        String fromValue = "uri://some-from-value";
+        MessageContext origMc = new MessageContext();
+        origMc.setFrom(fromValue);
+        MessageContext newMc = MessageHelper.clonePartially(origMc);
+        Object result = newMc.getFrom();
+        assertEquals(fromValue, result);
+    }
+
 }

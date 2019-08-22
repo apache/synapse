@@ -22,6 +22,7 @@ package org.apache.synapse.util;
 import javax.activation.DataHandler;
 
 import junit.framework.TestCase;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 
 /**
@@ -37,7 +38,7 @@ public class MessageHelperTest extends TestCase {
         Object result = newMc.getProperty(key);
         assertEquals(result, "propValue");
     }
-    
+
     // Regression test for SYNAPSE-309
     public void testClonePartiallyWithAttachments() throws Exception {
         MessageContext origMc = new MessageContext();
@@ -52,10 +53,10 @@ public class MessageHelperTest extends TestCase {
     public void testClonePartiallyWithFrom() throws Exception {
         String fromValue = "uri://some-from-value";
         MessageContext origMc = new MessageContext();
-        origMc.setFrom(fromValue);
+        origMc.setFrom(new EndpointReference(fromValue));
         MessageContext newMc = MessageHelper.clonePartially(origMc);
-        Object result = newMc.getFrom();
-        assertEquals(fromValue, result);
+        EndpointReference result = newMc.getFrom();
+        assertEquals(fromValue, result.getAddress());
     }
 
 }

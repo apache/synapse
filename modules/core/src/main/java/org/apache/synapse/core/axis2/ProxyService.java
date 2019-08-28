@@ -593,8 +593,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         if (wsAddrEnabled) {
             auditInfo("WS-Addressing is enabled for service : " + name);
             try {
-                proxyService.engageModule(axisCfg.getModule(
-                    SynapseConstants.ADDRESSING_MODULE_NAME), axisCfg);
+                proxyService.engageModule(axisCfg.getModule(SynapseConstants.ADDRESSING_MODULE_NAME));
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS Addressing module on proxy service : " + name, axisFault);
             }
@@ -604,8 +603,7 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         if (wsSecEnabled) {
             auditInfo("WS-Security is enabled for service : " + name);
             try {
-                proxyService.engageModule(axisCfg.getModule(
-                    SynapseConstants.SECURITY_MODULE_NAME), axisCfg);
+                proxyService.engageModule(axisCfg.getModule(SynapseConstants.SECURITY_MODULE_NAME));
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS Sec module on proxy service : "
                         + name, axisFault);

@@ -577,7 +577,6 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
                     axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);
                 }
             }
-            this.setRunning(true);
         } catch (AxisFault axisFault) {
             try {
                 if (axisCfg.getService(proxyService.getName()) != null) {

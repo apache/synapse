@@ -475,6 +475,18 @@ public class Axis2SynapseController implements SynapseController {
      * @return SynapseEnvironment instance
      */
     public SynapseEnvironment createSynapseEnvironment() {
+        synapseEnvironment = new Axis2SynapseEnvironment(
+            configurationContext, synapseConfiguration, serverContextInformation);
+        MessageContextCreatorForAxis2.setSynEnv(synapseEnvironment);
+
+        Parameter synapseEnvironmentParameter = new Parameter(
+            SynapseConstants.SYNAPSE_ENV, synapseEnvironment);
+        try {
+            configurationContext.getAxisConfiguration().addParameter(synapseEnvironmentParameter);
+        } catch (AxisFault e) {
+            handleFatal("Could not set parameter '" + SynapseConstants.SYNAPSE_ENV +
+                "' to the Axis2 configuration : " + e.getMessage(), e);
+        }
 
         try {
             deploySynapseService();
@@ -483,20 +495,6 @@ public class Axis2SynapseController implements SynapseController {
         } catch (AxisFault axisFault) {
             log.fatal("Synapse startup failed...", axisFault);
             throw new SynapseException("Synapse startup failed", axisFault);
-        }
-
-        synapseEnvironment = new Axis2SynapseEnvironment(
-                configurationContext, synapseConfiguration, serverContextInformation);
-        MessageContextCreatorForAxis2.setSynEnv(synapseEnvironment);
-
-        Parameter synapseEnvironmentParameter = new Parameter(
-                SynapseConstants.SYNAPSE_ENV, synapseEnvironment);
-        try {
-            configurationContext.getAxisConfiguration().addParameter(synapseEnvironmentParameter);
-        } catch (AxisFault e) {
-            handleFatal("Could not set parameter '" + SynapseConstants.SYNAPSE_ENV +
-                    "' to the Axis2 configuration : " + e.getMessage(), e);
-
         }
 
         synapseEnvironment.getTaskManager().init(taskDescriptionRepository, taskScheduler);
@@ -778,7 +776,9 @@ public class Axis2SynapseController implements SynapseController {
                         configurationContext.getAxisConfiguration());
                 if (proxyService != null) {
                     log.info("Deployed Proxy service : " + proxy.getName());
-                    if (!proxy.isStartOnLoad()) {
+                    if (proxy.isStartOnLoad()) {
+                        proxy.start(synapseConfiguration);
+                    } else {
                         proxy.stop(synapseConfiguration);
                     }
                 } else {

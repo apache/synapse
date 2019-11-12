@@ -291,7 +291,9 @@ public class RelayUtils {
             InputStream in = pipe.getInputStream();
             if (in != null) {
                 try {
-                    IOUtils.copy(in, new NullOutputStream());
+                    if (pipe.isConsumeRequired()) {
+                        IOUtils.copy(in, new NullOutputStream());
+                    }
                 } catch (IOException exception) {
                     handleException("Error when consuming the input stream to discard ", exception);
                 }

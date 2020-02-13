@@ -234,6 +234,8 @@ public class ClientWorker implements Runnable {
             log.error("Fault creating response SOAP envelope", af);            
         } catch (IOException e) {
             log.error("Error closing input stream from which message was read", e);
+        } finally {
+            cleanup();
         }
     }
 
@@ -251,6 +253,14 @@ public class ClientWorker implements Runnable {
         }
         // Unable to determine the content type - Return default value
         return PassThroughConstants.DEFAULT_CONTENT_TYPE;
+    }
+
+    /**
+     * Perform cleanup of ClientWorker
+     */
+    private void cleanup () {
+        //clean threadLocal variables
+        responseMsgCtx.destroyCurrentMessageContext();
     }
 
 }

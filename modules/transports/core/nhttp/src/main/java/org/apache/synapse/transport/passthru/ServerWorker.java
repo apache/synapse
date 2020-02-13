@@ -107,110 +107,114 @@ public class ServerWorker implements Runnable {
     }
 
     public void run() {
-        if (log.isDebugEnabled()) {
-            log.debug("Starting a new Server Worker instance");
-        }
-        ConfigurationContext cfgCtx = sourceConfiguration.getConfigurationContext();        
-        msgContext.setProperty(Constants.Configuration.HTTP_METHOD, request.getMethod());
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Starting a new Server Worker instance");
+            }
+            ConfigurationContext cfgCtx = sourceConfiguration.getConfigurationContext();
+            msgContext.setProperty(Constants.Configuration.HTTP_METHOD, request.getMethod());
 
-        String method = request.getRequest() != null ?
-                request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
-        
-        String uri = request.getUri();
-        String oriUri = uri;
-        
-        if (uri.contains(cfgCtx.getServicePath())) {
-            // discard up to servicePath
-            uri = uri.substring(uri.indexOf(cfgCtx.getServicePath()) +
-                    cfgCtx.getServicePath().length());
-            // discard [proxy] service name if any
-            int pos = uri.indexOf("/", 1);
-            if (pos > 0) {
-                uri = uri.substring(pos);
-            } else {
-                pos = uri.indexOf("?");
-                if (pos != -1) {
+            String method = request.getRequest() != null ?
+                    request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
+
+            String uri = request.getUri();
+            String oriUri = uri;
+
+            if (uri.contains(cfgCtx.getServicePath())) {
+                // discard up to servicePath
+                uri = uri.substring(uri.indexOf(cfgCtx.getServicePath()) +
+                        cfgCtx.getServicePath().length());
+                // discard [proxy] service name if any
+                int pos = uri.indexOf("/", 1);
+                if (pos > 0) {
                     uri = uri.substring(pos);
                 } else {
-                    uri = "";
+                    pos = uri.indexOf("?");
+                    if (pos != -1) {
+                        uri = uri.substring(pos);
+                    } else {
+                        uri = "";
+                    }
                 }
-            }
-        } else {
-            // remove any absolute prefix if any
-            int pos = uri.indexOf("://");
-            if (pos != -1) {
-                uri = uri.substring(pos + 3);
-                pos = uri.indexOf("/");
+            } else {
+                // remove any absolute prefix if any
+                int pos = uri.indexOf("://");
                 if (pos != -1) {
-                    uri = uri.substring(pos + 1);
+                    uri = uri.substring(pos + 3);
+                    pos = uri.indexOf("/");
+                    if (pos != -1) {
+                        uri = uri.substring(pos + 1);
+                    }
                 }
             }
-        }
 
-        String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));
-        if (!servicePrefix.contains("://")) {
-            HttpInetConnection conn = (HttpInetConnection) request.getConnection();
-            InetAddress localAddress = conn.getLocalAddress();
-            if (localAddress != null) {
-                servicePrefix = (sourceConfiguration.isSsl() ? "https://" : "http://") +
-                        localAddress.getHostAddress() + ":" + conn.getLocalPort() + servicePrefix;
+            String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));
+            if (!servicePrefix.contains("://")) {
+                HttpInetConnection conn = (HttpInetConnection) request.getConnection();
+                InetAddress localAddress = conn.getLocalAddress();
+                if (localAddress != null) {
+                    servicePrefix = (sourceConfiguration.isSsl() ? "https://" : "http://") +
+                            localAddress.getHostAddress() + ":" + conn.getLocalPort() + servicePrefix;
+                }
             }
-        }
-       
-        msgContext.setProperty(PassThroughConstants.SERVICE_PREFIX, servicePrefix);
 
-        msgContext.setTo(new EndpointReference(uri));
-        msgContext.setProperty(PassThroughConstants.REST_URL_POSTFIX, uri);
+            msgContext.setProperty(PassThroughConstants.SERVICE_PREFIX, servicePrefix);
 
-		if (("GET".equals(method) || "DELETE".equals(method)) && httpGetRequestProcessor != null) {
-			HttpResponse response = sourceConfiguration.getResponseFactory().newHttpResponse(
-		                request.getVersion(), HttpStatus.SC_OK,
-		                request.getConnection().getContext());
-			
-			// create a basic HttpEntity using the source channel of the response pipe
-            BasicHttpEntity entity = new BasicHttpEntity();
-            if (request.getVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
-                entity.setChunked(true);
+            msgContext.setTo(new EndpointReference(uri));
+            msgContext.setProperty(PassThroughConstants.REST_URL_POSTFIX, uri);
+
+            if (("GET".equals(method) || "DELETE".equals(method)) && httpGetRequestProcessor != null) {
+                HttpResponse response = sourceConfiguration.getResponseFactory().newHttpResponse(
+                        request.getVersion(), HttpStatus.SC_OK,
+                        request.getConnection().getContext());
+
+                // create a basic HttpEntity using the source channel of the response pipe
+                BasicHttpEntity entity = new BasicHttpEntity();
+                if (request.getVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
+                    entity.setChunked(true);
+                }
+                response.setEntity(entity);
+
+                httpGetRequestProcessor.process(request.getRequest(), response, msgContext,
+                        request.getConnection(), true);
             }
-            response.setEntity(entity);
-            
-			httpGetRequestProcessor.process(request.getRequest(), response, msgContext,
-					request.getConnection(), true);
-		} 
-		
-		//need special case to handle REST
-		boolean restHandle = false;
-		if (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
-                (Boolean) msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
-			msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
-	        msgContext.setServerSide(true);
-	        msgContext.setDoingREST(true);
-	        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-	        SOAPEnvelope soapEnvelope = this.handleRESTUrlPost(contentTypeHeader);
-	        processNonEntityEnclosingRESTHandler(soapEnvelope);
-			restHandle = true;
-		}
-		
-		// If WSDL generation is done then move out rather than hand over to
-		// entity handle methods.
-		SourceContext info = (SourceContext) request.getConnection().getContext().
-                getAttribute(SourceContext.CONNECTION_INFORMATION);
-        Object getHandled = msgContext.getProperty(PassThroughConstants.GET_REQUEST_HANDLED);
-		if ((info != null && info.getState().equals(ProtocolState.GET_REQUEST_COMPLETE)) ||
-                Boolean.TRUE.equals(getHandled)) {
-			return;
-		}
-		
-		//should be process normally
-		if (!restHandle) {
-			if (request.isEntityEnclosing()) {
-				processEntityEnclosingRequest();
-			} else {
-				processNonEntityEnclosingRESTHandler(null);
-			}
-		}
 
-        sendAck();
+            //need special case to handle REST
+            boolean restHandle = false;
+            if (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
+                    (Boolean) msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)) {
+                msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
+                msgContext.setServerSide(true);
+                msgContext.setDoingREST(true);
+                String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                SOAPEnvelope soapEnvelope = this.handleRESTUrlPost(contentTypeHeader);
+                processNonEntityEnclosingRESTHandler(soapEnvelope);
+                restHandle = true;
+            }
+
+            // If WSDL generation is done then move out rather than hand over to
+            // entity handle methods.
+            SourceContext info = (SourceContext) request.getConnection().getContext().
+                    getAttribute(SourceContext.CONNECTION_INFORMATION);
+            Object getHandled = msgContext.getProperty(PassThroughConstants.GET_REQUEST_HANDLED);
+            if ((info != null && info.getState().equals(ProtocolState.GET_REQUEST_COMPLETE)) ||
+                    Boolean.TRUE.equals(getHandled)) {
+                return;
+            }
+
+            //should be process normally
+            if (!restHandle) {
+                if (request.isEntityEnclosing()) {
+                    processEntityEnclosingRequest();
+                } else {
+                    processNonEntityEnclosingRESTHandler(null);
+                }
+            }
+
+            sendAck();
+        } finally {
+            cleanup();
+        }
     }
 
 	/**
@@ -536,5 +540,13 @@ public class ServerWorker implements Runnable {
 
     MessageContext getRequestContext() {
         return msgContext;
+    }
+
+    /**
+     * Perform cleanup of ServerWorker
+     */
+    private void cleanup () {
+        //clean threadLocal variables
+        msgContext.destroyCurrentMessageContext();
     }
 }

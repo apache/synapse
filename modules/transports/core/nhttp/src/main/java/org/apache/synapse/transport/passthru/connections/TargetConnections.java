@@ -98,9 +98,10 @@ public class TargetConnections {
                 log.warn("Connection pool reached maximum allowed connections for: "
                         + host + ":" + port + ". Target server may have become slow");
             }
+        } else {
+            return connection;
         }
-
-        return connection;
+        return null;
     }
 
     /**

@@ -146,12 +146,17 @@ if [ "$1" = "-xdebug" ]; then
     SERVER_NAME=$2
     shift 2 # -serverName and actual name
 
+  elif [ "$1" = "-synapseDebug" ]; then
+    SYNAPSE_DEBUG="synapseDebug"
+    shift
+
 elif [ "$1" = "-h" ]; then
     echo "Usage: synapse.sh ( commands ... )"
     echo "commands:"
     echo "  -xdebug            Start Synapse under JPDA debugger"
     echo "  -sample (number)   Start with sample Synapse configuration of given number"
     echo "  -serverName <name> Name of the Synapse server instance"
+    echo "  -synapseName       Start Synapse under debug mode"
     shift
     exit 0
 
@@ -185,4 +190,5 @@ $JAVA_HOME/bin/java -server -Xms512M -Xmx512M \
         $SYNAPSE_HOME \
         $SYNAPSE_XML \
         $SYNAPSE_HOME/repository \
-        $SERVER_NAME
+        $SERVER_NAME \
+        $SYNAPSE_DEBUG

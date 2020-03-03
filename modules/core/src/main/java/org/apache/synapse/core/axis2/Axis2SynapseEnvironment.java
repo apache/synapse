@@ -81,6 +81,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     Map<QName, SynapseXpathVariableResolver> xpathVariableExtensions =
             new HashMap<QName, SynapseXpathVariableResolver>();
 
+    private boolean synapseDebugMode;
+
     public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
 
         int coreThreads = SynapseThreadPool.SYNAPSE_CORE_THREADS;
@@ -499,7 +501,10 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
          }
     }
 
-
+    @Override
+    public boolean isSynapseDebugMode() {
+        return this.synapseDebugMode;
+    }
 
     private void handleException(String message, Throwable e) {
         log.error(message, e);
@@ -544,5 +549,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             }
         }
         return null;
+    }
+
+    public void setSynapseDebugMode(boolean synapseDebugMode) {
+        this.synapseDebugMode = synapseDebugMode;
     }
 }

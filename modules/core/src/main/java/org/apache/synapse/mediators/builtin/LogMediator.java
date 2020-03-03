@@ -95,6 +95,9 @@ public class LogMediator extends AbstractMediator {
                 break;
             case CATEGORY_DEBUG :
                 synLog.auditDebug(getLogMessage(synCtx));
+                if (synCtx.getEnvironment().isSynapseDebugMode()) {
+                    synLog.auditLog(getLogMessage(synCtx));
+                }
                 break;
             case CATEGORY_WARN :
                 synLog.auditWarn(getLogMessage(synCtx));

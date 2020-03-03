@@ -108,6 +108,8 @@ public class Axis2SynapseController implements SynapseController {
 
     private TaskScheduler taskScheduler;
 
+    private boolean synapseDebugMode;
+
     /**
      * {@inheritDoc}
      *
@@ -503,6 +505,9 @@ public class Axis2SynapseController implements SynapseController {
 
         //we initialize xpath extensions here since synapse environment is available
         initXpathExtensions();
+
+        ((Axis2SynapseEnvironment) synapseEnvironment)
+                .setSynapseDebugMode(serverConfigurationInformation.isSynapseDebug());
 
         return synapseEnvironment;
     }
@@ -1010,5 +1015,13 @@ public class Axis2SynapseController implements SynapseController {
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    public boolean isSynapseDebugMode() {
+        return synapseDebugMode;
+    }
+
+    public void setSynapseDebugMode(boolean synapseDebugMode) {
+        this.synapseDebugMode = synapseDebugMode;
     }
 }

@@ -160,5 +160,11 @@ public interface SynapseEnvironment {
      */
     public Map<QName, SynapseXpathVariableResolver> getXpathVariableExtensions();
 
+    /**
+     * This is used to check if the server instance is started
+     * with synapseDebug mode flag
+     * @return true if the server is started with debug mode
+     */
+    public boolean isSynapseDebugMode();
 
 }

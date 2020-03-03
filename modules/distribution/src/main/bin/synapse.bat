@@ -35,6 +35,7 @@ if ""%1""=="""" goto doneStart
 if ""%1""==""-sample"" goto SYNAPSESample
 if ""%1""==""-serverName"" goto serverName
 if ""%1""==""-xdebug"" goto xdebug
+if ""%1""==""-synapseDebug"" goto synapseDebug
 shift
 goto setupArgs
 
@@ -55,6 +56,11 @@ goto setupArgs
 shift
 set _SERVER_NAME=%1
 shift
+goto setupArgs
+
+:synapseDebug
+shift
+set _SNYPASE_DEBUG="synapseDebug"
 goto setupArgs
 
 :doneStart
@@ -111,7 +117,7 @@ rem
 rem Start the Wrapper
 rem
 :startup
-"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% wrapper.app.parameter.8=%_SERVER_NAME% %_XDEBUG%
+"%_WRAPPER_EXE%" -c %_WRAPPER_CONF% wrapper.app.parameter.5=%_SYNAPSE_XML% wrapper.app.parameter.8=%_SERVER_NAME% wrapper.app.parameter.9=%_SNYPASE_DEBUG% %_XDEBUG%
 
 if not errorlevel 1 goto :eof
 pause

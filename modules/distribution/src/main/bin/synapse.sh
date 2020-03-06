@@ -156,7 +156,7 @@ elif [ "$1" = "-h" ]; then
     echo "  -xdebug            Start Synapse under JPDA debugger"
     echo "  -sample (number)   Start with sample Synapse configuration of given number"
     echo "  -serverName <name> Name of the Synapse server instance"
-    echo "  -synapseName       Start Synapse under debug mode"
+    echo "  -synapseDebug      Start Synapse under debug mode"
     shift
     exit 0
 

@@ -42,6 +42,8 @@ public class ServerContextInformation {
     private ServerState serverState = ServerState.UNDETERMINED;
     /** Reference to the server configuration */
     private ServerConfigurationInformation serverConfigurationInformation;
+    /** whether unit test mode is enabled or not */
+    private boolean isUnitTestModeEnabled=false;
 
     public ServerContextInformation(ServerConfigurationInformation serverConfigurationInformation) {
         this.serverConfigurationInformation = serverConfigurationInformation;
@@ -95,5 +97,13 @@ public class ServerContextInformation {
 
     public ServerConfigurationInformation getServerConfigurationInformation() {
         return serverConfigurationInformation;
+    }
+
+    public boolean isServerUnitTestModeEnabled(){
+        return isUnitTestModeEnabled;
+    }
+
+    public void setServerUnitTestModeEnabled(boolean isUnitTestModeEnabled){
+        this.isUnitTestModeEnabled=isUnitTestModeEnabled;
     }
 }

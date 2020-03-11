@@ -504,6 +504,9 @@ public class Axis2SynapseController implements SynapseController {
         //we initialize xpath extensions here since synapse environment is available
         initXpathExtensions();
 
+        ((Axis2SynapseEnvironment) synapseEnvironment)
+                .setSynapseDebugMode(serverConfigurationInformation.isSynapseDebug());
+
         return synapseEnvironment;
     }
 

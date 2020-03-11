@@ -117,7 +117,11 @@ public class ServerConfigurationInformationFactory {
             information.setSynapseHome(args[2]);
             information.setSynapseXMLLocation(args[3]);
             information.setResolveRoot(args[4]);
-            information.setDeploymentMode(args[5]);
+            if (args[5].equalsIgnoreCase("synapseDebug")) {
+                information.setSynapseDebug(true);
+            } else {
+                information.setDeploymentMode(args[5]);
+            }
         } else if (args.length == 7) {
             information.setAxis2Xml(args[1]);
             information.setSynapseHome(args[2]);

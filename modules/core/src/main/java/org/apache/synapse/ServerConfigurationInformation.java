@@ -61,6 +61,8 @@ public class ServerConfigurationInformation {
     private String ipAddress;
     /* Deployment mode*/
     private String deploymentMode;
+    /* Synapse Debug mode */
+    private boolean synapseDebug;
 
     public ServerConfigurationInformation() {
         initServerHostAndIP();
@@ -231,8 +233,17 @@ public class ServerConfigurationInformation {
         }
     }
 
+    public boolean isSynapseDebug() {
+        return synapseDebug;
+    }
+
+    public void setSynapseDebug(boolean synapseDebug) {
+        this.synapseDebug = synapseDebug;
+    }
+
     public String toString() {
         StringBuffer sb = new StringBuffer();
+        sb.append("[ Synapse Debug Mode: ").append(synapseDebug).append(" ]");
         sb.append("[ Server Name : ").append(serverName).append(" ]");
         sb.append("[ Synapse Home : ").append(synapseHome).append(" ]");
         sb.append("[ Synapse XML : ").append(synapseXMLLocation).append(" ]");

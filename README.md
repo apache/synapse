@@ -1,4 +1,5 @@
 [![CI](https://github.com/apache/synapse/workflows/CI/badge.svg?branch=master)](https://github.com/apache/synapse/actions?query=workflow%3ACI)
+[![Build Status](https://builds.apache.org/job/Synapse%20-%20Trunk/badge/icon)](https://builds.apache.org/job/Synapse%20-%20Trunk/)
 
 
 # Synapse

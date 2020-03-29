@@ -1,6 +1,6 @@
 # This is a workflow to build master at midnight
 
-name: Synapse Daily Build
+name: Synapse Daily Test Build
 
 on:
   schedule:
@@ -37,5 +37,5 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.os }}
-        path: synapse/modules/distribution/target/synapse-*.zip
+        path: modules/distribution/target/synapse-*.zip
 

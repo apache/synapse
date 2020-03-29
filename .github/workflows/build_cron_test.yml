@@ -37,5 +37,5 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.os }}
-        path: modules/distribution/target/synapse-*.zip
+        path: modules/distribution/target/synapse-3.0.2-SNAPSHOT-bin.zip
 

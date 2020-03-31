@@ -412,9 +412,6 @@ public final class SynapseConstants {
 
     public static final String HTTP_SENDER_STATUSCODE = "transport.http.statusCode";
 
-    public static final String HTTP_INTERNAL_SERVER_ERROR = "500";
-    public static final String HTTP_BAD_REQUEST_ERROR = "400";
-
     // Fail-safe mode properties
     public static final String FAIL_SAFE_MODE_STATUS = "failsafe.mode.enable";
     public static final String FAIL_SAFE_MODE_ALL = "all";

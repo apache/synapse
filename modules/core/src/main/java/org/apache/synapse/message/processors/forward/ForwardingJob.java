@@ -288,12 +288,12 @@ public class ForwardingJob implements StatefulJob {
     private void handle400and500statusCodes(MessageContext outCtx) {
         if ((outCtx.getProperty(NhttpConstants.HTTP_SC) != null)) {
             String httpStatusCode =  outCtx.getProperty(NhttpConstants.HTTP_SC).toString();
-            if (httpStatusCode.equals(SynapseConstants.HTTP_INTERNAL_SERVER_ERROR)) {
+            if (httpStatusCode.equals(MessageProcessorConsents.HTTP_INTERNAL_SERVER_ERROR)) {
                 outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
-                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, SynapseConstants.HTTP_INTERNAL_SERVER_ERROR);
-            } else if (httpStatusCode.equals(SynapseConstants.HTTP_BAD_REQUEST_ERROR)) {
+                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConsents.HTTP_INTERNAL_SERVER_ERROR);
+            } else if (httpStatusCode.equals(MessageProcessorConsents.HTTP_BAD_REQUEST_ERROR)) {
                 outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
-                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, SynapseConstants.HTTP_BAD_REQUEST_ERROR);
+                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConsents.HTTP_BAD_REQUEST_ERROR);
             }
         }
     }

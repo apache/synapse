@@ -35,4 +35,10 @@ public final class MessageProcessorConsents {
      */
     public static final String MAX_DELIVER_ATTEMPTS = "max.deliver.attempts";
 
+    /**
+     * HTTP status codes which are used for message processor retry implementation
+     */
+    public static final String HTTP_INTERNAL_SERVER_ERROR = "500";
+    public static final String HTTP_BAD_REQUEST_ERROR = "400";
+
 }

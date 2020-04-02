@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.message.processors.MessageProcessorConsents;
+import org.apache.synapse.message.processors.MessageProcessorConstants;
 import org.apache.synapse.message.processors.ScheduledMessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -58,11 +58,11 @@ public class ResequencingJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
         final JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
-        final MessageStore messageStore = (MessageStore) jdm.get(MessageProcessorConsents.MESSAGE_STORE);
+        final MessageStore messageStore = (MessageStore) jdm.get(MessageProcessorConstants.MESSAGE_STORE);
         final ResequencingProcessor processor = (ResequencingProcessor) jdm.get(
                 ScheduledMessageProcessor.PROCESSOR_INSTANCE);
 
-        final Map<String, Object> parameters = (Map<String, Object>) jdm.get(MessageProcessorConsents.PARAMETERS);
+        final Map<String, Object> parameters = (Map<String, Object>) jdm.get(MessageProcessorConstants.PARAMETERS);
         final String sequence = (String) parameters.get(ResequencingProcessor.NEXT_SEQUENCE);
 
         SynapseXPath seqNoxPath = null;

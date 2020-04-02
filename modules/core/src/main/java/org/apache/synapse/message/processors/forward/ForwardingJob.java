@@ -30,7 +30,7 @@ import org.apache.synapse.core.axis2.Axis2BlockingClient;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.message.processors.MessageProcessorConsents;
+import org.apache.synapse.message.processors.MessageProcessorConstants;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.quartz.JobDataMap;
@@ -58,9 +58,9 @@ public class ForwardingJob implements StatefulJob {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
 
         //Get the Global Objects from DataMap
-        MessageStore messageStore = (MessageStore) jdm.get(MessageProcessorConsents.MESSAGE_STORE);
+        MessageStore messageStore = (MessageStore) jdm.get(MessageProcessorConstants.MESSAGE_STORE);
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(
-                MessageProcessorConsents.PARAMETERS);
+                MessageProcessorConstants.PARAMETERS);
         Axis2BlockingClient sender = (Axis2BlockingClient) jdm.get(
                 ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
         ScheduledMessageForwardingProcessor processor = (ScheduledMessageForwardingProcessor) jdm.get(
@@ -72,7 +72,7 @@ public class ForwardingJob implements StatefulJob {
 
         String mdaParam = null;
         if (parameters != null) {
-            mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);
+            mdaParam = (String) parameters.get(MessageProcessorConstants.MAX_DELIVER_ATTEMPTS);
         }
 
         if (mdaParam != null) {
@@ -288,12 +288,12 @@ public class ForwardingJob implements StatefulJob {
     private void handle400and500statusCodes(MessageContext outCtx) {
         if ((outCtx.getProperty(NhttpConstants.HTTP_SC) != null)) {
             String httpStatusCode =  outCtx.getProperty(NhttpConstants.HTTP_SC).toString();
-            if (httpStatusCode.equals(MessageProcessorConsents.HTTP_INTERNAL_SERVER_ERROR)) {
+            if (httpStatusCode.equals(MessageProcessorConstants.HTTP_INTERNAL_SERVER_ERROR)) {
                 outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
-                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConsents.HTTP_INTERNAL_SERVER_ERROR);
-            } else if (httpStatusCode.equals(MessageProcessorConsents.HTTP_BAD_REQUEST_ERROR)) {
+                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConstants.HTTP_INTERNAL_SERVER_ERROR);
+            } else if (httpStatusCode.equals(MessageProcessorConstants.HTTP_BAD_REQUEST_ERROR)) {
                 outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
-                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConsents.HTTP_BAD_REQUEST_ERROR);
+                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConstants.HTTP_BAD_REQUEST_ERROR);
             }
         }
     }

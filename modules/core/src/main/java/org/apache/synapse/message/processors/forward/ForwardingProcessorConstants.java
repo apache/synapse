@@ -65,4 +65,8 @@ public final class ForwardingProcessorConstants {
      */
     public static final String MAX_DELIVER_DROP = "max.deliver.drop";
 
+    /**
+     * Used to determine for which HTTP status codes, message processor should retry
+     */
+    public static final String RETRY_HTTP_STATUS_CODES = "retry.http.status.codes";
 }

@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.message.processors;
 
-public final class MessageProcessorConsents {
+public final class MessageProcessorConstants {
 
     public static final String MESSAGE_STORE = "message.store";
     public static final String PARAMETERS = "parameters";

@@ -60,13 +60,18 @@
                 &lt;parameter name="interval"&gt;10000&lt;/parameter&gt;
                 &lt;parameter name="max.deliver.attempts"&gt;3&lt;/parameter&gt;
                 &lt;parameter name="max.deliver.drop"&gt;true&lt;/parameter&gt;
+                &lt;parameter name="retry.http.status.codes"&gt;500, 504&lt;/parameter&gt;
                 &lt;/messageProcessor&gt;
                 &lt;/definitions&gt;
             </div>
             <subsection name="Objective">
                 <p>
-                    Introduction to Synapse Scheduled Message Forwarding Processor with advance parameters (max deliver
-                    attempt and drop the message after max deliver attempt)
+                    Introduction to Synapse Scheduled Message Forwarding Processor with following advance parameters
+                    <ul>
+                        <li>max.deliver.attempts</li>
+                        <li>max.deliver.drop</li>
+                        <li>retry.http.status.codes</li>
+                    </ul>
                 </p>
             </subsection>
             <subsection name="Pre-requisites">
@@ -97,6 +102,13 @@
 
                     "max.deliver.drop" parameter would have no effect when no value is specified for the Maximum Delivery Attempts parameter.
                     If this parameter is disabled, the undeliverable message will not be dropped and the message processor will be deactivated.
+                </p>
+                <p>
+                    Message Forwarding Processor by default do not retry for application level failures. It only retries by default when
+                    there is a network level failure. But if the user wants retry based on the application level failures, user can use
+                    "retry.http.status.codes" configuration to do so. Please note that in this context application level failures refers to
+                    HTTP error responses. For instance, in the above example Message Forwarding Processor retries not only for transport
+                    level failures but also for application level failures such as Internal Server Error (500) and Gateway timeout (504).
                 </p>
             </subsection>
         </section>

@@ -162,7 +162,7 @@ public class ForwardingJob implements StatefulJob {
 
             return serverName.equals(myServerName);
         }
-        return false;
+        return true;
     }
 
     /**
@@ -276,21 +276,26 @@ public class ForwardingJob implements StatefulJob {
     }
 
     private void handleError(int maxDeliverAttempts, MessageContext inMsgCtx, MessageContext outCtx) {
-        if (retryForHttpStatusCodes(messageStore, processor, outCtx)) {
-            if (maxDeliverAttempts > 0) {
-                processor.incrementSendAttemptCount();
+        if (isHttpStatusCodeError(outCtx)) {
+            if (isRetryHttpStatusCode(outCtx)) {
+                doPostErrorTasks(maxDeliverAttempts, inMsgCtx, outCtx);
             }
-            sendItToFaultSequence(outCtx);
-            if (maxDeliverAttempts > 0) {
-                if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
-                    deactivate(processor, inMsgCtx);
-                }
-            }
-            errorStop = true;
         } else {
-            messageStore.poll();
-            processor.resetSentAttemptCount();
+            doPostErrorTasks(maxDeliverAttempts, inMsgCtx, outCtx);
         }
+    }
+
+    private void doPostErrorTasks(int maxDeliverAttempts, MessageContext inMsgCtx, MessageContext outCtx) {
+        if (maxDeliverAttempts > 0) {
+            processor.incrementSendAttemptCount();
+        }
+        sendItToFaultSequence(outCtx);
+        if (maxDeliverAttempts > 0) {
+            if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
+                deactivate(processor, inMsgCtx);
+            }
+        }
+        errorStop = true;
     }
 
     private boolean handleOutOnlyError(int maxDeliverAttempts, boolean isMaxDeliverAttemptDropEnabled,
@@ -336,24 +341,22 @@ public class ForwardingJob implements StatefulJob {
         }
     }
 
-    private boolean retryForHttpStatusCodes(MessageStore messageStore, ScheduledMessageForwardingProcessor processor,
-                                            MessageContext outCtx) {
+    private boolean isHttpStatusCodeError(MessageContext outCtx) {
         // No need to retry for application level failures
         if (outCtx.getProperty(SynapseConstants.ERROR_MESSAGE) != null) {
             String errorMsg = outCtx.getProperty(SynapseConstants.ERROR_MESSAGE).toString();
-            if (errorMsg.matches(".*[3-5]\\d\\d.*")) {
-                return isRetryHttpStatusCode(errorMsg);
-            }
+            return errorMsg.matches(".*[3-5]\\d\\d.*");
         }
-        return true;
+        return false;
     }
 
-    private boolean isRetryHttpStatusCode(String message) {
+    private boolean isRetryHttpStatusCode(MessageContext outCtx) {
+        String errorMsg = outCtx.getProperty(SynapseConstants.ERROR_MESSAGE).toString();
         if (retryHttpStatusCodes == null) {
             return false;
         }
         for (String statsCode : retryHttpStatusCodes) {
-            if (message.contains(statsCode)) {
+            if (errorMsg.contains(statsCode)) {
                 return true;
             }
         }

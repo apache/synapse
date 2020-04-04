@@ -255,9 +255,7 @@ public class ForwardingJob implements StatefulJob {
         } else {
             // This Means we have invoked an out only operation
             // remove the message and reset the count
-            messageStore.poll();
-            processor.resetSentAttemptCount();
-            sendResponseToReplySeq(outCtx);
+            doPostSuccessTasks(outCtx);
         }
     }
 
@@ -279,10 +277,18 @@ public class ForwardingJob implements StatefulJob {
         if (isHttpStatusCodeError(outCtx)) {
             if (isRetryHttpStatusCode(outCtx)) {
                 doPostErrorTasks(inMsgCtx, outCtx);
+            } else {
+                doPostSuccessTasks(outCtx);
             }
         } else {
             doPostErrorTasks(inMsgCtx, outCtx);
         }
+    }
+
+    private void doPostSuccessTasks(MessageContext outCtx) {
+        messageStore.poll();
+        processor.resetSentAttemptCount();
+        sendResponseToReplySeq(outCtx);
     }
 
     private void doPostErrorTasks(MessageContext inMsgCtx, MessageContext outCtx) {
@@ -291,26 +297,28 @@ public class ForwardingJob implements StatefulJob {
         }
         sendItToFaultSequence(outCtx);
         if (maxDeliverAttempts > 0) {
-            if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
+            handleMaxDeliveryAttempts(inMsgCtx);
+        }
+        errorStop = true;
+    }
+
+    private void handleMaxDeliveryAttempts(MessageContext inMsgCtx) {
+        if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
+            if (isMaxDeliverAttemptDropEnabled) {
+                //Since explicitly enabled the message drop after max delivery attempt
+                // message has been removed and reset the delivery attempt count of the processor
+                processor.resetSentAttemptCount();
+                messageStore.poll();
+            } else {
                 deactivate(processor, inMsgCtx);
             }
         }
-        errorStop = true;
     }
 
     private boolean handleOutOnlyError(MessageContext inMsgCtx) {
         if (maxDeliverAttempts > 0) {
             processor.incrementSendAttemptCount();
-            if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
-                if (isMaxDeliverAttemptDropEnabled) {
-                    //Since explicitly enabled the message drop after max delivery attempt
-                    // message has been removed and reset the delivery attempt count of the processor
-                    processor.resetSentAttemptCount();
-                    messageStore.poll();
-                } else {
-                    deactivate(processor, inMsgCtx);
-                }
-            }
+            handleMaxDeliveryAttempts(inMsgCtx);
         }
         return true;
     }

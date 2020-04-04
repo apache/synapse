@@ -82,7 +82,7 @@ public class ForwardingJob implements StatefulJob {
                 ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(MessageProcessorConstants.PARAMETERS);
         maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
-        isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters, maxDeliverAttempts);
+        isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters);
         retryHttpStatusCodes(parameters);
         setSequences(parameters);
     }
@@ -104,7 +104,7 @@ public class ForwardingJob implements StatefulJob {
         return maxDeliverAttempts;
     }
 
-    private boolean isMaxDeliverAttemptDropEnabled(Map<String, Object> parameters, int maxDeliverAttempts) {
+    private boolean isMaxDeliverAttemptDropEnabled(Map<String, Object> parameters) {
         boolean isMaxDeliverAttemptDropEnabled = false;
         if (maxDeliverAttempts > 0 && parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP) != null &&
                 parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP).toString()
@@ -243,7 +243,7 @@ public class ForwardingJob implements StatefulJob {
                 processor.resetSentAttemptCount();
             }
         } catch (Exception e) {
-            errorStop = handleOutOnlyError(maxDeliverAttempts, isMaxDeliverAttemptDropEnabled, inMsgCtx);
+            errorStop = handleOutOnlyError(inMsgCtx);
             log.error("Error Forwarding Message ", e);
         }
     }
@@ -251,7 +251,7 @@ public class ForwardingJob implements StatefulJob {
     private void handleResponse(MessageContext inMsgCtx, MessageContext outCtx) {
         handle400and500statusCodes(outCtx);
         if ("true".equals(outCtx.getProperty(SynapseConstants.BLOCKING_CLIENT_ERROR))) {
-            handleError(maxDeliverAttempts, inMsgCtx, outCtx);
+            handleError(inMsgCtx, outCtx);
         } else {
             // This Means we have invoked an out only operation
             // remove the message and reset the count
@@ -275,17 +275,17 @@ public class ForwardingJob implements StatefulJob {
         }
     }
 
-    private void handleError(int maxDeliverAttempts, MessageContext inMsgCtx, MessageContext outCtx) {
+    private void handleError(MessageContext inMsgCtx, MessageContext outCtx) {
         if (isHttpStatusCodeError(outCtx)) {
             if (isRetryHttpStatusCode(outCtx)) {
-                doPostErrorTasks(maxDeliverAttempts, inMsgCtx, outCtx);
+                doPostErrorTasks(inMsgCtx, outCtx);
             }
         } else {
-            doPostErrorTasks(maxDeliverAttempts, inMsgCtx, outCtx);
+            doPostErrorTasks(inMsgCtx, outCtx);
         }
     }
 
-    private void doPostErrorTasks(int maxDeliverAttempts, MessageContext inMsgCtx, MessageContext outCtx) {
+    private void doPostErrorTasks(MessageContext inMsgCtx, MessageContext outCtx) {
         if (maxDeliverAttempts > 0) {
             processor.incrementSendAttemptCount();
         }
@@ -298,8 +298,7 @@ public class ForwardingJob implements StatefulJob {
         errorStop = true;
     }
 
-    private boolean handleOutOnlyError(int maxDeliverAttempts, boolean isMaxDeliverAttemptDropEnabled,
-                                       MessageContext messageContext) {
+    private boolean handleOutOnlyError(MessageContext inMsgCtx) {
         if (maxDeliverAttempts > 0) {
             processor.incrementSendAttemptCount();
             if (processor.getSendAttemptCount() >= maxDeliverAttempts) {
@@ -309,7 +308,7 @@ public class ForwardingJob implements StatefulJob {
                     processor.resetSentAttemptCount();
                     messageStore.poll();
                 } else {
-                    deactivate(processor, messageContext);
+                    deactivate(processor, inMsgCtx);
                 }
             }
         }

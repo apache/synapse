@@ -74,6 +74,70 @@ public class ForwardingJob implements StatefulJob {
         startProcessingMsgs();
     }
 
+    private void configureForwardingJob(JobDataMap jdm) {
+        messageStore = (MessageStore) jdm.get(MessageProcessorConstants.MESSAGE_STORE);
+        sender = (Axis2BlockingClient) jdm.get(
+                ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
+        processor = (ScheduledMessageForwardingProcessor) jdm.get(
+                ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
+        Map<String, Object> parameters = (Map<String, Object>) jdm.get(MessageProcessorConstants.PARAMETERS);
+        maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
+        isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters, maxDeliverAttempts);
+        retryHttpStatusCodes(parameters);
+        setSequences(parameters);
+    }
+
+    private int extractMaxDeliveryAttempts(Map<String, Object> parameters,
+                                           ScheduledMessageForwardingProcessor processor) {
+        int maxDeliverAttempts = -1;
+        String mdaParam = null;
+        if (parameters != null) {
+            mdaParam = (String) parameters.get(MessageProcessorConstants.MAX_DELIVER_ATTEMPTS);
+        }
+        if (mdaParam != null) {
+            maxDeliverAttempts = Integer.parseInt(mdaParam);
+            // Here we look for the edge case
+            if(maxDeliverAttempts == 0) {
+                processor.deactivate();
+            }
+        }
+        return maxDeliverAttempts;
+    }
+
+    private boolean isMaxDeliverAttemptDropEnabled(Map<String, Object> parameters, int maxDeliverAttempts) {
+        boolean isMaxDeliverAttemptDropEnabled = false;
+        if (maxDeliverAttempts > 0 && parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP) != null &&
+                parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP).toString()
+                        .equalsIgnoreCase("true")) {
+            //Configuration to continue the message processor even without stopping the message processor
+            // after maximum number of delivery
+            isMaxDeliverAttemptDropEnabled = true;
+        }
+        return isMaxDeliverAttemptDropEnabled;
+    }
+
+    private void retryHttpStatusCodes(Map<String, Object> parameters) {
+        if (parameters != null && parameters.get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES) != null) {
+            retryHttpStatusCodes = parameters
+                    .get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES).toString().split(",");
+        }
+    }
+
+    private void setSequences(Map<String, Object> parameters) {
+        if (parameters != null) {
+            if (parameters.get(ForwardingProcessorConstants.FAULT_SEQUENCE) != null) {
+                faultSequence = (String) parameters.get(ForwardingProcessorConstants.FAULT_SEQUENCE);
+            }
+            if (parameters.get(ForwardingProcessorConstants.DEACTIVATE_SEQUENCE) != null) {
+                deactivateSequence = (String) parameters.get(ForwardingProcessorConstants.DEACTIVATE_SEQUENCE);
+            }
+            if (parameters.get(ForwardingProcessorConstants.REPLY_SEQUENCE) != null) {
+                replySequence = (String) parameters.get(
+                        ForwardingProcessorConstants.REPLY_SEQUENCE);
+            }
+        }
+    }
+
     private void startProcessingMsgs() {
         errorStop = false;
         while (!errorStop) {
@@ -88,26 +152,11 @@ public class ForwardingJob implements StatefulJob {
         }
     }
 
-    private void configureForwardingJob(JobDataMap jdm) {
-        messageStore = (MessageStore) jdm.get(MessageProcessorConstants.MESSAGE_STORE);
-        sender = (Axis2BlockingClient) jdm.get(
-                ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
-        processor = (ScheduledMessageForwardingProcessor) jdm.get(
-                ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
-        Map<String, Object> parameters = (Map<String, Object>) jdm.get(MessageProcessorConstants.PARAMETERS);
-        maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
-        isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters, maxDeliverAttempts);
-        retryHttpStatusCodes(parameters);
-        setSequences(parameters);
-    }
-
     private boolean isMsgRelatedToThisServer(MessageContext inMsgCtx) {
-        String serverName = (String)
-                inMsgCtx.getProperty(SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
+        String serverName = (String) inMsgCtx.getProperty(SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
         if(serverName != null && inMsgCtx instanceof Axis2MessageContext) {
             AxisConfiguration configuration = ((Axis2MessageContext)inMsgCtx).
-                    getAxis2MessageContext().
-                    getConfigurationContext().getAxisConfiguration();
+                    getAxis2MessageContext().getConfigurationContext().getAxisConfiguration();
             String myServerName = getAxis2ParameterValue(configuration,
                                                          SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME);
 
@@ -116,10 +165,29 @@ public class ForwardingJob implements StatefulJob {
         return false;
     }
 
+    /**
+     * Helper method to get a value of a parameters in the AxisConfiguration
+     *
+     * @param axisConfiguration AxisConfiguration instance
+     * @param paramKey The name / key of the parameter
+     * @return The value of the parameter
+     */
+    private static String getAxis2ParameterValue(AxisConfiguration axisConfiguration, String paramKey) {
+        Parameter parameter = axisConfiguration.getParameter(paramKey);
+        if (parameter == null) {
+            return null;
+        }
+        Object value = parameter.getValue();
+        if (value != null && value instanceof String) {
+            return (String) parameter.getValue();
+        } else {
+            return null;
+        }
+    }
+
     private void handleNewMessage(MessageContext inMsgCtx) {
         sanitizeMsgContext(inMsgCtx);
-        String targetEp =
-                (String) inMsgCtx.getProperty(ForwardingProcessorConstants.TARGET_ENDPOINT);
+        String targetEp = (String) inMsgCtx.getProperty(ForwardingProcessorConstants.TARGET_ENDPOINT);
         if (targetEp != null) {
             Endpoint ep = inMsgCtx.getEndpoint(targetEp);
             // stop processing if endpoint is not ready to send
@@ -149,6 +217,18 @@ public class ForwardingJob implements StatefulJob {
                 proSet.remove(SynapseConstants.BLOCKING_CLIENT_ERROR);
             }
         }
+    }
+
+    private void logMsg(String targetEp, Endpoint ep) {
+        String logMsg;
+        if (ep == null) {
+            logMsg = "Endpoint named " + targetEp + " not found.Hence removing " +
+                    "the message form store";
+        } else {
+            logMsg = "Unsupported endpoint type. Only address/wsdl/default " +
+                    "endpoint types supported";
+        }
+        log.warn(logMsg);
     }
 
     private void sendMsgToEndpoint(MessageContext inMsgCtx, Endpoint ep) {
@@ -181,6 +261,20 @@ public class ForwardingJob implements StatefulJob {
         }
     }
 
+    private void handle400and500statusCodes(MessageContext outCtx) {
+        if ((outCtx.getProperty(NhttpConstants.HTTP_SC) != null)) {
+            String httpStatusCode =  outCtx.getProperty(NhttpConstants.HTTP_SC).toString();
+            if (httpStatusCode.equals(MessageProcessorConstants.HTTP_INTERNAL_SERVER_ERROR)) {
+                outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
+                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
+                                   MessageProcessorConstants.HTTP_INTERNAL_SERVER_ERROR);
+            } else if (httpStatusCode.equals(MessageProcessorConstants.HTTP_BAD_REQUEST_ERROR)) {
+                outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
+                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConstants.HTTP_BAD_REQUEST_ERROR);
+            }
+        }
+    }
+
     private void handleError(int maxDeliverAttempts, MessageContext inMsgCtx, MessageContext outCtx) {
         if (retryForHttpStatusCodes(messageStore, processor, outCtx)) {
             if (maxDeliverAttempts > 0) {
@@ -193,19 +287,10 @@ public class ForwardingJob implements StatefulJob {
                 }
             }
             errorStop = true;
-        }
-    }
-
-    private void logMsg(String targetEp, Endpoint ep) {
-        String logMsg;
-        if (ep == null) {
-            logMsg = "Endpoint named " + targetEp + " not found.Hence removing " +
-                    "the message form store";
         } else {
-            logMsg = "Unsupported endpoint type. Only address/wsdl/default " +
-                    "endpoint types supported";
+            messageStore.poll();
+            processor.resetSentAttemptCount();
         }
-        log.warn(logMsg);
     }
 
     private boolean handleOutOnlyError(int maxDeliverAttempts, boolean isMaxDeliverAttemptDropEnabled,
@@ -251,105 +336,28 @@ public class ForwardingJob implements StatefulJob {
         }
     }
 
-    private void setSequences(Map<String, Object> parameters) {
-        if (parameters != null) {
-            if (parameters.get(ForwardingProcessorConstants.FAULT_SEQUENCE) != null) {
-                faultSequence = (String) parameters.get(ForwardingProcessorConstants.FAULT_SEQUENCE);
-            }
-            if (parameters.get(ForwardingProcessorConstants.DEACTIVATE_SEQUENCE) != null) {
-                deactivateSequence = (String) parameters.get(ForwardingProcessorConstants.DEACTIVATE_SEQUENCE);
-            }
-            if (parameters.get(ForwardingProcessorConstants.REPLY_SEQUENCE) != null) {
-                replySequence = (String) parameters.get(
-                        ForwardingProcessorConstants.REPLY_SEQUENCE);
-            }
-        }
-    }
-
-    private void retryHttpStatusCodes(Map<String, Object> parameters) {
-        if (parameters != null && parameters.get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES) != null) {
-            retryHttpStatusCodes = parameters
-                    .get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES).toString().split(",");
-        }
-    }
-
-    private boolean isMaxDeliverAttemptDropEnabled(Map<String, Object> parameters, int maxDeliverAttempts) {
-        boolean isMaxDeliverAttemptDropEnabled = false;
-        if (maxDeliverAttempts > 0 && parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP) != null &&
-                parameters.get(ForwardingProcessorConstants.MAX_DELIVER_DROP).toString()
-                        .equalsIgnoreCase("true")) {
-	        //Configuration to continue the message processor even without stopping the message processor
-	        // after maximum number of delivery
-            isMaxDeliverAttemptDropEnabled = true;
-        }
-        return isMaxDeliverAttemptDropEnabled;
-    }
-
-    private int extractMaxDeliveryAttempts(Map<String, Object> parameters,
-                                           ScheduledMessageForwardingProcessor processor) {
-        int maxDeliverAttempts = -1;
-        String mdaParam = null;
-        if (parameters != null) {
-            mdaParam = (String) parameters.get(MessageProcessorConstants.MAX_DELIVER_ATTEMPTS);
-        }
-        if (mdaParam != null) {
-            maxDeliverAttempts = Integer.parseInt(mdaParam);
-            // Here we look for the edge case
-            if(maxDeliverAttempts == 0) {
-                processor.deactivate();
-            }
-        }
-        return maxDeliverAttempts;
-    }
-
     private boolean retryForHttpStatusCodes(MessageStore messageStore, ScheduledMessageForwardingProcessor processor,
                                             MessageContext outCtx) {
         // No need to retry for application level failures
         if (outCtx.getProperty(SynapseConstants.ERROR_MESSAGE) != null) {
             String errorMsg = outCtx.getProperty(SynapseConstants.ERROR_MESSAGE).toString();
             if (errorMsg.matches(".*[3-5]\\d\\d.*")) {
-                if (!isRetryHttpStatusCode(errorMsg)) {
-                    messageStore.poll();
-                    processor.resetSentAttemptCount();
-                    return false;
-                }
+                return isRetryHttpStatusCode(errorMsg);
             }
         }
         return true;
     }
 
-    private void handle400and500statusCodes(MessageContext outCtx) {
-        if ((outCtx.getProperty(NhttpConstants.HTTP_SC) != null)) {
-            String httpStatusCode =  outCtx.getProperty(NhttpConstants.HTTP_SC).toString();
-            if (httpStatusCode.equals(MessageProcessorConstants.HTTP_INTERNAL_SERVER_ERROR)) {
-                outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
-                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
-                                   MessageProcessorConstants.HTTP_INTERNAL_SERVER_ERROR);
-            } else if (httpStatusCode.equals(MessageProcessorConstants.HTTP_BAD_REQUEST_ERROR)) {
-                outCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
-                outCtx.setProperty(SynapseConstants.ERROR_MESSAGE, MessageProcessorConstants.HTTP_BAD_REQUEST_ERROR);
+    private boolean isRetryHttpStatusCode(String message) {
+        if (retryHttpStatusCodes == null) {
+            return false;
+        }
+        for (String statsCode : retryHttpStatusCodes) {
+            if (message.contains(statsCode)) {
+                return true;
             }
         }
-    }
-
-    /**
-     * Helper method to get a value of a parameters in the AxisConfiguration
-     *
-     * @param axisConfiguration AxisConfiguration instance
-     * @param paramKey The name / key of the parameter
-     * @return The value of the parameter
-     */
-    private static String getAxis2ParameterValue(AxisConfiguration axisConfiguration, String paramKey) {
-        Parameter parameter = axisConfiguration.getParameter(paramKey);
-        if (parameter == null) {
-            return null;
-        }
-        Object value = parameter.getValue();
-        if (value != null && value instanceof String) {
-            return (String) parameter.getValue();
-        } else {
-            return null;
-        }
+        return false;
     }
 
     private void deactivate(ScheduledMessageForwardingProcessor processor, MessageContext inMsgCtx) {
@@ -368,17 +376,5 @@ public class ForwardingJob implements StatefulJob {
         } else {
             log.warn("Deactivate sequence: " + deactivateSequence + " does not exist");
         }
-    }
-
-    private boolean isRetryHttpStatusCode(String message) {
-        if (retryHttpStatusCodes == null) {
-            return false;
-        }
-        for (String statsCode : retryHttpStatusCodes) {
-            if (message.contains(statsCode)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

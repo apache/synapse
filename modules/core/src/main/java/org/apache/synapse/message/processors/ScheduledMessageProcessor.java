@@ -82,9 +82,9 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
         JobBuilder jobBuilder = getJobBuilder();
         JobDataMap jobDataMap = getJobDataMap();
-        jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE,
-                configuration.getMessageStore(messageStore));
-        jobDataMap.put(MessageProcessorConsents.PARAMETERS, parameters);
+        jobDataMap.put(MessageProcessorConstants.MESSAGE_STORE,
+                       configuration.getMessageStore(messageStore));
+        jobDataMap.put(MessageProcessorConstants.PARAMETERS, parameters);
 
         JobDetail jobDetail = jobBuilder.usingJobData(jobDataMap).build();
 
@@ -117,18 +117,18 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
     public void setParameters(Map<String, Object> parameters) {
         super.setParameters(parameters);
         if (parameters != null && !parameters.isEmpty()) {
-            Object o = parameters.get(MessageProcessorConsents.CRON_EXPRESSION);
+            Object o = parameters.get(MessageProcessorConstants.CRON_EXPRESSION);
             if (o != null) {
                 cronExpression = o.toString();
             }
 
-            o = parameters.get(MessageProcessorConsents.INTERVAL);
+            o = parameters.get(MessageProcessorConstants.INTERVAL);
             if (o != null) {
                 interval = Integer.parseInt(o.toString());
             }
 
 
-            o = parameters.get(MessageProcessorConsents.QUARTZ_CONF);
+            o = parameters.get(MessageProcessorConstants.QUARTZ_CONF);
             if (o != null) {
                 quartzConfig = o.toString();
             }

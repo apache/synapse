@@ -68,7 +68,6 @@ public class ForwardingJob implements StatefulJob {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //Get the Global Objects from DataMap
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
-
         configureForwardingJob(jdm);
 
         // WE do not try to process if the processor is inactive or

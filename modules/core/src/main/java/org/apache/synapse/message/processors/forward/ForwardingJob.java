@@ -60,7 +60,7 @@ public class ForwardingJob implements StatefulJob {
     private String faultSequence;
     private String replySequence;
     private String[] retryHttpStatusCodes;
-    State jobState;
+    private State jobState;
     private MessageStore messageStore;
     private Axis2BlockingClient sender;
     private ScheduledMessageForwardingProcessor processor;

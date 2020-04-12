@@ -69,4 +69,9 @@ public final class ForwardingProcessorConstants {
      * Used to determine for which HTTP status codes, message processor should retry
      */
     public static final String RETRY_HTTP_STATUS_CODES = "retry.http.status.codes";
+
+    /**
+     * Used to determine the retry interval between retries
+     */
+    public static final String RETRY_INTERVAL = "retry.interval";
 }

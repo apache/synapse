@@ -96,7 +96,13 @@ public class ForwardingJob implements StatefulJob {
             maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
             isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters);
             if (parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL) != null) {
-                retryInterval = Integer.parseInt((String) parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL));
+                try {
+                    retryInterval = Integer.parseInt(
+                            (String) parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL));
+                } catch (NumberFormatException nfe) {
+                    parameters.remove(ForwardingProcessorConstants.RETRY_INTERVAL);
+                    log.error("Invalid value for retry.interval switching back to default value", nfe);
+                }
             }
             if (parameters.get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES) != null) {
                 retryHttpStatusCodes = parameters

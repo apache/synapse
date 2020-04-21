@@ -33,6 +33,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.message.processors.MessageProcessorConstants;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -45,20 +46,24 @@ import java.util.Set;
  * Redelivery Job will replay all the Messages in the Message Store when executed
  * Excluding ones that are already tried redelivering more than max number of tries
  */
+@DisallowConcurrentExecution
 public class ForwardingJob implements StatefulJob {
 
     private static final Log log = LogFactory.getLog(ForwardingJob.class);
 
+    enum State { CONTINUE_PROCESSING, CONTINUE_RETRYING, STOP_PROCESSING }
+
     private boolean isMaxDeliverAttemptDropEnabled;
     private int maxDeliverAttempts;
+    private int retryInterval;
     private String deactivateSequence;
     private String faultSequence;
     private String replySequence;
     private String[] retryHttpStatusCodes;
+    private State jobState;
     private MessageStore messageStore;
     private Axis2BlockingClient sender;
     private ScheduledMessageForwardingProcessor processor;
-    private boolean errorStop = false;
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //Get the Global Objects from DataMap
@@ -80,20 +85,37 @@ public class ForwardingJob implements StatefulJob {
                 ScheduledMessageForwardingProcessor.BLOCKING_SENDER);
         processor = (ScheduledMessageForwardingProcessor) jdm.get(
                 ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);
+        retryInterval = 1000;
+
+        setParameters(jdm);
+    }
+
+    private void setParameters(JobDataMap jdm) {
         Map<String, Object> parameters = (Map<String, Object>) jdm.get(MessageProcessorConstants.PARAMETERS);
-        maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
-        isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters);
-        retryHttpStatusCodes(parameters);
-        setSequences(parameters);
+        if (parameters != null) {
+            maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
+            isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters);
+            if (parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL) != null) {
+                try {
+                    retryInterval = Integer.parseInt(
+                            (String) parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL));
+                } catch (NumberFormatException nfe) {
+                    parameters.remove(ForwardingProcessorConstants.RETRY_INTERVAL);
+                    log.error("Invalid value for retry.interval switching back to default value", nfe);
+                }
+            }
+            if (parameters.get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES) != null) {
+                retryHttpStatusCodes = parameters
+                        .get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES).toString().split(",");
+            }
+            setSequences(parameters);
+        }
     }
 
     private int extractMaxDeliveryAttempts(Map<String, Object> parameters,
                                            ScheduledMessageForwardingProcessor processor) {
         int maxDeliverAttempts = -1;
-        String mdaParam = null;
-        if (parameters != null) {
-            mdaParam = (String) parameters.get(MessageProcessorConstants.MAX_DELIVER_ATTEMPTS);
-        }
+        String mdaParam = (String) parameters.get(MessageProcessorConstants.MAX_DELIVER_ATTEMPTS);
         if (mdaParam != null) {
             maxDeliverAttempts = Integer.parseInt(mdaParam);
             // Here we look for the edge case
@@ -116,13 +138,6 @@ public class ForwardingJob implements StatefulJob {
         return isMaxDeliverAttemptDropEnabled;
     }
 
-    private void retryHttpStatusCodes(Map<String, Object> parameters) {
-        if (parameters != null && parameters.get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES) != null) {
-            retryHttpStatusCodes = parameters
-                    .get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES).toString().split(",");
-        }
-    }
-
     private void setSequences(Map<String, Object> parameters) {
         if (parameters != null) {
             if (parameters.get(ForwardingProcessorConstants.FAULT_SEQUENCE) != null) {
@@ -139,15 +154,27 @@ public class ForwardingJob implements StatefulJob {
     }
 
     private void startProcessingMsgs() {
-        errorStop = false;
-        while (!errorStop) {
+        do {
+            jobState = State.CONTINUE_PROCESSING;
             MessageContext inMsgCtx = messageStore.peek();
             if (inMsgCtx != null) {
                 if (isMsgRelatedToThisServer(inMsgCtx)) {
                     handleNewMessage(inMsgCtx);
                 }
             } else {
-                errorStop = true;
+                jobState = State.STOP_PROCESSING;
+            }
+            waitBeforeRetry();
+        } while (jobState == State.CONTINUE_PROCESSING || jobState == State.CONTINUE_RETRYING);
+    }
+
+    private void waitBeforeRetry() {
+        if (jobState == State.CONTINUE_RETRYING) {
+            try {
+                // wait for some time before retrying
+                Thread.sleep(retryInterval);
+            } catch (InterruptedException ignore) {
+                // No harm even it gets interrupted. So nothing to handle.
             }
         }
     }
@@ -243,7 +270,7 @@ public class ForwardingJob implements StatefulJob {
                 processor.resetSentAttemptCount();
             }
         } catch (Exception e) {
-            errorStop = handleOutOnlyError(inMsgCtx);
+            handleOutOnlyError(inMsgCtx);
             log.error("Error Forwarding Message ", e);
         }
     }
@@ -299,7 +326,6 @@ public class ForwardingJob implements StatefulJob {
         if (maxDeliverAttempts > 0) {
             handleMaxDeliveryAttempts(inMsgCtx);
         }
-        errorStop = true;
     }
 
     private void handleMaxDeliveryAttempts(MessageContext inMsgCtx) {
@@ -312,15 +338,16 @@ public class ForwardingJob implements StatefulJob {
             } else {
                 deactivate(processor, inMsgCtx);
             }
+        } else {
+            jobState = State.CONTINUE_RETRYING;
         }
     }
 
-    private boolean handleOutOnlyError(MessageContext inMsgCtx) {
+    private void handleOutOnlyError(MessageContext inMsgCtx) {
         if (maxDeliverAttempts > 0) {
             processor.incrementSendAttemptCount();
             handleMaxDeliveryAttempts(inMsgCtx);
         }
-        return true;
     }
 
     private void sendResponseToReplySeq(MessageContext outCtx) {
@@ -371,6 +398,7 @@ public class ForwardingJob implements StatefulJob {
     }
 
     private void deactivate(ScheduledMessageForwardingProcessor processor, MessageContext inMsgCtx) {
+        jobState = State.STOP_PROCESSING;
         processor.deactivate();
         if (deactivateSequence != null) {
             if (inMsgCtx != null) {

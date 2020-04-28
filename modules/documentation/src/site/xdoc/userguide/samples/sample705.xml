@@ -110,11 +110,11 @@
                     level failures but also for application level failures such as Internal Server Error (500) and Gateway timeout (504).
                 </p>
                 <p>
-                    Rate in which Message Forwarding Processor sends request to configured back-end is controlled by configuring
-                    "interval" parameter. However, when there is a failure, rate in which Message Forwarding Processor retries is
-                    controlled by configuring "retry.interval". Similar to "interval" "retry.interval" value must be set in milli seconds.
-                    In the case of setting a non-integer value, makes Message Forwarding Processor set the default value
-                    to "retry.interval", which is 1000ms.
+                    Message Forwarding Processor sends messages to the back-end with the interval configured using "interval" parameter.
+                    However, when there is a failure, Message Forwarding Processor goes to retry mode. When retrying,
+                    Message Forwarding Processor sends the message to the back-end with the interval configured using "retry.interval"
+                    parameter. Similar to "interval" "retry.interval" value must be set in milli seconds. In the case of setting
+                    a non-integer value, makes Message Forwarding Processor set the default value to "retry.interval", which is 1000ms.
                 </p>
             </subsection>
         </section>

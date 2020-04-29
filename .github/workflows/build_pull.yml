@@ -10,10 +10,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [ 8 ]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: [7, 8]
 
     steps:
     - uses: actions/checkout@v2

@@ -58,7 +58,7 @@
       &lt;parameter name="max.deliver.attempts"&gt;3&lt;/parameter&gt;
       &lt;parameter name="max.deliver.drop"&gt;true&lt;/parameter&gt;
       &lt;parameter name="retry.http.status.codes"&gt;500, 504&lt;/parameter&gt;
-      &lt;parameter name="retry.interval"&gt;5000&lt;/parameter&gt;
+      &lt;parameter name="retry.interval"&gt;1000&lt;/parameter&gt;
    &lt;/messageProcessor&gt;
 &lt;/definitions&gt;
             </div>

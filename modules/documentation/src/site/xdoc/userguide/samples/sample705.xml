@@ -58,6 +58,7 @@
       &lt;parameter name="max.deliver.attempts"&gt;3&lt;/parameter&gt;
       &lt;parameter name="max.deliver.drop"&gt;true&lt;/parameter&gt;
       &lt;parameter name="retry.http.status.codes"&gt;500, 504&lt;/parameter&gt;
+      &lt;parameter name="retry.interval"&gt;1000&lt;/parameter&gt;
    &lt;/messageProcessor&gt;
 &lt;/definitions&gt;
             </div>
@@ -68,6 +69,7 @@
                         <li>max.deliver.attempts</li>
                         <li>max.deliver.drop</li>
                         <li>retry.http.status.codes</li>
+                        <li>retry.interval</li>
                     </ul>
                 </p>
             </subsection>
@@ -106,6 +108,13 @@
                     "retry.http.status.codes" configuration to do so. Please note that in this context application level failures refers to
                     HTTP error responses. For instance, in the above example Message Forwarding Processor retries not only for transport
                     level failures but also for application level failures such as Internal Server Error (500) and Gateway timeout (504).
+                </p>
+                <p>
+                    Message Forwarding Processor sends messages to the back-end with the interval configured using "interval" parameter.
+                    However, when there is a failure, Message Forwarding Processor goes to retry mode. When retrying,
+                    Message Forwarding Processor sends the message to the back-end with the interval configured using "retry.interval"
+                    parameter. Similar to "interval" "retry.interval" value must be set in milli seconds. In the case of setting
+                    a non-integer value, makes Message Forwarding Processor set the default value to "retry.interval", which is 1000ms.
                 </p>
             </subsection>
         </section>

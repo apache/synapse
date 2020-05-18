@@ -344,6 +344,7 @@ public class ForwardingJob implements StatefulJob {
     }
 
     private void handleOutOnlyError(MessageContext inMsgCtx) {
+        sendItToFaultSequence(inMsgCtx);
         if (maxDeliverAttempts > 0) {
             processor.incrementSendAttemptCount();
             handleMaxDeliveryAttempts(inMsgCtx);

@@ -74,4 +74,9 @@ public final class ForwardingProcessorConstants {
      * Used to determine the retry interval between retries
      */
     public static final String RETRY_INTERVAL = "retry.interval";
+
+    /**
+     * Used to determine if all the messages should be consumed per iteration
+     */
+    public static final String CONSUME_ALL = "consume.all";
 }

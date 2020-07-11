@@ -54,6 +54,7 @@ public class ForwardingJob implements StatefulJob {
     enum State { CONTINUE_PROCESSING, CONTINUE_RETRYING, STOP_PROCESSING }
 
     private boolean isMaxDeliverAttemptDropEnabled;
+    private boolean consumeAllEnabled;
     private int maxDeliverAttempts;
     private int retryInterval;
     private String deactivateSequence;
@@ -95,20 +96,35 @@ public class ForwardingJob implements StatefulJob {
         if (parameters != null) {
             maxDeliverAttempts = extractMaxDeliveryAttempts(parameters, processor);
             isMaxDeliverAttemptDropEnabled = isMaxDeliverAttemptDropEnabled(parameters);
-            if (parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL) != null) {
-                try {
-                    retryInterval = Integer.parseInt(
-                            (String) parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL));
-                } catch (NumberFormatException nfe) {
-                    parameters.remove(ForwardingProcessorConstants.RETRY_INTERVAL);
-                    log.error("Invalid value for retry.interval switching back to default value", nfe);
-                }
-            }
+            consumeAllEnabled = isConsumeAllEnabled(parameters);
+            setRetryInterval(parameters);
             if (parameters.get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES) != null) {
                 retryHttpStatusCodes = parameters
                         .get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES).toString().split(",");
             }
             setSequences(parameters);
+        }
+    }
+
+    private boolean isConsumeAllEnabled(Map<String, Object> parameters) {
+        boolean isConsumeAllEnabled = true;
+        if (parameters.get(ForwardingProcessorConstants.CONSUME_ALL) != null &&
+                parameters.get(ForwardingProcessorConstants.CONSUME_ALL).toString()
+                        .equalsIgnoreCase("false")) {
+            isConsumeAllEnabled = false;
+        }
+        return isConsumeAllEnabled;
+    }
+
+    private void setRetryInterval(Map<String, Object> parameters) {
+        if (parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL) != null) {
+            try {
+                retryInterval = Integer.parseInt(
+                        (String) parameters.get(ForwardingProcessorConstants.RETRY_INTERVAL));
+            } catch (NumberFormatException nfe) {
+                parameters.remove(ForwardingProcessorConstants.RETRY_INTERVAL);
+                log.error("Invalid value for retry.interval switching back to default value", nfe);
+            }
         }
     }
 
@@ -160,6 +176,9 @@ public class ForwardingJob implements StatefulJob {
             if (inMsgCtx != null) {
                 if (isMsgRelatedToThisServer(inMsgCtx)) {
                     handleNewMessage(inMsgCtx);
+                }
+                if (jobState == State.CONTINUE_PROCESSING && !consumeAllEnabled) {
+                    jobState = State.STOP_PROCESSING;
                 }
             } else {
                 jobState = State.STOP_PROCESSING;

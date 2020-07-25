@@ -59,6 +59,7 @@
       &lt;parameter name="max.deliver.drop"&gt;true&lt;/parameter&gt;
       &lt;parameter name="retry.http.status.codes"&gt;500, 504&lt;/parameter&gt;
       &lt;parameter name="retry.interval"&gt;1000&lt;/parameter&gt;
+      &lt;parameter name="consume.all"&gt;false&lt;/parameter&gt;
    &lt;/messageProcessor&gt;
 &lt;/definitions&gt;
             </div>
@@ -115,6 +116,14 @@
                     Message Forwarding Processor sends the message to the back-end with the interval configured using "retry.interval"
                     parameter. Similar to "interval" "retry.interval" value must be set in milli seconds. In the case of setting
                     a non-integer value, makes Message Forwarding Processor set the default value to "retry.interval", which is 1000ms.
+                </p>
+                <p>
+                    Every time the Message Forwarding Processor is triggered it consumes all the messages in the Message Store at once. For instance, 
+                    suppose, the Message Forwarding Processor is configured to run every ten seconds and the Message Store is filled 
+                    with five messages within the ten second gap. In such a situation, Message Forwarding Processor consumes all five messages 
+                    and try to send it to back-end as fast as possible. However, there could be situations where you need to send messages 
+                    to the back-end in a controlled rate. This can be achieved by setting the "consume.all" property value to false. When set to false, 
+                    the Message Forwarding Processor will only consume one message at each trigger.
                 </p>
             </subsection>
         </section>

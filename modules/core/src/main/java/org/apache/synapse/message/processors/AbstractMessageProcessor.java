@@ -47,6 +47,10 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
     protected String fileName;
 
+    /** This attribute is only need for forwarding message processor. However, it here because
+     * then we don't need to implement this in sampling processor with nothing */
+    protected String targetEndpoint;
+
     protected SynapseConfiguration configuration;
 
     protected enum State {
@@ -116,5 +120,13 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public void setTargetEndpoint(String targetEndpoint) {
+        this.targetEndpoint = targetEndpoint;
+    }
+
+    public String getTargetEndpoint() {
+        return targetEndpoint;
     }
 }

@@ -65,6 +65,7 @@ public class ForwardingJob implements StatefulJob {
     private MessageStore messageStore;
     private Axis2BlockingClient sender;
     private ScheduledMessageForwardingProcessor processor;
+    private String targetEndpoint = null;
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //Get the Global Objects from DataMap
@@ -103,6 +104,9 @@ public class ForwardingJob implements StatefulJob {
                         .get(ForwardingProcessorConstants.RETRY_HTTP_STATUS_CODES).toString().split(",");
             }
             setSequences(parameters);
+            if (jdm.get(ForwardingProcessorConstants.TARGET_ENDPOINT) != null) {
+                targetEndpoint = (String) jdm.get(ForwardingProcessorConstants.TARGET_ENDPOINT);
+            }
         }
     }
 
@@ -233,15 +237,17 @@ public class ForwardingJob implements StatefulJob {
 
     private void handleNewMessage(MessageContext inMsgCtx) {
         sanitizeMsgContext(inMsgCtx);
-        String targetEp = (String) inMsgCtx.getProperty(ForwardingProcessorConstants.TARGET_ENDPOINT);
-        if (targetEp != null) {
-            Endpoint ep = inMsgCtx.getEndpoint(targetEp);
+        if (targetEndpoint == null) {
+            targetEndpoint = (String) inMsgCtx.getProperty(ForwardingProcessorConstants.TARGET_ENDPOINT);
+        }
+        if (targetEndpoint != null) {
+            Endpoint ep = inMsgCtx.getEndpoint(targetEndpoint);
             // stop processing if endpoint is not ready to send
             if(ep.getContext().readyToSend()) {
                 if ((ep != null) && (((AbstractEndpoint) ep).isLeafEndpoint())) {
                     sendMsgToEndpoint(inMsgCtx, ep);
                 } else {
-                    logMsg(targetEp, ep);
+                    logMsg(targetEndpoint, ep);
                     messageStore.poll();
                 }
             }

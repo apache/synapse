@@ -93,11 +93,11 @@ public class MessageProcessorFactory {
         }
 
         if (FORWARDING_PROCESSOR.equals(clssAtt.getAttributeValue())) {
-            OMAttribute targetSequenceAtt = elem.getAttribute(TARGET_ENDPOINT_Q);
+            OMAttribute targetEndpointAtt = elem.getAttribute(TARGET_ENDPOINT_Q);
 
-            if (targetSequenceAtt != null) {
+            if (targetEndpointAtt != null) {
                 assert processor != null;
-                processor.setTargetEndpoint(targetSequenceAtt.getAttributeValue());
+                processor.setTargetEndpoint(targetEndpointAtt.getAttributeValue());
             } else {
                 // This validation is commented due to backward compatibility
                 // handleException("Can't create Message processor without a target endpoint ");

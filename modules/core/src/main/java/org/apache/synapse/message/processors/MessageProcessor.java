@@ -85,4 +85,17 @@ public interface MessageProcessor extends ManagedLifecycle , Nameable , SynapseA
      * @return Name of the file where this artifact is defined
      */
     public String getFileName();
+
+    /**
+     * This method set the target-endpoint associated with the Message Processor. Target-endpoint is a required
+     * parameter for Message Forwarding Processor but optional for Sampling Processor.
+     * @param targetEndpoint is the name of the associated endpoint
+     */
+    void setTargetEndpoint(String targetEndpoint);
+
+    /**
+     * This method is used to retrieve the associated target endpoint name of the message processor.
+     * @return The name of the endpoint
+     */
+    String getTargetEndpoint();
 }

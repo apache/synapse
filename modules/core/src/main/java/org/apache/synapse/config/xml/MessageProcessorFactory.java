@@ -54,8 +54,12 @@ public class MessageProcessorFactory {
                                                       "parameter");
     public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE,
                                                           "messageStore");
+    public static final QName TARGET_ENDPOINT_Q =
+            new QName(XMLConfigConstants.NULL_NAMESPACE, "targetEndpoint");
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
+    public static final String FORWARDING_PROCESSOR =
+            "org.apache.synapse.message.processors.forward.ScheduledMessageForwardingProcessor";
 
 
     /**
@@ -86,6 +90,18 @@ public class MessageProcessorFactory {
             processor.setName(nameAtt.getAttributeValue());
         } else {
             handleException("Can't create Message processor without a name ");
+        }
+
+        if (FORWARDING_PROCESSOR.equals(clssAtt.getAttributeValue())) {
+            OMAttribute targetEndpointAtt = elem.getAttribute(TARGET_ENDPOINT_Q);
+
+            if (targetEndpointAtt != null) {
+                assert processor != null;
+                processor.setTargetEndpoint(targetEndpointAtt.getAttributeValue());
+            } else {
+                // This validation is commented due to backward compatibility
+                // handleException("Can't create Message processor without a target endpoint ");
+            }
         }
 
         OMAttribute storeAtt = elem.getAttribute(MESSAGE_STORE_Q);

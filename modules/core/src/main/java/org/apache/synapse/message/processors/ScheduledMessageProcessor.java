@@ -21,6 +21,7 @@ package org.apache.synapse.message.processors;
 
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.message.processors.forward.ForwardingProcessorConstants;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -84,6 +85,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         JobDataMap jobDataMap = getJobDataMap();
         jobDataMap.put(MessageProcessorConstants.MESSAGE_STORE,
                        configuration.getMessageStore(messageStore));
+        jobDataMap.put(ForwardingProcessorConstants.TARGET_ENDPOINT, getTargetEndpoint());
         jobDataMap.put(MessageProcessorConstants.PARAMETERS, parameters);
 
         JobDetail jobDetail = jobBuilder.usingJobData(jobDataMap).build();

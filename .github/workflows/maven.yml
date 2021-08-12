@@ -31,4 +31,4 @@ jobs:
           ${{ runner.os }}-maven-
           
     - name: Maven Package
-      run: mvn clean install -Dmaven.test.skip=true
+      run: mvn clean package

@@ -1,4 +1,4 @@
-[![Java CI with Maven](https://github.com/n-jay/synapse/actions/workflows/maven.yml/badge.svg)](https://github.com/n-jay/synapse/actions/workflows/maven.yml)
+![](https://github.com/apache/synapse/workflows/Synapse%20Daily%20Build/badge.svg)
 
 # Synapse
 Apache Synapse is a lightweight and high-performance Enterprise Service Bus (ESB). Powered by a fast and asynchronous mediation engine, Apache Synapse provides exceptional support for XML, Web Services and REST. In addition to XML and SOAP, 

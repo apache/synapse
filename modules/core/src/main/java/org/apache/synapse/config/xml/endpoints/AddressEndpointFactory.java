@@ -21,6 +21,8 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.AddressEndpoint;
@@ -59,6 +61,8 @@ import java.util.Properties;
  */
 public class AddressEndpointFactory extends DefaultEndpointFactory {
 
+    private static final String SYSTEM_VARIABLE_PREFIX = "$SYSTEM";
+    private static final Log LOG = LogFactory.getLog(AddressEndpointFactory.class);
     private static AddressEndpointFactory instance = new AddressEndpointFactory();
 
     private AddressEndpointFactory() {
@@ -115,7 +119,16 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         }
 
         if (address != null) {
-            endpointDefinition.setAddress(address.getAttributeValue().trim());
+            String extractedAddress = address.getAttributeValue().trim();
+            if (extractedAddress.contains(SYSTEM_VARIABLE_PREFIX)) {
+                String extractedEnvVariableKey = extractedAddress.substring(extractedAddress.lastIndexOf(":") + 1);
+                String extractedEnvVariableValue = System.getenv(extractedEnvVariableKey);
+                log.info ("Environment variable " + extractedEnvVariableKey + " replaced with " +
+                        extractedEnvVariableValue);
+                endpointDefinition.setAddress(extractedEnvVariableValue);
+            } else {
+                endpointDefinition.setAddress(extractedAddress);
+            }
         }
 
         extractSpecificEndpointProperties(endpointDefinition, elem);

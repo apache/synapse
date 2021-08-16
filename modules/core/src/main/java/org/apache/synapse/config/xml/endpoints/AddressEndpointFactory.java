@@ -120,12 +120,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         }
 
         if (address != null) {
-            try {
-                String extractedAddress = address.getAttributeValue().trim();
-                endpointDefinition.setAddress(injectEnvironmentVariables(extractedAddress));
-            } catch (SynapseException injectionException) {
-                log.error("Malformed injected environment variable");
-            }
+            endpointDefinition.setAddress(address.getAttributeValue().trim());
         }
 
         extractSpecificEndpointProperties(endpointDefinition, elem);

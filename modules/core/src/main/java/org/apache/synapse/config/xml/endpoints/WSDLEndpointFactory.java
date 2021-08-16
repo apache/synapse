@@ -25,8 +25,6 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.util.JavaUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
@@ -72,9 +70,6 @@ import java.util.Properties;
 public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
     public static final String SKIP_WSDL_PARSING = "skip.wsdl.parsing";
-    private static final String SYSTEM_VARIABLE_PREFIX = "$SYSTEM";
-
-    private static final Log LOG = LogFactory.getLog(WSDLEndpointFactory.class);
 
     private static WSDLEndpointFactory instance = new WSDLEndpointFactory();
 
@@ -123,18 +118,13 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
-            // Environment variables are also injected here.
-
-            wsdlEndpoint.setServiceName(injectEnvironmentVariables(serviceName));
-            wsdlEndpoint.setPortName(injectEnvironmentVariables(portName));
+            wsdlEndpoint.setServiceName(serviceName);
+            wsdlEndpoint.setPortName(portName);
 
             String noParsing = properties.getProperty(SKIP_WSDL_PARSING);
 
             if (wsdlURI != null) {
-                // check if SYSTEM prefixes are added and populate them with
-                // extracted environment variables
-                wsdlEndpoint.setWsdlURI(injectEnvironmentVariables(wsdlURI).trim());
-
+                wsdlEndpoint.setWsdlURI(wsdlURI.trim());
                 if (noParsing == null || !JavaUtils.isTrueExplicitly(noParsing)) {
                     String synapseHome = properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
                             properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "";

@@ -25,6 +25,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
@@ -70,6 +72,9 @@ import java.util.Properties;
 public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
     public static final String SKIP_WSDL_PARSING = "skip.wsdl.parsing";
+    private static final String SYSTEM_VARIABLE_PREFIX = "$SYSTEM";
+
+    private static final Log LOG = LogFactory.getLog(WSDLEndpointFactory.class);
 
     private static WSDLEndpointFactory instance = new WSDLEndpointFactory();
 
@@ -118,12 +123,26 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
+            if (serviceName.contains(SYSTEM_VARIABLE_PREFIX)) {
+                String extractedEnvVariableServiceNameKey = serviceName.substring(serviceName.lastIndexOf(":") + 1);
+                serviceName = System.getenv(extractedEnvVariableServiceNameKey);
+            }
             wsdlEndpoint.setServiceName(serviceName);
+            if (portName.contains(SYSTEM_VARIABLE_PREFIX)) {
+                String extractedEnvVariablePortNameKey = portName.substring(portName.lastIndexOf(":") + 1);
+                portName = System.getenv(extractedEnvVariablePortNameKey);
+            }
             wsdlEndpoint.setPortName(portName);
 
             String noParsing = properties.getProperty(SKIP_WSDL_PARSING);
 
             if (wsdlURI != null) {
+                // check if SYSTEM prefixes are added and populate them with
+                // extracted environment variables
+                if (wsdlURI.contains(SYSTEM_VARIABLE_PREFIX)) {
+                    String extractedEnvVariableURIKey = wsdlURI.substring(wsdlURI.lastIndexOf(":") + 1);
+                    wsdlURI = System.getenv(extractedEnvVariableURIKey);
+                }
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
                 if (noParsing == null || !JavaUtils.isTrueExplicitly(noParsing)) {
                     String synapseHome = properties.get(SynapseConstants.SYNAPSE_HOME) != null ?

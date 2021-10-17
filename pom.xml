@@ -1071,6 +1071,15 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         <!--repository>
             <id>wso2-m2-snapshots</id>
             <name>WSO2 Maven 2 SNAPSHOTS Repository</name>

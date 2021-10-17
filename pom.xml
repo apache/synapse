@@ -767,6 +767,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>5.6.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
                 <version>${xmlunit.version}</version>
@@ -830,6 +836,27 @@
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-core</artifactId>
                 <version>${activemq.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- for testing with only lambda pattern -->
+            <dependency>
+                <groupId>uk.org.webcompere</groupId>
+                <artifactId>system-stubs-core</artifactId>
+                <version>1.1.0</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- for JUnit 4 -->
+            <dependency>
+                <groupId>uk.org.webcompere</groupId>
+                <artifactId>system-stubs-junit4</artifactId>
+                <version>1.1.0</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- for JUnit 5 -->
+            <dependency>
+                <groupId>uk.org.webcompere</groupId>
+                <artifactId>system-stubs-jupiter</artifactId>
+                <version>1.1.0</version>
                 <scope>test</scope>
             </dependency>
 

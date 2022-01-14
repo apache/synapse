@@ -22,11 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.AbstractTestCase;
 import org.apache.synapse.endpoints.AddressEndpoint;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import java.util.List;
 
 public class AddressEndpointSerializationTest extends AbstractTestCase {
 
@@ -130,12 +125,13 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
     public void testAddressEndpointScenarioSix() throws Exception {
         String inputXML = "<endpoint  xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<address uri=\"$SYSTEM:SOAP_SERVICE_TEST\" />" +
+                "</address>"+
                 "</endpoint>" ;
-        List<String> envVariables;
-//        OMElement inputElement = createOMElement(inputXML);
-//        AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(
-//                inputElement,true,null);
-//        OMElement serializedOut = AddressEndpointSerializer.getElementFromEndpoint(endpoint);
+        OMElement inputElement = createOMElement(inputXML);
+        AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(
+                inputElement,true,null);
+        assertNotNull(endpoint.getName());
+        OMElement serializedOut = AddressEndpointSerializer.getElementFromEndpoint(endpoint);
 //        assertTrue(compare(serializedOut,inputElement));
     }
 

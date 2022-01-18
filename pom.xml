@@ -224,6 +224,12 @@
                     <version>2.11</version>
                     <configuration>
                         <argLine>-Xms128m -Xmx256m</argLine>
+                        <systemProperties>
+                            <property>
+                                <name>$SYSTEM:SOAP_SERVICE_TEST</name>
+                                <value>http://localhost:9000/services/SimpleStockQuoteService</value>
+                            </property>>
+                        </systemProperties>
                     </configuration>
                 </plugin>
                 <plugin>

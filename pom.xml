@@ -224,12 +224,6 @@
                     <version>2.11</version>
                     <configuration>
                         <argLine>-Xms128m -Xmx256m</argLine>
-                        <systemProperties>
-                            <property>
-                                <name>$SYSTEM:SOAP_SERVICE_TEST</name>
-                                <value>http://localhost:9000/services/SimpleStockQuoteService</value>
-                            </property>>
-                        </systemProperties>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -865,6 +859,7 @@
                 <version>1.1.0</version>
                 <scope>test</scope>
             </dependency>
+
 
 
             <!-- Saxon -->

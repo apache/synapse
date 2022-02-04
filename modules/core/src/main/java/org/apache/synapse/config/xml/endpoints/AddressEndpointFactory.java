@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
@@ -119,15 +120,19 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         }
 
         if (address != null) {
-            String extractedAddress = address.getAttributeValue().trim();
-            if (extractedAddress.contains(SYSTEM_VARIABLE_PREFIX)) {
-                String extractedEnvVariableKey = extractedAddress.substring(extractedAddress.lastIndexOf(":") + 1);
-                String extractedEnvVariableValue = System.getenv(extractedEnvVariableKey);
-                log.info ("Environment variable " + extractedEnvVariableKey + " replaced with " +
-                        extractedEnvVariableValue);
-                endpointDefinition.setAddress(extractedEnvVariableValue);
-            } else {
-                endpointDefinition.setAddress(extractedAddress);
+            try {
+                String extractedAddress = address.getAttributeValue().trim();
+                if (extractedAddress.contains(SYSTEM_VARIABLE_PREFIX)) {
+                    String extractedEnvVariableKey = extractedAddress.substring(extractedAddress.lastIndexOf(":") + 1);
+                    String extractedEnvVariableValue = System.getenv(extractedEnvVariableKey);
+                    log.info("Environment variable " + extractedEnvVariableKey + " replaced with " +
+                            extractedEnvVariableValue);
+                    endpointDefinition.setAddress(extractedEnvVariableValue);
+                } else {
+                    endpointDefinition.setAddress(extractedAddress);
+                }
+            } catch (SynapseException injectionException) {
+                log.error("Malformed injected environment variable");
             }
         }
 

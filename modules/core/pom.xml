@@ -161,7 +161,7 @@
                         </property>
                     </systemProperties>
                     <environmentVariables>
-                        <TEST>http://localhost:9000/services/SimpleStockQuoteService</TEST>
+                        <SOAP_SERVICE_TEST>http://localhost:9000/services/SimpleStockQuoteService</SOAP_SERVICE_TEST>
                     </environmentVariables>
                     <forkMode>pertest</forkMode>
                     <!--<redirectTestOutputToFile>true</redirectTestOutputToFile>-->

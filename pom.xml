@@ -225,7 +225,7 @@
                     <configuration>
                         <argLine>-Xms128m -Xmx256m</argLine>
                         <environmentVariables>
-                            <TEST>http://localhost:9000/services/SimpleStockQuoteService</TEST>
+                            <SOAP_SERVICE_TEST>http://localhost:9000/services/SimpleStockQuoteService</SOAP_SERVICE_TEST>
                         </environmentVariables>
                     </configuration>
                 </plugin>

@@ -23,10 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.AbstractTestCase;
 import org.apache.synapse.endpoints.AddressEndpoint;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-
 public class AddressEndpointSerializationTest extends AbstractTestCase {
 
     public void testAddressEndpointScenarioOne() throws Exception {
@@ -125,17 +121,10 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
         assertTrue(compare(serializedOut,inputElement));
     }
 
-    @Rule
-    public final EnvironmentVariables environmentVariables
-            = new EnvironmentVariables();
 
-    @Test
     public void testAddressEndpointScenarioSix() throws Exception {
-        environmentVariables.set("$SYSTEM:SOAP_SERVICE_TEST", "http://localhost:9000/services/SimpleStockQuoteService");
-        String inputXML = "<endpoint  xmlns=\"http://ws.apache.org/ns/synapse\">" +
-                "<address uri=\"$SYSTEM:SOAP_SERVICE_TEST\" />" +
-                "</address>"+
-                "</endpoint>" ;
+        String inputXML = "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                "<address uri=\"$SYSTEM:SOAP_SERVICE_TEST\" /></endpoint>" ;
         OMElement inputElement = createOMElement(inputXML);
         AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(
                 inputElement,true,null);

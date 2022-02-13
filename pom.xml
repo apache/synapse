@@ -224,6 +224,9 @@
                     <version>2.11</version>
                     <configuration>
                         <argLine>-Xms128m -Xmx256m</argLine>
+                        <environmentVariables>
+                            <TEST>http://localhost:9000/services/SimpleStockQuoteService</TEST>
+                        </environmentVariables>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -839,14 +842,6 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- System Rules for unit testing -->
-            <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-rules</artifactId>
-                <version>1.19.0</version>
-                <scope>test</scope>
-            </dependency>
-
             <!-- Saxon -->
             <dependency>
                 <groupId>net.sf.saxon</groupId>
@@ -1182,6 +1177,7 @@
         <maven.version>3.0</maven.version>
         <maven.archiver.version>2.2</maven.archiver.version>
         <plexus.utils.version>1.5.4</plexus.utils.version>
+
     </properties>
 
     <developers>

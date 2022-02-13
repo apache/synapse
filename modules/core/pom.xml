@@ -160,6 +160,9 @@
                             <value>org.apache.xerces.jaxp.validation.XMLSchemaFactory</value>
                         </property>
                     </systemProperties>
+                    <environmentVariables>
+                        <TEST>http://localhost:9000/services/SimpleStockQuoteService</TEST>
+                    </environmentVariables>
                     <forkMode>pertest</forkMode>
                     <!--<redirectTestOutputToFile>true</redirectTestOutputToFile>-->
                     <!--<workingDirectory>../..</workingDirectory>-->
@@ -319,12 +322,5 @@
 	        <scope>test</scope>
         </dependency>
 
-        <!-- System Rules for unit testing -->
-        <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <version>1.19.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>

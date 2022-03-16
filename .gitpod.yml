@@ -1,0 +1,6 @@
+
+tasks:
+  - init: mvn clean install
+
+image:
+  file: .gitpod.Dockerfile

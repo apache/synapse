@@ -4,3 +4,7 @@ tasks:
 
 image:
   file: .gitpod.Dockerfile
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack

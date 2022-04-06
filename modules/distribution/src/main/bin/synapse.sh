@@ -129,6 +129,10 @@ SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse-config
 # server name
 SERVER_NAME=
 
+# synapse unit test parameters
+SYNAPSE_TEST_PARAM=
+SYNAPSE_TEST_PORT=
+
 # ----- Uncomment the following line to enalbe the SSL debug options ----------
 # TEMP_PROPS="-Djavax.net.debug=all"
 
@@ -150,7 +154,7 @@ if [ "$1" = "-xdebug" ]; then
     SYNAPSE_DEBUG="synapseDebug"
     shift
 
-elif [ "$1" = "-h" ]; then
+  elif [ "$1" = "-h" ]; then
     echo "Usage: synapse.sh ( commands ... )"
     echo "commands:"
     echo "  -xdebug            Start Synapse under JPDA debugger"
@@ -159,6 +163,18 @@ elif [ "$1" = "-h" ]; then
     echo "  -synapseDebug      Start Synapse under debug mode"
     shift
     exit 0
+
+  elif [[ $1 = -DsynapseTest ]]; then
+    SYNAPSE_TEST_PARAM=$1"=true"
+    shift 1
+
+  elif [[ "$1" = -DsynapseTest=true ]]; then
+    SYNAPSE_TEST_PARAM=$1
+    shift 1
+
+  elif [[ "$1" = -DsynapseTestPort* ]]; then
+    SYNAPSE_TEST_PORT=$1
+    shift 1
 
   else
     echo "Error: unknown command:$1"
@@ -180,6 +196,8 @@ echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 $JAVA_HOME/bin/java -server -Xms512M -Xmx512M \
     $XDEBUG \
     $TEMP_PROPS \
+    $SYNAPSE_TEST_PARAM \
+    $SYNAPSE_TEST_PORT \
     -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \
     -Djava.endorsed.dirs=$SYNAPSE_ENDORSED \
     -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse \

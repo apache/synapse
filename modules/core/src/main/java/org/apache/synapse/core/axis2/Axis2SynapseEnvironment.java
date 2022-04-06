@@ -44,6 +44,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.task.SynapseTaskManager;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.apache.synapse.unittest.UnitTestingExecutor;
 import org.apache.synapse.util.concurrent.SynapseThreadPool;
 import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;
 import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
@@ -82,6 +83,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             new HashMap<QName, SynapseXpathVariableResolver>();
 
     private boolean synapseDebugMode;
+
+    /** Unit test mode is enabled/disabled*/
+    private boolean isUnitTestEnabled = false;
 
     public Axis2SynapseEnvironment(SynapseConfiguration synCfg) {
 
@@ -126,7 +130,25 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
         SynapseConfiguration synapseConfig, ServerContextInformation contextInformation) {
         this(cfgCtx, synapseConfig);
-        this.contextInformation = contextInformation;        
+        this.contextInformation = contextInformation;
+        setSeverUnitTestMode(contextInformation);
+    }
+
+    /**
+     * This method is to set the unit test mode is enabled.
+     * unit test message context and environment initializes
+     */
+    private void setSeverUnitTestMode(ServerContextInformation contextInformation) {
+        if (Boolean.parseBoolean(System.getProperty("synapseTest"))) {
+            setUnitTestEnabled(true);
+            contextInformation.setServerUnitTestModeEnabled(true);
+            log.info("Synapse unit testing server enabled");
+
+            //starting UnitTestingExecutor
+            UnitTestingExecutor testExecutor = UnitTestingExecutor.getExecuteInstance();
+            testExecutor.setSynapseConfiguration(this.synapseConfig);
+            testExecutor.start();
+        }
     }
 
     public boolean injectMessage(final MessageContext synCtx) {
@@ -551,7 +573,26 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         return null;
     }
 
+
     public void setSynapseDebugMode(boolean synapseDebugMode) {
         this.synapseDebugMode = synapseDebugMode;
+    }
+
+    /**
+     * Whether unit test is enabled in the environment.
+     *
+     * @return whether debugging is enabled in the environment
+     */
+    public boolean isUnitTestEnabled() {
+        return isUnitTestEnabled;
+    }
+
+    /**
+     * set unit test mode enabled in the environment.
+     *
+     * @param isUnitTestEnabled boolean value of unit test mode
+     */
+    public void setUnitTestEnabled(boolean isUnitTestEnabled) {
+        this.isUnitTestEnabled = isUnitTestEnabled;
     }
 }

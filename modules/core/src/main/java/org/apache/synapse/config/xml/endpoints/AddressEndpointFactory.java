@@ -125,7 +125,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
                 if (extractedAddress.contains(SYSTEM_VARIABLE_PREFIX)) {
                     String extractedEnvVariableKey = extractedAddress.substring(extractedAddress.lastIndexOf(":") + 1);
                     String extractedEnvVariableValue = System.getenv(extractedEnvVariableKey);
-                    log.info("Environment variable " + extractedEnvVariableKey + " replaced with " +
+                    log.debug("Environment variable " + extractedEnvVariableKey + " replaced with " +
                             extractedEnvVariableValue);
                     endpointDefinition.setAddress(extractedEnvVariableValue);
                 } else {

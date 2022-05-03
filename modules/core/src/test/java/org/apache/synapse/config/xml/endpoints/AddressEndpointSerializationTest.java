@@ -121,16 +121,4 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
         assertTrue(compare(serializedOut,inputElement));
     }
 
-
-    public void testAddressEndpointScenarioSix() throws Exception {
-        String inputXML = "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
-                "<address uri=\"$SYSTEM:SOAP_SERVICE_TEST\" /></endpoint>" ;
-        OMElement inputElement = createOMElement(inputXML);
-        AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(
-                inputElement,true,null);
-
-        //TODO: need to add assertion code here
-
-    }
-
 }

@@ -343,6 +343,9 @@ public final class SynapseConstants {
 
     public static final String DOING_FAIL_OVER = "synapse.doing.failover";
 
+    /** System variable prefix for parameter injection */
+    public static final String SYSTEM_VARIABLE_PREFIX = "$SYSTEM";
+
     // to be a help for stat collection
     public static final String SENDING_REQUEST = "synapse.internal.request.sending";
 

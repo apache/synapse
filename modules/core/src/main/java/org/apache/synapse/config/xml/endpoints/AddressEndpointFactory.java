@@ -122,15 +122,7 @@ public class AddressEndpointFactory extends DefaultEndpointFactory {
         if (address != null) {
             try {
                 String extractedAddress = address.getAttributeValue().trim();
-                if (extractedAddress.contains(SYSTEM_VARIABLE_PREFIX)) {
-                    String extractedEnvVariableKey = extractedAddress.substring(extractedAddress.lastIndexOf(":") + 1);
-                    String extractedEnvVariableValue = System.getenv(extractedEnvVariableKey);
-                    log.debug("Environment variable " + extractedEnvVariableKey + " replaced with " +
-                            extractedEnvVariableValue);
-                    endpointDefinition.setAddress(extractedEnvVariableValue);
-                } else {
-                    endpointDefinition.setAddress(extractedAddress);
-                }
+                endpointDefinition.setAddress(injectEnvironmentVariables(extractedAddress));
             } catch (SynapseException injectionException) {
                 log.error("Malformed injected environment variable");
             }

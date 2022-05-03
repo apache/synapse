@@ -123,34 +123,18 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
-            if (serviceName.contains(SYSTEM_VARIABLE_PREFIX)) {
-                String extractedEnvVariableServiceNameKey = serviceName.substring(serviceName.lastIndexOf(":") + 1);
-                serviceName = System.getenv(extractedEnvVariableServiceNameKey);
-                LOG.debug ("Injected service name " + extractedEnvVariableServiceNameKey + " replaced with " +
-                        serviceName);
-            }
-            wsdlEndpoint.setServiceName(serviceName);
+            // Environment variables are also injected here.
 
-            if (portName.contains(SYSTEM_VARIABLE_PREFIX)) {
-                String extractedEnvVariablePortNameKey = portName.substring(portName.lastIndexOf(":") + 1);
-                portName = System.getenv(extractedEnvVariablePortNameKey);
-                LOG.debug ("Injected port name " + extractedEnvVariablePortNameKey + " replaced with " +
-                        portName);
-            }
-            wsdlEndpoint.setPortName(portName);
+            wsdlEndpoint.setServiceName(injectEnvironmentVariables(serviceName));
+            wsdlEndpoint.setPortName(injectEnvironmentVariables(portName));
 
             String noParsing = properties.getProperty(SKIP_WSDL_PARSING);
 
             if (wsdlURI != null) {
                 // check if SYSTEM prefixes are added and populate them with
                 // extracted environment variables
-                if (wsdlURI.contains(SYSTEM_VARIABLE_PREFIX)) {
-                    String extractedEnvVariableURIKey = wsdlURI.substring(wsdlURI.lastIndexOf(":") + 1);
-                    wsdlURI = System.getenv(extractedEnvVariableURIKey);
-                    LOG.debug ("Injected WSDL URI " + extractedEnvVariableURIKey + " replaced with " +
-                            wsdlURI);
-                }
-                wsdlEndpoint.setWsdlURI(wsdlURI.trim());
+                wsdlEndpoint.setWsdlURI(injectEnvironmentVariables(wsdlURI).trim());
+
                 if (noParsing == null || !JavaUtils.isTrueExplicitly(noParsing)) {
                     String synapseHome = properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
                             properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "";

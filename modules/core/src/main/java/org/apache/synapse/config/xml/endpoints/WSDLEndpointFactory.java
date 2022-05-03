@@ -126,7 +126,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
             if (serviceName.contains(SYSTEM_VARIABLE_PREFIX)) {
                 String extractedEnvVariableServiceNameKey = serviceName.substring(serviceName.lastIndexOf(":") + 1);
                 serviceName = System.getenv(extractedEnvVariableServiceNameKey);
-                LOG.info ("Injected service name " + extractedEnvVariableServiceNameKey + " replaced with " +
+                LOG.debug ("Injected service name " + extractedEnvVariableServiceNameKey + " replaced with " +
                         serviceName);
             }
             wsdlEndpoint.setServiceName(serviceName);
@@ -134,7 +134,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
             if (portName.contains(SYSTEM_VARIABLE_PREFIX)) {
                 String extractedEnvVariablePortNameKey = portName.substring(portName.lastIndexOf(":") + 1);
                 portName = System.getenv(extractedEnvVariablePortNameKey);
-                LOG.info ("Injected port name " + extractedEnvVariablePortNameKey + " replaced with " +
+                LOG.debug ("Injected port name " + extractedEnvVariablePortNameKey + " replaced with " +
                         portName);
             }
             wsdlEndpoint.setPortName(portName);
@@ -147,7 +147,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                 if (wsdlURI.contains(SYSTEM_VARIABLE_PREFIX)) {
                     String extractedEnvVariableURIKey = wsdlURI.substring(wsdlURI.lastIndexOf(":") + 1);
                     wsdlURI = System.getenv(extractedEnvVariableURIKey);
-                    LOG.info ("Injected WSDL URI " + extractedEnvVariableURIKey + " replaced with " +
+                    LOG.debug ("Injected WSDL URI " + extractedEnvVariableURIKey + " replaced with " +
                             wsdlURI);
                 }
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());

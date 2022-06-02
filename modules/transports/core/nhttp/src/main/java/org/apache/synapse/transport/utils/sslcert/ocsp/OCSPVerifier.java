@@ -24,7 +24,20 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.ocsp.*;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.CertificateID;
+import org.bouncycastle.cert.ocsp.CertificateStatus;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPReq;
+import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.cert.ocsp.RevokedStatus;
+import org.bouncycastle.cert.ocsp.SingleResp;
+import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.operator.DigestCalculator;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.apache.synapse.transport.utils.sslcert.*;
 
 import java.io.*;
@@ -32,10 +45,10 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.Security;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Used to check if a Certificate is revoked or not by its CA using Online Certificate
@@ -83,7 +96,7 @@ public class OCSPVerifier implements RevocationVerifier {
             SingleResp[] responses;
             try {
                 OCSPResp ocspResponse = getOCSPResponse(serviceUrl, request);
-                if (OCSPRespStatus.SUCCESSFUL != ocspResponse.getStatus()) {
+                if (OCSPResp.SUCCESSFUL != ocspResponse.getStatus()) {
                     continue; // Server didn't give the response right.
                 }
 
@@ -106,12 +119,12 @@ public class OCSPVerifier implements RevocationVerifier {
     }
 
     private RevocationStatus getRevocationStatus(SingleResp resp) throws CertificateVerificationException {
-        Object status = resp.getCertStatus();
+        CertificateStatus status = resp.getCertStatus();
         if (status == CertificateStatus.GOOD) {
             return RevocationStatus.GOOD;
-        } else if (status instanceof org.bouncycastle.ocsp.RevokedStatus) {
+        } else if (status instanceof RevokedStatus) {
             return RevocationStatus.REVOKED;
-        } else if (status instanceof org.bouncycastle.ocsp.UnknownStatus) {
+        } else if (status instanceof UnknownStatus) {
             return RevocationStatus.UNKNOWN;
         }
         throw new CertificateVerificationException("Cant recognize Certificate Status");
@@ -181,27 +194,23 @@ public class OCSPVerifier implements RevocationVerifier {
             //  CertID structure is used to uniquely identify certificates that are the subject of
             // an OCSP request or response and has an ASN.1 definition. CertID structure is defined
             // in RFC 2560
-            CertificateID id = new CertificateID(CertificateID.HASH_SHA1, issuerCert, serialNumber);
+            DigestCalculator digestCalculator = new JcaDigestCalculatorProviderBuilder().build().get(CertificateID.HASH_SHA1);
+            CertificateID id = new CertificateID(digestCalculator, new JcaX509CertificateHolder(issuerCert), serialNumber);
 
             // basic request generation with nonce
-            OCSPReqGenerator generator = new OCSPReqGenerator();
-            generator.addRequest(id);
+            OCSPReqBuilder builder = new OCSPReqBuilder();
+            builder.addRequest(id);
 
             // create details for nonce extension. The nonce extension is used to bind
             // a request to a response to prevent replay attacks. As the name implies,
             // the nonce value is something that the client should only use once within a reasonably
             // small period.
             BigInteger nonce = BigInteger.valueOf(System.currentTimeMillis());
-            Vector<ASN1ObjectIdentifier> objectIdentifiers = new Vector<ASN1ObjectIdentifier>();
-            Vector<X509Extension> values = new Vector<X509Extension>();
-
-            //to create the request Extension
-            objectIdentifiers.add(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-            values.add(new X509Extension(false, new DEROctetString(nonce.toByteArray())));
-            generator.setRequestExtensions(new X509Extensions(objectIdentifiers, values));
-
-            return generator.generate();
-        } catch (OCSPException e) {
+            Extension ext = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false, new DEROctetString(new DEROctetString(nonce.toByteArray()).getEncoded()));
+            builder.setRequestExtensions(new Extensions(new Extension[]{ext}));
+        
+            return builder.build();
+        } catch (OCSPException | OperatorCreationException | CertificateEncodingException | IOException e) {
             throw new CertificateVerificationException("Cannot generate OCSP Request with the " +
                     "given certificate", e);
         }

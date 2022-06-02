@@ -27,7 +27,10 @@ import org.apache.synapse.transport.utils.sslcert.cache.CacheController;
 import org.apache.synapse.transport.utils.sslcert.cache.CacheManager;
 import org.apache.synapse.transport.utils.sslcert.cache.ManageableCache;
 import org.apache.synapse.transport.utils.sslcert.cache.ManageableCacheValue;
-import org.bouncycastle.ocsp.*;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.OCSPReq;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.cert.ocsp.SingleResp;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -119,7 +122,7 @@ public class OCSPCache implements ManageableCache {
             OCSPReq request = cacheValue.request;
             OCSPResp response= ocspVerifier.getOCSPResponse(serviceUrl, request);
 
-            if (OCSPRespStatus.SUCCESSFUL != response.getStatus())
+            if (OCSPResp.SUCCESSFUL != response.getStatus())
                 throw new CertificateVerificationException("OCSP response status not SUCCESSFUL");
 
             BasicOCSPResp basicResponse = (BasicOCSPResp) response.getResponseObject();

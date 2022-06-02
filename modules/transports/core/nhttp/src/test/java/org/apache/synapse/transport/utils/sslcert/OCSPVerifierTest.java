@@ -172,8 +172,9 @@ public class OCSPVerifierTest extends TestCase {
 
                 RevokedStatus revokedStatus = new RevokedStatus(new Date(),
                         CRLReason.privilegeWithdrawn);
-                Date nextUpdate = new Date(new Date().getTime() + TestConstants.NEXT_UPDATE_PERIOD);
-                basicOCSPRespGenerator.addResponse(certID, revokedStatus, nextUpdate, null);
+                Date thisUpdate = new Date();
+                Date nextUpdate = new Date(thisUpdate.getTime() + TestConstants.NEXT_UPDATE_PERIOD);
+                basicOCSPRespGenerator.addResponse(certID, revokedStatus, thisUpdate, nextUpdate);
             } else {
                 basicOCSPRespGenerator.addResponse(certID, CertificateStatus.GOOD);
             }

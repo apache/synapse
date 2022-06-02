@@ -1140,7 +1140,7 @@
         <snmp4j.version>2.5.4</snmp4j.version>
         <snmp4j.agent.version>2.5.3</snmp4j.agent.version>
         <rabbitmq.version>3.1.2</rabbitmq.version>
-        <bcprov.nhttp.version>1.49</bcprov.nhttp.version>
+        <bcprov.nhttp.version>1.50</bcprov.nhttp.version>
 
         <!-- dependencies of Synapse extensions module -->
         <wso2commons.version>1.2</wso2commons.version>

@@ -1112,7 +1112,6 @@
         <rampart.version>1.7.1</rampart.version>
         <neethi.version>3.0.3</neethi.version>
         <jruby.version>1.3.0</jruby.version>
-        <bcprov.jdk15.version>140</bcprov.jdk15.version>
 
         <!-- startup, quartz -->
         <quartz.version>2.2.0</quartz.version>

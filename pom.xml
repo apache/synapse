@@ -1010,6 +1010,11 @@
                 <version>${rabbitmq.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>jakarta.xml.soap</groupId>
+                <artifactId>jakarta.xml.soap-api</artifactId>
+                <version>1.4.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

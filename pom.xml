@@ -1091,7 +1091,7 @@
         <!-- The Java version used to build Synapse. This property is used in the configuration
              of the maven-compiler-plugin as well as certain ant tasks executed using
              maven-antrun-plugin. -->
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
 
 	<synapse.version>${project.version}</synapse.version>
 

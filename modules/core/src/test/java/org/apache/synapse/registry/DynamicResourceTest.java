@@ -61,6 +61,7 @@ public class DynamicResourceTest extends TestCase {
     private SimpleInMemoryRegistry registry;
     private SynapseConfiguration config;
 
+    @Override
     public void setUp() {
         System.out.println("Initializing in-memory registry for dynamic resource tests...");
 

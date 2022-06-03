@@ -51,6 +51,7 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
      * @return the SSLContext to be used
      * @throws org.apache.axis2.AxisFault if an error occurs
      */
+    @Override
     protected SSLContext getSSLContext(TransportInDescription transportIn) throws AxisFault {
 
         KeyManager[] keymanagers  = null;
@@ -137,6 +138,7 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
         }
     }
 
+    @Override
     protected SSLSetupHandler getSSLSetupHandler(TransportInDescription transportIn)
             throws AxisFault {
 
@@ -144,6 +146,7 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
 
         return new SSLSetupHandler() {
 
+            @Override
             public void initalize(SSLEngine sslengine) {
                 if (clientAuth != null) {
                     if ("optional".equals(clientAuth.getValue())) {
@@ -154,6 +157,7 @@ public class PassThroughHttpSSLListener extends PassThroughHttpListener {
                 }
             }
 
+            @Override
             public void verify(IOSession ioSession, SSLSession sslSession) throws SSLException {
 
             }

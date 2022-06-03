@@ -60,6 +60,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
     private static final QName THEN_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "then");
     private static final QName ELSE_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "else");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         
         FilterMediator filter = new FilterMediator();
@@ -163,6 +164,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
         return filter;
     }
 
+    @Override
     public QName getTagQName() {
         return FILTER_Q;
     }

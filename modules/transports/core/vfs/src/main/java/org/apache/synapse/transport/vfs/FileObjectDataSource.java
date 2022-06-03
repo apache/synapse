@@ -41,6 +41,7 @@ public class FileObjectDataSource implements SizeAwareDataSource {
         this.contentType = contentType;
     }
 
+    @Override
     public long getSize() {
         try {
             return file.getContent().getSize();
@@ -49,18 +50,22 @@ public class FileObjectDataSource implements SizeAwareDataSource {
         }
     }
 
+    @Override
     public String getContentType() {
         return contentType;
     }
 
+    @Override
     public String getName() {
         return file.getName().getURI();
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
         return file.getContent().getInputStream();
     }
 
+    @Override
     public OutputStream getOutputStream() throws IOException {
         return file.getContent().getOutputStream();
     }

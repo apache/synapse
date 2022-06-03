@@ -139,10 +139,12 @@ public class InMemoryMessageStoreTest extends TestCase {
     private static class TestObserver implements MessageStoreObserver {
         int counter = 0;
 
+        @Override
         public void messageAdded(String messageId) {
             counter++;
         }
 
+        @Override
         public void messageRemoved(String messageId) {
             counter--;
         }

@@ -69,6 +69,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
 
     }
 
+    @Override
     public void resendAll() throws Exception {
         if (!processor.isActive()) {
 
@@ -81,6 +82,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
         }
     }
 
+    @Override
     public void deleteAll() throws Exception {
         if (!processor.isActive()) {
             messageStore.clear();
@@ -90,6 +92,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
         }
     }
 
+    @Override
     public List<String> messageIdList() throws Exception {
         if (!processor.isActive()) {
             int size = messageStore.size();
@@ -110,6 +113,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
 
     }
 
+    @Override
     public void resend(String messageID) throws Exception {
         if (!processor.isActive()) {
             if (messageID != null && !"".equals(messageID.trim())) {
@@ -125,6 +129,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
         }
     }
 
+    @Override
     public void delete(String messageID) throws Exception {
         if (!processor.isActive()) {
              if (messageID != null && !"".equals(messageID.trim())) {
@@ -136,6 +141,7 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
         }
     }
 
+    @Override
     public String getEnvelope(String messageID) throws Exception {
         if (!processor.isActive()) {
              if (messageID != null && !"".equals(messageID.trim())) {
@@ -156,22 +162,26 @@ public class MessageForwardingProcessorView implements MessageForwardingProcesso
         return null;
     }
 
+    @Override
     public int getSize() {
         return messageStore.size();
     }
 
 
+    @Override
     public boolean isActive() {
         assert processor != null;
         return processor.isActive();
     }
 
+    @Override
     public void activate() {
         assert processor != null;
         processor.resetSentAttemptCount();
         processor.activate();
     }
 
+    @Override
     public void deactivate() {
         assert processor != null;
         processor.deactivate();

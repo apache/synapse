@@ -69,14 +69,16 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 
 	protected SourceHandler sourceHandler;
 
-	public void init(ConfigurationContext cfgCtx, SourceHandler handler)
+	@Override
+    public void init(ConfigurationContext cfgCtx, SourceHandler handler)
 			throws AxisFault {
 
 		this.cfgCtx = cfgCtx;
 		this.sourceHandler = handler;
 	}
 
-	public void process(HttpRequest request, HttpResponse response,
+	@Override
+    public void process(HttpRequest request, HttpResponse response,
 			MessageContext msgContext, NHttpServerConnection conn,
 			boolean isRestDispatching) {
 

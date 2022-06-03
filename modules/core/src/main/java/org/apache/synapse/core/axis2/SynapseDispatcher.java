@@ -38,17 +38,20 @@ public class SynapseDispatcher extends AbstractDispatcher {
 
     public static final String NAME = "SynapseDispatcher";
 
+    @Override
     public void initDispatcher() {
         QName qn = new QName("http://synapse.apache.org", NAME);
         HandlerDescription hd = new HandlerDescription(qn.getLocalPart());
         super.init(hd);
     }
 
+    @Override
     public AxisService findService(MessageContext mc) throws AxisFault {
         AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
         return ac.getService(SynapseConstants.SYNAPSE_SERVICE_NAME);
     }
 
+    @Override
     public AxisOperation findOperation(AxisService svc, MessageContext mc) throws AxisFault {
         return svc.getOperation(SynapseConstants.SYNAPSE_OPERATION_NAME);
     }

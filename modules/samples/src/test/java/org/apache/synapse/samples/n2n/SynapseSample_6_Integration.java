@@ -27,6 +27,7 @@ import samples.userguide.StockQuoteClient;
  */
 public class SynapseSample_6_Integration extends AbstractAutomationTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_6.xml");
         System.setProperty("trpurl", SYNAPSE_BASE_URL + "soap/SimpleStockQuoteService");

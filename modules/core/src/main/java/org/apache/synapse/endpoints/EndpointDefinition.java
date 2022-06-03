@@ -523,6 +523,7 @@ public class EndpointDefinition implements AspectConfigurable {
         retryDisabledErrorCodes.add(code);
     }
 
+    @Override
     public String toString() {
         if (leafEndpoint != null) {
             return leafEndpoint.toString();
@@ -552,10 +553,12 @@ public class EndpointDefinition implements AspectConfigurable {
         }
     }
 
+    @Override
     public void configure(AspectConfiguration aspectConfiguration) {
         this.aspectConfiguration = aspectConfiguration;
     }
 
+    @Override
     public AspectConfiguration getAspectConfiguration() {
         return this.aspectConfiguration;
     }

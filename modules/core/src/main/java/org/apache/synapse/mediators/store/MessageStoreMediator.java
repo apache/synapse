@@ -49,6 +49,7 @@ public class MessageStoreMediator extends AbstractMediator{
     private String  onStoreSequence;
 
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         if(synCtx != null) {
             MessageStore messageStore = synCtx.getConfiguration().getMessageStore(messageStoreName);

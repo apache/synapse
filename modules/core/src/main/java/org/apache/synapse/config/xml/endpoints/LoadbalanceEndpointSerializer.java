@@ -34,6 +34,7 @@ import org.apache.synapse.endpoints.LoadbalanceEndpoint;
  */
 public class LoadbalanceEndpointSerializer extends EndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof LoadbalanceEndpoint)) {

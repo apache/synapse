@@ -64,6 +64,7 @@ public class FIXTransportSender extends AbstractTransportSender {
      * @param transportOut the Out Transport description
      * @throws AxisFault on error
      */
+    @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
         super.init(cfgCtx, transportOut);
         this.sessionFactory = FIXSessionFactory.getInstance(new FIXApplicationFactory(cfgCtx));
@@ -75,6 +76,7 @@ public class FIXTransportSender extends AbstractTransportSender {
         log.info("FIX transport sender initialized...");
     }
 
+    @Override
     public void stop() {
         try {
             this.workerPool.shutdown(10000);
@@ -93,6 +95,7 @@ public class FIXTransportSender extends AbstractTransportSender {
      * @param outTransportInfo the OutTransportInfo for the message
      * @throws AxisFault on error
      */
+    @Override
     public void sendMessage(MessageContext msgCtx, String targetEPR,
                             OutTransportInfo outTransportInfo) throws AxisFault {
 

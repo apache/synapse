@@ -78,6 +78,7 @@ public class MessageStoreMediatorSerializer extends AbstractMediatorSerializer {
 
     }
 
+    @Override
     public String getMediatorClassName() {
         return MessageStoreMediator.class.getName();
     }

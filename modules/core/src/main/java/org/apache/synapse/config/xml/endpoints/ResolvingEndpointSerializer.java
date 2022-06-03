@@ -31,6 +31,7 @@ import org.apache.synapse.config.xml.SynapseXPathSerializer;
  */
 public class ResolvingEndpointSerializer extends EndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof ResolvingEndpoint)) {

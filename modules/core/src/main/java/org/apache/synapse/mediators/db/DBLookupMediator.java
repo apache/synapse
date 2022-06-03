@@ -32,6 +32,7 @@ import java.sql.Connection;
  */
 public class DBLookupMediator extends AbstractDBMediator {
 
+    @Override
     protected void processStatement(Statement stmnt, MessageContext msgCtx) {
 
         SynapseLog synLog = getLog(msgCtx);

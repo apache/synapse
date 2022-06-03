@@ -37,6 +37,7 @@ public class LoopbackMediatorSerializer extends AbstractMediatorSerializer {
         return loopBack;
     }
 
+    @Override
     public String getMediatorClassName() {
         return LoopbackMediator.class.getName();
     }

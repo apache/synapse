@@ -47,6 +47,7 @@ public class SpringCustomLogger extends AbstractMediator {
     }
 
     /*This will log the username email that is initialised from Spring xml*/
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         log.info("Starting Spring Meditor");

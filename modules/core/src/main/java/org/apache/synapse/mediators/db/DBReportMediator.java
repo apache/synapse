@@ -43,6 +43,7 @@ public class DBReportMediator extends AbstractDBMediator {
     // default do not participate in a distribute tx
     boolean useTransaction = false;
 
+    @Override
     protected void processStatement(Statement stmnt, MessageContext msgCtx) {
 
 

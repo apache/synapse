@@ -245,7 +245,7 @@
                         <target>${java.version}</target>
                         <compilerArgs combine.children="append">
                             <compilerArg>-XDcompilePolicy=simple</compilerArg>
-                            <compilerArg>-Xplugin:ErrorProne -Xep:SizeGreaterThanOrEqualsZero:WARN -Xep:ReturnValueIgnored:WARN -Xep:GetClassOnClass:WARN -Xep:EqualsHashCode:WARN</compilerArg>
+                            <compilerArg>-Xplugin:ErrorProne -Xep:SizeGreaterThanOrEqualsZero:WARN -Xep:ReturnValueIgnored:WARN -Xep:GetClassOnClass:WARN -Xep:EqualsHashCode:WARN -Xep:MissingOverride:ERROR</compilerArg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <annotationProcessorPath>

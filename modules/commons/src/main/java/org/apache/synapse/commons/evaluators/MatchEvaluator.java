@@ -44,6 +44,7 @@ public class MatchEvaluator implements Evaluator {
 
     private Pattern regex = null;
 
+    @Override
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         String sourceText = textRetriever.getSourceText(context);
 
@@ -55,6 +56,7 @@ public class MatchEvaluator implements Evaluator {
         return matcher.matches();
     }
 
+    @Override
     public String getName() {
         return EvaluatorConstants.MATCH;
     }

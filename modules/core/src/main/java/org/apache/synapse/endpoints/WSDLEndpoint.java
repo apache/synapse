@@ -39,6 +39,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private String serviceName;
     private String portName;
 
+    @Override
     public void onFault(MessageContext synCtx) {
         
         // is this an actual leaf endpoint
@@ -55,10 +56,12 @@ public class WSDLEndpoint extends AbstractEndpoint {
         super.onFault(synCtx);
     }
 
+    @Override
     public void onSuccess() {
         getContext().onSuccess();
     }
 
+    @Override
     public void send(MessageContext synCtx) {
 
         if (getParentEndpoint() == null && !readyToSend()) {

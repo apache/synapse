@@ -44,6 +44,7 @@ public class IndirectEndpoint extends AbstractEndpoint {
      * Send by calling to the real endpoint
      * @param synCtx the message to send
      */
+    @Override
     public void send(MessageContext synCtx) {
 
         reLoadAndInitEndpoint(((Axis2MessageContext) synCtx).

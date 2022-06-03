@@ -79,6 +79,7 @@ public class PropertyMediator extends AbstractMediator {
      * @param synCtx the message context
      * @return true always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -224,6 +225,7 @@ public class PropertyMediator extends AbstractMediator {
         this.value = convertValue(value, type);
     }
 
+    @Override
     public String getType() {
         return type;
     }

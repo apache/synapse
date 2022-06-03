@@ -33,6 +33,7 @@ import org.apache.synapse.endpoints.Endpoint;
  */
 public class SendMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SendMediator)) {
@@ -57,6 +58,7 @@ public class SendMediatorSerializer extends AbstractMediatorSerializer {
         return send;
     }
 
+    @Override
     public String getMediatorClassName() {
         return SendMediator.class.getName();
     }

@@ -39,6 +39,7 @@ public class ResolvingEndpoint extends AbstractEndpoint {
      * Send by calling to the real endpoint
      * @param synCtx the message to send
      */
+    @Override
     public void send(MessageContext synCtx) {
 
         String key = keyExpression.stringValueOf(synCtx);

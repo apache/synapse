@@ -44,6 +44,7 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
     private LoadbalanceAlgorithm algorithm;
     private Properties properties;
 
+    @Override
     public void init(Properties props, LoadbalanceAlgorithm algorithm) {
         this.properties = props;
         this.lbDomain = props.getProperty("applicationDomain");
@@ -58,6 +59,7 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
         this.algorithm = algorithm;
     }
 
+    @Override
     public void setConfigurationContext(ConfigurationContext configCtx) {
         this.configCtx = configCtx;
 
@@ -79,6 +81,7 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
         }
     }
 
+    @Override
     public ConfigurationContext getConfigurationContext(){
         return configCtx;
     }
@@ -89,15 +92,18 @@ public class Axis2LoadBalanceMembershipHandler implements LoadBalanceMembershipH
      * @param context The AlgorithmContext
      * @return The current member
      */
+    @Override
     public Member getNextApplicationMember(AlgorithmContext context) {
         algorithm.setApplicationMembers(groupMgtAgent.getMembers());
         return algorithm.getNextApplicationMember(context);
     }
 
+    @Override
     public LoadbalanceAlgorithm getLoadbalanceAlgorithm() {
         return this.algorithm;
     }
 
+    @Override
     public Properties getProperties() {
         return this.properties;
     }

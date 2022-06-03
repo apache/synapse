@@ -53,6 +53,7 @@ public class BinaryExtractMediator extends AbstractMediator {
 
     public BinaryExtractMediator(){}
 
+    @Override
     public boolean mediate(MessageContext msgCtx) {
         try {
             log.debug("BinaryExtractMediator Process, with offset: "+offset+" ,length "+length);
@@ -77,14 +78,17 @@ public class BinaryExtractMediator extends AbstractMediator {
         return true;
     }
 
+    @Override
     public String getType() {
         return null;
     }
 
+    @Override
     public void setTraceState(int traceState) {
         this.traceState = traceState;
     }
 
+    @Override
     public int getTraceState() {
         return traceState;
     }

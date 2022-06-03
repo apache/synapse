@@ -68,18 +68,22 @@ public class SynapseBinaryDataSource implements DataSource {
         inputstream.close();
     }
 
+    @Override
     public String getContentType() {
         return contentType;
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
         return data.getInputStream();
     }
 
+    @Override
     public String getName() {
         return this.getClass().getName();
     }
 
+    @Override
     public OutputStream getOutputStream() throws IOException {
         return data.getOutputStream();
     }

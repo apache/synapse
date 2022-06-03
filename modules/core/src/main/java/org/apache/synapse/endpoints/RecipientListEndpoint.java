@@ -283,6 +283,7 @@ public class RecipientListEndpoint extends AbstractEndpoint {
 		return false;
 	}
 
+    @Override
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         //we just log the failed recipient here
         logOnChildEndpointFail(endpoint, synMessageContext);

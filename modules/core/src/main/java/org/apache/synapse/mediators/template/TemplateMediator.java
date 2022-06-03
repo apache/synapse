@@ -61,6 +61,7 @@ public class TemplateMediator extends AbstractListMediator {
         return eipPatternName;
     }
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog synLog = getLog(synCtx);
 

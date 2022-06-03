@@ -54,6 +54,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
 
     private static final SynapseAdaptorForOcspCrl ocspCrl = new SynapseAdaptorForOcspCrl();
 
+    @Override
     protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler, SSLContext sslContext,
         SSLSetupHandler sslSetupHandler, ConnectionConfig config,
         TransportOutDescription transportOut) throws AxisFault {
@@ -67,6 +68,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
      * @param transportOut the Axis2 transport configuration
      * @return the SSLContext to be used
      */
+    @Override
     protected SSLContext getSSLContext(TransportOutDescription transportOut) throws AxisFault {
 
         Parameter keyParam    = transportOut.getParameter("keystore");
@@ -101,6 +103,7 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
      * @return the SSLIOSessionHandler to be used
      * @throws AxisFault if a configuration error occurs
      */
+    @Override
     protected SSLSetupHandler getSSLSetupHandler(TransportOutDescription transportOut)
             throws AxisFault {
 
@@ -286,9 +289,11 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender {
 
         return new SSLSetupHandler() {
 
+            @Override
             public void initalize(SSLEngine sslengine) {
             }
 
+            @Override
             public void verify(IOSession ioSession, SSLSession session) throws SSLException {
                 SocketAddress remoteAddress = ioSession.getRemoteAddress();
                 String address;

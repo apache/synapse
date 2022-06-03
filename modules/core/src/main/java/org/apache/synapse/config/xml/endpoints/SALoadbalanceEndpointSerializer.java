@@ -37,6 +37,7 @@ import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
  */
 public class SALoadbalanceEndpointSerializer extends EndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof SALoadbalanceEndpoint)) {

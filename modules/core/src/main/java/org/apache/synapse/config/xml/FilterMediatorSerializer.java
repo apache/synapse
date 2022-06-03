@@ -46,6 +46,7 @@ import org.apache.synapse.mediators.filters.FilterMediator;
  */
 public class FilterMediatorSerializer extends AbstractListMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof FilterMediator)) {
@@ -105,6 +106,7 @@ public class FilterMediatorSerializer extends AbstractListMediatorSerializer {
         return filter;
     }
 
+    @Override
     public String getMediatorClassName() {
         return FilterMediator.class.getName();
     }

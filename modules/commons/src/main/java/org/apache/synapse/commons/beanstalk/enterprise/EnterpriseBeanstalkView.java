@@ -34,22 +34,27 @@ public class EnterpriseBeanstalkView implements EnterpriseBeanstalkViewMBean {
         this.beanstalk = beanstalk;
     }
 
+    @Override
     public String getBeanstalkName() {
         return beanstalk.getName();
     }
 
+    @Override
     public int getCachedStatelessStubCount() {
         return beanstalk.getStatelessBeans().size();
     }
 
+    @Override
     public int getCachedStatefulStubCount() {
         return beanstalk.getStatefulBeans().size();
     }
 
+    @Override
     public Map getStatelessStubCacheLastAccessTimes() {
         return getLastAccessTimesMap(beanstalk.getStatelessBeans());
     }
 
+    @Override
     public Map getStatefulStubCacheLastAccessTimes() {
         return getLastAccessTimesMap(beanstalk.getStatefulBeans());
     }
@@ -62,14 +67,17 @@ public class EnterpriseBeanstalkView implements EnterpriseBeanstalkViewMBean {
         return results;
     }
 
+    @Override
     public void cleanExpiredStubsNow() throws Exception {
         beanstalk.removeExpiredBeans();
     }
 
+    @Override
     public void removeStatelessStub(String className) {
         beanstalk.removeEnterpriseBean(className, null);
     }
 
+    @Override
     public void removeStatefulStub(String className, String sessionId) {
         beanstalk.removeEnterpriseBean(className, sessionId);
     }

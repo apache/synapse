@@ -42,6 +42,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t1 = new TestMediator();
         t1.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T1.");
                 }
@@ -49,6 +50,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t2 = new TestMediator();
         t2.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T2.");
                 }
@@ -56,6 +58,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t3 = new TestMediator();
         t3.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T3");
                 }
@@ -78,6 +81,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t1 = new TestMediator();
         t1.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T1.");
                 }
@@ -85,6 +89,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t2 = new TestMediator();
         t2.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T2.");
                     throw new SynapseException("test");
@@ -93,6 +98,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t3 = new TestMediator();
         t3.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T3.");
                 }
@@ -100,6 +106,7 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t4 = new TestMediator();
         t4.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     result.append("T4");
                     assertEquals("test", synCtx.getProperty(SynapseConstants.ERROR_MESSAGE));

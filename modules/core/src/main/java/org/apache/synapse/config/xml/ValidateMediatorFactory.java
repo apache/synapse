@@ -51,6 +51,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName ON_FAIL_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "on-fail");
     private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ValidateMediator validateMediator = new ValidateMediator();
@@ -137,6 +138,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         return validateMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return VALIDATE_Q;
     }

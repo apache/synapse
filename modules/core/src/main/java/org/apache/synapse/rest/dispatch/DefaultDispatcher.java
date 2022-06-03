@@ -27,6 +27,7 @@ import java.util.Collection;
 
 public class DefaultDispatcher implements RESTDispatcher {
 
+    @Override
     public Resource findResource(MessageContext synCtx, Collection<Resource> resources) {
         for (Resource resource : resources) {
             if (resource.getDispatcherHelper() == null) {

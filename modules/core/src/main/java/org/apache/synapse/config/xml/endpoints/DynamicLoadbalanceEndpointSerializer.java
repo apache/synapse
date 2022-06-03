@@ -47,6 +47,7 @@ import java.util.Properties;
 
 public class DynamicLoadbalanceEndpointSerializer extends EndpointSerializer {
     
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof DynamicLoadbalanceEndpoint)) {

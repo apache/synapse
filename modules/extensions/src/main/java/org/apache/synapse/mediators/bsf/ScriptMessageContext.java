@@ -155,42 +155,52 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     // -- all the remainder just use the underlying MessageContext
+    @Override
     public SynapseConfiguration getConfiguration() {
         return mc.getConfiguration();
     }
 
+    @Override
     public void setConfiguration(SynapseConfiguration cfg) {
         mc.setConfiguration(cfg);
     }
 
+    @Override
     public SynapseEnvironment getEnvironment() {
         return mc.getEnvironment();
     }
 
+    @Override
     public void setEnvironment(SynapseEnvironment se) {
         mc.setEnvironment(se);
     }
 
+    @Override
     public Map<String, Object> getContextEntries() {
         return mc.getContextEntries();
     }
 
+    @Override
     public void setContextEntries(Map<String, Object> entries) {
         mc.setContextEntries(entries);
     }
 
+    @Override
     public Object getProperty(String key) {
         return mc.getProperty(key);
     }
 
+    @Override
     public Object getEntry(String key) {
         return mc.getEntry(key);
     }
 
+    @Override
     public Object getLocalEntry(String key) {
         return mc.getLocalEntry(key);
     }
 
+    @Override
     public void setProperty(String key, Object value) {
         if (value instanceof XMLObject) {
             OMElement omElement = null;
@@ -282,174 +292,217 @@ public class ScriptMessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Set getPropertyKeySet() {
         return mc.getPropertyKeySet();
     }
 
+    @Override
     public Mediator getMainSequence() {
         return mc.getMainSequence();
     }
 
+    @Override
     public Mediator getFaultSequence() {
         return mc.getFaultSequence();
     }
 
+    @Override
     public Mediator getSequence(String key) {
         return mc.getSequence(key);
     }
 
+    @Override
     public Endpoint getEndpoint(String key) {
         return mc.getEndpoint(key);
     }
 
+    @Override
     public SOAPEnvelope getEnvelope() {
         return mc.getEnvelope();
     }
 
+    @Override
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
         mc.setEnvelope(envelope);
     }
 
+    @Override
     public EndpointReference getFaultTo() {
         return mc.getFaultTo();
     }
 
+    @Override
     public void setFaultTo(EndpointReference reference) {
         mc.setFaultTo(reference);
     }
 
+    @Override
     public EndpointReference getFrom() {
         return mc.getFrom();
     }
 
+    @Override
     public void setFrom(EndpointReference reference) {
         mc.setFrom(reference);
     }
 
+    @Override
     public String getMessageID() {
         return mc.getMessageID();
     }
 
+    @Override
     public void setMessageID(String string) {
         mc.setMessageID(string);
     }
 
+    @Override
     public RelatesTo getRelatesTo() {
         return mc.getRelatesTo();
     }
 
+    @Override
     public void setRelatesTo(RelatesTo[] reference) {
         mc.setRelatesTo(reference);
     }
 
+    @Override
     public EndpointReference getReplyTo() {
         return mc.getReplyTo();
     }
 
+    @Override
     public void setReplyTo(EndpointReference reference) {
         mc.setReplyTo(reference);
     }
 
+    @Override
     public EndpointReference getTo() {
         return mc.getTo();
     }
 
+    @Override
     public void setTo(EndpointReference reference) {
         mc.setTo(reference);
     }
 
+    @Override
     public void setWSAAction(String actionURI) {
         mc.setWSAAction(actionURI);
     }
 
+    @Override
     public String getWSAAction() {
         return mc.getWSAAction();
     }
 
+    @Override
     public String getSoapAction() {
         return mc.getSoapAction();
     }
 
+    @Override
     public void setSoapAction(String string) {
         mc.setSoapAction(string);
     }
 
+    @Override
     public void setWSAMessageID(String messageID) {
         mc.setWSAMessageID(messageID);
     }
 
+    @Override
     public String getWSAMessageID() {
         return mc.getWSAMessageID();
     }
 
+    @Override
     public boolean isDoingMTOM() {
         return mc.isDoingMTOM();
     }
 
+    @Override
     public boolean isDoingSWA() {
         return mc.isDoingSWA();
     }
 
+    @Override
     public void setDoingMTOM(boolean b) {
         mc.setDoingMTOM(b);
     }
 
+    @Override
     public void setDoingSWA(boolean b) {
         mc.setDoingSWA(b);
     }
 
+    @Override
     public boolean isDoingPOX() {
         return mc.isDoingPOX();
     }
 
+    @Override
     public void setDoingPOX(boolean b) {
         mc.setDoingPOX(b);
     }
 
+    @Override
     public boolean isDoingGET() {
         return mc.isDoingGET();
     }
 
+    @Override
     public void setDoingGET(boolean b) {
         mc.setDoingGET(b);
     }
 
+    @Override
     public boolean isSOAP11() {
         return mc.isSOAP11();
     }
 
+    @Override
     public void setResponse(boolean b) {
         mc.setResponse(b);
     }
 
+    @Override
     public boolean isResponse() {
         return mc.isResponse();
     }
 
+    @Override
     public void setFaultResponse(boolean b) {
         mc.setFaultResponse(b);
     }
 
+    @Override
     public boolean isFaultResponse() {
         return mc.isFaultResponse();
     }
 
+    @Override
     public int getTracingState() {
         return mc.getTracingState();
     }
 
+    @Override
     public void setTracingState(int tracingState) {
         mc.setTracingState(tracingState);
     }
 
+    @Override
     public Stack<FaultHandler> getFaultStack() {
         return mc.getFaultStack();
     }
 
+    @Override
     public void pushFaultHandler(FaultHandler fault) {
         mc.pushFaultHandler(fault);
     }
 
+    @Override
     public Log getServiceLog() {
         return LogFactory.getLog(ScriptMessageContext.class);
     }
@@ -459,6 +512,7 @@ public class ScriptMessageContext implements MessageContext {
      * @param key the sequence key to be looked up
      * @return the sequence template
      */
+    @Override
     public Mediator getSequenceTemplate(String key) {
         return mc.getSequenceTemplate(key);
     }

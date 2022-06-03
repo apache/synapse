@@ -152,6 +152,7 @@ public class ClientHandler implements NHttpClientEventHandler {
         metrics.setConnectionsPerHosts(openConnections);
     }
 
+    @Override
     public void requestReady(final NHttpClientConnection conn) {
         // The connection is ready for submission of a new request
     }
@@ -175,6 +176,7 @@ public class ClientHandler implements NHttpClientEventHandler {
      * @param conn the connection being processed
      * @param attachment the attachment set previously
      */
+    @Override
     public void connected(final NHttpClientConnection conn, final Object attachment) {
 
         if (log.isDebugEnabled() ) {
@@ -268,6 +270,7 @@ public class ClientHandler implements NHttpClientEventHandler {
      * 
      * @param conn HTTP connection to be closed
      */
+    @Override
     public void closed(final NHttpClientConnection conn) {
         ConnectionPool.forget(conn);
         String message = getErrorMessage("Connection close", conn);
@@ -299,6 +302,7 @@ public class ClientHandler implements NHttpClientEventHandler {
      * 
      * @param conn the connection being processed
      */
+    @Override
     public void timeout(final NHttpClientConnection conn) {
         String message = getErrorMessage("Connection timeout", conn);
         if (log.isDebugEnabled()) {
@@ -323,10 +327,12 @@ public class ClientHandler implements NHttpClientEventHandler {
         context.removeAttribute(REQUEST_SOURCE_BUFFER);
     }
 
+    @Override
     public void endOfInput(NHttpClientConnection conn) throws IOException {
         closed(conn);
     }
 
+    @Override
     public void exception(NHttpClientConnection conn, Exception e) {
         if (e instanceof HttpException) {
             exception(conn, (HttpException) e);
@@ -447,6 +453,7 @@ public class ClientHandler implements NHttpClientEventHandler {
             }
 
             workerPool.execute( new Runnable() {
+                @Override
                 public void run() {
                     MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
                     try {
@@ -504,6 +511,7 @@ public class ClientHandler implements NHttpClientEventHandler {
      * @param conn connection being processed
      * @param decoder the content decoder in use
      */
+    @Override
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
@@ -581,6 +589,7 @@ public class ClientHandler implements NHttpClientEventHandler {
      * @param conn the connection being processed
      * @param encoder the encoder in use
      */
+    @Override
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         HttpContext context = conn.getContext();
 
@@ -634,6 +643,7 @@ public class ClientHandler implements NHttpClientEventHandler {
      * 
      * @param conn the connection being processed
      */
+    @Override
     public void responseReceived(final NHttpClientConnection conn) {
 
         setServerContextAttribute(NhttpConstants.RES_HEADER_ARRIVAL_TIME,
@@ -832,6 +842,7 @@ public class ClientHandler implements NHttpClientEventHandler {
 
             Map<String, String> headerMap
                     = new TreeMap<String, String>(new Comparator<String>() {
+                @Override
                 public int compare(String o1, String o2) {
                     return o1.compareToIgnoreCase(o2);
                 }

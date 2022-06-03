@@ -40,6 +40,7 @@ public class ServiceLocator implements ClassVisitor {
         return implementations;
     }
 
+    @Override
     public void init(ClassLoader classLoader) throws ClassScannerException {
         try {
             serviceClass = classLoader.loadClass(serviceClassName);
@@ -48,6 +49,7 @@ public class ServiceLocator implements ClassVisitor {
         }
     }
 
+    @Override
     public void visit(Class<?> clazz) throws ClassScannerException {
         if (serviceClass.isAssignableFrom(clazz) && !Modifier.isAbstract(clazz.getModifiers())) {
             implementations.add(clazz.getName());

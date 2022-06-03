@@ -41,12 +41,14 @@ public class CustomURIBasedDispatcher extends AbstractDispatcher {
     private static final Log log = LogFactory.getLog(CustomURIBasedDispatcher.class);
     public static final String NAME = "CustomURIBasedDispatcher";
     
+    @Override
     public AxisOperation findOperation(AxisService axisService, MessageContext messageContext)
             throws AxisFault {
         // no need to do any processing, since this is not for operation dispatching
         return null;
     }
 
+    @Override
     public AxisService findService(MessageContext messageContext) throws AxisFault {
 
         EndpointReference toEPR = messageContext.getTo();
@@ -77,6 +79,7 @@ public class CustomURIBasedDispatcher extends AbstractDispatcher {
         return null;
     }
 
+    @Override
     public void initDispatcher() {
         init(new HandlerDescription(NAME));
     }

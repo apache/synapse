@@ -138,6 +138,7 @@ public class LibraryArtifact implements SynapseArtifact{
         this.extractedPath = path;
     }
 
+    @Override
     public String toString() {
         return name;
     }
@@ -154,10 +155,12 @@ public class LibraryArtifact implements SynapseArtifact{
         this.parent = parent;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getDescription() {
         return description;  //To change body of implemented methods use File | Settings | File Templates.
     }

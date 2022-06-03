@@ -29,12 +29,14 @@ import java.util.Map;
  */
 public class PerUserIPViewStrategy extends PerUserViewStrategy {
 
+    @Override
     public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
             ComponentType type) {
         return determineView(statisticsRecords, type, IP);
     }
 
+    @Override
     public Map<String, InOutStatisticsView> determineView(
             String id, List<StatisticsRecord> statisticsRecords, ComponentType type) {
         return determineView(id, statisticsRecords,

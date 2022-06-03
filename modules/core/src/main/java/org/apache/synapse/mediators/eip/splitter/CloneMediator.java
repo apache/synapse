@@ -65,6 +65,7 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
      * @param synCtx - MessageContext which is subjected to the cloning
      * @return boolean true if this needs to be further mediated (continueParent=true)
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -187,6 +188,7 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         this.sequential = sequential;
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
 
         for (Target target : targets) {
@@ -201,6 +203,7 @@ public class CloneMediator extends AbstractMediator implements ManagedLifecycle 
         }
     }
 
+    @Override
     public void destroy() {
 
         for (Target target : targets) {

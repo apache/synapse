@@ -35,6 +35,7 @@ import java.util.Properties;
 public class LibraryArtifactDeployer extends AbstractSynapseArtifactDeployer {
     private static final Log log = LogFactory.getLog(LibraryArtifactDeployer.class);
 
+    @Override
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
         String libFilePath = FilenameUtils.normalize(deploymentFileData.getAbsolutePath());
         if (log.isDebugEnabled()) {
@@ -126,6 +127,7 @@ public class LibraryArtifactDeployer extends AbstractSynapseArtifactDeployer {
         }
     }
 
+    @Override
     public void undeploy(String fileName) throws DeploymentException {
         fileName = FilenameUtils.normalize(fileName);
         if (log.isDebugEnabled()) {
@@ -178,6 +180,7 @@ public class LibraryArtifactDeployer extends AbstractSynapseArtifactDeployer {
         }
     }
 
+    @Override
     public void undeploySynapseArtifact(String artifactName) {
         //get Old Lib config
         Library existingLib = null;
@@ -196,20 +199,25 @@ public class LibraryArtifactDeployer extends AbstractSynapseArtifactDeployer {
 
     //avoid implementing any of the below methods since these are unusable in this library deployment
     // scenario . we just want to inherit some of the methods from  AbstractSynapseArtifactDeployer
+    @Override
     public void setDirectory(String directory) {
     }
 
+    @Override
     public void setExtension(String extension) {
     }
 
+    @Override
     public String deploySynapseArtifact(OMElement artifactConfig, String fileName, Properties properties) {
         return null;
     }
 
+    @Override
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName, String existingArtifactName, Properties properties) {
         return null;
     }
 
+    @Override
     public void restoreSynapseArtifact(String artifactName) {
     }
 }

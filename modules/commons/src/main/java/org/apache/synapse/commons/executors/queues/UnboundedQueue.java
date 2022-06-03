@@ -46,18 +46,22 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
         this.priority = priority;        
     }
 
+    @Override
     public Iterator<E> iterator() {
         return elements.iterator();
     }
 
+    @Override
     public int size() {
         return elements.size();
     }
 
+    @Override
     public boolean offer(E e) {
         return elements.add(e);
     }
 
+    @Override
     public E poll() {
         if (elements.size() > 0) {
             return elements.remove(elements.size() - 1);
@@ -65,6 +69,7 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
         return null;
     }
 
+    @Override
     public E peek() {
         if (elements.size() > 0) {
             return elements.get(elements.size() - 1);
@@ -72,22 +77,27 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
         return null;
     }
 
+    @Override
     public int getPriority() {
         return priority;
     }
 
+    @Override
     public void setPriority(int p) {
         this.priority = p;
     }    
 
+    @Override
     public Condition getNotFullCond() {
         return notFullCond;
     }
 
+    @Override
     public void setNotFullCond(Condition condition) {
         this.notFullCond = condition;
     }
 
+    @Override
     public int drainTo(Collection<? super E> c) {
         int count = elements.size();
         c.addAll(elements);
@@ -95,6 +105,7 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
         return count;
     }
 
+    @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
         if (maxElements >= elements.size()) {
             return drainTo(c);
@@ -104,10 +115,12 @@ public class UnboundedQueue<E> extends AbstractQueue<E> implements InternalQueue
         }
     }
 
+    @Override
     public int remainingCapacity() {
         return Integer.MAX_VALUE;
     }
 
+    @Override
     public int getCapacity() {
         return Integer.MAX_VALUE;
     }

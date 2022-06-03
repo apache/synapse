@@ -30,11 +30,13 @@ import java.util.Properties;
  */
 public class CloneMediatorTest extends AbstractSplitMediatorTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         fac = new CloneMediatorFactory();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         fac = null;

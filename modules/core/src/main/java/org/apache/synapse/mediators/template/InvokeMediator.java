@@ -55,6 +55,7 @@ public class InvokeMediator extends AbstractMediator {
         pName2ExpressionMap = new LinkedHashMap<String, Value>();
     }
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog synLog = getLog(synCtx);
 

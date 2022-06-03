@@ -34,14 +34,17 @@ import org.apache.axiom.om.OMElement;
 public class AXIOMResultBuilder implements ResultBuilder {
 	private final OMDocument document = OMAbstractFactory.getOMFactory().createOMDocument();
     
+    @Override
     public SAXResult getResult() {
         return document.getSAXResult();
     }
 
+    @Override
     public OMElement getNode(Charset charset) {
         return document.getOMDocumentElement();
     }
 
+    @Override
     public void release() {
     }
 }

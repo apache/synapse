@@ -56,7 +56,8 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 	 *            the message context
 	 * @return as per standard semantics
 	 */
-	public boolean mediate(MessageContext synCtx) {
+	@Override
+    public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
 
@@ -87,6 +88,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
         return result;
     }
 
+    @Override
     public void destroy() {
         if (log.isDebugEnabled()) {
             log.debug("Destroying class mediator instance for : " + mediator.getClass());
@@ -96,6 +98,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
         }
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (log.isDebugEnabled()) {
             log.debug("Initializing class mediator instance for : " + mediator.getClass());

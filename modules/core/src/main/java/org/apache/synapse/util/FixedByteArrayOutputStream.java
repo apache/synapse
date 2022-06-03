@@ -28,6 +28,7 @@ public class FixedByteArrayOutputStream extends ByteArrayOutputStream {
         super(size);
     }
 
+    @Override
     public synchronized void write(int b) {
         if (count+1 > buf.length) {
             throw new SynapseException("Fixed size of internal byte array exceeded");
@@ -35,6 +36,7 @@ public class FixedByteArrayOutputStream extends ByteArrayOutputStream {
         super.write(b);
     }
 
+    @Override
     public synchronized void write(byte b[], int off, int len) {
         if (count+len > buf.length) {
             throw new SynapseException("Fixed size of internal byte array exceeded");

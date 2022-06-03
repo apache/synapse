@@ -43,6 +43,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName TEMPLATE_BODY_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
 
+    @Override
     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
         TemplateMediator templateTemplateMediator = new TemplateMediator();
         OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
@@ -61,6 +62,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
         return templateTemplateMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return TEMPLATE_Q;
     }

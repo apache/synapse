@@ -26,6 +26,7 @@ public class TestMediateHandlerImpl implements TestMediateHandler {
 
     public static int invokeCount = 0;
 
+    @Override
     public void handle(MessageContext synCtx) {
         invokeCount++;
     }

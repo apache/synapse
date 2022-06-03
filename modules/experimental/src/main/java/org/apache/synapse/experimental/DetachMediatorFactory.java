@@ -36,10 +36,12 @@ public class DetachMediatorFactory extends AbstractMediatorFactory {
                 = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "detach");
     private static final QName ATT_PROPERTY = new QName("property");
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }
 
+    @Override
     public DetachMediator createSpecificMediator(OMElement elem, Properties properties) {
         DetachMediator mediator = new DetachMediator();
 

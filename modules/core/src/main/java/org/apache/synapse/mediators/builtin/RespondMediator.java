@@ -36,6 +36,7 @@ public class RespondMediator extends AbstractMediator {
      * @param synCtx the current message for mediation
      * @return false
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog synapseLog = getLog(synCtx);
 

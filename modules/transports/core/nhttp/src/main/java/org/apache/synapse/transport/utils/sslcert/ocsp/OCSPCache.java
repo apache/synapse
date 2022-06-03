@@ -87,6 +87,7 @@ public class OCSPCache implements ManageableCache {
      * Todo: Can move to an abstract class.
      * @return next cache value of the cache.
      */
+    @Override
     public ManageableCacheValue getNextCacheValue() {
         //Changes to the hash map are reflected on the keySet. And its iterator is weakly consistent. so will never
         //throw concurrent modification exception.
@@ -101,10 +102,12 @@ public class OCSPCache implements ManageableCache {
     /**
      * @return the current cache size (size of the hash map)
      */
+    @Override
     public int getCacheSize() {
         return hashMap.size();
     }
 
+    @Override
     public synchronized void resetIterator(){
         iterator = hashMap.entrySet().iterator();
     }
@@ -210,12 +213,14 @@ public class OCSPCache implements ManageableCache {
         /**
          * An OCSP response is valid during its validity period.
          */
+        @Override
         public boolean isValid() {
             Date now = new Date();
             Date nextUpdate = singleResp.getNextUpdate();
             return nextUpdate != null && nextUpdate.after(now);
         }
 
+        @Override
         public long getTimeStamp() {
             return timeStamp;
         }
@@ -223,10 +228,12 @@ public class OCSPCache implements ManageableCache {
         /**
          * Used by cacheManager to remove invalid entries.
          */
+        @Override
         public void removeThisCacheValue() {
             removeCacheValue(serialNumber);
         }
 
+        @Override
         public void updateCacheWithNewValue() {
             replaceNewCacheValue(this);
         }

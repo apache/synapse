@@ -85,6 +85,7 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * @param elem configuration element of the mediator to be built
      * @return built mediator using the above element
      */
+    @Override
     public final Mediator createMediator(OMElement elem, Properties properties) {
         Mediator mediator = createSpecificMediator(elem, properties);
         OMElement descElem = elem.getFirstChildWithName(DESCRIPTION_Q);

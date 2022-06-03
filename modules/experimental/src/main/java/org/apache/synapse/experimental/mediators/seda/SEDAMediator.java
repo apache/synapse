@@ -38,6 +38,7 @@ public class SEDAMediator extends AbstractMediator implements ManagedLifecycle {
     // A key of the mediator that do work after SEDA component - actual consumer
     private String consumer;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         if (initialized) {
             sedaQueueProducer.produce(synCtx);
@@ -45,6 +46,7 @@ public class SEDAMediator extends AbstractMediator implements ManagedLifecycle {
         return false;
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         Mediator mediator = se.getSynapseConfiguration().getSequence(consumer);
         sedaQueue = new SEDAQueue(sedaQueuePolicy,
@@ -56,6 +58,7 @@ public class SEDAMediator extends AbstractMediator implements ManagedLifecycle {
         initialized = true;
     }
 
+    @Override
     public void destroy() {
         sedaQueue.destory();
         initialized = false;

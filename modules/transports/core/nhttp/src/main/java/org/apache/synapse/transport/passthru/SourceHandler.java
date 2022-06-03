@@ -68,6 +68,7 @@ public class SourceHandler implements NHttpServerEventHandler {
 		}
     }
 
+    @Override
     public void connected(NHttpServerConnection conn) {
         // we have to have these two operations in order
         sourceConfiguration.getSourceConnections().addConnection(conn);
@@ -75,6 +76,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         metrics.connected();
     }
 
+    @Override
     public void requestReceived(NHttpServerConnection conn) {
         try {
             conn.getContext().setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME,
@@ -122,6 +124,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void inputReady(NHttpServerConnection conn, ContentDecoder decoder) {
         try {
             ProtocolState protocolState = SourceContext.getState(conn);
@@ -147,6 +150,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void responseReady(NHttpServerConnection conn) {
         try {
             ProtocolState protocolState = SourceContext.getState(conn);
@@ -183,6 +187,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void outputReady(NHttpServerConnection conn, ContentEncoder encoder) {
         try {
             ProtocolState protocolState = SourceContext.getState(conn);
@@ -258,6 +263,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         } 
     }
 
+    @Override
     public void endOfInput(NHttpServerConnection conn) throws IOException {
         ProtocolState state = SourceContext.getState(conn);
         boolean isError = false;
@@ -283,6 +289,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         sourceConfiguration.getSourceConnections().shutDownConnection(conn, isError);
     }
 
+    @Override
     public void exception(NHttpServerConnection conn, Exception e) {
         if (e instanceof HttpException) {
             exception(conn, (HttpException) e);
@@ -390,6 +397,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void timeout(NHttpServerConnection conn) {
         ProtocolState state = SourceContext.getState(conn);
 
@@ -416,6 +424,7 @@ public class SourceHandler implements NHttpServerEventHandler {
         sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);
     }
 
+    @Override
     public void closed(NHttpServerConnection conn) {
         ProtocolState state = SourceContext.getState(conn);
         boolean isFault = false;

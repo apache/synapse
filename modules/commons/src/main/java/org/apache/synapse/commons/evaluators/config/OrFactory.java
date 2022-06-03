@@ -43,6 +43,7 @@ import java.util.ArrayList;
 public class OrFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(OrFactory.class);
 
+    @Override
     public Evaluator create(OMElement e) throws EvaluatorException {
         OrEvaluator o = new OrEvaluator();
 

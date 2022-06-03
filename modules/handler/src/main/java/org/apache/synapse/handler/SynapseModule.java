@@ -51,6 +51,7 @@ public class SynapseModule implements Module {
      * @param axisModule - AxisModule describing handler initializationModule of Synapse
      * @throws AxisFault - in-case of a failure in initiation
      */
+    @Override
     public void init(ConfigurationContext configurationContext, AxisModule axisModule)
             throws AxisFault {
 
@@ -73,8 +74,12 @@ public class SynapseModule implements Module {
         }
     }
 
+    @Override
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {}
+    @Override
     public boolean canSupportAssertion(Assertion assertion) { return false; }
+    @Override
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {}
+    @Override
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {}
 }

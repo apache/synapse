@@ -32,10 +32,12 @@ package org.apache.synapse.commons.evaluators;
 public class NotEvaluator implements Evaluator {
     private Evaluator evaluator;
 
+    @Override
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         return !evaluator.evaluate(context);
     }
 
+    @Override
     public String getName() {
         return EvaluatorConstants.NOT;
     }

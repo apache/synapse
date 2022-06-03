@@ -90,6 +90,7 @@ public class AMQPConsumer {
                     CLASS +
                             ": Setting an ExceptionListener on the connection as sample uses a MessageConsumer");
             connection.setExceptionListener(new ExceptionListener() {
+                @Override
                 public void onException(JMSException jmse) {
                     // The connection may have broken invoke reconnect code if available.
                     // The connection may have broken invoke reconnect code if available.

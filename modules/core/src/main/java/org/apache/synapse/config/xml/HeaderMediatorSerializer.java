@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
  */
 public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof HeaderMediator)) {
@@ -88,6 +89,7 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer {
         return header;
     }
 
+    @Override
     public String getMediatorClassName() {
         return HeaderMediator.class.getName();
     }

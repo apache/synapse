@@ -82,6 +82,7 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
         return result;
     }
 
+    @Override
     public void addDataSourceInformation(DataSourceInformation dataSourceInformation) {
 
         assertDataSourceInformationNull(dataSourceInformation);
@@ -100,6 +101,7 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
         }
     }
 
+    @Override
     public void removeDataSourceInformation(DataSourceInformation dataSourceInformation) {
 
         assertDataSourceInformationNull(dataSourceInformation);
@@ -118,6 +120,7 @@ public class DataSourceRepositoryManager implements DataSourceInformationReposit
         }
     }
 
+    @Override
     public void reConfigure(Properties confProperties) {
 
         if (log.isDebugEnabled()) {

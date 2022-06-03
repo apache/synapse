@@ -32,6 +32,7 @@ public class ConnectCallback implements SessionRequestCallback {
     /** The agent used for delivering requests */
     private DeliveryAgent deliveryAgent;
 
+    @Override
     public void completed(SessionRequest request) {
         HostConnections pool = (HostConnections) request.getAttachment();
         pool.pendingConnectionSucceeded();
@@ -45,6 +46,7 @@ public class ConnectCallback implements SessionRequestCallback {
         }
     }
 
+    @Override
     public void failed(SessionRequest request) {
         HostConnections pool = (HostConnections) request.getAttachment();
         pool.pendingConnectionFailed();
@@ -55,6 +57,7 @@ public class ConnectCallback implements SessionRequestCallback {
         handleError("Connection refused or failed for : " + request.getRemoteAddress());
     }
 
+    @Override
     public void timeout(SessionRequest request) {
         HostConnections pool = (HostConnections) request.getAttachment();
         pool.pendingConnectionFailed();
@@ -66,6 +69,7 @@ public class ConnectCallback implements SessionRequestCallback {
         request.cancel();
     }
 
+    @Override
     public void cancelled(SessionRequest request) {
         HostConnections pool = (HostConnections) request.getAttachment();
         pool.pendingConnectionFailed();

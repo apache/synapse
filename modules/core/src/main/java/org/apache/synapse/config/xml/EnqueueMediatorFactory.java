@@ -36,6 +36,7 @@ public class EnqueueMediatorFactory extends AbstractMediatorFactory{
     public static final QName PRIORITY_ATT = new QName("priority");
     public static final QName QUEUE_ATT = new QName("executor");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         EnqueueMediator mediator = new EnqueueMediator();
 
@@ -61,6 +62,7 @@ public class EnqueueMediatorFactory extends AbstractMediatorFactory{
         return mediator;
     }
 
+    @Override
     public QName getTagQName() {
         return ENQUEUE_Q;
     }

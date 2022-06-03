@@ -85,6 +85,7 @@ public class CRLCache implements ManageableCache {
      *
      * @return next cache value of the cache.
      */
+    @Override
     public synchronized ManageableCacheValue getNextCacheValue() {
         //changes to the map are reflected on the keySet. And its iterator is weakly consistent.
         // so will never throw concurrent modification exception.
@@ -99,10 +100,12 @@ public class CRLCache implements ManageableCache {
     /**
      * To get the current cache size (size of the hash map).
      */
+    @Override
     public synchronized int getCacheSize() {
         return hashMap.size();
     }
 
+    @Override
     public synchronized void resetIterator() {
         iterator = hashMap.entrySet().iterator();
     }
@@ -188,12 +191,14 @@ public class CRLCache implements ManageableCache {
         /**
          * CRL has a validity period. We can reuse a downloaded CRL within that period.
          */
+        @Override
         public boolean isValid() {
             Date today = new Date();
             Date nextUpdate = crl.getNextUpdate();
             return nextUpdate != null && nextUpdate.after(today);
         }
 
+        @Override
         public long getTimeStamp() {
             return timeStamp;
         }
@@ -201,10 +206,12 @@ public class CRLCache implements ManageableCache {
         /**
          * Used by cacheManager to remove invalid entries.
          */
+        @Override
         public void removeThisCacheValue() {
             removeCacheValue(crlUrl);
         }
 
+        @Override
         public void updateCacheWithNewValue() {
             replaceNewCacheValue(this);
         }

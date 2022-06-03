@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
  */
 public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof PropertyMediator)) {
@@ -87,6 +88,7 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
         return property;
     }
 
+    @Override
     public String getMediatorClassName() {
         return PropertyMediator.class.getName();
     }

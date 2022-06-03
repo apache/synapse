@@ -53,11 +53,13 @@ public class SwitchMediatorTest extends TestCase {
     TestMediator ibmMediator, msftMediator, defaultMediator;
     SwitchMediator switchMediator = null;
 
+    @Override
     public void setUp() throws Exception {
 
         ibmMediator = new TestMediator();
         ibmMediator.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     setExecutedCase("IBM");
                 }
@@ -66,6 +68,7 @@ public class SwitchMediatorTest extends TestCase {
         msftMediator = new TestMediator();
         msftMediator.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     setExecutedCase("MSFT");
                 }
@@ -74,6 +77,7 @@ public class SwitchMediatorTest extends TestCase {
         defaultMediator = new TestMediator();
         defaultMediator.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     setExecutedCase("DEFAULT");
                 }

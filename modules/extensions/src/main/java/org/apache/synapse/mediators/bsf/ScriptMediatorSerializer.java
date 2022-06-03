@@ -37,6 +37,7 @@ import java.util.Map;
  */
 public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof ScriptMediator)) {
@@ -83,6 +84,7 @@ public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
         return script;
     }
 
+    @Override
     public String getMediatorClassName() {
         return ScriptMediator.class.getName();
     }

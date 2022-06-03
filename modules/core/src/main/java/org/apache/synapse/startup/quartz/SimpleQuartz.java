@@ -54,10 +54,12 @@ public class SimpleQuartz extends AbstractStartup {
 
     private Task task = null;
 
+    @Override
     public QName getTagQName() {
         return SimpleQuartzFactory.TASK;
     }
 
+    @Override
     public void destroy() {
 
         if (taskDescription == null) {
@@ -86,6 +88,7 @@ public class SimpleQuartz extends AbstractStartup {
         }
     }
 
+    @Override
     public void init(SynapseEnvironment synapseEnvironment) {
 
         if (taskDescription == null) {

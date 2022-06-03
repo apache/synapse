@@ -26,10 +26,12 @@ public class WeightedRoundRobinView implements WeightedRoundRobinViewMBean {
         this.algorithm = algorithm;
     }
 
+    @Override
     public void changeWeight(int pos, int weight) {
         algorithm.changeWeight(pos, weight);
     }
 
+    @Override
     public int[] getCurrentWeights() {
         return algorithm.getCurrentWeights();
     }

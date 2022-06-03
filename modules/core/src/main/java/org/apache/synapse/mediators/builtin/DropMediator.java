@@ -35,6 +35,7 @@ public class DropMediator extends AbstractMediator {
      * @param synCtx the current message
      * @return false always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
          SynapseLog synLog = getLog(synCtx);

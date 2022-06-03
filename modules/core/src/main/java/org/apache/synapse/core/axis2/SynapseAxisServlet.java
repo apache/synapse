@@ -44,6 +44,7 @@ public class SynapseAxisServlet extends AxisServlet {
      * @param config the servlet configuration on which synapse initializes.
      * @throws ServletException
      */
+    @Override
     public void init(ServletConfig config) throws ServletException {
         ServletContext servletContext = config.getServletContext();
 
@@ -60,6 +61,7 @@ public class SynapseAxisServlet extends AxisServlet {
         }
     }
 
+    @Override
     public void initContextRoot(HttpServletRequest req) {
         this.configContext.setContextRoot("/");
     }
@@ -71,6 +73,7 @@ public class SynapseAxisServlet extends AxisServlet {
      *
      * @see org.apache.axis2.transport.http.AxisServlet#createMessageContext(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, boolean)
      */
+    @Override
     protected MessageContext createMessageContext(HttpServletRequest request,
                                                   HttpServletResponse response,
                                                   boolean invocationType) throws IOException {

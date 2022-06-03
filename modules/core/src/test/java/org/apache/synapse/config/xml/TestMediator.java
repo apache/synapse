@@ -33,6 +33,7 @@ public class TestMediator extends AbstractMediator {
 
     private OMElement testElemProp;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         return false;
     }
@@ -53,6 +54,7 @@ public class TestMediator extends AbstractMediator {
         this.testElemProp = testElemProp;
     }
 
+    @Override
     public String getType() {
         return TestMediator.class.getName();
     }

@@ -33,6 +33,7 @@ import org.apache.synapse.mediators.eip.sample.SamplingThrottleMediator;
  */
 public class SamplingThrottleMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator mediator) {
         OMElement samplerElem = fac.createOMElement("sampler", synNS);
         saveTracingState(samplerElem, mediator);
@@ -69,6 +70,7 @@ public class SamplingThrottleMediatorSerializer extends AbstractMediatorSerializ
         return samplerElem;
     }
 
+    @Override
     public String getMediatorClassName() {
         return SamplingThrottleMediator.class.getName();
     }

@@ -82,30 +82,37 @@ public class Axis2MessageContext implements MessageContext {
     /** The service log for this message */
     private Log serviceLog = null;
 
+    @Override
     public SynapseConfiguration getConfiguration() {
         return synCfg;
     }
 
+    @Override
     public void setConfiguration(SynapseConfiguration synCfg) {
         this.synCfg = synCfg;
     }
 
+    @Override
     public SynapseEnvironment getEnvironment() {
         return synEnv;
     }
 
+    @Override
     public void setEnvironment(SynapseEnvironment synEnv) {
         this.synEnv = synEnv;
     }
 
+    @Override
     public Map<String, Object> getContextEntries() {
         return localEntries;
     }
 
+    @Override
     public void setContextEntries(Map<String, Object> entries) {
         this.localEntries.putAll(entries);
     }
 
+    @Override
     public Mediator getMainSequence() {
         Object o = localEntries.get(SynapseConstants.MAIN_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
@@ -117,6 +124,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Mediator getFaultSequence() {
         Object o = localEntries.get(SynapseConstants.FAULT_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
@@ -128,6 +136,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Mediator getSequence(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Mediator) {
@@ -147,6 +156,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Mediator getSequenceTemplate(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Mediator) {
@@ -163,6 +173,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Endpoint getEndpoint(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Endpoint) {
@@ -183,6 +194,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Object getEntry(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Entry) {
@@ -199,6 +211,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Object getLocalEntry(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Entry) {
@@ -223,10 +236,12 @@ public class Axis2MessageContext implements MessageContext {
         return Collections.unmodifiableMap(properties);
     }
 
+    @Override
     public Object getProperty(String key) {
         return properties.get(key);
     }
 
+    @Override
     public void setProperty(String key, Object value) {
         if (value == null) {
             return;
@@ -242,6 +257,7 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Set getPropertyKeySet() {
         return properties.keySet();
     }
@@ -260,116 +276,144 @@ public class Axis2MessageContext implements MessageContext {
         this.synEnv = synEnv;
     }
 
+    @Override
     public EndpointReference getFaultTo() {
         return axis2MessageContext.getFaultTo();
     }
 
+    @Override
     public void setFaultTo(EndpointReference reference) {
         axis2MessageContext.setFaultTo(reference);
     }
 
+    @Override
     public EndpointReference getFrom() {
         return axis2MessageContext.getFrom();
     }
 
+    @Override
     public void setFrom(EndpointReference reference) {
         axis2MessageContext.setFrom(reference);
     }
 
+    @Override
     public SOAPEnvelope getEnvelope() {
         return axis2MessageContext.getEnvelope();
     }
 
+    @Override
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
         axis2MessageContext.setEnvelope(envelope);
     }
 
+    @Override
     public String getMessageID() {
         return axis2MessageContext.getMessageID();
     }
 
+    @Override
     public void setMessageID(String string) {
         axis2MessageContext.setMessageID(string);
     }
 
+    @Override
     public RelatesTo getRelatesTo() {
         return axis2MessageContext.getRelatesTo();
     }
 
+    @Override
     public void setRelatesTo(RelatesTo[] reference) {
         axis2MessageContext.setRelationships(reference);
     }
 
+    @Override
     public EndpointReference getReplyTo() {
         return axis2MessageContext.getReplyTo();
     }
 
+    @Override
     public void setReplyTo(EndpointReference reference) {
         axis2MessageContext.setReplyTo(reference);
     }
 
+    @Override
     public EndpointReference getTo() {
         return axis2MessageContext.getTo();
     }
 
+    @Override
     public void setTo(EndpointReference reference) {
         axis2MessageContext.setTo(reference);
     }
 
+    @Override
     public void setWSAAction(String actionURI) {
         axis2MessageContext.setWSAAction(actionURI);
     }
 
+    @Override
     public String getWSAAction() {
         return axis2MessageContext.getWSAAction();
     }
 
+    @Override
     public void setWSAMessageID(String messageID) {
         axis2MessageContext.setWSAMessageId(messageID);
     }
 
+    @Override
     public String getWSAMessageID() {
         return axis2MessageContext.getMessageID();
     }
 
+    @Override
     public String getSoapAction() {
         return axis2MessageContext.getSoapAction();
     }
 
+    @Override
     public void setSoapAction(String string) {
         axis2MessageContext.setSoapAction(string);
     }
 
+    @Override
     public boolean isDoingMTOM() {
         return axis2MessageContext.isDoingMTOM();
     }
 
+    @Override
     public boolean isDoingSWA() {
         return axis2MessageContext.isDoingSwA();
     }
 
+    @Override
     public void setDoingMTOM(boolean b) {
         axis2MessageContext.setDoingMTOM(b);
     }
 
+    @Override
     public void setDoingSWA(boolean b) {
         axis2MessageContext.setDoingSwA(b);
     }
 
+    @Override
     public boolean isDoingPOX() {
         return axis2MessageContext.isDoingREST();
     }
 
+    @Override
     public void setDoingPOX(boolean b) {
         axis2MessageContext.setDoingREST(b);
     }
 
+    @Override
     public boolean isDoingGET() {
         return Constants.Configuration.HTTP_METHOD_GET.equals(
             axis2MessageContext.getProperty(Constants.Configuration.HTTP_METHOD))
             && axis2MessageContext.isDoingREST();
     }
 
+    @Override
     public void setDoingGET(boolean b) {
         if(b) {
             axis2MessageContext.setDoingREST(b);
@@ -380,41 +424,50 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    @Override
     public boolean isSOAP11() {
         return axis2MessageContext.isSOAP11();
     }
 
+    @Override
     public void setResponse(boolean b) {
         response = b;
         axis2MessageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, b);
     }
 
+    @Override
     public boolean isResponse() {
         Object o = properties.get(SynapseConstants.RESPONSE);
         return o != null && o instanceof String &&
                 ((String) o).equalsIgnoreCase("true") || response;
     }
 
+    @Override
     public void setFaultResponse(boolean b) {
         this.faultResponse = b;
     }
 
+    @Override
     public boolean isFaultResponse() {
         return this.faultResponse;
     }
 
+    @Override
     public int getTracingState() {
         return tracingState;
     }
 
+    @Override
     public void setTracingState(int tracingState) {
         this.tracingState= tracingState;
     }
 
+    @Override
     public Stack<FaultHandler> getFaultStack() {
         return this.faultStack;
     }
 
+    @Override
     public void pushFaultHandler(FaultHandler fault) {
         this.faultStack.push(fault);
     }
@@ -423,6 +476,7 @@ public class Axis2MessageContext implements MessageContext {
      * Return the service level Log for this message context or null
      * @return the service level Log for the message
      */
+    @Override
     public Log getServiceLog() {
 
         if (serviceLog != null) {
@@ -478,6 +532,7 @@ public class Axis2MessageContext implements MessageContext {
         axis2MessageContext.setServerSide(value);
     }
 
+    @Override
     public String toString() {
         
         StringBuffer sb = new StringBuffer();

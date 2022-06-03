@@ -43,6 +43,7 @@ public class AsymmetricCipher extends BaseCipher {
         super(cipherInformation, key);
     }
 
+    @Override
     public Key getKey(CipherOperationMode operationMode) {
         if (operationMode == CipherOperationMode.ENCRYPT) {
             return keyStoreWrapper.getPublicKey();

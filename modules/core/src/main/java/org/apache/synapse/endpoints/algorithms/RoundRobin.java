@@ -54,14 +54,17 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         this.endpoints = endpoints;
     }
 
+    @Override
     public void setApplicationMembers(List<Member> members) {
         this.members = members;
     }
 
+    @Override
     public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
     }
 
+    @Override
     public void setLoadBalanceEndpoint(Endpoint endpoint) {}
 
     /**
@@ -72,6 +75,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
      * @param algorithmContext The context in which holds run time states related to the algorithm
      * @return endpoint to send the next message
      */
+    @Override
     public Endpoint getNextEndpoint(MessageContext synCtx, AlgorithmContext algorithmContext) {
 
         Endpoint nextEndpoint;
@@ -100,6 +104,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         return nextEndpoint;
     }
 
+    @Override
     public Member getNextApplicationMember(AlgorithmContext algorithmContext) {
         if (members.size() == 0) {
             return null;
@@ -138,6 +143,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         return new RoundRobin();
     }
 
+    @Override
     public void reset(AlgorithmContext algorithmContext) {
         if (log.isDebugEnabled()) {
             log.debug("Resetting the Round Robin loadbalancing algorithm ...");
@@ -147,6 +153,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
         }
     }
 
+    @Override
     public String getName() {
         return "RoundRobin";
     }

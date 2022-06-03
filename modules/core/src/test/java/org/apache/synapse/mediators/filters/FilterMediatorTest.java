@@ -40,10 +40,12 @@ public class FilterMediatorTest extends TestCase {
     private boolean filterConditionPassed = false;
     TestMediator testMediator = new TestMediator();
 
+    @Override
     public void setUp() {
         testMediator = new TestMediator();
         testMediator.setHandler(
             new TestMediateHandler() {
+                @Override
                 public void handle(MessageContext synCtx) {
                     setFilterConditionPassed(true);
                 }

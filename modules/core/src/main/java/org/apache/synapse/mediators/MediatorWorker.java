@@ -64,6 +64,7 @@ public class MediatorWorker implements Runnable {
      * Execution method of the thread. This will just call the mediation of the specified
      * Synapse MessageContext using the specified Sequence Mediator
      */
+    @Override
     public void run() {
         try {
             seq.mediate(synCtx);

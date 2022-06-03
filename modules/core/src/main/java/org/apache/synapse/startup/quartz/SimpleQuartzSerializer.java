@@ -29,6 +29,7 @@ import org.apache.synapse.config.xml.StartupSerializer;
 
 public class SimpleQuartzSerializer implements StartupSerializer {
 
+    @Override
     public OMElement serializeStartup(OMElement parent, Startup s) {
 
         if (!(s instanceof SimpleQuartz)) {

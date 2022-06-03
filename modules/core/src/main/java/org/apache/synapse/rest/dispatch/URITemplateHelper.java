@@ -42,6 +42,7 @@ public class URITemplateHelper implements DispatcherHelper {
         return uriTemplate;
     }
 
+    @Override
     public String getString() {
         return templateString;
     }

@@ -49,10 +49,12 @@ public class GzipMessageFormatterDecorator implements MessageFormatter {
         this.messageFormatter = messageFormatter;
     }
 
+    @Override
     public byte[] getBytes(MessageContext messageContext, OMOutputFormat format) throws AxisFault {
         return messageFormatter.getBytes(messageContext, format);
     }
 
+    @Override
     public void writeTo(MessageContext messageContext, OMOutputFormat format, OutputStream outputStream, boolean preserve) throws AxisFault {
 
         try {
@@ -78,14 +80,17 @@ public class GzipMessageFormatterDecorator implements MessageFormatter {
 
     }
 
+    @Override
     public String getContentType(MessageContext messageContext, OMOutputFormat format, String soapAction) {
         return messageFormatter.getContentType(messageContext, format, soapAction);
     }
 
+    @Override
     public URL getTargetAddress(MessageContext messageContext, OMOutputFormat format, URL targetURL) throws AxisFault {
         return messageFormatter.getTargetAddress(messageContext, format, targetURL);
     }
 
+    @Override
     public String formatSOAPAction(MessageContext messageContext, OMOutputFormat format, String soapAction) {
         return messageFormatter.formatSOAPAction(messageContext, format, soapAction);
     }

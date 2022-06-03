@@ -91,6 +91,7 @@ public class EJBMediator extends AbstractMediator implements ManagedLifecycle {
      *
      * @param se SynapseEnvironment to be used for initialization
      */
+    @Override
     public void init(SynapseEnvironment se) {
 
         EnterpriseBeanstalkManager beanstalkManager =
@@ -116,6 +117,7 @@ public class EJBMediator extends AbstractMediator implements ManagedLifecycle {
      * @param synCtx The current message for mediation
      * @return true If mediation should continue
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         Object ejb = beanstalk.getEnterpriseBean(
@@ -148,6 +150,7 @@ public class EJBMediator extends AbstractMediator implements ManagedLifecycle {
         return true;
     }
 
+    @Override
     public void destroy() {
     }
 

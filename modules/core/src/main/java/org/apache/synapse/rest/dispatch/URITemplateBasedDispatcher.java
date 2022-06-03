@@ -28,6 +28,7 @@ import java.util.Map;
 
 public class URITemplateBasedDispatcher implements RESTDispatcher {
 
+    @Override
     public Resource findResource(MessageContext synCtx, Collection<Resource> resources) {
         String url = RESTUtils.getSubRequestPath(synCtx);
         for (Resource r : resources) {

@@ -30,10 +30,12 @@ public class HeaderTextRetriever implements SourceTextRetriever {
         this.source = source;
     }
 
+    @Override
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
         return context.getHeader(source);
     }
 
+    @Override
     public String getSource() {
         return source;
     }

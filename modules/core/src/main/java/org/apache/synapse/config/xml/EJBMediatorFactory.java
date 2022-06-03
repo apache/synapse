@@ -50,6 +50,7 @@ public class EJBMediatorFactory extends AbstractMediatorFactory {
     private static final QName EJB_Q =
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "ejb");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         EJBMediator mediator = new EJBMediator();
@@ -131,6 +132,7 @@ public class EJBMediatorFactory extends AbstractMediatorFactory {
         return mediator;
     }
 
+    @Override
     public QName getTagQName() {
         return EJB_Q;
     }

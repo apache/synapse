@@ -241,6 +241,7 @@ public class ServerConfigurationInformation {
         this.synapseDebug = synapseDebug;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("[ Synapse Debug Mode: ").append(synapseDebug).append(" ]");

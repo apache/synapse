@@ -102,6 +102,7 @@ public class VFSOutTransportInfo implements OutTransportInfo {
         }
     }
 
+    @Override
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }

@@ -45,6 +45,7 @@ public class TransactionMediator extends AbstractMediator {
 
     private String action = "";
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         UserTransaction tx = null;

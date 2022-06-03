@@ -50,6 +50,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
         return sequence;
     }
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SequenceMediator)) {
@@ -90,6 +91,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
         return sequence;
     }
 
+    @Override
     public String getMediatorClassName() {
         return SequenceMediator.class.getName();
     }

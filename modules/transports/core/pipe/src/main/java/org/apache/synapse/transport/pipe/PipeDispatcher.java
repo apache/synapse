@@ -38,7 +38,8 @@ public class PipeDispatcher implements DatagramDispatcher<PipeEndpoint> {
         this.callback = callback;
     }
 
-	public void addEndpoint(PipeEndpoint endpoint) throws IOException {
+	@Override
+    public void addEndpoint(PipeEndpoint endpoint) throws IOException {
 	    File pipe = endpoint.getPipe();
 	    if (!pipe.exists()) {
 	        throw new FileNotFoundException(pipe.getAbsolutePath() + " not found");
@@ -51,12 +52,14 @@ public class PipeDispatcher implements DatagramDispatcher<PipeEndpoint> {
 		endpointListeners.put(endpoint, listener);
 	}
 
-	public void removeEndpoint(PipeEndpoint endpoint) throws IOException {
+	@Override
+    public void removeEndpoint(PipeEndpoint endpoint) throws IOException {
 	    endpointListeners.get(endpoint).stop();
 	    endpointListeners.remove(endpoint);
 	}
 
-	public void stop() throws IOException {
+	@Override
+    public void stop() throws IOException {
 	    // TODO: this should not be necessary (see SYNAPSE-288)
 	    while (!endpointListeners.isEmpty()) {
 	        removeEndpoint(endpointListeners.keySet().iterator().next());

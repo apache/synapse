@@ -135,6 +135,7 @@ public class ClientWorker implements Runnable {
         // set any transport headers received
         Set<Map.Entry<String, String>> headerEntries = response.getHeaders().entrySet();
         Map<String, String> headerMap = new TreeMap<String, String>(new Comparator<String>() {
+            @Override
             public int compare(String o1, String o2) {
                 return o1.compareToIgnoreCase(o2);
             }
@@ -169,6 +170,7 @@ public class ClientWorker implements Runnable {
                 response.getConnection());
     }
 
+    @Override
     public void run() {
         if (responseMsgCtx == null) {
             return;

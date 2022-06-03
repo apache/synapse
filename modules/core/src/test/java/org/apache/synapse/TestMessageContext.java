@@ -56,34 +56,42 @@ public class TestMessageContext implements MessageContext {
 
     private String soapAction = null;
     
+    @Override
     public SynapseConfiguration getConfiguration() {
         return synCfg;
     }
 
+    @Override
     public void setConfiguration(SynapseConfiguration cfg) {
         this.synCfg = cfg;
     }
 
+    @Override
     public SynapseEnvironment getEnvironment() {
         return synEnv;
     }
 
+    @Override
     public void setEnvironment(SynapseEnvironment se) {
         synEnv = se;
     }
 
+    @Override
     public Map<String, Object> getContextEntries() {
         return localEntries;
     }
 
+    @Override
     public void setContextEntries(Map<String, Object> entries) {
         this.localEntries = entries;
     }
 
+    @Override
     public Object getProperty(String key) {
         return properties.get(key);
     }
 
+    @Override
     public Object getEntry(String key) {
         Object ret = properties.get(key);
         if (ret != null) {
@@ -95,6 +103,7 @@ public class TestMessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Object getLocalEntry(String key) {
         Object ret = properties.get(key);
         if (ret != null) {
@@ -106,14 +115,17 @@ public class TestMessageContext implements MessageContext {
         }
     }
 
+    @Override
     public void setProperty(String key, Object value) {
         properties.put(key, value);
     }
 
+    @Override
     public Set getPropertyKeySet() {
         return properties.keySet();
     }
 
+    @Override
     public Mediator getMainSequence() {
         Object o = localEntries.get(SynapseConstants.MAIN_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
@@ -125,6 +137,7 @@ public class TestMessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Mediator getFaultSequence() {
         Object o = localEntries.get(SynapseConstants.FAULT_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
@@ -136,6 +149,7 @@ public class TestMessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Mediator getSequence(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Mediator) {
@@ -155,6 +169,7 @@ public class TestMessageContext implements MessageContext {
         }
     }
 
+    @Override
     public Endpoint getEndpoint(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Endpoint) {
@@ -172,6 +187,7 @@ public class TestMessageContext implements MessageContext {
     }
 
     //---------
+    @Override
     public SOAPEnvelope getEnvelope() {
         if (envelope == null)
             return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
@@ -179,127 +195,161 @@ public class TestMessageContext implements MessageContext {
             return envelope;
     }
 
+    @Override
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
         this.envelope = envelope;
     }
 
+    @Override
     public EndpointReference getFaultTo() {
         return null;
     }
 
+    @Override
     public void setFaultTo(EndpointReference reference) {
     }
 
+    @Override
     public EndpointReference getFrom() {
         return null;
     }
 
+    @Override
     public void setFrom(EndpointReference reference) {
     }
 
+    @Override
     public String getMessageID() {
         return null;
     }
 
+    @Override
     public void setMessageID(String string) {
     }
 
+    @Override
     public RelatesTo getRelatesTo() {
         return null;
     }
 
+    @Override
     public void setRelatesTo(RelatesTo[] reference) {
     }
 
+    @Override
     public EndpointReference getReplyTo() {
         return null;
     }
 
+    @Override
     public void setReplyTo(EndpointReference reference) {
     }
 
+    @Override
     public EndpointReference getTo() {
         return to;
     }
 
+    @Override
     public void setTo(EndpointReference reference) {
         to = reference;
     }
 
+    @Override
     public void setWSAAction(String actionURI) {
     }
 
+    @Override
     public String getWSAAction() {
         return null;
     }
 
+    @Override
     public String getSoapAction() {
         return soapAction;
     }
 
+    @Override
     public void setSoapAction(String string) {
         soapAction = string;
     }
 
+    @Override
     public void setWSAMessageID(String messageID) {
         // TODO
     }
 
+    @Override
     public String getWSAMessageID() {
         return null;  // TODO
     }
 
+    @Override
     public boolean isDoingMTOM() {
         return false;
     }
 
+    @Override
     public boolean isDoingSWA() {
         return false;
     }
 
+    @Override
     public void setDoingMTOM(boolean b) {
     }
 
+    @Override
     public void setDoingSWA(boolean b) {
     }
 
+    @Override
     public boolean isDoingPOX() {
         return false;
     }
 
+    @Override
     public void setDoingPOX(boolean b) {
     }
 
+    @Override
     public boolean isDoingGET() {
         return false;
     }
 
+    @Override
     public void setDoingGET(boolean b) {
     }
 
+    @Override
     public boolean isSOAP11() {
         return envelope.getNamespace().getNamespaceURI().equals(
             SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
     }
 
+    @Override
     public void setResponse(boolean b) {
     }
 
+    @Override
     public boolean isResponse() {
         return false;
     }
 
+    @Override
     public void setFaultResponse(boolean b) {
     }
 
+    @Override
     public boolean isFaultResponse() {
         return false;
     }
 
+    @Override
     public int getTracingState() {
         return 0;  // TODO
     }
 
+    @Override
     public void setTracingState(int tracingState) {
         // TODO
     }
@@ -311,18 +361,22 @@ public class TestMessageContext implements MessageContext {
     public void setSynapseContext(MessageContext env) {
     }
 
+    @Override
     public Stack<FaultHandler> getFaultStack() {
         return faultStack;
     }
 
+    @Override
     public void pushFaultHandler(FaultHandler fault) {
         faultStack.push(fault);
     }
 
+    @Override
     public Log getServiceLog() {
         return LogFactory.getLog(TestMessageContext.class);
     }
 
+    @Override
     public Mediator getSequenceTemplate(String key) {
         Object o = localEntries.get(key);
         if (o != null && o instanceof Mediator) {

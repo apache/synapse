@@ -48,6 +48,7 @@ public class SchemaResourceResolver implements LSResourceResolver {
      * Lookup in {@link org.apache.synapse.util.resolver.ResourceMap} and returns
      * {@link org.apache.synapse.util.jaxp.SchemaResourceLSInput}
      */
+    @Override
     public LSInput resolveResource(String type, String namespaceURI,
                                    String publicId, String systemId,
                                    String baseURI) {

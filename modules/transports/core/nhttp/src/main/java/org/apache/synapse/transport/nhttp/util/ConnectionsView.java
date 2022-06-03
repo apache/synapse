@@ -78,6 +78,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
         this.name = name;
 
         this.scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, name + "-connections-view");
             }
@@ -87,6 +88,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
         initCounters(responseSizeCounters);
 
         Runnable task = new Runnable() {
+            @Override
             public void run() {
                 // We only need historical data for the last 15 minutes
                 // Therefore no need to keep data older than that...
@@ -101,6 +103,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
                 SHORT_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
 
         Runnable longTermCollector = new Runnable() {
+            @Override
             public void run() {
                 // We only need historical data for the last 24 hours
                 // Therefore no need to keep data older than that...
@@ -173,42 +176,52 @@ public class ConnectionsView implements ConnectionsViewMBean {
         }
     }
 
+    @Override
     public int getActiveConnections() {
         return activeConnections.get();
     }
 
+    @Override
     public int getLastMinuteConnections() {
         return getTotalConnections(1);
     }
 
+    @Override
     public int getLast5MinuteConnections() {
         return getTotalConnections(5);
     }
 
+    @Override
     public int getLast15MinuteConnections() {
         return getTotalConnections(15);
     }
 
+    @Override
     public int getLastHourConnections() {
         return getTotalConnectionsByHour(1);
     }
 
+    @Override
     public int getLast8HourConnections() {
         return getTotalConnectionsByHour(8);
     }
 
+    @Override
     public int getLast24HourConnections() {
         return getTotalConnectionsByHour(24);
     }
 
+    @Override
     public Map getRequestSizesMap() {
         return getCountersMap(requestSizeCounters);
     }
 
+    @Override
     public Map getResponseSizesMap() {
         return getCountersMap(responseSizeCounters);
     }
 
+    @Override
     public Date getLastResetTime() {
         return resetTime;
     }
@@ -226,6 +239,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
         return map;
     }
 
+    @Override
     public void reset() {
         initCounters(requestSizeCounters);
         initCounters(responseSizeCounters);
@@ -291,6 +305,7 @@ public class ConnectionsView implements ConnectionsViewMBean {
         this.activeConnectionsPerHost = activeConnectionsPerHost;
     }
 
+    @Override
     public Map getActiveConnectionsPerHosts(){
         return activeConnectionsPerHost;
     }

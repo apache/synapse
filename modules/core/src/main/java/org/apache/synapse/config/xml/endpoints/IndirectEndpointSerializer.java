@@ -32,6 +32,7 @@ import org.apache.synapse.endpoints.IndirectEndpoint;
  */
 public class IndirectEndpointSerializer extends EndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof IndirectEndpoint)) {

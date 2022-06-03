@@ -94,6 +94,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
     public void send(MessageContext synCtx) {
 
         if (log.isDebugEnabled()) {
@@ -200,6 +201,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
      *
      * @return true if active. false otherwise.
      */
+    @Override
     public boolean readyToSend() {
         for (Endpoint endpoint : getChildren()) {
             if (endpoint.readyToSend()) {
@@ -291,6 +293,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
             this.to = to;
         }
 
+        @Override
         public void onFault(MessageContext synCtx) {
             if (currentMember == null) {
                 return;
@@ -321,6 +324,7 @@ public class LoadbalanceEndpoint extends AbstractEndpoint {
      */
     private class MemberActivatorTask extends TimerTask {
 
+        @Override
         public void run() {
             try {
                 for(Member member: inactiveMembers){

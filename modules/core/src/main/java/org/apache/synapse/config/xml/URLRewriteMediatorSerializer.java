@@ -34,6 +34,7 @@ import java.util.List;
 
 public class URLRewriteMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     protected OMElement serializeSpecificMediator(Mediator m) {
         if (!(m instanceof URLRewriteMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -165,6 +166,7 @@ public class URLRewriteMediatorSerializer extends AbstractMediatorSerializer {
         return action;
     }
 
+    @Override
     public String getMediatorClassName() {
         return URLRewriteMediator.class.getName();
     }

@@ -30,6 +30,7 @@ public class PropertyTextRetriever implements SourceTextRetriever {
         this.source = source;
     }
 
+    @Override
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
         Object value = context.getProperty(source);
         if (value != null) {
@@ -38,6 +39,7 @@ public class PropertyTextRetriever implements SourceTextRetriever {
         return null;
     }
 
+    @Override
     public String getSource() {
         return source;
     }

@@ -42,6 +42,7 @@ public class SimpleInMemoryRegistry extends AbstractRegistry {
         }
     }
 
+    @Override
     public OMNode lookup(String key) {
         hitCount++;
         InMemoryRegistryEntry entry = registry.get(key);
@@ -51,26 +52,32 @@ public class SimpleInMemoryRegistry extends AbstractRegistry {
         return null;
     }
 
+    @Override
     public RegistryEntry getRegistryEntry(String key) {
         return registry.get(key);
     }
 
+    @Override
     public RegistryEntry[] getChildren(RegistryEntry entry) {
         return null;
     }
 
+    @Override
     public RegistryEntry[] getDescendants(RegistryEntry entry) {
         return null;
     }
 
+    @Override
     public void delete(String key) {
         registry.remove(key);
     }
 
+    @Override
     public void newResource(String key, boolean isDirectory) {
         registry.put(key, new InMemoryRegistryEntry(key));
     }
 
+    @Override
     public void updateResource(String key, Object value) {
         InMemoryRegistryEntry entry = registry.get(key);
         if (entry != null) {
@@ -78,6 +85,7 @@ public class SimpleInMemoryRegistry extends AbstractRegistry {
         }
     }
 
+    @Override
     public void updateRegistryEntry(RegistryEntry entry) {
 
     }

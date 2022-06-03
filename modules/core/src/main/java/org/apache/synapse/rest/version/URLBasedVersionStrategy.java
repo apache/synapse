@@ -31,6 +31,7 @@ public class URLBasedVersionStrategy extends AbstractVersionStrategy {
         this.versionParam = versionParam;
     }
 
+    @Override
     public boolean isMatchingVersion(Object versionInfoObj) {
         MessageContext msgContext = (MessageContext) versionInfoObj;
         String path = RESTUtils.getFullRequestPath(msgContext);
@@ -62,6 +63,7 @@ public class URLBasedVersionStrategy extends AbstractVersionStrategy {
         return version.equals(incomingVersionStr);
     }
 
+    @Override
     public String getVersionParam() {
         return versionParam;
     }

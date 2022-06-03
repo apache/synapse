@@ -37,6 +37,7 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
 
     private static final Log log = LogFactory.getLog(SystemViewStrategy.class);
 
+    @Override
     public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
             ComponentType type) {
@@ -78,6 +79,7 @@ public class SystemViewStrategy implements StatisticsViewStrategy {
     }
 
 
+    @Override
     public Map<String, InOutStatisticsView> determineView(String id,
                                                           List<StatisticsRecord> statisticsRecords,
                                                           ComponentType type) {

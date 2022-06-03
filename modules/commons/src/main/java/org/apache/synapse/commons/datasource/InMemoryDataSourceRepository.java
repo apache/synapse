@@ -51,6 +51,7 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
      * @param dataSourceInformation the information describing a data source
      * @see DataSourceRepository#register(DataSourceInformation)
      */
+    @Override
     public void register(DataSourceInformation dataSourceInformation) {
 
         if (dataSourceInformation == null) {
@@ -78,6 +79,7 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
         dataSources.put(name, dataSource);
     }
 
+    @Override
     public void unRegister(String name) {
 
         if (name == null || "".equals(name)) {
@@ -94,6 +96,7 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
      *
      * @see DataSourceRepository#lookUp(String)
      */
+    @Override
     public DataSource lookUp(String name) {
 
         if (name == null || "".equals(name)) {
@@ -104,14 +107,17 @@ public class InMemoryDataSourceRepository implements DataSourceRepository {
         return dataSources.get(name);
     }
 
+    @Override
     public void init(Properties properties) {
         // nothing
     }
 
+    @Override
     public boolean isInitialized() {
         return true;
     }
 
+    @Override
     public void clear() {
         if (!dataSources.isEmpty()) {
             log.info("Clearing all in-memory datasources ");

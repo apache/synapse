@@ -74,6 +74,7 @@ public class LogMediator extends AbstractMediator {
      * @param synCtx (current) message to be logged
      * @return true always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

@@ -69,6 +69,7 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
     /* Sessions time out interval*/
     private long sessionTimeout = -1;
 
+    @Override
     public void init(SynapseEnvironment synapseEnvironment) {
         ConfigurationContext cc =
                 ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
@@ -92,6 +93,7 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
         }
     }
 
+    @Override
     public void send(MessageContext synCtx) {
 
         if (log.isDebugEnabled()) {
@@ -171,6 +173,7 @@ public class SALoadbalanceEndpoint extends LoadbalanceEndpoint {
      * @param endpoint          Failed endpoint.
      * @param synCtx MessageContext of the failed message.
      */
+    @Override
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synCtx) {
 
         logOnChildEndpointFail(endpoint, synCtx);

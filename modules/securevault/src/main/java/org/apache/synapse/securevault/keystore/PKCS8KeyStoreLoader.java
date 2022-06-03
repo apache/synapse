@@ -70,6 +70,7 @@ public class PKCS8KeyStoreLoader implements IKeyStoreLoader {
     /**
      * Returns a JKS keyStore from the given private key, certificate path, key password and alias.
      */
+    @Override
     public KeyStore getKeyStore() {
 
         File file = new File(pkPath);

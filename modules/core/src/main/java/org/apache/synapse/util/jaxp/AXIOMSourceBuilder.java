@@ -29,10 +29,12 @@ import org.apache.axiom.om.OMElement;
  * using {@link OMContainer#getSAXSource(boolean)}.
  */
 public class AXIOMSourceBuilder implements SourceBuilder {
+    @Override
     public SAXSource getSource(OMElement node) {
         return node.getSAXSource(true);
     }
 
+    @Override
     public void release() {
     }
 }

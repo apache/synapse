@@ -72,6 +72,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy");
     private static final QName Q_ENDPOINT = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         CalloutMediator callout = new CalloutMediator();
@@ -197,6 +198,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         return callout;
     }
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }

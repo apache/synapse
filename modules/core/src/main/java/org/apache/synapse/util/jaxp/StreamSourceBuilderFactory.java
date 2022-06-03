@@ -26,6 +26,7 @@ import org.apache.synapse.core.SynapseEnvironment;
  * instances.
  */
 public class StreamSourceBuilderFactory implements SourceBuilderFactory {
+    @Override
     public SourceBuilder createSourceBuilder(SynapseEnvironment synEnv) {
         return new StreamSourceBuilder(synEnv);
     }

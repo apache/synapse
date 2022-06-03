@@ -103,6 +103,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         return lbMembershipHandler;
     }
 
+    @Override
     public void send(MessageContext synCtx) {
         SessionInformation sessionInformation = null;
         Member currentMember = null;
@@ -206,6 +207,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         return null;
     }
 
+    @Override
     public void setName(String name) {
         super.setName(name);
 //        algorithmContext.setContextID(name);
@@ -437,10 +439,12 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         private Member currentMember;
         private Endpoint currentEp;
 
+        @Override
         public void setCurrentMember(Member currentMember) {
             this.currentMember = currentMember;
         }
 
+        @Override
         public void setTo(EndpointReference to) {
             this.to = to;
         }
@@ -448,6 +452,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
         private DynamicLoadbalanceFaultHandlerImpl() {
         }
 
+        @Override
         public void onFault(MessageContext synCtx) {
             //cleanup endpoint if exists
             if(currentEp != null){
@@ -478,6 +483,7 @@ public class DynamicLoadbalanceEndpoint extends LoadbalanceEndpoint {
             sendToApplicationMember(synCtx, currentMember, this, true);
         }
 
+        @Override
         public void setCurrentEp(Endpoint currentEp) {
             this.currentEp = currentEp;
         }

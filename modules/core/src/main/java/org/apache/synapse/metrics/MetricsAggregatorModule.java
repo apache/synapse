@@ -34,6 +34,7 @@ import org.apache.neethi.Policy;
 
 public class MetricsAggregatorModule implements Module {
     // initialize the module
+    @Override
     public void init(ConfigurationContext configContext, AxisModule module) throws AxisFault {
         AxisConfiguration axiConfiguration = configContext.getAxisConfiguration();
 
@@ -45,16 +46,20 @@ public class MetricsAggregatorModule implements Module {
 
     }
 
+    @Override
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {}
 
+    @Override
     public boolean canSupportAssertion(Assertion assertion) {
         return false;
     }
 
+    @Override
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
         // no implementation 
     }
 
     // shutdown the module
+    @Override
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {}
 }

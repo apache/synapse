@@ -38,11 +38,13 @@ public class EqualEvaluator implements Evaluator {
 
     private SourceTextRetriever textRetriever;
 
+    @Override
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         String sourceText = textRetriever.getSourceText(context);
         return sourceText != null && sourceText.equalsIgnoreCase(value);
     }
 
+    @Override
     public String getName() {
         return EvaluatorConstants.EQUAL;
     }

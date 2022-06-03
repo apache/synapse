@@ -29,6 +29,7 @@ import org.apache.synapse.mediators.eventing.EventPublisherMediator;
  */
 public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof EventPublisherMediator)) {
@@ -49,6 +50,7 @@ public class EventPublisherMediatorSerializer extends AbstractMediatorSerializer
         return elmEventPublisher;
     }
 
+    @Override
     public String getMediatorClassName() {
         return EventPublisherMediator.class.getName();
     }

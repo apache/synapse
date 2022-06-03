@@ -161,6 +161,7 @@ public class EnterpriseBeanstalk {
         int minDelay = Math.min(statelessBeanTimeoutMinutes, statefulBeanTimeoutMinutes);
         scheduledFuture = scheduler.scheduleWithFixedDelay(
                             new Runnable() {
+                                @Override
                                 public void run() {
                                     removeExpiredBeans();
                                 }

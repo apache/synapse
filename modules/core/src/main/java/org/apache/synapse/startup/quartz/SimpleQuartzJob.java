@@ -42,6 +42,7 @@ public class SimpleQuartzJob implements Job {
 
     private static final Log log = LogFactory.getLog(SimpleQuartzJob.class);
 
+    @Override
     public void execute(JobExecutionContext ctx) throws JobExecutionException {
 
         String jobName = ctx.getJobDetail().getKey().getName();

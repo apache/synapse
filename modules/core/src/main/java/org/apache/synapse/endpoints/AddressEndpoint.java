@@ -29,6 +29,7 @@ import org.apache.synapse.SynapseConstants;
  */
 public class AddressEndpoint extends AbstractEndpoint {
 
+    @Override
     public void onFault(MessageContext synCtx) {
 
         // is this really a fault or a timeout/connection close etc?
@@ -43,12 +44,14 @@ public class AddressEndpoint extends AbstractEndpoint {
         super.onFault(synCtx);
     }
 
+    @Override
     public void onSuccess() {
         if (getContext() != null) {
             getContext().onSuccess();
         }
     }
 
+    @Override
     public void send(MessageContext synCtx) {
 
         if (getParentEndpoint() == null && !readyToSend()) {

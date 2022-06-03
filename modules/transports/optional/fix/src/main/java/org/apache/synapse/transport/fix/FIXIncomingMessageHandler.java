@@ -176,6 +176,7 @@ public class FIXIncomingMessageHandler implements Application {
      *
      * @param sessionID QuickFIX session ID
      */
+    @Override
     public void onCreate(SessionID sessionID) {
         log.info("New FIX session created: " + sessionID.toString());
         if (eventHandler != null) {
@@ -191,6 +192,7 @@ public class FIXIncomingMessageHandler implements Application {
      *
      * @param sessionID QuickFIX session ID
      */
+    @Override
     public void onLogon(SessionID sessionID) {
         if (!countersMap.containsKey(sessionID)) {
             countersMap.put(sessionID, new AtomicInteger(0));
@@ -210,6 +212,7 @@ public class FIXIncomingMessageHandler implements Application {
      *
      * @param sessionID QuickFIX session ID
      */
+    @Override
     public void onLogout(SessionID sessionID) {
         FIXTransportSender trpSender = (FIXTransportSender) cfgCtx.getAxisConfiguration().
                 getTransportOut(FIXConstants.TRANSPORT_NAME).getSender();
@@ -230,6 +233,7 @@ public class FIXIncomingMessageHandler implements Application {
      * @param message QuickFIX message
      * @param sessionID QuickFIX session ID
      */
+    @Override
     public void toAdmin(Message message, SessionID sessionID) {
         if (log.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer();
@@ -264,6 +268,7 @@ public class FIXIncomingMessageHandler implements Application {
      * @throws IncorrectTagValue
      * @throws RejectLogon causes a logon reject
      */
+    @Override
     public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound,
             IncorrectDataFormat, IncorrectTagValue, RejectLogon {
 
@@ -292,6 +297,7 @@ public class FIXIncomingMessageHandler implements Application {
      * @param sessionID QuickFIX session ID
      * @throws DoNotSend This exception aborts message transmission
      */
+    @Override
     public void toApp(Message message, SessionID sessionID) throws DoNotSend {
         if (log.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer();
@@ -328,6 +334,7 @@ public class FIXIncomingMessageHandler implements Application {
      * @throws IncorrectTagValue
      * @throws UnsupportedMessageType
      */
+    @Override
     public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
             IncorrectTagValue, UnsupportedMessageType {
         if (log.isDebugEnabled()) {
@@ -467,6 +474,7 @@ public class FIXIncomingMessageHandler implements Application {
             this.counter = counter;
         }
 
+        @Override
         public void run() {
             processMessage(message, sessionID, counter);
         }

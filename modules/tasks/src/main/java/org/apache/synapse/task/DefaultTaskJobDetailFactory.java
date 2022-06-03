@@ -39,6 +39,7 @@ public class DefaultTaskJobDetailFactory implements TaskJobDetailFactory {
     /**
      * @see TaskJobDetailFactory
      */
+    @Override
     public JobDetail createJobDetail(TaskDescription taskDescription, Map<String,
             Object> resources, Class<? extends Job> jobClass) {
 

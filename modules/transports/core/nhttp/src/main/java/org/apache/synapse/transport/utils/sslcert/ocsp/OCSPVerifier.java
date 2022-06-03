@@ -73,6 +73,7 @@ public class OCSPVerifier implements RevocationVerifier {
      * @throws CertificateVerificationException
      *
      */
+    @Override
     public RevocationStatus checkRevocationStatus(X509Certificate peerCert, X509Certificate issuerCert)
             throws CertificateVerificationException {
 

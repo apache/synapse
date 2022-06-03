@@ -41,10 +41,12 @@ public class EventPublisherMediatorFactory extends AbstractMediatorFactory {
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventPublisher");
     private static final QName PROP_NAME = new QName("eventSourceName");
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         EventPublisherMediator eventPublisherMediator = new EventPublisherMediator();
         OMAttribute attEventSource = elem.getAttribute(PROP_NAME);

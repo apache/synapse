@@ -42,6 +42,7 @@ public class PayloadFactoryMediatorSerializer extends AbstractMediatorSerializer
     private static final String EXPRESSION = "expression";
 
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof PayloadFactoryMediator)) {
@@ -90,6 +91,7 @@ public class PayloadFactoryMediatorSerializer extends AbstractMediatorSerializer
         return payloadFactoryElem;
     }
 
+    @Override
     public String getMediatorClassName() {
         return PayloadFactoryMediator.class.getName();
     }

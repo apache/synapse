@@ -42,6 +42,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
     private static final Log log = LogFactory.getLog(SynapseMessageReceiver.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
+    @Override
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);

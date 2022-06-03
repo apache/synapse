@@ -30,6 +30,7 @@ import org.apache.axis2.handlers.AbstractHandler;
 
 public class GlobalRequestCountHandler extends AbstractHandler {
 
+    @Override
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         msgContext
                 .setProperty(MetricsConstants.REQUEST_RECEIVED_TIME, System.currentTimeMillis());

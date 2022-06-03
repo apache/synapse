@@ -139,6 +139,7 @@ public class CacheManager {
      */
     private class CacheManagingTask implements Runnable {
 
+        @Override
         public void run() {
             long start = System.currentTimeMillis();
             if (log.isDebugEnabled()) {

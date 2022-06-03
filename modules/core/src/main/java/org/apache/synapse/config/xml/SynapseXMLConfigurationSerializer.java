@@ -68,6 +68,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
      * @return serialized element of the configuration
      */
 
+    @Override
     public OMElement serializeConfiguration(SynapseConfiguration synCfg) {
 
         OMElement definitions = fac.createOMElement("definitions", synNS);
@@ -240,6 +241,7 @@ public class SynapseXMLConfigurationSerializer implements ConfigurationSerialize
         throw new SynapseException(msg);
     }
 
+    @Override
     public QName getTagQName() {
         return XMLConfigConstants.DEFINITIONS_ELT;
 	}

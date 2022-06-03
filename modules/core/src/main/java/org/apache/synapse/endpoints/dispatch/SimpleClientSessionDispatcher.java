@@ -35,26 +35,31 @@ public class SimpleClientSessionDispatcher extends AbstractDispatcher {
     private static final QName CSID_QNAME = new QName("http://ws.apache.org/ns/synapse",
             "ClientID", "syn");
 
+    @Override
     public SessionInformation getSession(MessageContext synCtx) {
 
         return SALSessions.getInstance().getSession(
                 extractSessionID(synCtx.getEnvelope().getHeader(), CSID_QNAME));
     }
 
+    @Override
     public void updateSession(MessageContext synCtx) {
         SALSessions.getInstance().updateSession(synCtx,
                 extractSessionID(synCtx.getEnvelope().getHeader(), CSID_QNAME));
     }
 
+    @Override
     public void unbind(MessageContext synCtx) {
         SALSessions.getInstance().removeSession(
                 extractSessionID(synCtx.getEnvelope().getHeader(), CSID_QNAME));
     }
 
+    @Override
     public boolean isServerInitiatedSession() {
         return false;
     }
 
+    @Override
     public void removeSessionID(MessageContext syCtx) {
         // no need to remove
     }

@@ -48,6 +48,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
         return DATASOURCE_MBEAN_REPOSITORY;
     }
 
+    @Override
     public void addMBean(String name, Object mBean) {
 
         if (name == null || "".equals(name)) {
@@ -67,6 +68,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
                 MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
+    @Override
     public Object getMBean(String name) {
         if (name == null || "".equals(name)) {
             throw new SynapseCommonsException("DataSource MBean name cannot be found.", log);
@@ -74,6 +76,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
         return dataSourcesMBeans.get(name);
     }
 
+    @Override
     public void removeMBean(String name) {
 
         dataSourcesMBeans.remove(name);
@@ -81,6 +84,7 @@ public class DatasourceMBeanRepository implements MBeanRepository {
                 MBEAN_CATEGORY_DATABASE_CONNECTION_POOL, name);
     }
 
+    @Override
     public void clear() {
 
         if (!dataSourcesMBeans.isEmpty()) {

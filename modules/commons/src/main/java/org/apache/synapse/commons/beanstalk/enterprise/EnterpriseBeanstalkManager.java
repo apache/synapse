@@ -84,6 +84,7 @@ public class EnterpriseBeanstalkManager {
 
         scheduler = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactory() {
+                    @Override
                     public Thread newThread(Runnable r) {
                         return new Thread(r, "enterprise-beanstalk-cache-cleaner");
                     }

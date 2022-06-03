@@ -65,6 +65,7 @@ public class HessianMessageBuilder implements Builder {
      * @see org.apache.axis2.builder.Builder#processDocument(java.io.InputStream,
      * String, org.apache.axis2.context.MessageContext)
      */
+    @Override
     public OMElement processDocument(final InputStream inputStream, final String contentType,
             final MessageContext messageContext) throws AxisFault {
 

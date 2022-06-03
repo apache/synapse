@@ -34,6 +34,7 @@ public class URLTextRetriever implements SourceTextRetriever {
 
     private EvaluatorConstants.URI_FRAGMENTS fragment = null;
 
+    @Override
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
         if (fragment == null) {
             return context.getUrl();
@@ -58,6 +59,7 @@ public class URLTextRetriever implements SourceTextRetriever {
         }
     }
 
+    @Override
     public String getSource() {
         if (fragment != null) {
             return fragment.name();

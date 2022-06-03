@@ -129,6 +129,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         this.contextInformation = contextInformation;        
     }
 
+    @Override
     public boolean injectMessage(final MessageContext synCtx) {
         if (log.isDebugEnabled()) {
             log.debug("Injecting MessageContext");
@@ -241,6 +242,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         return true;
     }
 
+    @Override
     public void injectAsync(final MessageContext synCtx, SequenceMediator seq) {
 
         if (log.isDebugEnabled()) {
@@ -259,6 +261,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *                      and the properties of the sending process
      * @param synCtx   - Synapse MessageContext to be sent
      */
+    @Override
     public void send(EndpointDefinition endpoint, MessageContext synCtx) {
         if (synCtx.isResponse()) {
             if (endpoint != null) {
@@ -329,6 +332,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return Synapse MessageContext with the underlying axis2 message context set
      */
+    @Override
     public MessageContext createMessageContext() {
 
         if (log.isDebugEnabled()) {
@@ -364,6 +368,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return created TemporaryData object as per in the synapse.properties file
      */
+    @Override
     public OverflowBlob createOverflowBlob() {
 
         String chkSize = synapseConfig.getProperty(SynapseConstants.CHUNK_SIZE);
@@ -393,6 +398,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return Returns the <code>StatisticsCollector</code>
      */
+    @Override
     public StatisticsCollector getStatisticsCollector() {
         return statisticsCollector;
     }
@@ -402,6 +408,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @param collector - Statistics collector to be set
      */
+    @Override
     @Deprecated
     public void setStatisticsCollector(StatisticsCollector collector) {
         this.statisticsCollector = collector;
@@ -413,6 +420,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return an ExecutorService to execute the tasks in a new thread from the pool
      */
+    @Override
     public ExecutorService getExecutorService() {
         return executorService;
     }
@@ -422,6 +430,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return true if ready for processing
      */
+    @Override
     public boolean isInitialized() {
         return initialized;
     }
@@ -431,6 +440,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @param state true means ready for processing
      */
+    @Override
     public void setInitialized(boolean state) {
         this.initialized = state;
     }
@@ -440,6 +450,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return synapseConfig associated with the environment
      */
+    @Override
     public SynapseConfiguration getSynapseConfiguration() {
         return this.synapseConfig;
     }
@@ -450,6 +461,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      *
      * @return SynapseTaskManager of this synapse environment
      */
+    @Override
     public SynapseTaskManager getTaskManager() {
         return this.taskManager;
     }
@@ -459,6 +471,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      * 
      * @return ServerContextInformation of the environment
      */
+    @Override
     public ServerContextInformation getServerContextInformation() {
         return contextInformation;
     }
@@ -476,6 +489,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      * Returns all declared xpath Function Extensions
      * @return Hash Map Containing Function Extensions with supported QName keys
      */
+    @Override
     public Map<QName, SynapseXpathFunctionContextProvider> getXpathFunctionExtensions() {
         return xpathFunctionExtensions;
     }
@@ -484,6 +498,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
      * Returns all declared xpath Variable Extensions
      * @return Hash Map Containing Variable Extensions with supported QName keys
      */
+    @Override
     public Map<QName, SynapseXpathVariableResolver> getXpathVariableExtensions() {
         return xpathVariableExtensions;
     }

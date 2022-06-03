@@ -44,6 +44,7 @@ public class ConditionalRouterMediator extends AbstractMediator {
     
     private boolean continueAfterExplicitlySet;
     
+    @Override
     public boolean mediate(MessageContext synCtx) {
         
         Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;

@@ -62,10 +62,12 @@ public class ServiceLoadBalanceMembershipHandler implements LoadBalanceMembershi
         }
     }
 
+    @Override
     public void init(Properties props, LoadbalanceAlgorithm algorithm) {
         // Nothing to do
     }
 
+    @Override
     public void setConfigurationContext(ConfigurationContext configCtx) {
         this.configCtx = configCtx;
 
@@ -79,6 +81,7 @@ public class ServiceLoadBalanceMembershipHandler implements LoadBalanceMembershi
         }
     }
 
+    @Override
     public ConfigurationContext getConfigurationContext(){
         return configCtx;
     }
@@ -90,6 +93,7 @@ public class ServiceLoadBalanceMembershipHandler implements LoadBalanceMembershi
      * @return The current member
      * @deprecated Use {@link #getNextApplicationMember(String)}
      */
+    @Override
     public Member getNextApplicationMember(AlgorithmContext context) {
         throw new UnsupportedOperationException("This operation is invalid. " +
                                                 "Call getNextApplicationMember(String host)");
@@ -125,10 +129,12 @@ public class ServiceLoadBalanceMembershipHandler implements LoadBalanceMembershi
         return domainAlgorithmContext;
     }
 
+    @Override
     public LoadbalanceAlgorithm getLoadbalanceAlgorithm() {
         return null;
     }
 
+    @Override
     public Properties getProperties() {
         return null;
     }

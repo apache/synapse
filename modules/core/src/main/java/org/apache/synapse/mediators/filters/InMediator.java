@@ -37,6 +37,7 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
      * @param synCtx the current message
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -69,6 +70,7 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
      * @param synCtx the message context
      * @return MessageContext#isResponse()
      */
+    @Override
     public boolean test(MessageContext synCtx) {
         return !synCtx.isResponse();
     }

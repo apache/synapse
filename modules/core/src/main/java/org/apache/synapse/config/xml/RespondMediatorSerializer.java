@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.builtin.RespondMediator;
  */
 public class RespondMediatorSerializer extends AbstractMediatorSerializer{
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
         if (!(m instanceof RespondMediator)) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
@@ -40,6 +41,7 @@ public class RespondMediatorSerializer extends AbstractMediatorSerializer{
         return respond;
     }
 
+    @Override
     public String getMediatorClassName() {
         return RespondMediator.class.getName();
     }

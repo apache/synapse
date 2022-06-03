@@ -50,6 +50,7 @@ public class ContentBasedRouterMediator extends AbstractMediator {
      * @param messageContext the current message for mediation
      * @return  true
      */
+    @Override
     public boolean mediate(MessageContext messageContext) {
         SwitchMediator switchMediator = new SwitchMediator();
         initParams(messageContext, switchMediator);

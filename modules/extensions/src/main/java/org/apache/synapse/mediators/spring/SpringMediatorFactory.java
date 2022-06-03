@@ -48,6 +48,7 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
      * @param properties
      * @return the Spring mediator instance created
      */
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SpringMediator sm = new SpringMediator();
@@ -70,6 +71,7 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
         return null;
     }
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }

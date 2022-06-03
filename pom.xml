@@ -88,6 +88,52 @@
 
     <profiles>
         <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.veithen.alta</groupId>
+                        <artifactId>alta-maven-plugin</artifactId>
+                        <version>0.7.1</version>
+                        <executions>
+                            <execution>
+                                <id>errorprone-javac-path</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>generate-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <name>errorprone.javac.path</name>
+                                    <value>%file%</value>
+                                    <artifactSet>
+                                        <artifacts>
+                                            <artifact>
+                                                <groupId>com.google.errorprone</groupId>
+                                                <artifactId>javac</artifactId>
+                                            </artifact>
+                                        </artifacts>
+                                    </artifactSet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <compilerArg>-J-Xbootclasspath/p:${errorprone.javac.path}</compilerArg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>
@@ -197,6 +243,17 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <compilerArgs combine.children="append">
+                            <compilerArg>-XDcompilePolicy=simple</compilerArg>
+                            <compilerArg>-Xplugin:ErrorProne -Xep:SizeGreaterThanOrEqualsZero:WARN -Xep:ReturnValueIgnored:WARN -Xep:GetClassOnClass:WARN -Xep:EqualsHashCode:WARN</compilerArg>
+                        </compilerArgs>
+                        <annotationProcessorPaths>
+                            <annotationProcessorPath>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${errorprone.version}</version>
+                            </annotationProcessorPath>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1014,6 +1071,16 @@
                 <artifactId>jakarta.xml.soap-api</artifactId>
                 <version>1.4.2</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${errorprone.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>javac</artifactId>
+                <version>9+181-r4173-1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1161,6 +1228,8 @@
         <maven.version>3.0</maven.version>
         <maven.archiver.version>2.2</maven.archiver.version>
         <plexus.utils.version>1.5.4</plexus.utils.version>
+
+        <errorprone.version>2.10.0</errorprone.version>
     </properties>
 
     <developers>

@@ -1173,7 +1173,6 @@
         <maven.version>3.0</maven.version>
         <maven.archiver.version>2.2</maven.archiver.version>
         <plexus.utils.version>1.5.4</plexus.utils.version>
-
     </properties>
 
     <developers>

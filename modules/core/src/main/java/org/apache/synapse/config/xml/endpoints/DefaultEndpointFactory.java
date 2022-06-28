@@ -166,15 +166,4 @@ public class DefaultEndpointFactory extends EndpointFactory {
             }
         }
     }
-
-    public String injectEnvironmentVariables (String parameter) {
-        String injectedValue = parameter;
-        if (parameter.contains(SynapseConstants.SYSTEM_VARIABLE_PREFIX)) {
-            String extractedEnvVariableKey = parameter.substring(parameter.lastIndexOf(":") + 1);
-            injectedValue = System.getenv(extractedEnvVariableKey);
-            log.debug("Environment variable " + extractedEnvVariableKey + " replaced with " +
-                    injectedValue);
-        }
-        return injectedValue;
-    }
 }

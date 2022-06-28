@@ -22,6 +22,7 @@ package org.apache.synapse.endpoints;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ConfigUtils;
 
 /**
  * WSDLEndpoint represents the endpoints built using a WSDL document. It stores the details about
@@ -38,6 +39,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private OMElement wsdlDoc;
     private String serviceName;
     private String portName;
+    ConfigUtils configUtils = new ConfigUtils();
 
     public void onFault(MessageContext synCtx) {
         
@@ -75,7 +77,9 @@ public class WSDLEndpoint extends AbstractEndpoint {
     }
 
     public void setWsdlURI(String wsdlURI) {
-        this.wsdlURI = wsdlURI;
+        String injectedURI = configUtils.injectEnvironmentVariables(wsdlURI);
+        log.debug("WSDL URI " + wsdlURI + " replaced with " + injectedURI);
+        this.wsdlURI = injectedURI;
     }
 
     public OMElement getWsdlDoc() {
@@ -91,7 +95,9 @@ public class WSDLEndpoint extends AbstractEndpoint {
     }
 
     public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+        String injectedServiceName = configUtils.injectEnvironmentVariables(serviceName);
+        log.debug("WSDL service name " + serviceName + " replaced with " + injectedServiceName);
+        this.serviceName = injectedServiceName;
     }
 
     public String getPortName() {
@@ -99,6 +105,8 @@ public class WSDLEndpoint extends AbstractEndpoint {
     }
 
     public void setPortName(String portName) {
-        this.portName = portName;
+        String injectedPortName = configUtils.injectEnvironmentVariables(portName);
+        log.debug("WSDL port name " + portName + " replaced with " + injectedPortName);
+        this.portName = injectedPortName;
     }
 }

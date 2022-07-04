@@ -39,7 +39,6 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private OMElement wsdlDoc;
     private String serviceName;
     private String portName;
-    ConfigUtils configUtils = new ConfigUtils();
 
     public void onFault(MessageContext synCtx) {
         
@@ -77,7 +76,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     }
 
     public void setWsdlURI(String wsdlURI) {
-        String injectedURI = configUtils.injectEnvironmentVariables(wsdlURI);
+        String injectedURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
         log.debug("WSDL URI " + wsdlURI + " replaced with " + injectedURI);
         this.wsdlURI = injectedURI;
     }
@@ -95,7 +94,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     }
 
     public void setServiceName(String serviceName) {
-        String injectedServiceName = configUtils.injectEnvironmentVariables(serviceName);
+        String injectedServiceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
         log.debug("WSDL service name " + serviceName + " replaced with " + injectedServiceName);
         this.serviceName = injectedServiceName;
     }
@@ -105,7 +104,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     }
 
     public void setPortName(String portName) {
-        String injectedPortName = configUtils.injectEnvironmentVariables(portName);
+        String injectedPortName = ConfigUtils.fetchEnvironmentVariables(portName);
         log.debug("WSDL port name " + portName + " replaced with " + injectedPortName);
         this.portName = injectedPortName;
     }

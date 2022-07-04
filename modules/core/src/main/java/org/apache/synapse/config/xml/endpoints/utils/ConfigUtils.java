@@ -23,7 +23,7 @@ import org.apache.synapse.SynapseConstants;
 
 public class ConfigUtils {
 
-    public String injectEnvironmentVariables (String parameter) {
+    public static String fetchEnvironmentVariables(String parameter) {
         String injectedValue = parameter;
         if (parameter.contains(SynapseConstants.SYSTEM_VARIABLE_PREFIX)) {
             String extractedEnvVariableKey = parameter.substring(parameter.lastIndexOf(":") + 1);

@@ -1198,7 +1198,7 @@
         <wrapper.version>3.2.3</wrapper.version>
         <saxon.version>8.9</saxon.version>
         <jline.version>0.9.94</jline.version>
-        <xalan.version>2.7.1</xalan.version>
+        <xalan.version>2.7.2</xalan.version>
         <truezip.version>6.6</truezip.version>
         <jsch.version>0.1.31</jsch.version>
         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>

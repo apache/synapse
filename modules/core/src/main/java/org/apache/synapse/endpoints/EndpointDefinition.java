@@ -23,6 +23,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.AspectConfiguration;
+import org.apache.synapse.config.xml.endpoints.utils.ConfigUtils;
+import org.apache.commons.logging.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ import java.util.regex.Pattern;
  */
 public class EndpointDefinition implements AspectConfigurable {
 
+    protected Log log;
     /** Who is the leaf level Endpoint which uses me? */
     private Endpoint leafEndpoint = null;
     /**
@@ -152,6 +155,11 @@ public class EndpointDefinition implements AspectConfigurable {
     private final List<Integer> retryDisabledErrorCodes = new ArrayList<Integer>();
 
     /**
+     * Variable to persist original address before parameter injection
+     */
+    private String originalAddress;
+
+    /**
      * This should return the absolute EPR address referenced by the named endpoint. This may be
      * possibly computed.
      *
@@ -208,7 +216,19 @@ public class EndpointDefinition implements AspectConfigurable {
      * @param address the absolute address to be used
      */
     public void setAddress(String address) {
-        this.address = address;
+        this.originalAddress = address;
+        String fetchedAddress = ConfigUtils.fetchEnvironmentVariables(address);
+        log.debug("SOAP address " + address + " replaced with " + fetchedAddress);
+        this.address = fetchedAddress;
+    }
+
+    /**
+     * Retrieve originally set address before resolution
+     *
+     * @return original address
+     */
+    public String getOriginalAddress() {
+        return this.originalAddress;
     }
 
     /**

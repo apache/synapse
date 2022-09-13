@@ -81,7 +81,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 ep2.getDefinition().isAddressingOn());
     }
 
-    /**
+
     public void testAddressEndpointSerializationWithParameterInjection() {
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                                 "<endpoint>" +
@@ -112,7 +112,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
         assertEquals("Address URI is not serialized properly",
                 ep1.getDefinition().getAddress(), ep2.getDefinition().getAddress());
     }
-*/
+
 
     /**
     public void testWSDLEndpointSerialization() {

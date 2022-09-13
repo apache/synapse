@@ -218,7 +218,6 @@ public class EndpointDefinition implements AspectConfigurable {
     public void setAddress(String address) {
         this.originalAddress = address;
         String fetchedAddress = ConfigUtils.fetchEnvironmentVariables(address);
-        log.debug("SOAP address " + address + " replaced with " + fetchedAddress);
         this.address = fetchedAddress;
     }
 

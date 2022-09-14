@@ -114,7 +114,6 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
     }
 
 
-    /**
     public void testWSDLEndpointSerialization() {
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                      "<endpoint>" +
@@ -150,26 +149,18 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 ep1.getDefinition().isAddressingOn(),
                 ep2.getDefinition().isAddressingOn());
     }
-    */
 
-    /**
+
+
     public void testWSDLEndpointSerializationWithParameterInjection() {
-//
-//        String inputXML = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
-//                                "<endpoint>" +
-//                                    "<wsdl uri=\"$SYSTEM:WSDL_SERVICE_TEST_URI\" service='esbservice' " +
-//                                    "port=\"$SYSTEM:WSDL_SERVICE_TEST_PORT\">" +
-//                                        "<enableAddressing/>" +
-//                                    "</wsdl>" +
-//                                "</endpoint>" +
-//                            "</send>";
         String inputXML = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
-                "<endpoint>" +
-                "<wsdl uri='file:src/test/resources/esbservice.wsdl' service='esbservice' port=\"$SYSTEM:WSDL_SERVICE_TEST_PORT\">" +
-                "<enableAddressing/>" +
-                "</wsdl>" +
-                "</endpoint>" +
-                "</send>";
+                                "<endpoint>" +
+                                    "<wsdl uri=\"$SYSTEM:WSDL_SERVICE_TEST_URI\" service='esbservice' " +
+                                    "port=\"$SYSTEM:WSDL_SERVICE_TEST_PORT\">" +
+                                        "<enableAddressing/>" +
+                                    "</wsdl>" +
+                                "</endpoint>" +
+                            "</send>";
         OMElement config1 = createOMElement(inputXML);
         SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
 
@@ -190,10 +181,9 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
         assertEquals("Port name is not serialized properly", ep1.getPortName(), ep2.getPortName());
         assertEquals("WSDL URI is not serialized properly", ep1.getWsdlURI(), ep2.getWsdlURI());
     }
-    */
+
 
     public void testSimpleLoadbalanceSendSerialization() {
-
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<endpoint>" +
                     "<loadbalance>" +

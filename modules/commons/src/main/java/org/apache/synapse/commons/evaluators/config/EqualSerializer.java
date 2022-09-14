@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
  */
 public class EqualSerializer extends TextProcessingEvaluatorSerializer {
 
+    @Override
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
 
         if (!(evaluator instanceof EqualEvaluator)) {

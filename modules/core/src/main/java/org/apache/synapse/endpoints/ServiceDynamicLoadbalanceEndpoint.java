@@ -100,6 +100,7 @@ public class ServiceDynamicLoadbalanceEndpoint extends DynamicLoadbalanceEndpoin
         setAlgorithm(algorithm);
     }
 
+    @Override
     public LoadBalanceMembershipHandler getLbMembershipHandler() {
         return slbMembershipHandler;
     }
@@ -108,6 +109,7 @@ public class ServiceDynamicLoadbalanceEndpoint extends DynamicLoadbalanceEndpoin
         return Collections.unmodifiableMap(hostDomainMap);
     }
 
+    @Override
     public void send(MessageContext synCtx) {
         setCookieHeader(synCtx);
         //TODO: Refactor Session Aware LB dispatching code
@@ -201,6 +203,7 @@ public class ServiceDynamicLoadbalanceEndpoint extends DynamicLoadbalanceEndpoin
         // ThreadLocal variable to keep track of how many times this fault handler has been
         // called
         private ThreadLocal<Integer> callCount = new ThreadLocal<Integer>() {
+            @Override
             protected Integer initialValue() {
                 return 0;
             }
@@ -210,10 +213,12 @@ public class ServiceDynamicLoadbalanceEndpoint extends DynamicLoadbalanceEndpoin
             this.host = host;
         }
 
+        @Override
         public void setCurrentMember(Member currentMember) {
             this.currentMember = currentMember;
         }
 
+        @Override
         public void setTo(EndpointReference to) {
             this.to = to;
         }
@@ -221,6 +226,7 @@ public class ServiceDynamicLoadbalanceEndpoint extends DynamicLoadbalanceEndpoin
         private ServiceDynamicLoadbalanceFaultHandlerImpl() {
         }
 
+        @Override
         public void onFault(MessageContext synCtx) {
             if (currentMember == null) {
                 return;
@@ -273,6 +279,7 @@ public class ServiceDynamicLoadbalanceEndpoint extends DynamicLoadbalanceEndpoin
             // We cannot failover since we are using binary relay
         }
 
+        @Override
         public void setCurrentEp(Endpoint currentEp) {
             this.currentEp = currentEp;
         }

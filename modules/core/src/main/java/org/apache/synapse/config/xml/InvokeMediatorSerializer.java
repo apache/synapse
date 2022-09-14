@@ -73,6 +73,7 @@ public class InvokeMediatorSerializer extends AbstractMediatorSerializer {
 
     }
 
+    @Override
     public String getMediatorClassName() {
         return InvokeMediator.class.getName();
     }

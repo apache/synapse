@@ -50,6 +50,7 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
         this.msgContext = msgContext;
     }
 
+    @Override
     public void acknowledgeMessage(MessageContext msgContext) throws AxisFault {
         if (log.isDebugEnabled()) {
             log.debug("Acking one-way request");
@@ -66,6 +67,7 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
         }
     }
 
+    @Override
     public void awaitResponse() throws InterruptedException, AxisFault {
         if (log.isDebugEnabled()) {
             log.debug("Returning thread but keeping socket open -- awaiting response");
@@ -74,6 +76,7 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
         msgContext.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
     }
 
+    @Override
     public void signalResponseReady() {
         if (log.isDebugEnabled()) {
             log.debug("Signal response available");
@@ -81,18 +84,22 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
         status = RequestResponseTransportStatus.SIGNALLED;
     }
 
+    @Override
     public RequestResponseTransportStatus getStatus() {
         return status;
     }
 
+    @Override
     public void signalFaultReady(AxisFault fault) {
     }
     
+    @Override
     public boolean isResponseWritten() {
 		return responseWritten;
 	}
 
-	public void setResponseWritten(boolean responseWritten) {
+	@Override
+    public void setResponseWritten(boolean responseWritten) {
 		this.responseWritten = responseWritten;
 	}
 }

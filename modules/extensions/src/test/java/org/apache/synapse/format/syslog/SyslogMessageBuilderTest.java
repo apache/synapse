@@ -81,14 +81,17 @@ public class SyslogMessageBuilderTest extends TestCase {
         Schema schema = factory.newSchema(new StreamSource(SyslogMessageBuilderTest.class.getResource("schema.xsd").toExternalForm()));
         Validator validator = schema.newValidator();
         validator.setErrorHandler(new ErrorHandler() {
+            @Override
             public void error(SAXParseException exception) throws SAXException {
                 throw exception;
             }
 
+            @Override
             public void fatalError(SAXParseException exception) throws SAXException {
                 throw exception;
             }
 
+            @Override
             public void warning(SAXParseException exception) throws SAXException {
                 throw exception;
             }

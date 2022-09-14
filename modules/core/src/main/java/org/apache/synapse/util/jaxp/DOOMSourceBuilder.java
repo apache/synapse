@@ -32,12 +32,14 @@ import org.w3c.dom.Element;
  * to DOOM and produces a {@link DOMSource}.
  */
 public class DOOMSourceBuilder implements SourceBuilder {
+    @Override
     public Source getSource(OMElement node) {
         return new DOMSource(
                 ((Element) ElementHelper.importOMElement(node, OMAbstractFactory.getMetaFactory(
                         OMAbstractFactory.FEATURE_DOM).getOMFactory())).getOwnerDocument());
     }
 
+    @Override
     public void release() {
     }
 }

@@ -59,6 +59,7 @@ public class JavaScriptXmlHelper extends DefaultXMLHelper {
      * @return XML content as OMElement wrapped in Scriptable object
      * @throws javax.script.ScriptException when error
      */
+    @Override
     public OMElement toOMElement(Object scriptXML) throws ScriptException {
         if (scriptXML == null) {
             return null;
@@ -87,6 +88,7 @@ public class JavaScriptXmlHelper extends DefaultXMLHelper {
      * @return Scriptable object by adding the xml content
      * @throws javax.script.ScriptException when error
      */
+    @Override
     public Object toScriptXML(OMElement omElement)
             throws ScriptException {
         if (omElement == null) {

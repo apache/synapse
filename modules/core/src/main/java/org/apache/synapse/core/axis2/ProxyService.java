@@ -783,10 +783,12 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         return name;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -1005,10 +1007,12 @@ public class ProxyService implements AspectConfigurable, SynapseArtifact {
         this.policies.add(pi);
     }
 
+    @Override
     public void configure(AspectConfiguration aspectConfiguration) {
         this.aspectConfiguration = aspectConfiguration;
     }
 
+    @Override
     public AspectConfiguration getAspectConfiguration() {
         return aspectConfiguration;
     }

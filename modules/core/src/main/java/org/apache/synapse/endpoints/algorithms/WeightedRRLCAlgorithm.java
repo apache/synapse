@@ -82,16 +82,20 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
     public static final String LB_WEIGHTED_RRLC_WEIGHT_MAX = LB_WEIGHTED_RRLC_WEIGHT + ".max";
     public static final int LB_WEIGHTED_RRLC_WEIGHT_SKEW = 2;    
 
+    @Override
     public void setApplicationMembers(List<Member> members) {}
 
+    @Override
     public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
     }
 
+    @Override
     public void setLoadBalanceEndpoint(Endpoint endpoint) {
         this.loadBalanceEndpoint = endpoint;        
     }
 
+    @Override
     public synchronized Endpoint getNextEndpoint(MessageContext messageContext,
                                                  AlgorithmContext algorithmContext) {                
         WeightedState s = list[endpointCursor];
@@ -216,23 +220,27 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
 
         // sort the states according to the initial fixed weights
         Arrays.sort(list, new Comparator<WeightedState>() {
+            @Override
             public int compare(WeightedState o1, WeightedState o2) {
                 return o2.getFixedWeight() - o1.getFixedWeight();
             }
         });
     }
 
+    @Override
     public Member getNextApplicationMember(AlgorithmContext algorithmContext) {
         // this doesn't make sense for weighted load balance algorithm
         return null;
     }
 
+    @Override
     public void reset(AlgorithmContext algorithmContext) {
         for (WeightedState state : list) {
             state.reset();
         }
     }
 
+    @Override
     public String getName() {
         return WeightedRRLCAlgorithm.class.getName();
     }
@@ -305,10 +313,12 @@ public class WeightedRRLCAlgorithm implements LoadbalanceAlgorithm, ManagedLifec
         }
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         intialize();
     }
 
+    @Override
     public void destroy() {}
 
     /**

@@ -29,26 +29,32 @@ public class CacheController implements CacheControllerMBean {
         this.cacheManager = cacheManager;
     }
 
+    @Override
     public boolean stopCacheManager() {
         return cacheManager.stop();
     }
 
+    @Override
     public boolean wakeUpCacheManager() {
         return cacheManager.wakeUpNow();
     }
 
+    @Override
     public boolean changeCacheManagerDurationMins(int duration){
         return cacheManager.changeDuration(duration);
     }
 
+    @Override
     public boolean isCacheManagerRunning() {
         return cacheManager.isRunning();
     }
 
+    @Override
     public int getCacheSize() {
         return cache.getCacheSize();
     }
 
+    @Override
     public int getCacheManagerDurationMins(){
         return cacheManager.getDuration();
     }

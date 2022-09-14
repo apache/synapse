@@ -52,6 +52,7 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
      * @param m Mediator of the type CloneMediator which is subjected to the serialization
      * @return OMElement serialized in to xml from the given parameters
      */
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         OMElement cloneElem = fac.createOMElement("clone", synNS);
@@ -82,6 +83,7 @@ public class CloneMediatorSerializer extends AbstractMediatorSerializer {
      * 
      * @return full class name of the Mediator which is serialized by this Serializer
      */
+    @Override
     public String getMediatorClassName() {
         return CloneMediator.class.getName();
     }

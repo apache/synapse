@@ -48,6 +48,7 @@ public class TransactionMediatorFactory extends AbstractMediatorFactory {
      * @param properties
      * @return the Transaction mediator instance created
      */
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         TransactionMediator tm = new TransactionMediator();
@@ -70,6 +71,7 @@ public class TransactionMediatorFactory extends AbstractMediatorFactory {
         return null;
     }
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }

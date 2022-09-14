@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import java.util.Properties;
 
 public class XMLToTemplateMapper implements XMLToObjectMapper {
+    @Override
     public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (!(om instanceof OMElement)) {
             throw new SynapseException("Configuration is not in proper format.");

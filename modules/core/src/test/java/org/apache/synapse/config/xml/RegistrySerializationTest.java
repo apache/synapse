@@ -33,8 +33,8 @@ public class RegistrySerializationTest extends AbstractTestCase {
 
         String regitryConfiguration = "<syn:registry xmlns:syn=\"http://ws.apache.org/ns/synapse\" " +
                 "provider=\"org.apache.synapse.registry.url.SimpleURLRegistry\">" +
-                "<syn:parameter name=\"root\">file:./../../repository/</syn:parameter>" +
                 "<syn:parameter name=\"cachableDuration\">15000</syn:parameter>" +
+                "<syn:parameter name=\"root\">file:./../../repository/</syn:parameter>" +
                 "</syn:registry>";
 
         OMElement registryElement = createOMElement(regitryConfiguration);

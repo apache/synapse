@@ -266,6 +266,7 @@ public class PriorityExecutor {
             this.runnable = runnable;
         }
 
+        @Override
         public void run() {
             try {
                 runnable.run();
@@ -274,18 +275,22 @@ public class PriorityExecutor {
             }
         }
 
+        @Override
         public int getPriority() {
             return priority;
         }
 
+        @Override
         public void setPriority(int p) {
             this.priority = p;
         }
 
+        @Override
         public void setProperty(String name, Object value) {
             properties.put(name, value);
         }
 
+        @Override
         public Object getProperty(String name) {
             return properties.get(name);
         }

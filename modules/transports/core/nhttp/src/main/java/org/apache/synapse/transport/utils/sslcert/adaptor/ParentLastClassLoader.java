@@ -54,6 +54,7 @@ public class ParentLastClassLoader extends ClassLoader {
 
         File dir = new File(libDir);
         jarFiles = dir.listFiles(new FileFilter() {
+            @Override
             public boolean accept(File f) {
                 return f.getName().startsWith("synapse-nhttp-transport") ||
                         f.getName().equals("bcprov-jdk15on-1.49.jar");

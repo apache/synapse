@@ -50,10 +50,12 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATTRIBUTE_Q
                 = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         XSLTMediator transformMediator = new XSLTMediator();

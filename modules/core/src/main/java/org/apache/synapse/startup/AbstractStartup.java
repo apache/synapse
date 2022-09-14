@@ -46,6 +46,7 @@ public abstract class AbstractStartup implements Startup {
      *
      * @return String representing the name
      */
+    @Override
     public String getName() {
         return this.name;
     }
@@ -56,6 +57,7 @@ public abstract class AbstractStartup implements Startup {
      * @param name
      *          String name to be set to the startup
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -65,6 +67,7 @@ public abstract class AbstractStartup implements Startup {
      *
      * @return a file name as a string or null
      */
+    @Override
     public String getFileName() {
         return fileName;
     }
@@ -74,6 +77,7 @@ public abstract class AbstractStartup implements Startup {
      *
      * @param fileName the name of the file as a string
      */
+    @Override
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -83,6 +87,7 @@ public abstract class AbstractStartup implements Startup {
      *
      * @return description of the startup
      */
+    @Override
     public String getDescription() {
         return description;
     }
@@ -92,6 +97,7 @@ public abstract class AbstractStartup implements Startup {
      *
      * @param description tobe set to the artifact
      */
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }

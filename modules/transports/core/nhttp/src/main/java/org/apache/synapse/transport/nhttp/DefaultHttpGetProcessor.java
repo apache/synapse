@@ -63,6 +63,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
 
     protected ServerHandler serverHandler;
 
+    @Override
     public void init(ConfigurationContext cfgCtx, ServerHandler serverHandler) throws AxisFault {
         this.cfgCtx = cfgCtx;
         this.serverHandler = serverHandler;
@@ -77,6 +78,7 @@ public class DefaultHttpGetProcessor implements HttpGetRequestProcessor {
      * @param conn       The NHttpServerConnection
      * @param os         The OutputStream
      */
+    @Override
     public void process(HttpRequest request,
                         HttpResponse response,
                         MessageContext msgContext,

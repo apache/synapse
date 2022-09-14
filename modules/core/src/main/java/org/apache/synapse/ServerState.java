@@ -25,36 +25,42 @@ package org.apache.synapse;
 public enum ServerState {
 
     UNDETERMINED {
+        @Override
         public String toString() {
             return "UNDETERMINED";
         }
     },
 
     INITIALIZABLE {
+        @Override
         public String toString() {
             return "INITIALIZABLE";
         }
     },
     
     INITIALIZED {
+        @Override
         public String toString() {
             return "INITIALIZED";
         }
     },
     
     MAINTENANCE {
+        @Override
         public String toString() {
             return "MAINTENANCE";
         }
     },
 
     STARTED {
+        @Override
         public String toString() {
             return "STARTED";
         }
     },
 
     STOPPED {
+        @Override
         public String toString() {
             return "STOPPED";
         }

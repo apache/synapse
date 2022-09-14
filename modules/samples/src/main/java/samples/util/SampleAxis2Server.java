@@ -43,6 +43,7 @@ public class SampleAxis2Server {
 
     private static void addShutdownHook() {
         Thread shutdownHook = new Thread() {
+            @Override
             public void run() {
                 log.info("Shutting down SimpleAxisServer ...");
                 try {

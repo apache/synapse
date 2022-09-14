@@ -35,6 +35,7 @@ import java.util.Iterator;
  */
 public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof ClassMediator)) {
@@ -69,6 +70,7 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
         return clazz;
     }
 
+    @Override
     public String getMediatorClassName() {
         return ClassMediator.class.getName();
     }

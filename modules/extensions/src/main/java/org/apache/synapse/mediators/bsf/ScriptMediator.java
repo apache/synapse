@@ -168,6 +168,7 @@ public class ScriptMediator extends AbstractMediator {
      * @param synCtx the Synapse message context
      * @return the boolean result from the script invocation
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

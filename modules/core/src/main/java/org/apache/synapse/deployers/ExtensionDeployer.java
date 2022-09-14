@@ -67,6 +67,7 @@ public class ExtensionDeployer extends AbstractDeployer {
      * @param configurationContext - ConfigurationContext of Axis2 from which
      *  the deployer is initialized
      */
+    @Override
     public void init(ConfigurationContext configurationContext) {
         this.cfgCtx = configurationContext;
     }
@@ -79,6 +80,7 @@ public class ExtensionDeployer extends AbstractDeployer {
      * @param deploymentFileData - describes the updated file
      * @throws DeploymentException - in case an error on the deployment
      */
+    @Override
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
         log.info("Loading extensions from: " + deploymentFileData.getAbsolutePath());
@@ -178,6 +180,7 @@ public class ExtensionDeployer extends AbstractDeployer {
      *
      * @param string -
      */
+    @Override
     public void setDirectory(String string) {
         // we do not support changing the directory
     }
@@ -187,6 +190,7 @@ public class ExtensionDeployer extends AbstractDeployer {
      *
      * @param string -
      */
+    @Override
     public void setExtension(String string) {
         // we do not support changing the extension
     }
@@ -197,6 +201,7 @@ public class ExtensionDeployer extends AbstractDeployer {
      * @param string - filename of the deleted file
      * @throws DeploymentException - incase of an error in undeployment
      */
+    @Override
     public void undeploy(String string) throws DeploymentException {
         // todo: implement the undeployement
     }

@@ -40,6 +40,7 @@ public abstract class AbstractSplitMediatorTestCase extends AbstractMediatorTest
     MessageContext testCtx;
     MediatorFactory fac;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         SynapseConfiguration synCfg = new SynapseConfiguration();
@@ -60,6 +61,7 @@ public abstract class AbstractSplitMediatorTestCase extends AbstractMediatorTest
         testCtx.getConfiguration().addSequence("fault", new SequenceMediator());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         helperMediator.destroy();

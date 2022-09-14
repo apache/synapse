@@ -36,10 +36,12 @@ public class ReplaceMediatorFactory extends AbstractMediatorFactory {
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "replace");
     private static final QName ATT_PROPERTY = new QName("property");
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }
 
+    @Override
     public ReplaceMediator createSpecificMediator(OMElement elem, Properties properties) {
         ReplaceMediator mediator = new ReplaceMediator();
 

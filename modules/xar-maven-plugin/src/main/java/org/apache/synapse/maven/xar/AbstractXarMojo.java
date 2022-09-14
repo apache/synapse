@@ -179,6 +179,7 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
     
     private Logger logger;
     
+    @Override
     public void enableLogging(Logger logger) {
         this.logger = logger;
     }
@@ -211,6 +212,7 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
         AndArtifactFilter filter = new AndArtifactFilter();
         filter.add(new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME));
         filter.add(new ArtifactFilter() {
+            @Override
             public boolean include(Artifact artifact) {
                 return !artifact.isOptional();
             }
@@ -299,6 +301,7 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
         final Set<String> defaultExclusionSet
                 = new HashSet<String>(Arrays.asList(defaultRuntimeExcludes));
         return new ArtifactFilter() {
+            @Override
             public boolean include(Artifact artifact) {
                 Artifact runtimeArtifact = artifacts.get(artifact.getDependencyConflictId());
                 if (runtimeArtifact == null) {
@@ -372,6 +375,7 @@ public abstract class AbstractXarMojo extends AbstractMojo implements LogEnabled
     private void logArtifacts(Collection<Artifact> collection) {
         List<Artifact> artifacts = new ArrayList<Artifact>(collection);
         Collections.sort(artifacts, new Comparator<Artifact>() {
+            @Override
             public int compare(Artifact o1, Artifact o2) {
                 return o1.getArtifactId().compareTo(o2.getArtifactId());
             }

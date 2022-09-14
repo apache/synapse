@@ -62,6 +62,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
     private static final long DEFAULT_TIMEOUT = 5000L;
     private static final int DEFAULT_DISK_CACHE_SIZE = 200;
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         if (!CACHE_Q.equals(elem.getQName())) {
@@ -182,6 +183,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
         }
     }
 
+    @Override
     public QName getTagQName() {
         return CACHE_Q;
     }

@@ -29,6 +29,7 @@ import java.net.URLStreamHandler;
 
 public final class ClasspathURLStreamHandler extends URLStreamHandler {
 
+    @Override
     public URLConnection openConnection(URL url) {
         return new URLConnectionImpl(url);
     }
@@ -39,8 +40,10 @@ public final class ClasspathURLStreamHandler extends URLStreamHandler {
             super(url);
         }
 
+        @Override
         public void connect() {}
 
+        @Override
         public InputStream getInputStream() throws IOException {
             if (url == null) {
                 throw new MalformedURLException("Null or empty classpath URL");
@@ -55,6 +58,7 @@ public final class ClasspathURLStreamHandler extends URLStreamHandler {
             return is;
         }
 
+        @Override
         public OutputStream getOutputStream() {
             throw new UnsupportedOperationException();
         }

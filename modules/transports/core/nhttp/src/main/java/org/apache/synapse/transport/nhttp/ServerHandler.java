@@ -142,6 +142,7 @@ public class ServerHandler implements NHttpServerEventHandler {
      * Process a new incoming request
      * @param conn the connection
      */
+    @Override
     public void requestReceived(final NHttpServerConnection conn) {
 
         HttpContext context = conn.getContext();
@@ -233,6 +234,7 @@ public class ServerHandler implements NHttpServerEventHandler {
      * @param conn the connection being processed
      * @param decoder the content decoder in use
      */
+    @Override
     public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) {
 
         HttpContext context = conn.getContext();
@@ -267,6 +269,7 @@ public class ServerHandler implements NHttpServerEventHandler {
      * @param conn the connection being processed
      * @param encoder the content encoder in use
      */
+    @Override
     public void outputReady(final NHttpServerConnection conn, final ContentEncoder encoder) {
 
         HttpContext context = conn.getContext();
@@ -392,6 +395,7 @@ public class ServerHandler implements NHttpServerEventHandler {
      * Handle connection timeouts by shutting down the connections
      * @param conn the connection being processed
      */
+    @Override
     public void timeout(final NHttpServerConnection conn) {
         HttpContext context = conn.getContext();
         Boolean read = (Boolean) context.getAttribute(NhttpConstants.REQUEST_READ);
@@ -411,6 +415,7 @@ public class ServerHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void connected(final NHttpServerConnection conn) {
         if (log.isTraceEnabled()) {
             log.trace("New incoming connection");
@@ -427,6 +432,7 @@ public class ServerHandler implements NHttpServerEventHandler {
         activeConnections.add(conn);
     }
 
+    @Override
     public void responseReady(NHttpServerConnection conn) {
 
         if (JavaUtils.isTrueExplicitly(conn.getContext().getAttribute(NhttpConstants.FORCE_CLOSING))
@@ -453,6 +459,7 @@ public class ServerHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void closed(final NHttpServerConnection conn) {
 
         HttpContext context = conn.getContext();
@@ -510,10 +517,12 @@ public class ServerHandler implements NHttpServerEventHandler {
         } catch (Exception ignore) {}        
     }
 
+    @Override
     public void endOfInput(NHttpServerConnection conn) throws IOException {
         closed(conn);
     }
 
+    @Override
     public void exception(NHttpServerConnection conn, Exception e) {
         if (e instanceof HttpException) {
             exception(conn, (HttpException) e);

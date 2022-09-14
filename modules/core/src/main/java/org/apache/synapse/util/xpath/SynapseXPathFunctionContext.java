@@ -69,6 +69,7 @@ public class SynapseXPathFunctionContext implements FunctionContext {
      * @return resolved function
      * @throws UnresolvableException if the function specified does not found
      */
+    @Override
     public Function getFunction(String namespaceURI, String prefix, String localName)
         throws UnresolvableException {
 

@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
  * the {@link AndFactory}. 
  */
 public class AndSerializer extends AbstractEvaluatorSerializer {    
+    @Override
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {        
         if (!(evaluator instanceof AndEvaluator)) {           
             throw new IllegalArgumentException("Evaluator should be an AndEvaluator");

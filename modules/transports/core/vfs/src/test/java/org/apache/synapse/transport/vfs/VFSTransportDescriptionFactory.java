@@ -25,6 +25,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.testkit.axis2.TransportDescriptionFactory;
 
 public class VFSTransportDescriptionFactory implements TransportDescriptionFactory {
+    @Override
     public TransportInDescription createTransportInDescription() throws Exception {
         TransportInDescription trpInDesc = new TransportInDescription("vfs");
         trpInDesc.setReceiver(new VFSTransportListener());
@@ -33,6 +34,7 @@ public class VFSTransportDescriptionFactory implements TransportDescriptionFacto
         return trpInDesc;
     }
 
+    @Override
     public TransportOutDescription createTransportOutDescription() throws Exception {
         TransportOutDescription trpOutDesc = new TransportOutDescription("vfs");
         trpOutDesc.setSender(new VFSTransportSender());

@@ -42,12 +42,16 @@ public class AsyncCallback implements AxisCallback {
         this.synapseOutMsgCtx = synapseOutMsgCtx;
     }
 
+    @Override
     public void onMessage(org.apache.axis2.context.MessageContext messageContext) {}
 
+    @Override
     public void onFault(org.apache.axis2.context.MessageContext messageContext) {}
 
+    @Override
     public void onError(Exception e) {}
 
+    @Override
     public void onComplete() {}
 
     public org.apache.synapse.MessageContext getSynapseOutMsgCtx() {

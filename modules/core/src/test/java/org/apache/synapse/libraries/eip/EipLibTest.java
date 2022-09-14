@@ -45,6 +45,7 @@ public class EipLibTest extends AbstractEipLibTestCase {
     private MessageContext synCtx;
 
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());

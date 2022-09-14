@@ -71,6 +71,7 @@ public class FIXOutTransportInfo implements OutTransportInfo {
         return sessionID;
     }
 
+    @Override
     public void setContentType(String s) {
 
     }

@@ -41,6 +41,7 @@ public class TemplateEndpointSerializer extends EndpointSerializer {
 
     }
 
+    @Override
     public OMElement serializeEndpoint(Endpoint epr) {
         TemplateEndpoint endpoints = (TemplateEndpoint) epr;
 

@@ -56,6 +56,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
     private static final QName DEFAULT_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "default");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SwitchMediator switchMediator = new SwitchMediator();
@@ -111,6 +112,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
         return switchMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return SWITCH_Q;
     }

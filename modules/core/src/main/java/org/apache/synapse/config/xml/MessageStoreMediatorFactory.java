@@ -68,6 +68,7 @@ public class MessageStoreMediatorFactory extends AbstractMediatorFactory{
         return messageStoreMediator;
     }
 
+    @Override
     public QName getTagQName() {
        return STORE_Q;
     }

@@ -338,6 +338,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 children2.get(1) instanceof AddressEndpoint);
     }
 
+    @Override
     protected OMElement createOMElement(String xml) {
         try {
 

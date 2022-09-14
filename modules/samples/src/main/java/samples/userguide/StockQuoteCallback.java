@@ -27,6 +27,7 @@ import org.apache.axis2.client.async.AxisCallback;
  */
 public class StockQuoteCallback implements AxisCallback {
 
+    @Override
     public void onMessage(org.apache.axis2.context.MessageContext messageContext) {
         System.out.println("Response received to the callback");
         OMElement result
@@ -37,15 +38,18 @@ public class StockQuoteCallback implements AxisCallback {
         StockQuoteClient.InnerStruct.RESULT = result;
     }
 
+    @Override
     public void onFault(org.apache.axis2.context.MessageContext messageContext) {
         System.out.println("Fault received to the callback : " + messageContext.getEnvelope().
                 getBody().getFault());
     }
 
+    @Override
     public void onError(Exception e) {
         System.out.println("Error inside callback : " + e);
     }
 
+    @Override
     public void onComplete() {
         StockQuoteClient.InnerStruct.COMPLETED = true;
     }

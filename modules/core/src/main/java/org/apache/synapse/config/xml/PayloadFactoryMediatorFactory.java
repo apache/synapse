@@ -50,6 +50,7 @@ public class PayloadFactoryMediatorFactory extends AbstractMediatorFactory {
     private static final QName FORMAT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "format");
     private static final QName ARGS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "args");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         PayloadFactoryMediator payloadFactoryMediator = new PayloadFactoryMediator();
@@ -102,6 +103,7 @@ public class PayloadFactoryMediatorFactory extends AbstractMediatorFactory {
         return payloadFactoryMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return PAYLOAD_FACTORY_Q;
     }

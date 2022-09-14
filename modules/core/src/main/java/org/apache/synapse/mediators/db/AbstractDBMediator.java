@@ -73,6 +73,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      *  
      * @param se the Synapse environment reference
      */
+    @Override
     public void init(SynapseEnvironment se) {
         // check whether we shall try to lookup an existing data source or create a new custom data source
         if (dataSourceName != null) {
@@ -85,6 +86,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
     /**
      * Destroys the mediator. If we are using our custom DataSource, then shut down the connections
      */
+    @Override
     public void destroy() {
         if (dataSourceName != null) {
             // Don't touch the globally configured JNDI data sources
@@ -108,6 +110,7 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @param synCtx the current message
      * @return true, always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         String name = (this instanceof DBLookupMediator ? "DBLookup" : "DBReport");

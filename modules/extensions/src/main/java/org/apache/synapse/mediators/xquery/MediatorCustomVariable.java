@@ -71,6 +71,7 @@ public class MediatorCustomVariable extends MediatorVariable {
      *
      * @param synCtx The current message context
      */
+    @Override
     public boolean evaluateValue(MessageContext synCtx) {
 
         if (this.regKey == null) {   // get the node from the current message payload

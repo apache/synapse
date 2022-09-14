@@ -115,6 +115,7 @@ public class Axis2SynapseController implements SynapseController {
      * @param serverContextInformation       Server Context if the Axis2 Based Server
      *                                       Environment has been already set up.
      */
+    @Override
     public void init(ServerConfigurationInformation serverConfigurationInformation,
                      ServerContextInformation serverContextInformation) {
 
@@ -262,6 +263,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void destroy() {
 
         try {
@@ -293,6 +295,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isInitialized() {
         return initialized;
     }
@@ -301,6 +304,7 @@ public class Axis2SynapseController implements SynapseController {
      * Adds the synapse handlers to the inflow Dispatch phase and starts the listener manager
      * if the axis2 instance is created by the Synapse
      */
+    @Override
     public void start() {
 
         // add the Synapse handlers
@@ -356,6 +360,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void startMaintenance() {
         log.info("Putting transport listeners, senders and tasks into maintenance mode..");
 
@@ -376,6 +381,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void endMaintenance() {
         log.info("Resuming transport listeners, senders and tasks from maintenance mode...");
 
@@ -396,6 +402,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * Cleanup the axis2 environment and stop the synapse environment.
      */
+    @Override
     public void stop() {
         try {
             // stop tasks
@@ -474,6 +481,7 @@ public class Axis2SynapseController implements SynapseController {
      *
      * @return SynapseEnvironment instance
      */
+    @Override
     public SynapseEnvironment createSynapseEnvironment() {
         synapseEnvironment = new Axis2SynapseEnvironment(
             configurationContext, synapseConfiguration, serverContextInformation);
@@ -513,6 +521,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * Destroys the Synapse Environment by undeploying all Axis2 services.
      */
+    @Override
     public void destroySynapseEnvironment() {
         if (synapseEnvironment != null) {
             try {
@@ -529,6 +538,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SynapseConfiguration createSynapseConfiguration() {
 
         String synapseXMLLocation = serverConfigurationInformation.getSynapseXMLLocation();
@@ -581,6 +591,7 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void destroySynapseConfiguration() {
         if (synapseConfiguration != null) {
             synapseConfiguration.destroy();
@@ -601,6 +612,7 @@ public class Axis2SynapseController implements SynapseController {
      * @return true, if a safe state is reached before the specified <code>endTime</code>,
      *         otherwise false (forceful stop required)
      */
+    @Override
     public boolean waitUntilSafeToStop(long waitIntervalMillis, long endTime) {
 
         boolean safeToStop = false;
@@ -668,6 +680,7 @@ public class Axis2SynapseController implements SynapseController {
         return !forcefulStop;
     }
 
+    @Override
     public Object getContext() {
         return configurationContext;
     }

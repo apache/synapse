@@ -27,10 +27,12 @@ public class SynapseCallbackStoreView implements SynapseCallbackStoreViewMBean {
         this.receiver = receiver;
     }
 
+    @Override
     public int getCallbackCount() {
         return receiver.getCallbackCount();
     }
 
+    @Override
     public String[] getPendingCallbacks() {
         return receiver.getPendingCallbacks();
     }

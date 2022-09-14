@@ -33,6 +33,7 @@ import org.apache.synapse.endpoints.EndpointDefinition;
  */
 public class DefaultEndpointSerializer extends EndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof DefaultEndpoint)) {

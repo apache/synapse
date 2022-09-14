@@ -45,6 +45,7 @@ public class ActiveMQController extends AbstractBackEndServerController {
                 SampleConfigConstants.DEFAULT_BE_SERVER_CONF_JMS_PROVIDER_URL);
     }
 
+    @Override
     public boolean startProcess() {
         try {
             //using embedded jms broker
@@ -61,6 +62,7 @@ public class ActiveMQController extends AbstractBackEndServerController {
         }
     }
 
+    @Override
     public boolean stopProcess() {
         try {
             broker.stop();

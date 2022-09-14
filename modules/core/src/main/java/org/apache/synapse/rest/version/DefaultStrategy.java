@@ -27,10 +27,12 @@ public class DefaultStrategy extends  AbstractVersionStrategy{
         super(api, "", VersionStrategyFactory.TYPE_NULL);
     }
 
+    @Override
     public boolean isMatchingVersion(Object versionInfoObj) {
         return true;
     }
 
+    @Override
     public String getVersionParam() {
         return "";
     }

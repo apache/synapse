@@ -34,6 +34,7 @@ import java.util.List;
  */
 public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof ValidateMediator)) {
@@ -79,6 +80,7 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer {
         return validate;
     }
 
+    @Override
     public String getMediatorClassName() {
         return ValidateMediator.class.getName();
     }

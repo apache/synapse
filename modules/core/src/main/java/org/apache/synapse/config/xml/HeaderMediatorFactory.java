@@ -50,6 +50,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
     private static final QName ATT_ACTION = new QName("action");
     private static final QName ATT_SCOPE = new QName("scope");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         HeaderMediator headerMediator = new HeaderMediator();
@@ -154,6 +155,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
         return (elem.getChildElements() != null && elem.getChildElements().hasNext());
     }
 
+    @Override
     public QName getTagQName() {
         return HEADER_Q;
     }

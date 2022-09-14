@@ -37,6 +37,7 @@ public class EJBMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final String EJB = "ejb";
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof EJBMediator)) {
@@ -108,6 +109,7 @@ public class EJBMediatorSerializer extends AbstractMediatorSerializer {
         return mediatorElem;
     }
 
+    @Override
     public String getMediatorClassName() {
         return EJBMediator.class.getName();
     }

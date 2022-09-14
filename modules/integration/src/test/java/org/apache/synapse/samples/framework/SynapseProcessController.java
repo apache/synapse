@@ -85,6 +85,7 @@ public class SynapseProcessController implements ProcessController {
         information.setAxis2Xml(path);
     }
 
+    @Override
     public boolean startProcess() {
         processException = null;
 
@@ -107,6 +108,7 @@ public class SynapseProcessController implements ProcessController {
         return true;
     }
 
+    @Override
     public boolean stopProcess() {
         if (serverState == SERVER_ACTIVE) {
             synchronized (synapseServer) {
@@ -126,6 +128,7 @@ public class SynapseProcessController implements ProcessController {
         return true;
     }
 
+    @Override
     public String getServerName() {
         return information.getServerName();
     }
@@ -136,6 +139,7 @@ public class SynapseProcessController implements ProcessController {
             super(information.getServerName().toLowerCase());
         }
 
+        @Override
         public void run() {
             log.info("Starting up Synapse...");
 

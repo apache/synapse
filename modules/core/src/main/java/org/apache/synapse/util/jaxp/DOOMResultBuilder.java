@@ -44,6 +44,7 @@ public class DOOMResultBuilder implements ResultBuilder {
     
     private Document document;
 
+    @Override
     public Result getResult() {
         DOMMetaFactory domMetaFactory
                 = ((DOMMetaFactory)OMAbstractFactory.getMetaFactory(OMAbstractFactory.FEATURE_DOM));
@@ -55,6 +56,7 @@ public class DOOMResultBuilder implements ResultBuilder {
         return new DOMResult(document);
     }
 
+    @Override
     public OMElement getNode(Charset charset) {
         // TODO: we need to support SOAPEnvelope
         //       (not supported by the original code in XSLTMediator)
@@ -68,6 +70,7 @@ public class DOOMResultBuilder implements ResultBuilder {
         return null;
     }
 
+    @Override
     public void release() {
     }
 

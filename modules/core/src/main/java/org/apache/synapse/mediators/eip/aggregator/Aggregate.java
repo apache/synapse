@@ -215,6 +215,7 @@ public class Aggregate extends TimerTask {
         this.expiryTimeMillis = expiryTimeMillis;
     }
 
+    @Override
     public void run() {
         while (true) {
             if (completed) {
@@ -237,6 +238,7 @@ public class Aggregate extends TimerTask {
             this.aggregate = aggregate;
         }
 
+        @Override
         public void run() {
             aggregateMediator.completeAggregate(aggregate);
         }

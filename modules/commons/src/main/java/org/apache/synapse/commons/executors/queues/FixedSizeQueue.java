@@ -79,34 +79,42 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         array = (E[]) new Object[capacity];
     }
 
+    @Override
     public int getPriority() {
         return priority;
     }
 
+    @Override
     public void setPriority(int p) {
         this.priority = p;
     }    
 
+    @Override
     public Condition getNotFullCond() {
         return notFullCond;
     }
 
+    @Override
     public void setNotFullCond(Condition notFullCond) {
         this.notFullCond = notFullCond;
     }
 
+    @Override
     public Iterator<E> iterator() {
         return new Itr<E>();
     }
 
+    @Override
     public int size() {
         return count;
     }
 
+    @Override
     public String toString() {
         return super.toString() + this.priority;
     }
 
+    @Override
     public boolean offer(E e) {
         if (count == array.length) {
             return false;
@@ -116,20 +124,24 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         }
     }
 
+    @Override
     public E poll() {
         if (count == 0)
             return null;
         return get();
     }
 
+    @Override
     public E peek() {
         return (count == 0) ? null : array[head];
     }
 
+    @Override
     public int remainingCapacity() {
         return capacity - count;        
     }
 
+    @Override
     public int drainTo(Collection<? super E> c) {
         final E[] items = this.array;
         int i = head;
@@ -150,6 +162,7 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         return n;
     }
 
+    @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
         final E[] items = this.array;
         int i = head;
@@ -168,6 +181,7 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
         return n;
     }
 
+    @Override
     public int getCapacity() {
         return capacity;
     }
@@ -209,10 +223,12 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
     private class Itr<E> implements Iterator<E> {
 	    int index = head;
 
+        @Override
         public boolean hasNext() {
             return index != tail;
         }
 
+        @Override
         public E next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
@@ -222,6 +238,7 @@ public class FixedSizeQueue<E> extends AbstractQueue<E> implements InternalQueue
 
         }
 
+        @Override
         public void remove() {            
             while (index != tail) {
                 int j = increment(index);

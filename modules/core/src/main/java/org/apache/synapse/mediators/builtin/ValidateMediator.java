@@ -100,6 +100,7 @@ public class ValidateMediator extends AbstractListMediator {
     private final SchemaFactory factory = SchemaFactory.newInstance(
             XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
+    @Override
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
     public boolean mediate(MessageContext synCtx) {
 
@@ -285,16 +286,19 @@ public class ValidateMediator extends AbstractListMediator {
         private boolean validationError = false;
         private SAXParseException saxParseException = null;
 
+        @Override
         public void error(SAXParseException exception) throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
+        @Override
         public void fatalError(SAXParseException exception) throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
+        @Override
         public void warning(SAXParseException exception) throws SAXException {
         }
 

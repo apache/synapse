@@ -43,6 +43,7 @@ public class DiscountQuoteMediator extends AbstractMediator {
 
     public DiscountQuoteMediator(){}
 
+    @Override
     public boolean mediate(MessageContext mc) {
 
         String price= mc.getEnvelope().getBody().getFirstElement().getFirstElement().
@@ -74,14 +75,17 @@ public class DiscountQuoteMediator extends AbstractMediator {
         return true;
     }
 
+    @Override
     public String getType() {
         return null;
     }
 
+    @Override
     public void setTraceState(int traceState) {
         this.traceState = traceState;
     }
 
+    @Override
     public int getTraceState() {
         return 0;
     }

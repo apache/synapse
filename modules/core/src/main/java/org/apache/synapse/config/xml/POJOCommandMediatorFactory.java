@@ -64,6 +64,7 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
     protected static final String RAUM_ACTION = "ReadAndUpdateMessage";
     protected static final String RAUC_ACTION = "ReadAndUpdateContext";
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         POJOCommandMediator pojoMediator = new POJOCommandMediator();
@@ -233,6 +234,7 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
         }
     }
 
+    @Override
     public QName getTagQName() {
         return POJO_COMMAND_Q;
     }

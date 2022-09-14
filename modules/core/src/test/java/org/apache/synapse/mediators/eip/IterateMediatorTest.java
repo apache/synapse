@@ -33,6 +33,7 @@ import java.util.Properties;
  */
 public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
@@ -43,6 +44,7 @@ public class IterateMediatorTest extends AbstractSplitMediatorTestCase {
         fac = new IterateMediatorFactory();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         fac = null;

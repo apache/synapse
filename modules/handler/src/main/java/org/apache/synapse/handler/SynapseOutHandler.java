@@ -51,6 +51,7 @@ public class SynapseOutHandler extends AbstractHandler {
      *  InvocationResponse.ABORT if not
      * @throws AxisFault - incase of a failure in mediation of initiation of the mediation
      */
+    @Override
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
 
         HandlerUtil.doHandlerLogging(log, messageContext);

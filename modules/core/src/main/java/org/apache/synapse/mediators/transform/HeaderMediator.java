@@ -71,6 +71,7 @@ public class HeaderMediator extends AbstractMediator {
      * @param synCtx the current message which is altered as necessary
      * @return true always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

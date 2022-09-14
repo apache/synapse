@@ -58,6 +58,7 @@ public class DynamicRouterMediator extends AbstractMediator {
      * @param msgCtx the current message for mediation
      * @return
      */
+    @Override
     public boolean mediate(MessageContext msgCtx) {
         synCtx = msgCtx;
         ConditionalRouterMediator conditionalRouterMediator = new ConditionalRouterMediator();

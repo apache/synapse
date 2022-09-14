@@ -119,6 +119,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
      * @param mc message context
      * @throws AxisFault
      */
+    @Override
     public void receive(MessageContext mc) throws AxisFault {
         // Create synapse message context from the axis2 message context
         SynapseConfiguration synCfg = (SynapseConfiguration) mc.getConfigurationContext()
@@ -204,6 +205,7 @@ public class SynapseEventSource extends SynapseMessageReceiver {
             this.synCtx = synCtx;
         }
 
+        @Override
         public void run() {
             try {
                 MessageContext msgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();

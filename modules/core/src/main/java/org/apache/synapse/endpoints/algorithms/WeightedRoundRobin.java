@@ -84,18 +84,22 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
     private WeightedRoundRobinViewMBean view;
 
     /** we are not supporting members */
+    @Override
     public void setApplicationMembers(List<Member> members) {
         throw new UnsupportedOperationException("This algorithm doesn't operate on Members");
     }
 
+    @Override
     public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
     }
 
+    @Override
     public void setLoadBalanceEndpoint(Endpoint endpoint) {
         this.loadBalanceEndpoint = endpoint;   
     }
 
+    @Override
     public Endpoint getNextEndpoint(MessageContext synapseMessageContext,
                                     AlgorithmContext algorithmContext) {
 
@@ -143,10 +147,12 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
         }
     }        
 
+    @Override
     public Member getNextApplicationMember(AlgorithmContext algorithmContext) {
         throw new UnsupportedOperationException("This algorithm doesn't operate on Members");
     }
 
+    @Override
     public void reset(AlgorithmContext algorithmContext) {
         for (EndpointState state : endpointStates) {
             state.reset();
@@ -155,14 +161,17 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
         endpointCursor = 0;
     }
 
+    @Override
     public String getName() {
         return WeightedRoundRobin.class.getName();
     }
 
+    @Override
     public LoadbalanceAlgorithm clone() {
         return null;
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (endpoints == null) {
             String msg = "Endpoints are not set, cannot initialize the algorithm";
@@ -214,6 +223,7 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
                 loadBalanceEndpoint.getName() != null ? loadBalanceEndpoint.getName() : "LBEpr");
     }
 
+    @Override
     public void destroy() {}
 
     /**
@@ -319,6 +329,7 @@ public class WeightedRoundRobin implements LoadbalanceAlgorithm, ManagedLifecycl
     private void calculate() {
         // now we are going to sort
         Arrays.sort(endpointStates, new Comparator<EndpointState>() {
+            @Override
             public int compare(EndpointState o1, EndpointState o2) {
                 return o2.getWeight() - o1.getWeight();
             }

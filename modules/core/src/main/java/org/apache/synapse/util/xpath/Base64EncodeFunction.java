@@ -45,6 +45,7 @@ public class Base64EncodeFunction implements Function {
      * @return The string value of a property
      * @throws FunctionCallException
      */
+    @Override
     public Object call(Context context, List args) throws FunctionCallException {
         boolean debugOn = log.isDebugEnabled();
 

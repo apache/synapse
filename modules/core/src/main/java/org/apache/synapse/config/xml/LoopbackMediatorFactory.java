@@ -36,6 +36,7 @@ public class LoopbackMediatorFactory extends AbstractMediatorFactory {
         return loopBackMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return LoopBack_Q;
     }

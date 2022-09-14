@@ -241,6 +241,7 @@ public class ThrottleMediatorTest extends TestCase {
         Throttle throttle = null;
         private OMElement inLinePolicy = null;
 
+        @Override
         public boolean mediate(MessageContext synCtx) {
 
             init(synCtx);
@@ -341,6 +342,7 @@ public class ThrottleMediatorTest extends TestCase {
             }
         }
 
+        @Override
         public String getType() {
             return "ThrottleMediator";
         }

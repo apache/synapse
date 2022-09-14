@@ -40,6 +40,7 @@ public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
         this.source = source;
     }
 
+    @Override
     public String getSourceText(EvaluatorContext context) throws EvaluatorException {
         SOAPEnvelope envelope = context.getMessageContext().getEnvelope();
         Object result;
@@ -85,6 +86,7 @@ public class SOAPEnvelopeTextRetriever implements SourceTextRetriever {
         }
     }
 
+    @Override
     public String getSource() {
         return source;
     }

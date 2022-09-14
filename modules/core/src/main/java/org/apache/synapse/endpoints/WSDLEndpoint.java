@@ -40,6 +40,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private String serviceName;
     private String portName;
 
+
     private String originalWsdlURI;
     private String originalWsdlPort;
     private String getOriginalWsdlServiceName;
@@ -60,10 +61,12 @@ public class WSDLEndpoint extends AbstractEndpoint {
         super.onFault(synCtx);
     }
 
+    @Override
     public void onSuccess() {
         getContext().onSuccess();
     }
 
+    @Override
     public void send(MessageContext synCtx) {
 
         if (getParentEndpoint() == null && !readyToSend()) {

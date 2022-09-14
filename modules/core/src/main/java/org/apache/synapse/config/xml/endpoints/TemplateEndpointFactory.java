@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 public class TemplateEndpointFactory extends EndpointFactory {
+    @Override
     public Endpoint createEndpoint(OMElement endpointElement, boolean a, Properties properties) {
         TemplateEndpoint templateEndpoint = new TemplateEndpoint();
 

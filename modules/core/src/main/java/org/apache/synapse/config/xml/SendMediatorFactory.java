@@ -80,6 +80,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
     private static final QName ENDPOINT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
     private static final QName RECEIVING_SEQUENCE = new QName(XMLConfigConstants.RECEIVE);
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SendMediator sm =  new SendMediator();
@@ -108,6 +109,7 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
         return sm;
     }
 
+    @Override
     public QName getTagQName() {
         return SEND_Q;
     }

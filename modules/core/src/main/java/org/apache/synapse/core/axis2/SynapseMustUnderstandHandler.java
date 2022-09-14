@@ -37,6 +37,7 @@ public class SynapseMustUnderstandHandler extends AbstractHandler {
 
     public static final String NAME = "SynapseMustUnderstandHandler";
     
+    @Override
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
 
         SOAPEnvelope envelope = messageContext.getEnvelope();

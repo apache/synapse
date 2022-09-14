@@ -50,6 +50,7 @@ public class SynapseEventSourceTest extends TestCase {
     private static final String FILTER_DIALECT = "http://www.example.org/topicFilter";
     private static final String FILTER = "weather.storms";
 
+    @Override
     protected void setUp() throws Exception {
         source = new SynapseEventSource("foo");
         subMan = new DefaultInMemorySubscriptionManager();

@@ -48,7 +48,8 @@ public class BinaryRelayBuilder implements Builder{
 	}
 
 
-	public OMElement processDocument(InputStream inputStream,
+	@Override
+    public OMElement processDocument(InputStream inputStream,
 			String contentType, MessageContext messageContext) throws AxisFault {
 		try {
             //Fix for https://wso2.org/jira/browse/CARBON-7256

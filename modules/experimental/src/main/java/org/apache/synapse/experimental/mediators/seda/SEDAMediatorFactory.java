@@ -34,6 +34,7 @@ public class SEDAMediatorFactory extends AbstractMediatorFactory {
     private static final QName SEDA_Q =
             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "seda");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         final SEDAMediator mediator = new SEDAMediator();
@@ -49,6 +50,7 @@ public class SEDAMediatorFactory extends AbstractMediatorFactory {
         return mediator;
     }
 
+    @Override
     public QName getTagQName() {
         return SEDA_Q;
     }

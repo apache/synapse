@@ -81,15 +81,18 @@ public abstract class AbstractMessageStore implements MessageStore {
 
 
 
+    @Override
     public void init(SynapseEnvironment se) {
         this.synapseEnvironment = se;
         this.synapseConfiguration = synapseEnvironment.getSynapseConfiguration();
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
         messageStoreMBean = new MessageStoreView(name, this);
@@ -98,12 +101,14 @@ public abstract class AbstractMessageStore implements MessageStore {
     }
 
 
+    @Override
     public void registerObserver(MessageStoreObserver observer) {
         if(observer != null && !messageStoreObservers.contains(observer)) {
             messageStoreObservers.add(observer);
         }
     }
 
+    @Override
     public void unregisterObserver(MessageStoreObserver observer) {
         if(observer != null && messageStoreObservers.contains(observer)) {
             messageStoreObservers.remove(observer);
@@ -129,36 +134,44 @@ public abstract class AbstractMessageStore implements MessageStore {
             o.messageRemoved(messageId);
         }
     }
+    @Override
     public int size() {
         return -1;
     }
 
 
+    @Override
     public Map<String, Object> getParameters() {
         return parameters;
     }
 
+    @Override
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 
 
+    @Override
     public void destroy() {
         MBeanRegistrar.getInstance().unRegisterMBean("MessageStore", this.name);
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getDescription() {
         return this.description;
     }
 
+    @Override
     public void setFileName(String filename) {
         this.fileName = filename;
     }
 
+    @Override
     public String getFileName() {
         return this.fileName;
     }

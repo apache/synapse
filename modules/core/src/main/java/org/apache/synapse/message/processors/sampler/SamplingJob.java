@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 public class SamplingJob implements Job {
     private static Log log = LogFactory.getLog(SamplingJob.class);
 
+    @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();
 
@@ -72,6 +73,7 @@ public class SamplingJob implements Job {
                     final ExecutorService executor = messageContext.getEnvironment().
                             getExecutorService();
                     executor.submit(new Runnable() {
+                        @Override
                         public void run() {
                             try {
                                 Mediator processingSequence = messageContext.getSequence(sequence);

@@ -135,34 +135,42 @@ public class LatencyView implements LatencyViewMBean {
         latencyDataQueue.offer(latency);
     }
 
+    @Override
     public double getAllTimeAvgLatency() {
         return allTimeAvgLatency;
     }
 
+    @Override
     public double getLastMinuteAvgLatency() {
         return getAverageLatencyByMinute(1);
     }
 
+    @Override
     public double getLast5MinuteAvgLatency() {
         return getAverageLatencyByMinute(5);
     }
 
+    @Override
     public double getLast15MinuteAvgLatency() {
         return getAverageLatencyByMinute(15);
     }
 
+    @Override
     public double getLastHourAvgLatency() {
         return getAverageLatencyByHour(1);
     }
 
+    @Override
     public double getLast8HourAvgLatency() {
         return getAverageLatencyByHour(8);
     }
 
+    @Override
     public double getLast24HourAvgLatency() {
         return getAverageLatencyByHour(24);
     }
 
+    @Override
     public void reset() {
         lastLatency.set(0);
         allTimeAvgLatency = 0.0;
@@ -173,6 +181,7 @@ public class LatencyView implements LatencyViewMBean {
         resetTime = Calendar.getInstance().getTime();
     }
 
+    @Override
     public Date getLastResetTime() {
         return resetTime;
     }
@@ -226,6 +235,7 @@ public class LatencyView implements LatencyViewMBean {
     }
 
     private class ShortTermDataCollector implements Runnable {
+        @Override
         public void run() {
             long latency = lastLatency.get();
 
@@ -254,6 +264,7 @@ public class LatencyView implements LatencyViewMBean {
     }
 
     private class LongTermDataCollector implements Runnable {
+        @Override
         public void run() {
             long latency = lastLatency.get();
             if (longTermLatencyDataQueue.size() == 0 && latency == 0) {

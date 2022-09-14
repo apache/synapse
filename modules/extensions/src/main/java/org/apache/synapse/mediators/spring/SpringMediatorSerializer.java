@@ -34,6 +34,7 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer {
     private static final OMNamespace sprNS =
             fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "spring");
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SpringMediator)) {
@@ -61,6 +62,7 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer {
         return spring;
     }
 
+    @Override
     public String getMediatorClassName() {
         return SpringMediator.class.getName();
     }

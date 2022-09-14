@@ -31,6 +31,7 @@ public abstract class AbstractVersionStrategy implements VersionStrategy {
         this.versionType = versionType;
     }
 
+    @Override
     public String getVersion() {
         return version;
     }
@@ -39,6 +40,7 @@ public abstract class AbstractVersionStrategy implements VersionStrategy {
         return api;
     }
 
+    @Override
     public String getVersionType(){
         return versionType;
     }

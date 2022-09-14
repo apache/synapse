@@ -84,6 +84,7 @@ public class ThreadingView implements ThreadingViewMBean {
     public ThreadingView(final String threadNamePrefix) {
         this.threadNamePrefix = threadNamePrefix;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, threadNamePrefix + "-thread-view");
             }
@@ -134,6 +135,7 @@ public class ThreadingView implements ThreadingViewMBean {
         }
     }
 
+    @Override
     public int getTotalWorkerCount() {
         int count = 0;
         ThreadInfo[] threadInfo = dumpAllThreads();
@@ -164,6 +166,7 @@ public class ThreadingView implements ThreadingViewMBean {
         return ((double) blockedCount/(double) totalCount) * 100;
     }
 
+    @Override
     public String[] getDeadLockedWorkers() {
         String[] workers = null;
         // JDK 1.6 has a better implementation of this method but since we are on JDK 1.5
@@ -183,42 +186,52 @@ public class ThreadingView implements ThreadingViewMBean {
         return workers;
     }
 
+    @Override
     public double getAvgBlockedWorkerPercentage() {
         return avgBlockedWorkerPercentage;
     }
 
+    @Override
     public double getAvgUnblockedWorkerPercentage() {
         return avgUnblockedWorkerPercentage;
     }
 
+    @Override
     public double getLastMinuteBlockedWorkerPercentage() {
         return getAverageBlockedThreads(1);
     }
 
+    @Override
     public double getLast5MinuteBlockedWorkerPercentage() {
         return getAverageBlockedThreads(5);
     }
 
+    @Override
     public double getLast15MinuteBlockedWorkerPercentage() {
         return getAverageBlockedThreads(15);
     }
 
+    @Override
     public double getLastHourBlockedWorkerPercentage() {
         return getAverageBlockedThreadsByHour(1);
     }
 
+    @Override
     public double getLast8HourBlockedWorkerPercentage() {
         return getAverageBlockedThreadsByHour(8);
     }
 
+    @Override
     public double getLast24HourBlockedWorkerPercentage() {
         return getAverageBlockedThreadsByHour(24);
     }
 
+    @Override
     public Date getLastResetTime() {
         return resetTime;
     }
 
+    @Override
     public void reset() {
        avgBlockedWorkerPercentage = 0.0;
        avgUnblockedWorkerPercentage = 0.0;
@@ -322,6 +335,7 @@ public class ThreadingView implements ThreadingViewMBean {
 
     private class ThreadingDataCollectorTask implements Runnable {
 
+        @Override
         public void run() {
             samplesCount++;
 
@@ -367,6 +381,7 @@ public class ThreadingView implements ThreadingViewMBean {
     }
 
     private class LongTermDataCollectorTask implements Runnable {
+        @Override
         public void run() {
             double blocked = getBlockedWorkerPercentage();
 

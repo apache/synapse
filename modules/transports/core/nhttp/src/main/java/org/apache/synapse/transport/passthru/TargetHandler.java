@@ -68,6 +68,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         this.metrics = targetConfiguration.getMetrics();
     }
 
+    @Override
     public void connected(NHttpClientConnection conn, Object o) {
         assert o instanceof HostConnections : "Attachment should be a HostConnections";
 
@@ -89,6 +90,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         metrics.connected();
     }
 
+    @Override
     public void requestReady(NHttpClientConnection conn) {
         ProtocolState connState = null;
         try {
@@ -139,6 +141,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         }
     }
 
+    @Override
     public void outputReady(NHttpClientConnection conn, ContentEncoder encoder) {
         ProtocolState connState = null;
         try {
@@ -186,6 +189,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         }
     }
 
+    @Override
     public void responseReceived(NHttpClientConnection conn) {
         ProtocolState connState;
         try {
@@ -266,6 +270,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         return false;
     }
 
+    @Override
     public void inputReady(NHttpClientConnection conn, ContentDecoder decoder) {
         ProtocolState connState;
         try {
@@ -298,6 +303,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         }
     }
 
+    @Override
     public void closed(NHttpClientConnection conn) {
         ProtocolState state = TargetContext.getState(conn);
         boolean sendFault = false;
@@ -397,6 +403,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         targetConfiguration.getConnections().shutdownConnection(conn);
     }
 
+    @Override
     public void timeout(NHttpClientConnection conn) {
         ProtocolState state = TargetContext.getState(conn);
 
@@ -439,6 +446,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         targetConfiguration.getConnections().shutdownConnection(conn);
     }
 
+    @Override
     public void endOfInput(NHttpClientConnection conn) throws IOException {
         ProtocolState state = TargetContext.getState(conn);
         boolean sendFault = false;
@@ -476,6 +484,7 @@ public class TargetHandler implements NHttpClientEventHandler {
         targetConfiguration.getConnections().shutdownConnection(conn);
     }
 
+    @Override
     public void exception(NHttpClientConnection conn, Exception e) {
         ProtocolState state = TargetContext.getState(conn);
 

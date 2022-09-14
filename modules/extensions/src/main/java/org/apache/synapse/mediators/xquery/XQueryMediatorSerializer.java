@@ -45,6 +45,7 @@ import java.util.List;
  */
 public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof XQueryMediator)) {
@@ -186,6 +187,7 @@ public class XQueryMediatorSerializer extends AbstractMediatorSerializer {
         return xquery;
     }
 
+    @Override
     public String getMediatorClassName() {
         return XQueryMediator.class.getName();
     }

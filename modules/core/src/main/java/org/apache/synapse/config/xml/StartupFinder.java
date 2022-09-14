@@ -228,6 +228,7 @@ public class StartupFinder implements XMLToObjectMapper {
      * @param properties bag of properties with additional information
      * @return startup created
      */
+    @Override
     public Startup getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             return getStartup((OMElement) om, properties);

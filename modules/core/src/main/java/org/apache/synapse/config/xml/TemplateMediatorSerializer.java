@@ -75,6 +75,7 @@ public class TemplateMediatorSerializer extends AbstractListMediatorSerializer {
         serializeChildren(seqEl, childMediatorList);
     }
 
+    @Override
     public String getMediatorClassName() {
         return TemplateMediator.class.getName();
     }

@@ -62,6 +62,7 @@ public class DBReportMediatorFactory extends AbstractDBMediatorFactory {
             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dbreport");
     private static final QName DBREPORT_USE_TX = new QName("useTransaction");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         DBReportMediator mediator = new DBReportMediator();
 
@@ -79,6 +80,7 @@ public class DBReportMediatorFactory extends AbstractDBMediatorFactory {
         return mediator;
     }
 
+    @Override
     public QName getTagQName() {
         return DBREPORT_Q;
     }

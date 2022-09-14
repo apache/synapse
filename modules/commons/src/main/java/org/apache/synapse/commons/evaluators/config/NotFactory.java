@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 public class NotFactory implements EvaluatorFactory {
     private Log log = LogFactory.getLog(NotFactory.class);
 
+    @Override
     public Evaluator create(OMElement e) throws EvaluatorException {
         NotEvaluator not = new NotEvaluator();
 

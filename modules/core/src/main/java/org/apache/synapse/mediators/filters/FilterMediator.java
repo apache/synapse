@@ -68,6 +68,7 @@ public class FilterMediator extends AbstractListMediator implements
      * @param synCtx the current message
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -167,6 +168,7 @@ public class FilterMediator extends AbstractListMediator implements
      * @param synCtx the current message for evaluation of the test condition
      * @return true if evaluation of the XPath/Regex results in true
      */
+    @Override
     public boolean test(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

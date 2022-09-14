@@ -1,0 +1,10 @@
+
+tasks:
+  - init: mvn clean install
+
+image:
+  file: .gitpod.Dockerfile
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack

@@ -106,6 +106,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @param properties bag of properties to pass in any information to the factory
      * @return created endpoint as an {@link Object}
      */
+    @Override
     public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             return createEndpointWithName((OMElement) om, false, properties);

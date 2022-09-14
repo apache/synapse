@@ -46,6 +46,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_PATTERN = new QName("pattern");
     private static final QName ATT_GROUP = new QName("group");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         PropertyMediator propMediator = new PropertyMediator();
@@ -139,6 +140,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         return propMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return PROP_Q;
     }

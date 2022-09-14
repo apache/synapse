@@ -34,6 +34,7 @@ public class LibDeployerUtilsTest extends AbstractLibTestCase {
 
     String path;
 
+    @Override
     public void setUp() {
         path = getResourcePath();
     }

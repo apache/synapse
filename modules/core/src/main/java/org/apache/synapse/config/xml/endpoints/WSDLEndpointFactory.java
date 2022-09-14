@@ -80,6 +80,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
         return instance;
     }
 
+    @Override
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
                                       Properties properties) {
 

@@ -108,6 +108,7 @@ public abstract class SynapseTestCase extends TestCase {
      * Executed before this test case. That means, this will be executed before each test.
      * Loads all configuration info and starts the servers.
      */
+    @Override
     public void setUp() {
         // Print a short intro to the console, so the console output is more readable
         String title = "Sample " + sampleId + ": " + sampleName;
@@ -136,6 +137,7 @@ public abstract class SynapseTestCase extends TestCase {
     /**
      * Executed after this test case. That means, This will be executed after each test
      */
+    @Override
     public void tearDown() {
         log.info("Sample " + sampleId + " is finished");
         doCleanup();

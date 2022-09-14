@@ -26,6 +26,7 @@ import org.apache.synapse.core.SynapseEnvironment;
  * instances.
  */
 public class AXIOMResultBuilderFactory implements ResultBuilderFactory {
+    @Override
     public ResultBuilder createResultBuilder(SynapseEnvironment synEnv,
             Output expectedOutput) {
         return new AXIOMResultBuilder();

@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
  */
 public class MatchSerializer extends TextProcessingEvaluatorSerializer {
 
+    @Override
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof MatchEvaluator)) {
             throw new IllegalArgumentException("Evaluator must be a NotEvaluator");

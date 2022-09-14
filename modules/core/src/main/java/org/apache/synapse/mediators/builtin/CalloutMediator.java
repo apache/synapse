@@ -90,6 +90,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
 
     private Axis2BlockingClient blockingMsgSender = null;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -284,6 +285,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         return null;
     }
 
+    @Override
     public void init(SynapseEnvironment synEnv) {
         blockingMsgSender = new Axis2BlockingClient(clientRepository, axis2xml);
         blockingMsgSender.setInitClientOptions(initClientOptions);
@@ -323,6 +325,7 @@ public class CalloutMediator extends AbstractMediator implements ManagedLifecycl
         }
     }
 
+    @Override
     public void destroy() {
         if (!isWrappingEndpointCreated) {
             endpoint.destroy();

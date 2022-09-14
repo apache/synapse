@@ -43,6 +43,7 @@ public class FailoverEndpoint extends AbstractEndpoint {
     /** The fail-over mode supported by this endpoint. By default we do dynamic fail-over */
     private boolean dynamic = true;
 
+    @Override
     public void send(MessageContext synCtx) {
 
         if (log.isDebugEnabled()) {
@@ -137,6 +138,7 @@ public class FailoverEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         logOnChildEndpointFail(endpoint, synMessageContext);
         if (!((AbstractEndpoint)endpoint).isRetryDisabled(synMessageContext)) {
@@ -156,6 +158,7 @@ public class FailoverEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
     public boolean readyToSend() {
         for (Endpoint endpoint : getChildren()) {
             if (endpoint.readyToSend()) {

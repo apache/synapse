@@ -119,6 +119,7 @@ public class StatisticsRecord {
         isEndReported = endReported;
     }
 
+    @Override
     public String toString() {
         return new StringBuilder()
                 .append("[Message id : ").append(id).append(" ]")

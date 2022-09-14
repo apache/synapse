@@ -111,6 +111,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @param transportOut the description of the http/s transport from Axis2 configuration
      * @throws AxisFault thrown on an error
      */
+    @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
         // is this an SSL Sender?
         sslContext = getSSLContext(transportOut);
@@ -158,12 +159,14 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 getReactorConfig(),
                 new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                @Override
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: IOReactor encountered a checked exception : " +
                         ioException.getMessage(), ioException);
                     return true;
                 }
 
+                @Override
                 public boolean handle(RuntimeException runtimeException) {
                     log.warn("System may be unstable: IOReactor encountered a runtime exception : " +
                         runtimeException.getMessage(), runtimeException);
@@ -181,6 +184,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // start the Sender in a new separate thread
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     ioReactor.execute(ioEventDispatch);
@@ -261,6 +265,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return the invocation response (always InvocationResponse.CONTINUE)
      * @throws AxisFault on error
      */
+    @Override
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
         // remove unwanted HTTP headers (if any from the current message)
@@ -713,10 +718,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     }
 
 
+    @Override
     public void cleanup(MessageContext msgContext) throws AxisFault {
         // do nothing
     }
 
+    @Override
     public void stop() {
         if (state == BaseConstants.STOPPED) return;
         try {
@@ -740,6 +747,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     private SessionRequestCallback getSessionRequestCallback() {
         return new SessionRequestCallback() {
+            @Override
             public void completed(SessionRequest request) {
                 if (log.isDebugEnabled() && request.getSession() != null &&
                         request.getSession().getLocalAddress() != null) {
@@ -749,18 +757,21 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 }
             }
 
+            @Override
             public void failed(SessionRequest request) {
                 handleError(request, NhttpConstants.CONNECTION_FAILED, 
                     "Connection refused or failed for : " + request.getRemoteAddress() + ", " +
                     "IO Exception occurred : " + request.getException().getMessage());
             }
 
+            @Override
             public void timeout(SessionRequest request) {
                 handleError(request, NhttpConstants.CONNECT_TIMEOUT,
                     "Timeout connecting to : " + request.getRemoteAddress());
                 request.cancel();
             }
 
+            @Override
             public void cancelled(SessionRequest request) {
                 handleError(request, NhttpConstants.CONNECT_CANCEL,
                     "Connection cancelled for : " + request.getRemoteAddress());
@@ -802,18 +813,21 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         throw new AxisFault(msg);
     }
 
+    @Override
     public void pause() throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         state = BaseConstants.PAUSED;
         log.info((sslContext == null ? "HTTP" : "HTTPS") + "Sender Paused");
     }
 
+    @Override
     public void resume() throws AxisFault {
         if (state != BaseConstants.PAUSED) return;
         state = BaseConstants.STARTED;
         log.info((sslContext == null ? "HTTP" : "HTTPS") + "Sender Resumed");
     }
 
+    @Override
     public void maintenenceShutdown(long millis) throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         try {
@@ -830,6 +844,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * Returns the number of active threads processing messages
      * @return number of active threads processing messages
      */    
+    @Override
     public int getActiveThreadCount() {
         return handler.getActiveCount();
     }
@@ -838,11 +853,13 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * Returns the number of requestes queued in the thread pool
      * @return queue size
      */
+    @Override
     public int getQueueSize() {
         return handler.getQueueSize();
     }
 
     // -- jmx/management methods--
+    @Override
     public long getMessagesReceived() {
         if (metrics != null) {
             return metrics.getMessagesReceived();
@@ -850,6 +867,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getFaultsReceiving() {
         if (metrics != null) {
             return metrics.getFaultsReceiving();
@@ -857,6 +875,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getBytesReceived() {
         if (metrics != null) {
             return metrics.getBytesReceived();
@@ -864,6 +883,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getMessagesSent() {
         if (metrics != null) {
             return metrics.getMessagesSent();
@@ -871,6 +891,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getFaultsSending() {
         if (metrics != null) {
             return metrics.getFaultsSending();
@@ -878,6 +899,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getBytesSent() {
         if (metrics != null) {
             return metrics.getBytesSent();
@@ -885,6 +907,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getTimeoutsReceiving() {
         if (metrics != null) {
             return metrics.getTimeoutsReceiving();
@@ -892,6 +915,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getTimeoutsSending() {
         if (metrics != null) {
             return metrics.getTimeoutsSending();
@@ -899,6 +923,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getMinSizeReceived() {
         if (metrics != null) {
             return metrics.getMinSizeReceived();
@@ -906,6 +931,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getMaxSizeReceived() {
         if (metrics != null) {
             return metrics.getMaxSizeReceived();
@@ -913,6 +939,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public double getAvgSizeReceived() {
         if (metrics != null) {
             return metrics.getAvgSizeReceived();
@@ -920,6 +947,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getMinSizeSent() {
         if (metrics != null) {
             return metrics.getMinSizeSent();
@@ -927,6 +955,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getMaxSizeSent() {
         if (metrics != null) {
             return metrics.getMaxSizeSent();
@@ -934,6 +963,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public double getAvgSizeSent() {
         if (metrics != null) {
             return metrics.getAvgSizeSent();
@@ -941,6 +971,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public Map getResponseCodeTable() {
         if (metrics != null) {
             return metrics.getResponseCodeTable();
@@ -948,12 +979,14 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return null;
     }
 
+    @Override
     public void resetStatistics() {
         if (metrics != null) {
             metrics.reset();
         }
     }
 
+    @Override
     public long getLastResetTime() {
         if (metrics != null) {
             return metrics.getLastResetTime();
@@ -961,6 +994,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         return -1;
     }
 
+    @Override
     public long getMetricsWindow() {
         if (metrics != null) {
             return System.currentTimeMillis() - metrics.getLastResetTime();

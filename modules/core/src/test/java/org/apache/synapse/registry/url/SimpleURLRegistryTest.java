@@ -42,6 +42,7 @@ public class SimpleURLRegistryTest extends TestCase {
     private static final String TEXT_1 = "<text1 />";
     private static final String TEXT_2 = "<text2 />";
 
+    @Override
     public void setUp() throws Exception {
         writeToFile(TEXT_1);
         
@@ -130,6 +131,7 @@ public class SimpleURLRegistryTest extends TestCase {
         assertEquals("ValueOne", ((OMText) node).getText());
     }
 
+    @Override
     public void tearDown() throws Exception {
         FileUtils.deleteQuietly(new File(FILE));
         FileUtils.deleteQuietly(new File(FILE2));

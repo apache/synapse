@@ -127,6 +127,7 @@ public class SynapseXPathVariableContext implements VariableContext {
      * @return Resolved variable value
      * @throws UnresolvableException if the variable specified does not found
      */
+    @Override
     public Object getVariableValue(String namespaceURI, String prefix, String localName)
         throws UnresolvableException {
 

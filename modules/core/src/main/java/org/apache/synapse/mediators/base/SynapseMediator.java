@@ -41,6 +41,7 @@ public class SynapseMediator extends AbstractListMediator {
      * @param synCtx the message context
      * @return as per standard mediate() semantics
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

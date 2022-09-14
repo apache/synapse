@@ -52,6 +52,7 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
 
     private static final SynapseAdaptorForOcspCrl ocspCrl = new SynapseAdaptorForOcspCrl();
 
+    @Override
     protected IOEventDispatch getEventDispatch(NHttpClientEventHandler handler,
                                                SSLContext sslContext,
                                                SSLSetupHandler sslSetupHandler,
@@ -69,6 +70,7 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
      * @return the SSLContext to be used
      * @throws org.apache.axis2.AxisFault if an error occurs
      */
+    @Override
     protected SSLContext getSSLContext(TransportOutDescription transportOut) throws AxisFault {
 
         Parameter keyParam    = transportOut.getParameter("keystore");
@@ -103,6 +105,7 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
      * @return the SSLIOSessionHandler to be used
      * @throws AxisFault if a configuration error occurs
      */
+    @Override
     protected SSLSetupHandler getSSLSetupHandler(TransportOutDescription transportOut)
             throws AxisFault {
 
@@ -288,9 +291,11 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
 
         return new SSLSetupHandler() {
 
+            @Override
             public void initalize(SSLEngine sslengine) {
             }
 
+            @Override
             public void verify(IOSession ioSession, SSLSession session) throws SSLException {
                 SocketAddress remoteAddress = ioSession.getRemoteAddress();
                 String address;
@@ -336,16 +341,19 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
      * Trust manager accepting any certificate.
      */
     public static class NoValidateCertTrustManager implements X509TrustManager {
+        @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
             // Do nothing: we accept any certificate
         }
 
+        @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
             // Do nothing: we accept any certificate
         }
 
+        @Override
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }

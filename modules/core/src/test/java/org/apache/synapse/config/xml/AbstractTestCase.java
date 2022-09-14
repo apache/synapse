@@ -46,6 +46,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
     public AbstractTestCase() {
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }

@@ -38,6 +38,7 @@ public class DefaultTaskTriggerFactory implements TaskTriggerFactory {
     /**
      * @see TaskTriggerFactory
      */
+    @Override
     public Trigger createTrigger(TaskDescription taskDescription) {
 
         String name = taskDescription.getName();

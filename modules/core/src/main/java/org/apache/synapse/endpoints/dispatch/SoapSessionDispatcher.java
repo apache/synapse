@@ -40,6 +40,7 @@ public class SoapSessionDispatcher extends AbstractDispatcher {
      *         message and if current message is not the first message of the session. Returns null,
      *         if an Endpoint could not be found for the session.
      */
+    @Override
     public SessionInformation getSession(MessageContext synCtx) {
         return SALSessions.getInstance().getSession(
                 extractSessionID(synCtx.getEnvelope().getHeader(), QNAME_SERVICE_GROUP_ID));
@@ -52,6 +53,7 @@ public class SoapSessionDispatcher extends AbstractDispatcher {
      *
      * @param synCtx MessageContext of the response message.
      */
+    @Override
     public void updateSession(MessageContext synCtx) {
 
         // get the service group context id
@@ -82,6 +84,7 @@ public class SoapSessionDispatcher extends AbstractDispatcher {
         }
     }
 
+    @Override
     public void unbind(MessageContext synCtx) {
         SALSessions.getInstance().removeSession(extractSessionID(synCtx.getEnvelope().getHeader(),
                 QNAME_SERVICE_GROUP_ID));
@@ -92,10 +95,12 @@ public class SoapSessionDispatcher extends AbstractDispatcher {
      *
      * @return true
      */
+    @Override
     public boolean isServerInitiatedSession() {
         return true;
     }
 
+    @Override
     public void removeSessionID(MessageContext syCtx) {
         removeSessionID(syCtx.getEnvelope().getHeader(), QNAME_SERVICE_GROUP_ID);
     }

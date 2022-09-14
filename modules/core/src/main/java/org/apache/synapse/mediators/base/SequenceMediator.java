@@ -66,6 +66,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * @param synCtx the synapse message
      * @return as per standard mediator result
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -203,6 +204,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * To get the name of the sequence
      * @return the name of the sequence
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -211,6 +213,7 @@ public class SequenceMediator extends AbstractListMediator implements Nameable {
      * setting the name of the sequence
      * @param name the name of the this sequence
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }

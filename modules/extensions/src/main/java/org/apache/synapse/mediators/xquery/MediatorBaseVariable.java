@@ -32,6 +32,7 @@ public class MediatorBaseVariable extends MediatorVariable {
         super(name);
     }
 
+    @Override
     public boolean evaluateValue(MessageContext synCtx) {
           return false;
     }

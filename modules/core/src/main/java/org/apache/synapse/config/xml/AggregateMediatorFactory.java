@@ -74,6 +74,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "id");
 
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         AggregateMediator mediator = new AggregateMediator();
@@ -147,6 +148,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
         return mediator;
     }
 
+    @Override
     public QName getTagQName() {
         return AGGREGATE_Q;
     }

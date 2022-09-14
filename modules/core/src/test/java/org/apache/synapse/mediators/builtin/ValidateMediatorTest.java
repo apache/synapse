@@ -141,6 +141,7 @@ public class ValidateMediatorTest extends TestCase {
         TestMediator testMediator = new TestMediator();
         testMediator.setHandler(
                 new TestMediateHandler() {
+                    @Override
                     public void handle(MessageContext synCtx) {
                         onFailInvoked.setValue(1);
                     }

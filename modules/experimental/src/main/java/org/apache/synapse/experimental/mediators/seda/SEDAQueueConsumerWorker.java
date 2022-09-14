@@ -47,6 +47,7 @@ public class SEDAQueueConsumerWorker implements Runnable {
         this.sedaQueueConsumer = sedaQueueConsumer;
     }
 
+    @Override
     public void run() {
         String action = queueConsumerPolicy.getAction();
         if (SEDAQueueConsumerPolicy.TAKE.equals(action)) {

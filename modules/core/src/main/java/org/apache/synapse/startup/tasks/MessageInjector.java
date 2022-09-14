@@ -109,6 +109,7 @@ public class MessageInjector implements Task, ManagedLifecycle {
      * @param se
      *          SynapseEnvironment of synapse
      */
+    @Override
     public void init(SynapseEnvironment se) {
 		synapseEnvironment = se;
 	}
@@ -180,6 +181,7 @@ public class MessageInjector implements Task, ManagedLifecycle {
      * This will be invoked by the scheduler to inject the message
      * in to the SynapseEnvironment
      */
+    @Override
     public void execute() {
 
         if (log.isDebugEnabled()) {
@@ -324,6 +326,7 @@ public class MessageInjector implements Task, ManagedLifecycle {
     /**
      * Destroys the Injector
      */
+    @Override
     public void destroy() {
     }
 

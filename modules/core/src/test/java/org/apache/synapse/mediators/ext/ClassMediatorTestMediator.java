@@ -38,11 +38,13 @@ public class ClassMediatorTestMediator extends AbstractMediator implements Manag
 
     public static String testProp = null;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         invoked = true;
         return false;
     }
 
+    @Override
     public String getType() {
         return null;
     }
@@ -55,10 +57,12 @@ public class ClassMediatorTestMediator extends AbstractMediator implements Manag
         return testProp;
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         initialized = true;
     }
 
+    @Override
     public void destroy() {
         destroyed = true;
     }

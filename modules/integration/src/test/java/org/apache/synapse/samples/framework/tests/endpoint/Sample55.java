@@ -37,6 +37,7 @@ public class Sample55 extends SynapseTestCase {
         final StockQuoteSampleClient client = getStockQuoteClient();
         log.info("Running test: Failover sending among 3 endpoints");
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 result = client.statefulClient(addUrl, null, 200);
             }

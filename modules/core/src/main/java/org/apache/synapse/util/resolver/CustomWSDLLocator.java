@@ -51,10 +51,12 @@ public class CustomWSDLLocator implements WSDLLocator {
         this.synCfg = synCfg;
     }
 
+    @Override
     public InputSource getBaseInputSource() {
         return baseInputSource;
     }
 
+    @Override
     public String getBaseURI() {
         return baseURI;
     }
@@ -67,6 +69,7 @@ public class CustomWSDLLocator implements WSDLLocator {
      * returns null, it will resolve the location using
      * {@link SynapseConfigUtils#resolveRelativeURI(String, String)}.
      */
+    @Override
     public InputSource getImportInputSource(String parentLocation, String relativeLocation) {
         InputSource result = null;
         if (resourceMap != null) {
@@ -82,10 +85,12 @@ public class CustomWSDLLocator implements WSDLLocator {
         return result;
     }
 
+    @Override
     public String getLatestImportURI() {
         return latestImportURI;
     }
 
+    @Override
     public void close() {
     }
 }

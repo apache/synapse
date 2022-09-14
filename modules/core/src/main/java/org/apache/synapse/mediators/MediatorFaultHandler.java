@@ -60,6 +60,7 @@ public class MediatorFaultHandler extends FaultHandler {
      * @throws SynapseException in case there is a failure in the fault execution
      * @see org.apache.synapse.FaultHandler#handleFault(org.apache.synapse.MessageContext)
      */
+    @Override
     public void onFault(MessageContext synCtx) throws SynapseException {
 
         boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;

@@ -33,6 +33,7 @@ public class BeanMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final String BEAN = "bean";
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof BeanMediator)) {
@@ -126,6 +127,7 @@ public class BeanMediatorSerializer extends AbstractMediatorSerializer {
         }
     }
 
+    @Override
     public String getMediatorClassName() {
         return BeanMediator.class.getName();
     }

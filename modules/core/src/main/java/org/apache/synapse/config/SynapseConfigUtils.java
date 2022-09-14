@@ -439,6 +439,7 @@ public class SynapseConfigUtils {
                     }
 
                     connection.setHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
+                        @Override
                         public boolean verify(String hostname, javax.net.ssl.SSLSession session) {
                             if (log.isTraceEnabled()) {
                                 log.trace("HostName verification disabled");

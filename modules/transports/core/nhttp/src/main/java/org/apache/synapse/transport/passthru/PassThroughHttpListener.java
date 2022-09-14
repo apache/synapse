@@ -93,6 +93,7 @@ public class PassThroughHttpListener implements TransportListener {
 
     private String namePrefix;
 
+    @Override
     public void init(ConfigurationContext cfgCtx, TransportInDescription transportInDescription)
             throws AxisFault {
 
@@ -137,6 +138,7 @@ public class PassThroughHttpListener implements TransportListener {
         sourceConfiguration.setMetrics(metrics);
     }
 
+    @Override
     public void start() throws AxisFault {
         log.info("Starting pass-through " + namePrefix + " listener...");
 
@@ -148,12 +150,14 @@ public class PassThroughHttpListener implements TransportListener {
             
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
 
+                @Override
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: " + namePrefix +
                             " ListeningIOReactor encountered a checked exception." , ioException);
                     return true;
                 }
 
+                @Override
                 public boolean handle(RuntimeException runtimeException) {
                     log.warn("System may be unstable: " + namePrefix +
                             " ListeningIOReactor encountered a runtime exception.", runtimeException);
@@ -189,6 +193,7 @@ public class PassThroughHttpListener implements TransportListener {
         }
 
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     ioReactor.execute(ioEventDispatch);
@@ -224,6 +229,7 @@ public class PassThroughHttpListener implements TransportListener {
      * @return the EndpointReferences for this service over the transport
      * @throws AxisFault on error
      */
+    @Override
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
         String trailer = "";
         //Strip out the operation name
@@ -250,10 +256,12 @@ public class PassThroughHttpListener implements TransportListener {
         return endpointReferences;
     }
 
+    @Override
     public SessionContext getSessionContext(MessageContext messageContext) {
         return null;
     }
 
+    @Override
     public void stop() throws AxisFault {
         log.info("Stopping pass-through " + namePrefix + " listener..");
         try {
@@ -263,6 +271,7 @@ public class PassThroughHttpListener implements TransportListener {
         }
     }
 
+    @Override
     public void destroy() {
         if (log.isDebugEnabled()) {
             log.debug("Destroying pass-through " + namePrefix + " listener");
@@ -335,8 +344,10 @@ public class PassThroughHttpListener implements TransportListener {
      * and stop listening when services are un-deployed or stopped.
      */
     private class GenericAxisObserver implements AxisObserver {
+        @Override
         public void init(AxisConfiguration axisConfig) {}
 
+        @Override
         public void serviceUpdate(AxisEvent event, AxisService service) {
             if (!ignoreService(service) && BaseUtils.isUsingTransport(
                     service, sourceConfiguration.getTransportName())) {
@@ -357,13 +368,21 @@ public class PassThroughHttpListener implements TransportListener {
             }
         }
 
+        @Override
         public void moduleUpdate(AxisEvent event, AxisModule module) {}
+        @Override
         public void addParameter(Parameter parameter) throws AxisFault {}
+        @Override
         public void removeParameter(Parameter parameter) throws AxisFault {}
+        @Override
         public void deserializeParameters(OMElement parameterElement) throws AxisFault {}
+        @Override
         public Parameter getParameter(String name) { return null; }
+        @Override
         public ArrayList<Parameter> getParameters() { return null; }
+        @Override
         public boolean isParameterLocked(String parameterName) { return false; }
+        @Override
         public void serviceGroupUpdate(AxisEvent event, AxisServiceGroup serviceGroup) {}
     }
 

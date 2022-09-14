@@ -89,6 +89,7 @@ public class POJOCommandMediator extends AbstractMediator {
      * @param synCtx - Synapse MessageContext to be mediated
      * @return boolean true since this will not stop exection chain
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

@@ -144,10 +144,6 @@
             <classifier>jars</classifier>
             <type>zip</type>
         </dependency>
-        <!--dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency-->
 
         <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->
         <dependency>

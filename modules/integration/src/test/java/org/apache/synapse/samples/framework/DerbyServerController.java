@@ -51,6 +51,7 @@ public class DerbyServerController extends AbstractBackEndServerController {
                 SampleConfigConstants.DEFAULT_BE_SERVER_CONF_DERBY_PORT));
     }
 
+    @Override
     public boolean startProcess() {
         try {
             //server
@@ -110,6 +111,7 @@ public class DerbyServerController extends AbstractBackEndServerController {
         }
     }
 
+    @Override
     public boolean stopProcess() {
         log.info("Shutting down Derby server...");
         try {

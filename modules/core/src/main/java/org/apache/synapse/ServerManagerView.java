@@ -37,6 +37,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getServerState() {
         return serverManager.getServerState().toString();
     }
@@ -44,6 +45,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void start()  throws Exception {
         try {
             Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
@@ -57,6 +59,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void stop() throws Exception {
         try {
             Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
@@ -70,6 +73,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void restart() throws Exception {
         try {
             log.info("Re-starting Synapse ..");
@@ -84,6 +88,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void shutdown() throws Exception {
         try {
             Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
@@ -100,6 +105,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
      * @param waitSeconds number of seconds to wait for a graceful stop before initiating
      *                    a hard stop
      */
+    @Override
     public void stopGracefully(long waitSeconds) throws Exception {
         try {
             Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
@@ -113,6 +119,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void startMaintenance() throws Exception {
         try {
             Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());
@@ -126,6 +133,7 @@ public class ServerManagerView implements ServerManagerViewMBean {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void endMaintenance() throws Exception {
         try {
             Thread.currentThread().setContextClassLoader(serverManager.getClassLoader());

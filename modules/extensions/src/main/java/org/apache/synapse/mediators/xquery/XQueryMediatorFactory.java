@@ -58,6 +58,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
     public static final QName ATT_TYPE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "type");
 
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         XQueryMediator xQueryMediator = new XQueryMediator();
@@ -169,6 +170,7 @@ public class XQueryMediatorFactory extends AbstractMediatorFactory {
         return xQueryMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }

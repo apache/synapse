@@ -33,10 +33,12 @@ public class AnonymousListMediatorSerializer extends AbstractListMediatorSeriali
      * @param m
      * @return OMElement
      */
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
         throw new UnsupportedOperationException("Anonymous list mediator has nothing specific");
     }
 
+    @Override
     public String getMediatorClassName() {
         return AnonymousListMediator.class.getName();
     }

@@ -42,6 +42,7 @@ public class FtpFileNameParser extends HostFileNameParser
         return INSTANCE;
     }
 
+    @Override
     public FileName parseUri(final VfsComponentContext context, FileName base, final String filename) throws FileSystemException {
         // FTP URI are generic URI (as per RFC 2396)
         final StringBuilder name = new StringBuilder();

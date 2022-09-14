@@ -45,6 +45,7 @@ public abstract class AbstractRegistry implements Registry {
      * @param properties bag of properties with additional information
      * @return the matching resultant object
      */
+    @Override
     public Object getResource(Entry entry, Properties properties) {
 
         OMNode omNode = null;
@@ -195,18 +196,22 @@ public abstract class AbstractRegistry implements Registry {
         return null;
     }
 
+    @Override
     public String getProviderClass() {
         return this.getClass().getName();
     }
 
+    @Override
     public Properties getConfigurationProperties() {
         return properties;
     }
 
+    @Override
     public void init(Properties properties) {
         this.properties.putAll(properties);
     }
 
+    @Override
     public Properties getResourceProperties(String entryKey) {
         return null;
     }

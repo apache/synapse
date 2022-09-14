@@ -1,0 +1,5 @@
+notifications:
+  commits: commits@synapse.apache.org
+  pullrequests: dev@synapse.apache.org
+  jobs: dev@synapse.apache.org
+  jira_options: link label comment

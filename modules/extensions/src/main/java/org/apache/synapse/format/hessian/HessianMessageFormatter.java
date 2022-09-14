@@ -63,6 +63,7 @@ public class HessianMessageFormatter implements MessageFormatter {
      * 
      * @return contentType formatted content type as a String
      */
+    @Override
     public String getContentType(MessageContext msgCtxt, OMOutputFormat format,
             String soapActionString) {
 
@@ -89,6 +90,7 @@ public class HessianMessageFormatter implements MessageFormatter {
      * 
      * @throws AxisFault in case of a failure in writing the message to the provided stream
      */
+    @Override
     public void writeTo(MessageContext msgCtx, OMOutputFormat format, OutputStream out,
             boolean preserve) throws AxisFault {
 
@@ -122,6 +124,7 @@ public class HessianMessageFormatter implements MessageFormatter {
      * 
      * @throws AxisFault for any invocation
      */
+    @Override
     public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) throws AxisFault {
         throw new AxisFault("Method not supported. Use the "
                 + "HessianMessageFormatter#writeTo method instead");
@@ -132,6 +135,7 @@ public class HessianMessageFormatter implements MessageFormatter {
      * 
      * Simply returns the soapAction unchanged.
      */
+    @Override
     public String formatSOAPAction(MessageContext messageContext, OMOutputFormat format,
             String soapAction) {
 
@@ -143,6 +147,7 @@ public class HessianMessageFormatter implements MessageFormatter {
      * 
      * @return A templated URL based on the given target URL. 
      */
+    @Override
     public URL getTargetAddress(MessageContext messageContext, OMOutputFormat format, URL targetURL)
             throws AxisFault {
 

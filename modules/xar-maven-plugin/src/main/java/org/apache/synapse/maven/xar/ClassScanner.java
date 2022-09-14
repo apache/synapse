@@ -72,6 +72,7 @@ public class ClassScanner {
     
     private void scan(File dir, String packageName) throws ClassScannerException {
         File[] children = dir.listFiles(new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory() || (file.isFile() && file.getName().endsWith(".class"));
             }

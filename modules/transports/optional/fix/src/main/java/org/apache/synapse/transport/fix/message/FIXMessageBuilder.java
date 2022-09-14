@@ -45,7 +45,8 @@ public class FIXMessageBuilder implements Builder {
 
 	private static final Log log = LogFactory.getLog(FIXMessageBuilder.class);
 
-	public OMElement processDocument(InputStream inputStream, String contentType,
+	@Override
+    public OMElement processDocument(InputStream inputStream, String contentType,
                                      MessageContext messageContext) throws AxisFault {
 		Reader reader;
         quickfix.Message message;

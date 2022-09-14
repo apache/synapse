@@ -30,6 +30,7 @@ public class POJOCommandTestImplementedMediator implements Command {
     public static String testProp = null;
     private String ctxTest = "";
 
+    @Override
     public void execute() {
         POJOCommandTestHelper.getInstance().setExecuted(true);
         ctxTest += "command";

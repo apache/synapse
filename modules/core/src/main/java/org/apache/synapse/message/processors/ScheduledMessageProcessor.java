@@ -67,6 +67,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
     protected State state = State.DESTROY;
 
 
+    @Override
     public void start() {
         Trigger trigger;
         TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger().
@@ -98,6 +99,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         }
     }
 
+    @Override
     public void stop() {
         if (state == State.START) {
             try {
@@ -116,6 +118,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
     }
 
 
+    @Override
     public void setParameters(Map<String, Object> parameters) {
         super.setParameters(parameters);
         if (parameters != null && !parameters.isEmpty()) {
@@ -138,6 +141,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         }
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         super.init(se);
         StdSchedulerFactory sf = new StdSchedulerFactory();
@@ -179,6 +183,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         return new JobDataMap();
     }
 
+    @Override
     public void destroy() {
         try {
             scheduler.deleteJob( new JobKey(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP));

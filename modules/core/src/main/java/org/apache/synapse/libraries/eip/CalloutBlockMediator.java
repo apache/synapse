@@ -71,6 +71,7 @@ public class CalloutBlockMediator extends AbstractMediator implements ManagedLif
      * @param synCtx the current message for mediation
      * @return true
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -310,6 +311,7 @@ public class CalloutBlockMediator extends AbstractMediator implements ManagedLif
      * Initialize synapse environment
      * @param synEnv SynapseEnvironment
      */
+    @Override
     public void init(SynapseEnvironment synEnv) {
         try {
             configCtx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
@@ -322,6 +324,7 @@ public class CalloutBlockMediator extends AbstractMediator implements ManagedLif
         }
     }
 
+    @Override
     public void destroy() {
         try {
             configCtx.terminate();

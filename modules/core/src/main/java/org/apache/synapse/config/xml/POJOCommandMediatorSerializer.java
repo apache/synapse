@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.ext.POJOCommandMediator;
  */
 public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
         
         if (!(m instanceof POJOCommandMediator)) {
@@ -139,6 +140,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
             m.getMessageSetterProperties().containsKey(propName);
     }
 
+    @Override
     public String getMediatorClassName() {
         return POJOCommandMediator.class.getName();
     }

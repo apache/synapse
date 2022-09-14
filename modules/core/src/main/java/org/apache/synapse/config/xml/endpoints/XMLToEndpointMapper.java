@@ -49,6 +49,7 @@ public class XMLToEndpointMapper implements XMLToObjectMapper {
      * @param om OMNode containing endpoint configuration. This should be an OMElement.
      * @return Endpoint implementation for the given OMNode.
      */
+    @Override
     public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             OMElement epElement = (OMElement) om;

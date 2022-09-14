@@ -30,6 +30,8 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.registry.Registry;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * &lt;registry [name="string"] provider="provider.class"&gt;
@@ -55,10 +57,10 @@ public class RegistrySerializer {
             handleException("Invalid registry. Provider is required");
         }
 
-        Iterator iter = registry.getConfigurationProperties().keySet().iterator();
-        while (iter.hasNext()) {
-            String name = (String) iter.next();
-            String value = (String) registry.getConfigurationProperties().get(name);
+        // Sort the properties to make the result deterministic.
+        for (Map.Entry<Object, Object> entry : new TreeMap<>(registry.getConfigurationProperties()).entrySet()) {
+            String name = (String) entry.getKey();
+            String value = (String) entry.getValue();
             OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
                 "name", nullNS, name));

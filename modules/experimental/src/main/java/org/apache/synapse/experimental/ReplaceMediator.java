@@ -30,6 +30,7 @@ public class ReplaceMediator extends AbstractMediator {
     private final SourceXPathSupport target = new SourceXPathSupport();
     private String property;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog synLog = getLog(synCtx);
         OMNode replacement = (OMNode)synCtx.getProperty(property);

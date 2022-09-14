@@ -58,6 +58,7 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
         return instance;
     }
 
+    @Override
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
                                       Properties properties) {
 

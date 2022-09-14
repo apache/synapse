@@ -106,6 +106,7 @@ public class Access {
     }
 
     private class LogRequests extends TimerTask {
+        @Override
         public void run() {
             while (!requestQueue.isEmpty()) {
                 HttpRequest req = requestQueue.poll();
@@ -115,6 +116,7 @@ public class Access {
     }
 
     private class LogResponses extends TimerTask {
+        @Override
         public void run() {
             while (!responseQueue.isEmpty()) {
                 HttpResponse res = responseQueue.poll();
@@ -269,6 +271,7 @@ public class Access {
             LOCAL_ADDR_VALUE = init;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(LOCAL_ADDR_VALUE);
@@ -280,6 +283,7 @@ public class Access {
      * write remote host name - %h
      */
     protected static class HostElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             String host = "";
@@ -296,6 +300,7 @@ public class Access {
      * write remote logical username from identd (always returns '-') - %l
      */
     protected static class LogicalUserNameElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             String logicalUserName = "";
@@ -313,6 +318,7 @@ public class Access {
      * write remote user that was authenticated (if any), else '-' - %u
      */
     protected static class UserElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             String userElement = "";
@@ -331,6 +337,7 @@ public class Access {
      */
     protected static class DateAndTimeElement implements AccessLogElement {
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             String currentDate = "";
@@ -347,6 +354,7 @@ public class Access {
      * write first line of the request (method and request URI) - %r
      */
     protected static class RequestElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             if (request != null) {
@@ -362,6 +370,7 @@ public class Access {
      * write HTTP status code of the response - %s
      */
     protected static class HttpStatusCodeElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             if (response != null) {
@@ -389,6 +398,7 @@ public class Access {
             this.conversion = conversion;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             // Don't need to flush since trigger for log message is after the
@@ -410,6 +420,7 @@ public class Access {
      * write request method (GET, POST, etc.) - %m
      */
     protected static class MethodElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             if (request != null) {
@@ -422,6 +433,7 @@ public class Access {
      * write requested URL path - %U
      */
     protected static class RequestURIElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             if (request != null) {
@@ -436,6 +448,7 @@ public class Access {
      * write local server name - %v
      */
     protected static class LocalServerNameElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getHeaderValues(request, "server"));
@@ -452,6 +465,7 @@ public class Access {
             this.str = str;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(str);
@@ -468,6 +482,7 @@ public class Access {
             this.header = header;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             try {
@@ -487,6 +502,7 @@ public class Access {
      * write a specific cookie - %{xxx}c
      */
     protected static class CookieElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getCookieElement(request));
@@ -498,6 +514,7 @@ public class Access {
      * write the referer - %f
      */
     protected static class RefererElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getRefererElement(request));
@@ -509,6 +526,7 @@ public class Access {
      * write the user agent - %a
      */
     protected static class UserAgentElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getUserAgentElement(request));
@@ -519,6 +537,7 @@ public class Access {
      * write the Accept Element - %C
      */
     protected static class AcceptElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getAcceptElement(request));
@@ -529,6 +548,7 @@ public class Access {
      * write the Accept Language Element - %L
      */
     protected static class AcceptLanguageElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getAcceptLanguageElement(request));
@@ -539,6 +559,7 @@ public class Access {
      * write the Accept Encoding Element - %e
      */
     protected static class AcceptEncodingElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getAcceptEncodingElement(request));
@@ -549,6 +570,7 @@ public class Access {
      * write the Accept Character Set Element - %S
      */
     protected static class AcceptCharSetElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getAcceptCharSetElement(request));
@@ -559,6 +581,7 @@ public class Access {
      * write the Connection Element - %x
      */
     protected static class ConnectionElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getConnectionElement(request));
@@ -569,6 +592,7 @@ public class Access {
      * write the Content Type Element - %T
      */
     protected static class ContentTypeElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getContentTypeElement(request));
@@ -579,6 +603,7 @@ public class Access {
      * write the Keep Alive Element - %k
      */
     protected static class KeepAliveElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getKeepAliveElement(request));
@@ -589,6 +614,7 @@ public class Access {
      * write the Transfer Encoding Element - %E
      */
     protected static class TransferEncodingElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getTransferEncodingElement(request));
@@ -599,6 +625,7 @@ public class Access {
      * write the Content Encoding Element - %n
      */
     protected static class ContentEncodingElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getContentEncodingElement(request));
@@ -609,6 +636,7 @@ public class Access {
      * write the Vary Element - %V
      */
     protected static class VaryElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getVaryElement(request));
@@ -619,6 +647,7 @@ public class Access {
      * write the Server Element - %Z
      */
     protected static class ServerElement implements AccessLogElement {
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             buf.append(getServerElement(request));
@@ -635,6 +664,7 @@ public class Access {
             this.header = header;
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             if (null != response) {
@@ -652,6 +682,7 @@ public class Access {
         public RequestAttributeElement() {
         }
 
+        @Override
         public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                HttpResponse response) {
             Object value;

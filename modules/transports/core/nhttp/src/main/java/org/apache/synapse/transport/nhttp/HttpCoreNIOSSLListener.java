@@ -52,12 +52,14 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
 
     private static final Log log = LogFactory.getLog(HttpCoreNIOSSLListener.class);
 
+    @Override
     protected IOEventDispatch getEventDispatch(
         NHttpServerEventHandler handler, SSLContext sslContext,
         SSLSetupHandler sslSetupHandler, ConnectionConfig config) {
         return LoggingUtils.getServerIODispatch(handler, config, sslContext, sslSetupHandler);
     }
 
+    @Override
     protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String host, int port) {
         return "https://" + host + (port == 443 ? "" : ":" + port) +
             (!cfgCtx.getServiceContextPath().startsWith("/") ? "/" : "") +
@@ -71,6 +73,7 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
      * @param transportIn the Axis2 transport description
      * @return the SSLContext to be used
      */
+    @Override
     protected SSLContext getSSLContext(TransportInDescription transportIn) throws AxisFault {
 
         KeyManager[] keymanagers  = null;
@@ -167,12 +170,14 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
      * @return the SSLIOSessionHandler to be used
      * @throws AxisFault if a configuration error occurs
      */
+    @Override
     protected SSLSetupHandler getSSLIOSessionHandler(TransportInDescription transportIn) throws AxisFault {
 
         final Parameter clientAuth = transportIn.getParameter("SSLVerifyClient");
 
         return new SSLSetupHandler() {
 
+            @Override
             public void initalize(SSLEngine sslengine) {
                 if (clientAuth != null) {
                     if ("optional".equals(clientAuth.getValue())) {
@@ -183,6 +188,7 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
                 }
             }
 
+            @Override
             public void verify(IOSession ioSession, SSLSession sslSession) throws SSLException {
 
             }

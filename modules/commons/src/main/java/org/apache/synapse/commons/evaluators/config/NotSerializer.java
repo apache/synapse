@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
  */
 public class NotSerializer extends AbstractEvaluatorSerializer {
 
+    @Override
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof NotEvaluator)) {
             throw new IllegalArgumentException("Evaluator should be a NotEvaluator");

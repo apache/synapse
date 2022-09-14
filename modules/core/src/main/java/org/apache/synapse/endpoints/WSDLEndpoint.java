@@ -44,6 +44,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private String originalWsdlPort;
     private String getOriginalWsdlServiceName;
 
+    @Override
     public void onFault(MessageContext synCtx) {
         
         // is this an actual leaf endpoint

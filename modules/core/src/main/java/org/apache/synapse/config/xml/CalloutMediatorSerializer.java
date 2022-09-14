@@ -38,6 +38,7 @@ import org.apache.synapse.mediators.builtin.CalloutMediator;
  */
 public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof CalloutMediator)) {
@@ -125,6 +126,7 @@ public class CalloutMediatorSerializer extends AbstractMediatorSerializer {
         return callout;
     }
 
+    @Override
     public String getMediatorClassName() {
         return CalloutMediator.class.getName();
     }

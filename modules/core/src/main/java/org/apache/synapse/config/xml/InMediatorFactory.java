@@ -40,6 +40,7 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName IN_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "in");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         InMediator filter = new InMediator();
         // after successfully creating the mediator
@@ -49,6 +50,7 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
         return filter;
     }
 
+    @Override
     public QName getTagQName() {
         return IN_Q;
     }

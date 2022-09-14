@@ -66,6 +66,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      * 
      * @param configCtx Axis2 ConfigurationContext
      */
+    @Override
     public void init(ConfigurationContext configCtx) {
         this.cfgCtx = configCtx;
     }
@@ -90,6 +91,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      * @see AbstractSynapseArtifactDeployer#deploySynapseArtifact(org.apache.axiom.om.OMElement,
      * String,java.util.Properties)
      */
+    @Override
     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
 
         String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
@@ -205,6 +207,7 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
      * @see org.apache.synapse.deployers.AbstractSynapseArtifactDeployer#undeploySynapseArtifact(
      * String)
      */
+    @Override
     public void undeploy(String fileName) throws DeploymentException {
 
         if (!isHotDeploymentEnabled()) {
@@ -278,7 +281,9 @@ public abstract class AbstractSynapseArtifactDeployer extends AbstractDeployer {
     }
 
     // We do not support dynamically setting the directory nor the extension
+    @Override
     public void setDirectory(String directory) {}
+    @Override
     public void setExtension(String extension) {}
 
     /**

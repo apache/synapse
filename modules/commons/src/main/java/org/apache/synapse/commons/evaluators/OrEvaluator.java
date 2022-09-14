@@ -34,6 +34,7 @@ public class OrEvaluator implements Evaluator {
 
     private Evaluator[] evaluators;
 
+    @Override
     public boolean evaluate(EvaluatorContext context) throws EvaluatorException {
         for (Evaluator e : evaluators) {
             if (e.evaluate(context)) {
@@ -43,6 +44,7 @@ public class OrEvaluator implements Evaluator {
         return false;
     }
 
+    @Override
     public String getName() {
         return EvaluatorConstants.OR;
     }

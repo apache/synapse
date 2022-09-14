@@ -47,6 +47,7 @@ public class SymmetricCipher extends BaseCipher {
         super(cipherInformation, key);
     }
 
+    @Override
     public Key getKey(CipherOperationMode operationMode) {
         SecretKey secretKey = keyStoreWrapper.getSecretKey();
         if (secretKey == null) {

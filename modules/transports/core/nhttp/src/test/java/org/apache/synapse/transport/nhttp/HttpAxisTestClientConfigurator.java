@@ -36,6 +36,7 @@ public class HttpAxisTestClientConfigurator implements AxisTestClientConfigurato
         return forceHTTP10;
     }
 
+    @Override
     public void setupRequestMessageContext(MessageContext msgContext) throws AxisFault {
         msgContext.setProperty(NhttpConstants.FORCE_HTTP_1_0, forceHTTP10);
     }

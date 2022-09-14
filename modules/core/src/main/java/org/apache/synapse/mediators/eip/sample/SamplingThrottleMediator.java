@@ -66,6 +66,7 @@ public class SamplingThrottleMediator extends AbstractMediator implements Manage
 
     private TimerTask messageProcessor;
 
+    @Override
     public void init(SynapseEnvironment synapseEnvironment) {
 
         if (messageQueue.isPersistent()) {
@@ -80,6 +81,7 @@ public class SamplingThrottleMediator extends AbstractMediator implements Manage
         samplingTimer.schedule(messageProcessor, 0, unitTime);
     }
 
+    @Override
     public void destroy() {
         messageProcessor.cancel();
         if (!messageQueue.isEmpty()) {
@@ -101,6 +103,7 @@ public class SamplingThrottleMediator extends AbstractMediator implements Manage
         }
     }
 
+    @Override
     public boolean mediate(MessageContext messageContext) {
 
         SynapseLog synLog = getLog(messageContext);

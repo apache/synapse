@@ -44,6 +44,7 @@ public class RespondMediatorFactory extends AbstractMediatorFactory {
         return responseMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return Respond_Q;
     }

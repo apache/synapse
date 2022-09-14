@@ -75,6 +75,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
      * @param properties properties passed
      * @return IterateMediator created from the given configuration
      */
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         IterateMediator mediator = new IterateMediator();
@@ -153,6 +154,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
      *
      * @return QName specifying the IterateMediator tag name of the xml configuration
      */
+    @Override
     public QName getTagQName() {
         return ITERATE_Q;
     }

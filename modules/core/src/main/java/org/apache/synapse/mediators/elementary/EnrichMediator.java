@@ -68,6 +68,7 @@ public class EnrichMediator extends AbstractMediator {
 
     private Target target = null;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog synLog = getLog(synCtx);
 

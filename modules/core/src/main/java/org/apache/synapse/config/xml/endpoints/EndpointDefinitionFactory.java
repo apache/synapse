@@ -41,6 +41,7 @@ public class EndpointDefinitionFactory implements DefinitionFactory {
      * @param elem XML which represents the endpoint with QoS information
      * @return the created endpoint definition
      */
+    @Override
     public EndpointDefinition createDefinition(OMElement elem) {
         EndpointDefinition definition = new EndpointDefinition();
 

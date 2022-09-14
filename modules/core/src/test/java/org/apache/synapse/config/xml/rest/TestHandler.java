@@ -24,10 +24,12 @@ import org.apache.synapse.rest.Handler;
 
 public class TestHandler implements Handler {
 
+    @Override
     public boolean handleRequest(MessageContext messageContext) {
         return true;
     }
 
+    @Override
     public boolean handleResponse(MessageContext messageContext) {
         return true;
     }

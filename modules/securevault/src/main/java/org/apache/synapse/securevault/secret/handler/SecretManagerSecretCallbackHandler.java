@@ -30,6 +30,7 @@ public class SecretManagerSecretCallbackHandler extends AbstractSecretCallbackHa
 
     private final SecretManager secretManager = SecretManager.getInstance();
 
+    @Override
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
 
         if (!secretManager.isInitialized()) {

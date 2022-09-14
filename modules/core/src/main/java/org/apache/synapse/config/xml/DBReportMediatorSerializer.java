@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.db.DBReportMediator;
  */
 public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DBReportMediator)) {
@@ -47,6 +48,7 @@ public class DBReportMediatorSerializer extends AbstractDBMediatorSerializer {
         return dbReport;
     }
 
+    @Override
     public String getMediatorClassName() {
         return DBReportMediator.class.getName();
     }

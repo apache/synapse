@@ -24,6 +24,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 
 public class LoopbackMediator extends AbstractMediator {
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

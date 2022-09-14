@@ -41,6 +41,7 @@ public class PKCS12KeyStoreLoader extends AbstractKeyStoreLoader {
     /**
      * returns KeyStore to be used
      */
+    @Override
     public KeyStore getKeyStore() {
         return getKeyStore(keyStorePath, keyStorePassword, "PKCS12", "SunJSSE");
     }

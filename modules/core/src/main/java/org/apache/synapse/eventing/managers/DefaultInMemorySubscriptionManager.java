@@ -47,6 +47,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
     private final Map<String, String> properties = new HashMap<String, String>();
     private static final Log log = LogFactory.getLog(DefaultInMemorySubscriptionManager.class);
 
+    @Override
     public List<Subscription> getStaticSubscriptions() {
         LinkedList<Subscription> list = new LinkedList<Subscription>();
         for (Subscription storeSubscription : store.values()) {
@@ -57,6 +58,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         return list;
     }
 
+    @Override
     public String subscribe(Subscription subscription) throws EventException {
         if (subscription.getId() == null) {
             subscription.setId(UIDGenerator.generateURNString());
@@ -66,7 +68,8 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
 
     }
 
-  public boolean unsubscribe(String id) throws EventException {
+  @Override
+public boolean unsubscribe(String id) throws EventException {
         if (store.containsKey(id)) {
             store.remove(id);
             return true;
@@ -76,6 +79,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
     }
 
 
+    @Override
     public boolean renew(Subscription subscription) throws EventException {
         Subscription subscriptionOld = getSubscription(subscription.getId());
         if (subscriptionOld != null) {
@@ -86,6 +90,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         }
     }
 
+    @Override
     public List<Subscription> getSubscriptions() throws EventException {
         LinkedList<Subscription> list = new LinkedList<Subscription>();
         for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
@@ -94,6 +99,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         return list;
     }
 
+    @Override
     public List<Subscription> getAllSubscriptions() throws EventException {
         LinkedList<Subscription> list = new LinkedList<Subscription>();
         for (Map.Entry<String, Subscription> stringSubscriptionEntry : store.entrySet()) {
@@ -102,6 +108,7 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         return list;
     }
 
+    @Override
     public List<Subscription> getMatchingSubscriptions(Event<MessageContext> event)
             throws EventException {
         final LinkedList<Subscription> list = new LinkedList<Subscription>();
@@ -132,15 +139,18 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         return list;
     }
 
+    @Override
     public Subscription getSubscription(String id) {
         return store.get(id);
     }
 
+    @Override
     public Subscription getStatus(String s) throws EventException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 
+    @Override
     public void init() {
         try {
             //TODO: pick values from the constants
@@ -162,14 +172,17 @@ public class DefaultInMemorySubscriptionManager implements SubscriptionManager<M
         }
     }
 
+    @Override
     public void addProperty(String name, String value) {
         properties.put(name, value);
     }
 
+    @Override
     public Collection<String> getPropertyNames() {
         return properties.keySet();
     }
 
+    @Override
     public String getPropertyValue(String name) {
         return properties.get(name);
     }

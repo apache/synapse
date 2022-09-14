@@ -50,6 +50,7 @@ public class TemporaryData {
         
         private FileOutputStream fileOutputStream;
         
+        @Override
         public void write(byte[] b, int off, int len) throws IOException {
 
             if (fileOutputStream != null) {
@@ -86,20 +87,24 @@ public class TemporaryData {
             }
         }
 
+        @Override
         public void write(byte[] b) throws IOException {
             write(b, 0, b.length);
         }
 
+        @Override
         public void write(int b) throws IOException {
             write(new byte[] { (byte)b }, 0, 1);
         }
 
+        @Override
         public void flush() throws IOException {
             if (fileOutputStream != null) {
                 fileOutputStream.flush();
             }
         }
 
+        @Override
         public void close() throws IOException {
             if (fileOutputStream != null) {
                 fileOutputStream.close();
@@ -114,10 +119,12 @@ public class TemporaryData {
         private int markChunkIndex;
         private int markChunkOffset;
         
+        @Override
         public int available() throws IOException {
             return (chunkIndex-currentChunkIndex)*chunkSize + chunkOffset - currentChunkOffset;
         }
 
+        @Override
         public int read(byte[] b, int off, int len) throws IOException {
 
             if (len == 0) {
@@ -158,29 +165,35 @@ public class TemporaryData {
             }
         }
 
+        @Override
         public int read(byte[] b) throws IOException {
             return read(b, 0, b.length);
         }
 
+        @Override
         public int read() throws IOException {
             byte[] b = new byte[1];
             return read(b) == -1 ? -1 : (int)b[0] & 0xFF;
         }
 
+        @Override
         public boolean markSupported() {
             return true;
         }
 
+        @Override
         public void mark(int readlimit) {
             markChunkIndex = currentChunkIndex;
             markChunkOffset = currentChunkOffset;
         }
 
+        @Override
         public void reset() throws IOException {
             currentChunkIndex = markChunkIndex;
             currentChunkOffset = markChunkOffset;
         }
 
+        @Override
         public long skip(long n) throws IOException {
 
             int available = available();
@@ -192,6 +205,7 @@ public class TemporaryData {
             return c;
         }
         
+        @Override
         public void close() throws IOException {
         }
     }

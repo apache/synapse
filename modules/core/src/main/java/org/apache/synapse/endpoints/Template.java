@@ -113,10 +113,12 @@ public class Template implements SynapseArtifact {
         return null;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

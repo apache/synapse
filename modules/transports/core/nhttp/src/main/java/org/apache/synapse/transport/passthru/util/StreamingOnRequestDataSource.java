@@ -39,10 +39,12 @@ public class StreamingOnRequestDataSource implements DataSource {
 
     private ByteArrayDataSource cachedData = null;
 
+    @Override
     public String getContentType() {
         return "application/octet-stream";
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
         if (cachedData != null) {
             return cachedData.getInputStream();
@@ -61,10 +63,12 @@ public class StreamingOnRequestDataSource implements DataSource {
         }
     }
 
+    @Override
     public String getName() {
         return "StreamingOnRequestDataSource";
     }
 
+    @Override
     public OutputStream getOutputStream() throws IOException {
         throw new UnsupportedOperationException();
     }

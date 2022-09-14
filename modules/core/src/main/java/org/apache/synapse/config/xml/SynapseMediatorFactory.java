@@ -40,10 +40,12 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
     private final static QName RULES_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "rules");
 
+    @Override
     public QName getTagQName() {
         return RULES_Q;
     }
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
         SynapseMediator sm = new SynapseMediator();
 

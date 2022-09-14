@@ -30,6 +30,7 @@ public class MessageCounter extends AbstractHandler {
 
     private Map<String,AtomicInteger> counter = new HashMap<String, AtomicInteger>();
 
+    @Override
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         String service = "_anon_";
         String operation = "_anon_";

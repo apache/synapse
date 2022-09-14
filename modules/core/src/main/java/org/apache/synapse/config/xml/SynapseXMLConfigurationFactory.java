@@ -57,6 +57,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
 
+    @Override
     public SynapseConfiguration getConfiguration(OMElement definitions, Properties properties) {
 
         if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) {
@@ -366,11 +367,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         throw new SynapseException(msg);
     }
 
+    @Override
     public QName getTagQName() {
 
         return XMLConfigConstants.DEFINITIONS_ELT;
     }
 
+    @Override
     public Class getSerializerClass() {
         return SynapseXMLConfigurationSerializer.class;
     }

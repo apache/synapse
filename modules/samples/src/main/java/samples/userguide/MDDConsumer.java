@@ -52,6 +52,7 @@ public class MDDConsumer implements MessageListener {
         System.out.println("MDD-Consumer listening for topic : "+topic.getTopicName());        
         connection.start();
     }
+    @Override
     public void onMessage(Message message){
         try {
             System.out.println(" Market data recived for symbol : "+ message.getJMSDestination().toString());

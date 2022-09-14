@@ -34,6 +34,7 @@ public class HttpTransportDescriptionFactory implements TransportDescriptionFact
         port = env.getServerPort();
     }
 
+    @Override
     public TransportInDescription createTransportInDescription() throws Exception {
         TransportInDescription desc = new TransportInDescription("http");
         desc.setReceiver(new HttpCoreNIOListener());
@@ -41,6 +42,7 @@ public class HttpTransportDescriptionFactory implements TransportDescriptionFact
         return desc;
     }
 
+    @Override
     public TransportOutDescription createTransportOutDescription() throws Exception {
         TransportOutDescription desc = new TransportOutDescription("http");
         desc.setSender(new HttpCoreNIOSender());

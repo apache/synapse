@@ -37,6 +37,7 @@ public class VFSRequestResponseClient extends VFSClient implements RequestRespon
         replyFile = channel.getReplyFile();
     }
     
+    @Override
     public IncomingMessage<byte[]> sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
         send(message);
         File requestFile = getRequestFile();

@@ -116,6 +116,7 @@ public class EnrichMediatorSerializer extends AbstractMediatorSerializer {
         return null;
     }
 
+    @Override
     public String getMediatorClassName() {
         return EnrichMediator.class.getName();
     }

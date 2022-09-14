@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
  */
 public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         AggregateMediator mediator = null;
@@ -87,6 +88,7 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
         return aggregator;
     }
 
+    @Override
     public String getMediatorClassName() {
         return AggregateMediator.class.getName();
     }

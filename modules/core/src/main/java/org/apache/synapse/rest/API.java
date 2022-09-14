@@ -161,6 +161,7 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         return handlers.toArray(new Handler[handlers.size()]);
     }
 
+    @Override
     boolean canProcess(MessageContext synCtx) {
         if (synCtx.isResponse()) {
             String apiName = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API);
@@ -243,6 +244,7 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         return true;
     }
 
+    @Override
     void process(MessageContext synCtx) {
         if (log.isDebugEnabled()) {
             log.debug("Processing message with ID: " + synCtx.getMessageID() + " through the " +
@@ -394,6 +396,7 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         }
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (resources.isEmpty()) {
             handleException("The API: " + name + " has been configured without " +
@@ -412,6 +415,7 @@ public class API extends AbstractRESTProcessor implements ManagedLifecycle {
         }
     }
 
+    @Override
     public void destroy() {
         log.info("Destroying API: " + name);
         for (Resource resource : resources.values()) {

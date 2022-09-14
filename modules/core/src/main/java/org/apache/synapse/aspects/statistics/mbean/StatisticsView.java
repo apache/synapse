@@ -40,6 +40,7 @@ public class StatisticsView implements StatisticsViewMBean {
         this.collector = collector;
     }
 
+    @Override
     public List<String> getSystemEndpointStats(String id) {
         return getAsList(
                 this.systemViewStrategy.determineView(id,
@@ -47,12 +48,14 @@ public class StatisticsView implements StatisticsViewMBean {
                         ComponentType.ENDPOINT));
     }
 
+    @Override
     public List<String> getSystemSequenceStats(String id) {
         return getAsList(this.systemViewStrategy.determineView(id,
                 collector.getStatisticsRecords(),
                 ComponentType.SEQUENCE));
     }
 
+    @Override
     public List<String> getSystemProxyServiceStats(String id) {
         return getAsList(this.systemViewStrategy.determineView(id,
                 collector.getStatisticsRecords(),
@@ -60,18 +63,21 @@ public class StatisticsView implements StatisticsViewMBean {
 
     }
 
+    @Override
     public List<String> getSystemEndpointsStats() {
         return getAllStatsAsList(
                 this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
                         ComponentType.ENDPOINT));
     }
 
+    @Override
     public List<String> getSystemSequencesStats() {
         return getAllStatsAsList(
                 this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
                         ComponentType.SEQUENCE));
     }
 
+    @Override
     public List<String> getSystemProxyServicesStats() {
         return getAllStatsAsList(
                 this.systemViewStrategy.determineView(collector.getStatisticsRecords(),
@@ -79,6 +85,7 @@ public class StatisticsView implements StatisticsViewMBean {
 
     }
 
+    @Override
     public void clearAllStatistics() {
         this.collector.clearStatistics();
     }

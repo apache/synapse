@@ -82,6 +82,7 @@ public class InvokeMediatorFactory extends AbstractMediatorFactory {
     }
 
 
+    @Override
     public QName getTagQName() {
         return INVOKE_Q;
     }

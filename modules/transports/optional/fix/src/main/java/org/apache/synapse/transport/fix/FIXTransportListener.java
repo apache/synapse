@@ -56,6 +56,7 @@ public class FIXTransportListener extends AbstractTransportListener {
      * @param cfgCtx    the Axis configuration context
      * @param trpInDesc the TransportIn description
      */
+    @Override
     public void init(ConfigurationContext cfgCtx,
                      TransportInDescription trpInDesc) throws AxisFault {
 
@@ -71,6 +72,7 @@ public class FIXTransportListener extends AbstractTransportListener {
      *
      * @param service the service for which to listen for messages
      */
+    @Override
     public void startListeningForService(AxisService service) {
         try {
             boolean acceptorCreated = fixSessionFactory.createFIXAcceptor(service);
@@ -93,6 +95,7 @@ public class FIXTransportListener extends AbstractTransportListener {
      *
      * @param service the service that was undeployed or stopped
      */
+    @Override
     protected void stopListeningForService(AxisService service) {
         fixSessionFactory.disposeFIXAcceptor(service);
     }
@@ -105,6 +108,7 @@ public class FIXTransportListener extends AbstractTransportListener {
      * @return the EPR for the service
      * @throws AxisFault
      */
+    @Override
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
 
         if (serviceName.indexOf('.') != -1) {

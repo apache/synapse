@@ -43,6 +43,7 @@ public class BeanMediatorFactory extends AbstractMediatorFactory {
     private static final QName BEAN_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "bean");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         BeanMediator mediator = new BeanMediator();
@@ -152,6 +153,7 @@ public class BeanMediatorFactory extends AbstractMediatorFactory {
         }
     }
 
+    @Override
     public QName getTagQName() {
         return BEAN_Q;
     }

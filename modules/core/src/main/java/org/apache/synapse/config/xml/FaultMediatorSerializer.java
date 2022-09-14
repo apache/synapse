@@ -37,6 +37,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final String POX = "pox";
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof FaultMediator)) {
@@ -127,6 +128,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer {
         return fault;
     }
 
+    @Override
     public String getMediatorClassName() {
         return FaultMediator.class.getName();
     }

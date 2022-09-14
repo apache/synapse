@@ -71,10 +71,12 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         super();
     }
 
+    @Override
     public Object get(String name) {
         return this.get((Object) name);
     }
 
+    @Override
     public boolean getBoolean(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Boolean) {
@@ -85,6 +87,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public byte getByte(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Byte) {
@@ -95,6 +98,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public byte[] getBytes(String name) {
         Object o = this.get((Object) name);
         if (o instanceof byte[]) {
@@ -105,6 +109,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public char getChar(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Character) {
@@ -116,6 +121,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public double getDouble(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Double) {
@@ -126,6 +132,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public float getFloat(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Float) {
@@ -136,6 +143,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public int getInt(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Integer) {
@@ -146,6 +154,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public long getLong(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Long) {
@@ -156,6 +165,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public short getShort(String name) {
         Object o = this.get((Object) name);
         if (o instanceof Short) {
@@ -166,6 +176,7 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public String getString(String name) {
         Object o = this.get((Object) name);
         if (o instanceof String) {
@@ -176,46 +187,57 @@ public class SimpleMapImpl extends HashMap implements SimpleMap {
         }
     }
 
+    @Override
     public void put(String name, Object value) {
         this.put((Object) name, value);
     }
 
+    @Override
     public void putBoolean(String name, boolean b) {
         this.put((Object) name, b);
     }
 
+    @Override
     public void putByte(String name, byte b) {
         this.put((Object) name, b);
     }
 
+    @Override
     public void putBytes(String name, byte[] bytes) {
         this.put((Object) name, bytes);
     }
 
+    @Override
     public void putChar(String name, char c) {
         this.put((Object) name, c);
     }
 
+    @Override
     public void putDouble(String name, double d) {
         this.put((Object) name, d);
     }
 
+    @Override
     public void putFloat(String name, float fl) {
         this.put((Object) name, fl);
     }
 
+    @Override
     public void putInt(String name, int i) {
         this.put((Object) name, i);
     }
 
+    @Override
     public void putLong(String name, long l) {
         this.put((Object) name, l);
     }
 
+    @Override
     public void putShort(String name, short s) {
         this.put((Object) name, s);
     }
 
+    @Override
     public void putString(String name, String value) {
         this.put((Object) name, value);
     }

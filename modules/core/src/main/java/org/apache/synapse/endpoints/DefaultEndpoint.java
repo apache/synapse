@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseConstants;
  * using any QOS etc as specified
  */
 public class DefaultEndpoint extends AbstractEndpoint {
+    @Override
     public void onFault(MessageContext synCtx) {
 
         // is this really a fault or a timeout/connection close etc?
@@ -42,12 +43,14 @@ public class DefaultEndpoint extends AbstractEndpoint {
         super.onFault(synCtx);
     }
 
+    @Override
     public void onSuccess() {
         if (getContext() != null) {
             getContext().onSuccess();
         }
     }
 
+    @Override
     public void send(MessageContext synCtx) {
         if (getParentEndpoint() == null && !readyToSend()) {
             // if the this leaf endpoint is too a root endpoint and is in inactive

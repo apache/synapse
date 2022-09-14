@@ -85,6 +85,7 @@ public class FaultMediator extends AbstractMediator {
     /** array of fault detail elements */
     private final List<OMElement> faultDetailElements = new ArrayList<OMElement>();
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

@@ -56,6 +56,7 @@ public class SynapseLibrary implements Library {
         dependencies = new ArrayList<LibraryArtifact.Dependency>();
     }
 
+    @Override
     public QName getQName() {
         return qualifiedName;
     }
@@ -76,6 +77,7 @@ public class SynapseLibrary implements Library {
         libArtifactDetails.put(artifact.getName(),artifact.getDescription());
     }
 
+    @Override
     public String  getArtifactDescription(String  artifactName){
         return libArtifactDetails.get(artifactName);
     }
@@ -110,6 +112,7 @@ public class SynapseLibrary implements Library {
      *
      * @return success
      */
+    @Override
     public synchronized boolean loadLibrary() {
         if (!isLoaded) {
             for (String  artifactName : depNameToArtifactIndex.keySet()) {
@@ -139,6 +142,7 @@ public class SynapseLibrary implements Library {
      *
      * @return success
      */
+    @Override
     public synchronized boolean unLoadLibrary() {
         //TODO when components are un-loaded iterate and execute Lifecycle method #destroy() ?
         libComponentIndex.clear();
@@ -146,6 +150,7 @@ public class SynapseLibrary implements Library {
         return true;
     }
 
+    @Override
     public ClassLoader getLibClassLoader() {
         return libClassLoader;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -162,6 +167,7 @@ public class SynapseLibrary implements Library {
      * @param artifacName
      * @return
      */
+    @Override
     public Object getArtifact(String artifacName) {
         if (libComponentIndex.containsKey(artifacName)) {
             return libComponentIndex.get(artifacName);
@@ -169,18 +175,22 @@ public class SynapseLibrary implements Library {
         return null;
     }
 
+    @Override
     public String toString() {
         return qualifiedName.toString();
     }
 
+    @Override
     public String getPackage() {
         return packageN;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

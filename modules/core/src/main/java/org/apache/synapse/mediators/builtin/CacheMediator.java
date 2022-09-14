@@ -76,18 +76,21 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
     private String cacheKey = "synapse.cache_key";
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (onCacheHitSequence != null) {
             onCacheHitSequence.init(se);
         }
     }
 
+    @Override
     public void destroy() {
         if (onCacheHitSequence != null) {
             onCacheHitSequence.destroy();
         }
     }
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

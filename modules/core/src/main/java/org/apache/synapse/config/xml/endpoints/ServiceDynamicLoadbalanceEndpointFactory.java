@@ -82,6 +82,7 @@ public class ServiceDynamicLoadbalanceEndpointFactory extends EndpointFactory {
         return instance;
     }
 
+    @Override
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
                                       Properties properties) {
 

@@ -37,6 +37,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
     private static final QName ATTRIBUTE_Q
                 = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof XSLTMediator)) {
@@ -87,6 +88,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         return xslt;
     }
 
+    @Override
     public String getMediatorClassName() {
         return XSLTMediator.class.getName();
     }

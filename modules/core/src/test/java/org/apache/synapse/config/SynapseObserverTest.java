@@ -130,66 +130,82 @@ public class SynapseObserverTest extends TestCase {
             tracker.put(SEQUENCE_TEMPLATE, new HashSet<String>());
         }
 
+        @Override
         public void endpointAdded(Endpoint endpoint) {
             tracker.get(ENDPOINT).add(endpoint.getName());
         }
 
+        @Override
         public void endpointRemoved(Endpoint endpoint) {
             tracker.get(ENDPOINT).remove(endpoint.getName());
         }
 
+        @Override
         public void entryAdded(Entry entry) {
             tracker.get(ENTRY).add(entry.getKey());
         }
 
+        @Override
         public void entryRemoved(Entry entry) {
             tracker.get(ENTRY).remove(entry.getKey());
         }
 
+        @Override
         public void eventSourceAdded(SynapseEventSource eventSource) {
             tracker.get(EVENT_SRC).add(eventSource.getName());
         }
 
+        @Override
         public void eventSourceRemoved(SynapseEventSource eventSource) {
             tracker.get(EVENT_SRC).remove(eventSource.getName());
         }
 
+        @Override
         public void proxyServiceAdded(ProxyService proxy) {
             tracker.get(PROXY).add(proxy.getName());
         }
 
+        @Override
         public void proxyServiceRemoved(ProxyService proxy) {
             tracker.get(PROXY).remove(proxy.getName());
         }
 
+        @Override
         public void sequenceAdded(Mediator sequence) {
             tracker.get(SEQUENCE).add(((SequenceMediator) sequence).getName());
         }
 
+        @Override
         public void sequenceRemoved(Mediator sequence) {
             tracker.get(SEQUENCE).remove(((SequenceMediator) sequence).getName());
         }
 
+        @Override
         public void sequenceTemplateAdded(Mediator template) {
             tracker.get(SEQUENCE_TEMPLATE).add(((TemplateMediator) template).getName());
         }
 
+        @Override
         public void sequenceTemplateRemoved(Mediator template) {
             tracker.get(SEQUENCE_TEMPLATE).remove(((TemplateMediator) template).getName());
         }
 
+        @Override
         public void startupAdded(Startup startup) {
             tracker.get(STARTUP).add(startup.getName());
         }
 
+        @Override
         public void startupRemoved(Startup startup) {
             tracker.get(STARTUP).remove(startup.getName());
         }
 
+        @Override
         public void priorityExecutorAdded(PriorityExecutor exec) {
             tracker.get(EXECUTOR).add(exec.getName());
         }
 
+        @Override
         public void priorityExecutorRemoved(PriorityExecutor exec) {
             tracker.get(EXECUTOR).remove(exec.getName());
         }

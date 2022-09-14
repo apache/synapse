@@ -38,6 +38,7 @@ public class SpringTestBean extends AbstractMediator {
     public SpringTestBean() {
     }
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         if (handler != null) {
             handler.handle(synCtx);
@@ -53,6 +54,7 @@ public class SpringTestBean extends AbstractMediator {
         this.handler = handlerTest;
     }
 
+    @Override
     public String getType() {
         return "SpringTestBean";
     }

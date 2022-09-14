@@ -41,10 +41,12 @@ public class SecretManagerAdminMBeanImpl extends StandardMBean implements Secret
     /**
      * @see SecretManagerAdminMBean
      */
+    @Override
     public void init() {
         this.secretManager.init(SynapsePropertiesLoader.loadSynapseProperties());
     }
 
+    @Override
     public void shutDown() {
         this.secretManager.shoutDown();
     }

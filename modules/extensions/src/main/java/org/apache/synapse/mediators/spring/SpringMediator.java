@@ -57,6 +57,7 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
      */
     private ApplicationContext appContext = null;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -159,11 +160,13 @@ public class SpringMediator extends AbstractMediator implements ManagedLifecycle
         this.appContext = appContext;
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         MessageContext synCtx = se.createMessageContext();
         buildAppContext(synCtx, getLog(synCtx));
     }
 
+    @Override
     public void destroy() {
     }
 }

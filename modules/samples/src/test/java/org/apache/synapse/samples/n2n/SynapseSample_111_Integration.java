@@ -26,6 +26,7 @@ import org.apache.synapse.SynapseConstants;
  */
 public class SynapseSample_111_Integration extends AbstractAutomationTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_111.xml");
 //        System.setProperty("addurl", SYNAPSE_BASE_URL + "soap/StockQuoteProxy");

@@ -125,6 +125,7 @@ public class EntryFactory implements XMLToObjectMapper {
         throw new SynapseException(msg);
     }
 
+    @Override
     public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             return createEntry((OMElement) om, properties);

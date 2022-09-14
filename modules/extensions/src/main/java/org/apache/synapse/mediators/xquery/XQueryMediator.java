@@ -103,6 +103,7 @@ public class XQueryMediator extends AbstractMediator {
      * @param synCtx The current message
      * @return true always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         try {

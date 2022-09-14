@@ -32,6 +32,7 @@ public class XPathBasedEventFilter implements SynapseEventFilter {
     private String resultValue;
     private static final String FILTER_SEP = "/";
 
+    @Override
     public boolean isSatisfied(MessageContext mc) {
         String evaluatedValue = sourceXpath.stringValueOf(mc);
         if (evaluatedValue.equals(resultValue)) {
@@ -58,6 +59,7 @@ public class XPathBasedEventFilter implements SynapseEventFilter {
         this.resultValue = resultValue;
     }
 
+    @Override
     public String toString() {
         return resultValue;
     }

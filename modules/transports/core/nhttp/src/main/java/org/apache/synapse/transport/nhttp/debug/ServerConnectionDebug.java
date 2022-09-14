@@ -93,6 +93,7 @@ public class ServerConnectionDebug extends AbstractConnectionDebug {
         return clientConnectionDebug;
     }
 
+    @Override
     public String dump() {
         StringBuffer sb = new StringBuffer(50);
         responseCompletionTime = responseCompletionTime == 0 ?

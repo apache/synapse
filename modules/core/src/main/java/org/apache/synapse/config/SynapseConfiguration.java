@@ -1298,6 +1298,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * @param se
      *          SynapseEnvironment specifying the env to be initialized
      */
+    @Override
     public synchronized void init(SynapseEnvironment se) {
         if (initialized) {
             log.warn("Attempted to re-initialize SynapseConfiguration");
@@ -1318,6 +1319,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      * This method will be called on the soft shutdown or destroying the configuration
      * and will destroy all the stateful managed parts of the configuration.
      */
+    @Override
     public synchronized void destroy() {
         if (!initialized) {
             log.warn("Attempted to destroy uninitialized SynapseConfiguration");
@@ -1739,6 +1741,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      *
      * @param description tobe set to the artifact
      */
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -1748,6 +1751,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
      *
      * @return description of the configuration
      */
+    @Override
     public String getDescription() {
         return description;
     }

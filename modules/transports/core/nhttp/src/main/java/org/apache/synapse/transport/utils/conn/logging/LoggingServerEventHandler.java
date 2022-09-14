@@ -60,6 +60,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         this.log = LogFactory.getLog(handler.getClass());
     }
 
+    @Override
     public void connected(final NHttpServerConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Connected");
@@ -67,6 +68,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         this.handler.connected(conn);
     }
 
+    @Override
     public void closed(final NHttpServerConnection conn) {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Closed");
@@ -74,6 +76,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         this.handler.closed(conn);
     }
 
+    @Override
     public void endOfInput(NHttpServerConnection conn) throws IOException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Closed at the remote end");
@@ -81,12 +84,14 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         this.handler.endOfInput(conn);
     }
 
+    @Override
     public void exception(NHttpServerConnection conn, Exception ex) {
         // No need to log errors at this level - Actual handler implementation
         // should take care of that
         this.handler.exception(conn, ex);
     }
 
+    @Override
     public void requestReceived(final NHttpServerConnection conn) throws IOException, HttpException {
         HttpRequest request = conn.getHttpRequest();
         if (this.log.isDebugEnabled()) {
@@ -96,6 +101,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         this.handler.requestReceived(conn);
     }
 
+    @Override
     public void outputReady(final NHttpServerConnection conn, final ContentEncoder encoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Output ready");
@@ -106,6 +112,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void responseReady(final NHttpServerConnection conn) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Response ready");
@@ -113,6 +120,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         this.handler.responseReady(conn);
     }
 
+    @Override
     public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) throws IOException, HttpException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Input ready");
@@ -123,6 +131,7 @@ public class LoggingServerEventHandler implements NHttpServerEventHandler {
         }
     }
 
+    @Override
     public void timeout(final NHttpServerConnection conn) throws IOException {
         if (this.log.isDebugEnabled()) {
             this.log.debug("HTTP connection " + conn + ": Timeout");

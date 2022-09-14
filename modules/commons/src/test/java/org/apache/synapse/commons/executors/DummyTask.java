@@ -28,16 +28,20 @@ public class DummyTask implements Importance, Runnable {
         this.priority = priority;
     }
 
+    @Override
     public int getPriority() {
         return priority;
     }
 
+    @Override
     public void setPriority(int p) {
         this.priority = p;
     }
 
+    @Override
     public void setProperty(String name, Object value) {}
 
+    @Override
     public Object getProperty(String name) {
         return null;
     }
@@ -50,6 +54,7 @@ public class DummyTask implements Importance, Runnable {
         this.mark = mark;
     }
 
+    @Override
     public void run() {
     
     }

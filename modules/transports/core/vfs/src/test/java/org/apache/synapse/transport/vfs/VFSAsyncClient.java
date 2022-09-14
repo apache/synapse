@@ -25,6 +25,7 @@ import org.apache.axis2.transport.testkit.client.AsyncTestClient;
 import org.apache.axis2.transport.testkit.client.ClientOptions;
 
 public class VFSAsyncClient extends VFSClient implements AsyncTestClient<byte[]> {
+    @Override
     public void sendMessage(ClientOptions options, ContentType contentType, byte[] message) throws Exception {
         send(message);
     }

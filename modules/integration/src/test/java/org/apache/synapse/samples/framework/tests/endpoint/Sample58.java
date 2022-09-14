@@ -36,6 +36,7 @@ public class Sample58 extends SynapseTestCase {
         final StockQuoteSampleClient client = getStockQuoteClient();
 
         new Thread(new Runnable() {
+            @Override
             public void run() {
                 result = client.sessionlessClient(addUrl, null, 200);
             }

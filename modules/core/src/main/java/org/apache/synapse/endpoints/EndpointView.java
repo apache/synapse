@@ -36,6 +36,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     private static final Long ONE = 1L;
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20,
         new ThreadFactory() {
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, "endpoint-jmx-stat-collector");
             }
@@ -98,6 +99,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         this.endpoint = endpoint;
 
         this.future = scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
             public void run() {
                 if (suspensionCounts.size() == 15) {
                     suspensionCounts.remove();
@@ -123,6 +125,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Switch on a leaf endpoint, or all endpoints on a group - from maintenance
      * @throws Exception
      */
+    @Override
     public void switchOn() throws Exception {
         if (endpoint.getChildren() != null) {
             for (Endpoint e : endpoint.getChildren()) {
@@ -142,6 +145,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      *
      * @throws Exception
      */
+    @Override
     public void switchOff() throws Exception {
         if (endpoint.getChildren() != null) {
             for (Endpoint e : endpoint.getChildren()) {
@@ -162,6 +166,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return true if at least one is active in a group endpoint; for a leaf - if it is currently active
      * @throws Exception
      */
+    @Override
     public boolean isActive() throws Exception {
         if (endpoint.getChildren() != null) {
             return getActiveChildren() > 0;
@@ -176,6 +181,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return true if a leaf level endpoint has timed out, For a group, has all endpoints timed out?
      * @throws Exception
      */
+    @Override
     public boolean isTimedout() throws Exception {
         return isEndpointInState(EndpointContext.ST_TIMEOUT);
     }
@@ -185,6 +191,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return true if a leaf level endpoint is suspended, false for group endpoints and non-suspend
      * @throws Exception
      */
+    @Override
     public boolean isSuspended() throws Exception {
         return isEndpointInState(EndpointContext.ST_SUSPENDED);
     }
@@ -194,6 +201,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return true if a leaf level endpoint is off, false for group endpoints and non-off
      * @throws Exception
      */
+    @Override
     public boolean isSwitchedOff() throws Exception {
         return isEndpointInState(EndpointContext.ST_OFF);
     }
@@ -203,6 +211,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return the number of children for this endpoint
      * @throws Exception
      */
+    @Override
     public int getTotalChildren() throws Exception {
         return (endpoint.getChildren() == null ? 0 : endpoint.getChildren().size());
     }
@@ -212,6 +221,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return the number of active children for this endpoint
      * @throws Exception
      */
+    @Override
     public int getActiveChildren() throws Exception {
         if (endpoint.getChildren() == null) {
             return 0;
@@ -231,6 +241,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * @return the number of ready children for this endpoint
      * @throws Exception
      */
+    @Override
     public int getReadyChildren() throws Exception {
         if (endpoint.getChildren() == null) {
             return 0;
@@ -250,6 +261,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Time when statistics was last reset for this leaf endpoint
      * @return the time when statistics was last reset for this leaf endpoint, or -1 for group endpoints
      */
+    @Override
     public long getLastResetTime() {
         return (endpoint.getChildren() != null ? -1 : lastResetTime);
     }
@@ -258,6 +270,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Time since statistics was last reset for this leaf endpoint
      * @return the time since statistics was last reset for this leaf endpoint, or -1 for group endpoints
      */
+    @Override
     public long getMetricsWindow() {
         return (endpoint.getChildren() != null ? -1 : System.currentTimeMillis() - lastResetTime);
     }
@@ -266,6 +279,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * A Map of receive faults with the error code and count
      * @return a Map of receive faults
      */
+    @Override
     public Map<Integer, Long> getReceivingFaultTable() {
         if (endpoint.getChildren() != null) {
             Map<Integer, Long> receivingFaultTable = new HashMap<Integer, Long>();
@@ -285,6 +299,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * A Map of send faults with the error code and count
      * @return a Map of send faults
      */
+    @Override
     public Map<Integer, Long> getSendingFaultTable() {
         if (endpoint.getChildren() != null) {
             Map<Integer, Long> sendingFaultTable = new HashMap<Integer, Long>();
@@ -304,6 +319,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * A Map of response codes and counts
      * @return a Map of response codes and counts
      */
+    @Override
     public Map<Integer, Long> getResponseCodeTable() {
         if (endpoint.getChildren() != null) {
             Map<Integer, Long> responseCodeTable = new HashMap<Integer, Long>();
@@ -318,6 +334,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public Date getSuspendedAt() {
         return suspendedAt;
     }
@@ -326,6 +343,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         this.suspendedAt = suspendedAt;
     }
 
+    @Override
     public Date getTimedoutAt() {
         return timedoutAt;
     }
@@ -334,6 +352,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         this.timedoutAt = timedoutAt;
     }
 
+    @Override
     public int getConsecutiveEndpointSuspensions() {
         return consecutiveSuspensions;
     }
@@ -348,6 +367,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         consecutiveSuspensions = 0;
     }
 
+    @Override
     public int getConsecutiveEndpointTimeouts() {
         return consecutiveTimeouts;
     }
@@ -362,34 +382,42 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         consecutiveTimeouts = 0;
     }
 
+    @Override
     public int getTotalEndpointSuspensions() {
         return totalSuspensions;
     }
 
+    @Override
     public int getTotalEndpointTimeouts() {
         return totalTimeouts;
     }
 
+    @Override
     public int getLastMinuteEndpointSuspensions() {
         return getTotal(suspensionCounts, 1);
     }
 
+    @Override
     public int getLast5MinuteEndpointSuspensions() {
         return getTotal(suspensionCounts, 5);
     }
 
+    @Override
     public int getLast15MinuteEndpointSuspensions() {
         return getTotal(suspensionCounts, 15);
     }
 
+    @Override
     public int getLastMinuteEndpointTimeouts() {
         return getTotal(timeoutCounts, 1);
     }
 
+    @Override
     public int getLast5MinuteEndpointTimeouts() {
         return getTotal(timeoutCounts, 5);
     }
 
+    @Override
     public int getLast15MinuteEndpointTimeouts() {
         return getTotal(timeoutCounts, 15);
     }
@@ -414,6 +442,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of messages (ie replies) received
      * @return # of messages (replies) received
      */
+    @Override
     public long getMessagesReceived() {
         if (endpoint.getChildren() != null) {
             long messagesReceived = 0;
@@ -432,6 +461,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of faults, receiving replies
      * @return # of faults, receiving replies
      */
+    @Override
     public long getFaultsReceiving() {
         if (endpoint.getChildren() != null) {
             long faultsReceiving = 0;
@@ -450,6 +480,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of timeouts, receiving replies
      * @return # of timeouts, receiving replies
      */
+    @Override
     public long getTimeoutsReceiving() {
         if (endpoint.getChildren() != null) {
             long timeoutsReceiving = 0;
@@ -468,6 +499,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of bytes received, receiving replies
      * @return # of bytes received, receiving replies
      */
+    @Override
     public long getBytesReceived() {
         if (endpoint.getChildren() != null) {
             long bytesReceived = 0;
@@ -486,6 +518,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of messages sent
      * @return # of messages sent
      */
+    @Override
     public long getMessagesSent() {
         if (endpoint.getChildren() != null) {
             long messagesSent = 0;
@@ -504,6 +537,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of faults sending
      * @return # of faults sending
      */
+    @Override
     public long getFaultsSending() {
         if (endpoint.getChildren() != null) {
             long faultsSending = 0;
@@ -522,6 +556,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of timeouts, sending
      * @return # of timeouts, sending
      */
+    @Override
     public long getTimeoutsSending() {
         if (endpoint.getChildren() != null) {
             long timeoutsSending = 0;
@@ -540,6 +575,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Number of bytes sent
      * @return # of bytes sent
      */
+    @Override
     public long getBytesSent() {
         if (endpoint.getChildren() != null) {
             long bytesSent = 0;
@@ -554,6 +590,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public long getMinSizeReceived() {
         if (endpoint.getChildren() != null) {
             long minSizeReceived = 0;
@@ -572,6 +609,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public long getMaxSizeReceived() {
         if (endpoint.getChildren() != null) {
             long maxSizeReceived = 0;
@@ -590,6 +628,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public long getMinSizeSent() {
         if (endpoint.getChildren() != null) {
             long minSizeSent = 0;
@@ -608,6 +647,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public long getMaxSizeSent() {
         if (endpoint.getChildren() != null) {
             long maxSizeSent = 0;
@@ -626,6 +666,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public double getAvgSizeReceived() {
         if (endpoint.getChildren() != null) {
             double avgSizeReceived = 0;
@@ -643,6 +684,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public double getAvgSizeSent() {
         if (endpoint.getChildren() != null) {
             double avgSizeSent = 0;
@@ -660,6 +702,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
     }
 
     // --- MessageLevelMetricsCollector methods ---
+    @Override
     public void resetStatistics() {
 
         messagesReceived  = 0;
@@ -693,10 +736,12 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         log.info("Endpoint statistics reset for : " + endpointName + " (and/or its children)");
     }
 
+    @Override
     public synchronized void incrementMessagesReceived() {
         messagesReceived++;
     }
 
+    @Override
     public synchronized void incrementFaultsReceiving(int errorCode) {
         faultsReceiving++;
         Object o = receivingFaultTable.get(errorCode);
@@ -707,18 +752,22 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public synchronized void incrementTimeoutsReceiving() {
         timeoutsReceiving++;
     }
 
+    @Override
     public synchronized void incrementBytesReceived(long size) {
         bytesReceived += size;
     }
 
+    @Override
     public synchronized void incrementMessagesSent() {
         messagesSent++;
     }
 
+    @Override
     public synchronized void incrementFaultsSending(int errorCode) {
         faultsSending++;
         Object o = sendingFaultTable.get(errorCode);
@@ -729,14 +778,17 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         }
     }
 
+    @Override
     public synchronized void incrementTimeoutsSending() {
         timeoutsSending++;
     }
 
+    @Override
     public synchronized void incrementBytesSent(long size) {
         bytesSent += size;
     }
 
+    @Override
     public synchronized void notifyReceivedMessageSize(long size) {
         if (minSizeReceived == 0 || size < minSizeReceived) {
             minSizeReceived = size;
@@ -747,6 +799,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
         avgSizeReceived = (avgSizeReceived == 0 ? size : (avgSizeReceived + size) / 2);
     }
 
+    @Override
     public synchronized void notifySentMessageSize(long size) {
         if (minSizeSent == 0 || size < minSizeSent) {
             minSizeSent = size;
@@ -762,6 +815,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * the sendingFault count e.g. to report a successful fail-over etc
      * @param errorCode the code to report
      */
+    @Override
     public void reportSendingFault(int errorCode) {
         synchronized(sendingFaultTable) {
             Object o = sendingFaultTable.get(errorCode);
@@ -778,6 +832,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * the receivingFault count
      * @param errorCode the code to report
      */
+    @Override
     public void reportReceivingFault(int errorCode) {
         synchronized(receivingFaultTable) {
             Object o = receivingFaultTable.get(errorCode);
@@ -793,6 +848,7 @@ public class EndpointView implements EndpointViewMBean, MessageLevelMetricsColle
      * Collect response code statistics
      * @param respCode response code
      */
+    @Override
     public void reportResponseCode(int respCode) {
         synchronized(responseCodeTable) {
             Object o = responseCodeTable.get(respCode);

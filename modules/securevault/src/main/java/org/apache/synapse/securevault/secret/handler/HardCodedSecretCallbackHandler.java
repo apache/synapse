@@ -29,6 +29,7 @@ import org.apache.synapse.securevault.secret.SingleSecretCallback;
 public class HardCodedSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
 
+    @Override
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
         // can set multiple passwords based id of SingleSecretCallback
         singleSecretCallback.setSecret("password");

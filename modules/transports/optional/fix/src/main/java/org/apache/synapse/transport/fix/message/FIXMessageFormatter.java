@@ -41,16 +41,19 @@ public class FIXMessageFormatter implements MessageFormatter {
 
 	private static final Log log = LogFactory.getLog(FIXMessageFormatter.class);
 
-	public String formatSOAPAction(MessageContext arg0, OMOutputFormat arg1, String arg2) {
+	@Override
+    public String formatSOAPAction(MessageContext arg0, OMOutputFormat arg1, String arg2) {
 		return null;
 	}
 
-	public byte[] getBytes(MessageContext arg0, OMOutputFormat arg1) throws AxisFault {
+	@Override
+    public byte[] getBytes(MessageContext arg0, OMOutputFormat arg1) throws AxisFault {
 	
 		return null;
 	}
 
-	public String getContentType(MessageContext msgCtx, OMOutputFormat format, String soapActionString) {
+	@Override
+    public String getContentType(MessageContext msgCtx, OMOutputFormat format, String soapActionString) {
 		String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
 		String encoding = format.getCharSetEncoding();
 		if (contentType == null) {
@@ -62,11 +65,13 @@ public class FIXMessageFormatter implements MessageFormatter {
 		return contentType;
 	}
 
-	public URL getTargetAddress(MessageContext arg0, OMOutputFormat arg1, URL arg2) throws AxisFault {
+	@Override
+    public URL getTargetAddress(MessageContext arg0, OMOutputFormat arg1, URL arg2) throws AxisFault {
 		return null;
 	}
 
-	public void writeTo(MessageContext msgCtx, OMOutputFormat format, OutputStream out,
+	@Override
+    public void writeTo(MessageContext msgCtx, OMOutputFormat format, OutputStream out,
                         boolean preserve) throws AxisFault {
 
 		try {

@@ -61,6 +61,7 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
     private static final QName ASYNCHRONOUS_ATTR
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "asynchronous");
     
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ConditionalRouterMediator conditionalRouterMediator = new ConditionalRouterMediator();
@@ -127,6 +128,7 @@ public class ConditionalRouterMediatorFactory extends AbstractMediatorFactory {
         return conditionalRouterMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return CONDITIONAL_ROUTER_Q;
     }

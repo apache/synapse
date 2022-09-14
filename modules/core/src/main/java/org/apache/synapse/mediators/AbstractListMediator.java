@@ -40,6 +40,7 @@ public abstract class AbstractListMediator extends AbstractMediator
 
     private boolean contentAware = false;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         int parentsEffectiveTraceState = synCtx.getTracingState();
@@ -79,26 +80,32 @@ public abstract class AbstractListMediator extends AbstractMediator
         return true;
     }
 
+    @Override
     public List<Mediator> getList() {
         return mediators;
     }
 
+    @Override
     public boolean addChild(Mediator m) {
         return mediators.add(m);
     }
 
+    @Override
     public boolean addAll(List<Mediator> c) {
         return mediators.addAll(c);
     }
 
+    @Override
     public Mediator getChild(int pos) {
         return mediators.get(pos);
     }
 
+    @Override
     public boolean removeChild(Mediator m) {
         return mediators.remove(m);
     }
 
+    @Override
     public Mediator removeChild(int pos) {
         return mediators.remove(pos);
     }
@@ -107,6 +114,7 @@ public abstract class AbstractListMediator extends AbstractMediator
      * Initialize child mediators recursively
      * @param se synapse environment
      */
+    @Override
     public void init(SynapseEnvironment se) {
         if (log.isDebugEnabled()) {
             log.debug("Initializing child mediators of mediator : " + getType());
@@ -126,6 +134,7 @@ public abstract class AbstractListMediator extends AbstractMediator
     /**
      * Destroy child mediators recursively
      */
+    @Override
     public void destroy() {
         if (log.isDebugEnabled()) {
             log.debug("Destroying child mediators of mediator : " + getType());

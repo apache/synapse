@@ -66,6 +66,7 @@ public class PassThroughConfiguration extends HttpTransportConfiguration {
                 DEFAULT_WORKER_POOL_QUEUE_LENGTH);
     }
 
+    @Override
     protected int getThreadsPerReactor() {
         return getIntProperty(PassThroughConfigPNames.IO_THREADS_PER_REACTOR,
                 DEFAULT_IO_THREADS_PER_REACTOR);

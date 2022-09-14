@@ -58,10 +58,12 @@ public class EndDelimitedProtocol implements Protocol {
         
         public ProtocolDecoderImpl() {}
         
+        @Override
         public boolean inputRequired() {
             return messages.isEmpty();
         }
 
+        @Override
         public void decode(byte[] buf, int offset, int length) {
             byte delimiter = getDelimiter();
             int start = offset;
@@ -76,6 +78,7 @@ public class EndDelimitedProtocol implements Protocol {
             messageBuffer.write(buf, start, length-start);
         }
 
+        @Override
         public byte[] getNext() {
             return messages.poll();
         }
@@ -83,6 +86,7 @@ public class EndDelimitedProtocol implements Protocol {
     
     private byte delimiter;
     
+    @Override
     public void init(ParameterInclude paramInclude) throws AxisFault {
         delimiter = (byte)ParamUtils.getRequiredParamInt(paramInclude, "delimiter");
     }
@@ -95,6 +99,7 @@ public class EndDelimitedProtocol implements Protocol {
         this.delimiter = delimiter;
     }
 
+    @Override
     public ProtocolDecoder createProtocolDecoder() {
         return new ProtocolDecoderImpl();
     }

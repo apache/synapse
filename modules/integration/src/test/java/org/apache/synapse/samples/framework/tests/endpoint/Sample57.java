@@ -41,6 +41,7 @@ public class Sample57 extends SynapseTestCase {
 
         }
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 result = client.sessionlessClient(addUrl, null, 500);
             }

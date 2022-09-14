@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.filters.SwitchMediator;
  */
 public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SwitchMediator)) {
@@ -76,6 +77,7 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
         return switchMed;
     }
 
+    @Override
     public String getMediatorClassName() {
         return SwitchMediator.class.getName();
     }

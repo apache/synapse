@@ -194,10 +194,12 @@ public abstract class BaseCipher implements EncryptionProvider, DecryptionProvid
         }
     }
 
+    @Override
     public byte[] encrypt(byte[] plainText) {
         return doCipherOperation(plainText);
     }
 
+    @Override
     public byte[] decrypt(byte[] cipherText) {
         return doCipherOperation(cipherText);
     }

@@ -49,6 +49,7 @@ public class VFSClient implements TestClient {
         return requestFile;
     }
 
+    @Override
     public ContentType getContentType(ClientOptions options, ContentType contentType) {
         return contentType;
     }

@@ -38,81 +38,97 @@ public abstract class AbstractSynapseObserver implements SynapseObserver {
         log = LogFactory.getLog(this.getClass()); 
     }
 
+    @Override
     public void sequenceAdded(Mediator sequence) {
         log.info("Sequence : " + ((SequenceMediator) sequence).getName() + " was added " +
                 "to the Synapse configuration successfully" );
     }
 
+    @Override
     public void sequenceRemoved(Mediator sequence) {
         log.info("Sequence : " + ((SequenceMediator) sequence).getName() + " was  removed " +
                 "from the Synapse configuration successfully");
     }
 
+    @Override
     public void sequenceTemplateAdded(Mediator template) {
         log.info("Template : " + ((TemplateMediator) template).getName() + " was added " +
                 "to the Synapse configuration successfully" );
     }
 
+    @Override
     public void sequenceTemplateRemoved(Mediator template) {
         log.info("Template : " + ((TemplateMediator) template).getName() + " was removed " +
                 "to the Synapse configuration successfully" );
     }
 
+    @Override
     public void entryAdded(Entry entry) {
         log.info("Local entry : " + entry.getKey() + " was added " +
                 "to the Synapse configuration successfully");
     }
 
+    @Override
     public void entryRemoved(Entry entry) {
         log.info("Local entry : " + entry.getKey() + " was removed " +
                 "from the Synapse configuration successfully");
     }
 
+    @Override
     public void endpointAdded(Endpoint endpoint) {
         log.info("Endpoint : " + endpoint.getName() + " was added " +
                 "to the Synapse configuration successfully");
     }
 
+    @Override
     public void endpointRemoved(Endpoint endpoint) {
         log.info("Endpoint : " + endpoint.getName() + " was removed " +
                 "from the Synapse configuration successfully");
     }
 
+    @Override
     public void proxyServiceAdded(ProxyService proxy) {
         log.info("Proxy service : " + proxy.getName() + " was added " +
                 "to the Synapse configuration successfully");
     }
 
+    @Override
     public void proxyServiceRemoved(ProxyService proxy) {
         log.info("Proxy service : " + proxy.getName() + " was removed " +
                 "from the Synapse configuration successfully");
     }
 
+    @Override
     public void startupAdded(Startup startup) {
         log.info("Startup : " + startup.getName() + " was added " +
                 "to the Synapse configuration successfully");
     }
 
+    @Override
     public void startupRemoved(Startup startup) {
         log.info("Startup : " + startup.getName() + " was removed " +
                 "from the Synapse configuration successfully");
     }
 
+    @Override
     public void eventSourceAdded(SynapseEventSource eventSource) {
         log.info("Event source : " + eventSource.getName() + " was added " +
                 "to the Synapse configuration successfully");
     }
 
+    @Override
     public void eventSourceRemoved(SynapseEventSource eventSource) {
         log.info("Event source : " + eventSource.getName() + " was removed " +
                 "from the Synapse configuration successfully");
     }
 
+    @Override
     public void priorityExecutorAdded(PriorityExecutor exec) {
         log.info("Priority executor : " + exec.getName() + " was added " +
                 "to the Synapse configuration successfully");
     }
 
+    @Override
     public void priorityExecutorRemoved(PriorityExecutor exec) {
         log.info("Priority executor : " + exec.getName() + " was removed " +
                 "from the Synapse configuration successfully");

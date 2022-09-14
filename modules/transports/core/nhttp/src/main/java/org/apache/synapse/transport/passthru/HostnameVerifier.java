@@ -64,6 +64,7 @@ import java.util.*;
 
 public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
 
+    @Override
     boolean verify(String host, SSLSession session);
 
     void check(String host, SSLSocket ssl) throws IOException;
@@ -108,12 +109,14 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
      */
     public final static HostnameVerifier DEFAULT =
         new AbstractVerifier() {
+            @Override
             public final void check(final String[] hosts, final String[] cns,
                 final String[] subjectAlts)
                 throws SSLException {
                 check(hosts, cns, subjectAlts, false, false);
             }
 
+            @Override
             public final String toString() {
                 return "DEFAULT";
             }
@@ -128,6 +131,7 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
      */
     public final static HostnameVerifier DEFAULT_AND_LOCALHOST =
         new AbstractVerifier() {
+            @Override
             public final void check(final String[] hosts, final String[] cns,
                 final String[] subjectAlts)
                 throws SSLException {
@@ -137,6 +141,7 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
                 check(hosts, cns, subjectAlts, false, false);
             }
 
+            @Override
             public final String toString() {
                 return "DEFAULT_AND_LOCALHOST";
             }
@@ -160,12 +165,14 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
      */
     public final static HostnameVerifier STRICT =
         new AbstractVerifier() {
+            @Override
             public final void check(final String[] host, final String[] cns,
                 final String[] subjectAlts)
                 throws SSLException {
                 check(host, cns, subjectAlts, false, true);
             }
 
+            @Override
             public final String toString() {
                 return "STRICT";
             }
@@ -179,12 +186,14 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
      */
     public final static HostnameVerifier STRICT_IE6 =
         new AbstractVerifier() {
+            @Override
             public final void check(final String[] host, final String[] cns,
                 final String[] subjectAlts)
                 throws SSLException {
                 check(host, cns, subjectAlts, true, true);
             }
 
+            @Override
             public final String toString() {
                 return "STRICT_IE6";
             }
@@ -196,11 +205,13 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
      */
     public final static HostnameVerifier ALLOW_ALL =
         new AbstractVerifier() {
+            @Override
             public final void check(final String[] host, final String[] cns,
                 final String[] subjectAlts) {
                 // Allow everything - so never blowup.
             }
 
+            @Override
             public final String toString() {
                 return "ALLOW_ALL";
             }
@@ -243,6 +254,7 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
          * @param session SSLSession with the remote server
          * @return true if the host matched the one in the certificate.
          */
+        @Override
         public boolean verify(String host, SSLSession session) {
             try {
                 Certificate[] certs = session.getPeerCertificates();
@@ -255,20 +267,24 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
             }
         }
 
+        @Override
         public void check(String host, SSLSocket ssl) throws IOException {
             check(new String[]{host}, ssl);
         }
 
+        @Override
         public void check(String host, X509Certificate cert)
             throws SSLException {
             check(new String[]{host}, cert);
         }
 
+        @Override
         public void check(String host, String[] cns, String[] subjectAlts)
             throws SSLException {
             check(new String[]{host}, cns, subjectAlts);
         }
 
+        @Override
         public void check(String host[], SSLSocket ssl)
             throws IOException {
             if (host == null) {
@@ -325,6 +341,7 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
             check(host, x509);
         }
 
+        @Override
         public void check(String[] host, X509Certificate cert)
             throws SSLException {
 

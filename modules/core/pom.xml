@@ -315,11 +315,9 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
         </dependency>
-	    <dependency>
-	        <!-- Required for validate mediator tests on JDK 5 -->
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-	        <scope>test</scope>
+        <dependency>
+            <groupId>jakarta.xml.soap</groupId>
+            <artifactId>jakarta.xml.soap-api</artifactId>
         </dependency>
 
     </dependencies>

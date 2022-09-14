@@ -47,6 +47,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "class");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ClassMediator classMediator = new ClassMediator();
@@ -108,6 +109,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
         return classMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return CLASS_Q;
     }

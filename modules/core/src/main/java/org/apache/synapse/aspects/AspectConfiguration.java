@@ -36,22 +36,26 @@ public class AspectConfiguration implements StatisticsConfigurable, Identifiable
         this.id = id;
     }
 
+    @Override
     public boolean isStatisticsEnable() {
         return statisticsEnable;
     }
 
+    @Override
     public void disableStatistics() {
         if (statisticsEnable) {
             this.statisticsEnable = false;
         }
     }
 
+    @Override
     public void enableStatistics() {
         if (!statisticsEnable) {
             statisticsEnable = true;
         }
     }
 
+    @Override
     public String getId() {
         return id;
     }

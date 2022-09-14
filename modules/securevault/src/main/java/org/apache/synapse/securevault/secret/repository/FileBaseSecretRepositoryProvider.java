@@ -34,6 +34,7 @@ public class FileBaseSecretRepositoryProvider implements SecretRepositoryProvide
      *
      * @see org.apache.synapse.securevault.secret.SecretRepositoryProvider
      */
+    @Override
     public SecretRepository getSecretRepository(IdentityKeyStoreWrapper identity,
                                                 TrustKeyStoreWrapper trust) {
         return new FileBaseSecretRepository(identity, trust);

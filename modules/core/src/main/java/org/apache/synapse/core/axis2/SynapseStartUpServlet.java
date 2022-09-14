@@ -44,6 +44,7 @@ public class SynapseStartUpServlet extends HttpServlet {
 
     public static final String SYNAPSE_SERVER_MANAGER = "synapse.server.manager";
 
+    @Override
     public void init() throws ServletException {
         ServletConfig servletConfig = getServletConfig();
         ServletContext servletContext = servletConfig.getServletContext();
@@ -62,14 +63,17 @@ public class SynapseStartUpServlet extends HttpServlet {
     }
 
 
+    @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
     }
 
+    @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
     }
 
+    @Override
     public void destroy() {
         try {
             Object o = getServletConfig().getServletContext().getAttribute(SYNAPSE_SERVER_MANAGER);

@@ -79,6 +79,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
      * @param m mediator to be serialized
      * @return the serialized Element
      */
+    @Override
     public final OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (m instanceof AnonymousListMediator) {

@@ -45,6 +45,7 @@ public class EnqueueMediator extends AbstractMediator {
 
     private String sequenceName = null;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog log = getLog(synCtx);
         if (log.isTraceOrDebugEnabled()) {

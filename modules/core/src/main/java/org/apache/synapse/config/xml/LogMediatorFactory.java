@@ -53,10 +53,12 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
     private static final QName ATT_SEPERATOR = new QName("separator");
     private static final QName ATT_CATEGORY = new QName("category");
 
+    @Override
     public QName getTagQName() {
         return LOG_Q;
     }
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         LogMediator logMediator = new LogMediator();

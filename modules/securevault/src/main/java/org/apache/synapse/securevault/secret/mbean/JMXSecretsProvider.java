@@ -34,6 +34,7 @@ public class JMXSecretsProvider implements JMXSecretsProviderMBean {
     /* Secrets map - id vs secret */
     private final Map<String, String> secrets = new HashMap<String, String>();
 
+    @Override
     public void addSecret(String id, String secret) {
         assertIdEmpty(id);
         assertSecretEmpty(secret);
@@ -45,11 +46,13 @@ public class JMXSecretsProvider implements JMXSecretsProviderMBean {
         return secrets.get(id);
     }
 
+    @Override
     public void removeSecret(String id) {
         assertIdEmpty(id);
         secrets.remove(id);
     }
 
+    @Override
     public void clear() {
         secrets.clear();
     }

@@ -106,6 +106,7 @@ public class ServerWorker implements Runnable {
                 request.getConnection());
     }
 
+    @Override
     public void run() {
         try {
             if (log.isDebugEnabled()) {
@@ -472,6 +473,7 @@ public class ServerWorker implements Runnable {
 
         // http transport header names are case insensitive
         Map<String, String> headers = new TreeMap<String, String>(new Comparator<String>() {
+            @Override
             public int compare(String o1, String o2) {
                 return o1.compareToIgnoreCase(o2);
             }

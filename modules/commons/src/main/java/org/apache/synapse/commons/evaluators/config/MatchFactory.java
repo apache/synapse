@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
  */
 public class MatchFactory extends TextProcessingEvaluatorFactory {
 
+    @Override
     public Evaluator create(OMElement e) throws EvaluatorException {
         MatchEvaluator equal = new MatchEvaluator();
         SourceTextRetriever textRetriever = getSourceTextRetriever(e);

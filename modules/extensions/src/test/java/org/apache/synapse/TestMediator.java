@@ -31,6 +31,7 @@ public class TestMediator extends AbstractMediator {
     public TestMediator() {
     }
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         if (handlerTest != null) {
             handlerTest.handle(synCtx);
@@ -38,6 +39,7 @@ public class TestMediator extends AbstractMediator {
         return true;
     }
 
+    @Override
     public String getType() {
         return null;
     }

@@ -28,16 +28,19 @@ import javax.net.ssl.X509TrustManager;
  * Trust manager accepting any certificate.
  */
 public class NoValidateCertTrustManager implements X509TrustManager {
+    @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
         // Do nothing: we accept any certificate
     }
 
+    @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
         // Do nothing: we accept any certificate
     }
 
+    @Override
     public X509Certificate[] getAcceptedIssuers() {
         return new X509Certificate[0];
     }

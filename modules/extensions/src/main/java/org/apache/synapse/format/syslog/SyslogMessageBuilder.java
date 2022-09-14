@@ -49,6 +49,7 @@ public class SyslogMessageBuilder implements Builder {
         "emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"
     };
     
+    @Override
     public OMElement processDocument(InputStream inputStream,
             String contentType, MessageContext messageContext) throws AxisFault {
         String facility = null;

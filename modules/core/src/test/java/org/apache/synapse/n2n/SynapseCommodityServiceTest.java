@@ -47,6 +47,7 @@ import java.io.*;
 
 public class SynapseCommodityServiceTest extends TestCase {
 
+    @Override
     protected void setUp() throws java.lang.Exception {
 
         ServerConfigurationInformation information = new ServerConfigurationInformation();
@@ -134,6 +135,7 @@ public class SynapseCommodityServiceTest extends TestCase {
         startServer(businessConfigCtx);
     }
 
+    @Override
     protected void tearDown() throws java.lang.Exception {
     }
 

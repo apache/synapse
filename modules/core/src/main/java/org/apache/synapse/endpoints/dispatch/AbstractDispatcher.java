@@ -41,6 +41,7 @@ public abstract class AbstractDispatcher implements Dispatcher {
         log = LogFactory.getLog(this.getClass());
     }
 
+    @Override
     public List<Endpoint> getEndpoints(SessionInformation sessionInformation) {
         return SALSessions.getInstance().getChildEndpoints(sessionInformation);
     }

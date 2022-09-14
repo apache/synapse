@@ -64,6 +64,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
      * @param synCtx the current message for mediation
      * @return true if the transformation is successful, false otherwise.
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SOAPBody soapBody = synCtx.getEnvelope().getBody();

@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
  */
 public class EqualFactory extends TextProcessingEvaluatorFactory {
 
+    @Override
     public Evaluator create(OMElement e) throws EvaluatorException {
         EqualEvaluator equal = new EqualEvaluator();
         SourceTextRetriever textRetriever = getSourceTextRetriever(e);

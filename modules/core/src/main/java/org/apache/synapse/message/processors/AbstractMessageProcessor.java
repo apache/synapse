@@ -68,11 +68,13 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
     private State state  = State.DESTROY;
 
 
+    @Override
     public void init(SynapseEnvironment se) {
         configuration = se.getSynapseConfiguration();
     }
 
 
+    @Override
     public void setMessageStoreName(String  messageStore) {
         if (messageStore != null) {
             this.messageStore = messageStore;
@@ -81,51 +83,63 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
         }
     }
 
+    @Override
     public String getMessageStoreName() {
         return messageStore;
     }
 
+    @Override
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 
+    @Override
     public Map<String, Object> getParameters() {
         return parameters;
     }
 
+    @Override
     public boolean isStarted() {
         return state == State.START;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
 
+    @Override
     public void setDescription(String description) {
         this.description=description;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setFileName(String filename) {
         this.fileName = filename;
     }
 
+    @Override
     public String getFileName() {
         return fileName;
     }
 
+    @Override
     public void setTargetEndpoint(String targetEndpoint) {
         this.targetEndpoint = targetEndpoint;
     }
 
+    @Override
     public String getTargetEndpoint() {
         return targetEndpoint;
     }

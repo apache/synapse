@@ -74,6 +74,7 @@ public class SynapseNHttpClientConnectionFactory implements NHttpConnectionFacto
         this.config = config;
     }
 
+    @Override
     public DefaultNHttpClientConnection createConnection(IOSession session) {
         if (targetSessionLog.isDebugEnabled() || targetWireLog.isDebugEnabled()) {
             session = new LoggingIOSession(targetSessionLog, targetWireLog,
@@ -111,12 +112,14 @@ public class SynapseNHttpClientConnectionFactory implements NHttpConnectionFacto
     }
 
     static class LoggingNHttpRequestWriterFactory implements NHttpMessageWriterFactory<HttpRequest> {
+        @Override
         public NHttpMessageWriter<HttpRequest> create(SessionOutputBuffer sessionBuffer) {
             return new LoggingNHttpRequestWriter(sessionBuffer);
         }
     }
 
     static class LoggingNHttpResponseParserFactory implements NHttpMessageParserFactory<HttpResponse> {
+        @Override
         public NHttpMessageParser<HttpResponse> create(SessionInputBuffer sessionBuffer,
                                                       MessageConstraints messageConstraints) {
             return new LoggingNHttpResponseParser(sessionBuffer, messageConstraints);
@@ -129,6 +132,7 @@ public class SynapseNHttpClientConnectionFactory implements NHttpConnectionFacto
             super(buffer);
         }
 
+        @Override
         public void write(final HttpRequest request) throws IOException, HttpException {
             if (request != null) {
                 if (targetHeaderLog.isDebugEnabled()) {
@@ -154,6 +158,7 @@ public class SynapseNHttpClientConnectionFactory implements NHttpConnectionFacto
             super(buffer, constraints);
         }
 
+        @Override
         public HttpResponse parse() throws IOException, HttpException {
             HttpResponse response = super.parse();
             if (response != null) {

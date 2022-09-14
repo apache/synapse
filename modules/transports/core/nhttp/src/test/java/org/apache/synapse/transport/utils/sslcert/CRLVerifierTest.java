@@ -21,7 +21,7 @@ package org.apache.synapse.transport.utils.sslcert;
 import junit.framework.TestCase;
 import org.apache.synapse.transport.utils.sslcert.crl.CRLCache;
 import org.apache.synapse.transport.utils.sslcert.crl.CRLVerifier;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.x509.X509V2CRLGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
@@ -147,7 +147,7 @@ public class CRLVerifierTest extends TestCase {
         Utils utils = new Utils();
         X509V3CertificateGenerator certGen = utils.getUsableCertificateGenerator(caCert,
                 entityKey, serialNumber);
-        certGen.copyAndAddExtension(new DERObjectIdentifier(X509Extensions.CRLDistributionPoints
+        certGen.copyAndAddExtension(new ASN1ObjectIdentifier(X509Extensions.CRLDistributionPoints
                 .getId()), false, firstCertificate);
 
         return certGen.generateX509Certificate(caKey, "BC");

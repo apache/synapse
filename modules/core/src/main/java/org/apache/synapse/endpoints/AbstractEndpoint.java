@@ -98,18 +98,22 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     //------------------------------- getters and setters ------------------------------------------
 
+    @Override
     public EndpointView getMetricsMBean() {
         return metricsMBean;
     }
 
+    @Override
     public EndpointContext getContext() {
         return context;
     }
 
+    @Override
     public String getName() {
         return endpointName;
     }
 
+    @Override
     public boolean isInitialized() {
         return initialized;
     }
@@ -127,10 +131,12 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         return parentEndpoint;
     }
 
+    @Override
     public void setParentEndpoint(Endpoint parentEndpoint) {
         this.parentEndpoint = parentEndpoint;
     }
 
+    @Override
     public List<Endpoint> getChildren() {
         return children;
     }
@@ -139,10 +145,12 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         this.children = children;
     }
 
+    @Override
     public String getFileName() {
         return fileName;
     }
 
+    @Override
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -155,14 +163,17 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         this.anonymous = anonymous;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getDescription() {
         return this.description;
     }
 
+    @Override
     public String toString() {
         if (endpointName != null) {
             return "Endpoint [" + endpointName + "]";
@@ -170,6 +181,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         return SynapseConstants.ANONYMOUS_ENDPOINT;
     }
 
+    @Override
     public void setName(String endpointName) {
         this.endpointName = endpointName;
         if (enableMBeanStats) {
@@ -194,6 +206,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
 
     //----------------------- default method implementations and common code -----------------------
 
+    @Override
     public void init(SynapseEnvironment synapseEnvironment) {
         ConfigurationContext cc =
                 ((Axis2SynapseEnvironment) synapseEnvironment).getAxis2ConfigurationContext();
@@ -222,6 +235,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
                 definition.isSecurityOn() || definition.isAddressingOn());
     }
 
+    @Override
     public boolean readyToSend() {
         if (!initialized) {
             //can't send to a non-initialized endpoint. This is a program fault
@@ -232,6 +246,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         return context != null && context.readyToSend();
     }
 
+    @Override
     public void send(MessageContext synCtx) {
 
         boolean traceOn = isTraceOn(synCtx);
@@ -322,6 +337,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         return children == null || children.size() == 0;
     }
 
+    @Override
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         // do nothing, the LB/FO endpoints will override this
     }
@@ -426,6 +442,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      *
      * @param synCtx the message at hand
      */
+    @Override
     public void onFault(MessageContext synCtx) {
         invokeNextFaultHandler(synCtx);
     }
@@ -434,6 +451,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * The SynapseCallback Receiver notifies an endpoint, if a message was successfully processed
      * to give it a chance to clear up or reset its state to active
      */
+    @Override
     public void onSuccess() {
         // do nothing
     }
@@ -584,6 +602,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
         }
     }
 
+    @Override
     public void destroy() {
         if (metricsMBean != null) {
             metricsMBean.destroy();
@@ -600,6 +619,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * Add a property to the endpoint.
       * @param property property to be added
      */
+    @Override
     public void addProperty(MediatorProperty property) {        
         properties.put(property.getName(), property);
     }
@@ -610,6 +630,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      *
      * @return a property with the given name
      */
+    @Override
     public MediatorProperty getProperty(String name) {
         MediatorProperty value = properties.get(name);
         if (value == null) {
@@ -625,6 +646,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * 
      * @return <code>Collection</code> of properties
      */
+    @Override
     public Collection<MediatorProperty> getProperties() {
         return properties.values();
     }
@@ -635,6 +657,7 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      *
      * @return the remove property or <code>null</code> if a property doesn't exists
      */
+    @Override
     public MediatorProperty removeProperty(String name) {
         return properties.remove(name);
     }
@@ -643,16 +666,19 @@ public abstract class AbstractEndpoint extends FaultHandler implements Endpoint,
      * Add all the properties to the endpoint
      * @param mediatorProperties <code>Collection</code> of properties to be added 
      */
+    @Override
     public void addProperties(Collection<MediatorProperty> mediatorProperties) {
         for (MediatorProperty property : mediatorProperties) {
             properties.put(property.getName(), property);
         }
     }
 
+    @Override
     public String getErrorHandler() {
         return errorHandler;
     }
 
+    @Override
     public void setErrorHandler(String errorHandler) {
         this.errorHandler = errorHandler;
     }

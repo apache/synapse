@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
  * the {@link OrFactory}. 
  */
 public class OrSerializer extends AbstractEvaluatorSerializer {
+    @Override
     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {
         if (!(evaluator instanceof OrEvaluator)) {
             throw new IllegalArgumentException("Evaluator should be an OrEvaluator");

@@ -108,6 +108,7 @@ public class ClientConnectionDebug extends AbstractConnectionDebug {
         return responseStartTime;
     }
 
+    @Override
     public String dump() {
         StringBuffer sb = new StringBuffer(25);
 

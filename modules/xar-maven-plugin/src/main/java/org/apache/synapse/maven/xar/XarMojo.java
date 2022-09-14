@@ -94,6 +94,7 @@ public class XarMojo extends AbstractXarMojo {
      *
      * @throws MojoExecutionException if an error occurred while building the XAR
      */
+    @Override
     public void execute() throws MojoExecutionException {
 
         File xarFile = new File(outputDirectory, xarName + ".xar");

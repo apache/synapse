@@ -51,6 +51,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
     private static final QName SEQUENCE_Q
         = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
 
+    @Override
     public QName getTagQName() {
         return SEQUENCE_Q;
     }
@@ -70,6 +71,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return seqMediator;
     }
     
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         SequenceMediator seqMediator = new SequenceMediator();

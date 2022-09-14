@@ -40,11 +40,13 @@ public class MessageStoreView implements MessageStoreViewMBean{
     }
 
 
+    @Override
     public void deleteAll() {
         messageStore.clear();
         log.info("All messages in Message Store" + messageStoreName + " were deleted");
     }
 
+    @Override
     public List<String> getMessageIds() {
 
         List<String> returnList = new ArrayList<String>();
@@ -56,6 +58,7 @@ public class MessageStoreView implements MessageStoreViewMBean{
         return returnList;
     }
 
+    @Override
     public void delete(String messageID) {
         if(messageID != null) {
             MessageContext m =messageStore.remove(messageID);
@@ -65,6 +68,7 @@ public class MessageStoreView implements MessageStoreViewMBean{
         }
     }
 
+    @Override
     public String getEnvelope(String messageID) {
         if (messageID != null) {
             MessageContext m = messageStore.get(messageID);
@@ -76,6 +80,7 @@ public class MessageStoreView implements MessageStoreViewMBean{
         return null;
     }
 
+    @Override
     public int getSize() {
         return messageStore.size();
     }

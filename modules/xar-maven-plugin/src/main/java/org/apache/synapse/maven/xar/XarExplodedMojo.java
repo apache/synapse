@@ -43,6 +43,7 @@ public class XarExplodedMojo extends AbstractXarMojo {
      */
     private File xarDirectory;
     
+    @Override
     public void execute() throws MojoExecutionException {
         Archiver archiver = new DirectoryArchiver();
         archiver.setDestFile(xarDirectory);

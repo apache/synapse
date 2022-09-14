@@ -29,12 +29,14 @@ import java.util.Map;
  */
 public class PerUserDomainViewStrategy extends PerUserViewStrategy {
 
+    @Override
     public Map<String, Map<String, InOutStatisticsView>> determineView(
             List<StatisticsRecord> statisticsRecords,
             ComponentType type) {
         return determineView(statisticsRecords, type, DOMAIN);
     }
 
+    @Override
     public Map<String, InOutStatisticsView> determineView(
             String id, List<StatisticsRecord> statisticsRecords,
             ComponentType type) {

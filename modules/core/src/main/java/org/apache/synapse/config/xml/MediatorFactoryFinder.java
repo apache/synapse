@@ -218,6 +218,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      * @param om node from which the object is expected
      * @return Object buit from the om node
      */
+    @Override
     public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             return getMediator((OMElement) om, properties);

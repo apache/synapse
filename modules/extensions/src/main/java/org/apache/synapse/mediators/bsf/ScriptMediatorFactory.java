@@ -62,6 +62,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
     private static final QName INCLUDE_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "include");
 
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
 
         ScriptMediator mediator;
@@ -132,6 +133,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
         return includeKeysMap;
     }
 
+    @Override
     public QName getTagQName() {
         return TAG_NAME;
     }

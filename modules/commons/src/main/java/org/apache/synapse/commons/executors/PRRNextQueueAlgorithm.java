@@ -49,6 +49,7 @@ public class PRRNextQueueAlgorithm<E> implements NextQueueAlgorithm<E> {
     /** Number of messages sent from the current queue */
     private int currentCount = 0;
 
+    @Override
     public InternalQueue<E> getNextQueue() {
         InternalQueue<E> internalQueue = queues.get(currentQueue);
 
@@ -83,6 +84,7 @@ public class PRRNextQueueAlgorithm<E> implements NextQueueAlgorithm<E> {
         return internalQueue;
     }
 
+    @Override
     public void init(List<InternalQueue<E>> queues) {
         this.queues = queues;
         size = queues.size();

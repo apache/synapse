@@ -37,6 +37,7 @@ public class DBPoolView implements DBPoolViewMBean {
         this.name = name;
     }
 
+    @Override
     public int getNumActive() {
         return numActive;
     }
@@ -45,6 +46,7 @@ public class DBPoolView implements DBPoolViewMBean {
         this.numActive = numActive;
     }
 
+    @Override
     public int getNumIdle() {
         return numIdle;
     }
@@ -53,6 +55,7 @@ public class DBPoolView implements DBPoolViewMBean {
         this.numIdle = numIdle;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -73,10 +76,12 @@ public class DBPoolView implements DBPoolViewMBean {
         }
     }
 
+    @Override
     public Map getConnectionUsage() {
         return connectionsUsage;
     }
 
+    @Override
     public void reset() {
         numActive = 0;
         numIdle = 0;

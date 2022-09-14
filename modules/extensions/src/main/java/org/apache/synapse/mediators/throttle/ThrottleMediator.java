@@ -78,6 +78,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         this.accessControler = new AccessRateController();
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (onAcceptMediator instanceof ManagedLifecycle) {
             ((ManagedLifecycle) onAcceptMediator).init(se);
@@ -87,6 +88,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         }
     }
 
+    @Override
     public void destroy() {
         if (onAcceptMediator instanceof ManagedLifecycle) {
             ((ManagedLifecycle) onAcceptMediator).destroy();
@@ -96,6 +98,7 @@ public class ThrottleMediator extends AbstractMediator implements ManagedLifecyc
         }
     }
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

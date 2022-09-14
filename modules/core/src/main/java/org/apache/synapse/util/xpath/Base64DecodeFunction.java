@@ -46,6 +46,7 @@ public class Base64DecodeFunction implements Function {
      * @return The string value of a property
      * @throws FunctionCallException
      */
+    @Override
     public Object call(Context context, List args) throws FunctionCallException {
         if (args == null || args.size() == 0) {
             if (log.isDebugEnabled()) {

@@ -50,6 +50,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
 
     private boolean initialized = false;
 
+    @Override
     public void init(Properties jndiEnv) {
 
         initialized = true;
@@ -71,6 +72,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
      *
      * @see DataSourceRepository#register(DataSourceInformation)
      */
+    @Override
     public void register(DataSourceInformation information) {
 
         validateInitialized();
@@ -236,6 +238,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         cachedNameList.add(dataSourceName);
     }
 
+    @Override
     public void unRegister(String name) {
 
         InitialContext context = getCachedInitialContext(name);
@@ -253,6 +256,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
      *
      * @see DataSourceRepository#lookUp(String)
      */
+    @Override
     public DataSource lookUp(String dsName) {
 
         validateInitialized();
@@ -272,6 +276,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         return DataSourceFinder.find(dsName, context);
     }
 
+    @Override
     public void clear() {
         initialized = false;
         initialContext = null;
@@ -500,6 +505,7 @@ public class JNDIBasedDataSourceRepository implements DataSourceRepository {
         return jndiEvn;
     }
 
+    @Override
     public boolean isInitialized() {
         return initialized;
     }

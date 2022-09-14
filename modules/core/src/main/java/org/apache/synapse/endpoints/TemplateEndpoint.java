@@ -143,6 +143,7 @@ public class TemplateEndpoint extends AbstractEndpoint {
         }
     }
 
+    @Override
     public boolean readyToSend() {
         if (realEndpoint != null && realEndpoint.readyToSend()) {
             if (log.isDebugEnabled()) {

@@ -30,6 +30,7 @@ public class SynapseSample_54_Integration extends AbstractAutomationTestCase {
 
     ListenerManager listenerManager = null;
 
+    @Override
     protected void setUp() throws Exception {
         System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_54.xml");
         System.setProperty("addurl", SYNAPSE_BASE_URL);

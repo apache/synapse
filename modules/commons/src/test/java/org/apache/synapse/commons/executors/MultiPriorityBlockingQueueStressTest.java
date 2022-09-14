@@ -168,6 +168,7 @@ public class MultiPriorityBlockingQueueStressTest extends MultiPriorityBlockingQ
 
             }
 
+            @Override
             public void run() {
                 for (int i = 0; i < max; i++) {
                     boolean offer = queue.offer(new DummyTask(priority));
@@ -193,6 +194,7 @@ public class MultiPriorityBlockingQueueStressTest extends MultiPriorityBlockingQ
             this.max = max;
         }
 
+        @Override
         public void run() {
             for (int i = 0; i < max; i++) {
                 try {

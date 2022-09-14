@@ -56,6 +56,7 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
     private static final QName CLASS_ATTR
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
 
+    @Override
     public Mediator createSpecificMediator(OMElement omElement, Properties properties) {
 
         SamplingThrottleMediator samplingThrottleMediator = new SamplingThrottleMediator();
@@ -122,6 +123,7 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
         return samplingThrottleMediator;
     }
 
+    @Override
     public QName getTagQName() {
         return SAMPLER_Q;
     }

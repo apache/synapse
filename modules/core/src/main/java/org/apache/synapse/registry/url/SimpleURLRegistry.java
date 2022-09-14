@@ -54,6 +54,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     private String root = "";
     private final OMFactory omFactory = OMAbstractFactory.getOMFactory();
 
+    @Override
     public OMNode lookup(String key) {
 
         if (log.isDebugEnabled()) {
@@ -140,6 +141,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         return result;
     }
 
+    @Override
     public RegistryEntry getRegistryEntry(String key) {
 
         if (log.isDebugEnabled()) {
@@ -175,6 +177,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         return wre;
     }
 
+    @Override
     public void init(Properties properties) {
         super.init(properties);
         String value = properties.getProperty("root");
@@ -197,18 +200,22 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
 
+    @Override
     public void delete(String path) {
         //TODO
     }
 
+    @Override
     public void newResource(String path, boolean isDirectory) {
         //TODO
     }
 
+    @Override
     public void updateResource(String path, Object value) {
         //TODO
     }
 
+    @Override
     public void updateRegistryEntry(RegistryEntry entry) {
         //TODO
     }
@@ -219,6 +226,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         return cachableDuration == null ? 1500 : Long.parseLong(cachableDuration);
     }
 
+    @Override
     public RegistryEntry[] getChildren(RegistryEntry entry) {
         URL url;
         if (entry == null) {
@@ -278,6 +286,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         }
     }
 
+    @Override
     public RegistryEntry[] getDescendants(RegistryEntry entry) {
 
         ArrayList<RegistryEntry> list = new ArrayList<RegistryEntry>();

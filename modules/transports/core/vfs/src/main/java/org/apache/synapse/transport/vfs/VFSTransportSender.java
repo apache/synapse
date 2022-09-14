@@ -73,6 +73,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
      * @param transportOut the transport-out description
      * @throws AxisFault on error
      */
+    @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut)
             throws AxisFault {
 
@@ -101,6 +102,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
      * @param msgCtx the axis2 message context
      * @throws AxisFault on error
      */
+    @Override
     public void sendMessage(MessageContext msgCtx, String targetAddress,
                             OutTransportInfo outTransportInfo) throws AxisFault {
 

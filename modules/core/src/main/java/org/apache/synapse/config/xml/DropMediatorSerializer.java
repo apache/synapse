@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.builtin.DropMediator;
  */
 public class DropMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DropMediator)) {
@@ -43,6 +44,7 @@ public class DropMediatorSerializer extends AbstractMediatorSerializer {
         return drop;
     }
 
+    @Override
     public String getMediatorClassName() {
         return DropMediator.class.getName();
     }

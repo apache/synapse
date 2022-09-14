@@ -49,6 +49,7 @@ public class TopicBasedEventFilter implements EventFilter<MessageContext> {
         this.resultValue = resultValue;
     }
 
+    @Override
     public String toString() {
         return resultValue;
     }
@@ -61,6 +62,7 @@ public class TopicBasedEventFilter implements EventFilter<MessageContext> {
         this.sourceXpath = sourceXpath;
     }
 
+    @Override
     public boolean match(Event<MessageContext> event) {
         MessageContext messageContext = event.getMessage();
         String evaluatedValue = null;

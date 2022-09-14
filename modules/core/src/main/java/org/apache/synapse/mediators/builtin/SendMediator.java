@@ -47,6 +47,7 @@ public class SendMediator extends AbstractMediator implements ManagedLifecycle {
      * @param synCtx the current message to be sent
      * @return false always as this is a leaf mediator
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
@@ -108,12 +109,14 @@ public class SendMediator extends AbstractMediator implements ManagedLifecycle {
         this.receivingSequence = receivingSequence;
     }
 
+    @Override
     public void init(SynapseEnvironment synapseEnvironment) {
         if (endpoint != null) {
             endpoint.init(synapseEnvironment);
         }
     }
 
+    @Override
     public void destroy() {
         if (endpoint != null) {
             endpoint.destroy();

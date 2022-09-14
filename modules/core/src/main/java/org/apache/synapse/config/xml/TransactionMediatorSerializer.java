@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.transaction.TransactionMediator;
  */
 public class TransactionMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof TransactionMediator)) {
@@ -45,6 +46,7 @@ public class TransactionMediatorSerializer extends AbstractMediatorSerializer {
         return transaction;
     }
 
+    @Override
     public String getMediatorClassName() {
         return TransactionMediator.class.getName();
     }

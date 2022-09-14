@@ -75,6 +75,7 @@ public class FileBaseSecretRepository implements SecretRepository {
      * @param properties Configuration properties
      * @param id         Identifier to identify properties related to the corresponding repository
      */
+    @Override
     public void init(Properties properties, String id) {
         StringBuffer sb = new StringBuffer();
         sb.append(id);
@@ -145,6 +146,7 @@ public class FileBaseSecretRepository implements SecretRepository {
      * @return Secret if there is any , otherwise ,alias itself
      * @see org.apache.synapse.securevault.secret.SecretRepository
      */
+    @Override
     public String getSecret(String alias) {
 
         if (alias == null || "".equals(alias)) {
@@ -173,10 +175,12 @@ public class FileBaseSecretRepository implements SecretRepository {
         return secret;
     }
 
+    @Override
     public void setParent(SecretRepository parent) {
         this.parentRepository = parent;
     }
 
+    @Override
     public SecretRepository getParent() {
         return this.parentRepository;
     }

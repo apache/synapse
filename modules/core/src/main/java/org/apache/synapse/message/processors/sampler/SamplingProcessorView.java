@@ -27,16 +27,19 @@ public class SamplingProcessorView implements SamplingProcessorViewMBean{
         this.processor = processor;
     }
 
+    @Override
     public void activate() {
         assert processor != null;
         processor.activate();
     }
 
+    @Override
     public void deactivate() {
         assert processor != null;
         processor.deactivate();
     }
 
+    @Override
     public boolean isActive() {
         assert processor != null;
         return processor.isActive();

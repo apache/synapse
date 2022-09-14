@@ -37,6 +37,7 @@ public abstract class AbstractSecretCallbackHandler implements SecretCallbackHan
         log = LogFactory.getLog(getClass());
     }
 
+    @Override
     public void handle(SecretCallback[] secretCallbacks) {
 
         if (secretCallbacks == null || secretCallbacks.length == 0) {

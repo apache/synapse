@@ -120,6 +120,7 @@ public class MultiPriorityBlockingQueueTest extends MultiPriorityBlockingQueueAb
         assertEquals(ITEMS * 2, fixedQueue.size());
 
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     fixedQueue.put(new DummyTask(10));
@@ -138,6 +139,7 @@ public class MultiPriorityBlockingQueueTest extends MultiPriorityBlockingQueueAb
         t.interrupt();
 
         t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     fixedQueue.put(new DummyTask(10));

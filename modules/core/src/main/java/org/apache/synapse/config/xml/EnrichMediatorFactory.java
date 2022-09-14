@@ -183,6 +183,7 @@ public class EnrichMediatorFactory extends AbstractMediatorFactory {
         return -1;
     }
 
+    @Override
     public QName getTagQName() {
         return XML_Q;
     }

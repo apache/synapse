@@ -70,17 +70,20 @@ public class XSLTMediator extends AbstractMediator {
             this.activity = activity;
         }
         
+        @Override
         public void warning(TransformerException e) throws TransformerException {
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebugWarn("Warning encountered during " + activity + " : " + e);
             }
         }
         
+        @Override
         public void error(TransformerException e) throws TransformerException {
             synLog.error("Error occurred in " + activity + " : " + e);
             throw e;
         }
         
+        @Override
         public void fatalError(TransformerException e) throws TransformerException {
             synLog.error("Fatal error occurred in " + activity + " : " + e);
             throw e;
@@ -178,6 +181,7 @@ public class XSLTMediator extends AbstractMediator {
      * @param synCtx the current message where the transformation will apply
      * @return true always
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

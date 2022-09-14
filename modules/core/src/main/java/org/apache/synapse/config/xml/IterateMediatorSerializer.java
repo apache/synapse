@@ -53,6 +53,7 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
      *
      * @return OMElement describing the serialized configuration of the IterateMediator
      */
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof IterateMediator)) {
@@ -100,6 +101,7 @@ public class IterateMediatorSerializer extends AbstractMediatorSerializer {
      *
      * @return String representing the full class name of the mediator
      */
+    @Override
     public String getMediatorClassName() {
         return IterateMediator.class.getName();
     }

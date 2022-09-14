@@ -257,6 +257,7 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
         return true;
     }
 
+    @Override
     void process(MessageContext synCtx) {
         if (log.isDebugEnabled()) {
             log.debug("Processing message with ID: " + synCtx.getMessageID() + " through the " +
@@ -393,6 +394,7 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
         return value.toString();
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (log.isDebugEnabled()) {
             log.debug("Initializing resource with ID: " + name);
@@ -409,6 +411,7 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
         }
     }
 
+    @Override
     public void destroy() {
         if (log.isDebugEnabled()) {
             log.debug("Destroying resource with ID: " + name);

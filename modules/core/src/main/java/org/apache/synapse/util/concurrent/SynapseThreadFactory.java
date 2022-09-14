@@ -58,6 +58,7 @@ public class SynapseThreadFactory implements ThreadFactory {
      * @param runnable - Runnable class to run by the created thread
      * @return a Thread executing the given runnable
      */
+    @Override
     public Thread newThread(final Runnable runnable) {
         StringBuffer buffer = new StringBuffer();
         buffer.append(this.namePrefix);

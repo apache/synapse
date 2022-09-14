@@ -30,6 +30,7 @@ public class URLMappingBasedDispatcher implements RESTDispatcher {
 
     private static final Log log = LogFactory.getLog(URLMappingBasedDispatcher.class);
 
+    @Override
     public Resource findResource(MessageContext synCtx, Collection<Resource> resources) {
         List<URLMappingHelper> mappings = new ArrayList<URLMappingHelper>();
         List<Resource> filteredResources = new ArrayList<Resource>();

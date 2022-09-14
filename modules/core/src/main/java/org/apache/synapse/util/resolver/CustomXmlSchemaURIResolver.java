@@ -55,6 +55,7 @@ public class CustomXmlSchemaURIResolver implements URIResolver {
      * returns null, it will resolve the location using
      * {@link SynapseConfigUtils#resolveRelativeURI(String, String)}.
      */
+    @Override
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
         InputSource result = null;
         if (resourceMap != null) {

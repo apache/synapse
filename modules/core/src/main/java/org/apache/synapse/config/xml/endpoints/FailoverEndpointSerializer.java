@@ -32,6 +32,7 @@ import org.apache.synapse.endpoints.FailoverEndpoint;
  */
 public class FailoverEndpointSerializer extends EndpointSerializer {
 
+    @Override
     protected OMElement serializeEndpoint(Endpoint endpoint) {
 
         if (!(endpoint instanceof FailoverEndpoint)) {

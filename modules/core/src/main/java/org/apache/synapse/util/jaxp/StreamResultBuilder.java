@@ -55,12 +55,14 @@ public class StreamResultBuilder implements ResultBuilder {
         this.expectedOutput = expectedOutput;
     }
 
+    @Override
     public Result getResult() {
         tmp = synEnv.createOverflowBlob();
         out = tmp.getOutputStream();
         return new StreamResult(out);
     }
 
+    @Override
     public OMElement getNode(Charset charset) {
         try {
             out.close();
@@ -88,6 +90,7 @@ public class StreamResultBuilder implements ResultBuilder {
         }
     }
 
+    @Override
     public void release() {
         if (tmp != null) {
             tmp.release();

@@ -71,6 +71,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      * @param properties
      * @return Mediator of the type CloneMediator built from the config element
      */
+    @Override
     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
     	
     	boolean asynchronousExe = true;
@@ -111,6 +112,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      *
      * @return QName of the clone element in xml configuration
      */
+    @Override
     public QName getTagQName() {
         return CLONE_Q;
     }

@@ -43,34 +43,42 @@ public class InMemoryRegistryEntry implements RegistryEntry {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    @Override
     public long getCachableDuration() {
         return cachableDuration;
     }
 
+    @Override
     public long getCreated() {
         return createdDate;
     }
 
+    @Override
     public String getDescription() {
         return "Resource at: " + key;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public long getLastModified() {
         return lastModifiedDate;
     }
 
+    @Override
     public String getName() {
         return key;
     }
 
+    @Override
     public String getType() {
         return "text/xml";
     }
 
+    @Override
     public long getVersion() {
         return lastModifiedDate;
     }

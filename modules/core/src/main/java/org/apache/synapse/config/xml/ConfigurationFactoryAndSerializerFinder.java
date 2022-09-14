@@ -243,6 +243,7 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
      * @param properties bag of properties to pass in any information to the factory
      * @return built object
      */
+    @Override
     public Object getObjectFromOMNode(OMNode om, Properties properties) {
         if (om instanceof OMElement) {
             return getConfiguration((OMElement) om, properties);

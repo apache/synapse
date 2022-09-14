@@ -38,6 +38,7 @@ public class DefaultConsumer implements SEDAQueueConsumer {
         this.mediator = mediator;
     }
 
+    @Override
     public void consume(MessageContext messageContext) {
         EXECUTOR.execute(new Worker(mediator, messageContext));
     }
@@ -55,6 +56,7 @@ public class DefaultConsumer implements SEDAQueueConsumer {
             this.messageContext = messageContext;
         }
 
+        @Override
         public void run() {
             try {
                 mediator.mediate(messageContext);

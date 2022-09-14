@@ -57,6 +57,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      * Returns the class name of the mediator
      * @return the class name of the mediator
      */
+    @Override
     public String getType() {
         String cls = getClass().getName();
         int p = cls.lastIndexOf(".");
@@ -70,6 +71,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      * Returns the tracing state
      * @return the tracing state for this mediator (see SynapseConstants)
      */
+    @Override
     public int getTraceState() {
         return traceState;
     }
@@ -78,6 +80,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      * Set the tracing state variable
      * @param traceState the new tracing state for this mediator (see SynapseConstants)
      */
+    @Override
     public void setTraceState(int traceState) {
         this.traceState = traceState;
     }
@@ -86,6 +89,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      * Set the description of the mediator
      * @param description tobe set to the mediator
      */
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -94,6 +98,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      * Gives the description of the mediator
      * @return description of the mediator
      */
+    @Override
     public String getDescription() {
         return this.description;
     }
@@ -315,6 +320,7 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      *
      * @param aspectConfiguration AspectConfiguration instance
      */
+    @Override
     public void configure(AspectConfiguration aspectConfiguration) {
        this.aspectConfiguration = aspectConfiguration;
     }
@@ -324,10 +330,12 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
      *
      * @return AspectConfiguration instance
      */
+    @Override
     public AspectConfiguration getAspectConfiguration() {
         return aspectConfiguration;
     }
 
+    @Override
     public boolean isContentAware() {
         return true;
     }

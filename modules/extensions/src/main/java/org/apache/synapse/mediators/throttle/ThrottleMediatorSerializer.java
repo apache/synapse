@@ -40,6 +40,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 
 public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
         if (!(m instanceof ThrottleMediator)) {
             handleException("Invalid Mediator has passed to serializer");
@@ -100,6 +101,7 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
 
     }
 
+    @Override
     public String getMediatorClassName() {
         return ThrottleMediator.class.getName();
     }

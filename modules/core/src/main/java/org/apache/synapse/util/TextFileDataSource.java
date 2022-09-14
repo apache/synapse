@@ -51,6 +51,7 @@ public class TextFileDataSource extends AbstractPullOMDataSource {
         return fac.createOMElement(txtFileDS, BaseConstants.DEFAULT_TEXT_WRAPPER);
     }
 
+    @Override
     public XMLStreamReader getReader() throws XMLStreamException {
         InputStream is;
         try {
@@ -63,14 +64,17 @@ public class TextFileDataSource extends AbstractPullOMDataSource {
                 BaseConstants.DEFAULT_TEXT_WRAPPER, new InputStreamReader(is, charset));
     }
 
+    @Override
     public Object getObject() {
         return overflowBlob;
     }
 
+    @Override
     public boolean isDestructiveRead() {
         return false;
     }
 
+    @Override
     public OMDataSourceExt copy() {
         return new TextFileDataSource(overflowBlob, charset);
     }

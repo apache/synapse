@@ -30,6 +30,7 @@ import org.apache.synapse.mediators.db.DBLookupMediator;
  */
 public class DBLookupMediatorSerializer extends AbstractDBMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof DBLookupMediator)) {
@@ -44,6 +45,7 @@ public class DBLookupMediatorSerializer extends AbstractDBMediatorSerializer {
         return dbLookup;
     }
 
+    @Override
     public String getMediatorClassName() {
         return DBLookupMediator.class.getName();
     }

@@ -68,6 +68,7 @@ public class IdentityKeyStoreWrapper extends KeyStoreWrapper {
      *
      * @return PrivateKey if there is a one , otherwise null
      */
+    @Override
     public PrivateKey getPrivateKey(String alias) {
         Key key = super.getPrivateKey(alias);
         if (key instanceof PrivateKey) {

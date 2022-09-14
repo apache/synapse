@@ -38,6 +38,7 @@ import org.apache.synapse.mediators.builtin.CacheMediator;
  */
 public class CacheMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof CacheMediator)) {
@@ -109,6 +110,7 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
         return cache;
     }
 
+    @Override
     public String getMediatorClassName() {
         return CacheMediator.class.getName();
     }

@@ -91,6 +91,7 @@ public class URLMappingHelper implements DispatcherHelper {
         return 0;
     }
 
+    @Override
     public String getString() {
         if (pathSegments != null) {
             StringBuilder str = new StringBuilder("");

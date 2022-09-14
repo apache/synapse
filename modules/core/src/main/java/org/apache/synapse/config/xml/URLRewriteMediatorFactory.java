@@ -82,6 +82,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
     public static final String FRAGMENT_REF = "ref";
     public static final String FRAGMENT_FULL_URI = "full";
 
+    @Override
     protected Mediator createSpecificMediator(OMElement element, Properties properties) {
         Iterator rules = element.getChildrenWithName(RULE_Q);
         String inputProperty = element.getAttributeValue(ATT_IN_PROPERTY);
@@ -200,6 +201,7 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
         return action;
     }
 
+    @Override
     public QName getTagQName() {
         return REWRITE_Q;
     }

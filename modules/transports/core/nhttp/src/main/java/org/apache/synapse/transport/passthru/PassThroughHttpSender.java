@@ -110,6 +110,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
     /** The list of known hosts to go via proxy */
     private List<String> knownProxyHosts = new ArrayList<String>();
 
+    @Override
     public void init(ConfigurationContext configurationContext,
                      TransportOutDescription transportOutDescription) throws AxisFault {
 
@@ -180,6 +181,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
 
+                @Override
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: " + namePrefix +
                             " ConnectingIOReactor encountered a checked exception : " +
@@ -187,6 +189,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
                     return true;
                 }
 
+                @Override
                 public boolean handle(RuntimeException runtimeException) {
                     log.warn("System may be unstable: " + namePrefix +
                             " ConnectingIOReactor encountered a runtime exception : "
@@ -216,6 +219,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
 
         // start the sender in a separate thread
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     ioReactor.execute(ioEventDispatch);
@@ -233,10 +237,12 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         log.info("Pass-through " + namePrefix + " sender started...");
     }
 
+    @Override
     public void cleanup(org.apache.axis2.context.MessageContext messageContext) throws AxisFault {
 
     }
 
+    @Override
     public void stop() {
         try {
             ioReactor.shutdown();
@@ -245,6 +251,7 @@ public class PassThroughHttpSender extends AbstractHandler implements TransportS
         }
     }
 
+    @Override
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         // remove unwanted HTTP headers (if any from the current message)
         PassThroughTransportUtils.removeUnwantedHeaders(msgContext, targetConfiguration);

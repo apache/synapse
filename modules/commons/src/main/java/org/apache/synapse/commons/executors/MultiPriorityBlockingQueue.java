@@ -85,6 +85,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
 
         Collections.sort(this.queues, new Comparator<InternalQueue<E>>() {
+            @Override
             public int compare(InternalQueue<E> o1, InternalQueue<E> o2) {
                 return o2.getPriority() - o1.getPriority();
             }
@@ -110,6 +111,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @param e object that implements the Importance interface
      * @throws InterruptedException
      */
+    @Override
     public void put(E e) throws InterruptedException {
         Importance i = (Importance) e;
         InternalQueue<E> internalQueue = getQueueForPriority(i.getPriority());
@@ -141,6 +143,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @param e element to be added
      * @return true if element is added
      */
+    @Override
     public boolean offer(E e) {
         Importance i = (Importance) e;
         InternalQueue<E> internalQueue = getQueueForPriority(i.getPriority());
@@ -171,6 +174,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @return true if the element is added
      * @throws InterruptedException if the thread is interrupted
      */
+    @Override
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
         Importance i = (Importance) e;
         InternalQueue<E> internalQueue = getQueueForPriority(i.getPriority());
@@ -205,6 +209,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @return an element
      * @throws InterruptedException if the thread is interrupted
      */
+    @Override
     public E take() throws InterruptedException {
         final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
@@ -237,6 +242,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @return an object
      * @throws InterruptedException
      */
+    @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
         final ReentrantLock lock = this.lock;
@@ -271,6 +277,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @param c collection to drain the items     
      * @return number of elements copied
      */
+    @Override
     public int drainTo(Collection<? super E> c) {
         int count = 0;
         final ReentrantLock lock = this.lock;
@@ -295,6 +302,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      * @param maxElements maximum elements to copy
      * @return number of elements copied
      */
+    @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
         int elementsCopied = 0;
         final ReentrantLock lock = this.lock;
@@ -317,6 +325,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
      *
      * @return an object
      */
+    @Override
     public E poll() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -335,10 +344,12 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
+    @Override
     public int remainingCapacity() {
         return capacity - count;
     }
 
+    @Override
     public E peek() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -354,18 +365,22 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
+    @Override
     public Iterator<E> iterator() {
         return new QueueIterator(toArray());
     }
 
+    @Override
     public int size() {
         return count;
     }
 
+    @Override
     public boolean isEmpty() {
         return count == 0;
     }
 
+    @Override
     public boolean remove(Object o) {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -382,6 +397,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
+    @Override
     public boolean contains(Object o) {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -395,6 +411,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
+    @Override
     public String toString() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -409,6 +426,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
+    @Override
     public void clear() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -422,6 +440,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }                
     }
 
+    @Override
     @SuppressWarnings({"SuspiciousToArrayCall"})
     public <T> T[] toArray(T[] a) {
         final ReentrantLock lock = this.lock;
@@ -437,6 +456,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
         }
     }
 
+    @Override
     public Object[] toArray() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -470,10 +490,12 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
             this.array = array;
         }
 
+        @Override
         public boolean hasNext() {
             return cursor < array.length;
         }
 
+        @Override
         public E next() {
             if (cursor >= array.length)
                 throw new NoSuchElementException();
@@ -481,6 +503,7 @@ public class MultiPriorityBlockingQueue<E> extends AbstractQueue<E>
             return (E) array[cursor++];
         }
 
+        @Override
         public void remove() {
             if (lastRet < 0)
                 throw new IllegalStateException();

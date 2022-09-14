@@ -36,6 +36,7 @@ public class JMXSecretCallbackHandler extends AbstractSecretCallbackHandler {
                 "SecretsProvider");
     }
 
+    @Override
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
         String id = singleSecretCallback.getId();
         if (id != null && !"".equals(id)) {

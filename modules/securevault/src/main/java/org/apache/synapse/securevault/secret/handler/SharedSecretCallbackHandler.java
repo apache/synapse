@@ -32,6 +32,7 @@ public class SharedSecretCallbackHandler extends AbstractSecretCallbackHandler {
     private SecretCallbackHandler secretCallbackHandler =
             SharedSecretCallbackHandlerCache.getInstance().getSecretCallbackHandler();
 
+    @Override
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
 
         if (secretCallbackHandler == null) {

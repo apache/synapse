@@ -100,12 +100,14 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
         }
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         if (onCompleteSequence != null) {
             onCompleteSequence.init(se);
         }
     }
 
+    @Override
     public void destroy() {
         if (onCompleteSequence != null) {
             onCompleteSequence.destroy();
@@ -119,6 +121,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
      * @param synCtx - MessageContext to be mediated and aggregated
      * @return boolean true if the complete condition for the particular aggregate is validated
      */
+    @Override
     public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);

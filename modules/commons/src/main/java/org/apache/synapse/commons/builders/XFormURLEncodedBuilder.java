@@ -48,6 +48,7 @@ public class XFormURLEncodedBuilder implements Builder {
 
     private static final QName XFORM_FIRST_ELEMENT = new QName("xformValues");
 
+    @Override
     public OMElement processDocument(InputStream inputStream, String s,
                                      MessageContext messageContext) throws AxisFault {
         // first process the input stream using the Axis2 builder

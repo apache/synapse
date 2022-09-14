@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.base.SynapseMediator;
  */
 public class SynapseMediatorSerializer extends AbstractListMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof SynapseMediator)) {
@@ -47,6 +48,7 @@ public class SynapseMediatorSerializer extends AbstractListMediatorSerializer {
         return rules;
     }
 
+    @Override
     public String getMediatorClassName() {
         return SynapseMediator.class.getName();
     }

@@ -47,6 +47,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
     /** The proxy service */
     private ProxyService proxy = null;
 
+    @Override
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         boolean traceOn = proxy.getTraceState() == SynapseConstants.TRACING_ON;

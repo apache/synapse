@@ -48,10 +48,12 @@ public class SwitchCase implements ManagedLifecycle {
      */
     private AnonymousListMediator caseMediator;
 
+    @Override
     public void init(SynapseEnvironment se) {
         caseMediator.init(se);
     }
 
+    @Override
     public void destroy() {
         caseMediator.destroy();
     }

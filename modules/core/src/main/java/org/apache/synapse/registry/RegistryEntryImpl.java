@@ -40,6 +40,7 @@ public class RegistryEntryImpl implements RegistryEntry {
     private long lastModified;
     private long cachableDuration;
 
+    @Override
     public String getKey() {
         return key;
     }
@@ -48,6 +49,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.key = key;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -56,6 +58,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.name = name;
     }
 
+    @Override
     public long getVersion() {
         return version;
     }
@@ -64,6 +67,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.version = version;
     }
 
+    @Override
     public String getType() {
         return type;
     }
@@ -81,6 +85,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         }
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
@@ -89,6 +94,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.description = description;
     }
 
+    @Override
     public long getCreated() {
         return created;
     }
@@ -97,6 +103,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.created = created;
     }
 
+    @Override
     public long getLastModified() {
         return lastModified;
     }
@@ -105,6 +112,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.lastModified = lastModified;
     }
 
+    @Override
     public long getCachableDuration() {
         return cachableDuration;
     }
@@ -113,6 +121,7 @@ public class RegistryEntryImpl implements RegistryEntry {
         this.cachableDuration = cachableDuration;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("RegistryEntry {")

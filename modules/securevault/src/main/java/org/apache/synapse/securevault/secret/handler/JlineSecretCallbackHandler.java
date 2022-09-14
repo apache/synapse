@@ -32,6 +32,7 @@ public class JlineSecretCallbackHandler extends AbstractSecretCallbackHandler {
 
     private final static String DEFAULT_PROMPT = "enter password> ";
 
+    @Override
     protected void handleSingleSecretCallback(SingleSecretCallback singleSecretCallback) {
         String prompt = singleSecretCallback.getPrompt();
         if (prompt == null || "".equals(prompt)) {

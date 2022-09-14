@@ -30,6 +30,7 @@ public class DetachMediator extends AbstractMediator {
     private final SourceXPathSupport source = new SourceXPathSupport();
     private String property;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         SynapseLog synLog = getLog(synCtx);
         OMNode node = source.selectOMNode(synCtx, synLog);

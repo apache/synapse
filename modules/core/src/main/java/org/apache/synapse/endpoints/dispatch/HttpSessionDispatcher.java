@@ -49,6 +49,7 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
      * @param synCtx MessageContext possibly containing a "Cookie" HTTP header.
      * @return Endpoint Server endpoint for the given HTTP session.
      */
+    @Override
     public SessionInformation getSession(MessageContext synCtx) {
         String hostName = extractHost(synCtx);
         if (log.isDebugEnabled()) {
@@ -105,6 +106,7 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
      *
      * @param synCtx MessageContext possibly containing the "Set-Cookie" HTTP header.
      */
+    @Override
     public void updateSession(MessageContext synCtx) {
 
         String sessionId = extractSessionID(synCtx, SET_COOKIE);
@@ -122,6 +124,7 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
 
     }
 
+    @Override
     public void unbind(MessageContext synCtx) {
         SALSessions.getInstance().removeSession(extractSessionID(synCtx, COOKIE));
     }
@@ -131,10 +134,12 @@ public class HttpSessionDispatcher extends AbstractDispatcher {
      *
      * @return true
      */
+    @Override
     public boolean isServerInitiatedSession() {
         return true;
     }
 
+    @Override
     public void removeSessionID(MessageContext syCtx) {
         removeSessionID(syCtx, COOKIE);
     }

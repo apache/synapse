@@ -40,6 +40,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
     private Lock lock = new ReentrantLock();
 
+    @Override
     public boolean offer(MessageContext messageContext) {
         lock.lock();
         try {
@@ -59,6 +60,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         return true;
     }
 
+    @Override
     public MessageContext poll() {
         lock.lock();
         try {
@@ -73,10 +75,12 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         }
     }
 
+    @Override
     public MessageContext peek() {
         return messageList.peek();        
     }
 
+    @Override
     public MessageContext remove() throws NoSuchElementException {
         lock.lock();
         try {
@@ -90,6 +94,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         }
     }
 
+    @Override
     public MessageContext get(int index) {
         lock.lock();
         try {
@@ -108,6 +113,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         }
     }
 
+    @Override
     public MessageContext remove(String messageID) {
         lock.lock();
         try {
@@ -130,6 +136,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         return null;
     }
 
+    @Override
     public void clear() {
         lock.lock();
         try {
@@ -143,6 +150,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         }
     }
 
+    @Override
     public List<MessageContext> getAll() {
         lock.lock();
         try {
@@ -154,6 +162,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         }
     }
 
+    @Override
     public MessageContext get(String messageId) {
         lock.lock();
         try {
@@ -170,6 +179,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
         return null;
     }
 
+    @Override
     public int size() {
         return messageList.size();
     }

@@ -41,6 +41,7 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
 
     private ServerManager serverManager;
 
+    @Override
     protected void setUp() throws java.lang.Exception {
         super.setUp();
         SampleAxis2Server.main(new String[]{"-repo", "modules/samples/target/test_repos/axis2Server/",
@@ -87,6 +88,7 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
         SampleAxis2ServerManager.getInstance().stop();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         serverManager.stop();
         super.tearDown();

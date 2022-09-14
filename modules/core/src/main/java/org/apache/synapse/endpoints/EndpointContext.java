@@ -510,6 +510,7 @@ public class EndpointContext {
         throw new SynapseException(msg);
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("[ Name : ").append(endpointName).

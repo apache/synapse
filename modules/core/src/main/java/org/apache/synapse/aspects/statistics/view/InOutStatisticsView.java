@@ -64,6 +64,7 @@ public class InOutStatisticsView {
         return componentType;
     }
 
+    @Override
     public String toString() {
 
         StringBuffer sb = new StringBuffer();

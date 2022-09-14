@@ -49,6 +49,7 @@ public class MediatorLog implements SynapseLog {
         this.synCtx = synCtx;
     }
 
+    @Override
     public boolean isTraceOrDebugEnabled() {
         return traceOn || defaultLog.isDebugEnabled();
     }
@@ -57,6 +58,7 @@ public class MediatorLog implements SynapseLog {
      * Log a message to the default log at level DEBUG and and to the trace log
      * at level INFO if trace is enabled for the mediator.
      */
+    @Override
     public void traceOrDebug(Object msg) {
         if (traceOn) {
             traceLog.info(msg);
@@ -68,6 +70,7 @@ public class MediatorLog implements SynapseLog {
      * Log a message at level WARN to the default log, if level DEBUG is enabled,
      * and to the trace log, if trace is enabled for the mediator.
      */
+    @Override
     public void traceOrDebugWarn(Object msg) {
         if (traceOn) {
             traceLog.warn(msg);
@@ -77,6 +80,7 @@ public class MediatorLog implements SynapseLog {
         }
     }
     
+    @Override
     public boolean isTraceTraceEnabled() {
         return traceOn && traceLog.isTraceEnabled();
     }
@@ -84,6 +88,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message to the trace log at level TRACE if trace is enabled for the mediator.
      */
+    @Override
     public void traceTrace(Object msg) {
         if (traceOn) {
             traceLog.trace(msg);
@@ -93,6 +98,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level INFO to all available/enabled logs.
      */
+    @Override
     public void auditLog(Object msg) {
         defaultLog.info(msg);
         if (synCtx.getServiceLog() != null) {
@@ -106,6 +112,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level DEBUG to all available/enabled logs.
      */
+    @Override
     public void auditDebug(Object msg) {
         defaultLog.debug(msg);
         if (synCtx.getServiceLog() != null) {
@@ -119,6 +126,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level TRACE to all available/enabled logs.
      */
+    @Override
     public void auditTrace(Object msg) {
         defaultLog.trace(msg);
         if (synCtx.getServiceLog() != null) {
@@ -132,6 +140,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level WARN to all available/enabled logs.
      */
+    @Override
     public void auditWarn(Object msg) {
         defaultLog.warn(msg);
         if (synCtx.getServiceLog() != null) {
@@ -145,6 +154,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level ERROR to all available/enabled logs.
      */
+    @Override
     public void auditError(Object msg) {
         defaultLog.error(msg);
         if (synCtx.getServiceLog() != null) {
@@ -158,6 +168,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level FATAL to all available/enabled logs.
      */
+    @Override
     public void auditFatal(Object msg) {
         defaultLog.fatal(msg);
         if (synCtx.getServiceLog() != null) {
@@ -171,6 +182,7 @@ public class MediatorLog implements SynapseLog {
     /**
      * Log a message at level ERROR to the default log and to the trace, if trace is enabled.
      */
+    @Override
     public void error(Object msg) {
         defaultLog.error(msg);
         if (traceOn) {
@@ -182,6 +194,7 @@ public class MediatorLog implements SynapseLog {
      * Log a message at level ERROR to the default log, the service log and the trace, if trace
      * is enabled.
      */
+    @Override
     public void logSynapseException(String msg, Throwable cause) {
         defaultLog.error(msg, cause);
         if (synCtx.getServiceLog() != null) {

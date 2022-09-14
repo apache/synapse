@@ -48,6 +48,7 @@ public class StreamSourceBuilder implements SourceBuilder {
         this.synEnv = synEnv;
     }
 
+    @Override
     public Source getSource(OMElement node) {
         tmp = synEnv.createOverflowBlob();
         OutputStream out = tmp.getOutputStream();
@@ -68,6 +69,7 @@ public class StreamSourceBuilder implements SourceBuilder {
         }
     }
 
+    @Override
     public void release() {
         if (in != null) {
             try {

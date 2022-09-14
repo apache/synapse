@@ -28,6 +28,7 @@ import samples.userguide.MTOMSwAClient;
  */
 public class SynapseSample_51_Integration extends AbstractAutomationTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_51.xml");
         super.setUp();

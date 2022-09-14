@@ -100,6 +100,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @param transportIn the description of the http/s transport from Axis2 configuration
      * @throws AxisFault on error
      */
+    @Override
     public void init(ConfigurationContext cfgCtx, TransportInDescription transportIn)
             throws AxisFault {
 
@@ -192,6 +193,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * accept connections.
      * @throws AxisFault
      */
+    @Override
     public void start() throws AxisFault {
         if (log.isDebugEnabled()) {
             log.debug("Starting Listener...");
@@ -205,12 +207,14 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
                 new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
 
             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                @Override
                 public boolean handle(IOException ioException) {
                     log.warn("System may be unstable: IOReactor encountered a checked exception : "
                             + ioException.getMessage(), ioException);
                     return true;
                 }
 
+                @Override
                 public boolean handle(RuntimeException runtimeException) {
                     log.warn("System may be unstable: IOReactor encountered a runtime exception : "
                             + runtimeException.getMessage(), runtimeException);
@@ -249,6 +253,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         
         // start the IO reactor in a new separate thread
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     ioReactor.execute(ioEventDispatch);
@@ -299,6 +304,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * Stop the listener
      * @throws AxisFault on error
      */
+    @Override
     public void stop() throws AxisFault {
         if (state == BaseConstants.STOPPED) return;
         try {
@@ -318,6 +324,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * connections until they complete. This helps bring an instance into a maintenance mode
      * @throws AxisFault
      */
+    @Override
     public void pause() throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         try {
@@ -334,6 +341,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * Resume the lister - Brings the lister into active mode back from a paused state
      * @throws AxisFault
      */
+    @Override
     public void resume() throws AxisFault {
         if (state != BaseConstants.PAUSED) return;
         try {
@@ -349,6 +357,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * Returns the number of active threads processing messages
      * @return number of active threads processing messages
      */
+    @Override
     public int getActiveThreadCount() {
         return handler.getActiveCount();
     }
@@ -357,6 +366,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * Returns the number of requests queued in the thread pool
      * @return queue size
      */
+    @Override
     public int getQueueSize() {
         return handler.getQueueSize();
     }
@@ -368,6 +378,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @param millis a number of milliseconds to wait until pending requests are allowed to complete
      * @throws AxisFault
      */
+    @Override
     public void maintenenceShutdown(long millis) throws AxisFault {
         if (state != BaseConstants.STARTED) return;
         try {
@@ -389,6 +400,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @return the EndpointReferences for this service over the transport
      * @throws AxisFault on error
      */
+    @Override
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
 
         String trailer = "";
@@ -422,10 +434,12 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
      * @param messageContext context to be used
      * @return always null
      */
+    @Override
     public SessionContext getSessionContext(MessageContext messageContext) {
         return null;
     }
 
+    @Override
     public void destroy() {
         ioReactor = null;
         listenerContext.getCfgCtx().getAxisConfiguration().getObserversList().remove(axisObserver);
@@ -440,9 +454,11 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     class GenericAxisObserver implements AxisObserver {
 
         // The initilization code will go here
+        @Override
         public void init(AxisConfiguration axisConfig) {
         }
 
+        @Override
         public void serviceUpdate(AxisEvent event, AxisService service) {
 
             if (!ignoreService(service)
@@ -464,13 +480,21 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
             }
         }
 
+        @Override
         public void moduleUpdate(AxisEvent event, AxisModule module) {}
+        @Override
         public void addParameter(Parameter param) throws AxisFault {}
+        @Override
         public void removeParameter(Parameter param) throws AxisFault {}
+        @Override
         public void deserializeParameters(OMElement parameterElement) throws AxisFault {}
+        @Override
         public Parameter getParameter(String name) { return null; }
+        @Override
         public ArrayList<Parameter> getParameters() { return null; }
+        @Override
         public boolean isParameterLocked(String parameterName) { return false; }
+        @Override
         public void serviceGroupUpdate(AxisEvent event, AxisServiceGroup serviceGroup) {}
     }
 
@@ -487,6 +511,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
     }
 
     // -- jmx/management methods--
+    @Override
     public long getMessagesReceived() {
         if (metrics != null) {
             return metrics.getMessagesReceived();
@@ -494,6 +519,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getFaultsReceiving() {
         if (metrics != null) {
             return metrics.getFaultsReceiving();
@@ -501,6 +527,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getBytesReceived() {
         if (metrics != null) {
             return metrics.getBytesReceived();
@@ -508,6 +535,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getMessagesSent() {
         if (metrics != null) {
             return metrics.getMessagesSent();
@@ -515,6 +543,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getFaultsSending() {
         if (metrics != null) {
             return metrics.getFaultsSending();
@@ -522,6 +551,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getBytesSent() {
         if (metrics != null) {
             return metrics.getBytesSent();
@@ -529,6 +559,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getTimeoutsReceiving() {
         if (metrics != null) {
             return metrics.getTimeoutsReceiving();
@@ -536,6 +567,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getTimeoutsSending() {
         if (metrics != null) {
             return metrics.getTimeoutsSending();
@@ -543,6 +575,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getMinSizeReceived() {
         if (metrics != null) {
             return metrics.getMinSizeReceived();
@@ -550,6 +583,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getMaxSizeReceived() {
         if (metrics != null) {
             return metrics.getMaxSizeReceived();
@@ -557,6 +591,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public double getAvgSizeReceived() {
         if (metrics != null) {
             return metrics.getAvgSizeReceived();
@@ -564,6 +599,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getMinSizeSent() {
         if (metrics != null) {
             return metrics.getMinSizeSent();
@@ -571,6 +607,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getMaxSizeSent() {
         if (metrics != null) {
             return metrics.getMaxSizeSent();
@@ -578,6 +615,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public double getAvgSizeSent() {
         if (metrics != null) {
             return metrics.getAvgSizeSent();
@@ -585,6 +623,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public Map getResponseCodeTable() {
         if (metrics != null) {
             return metrics.getResponseCodeTable();
@@ -592,12 +631,14 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return null;
     }
 
+    @Override
     public void resetStatistics() {
         if (metrics != null) {
             metrics.reset();
         }
     }
 
+    @Override
     public long getLastResetTime() {
         if (metrics != null) {
             return metrics.getLastResetTime();
@@ -605,6 +646,7 @@ public class HttpCoreNIOListener implements TransportListener, ManagementSupport
         return -1;
     }
 
+    @Override
     public long getMetricsWindow() {
         if (metrics != null) {
             return System.currentTimeMillis() - metrics.getLastResetTime();

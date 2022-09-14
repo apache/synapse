@@ -38,6 +38,7 @@ public class JmxSecretAuthenticator implements JMXAuthenticator {
         this.secretInformation = secretInformation;
     }
 
+    @Override
     public Subject authenticate(Object credentials) {
 
         if (credentials == null) {

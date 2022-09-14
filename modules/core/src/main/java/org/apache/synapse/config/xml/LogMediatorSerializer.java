@@ -32,6 +32,7 @@ import org.apache.synapse.mediators.builtin.LogMediator;
  */
 public class LogMediatorSerializer extends AbstractMediatorSerializer {
 
+    @Override
     public OMElement serializeSpecificMediator(Mediator m) {
 
         if (!(m instanceof LogMediator)) {
@@ -78,6 +79,7 @@ public class LogMediatorSerializer extends AbstractMediatorSerializer {
         return log;
     }
 
+    @Override
     public String getMediatorClassName() {
         return LogMediator.class.getName();
     }

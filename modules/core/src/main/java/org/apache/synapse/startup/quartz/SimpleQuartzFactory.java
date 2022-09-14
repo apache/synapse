@@ -48,6 +48,7 @@ public class SimpleQuartzFactory implements StartupFactory {
 
     private final static Log log = LogFactory.getLog(SimpleQuartzFactory.class);
 
+    @Override
     public Startup createStartup(OMElement el) {
         
         if (log.isDebugEnabled()) {
@@ -74,10 +75,12 @@ public class SimpleQuartzFactory implements StartupFactory {
         }
     }
 
+    @Override
     public Class<SimpleQuartzSerializer> getSerializerClass() {
         return SimpleQuartzSerializer.class;
     }
 
+    @Override
     public QName getTagQName() {
         return TASK;
     }  

@@ -46,6 +46,7 @@ public class JKSKeyStoreLoader extends AbstractKeyStoreLoader {
      *
      * @return KeyStore instance
      */
+    @Override
     public KeyStore getKeyStore() {
         return getKeyStore(keyStorePath, keyStorePassword, "JKS", null);
     }

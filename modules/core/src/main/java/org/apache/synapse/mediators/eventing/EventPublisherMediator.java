@@ -28,6 +28,7 @@ public class EventPublisherMediator extends AbstractMediator {
     private static final Log log = LogFactory.getLog(EventPublisherMediator.class);
     private String eventSourceName = null;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         if (log.isDebugEnabled()) {
             log.debug("Mediation for Event Publisher started");

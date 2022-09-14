@@ -128,6 +128,7 @@ public class ClientWorker implements Runnable {
 
                 Map<String, String> headerMap
                         = new TreeMap<String, String>(new Comparator<String>() {
+                    @Override
                     public int compare(String o1, String o2) {
                         return o1.compareToIgnoreCase(o2);
                     }
@@ -187,6 +188,7 @@ public class ClientWorker implements Runnable {
     /**
      * Process the received response through Axis2
      */
+    @Override
     public void run() {
         // to support Sandesha.. if there isn't a response message context, we cannot read any
         // response and populate it with the soap envelope

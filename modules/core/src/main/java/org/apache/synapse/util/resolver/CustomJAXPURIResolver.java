@@ -54,6 +54,7 @@ public class CustomJAXPURIResolver implements URIResolver {
      * returns null, it will resolve the location using
      * {@link SynapseConfigUtils#resolveRelativeURI(String, String)}.
      */
+    @Override
     public Source resolve(String href, String base) throws TransformerException {
         Source result = null;
         if (resourceMap != null) {

@@ -40,6 +40,7 @@ public class SplitTestHelperMediator extends AbstractMediator implements Managed
     int msgcount;
     String checkString;
 
+    @Override
     public boolean mediate(MessageContext synCtx) {
         synchronized(this) {
             if (msgcount == 0) {
@@ -77,10 +78,12 @@ public class SplitTestHelperMediator extends AbstractMediator implements Managed
         return checkString;
     }
 
+    @Override
     public void init(SynapseEnvironment se) {
         msgcount = 0;
     }
 
+    @Override
     public void destroy() {
         clearMediatedContexts();
         msgcount = 0;

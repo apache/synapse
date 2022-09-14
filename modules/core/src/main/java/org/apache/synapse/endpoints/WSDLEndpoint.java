@@ -40,6 +40,10 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private String serviceName;
     private String portName;
 
+    private String originalWsdlURI;
+    private String originalWsdlPort;
+    private String getOriginalWsdlServiceName;
+
     public void onFault(MessageContext synCtx) {
         
         // is this an actual leaf endpoint
@@ -75,10 +79,14 @@ public class WSDLEndpoint extends AbstractEndpoint {
         return wsdlURI;
     }
 
+    public String getOriginalWsdlURI() {
+        return this.originalWsdlURI;
+    }
+
     public void setWsdlURI(String wsdlURI) {
-        String injectedURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
-        log.debug("WSDL URI " + wsdlURI + " replaced with " + injectedURI);
-        this.wsdlURI = injectedURI;
+        this.originalWsdlURI = wsdlURI;
+        String fetchedURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
+        this.wsdlURI = fetchedURI;
     }
 
     public OMElement getWsdlDoc() {
@@ -93,19 +101,27 @@ public class WSDLEndpoint extends AbstractEndpoint {
         return serviceName;
     }
 
+    public String getGetOriginalWsdlServiceName() {
+        return this.getOriginalWsdlServiceName;
+    }
+
     public void setServiceName(String serviceName) {
-        String injectedServiceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
-        log.debug("WSDL service name " + serviceName + " replaced with " + injectedServiceName);
-        this.serviceName = injectedServiceName;
+        this.getOriginalWsdlServiceName = serviceName;
+        String fetchedServiceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
+        this.serviceName = fetchedServiceName;
     }
 
     public String getPortName() {
         return portName;
     }
 
+    public String getOriginalWsdlPort() {
+        return this.originalWsdlPort;
+    }
+
     public void setPortName(String portName) {
-        String injectedPortName = ConfigUtils.fetchEnvironmentVariables(portName);
-        log.debug("WSDL port name " + portName + " replaced with " + injectedPortName);
-        this.portName = injectedPortName;
+        this.originalWsdlPort = portName;
+        String fetchedPortName = ConfigUtils.fetchEnvironmentVariables(portName);
+        this.portName = fetchedPortName;
     }
 }

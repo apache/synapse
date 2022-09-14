@@ -47,17 +47,17 @@ public class WSDLEndpointSerializer extends EndpointSerializer {
         
 
         OMElement wsdlElement = fac.createOMElement("wsdl", SynapseConstants.SYNAPSE_OMNAMESPACE);
-        String serviceName = wsdlEndpoint.getServiceName();
+        String serviceName = wsdlEndpoint.getGetOriginalWsdlServiceName();
         if (serviceName != null) {
             wsdlElement.addAttribute("service", serviceName, null);
         }
 
-        String portName = wsdlEndpoint.getPortName();
+        String portName = wsdlEndpoint.getOriginalWsdlPort();
         if (portName != null) {
             wsdlElement.addAttribute("port", portName, null);
         }
 
-        String uri = wsdlEndpoint.getWsdlURI();
+        String uri = wsdlEndpoint.getOriginalWsdlURI();
         if (uri != null) {
             wsdlElement.addAttribute("uri", uri, null);
         }

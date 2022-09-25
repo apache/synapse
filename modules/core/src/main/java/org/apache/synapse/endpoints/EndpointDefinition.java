@@ -217,8 +217,7 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     public void setAddress(String address) {
         this.originalAddress = address;
-        String fetchedAddress = ConfigUtils.fetchEnvironmentVariables(address);
-        this.address = fetchedAddress;
+        this.address = ConfigUtils.fetchEnvironmentVariables(address);
     }
 
     /**

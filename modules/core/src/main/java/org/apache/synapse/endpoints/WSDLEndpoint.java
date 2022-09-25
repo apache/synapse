@@ -83,14 +83,18 @@ public class WSDLEndpoint extends AbstractEndpoint {
         return wsdlURI;
     }
 
+    /**
+     * Retrieve originally set WSDL URI before resolution
+     *
+     * @return original URI string value
+     */
     public String getOriginalWsdlURI() {
         return this.originalWsdlURI;
     }
 
     public void setWsdlURI(String wsdlURI) {
         this.originalWsdlURI = wsdlURI;
-        String fetchedURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
-        this.wsdlURI = fetchedURI;
+        this.wsdlURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
     }
 
     public OMElement getWsdlDoc() {
@@ -105,14 +109,18 @@ public class WSDLEndpoint extends AbstractEndpoint {
         return serviceName;
     }
 
+    /**
+     * Retrieve originally set service name before resolution
+     *
+     * @return original service name string value
+     */
     public String getGetOriginalWsdlServiceName() {
         return this.getOriginalWsdlServiceName;
     }
 
     public void setServiceName(String serviceName) {
         this.getOriginalWsdlServiceName = serviceName;
-        String fetchedServiceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
-        this.serviceName = fetchedServiceName;
+        this.serviceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
     }
 
     public String getPortName() {
@@ -125,7 +133,6 @@ public class WSDLEndpoint extends AbstractEndpoint {
 
     public void setPortName(String portName) {
         this.originalWsdlPort = portName;
-        String fetchedPortName = ConfigUtils.fetchEnvironmentVariables(portName);
-        this.portName = fetchedPortName;
+        this.portName = ConfigUtils.fetchEnvironmentVariables(portName);
     }
 }

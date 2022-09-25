@@ -62,7 +62,6 @@ import java.util.Properties;
  */
 public class AddressEndpointFactory extends DefaultEndpointFactory {
 
-    private static final String SYSTEM_VARIABLE_PREFIX = "$SYSTEM";
     private static final Log LOG = LogFactory.getLog(AddressEndpointFactory.class);
     private static AddressEndpointFactory instance = new AddressEndpointFactory();
 

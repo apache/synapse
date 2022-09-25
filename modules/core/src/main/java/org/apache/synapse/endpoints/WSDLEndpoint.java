@@ -22,6 +22,7 @@ package org.apache.synapse.endpoints;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ConfigUtils;
 
 /**
  * WSDLEndpoint represents the endpoints built using a WSDL document. It stores the details about
@@ -38,6 +39,11 @@ public class WSDLEndpoint extends AbstractEndpoint {
     private OMElement wsdlDoc;
     private String serviceName;
     private String portName;
+
+
+    private String originalWsdlURI;
+    private String originalWsdlPort;
+    private String getOriginalWsdlServiceName;
 
     @Override
     public void onFault(MessageContext synCtx) {
@@ -77,8 +83,18 @@ public class WSDLEndpoint extends AbstractEndpoint {
         return wsdlURI;
     }
 
+    /**
+     * Retrieve originally set WSDL URI before resolution
+     *
+     * @return original URI string value
+     */
+    public String getOriginalWsdlURI() {
+        return this.originalWsdlURI;
+    }
+
     public void setWsdlURI(String wsdlURI) {
-        this.wsdlURI = wsdlURI;
+        this.originalWsdlURI = wsdlURI;
+        this.wsdlURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
     }
 
     public OMElement getWsdlDoc() {
@@ -93,15 +109,30 @@ public class WSDLEndpoint extends AbstractEndpoint {
         return serviceName;
     }
 
+    /**
+     * Retrieve originally set service name before resolution
+     *
+     * @return original service name string value
+     */
+    public String getGetOriginalWsdlServiceName() {
+        return this.getOriginalWsdlServiceName;
+    }
+
     public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+        this.getOriginalWsdlServiceName = serviceName;
+        this.serviceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
     }
 
     public String getPortName() {
         return portName;
     }
 
+    public String getOriginalWsdlPort() {
+        return this.originalWsdlPort;
+    }
+
     public void setPortName(String portName) {
-        this.portName = portName;
+        this.originalWsdlPort = portName;
+        this.portName = ConfigUtils.fetchEnvironmentVariables(portName);
     }
 }

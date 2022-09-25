@@ -166,5 +166,5 @@ public class DefaultEndpointFactory extends EndpointFactory {
                 }
             }
         }
-    }   
+    }
 }

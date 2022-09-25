@@ -160,6 +160,10 @@
                             <value>org.apache.xerces.jaxp.validation.XMLSchemaFactory</value>
                         </property>
                     </systemProperties>
+                    <environmentVariables>
+                        <SOAP_SERVICE_TEST>http://localhost:9000/services/SimpleStockQuoteService</SOAP_SERVICE_TEST>
+                        <scope>test</scope>
+                    </environmentVariables>
                     <forkMode>pertest</forkMode>
                     <!--<redirectTestOutputToFile>true</redirectTestOutputToFile>-->
                     <!--<workingDirectory>../..</workingDirectory>-->
@@ -316,5 +320,6 @@
             <groupId>jakarta.xml.soap</groupId>
             <artifactId>jakarta.xml.soap-api</artifactId>
         </dependency>
+
     </dependencies>
 </project>

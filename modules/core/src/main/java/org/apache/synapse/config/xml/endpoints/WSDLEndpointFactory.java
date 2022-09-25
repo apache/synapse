@@ -130,7 +130,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                     String synapseHome = properties.get(SynapseConstants.SYNAPSE_HOME) != null ?
                             properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "";
                     try {
-                        OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlURI)
+                        OMNode wsdlOM = SynapseConfigUtils.getOMElementFromURL(new URL(wsdlEndpoint.getWsdlURI())
                                 .toString(), synapseHome);
                         if (wsdlOM != null && wsdlOM instanceof OMElement) {
                             OMElement omElement = (OMElement) wsdlOM;
@@ -139,10 +139,11 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                                 String nsUri = omElement.getNamespace().getNamespaceURI();
                                 if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(nsUri)) {
                                     URI baseURI = SynapseConfigUtils.resolveRelativeURI(
-                                            new URI(wsdlURI), synapseHome);
+                                            new URI(wsdlEndpoint.getWsdlURI()), synapseHome);
                                     new WSDL11EndpointBuilder().
                                             populateEndpointDefinitionFromWSDL(endpoint,
-                                                    baseURI.toString(), omElement, serviceName, portName);
+                                                baseURI.toString(), omElement, wsdlEndpoint.getServiceName(),
+                                                wsdlEndpoint.getPortName());
 
                                 } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
                                     //endpoint = new WSDL20EndpointBuilder().
@@ -175,7 +176,7 @@ public class WSDLEndpointFactory extends DefaultEndpointFactory {
                         baseUri = baseUri + File.separator;
                     }
                     new WSDL11EndpointBuilder().populateEndpointDefinitionFromWSDL(endpoint,
-                            baseUri, definitionElement, serviceName, portName);
+                            baseUri, definitionElement, wsdlEndpoint.getServiceName(), wsdlEndpoint.getPortName());
                 } else {
                     endpoint = new EndpointDefinition();
                 }

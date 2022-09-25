@@ -46,7 +46,6 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testAddressEndpointSerialization() {
-
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                      "<endpoint>" +
                           "<address uri='http://localhost:9000/services/MyService1'>" +
@@ -74,7 +73,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
         AddressEndpoint ep2 = (AddressEndpoint) send2.getEndpoint();
 
         assertEquals("Address URI is not serialized properly",
-                ep1.getDefinition().getAddress(), ep2.getDefinition().getAddress());
+                ep1.getDefinition().getOriginalAddress(), ep2.getDefinition().getOriginalAddress());
 
         assertEquals(
                 "Addressing information is not serialized properly",
@@ -82,8 +81,40 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 ep2.getDefinition().isAddressingOn());
     }
 
-    public void testWSDLEndpointSerialization() {
 
+    public void testAddressEndpointSerializationWithParameterInjection() {
+        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                                "<endpoint>" +
+                                    "<address uri=\"$SYSTEM:SOAP_SERVICE_TEST\">" +
+                                        "<enableAddressing/>" +
+                                        "<timeout>" +
+                                            "<duration>60</duration>" +
+                                            "<responseAction>discard</responseAction>" +
+                                        "</timeout>" +
+                                    "</address>" +
+                                "</endpoint>" +
+                            "</send>";
+
+        OMElement config1 = createOMElement(sendConfig);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
+
+        OMElement config2 = serializer.serializeMediator(null, send1);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
+
+        assertTrue("Top level endpoint should be a address endpoint.",
+                send1.getEndpoint() instanceof AddressEndpoint);
+        AddressEndpoint ep1 = (AddressEndpoint) send1.getEndpoint();
+
+        assertTrue("Top level endpoint should be a WSDL endpoint.",
+                send2.getEndpoint() instanceof AddressEndpoint);
+        AddressEndpoint ep2 = (AddressEndpoint) send2.getEndpoint();
+
+        assertEquals("Address URI is not serialized properly",
+                ep1.getDefinition().getAddress(), ep2.getDefinition().getAddress());
+    }
+
+
+    public void testWSDLEndpointSerialization() {
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                      "<endpoint>" +
                           "<wsdl uri='file:src/test/resources/esbservice.wsdl' service='esbservice' port='esbserviceSOAP11port_http'>" +
@@ -119,8 +150,40 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 ep2.getDefinition().isAddressingOn());
     }
 
-    public void testSimpleLoadbalanceSendSerialization() {
 
+
+    public void testWSDLEndpointSerializationWithParameterInjection() {
+        String inputXML = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                                "<endpoint>" +
+                                    "<wsdl uri=\"$SYSTEM:WSDL_SERVICE_TEST_URI\" service='esbservice' " +
+                                    "port=\"$SYSTEM:WSDL_SERVICE_TEST_PORT\">" +
+                                        "<enableAddressing/>" +
+                                    "</wsdl>" +
+                                "</endpoint>" +
+                            "</send>";
+        OMElement config1 = createOMElement(inputXML);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1, new Properties());
+
+        OMElement config2 = serializer.serializeMediator(null, send1);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2, new Properties());
+
+        assertTrue("Top level endpoint should be a WSDL endpoint.",
+                send1.getEndpoint() instanceof WSDLEndpoint);
+        WSDLEndpoint ep1 = (WSDLEndpoint) send1.getEndpoint();
+
+        assertTrue("Top level endpoint should be a WSDL endpoint.",
+                send2.getEndpoint() instanceof WSDLEndpoint);
+        WSDLEndpoint ep2 = (WSDLEndpoint) send2.getEndpoint();
+
+        assertEquals("Service name is not serialized properly.",
+                ep1.getServiceName(), ep2.getServiceName());
+
+        assertEquals("Port name is not serialized properly", ep1.getPortName(), ep2.getPortName());
+        assertEquals("WSDL URI is not serialized properly", ep1.getWsdlURI(), ep2.getWsdlURI());
+    }
+
+
+    public void testSimpleLoadbalanceSendSerialization() {
         String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<endpoint>" +
                     "<loadbalance>" +
@@ -165,7 +228,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/services/Service1".equals(addressEndpoint.getDefinition().getAddress()));
+                "http://localhost:9001/services/Service1".equals(addressEndpoint.getDefinition().getOriginalAddress()));
     }
 
     public void testSimpleFailoverSendSerialization() {
@@ -214,7 +277,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/services/Service1".equals(addressEndpoint.getDefinition().getAddress()));
+                "http://localhost:9001/services/Service1".equals(addressEndpoint.getDefinition().getOriginalAddress()));
     }
 
     public void testNestedLoadbalanceFailoverSendSerialization() {

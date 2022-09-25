@@ -63,9 +63,9 @@ public class AddressEndpointSerializer extends DefaultEndpointSerializer {
 
         OMElement element = fac.createOMElement("address", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
-        if (endpointDefinition.getAddress() != null) {
+        if (endpointDefinition.getOriginalAddress() != null) {
             element.addAttribute(
-                    fac.createOMAttribute("uri", null, endpointDefinition.getAddress()));
+                    fac.createOMAttribute("uri", null, endpointDefinition.getOriginalAddress()));
         } else {
             handleException("Invalid Endpoint. Address is required");
         }

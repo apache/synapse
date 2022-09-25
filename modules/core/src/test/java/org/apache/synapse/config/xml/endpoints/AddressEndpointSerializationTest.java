@@ -120,4 +120,5 @@ public class AddressEndpointSerializationTest extends AbstractTestCase {
         // the generated name should not show up in the serialization
         assertTrue(compare(serializedOut,inputElement));
     }
+
 }

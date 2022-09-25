@@ -25,7 +25,7 @@ public class ConfigUtils {
 
     public static String fetchEnvironmentVariables(String parameter) {
         String injectedValue = parameter;
-        if (parameter.contains(SynapseConstants.SYSTEM_VARIABLE_PREFIX)) {
+        if (parameter.startsWith(SynapseConstants.SYSTEM_VARIABLE_PREFIX)) {
             String extractedEnvVariableKey = parameter.substring(parameter.lastIndexOf(":") + 1);
             injectedValue = System.getenv(extractedEnvVariableKey);
         }

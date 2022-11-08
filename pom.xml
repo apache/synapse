@@ -1226,7 +1226,7 @@
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0</bsf.version>
         <groovy.version>1.1-rc-1</groovy.version>
-        <spring.version>1.2.8</spring.version>
+        <spring.version>5.2.3.RELEASE</spring.version>
         <rhino.version>1.7R5</rhino.version>
         <activation.version>1.1</activation.version>
 

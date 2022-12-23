@@ -51,7 +51,7 @@
 				</li>
                 <li>
                     A AMQP transport which support the AMQP protocol.
-                    <a class="externalLink" href="http://www.amqp.org/">AMQP</a>  is a messaging
+                    <a class="externalLink" href="https://www.amqp.org/">AMQP</a>  is a messaging
                     protocol.
                 </li>
 			</ul>
@@ -60,18 +60,18 @@
 			</p>
 			<p>
 				The Synapse distribution also comes bundled with the following transports from
-                the <a class="externalLink" href="http://axis.apache.org/axis2/java/transports/index.html">Axis2 Transport</a>
+                the <a class="externalLink" href="https://axis.apache.org/axis2/java/transports/index.html">Axis2 Transport</a>
 				project:
 			</p>
 			<ul>
 				<li>
 					A
-					<a class="externalLink" href="http://axis.apache.org/axis2/java/transports/jms.html">JMS transport</a>
+					<a class="externalLink" href="https://axis.apache.org/axis2/java/transports/jms.html">JMS transport</a>
 					supporting any JMS 1.0 or 1.1 provider.
 				</li>
 				<li>
 					A
-					<a class="externalLink" href="http://axis.apache.org/axis2/java/transports/mail.html">Mail transport</a>
+					<a class="externalLink" href="https://axis.apache.org/axis2/java/transports/mail.html">Mail transport</a>
 					able to send messages using SMTP and poll messages from a POP3 or IMAP account.
 					<p>
                         Apache Synapse is also compatible with the following transport implementations
@@ -79,10 +79,10 @@
 					</p>
 				</li>
 				<li>
-					<a class="externalLink" href="http://axis.apache.org/axis2/java/transports/tcp-transport.html">TCP transport</a>
+					<a class="externalLink" href="https://axis.apache.org/axis2/java/transports/tcp-transport.html">TCP transport</a>
 				</li>
 				<li>
-					<a class="externalLink" href="http://axis.apache.org/axis2/java/transports/sms.html">SMS transport</a>
+					<a class="externalLink" href="https://axis.apache.org/axis2/java/transports/sms.html">SMS transport</a>
 				</li>
 				<li>UDP transport</li>
 				<li>
@@ -90,7 +90,7 @@
 					<p>
 						These transports are not shipped with Apache Synapse by default and hence they
                         should be
-						<a class="externalLink" href="http://axis.apache.org/axis2/java/transports/download.cgi">downloaded separately</a>
+						<a class="externalLink" href="https://axis.apache.org/axis2/java/transports/download.cgi">downloaded separately</a>
 						from the Axis2 transport website and installed in the Synapse runtime.
 					</p>
 				</li>
@@ -291,7 +291,7 @@
 					</dt>
 					<dd>
 						This parameter has the same meaning as the corresponding
-						<a class="externalLink" href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">mod_ssl directive</a>
+						<a class="externalLink" href="https://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">mod_ssl directive</a>
 						and sets the desired certificate verification level for client authentication:
 						<ul>
 							<li>
@@ -407,8 +407,8 @@
 					</dt>
 					<dd>
 						This is an optional parameter to validate the revocation status of the host
-						certificates using <a href="http://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
-						<a href="http://www.ietf.org/rfc/rfc5280.txt">CRL</a> when making HTTPS connections.
+						certificates using <a href="https://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
+						<a href="https://www.ietf.org/rfc/rfc5280.txt">CRL</a> when making HTTPS connections.
 						Simply uncomment this parameter in the axis2.xml file to enable the feature.
 						Two LRU caches are used to cache CRLs and OCSP responses until they are expired. "CacheSize"
 						property defines the maximum size of a cache. When this limit is reached, the
@@ -542,7 +542,7 @@
 					</dt>
 					<dd>
 						This parameter has the same meaning as the corresponding
-						<a class="externalLink" href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">mod_ssl directive</a>
+						<a class="externalLink" href="https://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">mod_ssl directive</a>
 						and sets the desired certificate verification level for client authentication:
 						<ul>
 							<li>
@@ -658,8 +658,8 @@
                     </dt>
                     <dd>
                         This is an optional parameter to validate the revocation status of the host
-                        certificates using <a href="http://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
-                        <a href="http://www.ietf.org/rfc/rfc5280.txt">CRL</a> when making HTTPS connections.
+                        certificates using <a href="https://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
+                        <a href="https://www.ietf.org/rfc/rfc5280.txt">CRL</a> when making HTTPS connections.
                         Simply uncomment this parameter in the axis2.xml file to enable the feature.
                         Two LRU caches are used to cache CRLs and OCSP responses until they are expired. "CacheSize"
                         property defines the maximum size of a cache. When this limit is reached, the
@@ -689,7 +689,7 @@
 				</p>
 				<p>
 					The transport is based on
-					<a class="externalLink" href="http://commons.apache.org/vfs/">Apache Commons VFS</a>
+					<a class="externalLink" href="https://commons.apache.org/vfs/">Apache Commons VFS</a>
 					and supports any protocol for which a VFS provider is available. The transport is
                     pre-configured with providers for local files (
 					<tt>file:</tt>
@@ -884,7 +884,7 @@
 &lt;/endpoint&gt;</div>
 				<p>
 					Other examples of valid VFS URLs are (see
-					<a class="externalLink" href="http://commons.apache.org/vfs/filesystems.html">http://commons.apache.org/vfs/filesystems.html</a>
+					<a class="externalLink" href="https://commons.apache.org/vfs/filesystems.html">https://commons.apache.org/vfs/filesystems.html</a>
 					for more samples):
 				</p>
 				<ul>
@@ -936,7 +936,7 @@
 					Jsch loads the list of known hosts from a file called <tt>known_hosts</tt> in
                     the <tt>.ssh</tt> sub-directory of the user's home directory, i.e. <tt>$HOME/.ssh</tt>
 					in Unix and <tt>%HOMEPATH%\.ssh</tt> in Windows. The location and format of this
-                    file are compatible with the <a class="externalLink" href="http://www.openssh.com/">OpenSSH</a>
+                    file are compatible with the <a class="externalLink" href="https://www.openssh.com/">OpenSSH</a>
 					client.
 				</p>
 				<p>
@@ -968,19 +968,19 @@
 			<p>A general overview about the FIX transport can be found in the following articles:</p>
 			<ul>
 				<li>
-					<a class="externalLink" href="http://wso2.org/library/3449">Apache Synapse FIX'ed</a>
+					<a class="externalLink" href="https://wso2.org/library/3449">Apache Synapse FIX'ed</a>
 				</li>
 				<li>
-					<a class="externalLink" href="http://wso2.org/library/3837">Using the WSO2 ESB and FIX</a>
+					<a class="externalLink" href="https://wso2.org/library/3837">Using the WSO2 ESB and FIX</a>
 					(also applies to Synapse)
 				</li>
 			</ul>
 			<subsection name="Setting up the FIX Transport" id="Setting_up_the_FIX_Transport">
 				<p>
 					To use the FIX transport, you need a local
-					<a class="externalLink" href="http://www.quickfixj.org">Quickfix/J</a>
+					<a class="externalLink" href="https://www.quickfixj.org">Quickfix/J</a>
 					installation. Download Quickfix/J from
-					<a class="externalLink" href="http://www.quickfixj.org/downloads">http://www.quickfixj.org/downloads</a>
+					<a class="externalLink" href="https://www.quickfixj.org/downloads">https://www.quickfixj.org/downloads</a>
 					.
 				</p>
 				<p>
@@ -1121,8 +1121,8 @@
             <subsection name="Setting Up the Transport" id="setting_up_the_amqp_transport">
                 <p>
                     AMQP transport is based on the widely used
-                    <a href="http://www.rabbitmq.com/java-client.html">Java AMQP client</a> library from
-                    <a class="externalLink" href="http://www.rabbitmq.com/">RabbitMQ</a>.
+                    <a href="https://www.rabbitmq.com/java-client.html">Java AMQP client</a> library from
+                    <a class="externalLink" href="https://www.rabbitmq.com/">RabbitMQ</a>.
                     The client library is not distributed with Apache Synapse, and hence in order to use
                     the AMQP transport, download the RabbitMQ Java client and copy the client library
                     (rabbitmq-client.jar) into Synapse classpath (SYNAPSE_HOME/lib directory).

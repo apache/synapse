@@ -29,10 +29,10 @@
             <item name="Home" href="index.html"/>
             <item name="Download" href="download.html"/>
             <item name="History" href="history.html"/>
-            <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
-            <item name="Thanks" href="http://www.apache.org/foundation/thanks.html"/>
-            <item name="Sponsorship" href="http://www.apache.org/foundation/sponsorship.html"/>
-            <item name="Security" href="http://www.apache.org/security/"/>
+            <item name="License" href="https://www.apache.org/licenses/LICENSE-2.0"/>
+            <item name="Thanks" href="https://www.apache.org/foundation/thanks.html"/>
+            <item name="Sponsorship" href="https://www.apache.org/foundation/sponsorship.html"/>
+            <item name="Security" href="https://www.apache.org/security/"/>
         </menu>
         <menu name="Documentation">
             <item name="Installation Guide" href="userguide/installation.html"/>

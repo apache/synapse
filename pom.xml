@@ -283,8 +283,13 @@
                         <argLine>-Xms128m -Xmx256m</argLine>
                         <environmentVariables>
                             <SOAP_SERVICE_TEST>http://localhost:9000/services/MyService1</SOAP_SERVICE_TEST>
+
                             <WSDL_SERVICE_TEST_URI>file:src/test/resources/esbservice.wsdl</WSDL_SERVICE_TEST_URI>
                             <WSDL_SERVICE_TEST_PORT>esbserviceSOAP11port_http</WSDL_SERVICE_TEST_PORT>
+
+                            <LOAD_BALANCE_TEST_MEMBER1>http://localhost:9001/soap/LBService1</LOAD_BALANCE_TEST_MEMBER1>
+                            <LOAD_BALANCE_TEST_MEMBER2>http://localhost:9002/soap/LBService1</LOAD_BALANCE_TEST_MEMBER2>
+                            <LOAD_BALANCE_TEST_MEMBER3>http://localhost:9003/soap/LBService1</LOAD_BALANCE_TEST_MEMBER3>
                             <scope>test</scope>
                         </environmentVariables>
                     </configuration>

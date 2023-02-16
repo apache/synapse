@@ -54,4 +54,36 @@ public class LoadBalanceEndpointSerializationTest extends AbstractTestCase {
 
         assertTrue(compare(serializedOut,inputElement));
     }
+
+    public void testLoadBalanceEndpointScenarioOneWithParameterInjection() throws Exception {
+        String inputXml = "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                "<session type=\"simpleClientSession\"/>" +
+                "<loadbalance algorithm=\"org.apache.synapse.endpoints.algorithms.RoundRobin\">" +
+                "<endpoint>" +
+                "<address uri=\"$SYSTEM:LOAD_BALANCE_TEST_MEMBER1\">" +
+                "<enableAddressing/>" +
+                "</address>" +
+                "</endpoint>" +
+                "<endpoint>" +
+                "<address uri=\"$SYSTEM:LOAD_BALANCE_TEST_MEMBER2\">" +
+                "<enableAddressing/>" +
+                "</address>" +
+                "</endpoint>" +
+                "<endpoint>" +
+                "<address uri=\"$SYSTEM:LOAD_BALANCE_TEST_MEMBER3\">" +
+                "<enableAddressing/>" +
+                "</address>" +
+                "</endpoint>" +
+                "</loadbalance>" +
+                "</endpoint>";
+
+
+        OMElement inputElement = createOMElement(inputXml);
+        Endpoint endpoint = LoadbalanceEndpointFactory.getEndpointFromElement(
+                inputElement,true,null);
+        OMElement serializedOut = LoadbalanceEndpointSerializer.getElementFromEndpoint(endpoint);
+
+        assertTrue(compare(serializedOut,inputElement));
+
+    }
 }

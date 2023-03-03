@@ -23,7 +23,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.AspectConfiguration;
-import org.apache.synapse.config.xml.endpoints.utils.ConfigUtils;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.commons.logging.Log;
 
 import java.util.ArrayList;
@@ -217,7 +217,7 @@ public class EndpointDefinition implements AspectConfigurable {
      */
     public void setAddress(String address) {
         this.originalAddress = address;
-        this.address = ConfigUtils.fetchEnvironmentVariables(address);
+        this.address = SynapseConfigUtils.fetchEnvironmentVariables(address);
     }
 
     /**

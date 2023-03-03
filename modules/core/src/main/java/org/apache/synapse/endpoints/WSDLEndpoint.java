@@ -22,7 +22,7 @@ package org.apache.synapse.endpoints;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.config.xml.endpoints.utils.ConfigUtils;
+import org.apache.synapse.config.SynapseConfigUtils;
 
 /**
  * WSDLEndpoint represents the endpoints built using a WSDL document. It stores the details about
@@ -94,7 +94,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
 
     public void setWsdlURI(String wsdlURI) {
         this.originalWsdlURI = wsdlURI;
-        this.wsdlURI = ConfigUtils.fetchEnvironmentVariables(wsdlURI);
+        this.wsdlURI = SynapseConfigUtils.fetchEnvironmentVariables(wsdlURI);
     }
 
     public OMElement getWsdlDoc() {
@@ -120,7 +120,7 @@ public class WSDLEndpoint extends AbstractEndpoint {
 
     public void setServiceName(String serviceName) {
         this.getOriginalWsdlServiceName = serviceName;
-        this.serviceName = ConfigUtils.fetchEnvironmentVariables(serviceName);
+        this.serviceName = SynapseConfigUtils.fetchEnvironmentVariables(serviceName);
     }
 
     public String getPortName() {
@@ -133,6 +133,6 @@ public class WSDLEndpoint extends AbstractEndpoint {
 
     public void setPortName(String portName) {
         this.originalWsdlPort = portName;
-        this.portName = ConfigUtils.fetchEnvironmentVariables(portName);
+        this.portName = SynapseConfigUtils.fetchEnvironmentVariables(portName);
     }
 }

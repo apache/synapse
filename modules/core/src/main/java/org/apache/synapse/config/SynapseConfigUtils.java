@@ -898,5 +898,20 @@ public class SynapseConfigUtils {
         }
         return false;
     }
+
+    /**
+     * Retrieve injected environment variables when detecting parameters with "$" prefix
+     *
+     * @param parameter parameter to be populated with retrieved environment variable
+     * @return string value in environment variables
+     */
+    public static String fetchEnvironmentVariables(String parameter) {
+        String injectedValue = parameter;
+        if (parameter.startsWith(SynapseConstants.SYSTEM_VARIABLE_PREFIX)) {
+            String extractedEnvVariableKey = parameter.substring(parameter.lastIndexOf(":") + 1);
+            injectedValue = System.getenv(extractedEnvVariableKey);
+        }
+        return injectedValue;
+    }
 }
 

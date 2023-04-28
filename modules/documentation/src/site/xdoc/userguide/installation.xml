@@ -64,7 +64,7 @@
                             </a>
                         </td>
                         <td>
-                            1.6.0_23 or higher (For instructions on setting up the JDK on different
+                            1.8.0_141 or higher (For instructions on setting up the JDK on different
                             operating systems, visit<a
                                 href="http://www.oracle.com/technetwork/java/index.html">
                             Java homepage.
@@ -225,9 +225,12 @@
                     the source
                     distribution, which is available as a zip archive. All the necessary
                     build scripts are included with this distribution.
+                    Alternatively Synapse can be cloned from the Github <a href="https://github.com/apache/synapse">
+                    repository</a>.
                 </li>
                 <li>
-                    Extract the source archive to a directory of your choice.
+                    Extract the source archive to a directory of your choice. If cloned from Github repository,
+                    change directories into downloaded project root.
                 </li>
                 <li>
                     Run <strong>mvn clean install</strong> command inside that directory to build

@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -37,7 +37,8 @@
         <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</developerConnection>
         <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/distribution</url>
-    </scm>
+      <tag>Apache-Synapse-3.0.2</tag>
+  </scm>
 
     <dependencies>
         <dependency>

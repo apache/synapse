@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.2-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -41,8 +41,7 @@
         <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</developerConnection>
         <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/migrator</url>
-      <tag>Apache-Synapse-3.0.2</tag>
-  </scm>
+    </scm>
 
     <build>
         <plugins>

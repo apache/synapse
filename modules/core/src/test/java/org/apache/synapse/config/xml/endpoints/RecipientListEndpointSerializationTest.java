@@ -54,6 +54,35 @@ public class RecipientListEndpointSerializationTest extends AbstractTestCase {
         assertTrue(compare(serializedOut, inputElement));
     }
 
+    public void testRecipientListEndpointScenarioOneWithParameterInjection() throws Exception {
+        String inputXml = "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                "<recipientlist>" +
+                "<endpoint>" +
+                "<address uri=\"$SYSTEM:SOAP_TEST_ENDPOINT1\">" +
+                "<enableAddressing/>" +
+                "</address>" +
+                "</endpoint>" +
+                "<endpoint>" +
+                "<address uri=\"$SYSTEM:SOAP_TEST_ENDPOINT2\">" +
+                "<enableAddressing/>" +
+                "</address>" +
+                "</endpoint>" +
+                "<endpoint>" +
+                "<address uri=\"$SYSTEM:SOAP_TEST_ENDPOINT3\">" +
+                "<enableAddressing/>" +
+                "</address>" +
+                "</endpoint>" +
+                "</recipientlist>" +
+                "</endpoint>";
+
+        OMElement inputElement = createOMElement(inputXml);
+        Endpoint endpoint = RecipientListEndpointFactory.getEndpointFromElement(
+                inputElement,true,null);
+        OMElement serializedOut = RecipientListEndpointSerializer.getElementFromEndpoint(endpoint);
+
+        assertTrue(compare(serializedOut, inputElement));
+    }
+
     public void testRecipientListEndpointScenarioTwo()throws Exception {
         String inputXml = "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\">" +
                 "<recipientlist>" +

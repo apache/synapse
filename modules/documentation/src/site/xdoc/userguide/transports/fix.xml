@@ -57,7 +57,7 @@
             </p>
             <p>
                 Apache Synapse supports sending and receiving FIX messages via its FIX transport.
-                This transport is based on <a href="http://www.quickfixj.org">Quickfix/J</a>, a
+                This transport is based on <a href="https://www.quickfixj.org">Quickfix/J</a>, a
                 popular open source library used to develop applications based on the FIX protocol.
                 The FIX transport enables Synapse to operate as both a FIX acceptor and a FIX
                 initiator. If you have some prior experience working with Quickfix/J, you will realize
@@ -70,10 +70,10 @@
             </p>
             <ul>
                 <li>
-                    <a class="externalLink" href="http://wso2.org/library/3449">Apache Synapse FIX'ed</a>
+                    <a class="externalLink" href="https://wso2.org/library/3449">Apache Synapse FIX'ed</a>
                 </li>
                 <li>
-                    <a class="externalLink" href="http://wso2.org/library/3837">Using the WSO2 ESB and FIX</a>
+                    <a class="externalLink" href="https://wso2.org/library/3837">Using the WSO2 ESB and FIX</a>
                     (also applies to Synapse)
                 </li>
             </ul>
@@ -81,7 +81,7 @@
         <section name="Transport Configuration" id="Configuration">
             <p>
                 Synapse binary distribution does not contain the Quickfix/J libraries. To use the
-                FIX transport, you must <a href="http://www.quickfixj.org/downloads/">download Quickfix/J</a>
+                FIX transport, you must <a href="https://www.quickfixj.org/downloads/">download Quickfix/J</a>
                 separately, and deploy the necessary jar files into the Synapse installation. We
                 recommend using Quickfix/J 1.4.0 with Synapse. Copy the following jar files from the
                 Quickfix/J binary distribution to the <strong>SYNAPSE_HOME/lib</strong> directory.
@@ -152,7 +152,7 @@
                             specifies the URL to a file, which contains the FIX configuration
                             for the acceptor. The URL may point to a file in the local file system
                             or a remotely hosted file accessible over a standard protocol such as HTTP.
-                            The file itself should be a standard <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Sample%20Settings%20File">.cfg file</a>,
+                            The file itself should be a standard <a href="https://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Sample%20Settings%20File">.cfg file</a>,
                             typically used to
                             configure FIX acceptors in Quickfix/J. Parameter is required if the proxy
                             service should receive FIX traffic as an acceptor.
@@ -169,7 +169,7 @@
                             specifies the URL to a file, which contains the FIX configuration
                             for the initiator. The URL may point to a file in the local file system
                             or a remotely hosted file accessible over a standard protocol such as HTTP.
-                            The file itself should be a standard <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Sample%20Settings%20File">.cfg file</a>,
+                            The file itself should be a standard <a href="https://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Sample%20Settings%20File">.cfg file</a>,
                             typically used to
                             configure FIX initiators in Quickfix/J. Parameter is required if the proxy
                             service should receive FIX traffic as an initiator.
@@ -183,7 +183,7 @@
                         <td>
                             The type of message store to be used with the acceptor. Allowed values for
                             this parameter are 'file', 'jdbc', 'memory' and 'sleepycat'. Additional
-                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Storage">parameters</a>
+                            <a href="https://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Storage">parameters</a>
                             required to configure the message store should be specified in the
                             acceptor configuration file. Ignored if the proxy service is not operating
                             in the acceptor mode.
@@ -197,7 +197,7 @@
                         <td>
                             The type of message store to be used with the initiator. Allowed values for
                             this parameter are 'file', 'jdbc', 'memory' and 'sleepycat'. Additional
-                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Storage">parameters</a>
+                            <a href="https://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Storage">parameters</a>
                             required to configure the message store should be specified in the
                             initiator configuration file. Ignored if the proxy service is not operating
                             in the initiator mode.
@@ -213,7 +213,7 @@
                             through the acceptor. FIX messages are logged without putting them in SOAP
                             envelopes at this level. Accepted values are 'console', 'file' and 'jdbc'.
                             If not specified no logging will be done at the transport level. Additional
-                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Logging">parameters</a>
+                            <a href="https://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Logging">parameters</a>
                             required to configure each of the lof factories should be specified
                             in the acceptor configuration file. Ignored if the proxy service is not
                             operating in the acceptor mode.
@@ -229,7 +229,7 @@
                             through the initiator. FIX messages are logged without putting them in SOAP
                             envelopes at this level. Accepted values are 'console', 'file' and 'jdbc'.
                             If not specified no logging will be done at the transport level. Additional
-                            <a href="http://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Logging">parameters</a>
+                            <a href="https://www.quickfixj.org/quickfixj/usermanual/1.4.0/usage/configuration.html#Logging">parameters</a>
                             required to configure each of the lof factories should be specified
                             in the initiator configuration file. Ignored if the proxy service is not
                             operating in the initiator mode.

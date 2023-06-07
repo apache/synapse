@@ -62,7 +62,7 @@
                 file transfer protocols such as FTP.
             </p>
             <p>
-                The file transport is based on <a href="http://commons.apache.org/proper/commons-vfs/">Apache Commons VFS</a>,
+                The file transport is based on <a href="https://commons.apache.org/proper/commons-vfs/">Apache Commons VFS</a>,
                 and supports all the file transfer protocols supported by Commons VFS. This includes
                 interactions with the local file system, HTTP, HTTPS, FTP and SFTP (i.e. file transfer
                 over SSH).
@@ -252,7 +252,7 @@
                         <td>transport.vfs.MoveTimestampFormat</td>
                         <td>
                             Must be a timestamp format string compatible with
-                            <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">java.text.SimpleDateFormat</a>.
+                            <a href="https://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">java.text.SimpleDateFormat</a>.
                             If specified, Synapse will append a timestamp in the specified format to
                             all the file names, whenever a file is moved to a new location (i.e. when
                             moving a file after processing it or after a failure).
@@ -408,7 +408,7 @@
                 <p>
                     Some more example file URIs are listed below. Remember to prefix each
                     URI with the string 'vfs:' when using these to define Synapse endpoints.
-                    Refer <a class="externalLink" href="http://commons.apache.org/vfs/filesystems.html">http://commons.apache.org/vfs/filesystems.html</a>
+                    Refer <a class="externalLink" href="https://commons.apache.org/vfs/filesystems.html">https://commons.apache.org/vfs/filesystems.html</a>
                     for a complete list of Commons VFS supported protocols and their corresponding
                     URI formats.
                 </p>
@@ -538,7 +538,7 @@
             </p>
             <p>
                 The VFS transports supports SFTP through the
-                <a class="externalLink" href="http://www.jcraft.com/jsch/">JSch</a>
+                <a class="externalLink" href="https://www.jcraft.com/jsch/">JSch</a>
                 library and this library also requires a list of known hosts. Since Synapse is
                 not an interactive process, it can't request confirmation from the user and is
                 therefore unable to automatically add a host to the list. This implies that the
@@ -548,7 +548,7 @@
                 JSch loads the list of known hosts from a file called <tt>known_hosts</tt> in
                 the <tt>.ssh</tt> sub-directory of the user's home directory, i.e. <tt>$HOME/.ssh</tt>
                 in Unix and <tt>%HOMEPATH%\.ssh</tt> in Windows. The location and format of this
-                file are compatible with the <a class="externalLink" href="http://www.openssh.com/">OpenSSH</a>
+                file are compatible with the <a class="externalLink" href="https://www.openssh.com/">OpenSSH</a>
                 client.
             </p>
             <p>

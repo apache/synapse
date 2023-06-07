@@ -65,7 +65,7 @@
 					</p>
 					<h4>
 						<a class="externalLink"
-							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/MessageContext.java?view=markup">MessageContext
+							href="https://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/MessageContext.java?view=markup">MessageContext
 							Interface
 						</a>
 					</h4>
@@ -152,7 +152,7 @@ public interface MessageContext {
 					</p>
 					<h4>
 						<a class="externalLink"
-							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
+							href="https://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
 							interface
 						</a>
 					</h4>
@@ -214,7 +214,7 @@ public interface <span style="font-weight: bold;">Mediator </span>{
 					</p>
 					<h4>
 						<a class="externalLink"
-							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
+							href="https://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
 							ListMediator interface
 						</a>
 					</h4>
@@ -277,7 +277,7 @@ public interface ListMediator extends Mediator {
 					</p>
 					<h4>
 						<a class="externalLink"
-							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
+							href="https://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
 							interface
 						</a>
 					</h4>
@@ -338,7 +338,7 @@ public interface <span style="font-weight: bold;">FilterMediator </span>extends 
 					</p>
 					<h4>
 						<a class="externalLink"
-							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
+							href="https://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
 							MediatorFactory interface
 						</a>
 					</h4>
@@ -366,7 +366,7 @@ public interface MediatorFactory {
 }</div>
 					<h4>
 						<a class="externalLink"
-							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
+							href="https://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
 							MediatorSerializer interface
 						</a>
 					</h4>
@@ -409,7 +409,7 @@ public interface MediatorSerializer {
 						Synapse loads available extensions from the runtime classpath
 						using the
 						<a class="externalLink"
-							href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">J2SE
+							href="https://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">J2SE
 							Service Provider model
 						</a>
 						. This essentially iterates over the available JAR files, for a META-INF/services directory within each file,

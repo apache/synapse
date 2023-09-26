@@ -1227,7 +1227,7 @@
         <!-- Maven Tools -->
         <maven.version>3.0</maven.version>
         <maven.archiver.version>2.2</maven.archiver.version>
-        <plexus.utils.version>1.5.4</plexus.utils.version>
+        <plexus.utils.version>3.0.24</plexus.utils.version>
 
         <errorprone.version>2.10.0</errorprone.version>
     </properties>

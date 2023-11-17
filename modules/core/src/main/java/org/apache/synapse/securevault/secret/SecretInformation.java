@@ -23,7 +23,6 @@ import org.apache.synapse.securevault.SecretResolver;
 
 /**
  * Encapsulates the All information related to a DataSource
- * TODO - properly remove SecretResolve instances
  */
 public class SecretInformation {
 

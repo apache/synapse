@@ -127,12 +127,12 @@ public class JDBCMessageStore extends AbstractMessageStore {
 
     @Override
     public boolean offer(MessageContext messageContext) {
-        throw new UnsupportedOperationException();
+        return this.getProducer().storeMessage(messageContext);
     }
 
     @Override
     public MessageContext poll() {
-        throw new UnsupportedOperationException();
+        return this.remove();
     }
 
     /**

@@ -18,8 +18,7 @@
   ~  under the License.
   -->
 
-<!-- Introduction to Synapse Scheduled Message Forwarding Processor with max deliver attempt and
-drop the message after max deliver attempt -->
+<!-- Introduction to Synapse JDBC message store -->
 
 <definitions xmlns="http://ws.apache.org/ns/synapse">
     <endpoint name="StockQuoteServiceEp">

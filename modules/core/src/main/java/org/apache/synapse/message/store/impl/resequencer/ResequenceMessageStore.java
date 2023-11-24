@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -139,14 +140,14 @@ public class ResequenceMessageStore extends JDBCMessageStore {
         String storeName = this.getName();
         final String lastProcessIdSelectStatement = "SELECT " + ResequenceMessageStoreConstants.SEQ_ID + " FROM " +
                 ResequenceMessageStoreConstants.LAST_PROCESS_ID_TABLE_NAME + " WHERE " +
-                ResequenceMessageStoreConstants.STATEMENT_COLUMN + "=" + "\"" + storeName + "\"";
-
+                ResequenceMessageStoreConstants.STATEMENT_COLUMN + "= ?";
         Statement statement = new Statement(lastProcessIdSelectStatement) {
             @Override
             public List<Map> getResult(ResultSet resultSet) throws SQLException {
                 return startIdSelectionResult(resultSet);
             }
         };
+        statement.addParameter(storeName);
         List<Map> processedRows = getProcessedRows(statement);
         if (processedRows.size() > minimumRowCount) {
             final int firstIndex = 0;
@@ -217,6 +218,42 @@ public class ResequenceMessageStore extends JDBCMessageStore {
     }
 
     /**
+     * Will get the current message belonging to a sequence.
+     *
+     * @return the current message in the sequence.
+     */
+    private MessageContext getCurrentMessage() {
+        MessageContext msg = null;
+        final int firstRowIndex = 0;
+        try {
+            String tableName = getJdbcConfiguration().getTableName();
+            String selectMessageStatement = "SELECT message FROM " + tableName + " WHERE "
+                    + ResequenceMessageStoreConstants.SEQ_ID + "= ?";
+            Statement statement = new Statement(selectMessageStatement) {
+                @Override
+                public List<Map> getResult(ResultSet resultSet) throws SQLException {
+                    return messageContentResultSet(resultSet, this.getStatement());
+                }
+            };
+            statement.addParameter(nextSequenceId - 1);
+            List<Map> processedRows = getProcessedRows(statement);
+            if (!processedRows.isEmpty()) {
+                msg = getMessageContext(processedRows, firstRowIndex);
+                if (log.isTraceEnabled()) {
+                    log.trace("Message with id " + msg.getMessageID() + " returned for sequence " + nextSequenceId);
+                }
+            } else {
+                if (log.isTraceEnabled()) {
+                    log.trace("Sequences not returned from DB, next sequence will be:" + nextSequenceId);
+                }
+            }
+        } catch (SynapseException ex) {
+            throw new SynapseException("Error while peek the message", ex);
+        }
+        return msg;
+    }
+
+    /**
      * Will get the next message belonging to a sequence.
      *
      * @return the next message in the sequence.
@@ -276,14 +313,26 @@ public class ResequenceMessageStore extends JDBCMessageStore {
         final String deleteMessageStatement = "DELETE FROM " + getJdbcConfiguration().getTableName()
                 + " WHERE msg_id=?";
         final String insertLastProcessIdStatement = "INSERT INTO " +
-                ResequenceMessageStoreConstants.LAST_PROCESS_ID_TABLE_NAME
-                + " (statement,seq_id) VALUES (?,?) ON DUPLICATE KEY UPDATE seq_id = ?";
-        Statement sequenceIdUpdateStatement = new Statement(insertLastProcessIdStatement) {
+                ResequenceMessageStoreConstants.LAST_PROCESS_ID_TABLE_NAME + " SELECT ?, ?" +
+                " FROM " + ResequenceMessageStoreConstants.LAST_PROCESS_ID_TABLE_NAME + " WHERE statement = ? " +
+                "HAVING COUNT(*) = 0";
+
+        final String updateLastProcessIdStatement = "UPDATE " + ResequenceMessageStoreConstants.LAST_PROCESS_ID_TABLE_NAME +
+                " SET statement = ? , seq_id = ? WHERE statement = ?";
+        Statement sequenceIdInsertStatement = new Statement(insertLastProcessIdStatement) {
             @Override
             public List<Map> getResult(ResultSet resultSet) throws SQLException {
                 throw new UnsupportedOperationException();
             }
         };
+
+        Statement sequenceIdUpdateStatement = new Statement(updateLastProcessIdStatement) {
+            @Override
+            public List<Map> getResult(ResultSet resultSet) throws SQLException {
+                throw new UnsupportedOperationException();
+            }
+        };
+
         Statement deleteMessage = new Statement(deleteMessageStatement) {
             @Override
             public List<Map> getResult(ResultSet resultSet) throws SQLException {
@@ -291,10 +340,14 @@ public class ResequenceMessageStore extends JDBCMessageStore {
             }
         };
         deleteMessage.addParameter(msgId);
+        sequenceIdInsertStatement.addParameter(messageStoreName);
+        sequenceIdInsertStatement.addParameter(messageSequenceId);
+        sequenceIdInsertStatement.addParameter(messageStoreName);
         sequenceIdUpdateStatement.addParameter(messageStoreName);
         sequenceIdUpdateStatement.addParameter(messageSequenceId);
-        sequenceIdUpdateStatement.addParameter(messageSequenceId);
+        sequenceIdUpdateStatement.addParameter(messageStoreName);
         statements.add(deleteMessage);
+        statements.add(sequenceIdInsertStatement);
         statements.add(sequenceIdUpdateStatement);
         if (log.isDebugEnabled()) {
             log.debug("Removing message with id:" + msgId + " and last process id:" + messageSequenceId);
@@ -372,14 +425,14 @@ public class ResequenceMessageStore extends JDBCMessageStore {
     private MessageContext getMessageWithMinimumSequence() {
         String tableName = getJdbcConfiguration().getTableName();
         String selectMinimumSequenceIdStatement = "SELECT message,seq_id FROM " + tableName + " WHERE "
-                + ResequenceMessageStoreConstants.SEQ_ID + "=(SELECT min("
-                + ResequenceMessageStoreConstants.SEQ_ID + ")" + " from " + tableName + ")";
+                + ResequenceMessageStoreConstants.SEQ_ID + "=(SELECT min(?)" + " from " + tableName + ")";
         Statement stmt = new Statement(selectMinimumSequenceIdStatement) {
             @Override
             public List<Map> getResult(ResultSet resultSet) throws SQLException {
                 return getMessageWithMinimumId(resultSet, this.getStatement());
             }
         };
+        stmt.addParameter(ResequenceMessageStoreConstants.SEQ_ID);
         MessageContext msg = null;
         final int firstRowIndex = 0;
         try {
@@ -388,6 +441,7 @@ public class ResequenceMessageStore extends JDBCMessageStore {
                 msg = getMessageContext(processedRows, firstRowIndex);
                 long sequenceId = getSequenceId(processedRows, firstRowIndex);
                 nextSequenceId = sequenceId + 1;
+
                 if (log.isTraceEnabled()) {
                     log.trace("Message with id " + msg.getMessageID() + " returned as the minimum, the minimum " +
                             "sequence " + "will be marked as " + nextSequenceId);
@@ -427,6 +481,20 @@ public class ResequenceMessageStore extends JDBCMessageStore {
     private boolean shouldWait() {
         long currentTime = System.currentTimeMillis();
         return nextElapsedTime < 0 || currentTime <= nextElapsedTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessageContext poll() {
+        MessageContext messageContext = getCurrentMessage();
+        messageContext = remove(messageContext.getMessageID());
+        if (messageContext != null) {
+            return messageContext;
+        } else {
+            throw new NoSuchElementException("First element not found and remove failed !");
+        }
     }
 
     /**

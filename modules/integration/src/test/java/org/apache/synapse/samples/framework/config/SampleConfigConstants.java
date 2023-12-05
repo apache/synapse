@@ -44,6 +44,7 @@ public class SampleConfigConstants {
 
     public static final String TAG_BE_SERVER_CONF_AXIS2_REPO = "axis2Repo";
     public static final String TAG_BE_SERVER_CONF_AXIS2_XML = "axis2Xml";
+    public static final String TAG_AXIS2_BLOCKING_CONFIG = "axis2BlockingXml";
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT = "httpPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = "httpsPort";
     public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = "counterEnabled";

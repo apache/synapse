@@ -82,7 +82,18 @@ public class DerbyServerController extends AbstractBackEndServerController {
 
         //client
         String dbName = "synapsedb";
-        String createTableQuery = "CREATE table company(name varchar(10), id varchar(10), price double)";
+        String createCompanyTableQuery = "CREATE table company(name varchar(10), id varchar(10), price double)";
+        final String createJDBCMessageStoreQuery = "CREATE TABLE jdbc_message_store" +
+                "(indexId INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY(Start with 1, Increment by 1)," +
+                "msg_id VARCHAR(200) NOT NULL,message BLOB NOT NULL)";
+        final String createResequenceMessageStoreQuery = "CREATE TABLE tbl_resequence" +
+                "(indexId INTEGER GENERATED ALWAYS AS IDENTITY(Start with 1, Increment by 1) PRIMARY KEY," +
+                "msg_id VARCHAR(200) NOT NULL UNIQUE," +
+                "seq_id INTEGER NOT NULL UNIQUE," +
+                "message BLOB NOT NULL)";
+        final String createLastProcessedIdTblQuery = "CREATE TABLE tbl_lastprocessid" +
+                "(statement VARCHAR(20) PRIMARY KEY,seq_id INTEGER NOT NULL UNIQUE)";
+
         String connectionURL = "jdbc:derby://localhost:1527/" + dbName + ";create=true";
 
         java.util.Properties props = new java.util.Properties();
@@ -96,7 +107,10 @@ public class DerbyServerController extends AbstractBackEndServerController {
             Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
             conn = DriverManager.getConnection(connectionURL, props);
             Statement s = conn.createStatement();
-            s.execute(createTableQuery);
+            s.execute(createCompanyTableQuery);
+            s.execute(createJDBCMessageStoreQuery);
+            s.execute(createResequenceMessageStoreQuery);
+            s.execute(createLastProcessedIdTblQuery);
             s.execute("INSERT into company values ('IBM','c1',0.0)");
             s.execute(" INSERT into company values ('SUN','c2',0.0)");
             s.execute(" INSERT into company values ('MSFT','c3',0.0)");

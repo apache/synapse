@@ -66,6 +66,36 @@ public abstract class SynapseTestCase extends TestCase {
         loadConfiguration();
     }
 
+    /**
+     * Apply configuration values to message store XML.
+     *
+     * @param synapseRepoPath         path to the synapse XML repository.
+     * @param axis2BlockingConfigPath path to axis2 blocking client.
+     */
+    private void applyMessageStoreConfigurationToFile(OMElement synapseRepoPath, OMElement axis2BlockingConfigPath,
+                                                      OMElement config) {
+        try {
+            if (null != synapseRepoPath && null != axis2BlockingConfigPath) {
+                String currentDir = SynapseTestUtils.getCurrentDir();
+                String sampleFilePath = SynapseTestUtils.getRequiredParameter(config.getFirstChildWithName
+                                (new QName(SampleConfigConstants.TAG_SYNAPSE_CONF)),
+                        SampleConfigConstants.TAG_SYNAPSE_CONF_XML);
+                String normalizeFilePath = FilenameUtils.normalize(currentDir + sampleFilePath);
+                File synapseSampleFile = new File(normalizeFilePath);
+                String synapseXml = FileUtils.readFileToString(synapseSampleFile);
+                String modifiedSynapseAxis2 = SynapseTestUtils.replace(synapseXml, "${AXIS2_REPO}",
+                        FilenameUtils.normalize(currentDir + synapseRepoPath.getText()));
+                String modifiedAxis2Blocking = SynapseTestUtils.replace(modifiedSynapseAxis2, "${AXIS2_CONFIG}",
+                        FilenameUtils.normalize(currentDir + axis2BlockingConfigPath.getText()));
+                FileUtils.writeStringToFile(synapseSampleFile, modifiedAxis2Blocking);
+            }
+        } catch (IOException e) {
+            String message = "Error occurred while reading the sample configuration";
+            log.error(message, e);
+            fail(message);
+        }
+    }
+
     private void loadConfiguration() {
         // Parse the sample descriptor
         OMElement sampleConfig = loadDescriptorInfoFile();
@@ -90,6 +120,17 @@ public abstract class SynapseTestCase extends TestCase {
         } else {
             this.sampleName = sampleNameElt.getText();
         }
+
+        // Load synapse repo name and axis2blocking client, needed for message stores
+        OMElement synapseConfigElement =
+                sampleConfig.getFirstChildWithName(new QName(SampleConfigConstants.TAG_SYNAPSE_CONF));
+        OMElement synapseRepoPath = synapseConfigElement.getFirstChildWithName(
+                new QName(SampleConfigConstants.TAG_SYNAPSE_CONF_AXIS2_REPO));
+        OMElement axis2BlockingConfigPath = synapseConfigElement.getFirstChildWithName(
+                new QName(SampleConfigConstants.TAG_AXIS2_BLOCKING_CONFIG));
+
+        //Apply the configurations to the file
+        applyMessageStoreConfigurationToFile(synapseRepoPath, axis2BlockingConfigPath, sampleConfig);
 
         // Load Synapse, backend server and client configurations
         synapseController = initSynapseConfigInfo(sampleConfig);

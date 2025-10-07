@@ -32,6 +32,8 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.cors.CORSHelper;
+import org.apache.synapse.rest.cors.SynapseCORSConfiguration;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 
@@ -268,6 +270,10 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
             String method = (String) synCtx.getProperty(RESTConstants.REST_METHOD);
             if (RESTConstants.METHOD_OPTIONS.equals(method) && sendOptions(synCtx)) {
                 return;
+            } else {
+                // Handle CORS for other HTTP Methods
+                CORSHelper.handleCORSHeaders(SynapseCORSConfiguration.getInstance(),
+                        synCtx, getSupportedMethods(), false);
             }
 
             synCtx.setProperty(RESTConstants.SYNAPSE_RESOURCE, name);
@@ -291,6 +297,9 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
                     }
                 }
             }
+        } else {
+            // Add CORS headers for response message
+            CORSHelper.handleCORSHeadersForResponse(SynapseCORSConfiguration.getInstance(), synCtx);
         }
 
         SequenceMediator sequence = synCtx.isResponse() ? outSequence : inSequence;
@@ -357,6 +366,8 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
                     synCtx.setResponse(true);
                     synCtx.setTo(null);
                     transportHeaders.put(HttpHeaders.ALLOW, getSupportedMethods());
+                    CORSHelper.handleCORSHeaders(SynapseCORSConfiguration.getInstance(),
+                            synCtx, getSupportedMethods(),true);
                     Axis2Sender.sendBack(synCtx);
                     return true;
                 } else {
@@ -370,6 +381,8 @@ public class Resource extends AbstractRESTProcessor implements ManagedLifecycle 
             synCtx.setResponse(true);
             synCtx.setTo(null);
             transportHeaders.put(HttpHeaders.ALLOW, getSupportedMethods());
+            CORSHelper.handleCORSHeaders(SynapseCORSConfiguration.getInstance(),
+                    synCtx, getSupportedMethods(), true);
             Axis2Sender.sendBack(synCtx);
             return true;
         }

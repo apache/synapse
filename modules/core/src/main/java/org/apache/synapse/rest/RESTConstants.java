@@ -53,4 +53,33 @@ public class RESTConstants {
     /** The Synapse MC property that marks if the message was denied on the accessed transport */
     public static final String REST_API_TRANSPORT_DENIED = "REST_API_TRANSPORT_DENIED";
 
+    public static final String CORS_HEADER_ACCESS_CTL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+    public static final String CORS_HEADER_ACCESS_CTL_ALLOW_METHODS = "Access-Control-Allow-Methods";
+    public static final String CORS_HEADER_ACCESS_CTL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+    public static final String CORS_HEADER_ORIGIN = "Origin";
+    /**
+     * CORS related configuration in synapse.properties
+     */
+    // enable/disable CORS support
+    public static final String CORS_CONFIGURATION_ENABLED = "synapse.rest.CORSConfig.enabled";
+    // List of allowed origins (comma separated)
+    public static final String CORS_CONFIGURATION_ACCESS_CTL_ALLOW_ORIGIN =
+            "synapse.rest.CORSConfig.Access-Control-Allow-Origin";
+    // List of allowed headers (comma separated)
+    public static final String CORS_CONFIGURATION_ACCESS_CTL_ALLOW_HEADERS =
+            "synapse.rest.CORSConfig.Access-Control-Allow-Headers";
+
+    /**
+     * Constant prefix for rest related internal properties
+     */
+    public static final String _SYNAPSE_INTERNAL_ = "_SYNAPSE_INTERNAL_REST_";
+
+    public static final String INTERNAL_CORS_HEADER_ACCESS_CTL_ALLOW_ORIGIN =
+            _SYNAPSE_INTERNAL_ + "Access-Control-Allow-Origin";
+    public static final String INTERNAL_CORS_HEADER_ACCESS_CTL_ALLOW_METHODS =
+            _SYNAPSE_INTERNAL_+ "Access-Control-Allow-Methods";
+    public static final String INTERNAL_CORS_HEADER_ACCESS_CTL_ALLOW_HEADERS =
+            _SYNAPSE_INTERNAL_+ "Access-Control-Allow-Headers";
+    public static final String INTERNAL_CORS_HEADER_ORIGIN = _SYNAPSE_INTERNAL_+ "Origin";
+
 }

@@ -20,9 +20,12 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.rest.cors.CORSHelper;
+import org.apache.synapse.rest.cors.SynapseCORSConfiguration;
 
 /**
  * Halts further processing/mediation of the current message and return the current message back to client
@@ -51,6 +54,14 @@ public class RespondMediator extends AbstractMediator {
 
         synCtx.setTo(null);
         synCtx.setResponse(true);
+
+        // if this is not a response from a proxy service
+        String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);
+        if (proxyName == null || proxyName.isEmpty()) {
+            // Add CORS headers for API response
+            CORSHelper.handleCORSHeadersForResponse(SynapseCORSConfiguration.getInstance(), synCtx);
+        }
+
         Axis2Sender.sendBack(synCtx);
 
         if (isTraceOrDebugEnabled) {

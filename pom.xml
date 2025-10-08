@@ -288,9 +288,9 @@
                             <WSDL_SERVICE_TEST_URI>file:src/test/resources/esbservice.wsdl</WSDL_SERVICE_TEST_URI>
                             <WSDL_SERVICE_TEST_PORT>esbserviceSOAP11port_http</WSDL_SERVICE_TEST_PORT>
 
-                            <LOAD_BALANCE_TEST_ENDPOINT1>http://localhost:9001/soap/LBService1</LOAD_BALANCE_TEST_ENDPOINT1>
-                            <LOAD_BALANCE_TEST_ENDPOINT2>http://localhost:9002/soap/LBService1</LOAD_BALANCE_TEST_ENDPOINT2>
-                            <LOAD_BALANCE_TEST_ENDPOINT3>http://localhost:9003/soap/LBService1</LOAD_BALANCE_TEST_ENDPOINT3>
+                            <SOAP_TEST_ENDPOINT1>http://localhost:9001/soap/LBService1</SOAP_TEST_ENDPOINT1>
+                            <SOAP_TEST_ENDPOINT2>http://localhost:9002/soap/LBService1</SOAP_TEST_ENDPOINT2>
+                            <SOAP_TEST_ENDPOINT3>http://localhost:9003/soap/LBService1</SOAP_TEST_ENDPOINT3>
                             <scope>test</scope>
                         </environmentVariables>
                     </configuration>

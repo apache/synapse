@@ -57,9 +57,9 @@
                                 <mkdir dir="target/test_repos/axis2Server" />
                                 <mkdir dir="target/test_repos/axis2Client" />
                                 <mkdir dir="target/test_repos/synapse" />
-                                <mkdir dir="target/test_repos/synapse" />
                                 <mkdir dir="target/test_repos/synapse/modules" />
                                 <mkdir dir="target/test_repos/synapse/conf" />
+                                <mkdir dir="target/test_repos/synapse/samples" />
                                 <mkdir dir="target/test_repos/axis2Server/services" />
                                 <mkdir dir="target/test_repos/axis2Server/modules" />
                                 <mkdir dir="target/test_repos/axis2Server/conf" />
@@ -81,7 +81,11 @@
                                         <include name="*.xml" />
                                     </fileset>
                                 </copy>
-
+                                <copy todir="target/test_repos/synapse/samples">
+                                    <fileset dir="src/test/resources/extras">
+                                        <include name="*_altered_msmp.xml" />
+                                    </fileset>
+                                </copy>
                                 <!--<copy file="src/test/resources/trust.jks"-->
                                 <!--tofile="target/test_repos/synapse/conf/trust.jks" />-->
                                 <!--<copy file="src/test/resources/identity.jks"-->

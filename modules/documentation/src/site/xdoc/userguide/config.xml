@@ -111,7 +111,7 @@
                 All the functional components of the Synapse configuration are configured through
                 XML files. The Synapse configuration language governs the XML syntax used to define
                 and configure different types of components. This configuration language is now
-                available as a <a href="http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">XML schema</a>.
+                available as a <a href="https://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd">XML schema</a>.
             </p>
             <p>
                 Typically the Synapse ESB is used to mediate the message flow between a client
@@ -1099,11 +1099,11 @@
                 registry by specifying appropriate 'resource' elements.
             </p>
             <div class="xmlConf">&lt;publishWSDL key="my.wsdl"&gt;
-   &lt;resource location="http://www.standards.org/standard.wsdl" key="standard.wsdl"/&gt;
+   &lt;resource location="https://www.standards.org/standard.wsdl" key="standard.wsdl"/&gt;
 &lt;/publishWSDL&gt;</div>
             <p>
                 In this example the WSDL is retrieved from the registry using the key 'my.wsdl'. It
-                imports another WSDL from location 'http://www.standards.org/standard.wsdl'. Instead
+                imports another WSDL from location 'https://www.standards.org/standard.wsdl'. Instead
                 of loading it from this location, Synapse will retrieve the imported WSDL from the
                 registry entry 'standard.wsdl'.
             </p>

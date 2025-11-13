@@ -82,8 +82,7 @@ public class ParentLastClassLoader extends ClassLoader {
             }
 
             for (File jarFile : jarFiles) {
-                try {
-                    JarFile jar = new JarFile(jarFile);
+                try (JarFile jar = new JarFile(jarFile)){
                     JarEntry entry = jar.getJarEntry(className.replace(".", "/") + ".class");
                     InputStream is = jar.getInputStream(entry);
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();

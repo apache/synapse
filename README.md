@@ -1,6 +1,5 @@
-![](https://github.com/apache/synapse/workflows/Synapse%20Daily%20Build/badge.svg)
+[![Synapse Daily Build](https://github.com/apache/synapse/actions/workflows/build_daily.yml/badge.svg)](https://github.com/apache/synapse/actions/workflows/build_daily.yml)
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/apache/synapse)
 
 # Synapse
 Apache Synapse is a lightweight and high-performance Enterprise Service Bus (ESB). Powered by a fast and asynchronous mediation engine, Apache Synapse provides exceptional support for XML, Web Services and REST. In addition to XML and SOAP, 

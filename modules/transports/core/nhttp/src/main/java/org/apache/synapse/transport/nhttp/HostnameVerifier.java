@@ -18,6 +18,9 @@
  */
 package org.apache.synapse.transport.nhttp;
 
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
@@ -28,6 +31,8 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateParsingException;
 import java.util.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ************************************************************************
@@ -502,38 +507,23 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
     }
 
     class Certificates {
+
+        private static final Log log = LogFactory.getLog(Certificates.class);
         public static String[] getCNs(X509Certificate cert) {
             LinkedList cnList = new LinkedList();
-            /*
-           Sebastian Hauer's original StrictSSLProtocolSocketFactory used
-           getName() and had the following comment:
-
-              Parses a X.500 distinguished name for the value of the
-              "Common Name" field.  This is done a bit sloppy right
-              now and should probably be done a bit more according to
-              <code>RFC 2253</code>.
-
-            I've noticed that toString() seems to do a better job than
-            getName() on these X500Principal objects, so I'm hoping that
-            addresses Sebastian's concern.
-
-            For example, getName() gives me this:
-            1.2.840.113549.1.9.1=#16166a756c6975736461766965734063756362632e636f6d
-
-            whereas toString() gives me this:
-            EMAILADDRESS=juliusdavies@cucbc.com
-
-            Looks like toString() even works with non-ascii domain names!
-            I tested it with "&#x82b1;&#x5b50;.co.jp" and it worked fine.
-           */
-            String subjectPrincipal = cert.getSubjectX500Principal().toString();
-            StringTokenizer st = new StringTokenizer(subjectPrincipal, ",");
-            while (st.hasMoreTokens()) {
-                String tok = st.nextToken();
-                int x = tok.indexOf("CN=");
-                if (x >= 0) {
-                    cnList.add(tok.substring(x + 3));
+            try {
+                LdapName ldapDN = new LdapName(cert.getSubjectX500Principal().getName());
+                for (Rdn rdn : ldapDN.getRdns()) {
+                    if ("CN".equalsIgnoreCase(rdn.getType())) {
+                        Object value = rdn.getValue();
+                        if (value != null) {
+                            cnList.add(value.toString());
+                        }
+                    }
                 }
+            } catch (InvalidNameException e) {
+                // unparseable DN — no CNs extractable
+                log.debug("Could not parse certificate DN for CN extraction", e);
             }
             if (!cnList.isEmpty()) {
                 String[] cns = new String[cnList.size()];
@@ -566,7 +556,7 @@ public interface HostnameVerifier extends javax.net.ssl.HostnameVerifier {
             }
             catch (CertificateParsingException cpe) {
                 // Should probably log.debug() this?
-                cpe.printStackTrace();
+                log.debug("Could not parse SubjectAlternativeNames from certificate", cpe);
             }
             if (c != null) {
                 Iterator it = c.iterator();

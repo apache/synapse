@@ -40,5 +40,12 @@ public class JmxConfigurationConstants {
     
     /** Property to activate remote SSL support (same as com.sun.management.jmxremote.ssl) */
     public static final String PROP_REMOTE_SSL = "remote.ssl";
-    
+
+    /** Property to configure JEP 290 serial filter for remote JMX RMI. */
+    public static final String PROP_REMOTE_SERIAL_FILTER_PATTERN = "remote.serial.filter.pattern";
+
+    /** Standard JMX connector environment key for the RMI deserialization filter pattern. */
+    public static final String JMX_REMOTE_SERIAL_FILTER_PATTERN =
+            "jmx.remote.rmi.server.serial.filter.pattern";
+
 }

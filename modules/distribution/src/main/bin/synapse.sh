@@ -122,6 +122,11 @@ if $cygwin; then
 fi
 # endorsed dir
 SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
+ENDORSED_PROP=
+# -Djava.endorsed.dirs is removed from Java 9+.
+if [ "$jdk_16" -o "$jdk_17" -o "$jdk_18" ]; then
+    ENDORSED_PROP="-Djava.endorsed.dirs=$SYNAPSE_ENDORSED"
+fi
 
 # synapse config
 SYNAPSE_XML=$SYNAPSE_HOME/repository/conf/synapse-config
@@ -181,7 +186,7 @@ $JAVA_HOME/bin/java -server -Xms512M -Xmx512M \
     $XDEBUG \
     $TEMP_PROPS \
     -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \
-    -Djava.endorsed.dirs=$SYNAPSE_ENDORSED \
+    $ENDORSED_PROP \
     -Djava.io.tmpdir=$SYNAPSE_HOME/work/temp/synapse \
     -classpath $SYNAPSE_CLASSPATH \
     org.apache.synapse.SynapseServer \

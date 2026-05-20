@@ -127,11 +127,10 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-vfs-transport</artifactId>
         </dependency>
-        <!-- Skipped in JDK 17 full build: synapse-amqp-transport is Java 6 source/target; see docs/JDK17-build-report.md -->
-        <!--dependency>
+        <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-amqp-transport</artifactId>
-        </dependency-->
+        </dependency>
 
         <dependency>
             <groupId>com.oopsconsultancy</groupId>

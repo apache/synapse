@@ -100,7 +100,7 @@
                             <value>target/cobertura.ser</value>
                         </property>
                     </systemProperties>
-                    <argLine>-javaagent:target/lib/aspectjweaver.jar -Xms64m -Xmx128m</argLine>
+                    <argLine>${surefire.extra.argline} -javaagent:target/lib/aspectjweaver.jar -Xms64m -Xmx128m</argLine>
                 </configuration>
             </plugin>-->
         </plugins>

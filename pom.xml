@@ -135,6 +135,58 @@
             </build>
         </profile>
         <profile>
+            <id>jdk17</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <properties>
+                <aspectj.version>1.9.21</aspectj.version>
+                <surefire.extra.argline>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED</surefire.extra.argline>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjrt</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</compilerArg>
+                                <compilerArg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</compilerArg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.22.2</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>
@@ -281,7 +333,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.11</version>
                     <configuration>
-                        <argLine>-Xms128m -Xmx256m</argLine>
+                        <argLine>${surefire.extra.argline} -Xms128m -Xmx256m</argLine>
                         <environmentVariables>
                             <SOAP_SERVICE_TEST>http://localhost:9000/services/MyService1</SOAP_SERVICE_TEST>
 
@@ -323,7 +375,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1.1</version>
+                    <version>3.3.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1158,6 +1210,7 @@
              of the maven-compiler-plugin as well as certain ant tasks executed using
              maven-antrun-plugin.-->
         <java.version>1.8</java.version>
+        <surefire.extra.argline></surefire.extra.argline>
 
 	    <synapse.version>${project.version}</synapse.version>
 

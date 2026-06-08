@@ -45,6 +45,9 @@ public class JmxInformation {
     
     /** Use remote SSL? */
     private boolean remoteSSL;
+
+    /** JEP 290 filter pattern used by remote JMX RMI deserialization. */
+    private String remoteSerialFilterPattern;
     
     /**
      * The jmxUrl to connect to.
@@ -113,6 +116,14 @@ public class JmxInformation {
 
     public void setRemoteSSL(boolean remoteSSL) {
         this.remoteSSL = remoteSSL;
+    }
+
+    public String getRemoteSerialFilterPattern() {
+        return remoteSerialFilterPattern;
+    }
+
+    public void setRemoteSerialFilterPattern(String remoteSerialFilterPattern) {
+        this.remoteSerialFilterPattern = remoteSerialFilterPattern;
     }
     
     /**

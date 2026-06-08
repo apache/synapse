@@ -25,6 +25,7 @@ import org.apache.synapse.securevault.secret.SecretInformation;
 import org.apache.synapse.commons.util.RMIRegistryController;
 import org.apache.synapse.commons.jmx.JmxInformation;
 import org.apache.synapse.commons.jmx.JmxSecretAuthenticator;
+import org.apache.synapse.jmx.JmxSerializationFilterSupport;
 
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
@@ -203,6 +204,17 @@ public class JmxAdapter {
      */
     private Map<String, Object> createContextMap() {
         Map<String, Object> env = new HashMap<String, Object>();
+
+        String remoteSerialFilterPattern = jmxInformation.getRemoteSerialFilterPattern();
+        if (remoteSerialFilterPattern != null && remoteSerialFilterPattern.trim().length() > 0) {
+            // Deserialization limits are applied via JmxSerializationFilterSupport (JEP 415 factory),
+            // not via jmx.remote.rmi.server.serial.filter.pattern in the connector env.
+            JmxSerializationFilterSupport.configureForJmxPattern(remoteSerialFilterPattern, log);
+            if (log.isDebugEnabled()) {
+                log.debug("Configured JEP 290 deserialization filter for remote JMX: "
+                        + remoteSerialFilterPattern);
+            }
+        }
 
         if (jmxInformation.isAuthenticate()) {
 

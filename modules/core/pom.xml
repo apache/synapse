@@ -126,7 +126,7 @@
                 <executions>
                     <execution>
                         <id>create_repo</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>process-test-resources</phase>
                         <configuration>
                             <tasks>
                                 <echo message="*** Creating a testing repository ***" />

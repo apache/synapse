@@ -206,7 +206,7 @@
 					deployment was limited to mediators bundled as simple JAR files, 1.3 extended this
                     support to tasks and defined a new archive format (XAR) that allows to bundle
                     these extensions together with their dependency JARs (see
-					<a class="externalLink" href="http://issues.apache.org/jira/browse/SYNAPSE-377">SYNAPSE-377</a>
+					<a class="externalLink" href="https://issues.apache.org/jira/browse/SYNAPSE-377">SYNAPSE-377</a>
 					for more details). Enabling these features requires changes to the <tt>axis2.xml</tt>
 					configuration file. In 1.2 the deployer was configured as follows:
 				</p>
@@ -232,7 +232,7 @@
 					The way the JMS transport determines the content type of incoming messages has
                     slightly changed between Synapse 1.2 and 2.x. The mechanism is also more flexible.
                     See SYNAPSE-304 and SYNAPSE-424 for the reasons of this change and refer to the
-					<a class="externalLink" href="http://ws.apache.org/commons/transport/">WS-Commons Transport project</a>
+					<a class="externalLink" href="https://ws.apache.org/commons/transport/">WS-Commons Transport project</a>
 					for documentation.
 				</p>
 			</subsection>

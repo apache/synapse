@@ -439,6 +439,9 @@ public class LibDeployerUtils {
                 continue;
             }
             File dest = new File(destPath, entry.getName());
+          if (!dest.toPath().normalize().startsWith(destPath)) {
+            throw new IOException("Bad zip entry");
+          }
             dest.getParentFile().mkdirs();
             copyInputStream(zipFile.getInputStream(entry),
                             new BufferedOutputStream(new FileOutputStream(dest)));

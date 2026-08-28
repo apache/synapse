@@ -58,7 +58,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("Creating a new instance of POJO class : " + getCommand().getClass());
+            synLog.traceOrDebug("Creating a new instance of POJO class : " + getCommand());
         }
 
         Object commandObject = null;
@@ -67,7 +67,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             commandObject = getCommand().newInstance();
         } catch (Exception e) {
             handleException("Error creating an instance of the POJO command class : " +
-                            getCommand().getClass(), e, synCtx);
+                            getCommand(), e, synCtx);
         }
 
         synLog.traceOrDebug("Instance created, setting static and dynamic properties");
@@ -86,7 +86,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             if (f.getType().equals(String.class)) {
                 v = xpath.stringValueOf(synCtx);
             } else {
-                throw new UnsupportedOperationException("non-String types not supportted yet");
+                throw new UnsupportedOperationException("non-String types not supported yet");
             }
             try {
                 f.set(commandObject, v);
@@ -101,7 +101,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
             if (m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(String.class)) {
                 v = xpath.stringValueOf(synCtx);
             } else {
-                throw new UnsupportedOperationException("non-String types not supportted yet");
+                throw new UnsupportedOperationException("non-String types not supported yet");
             }
             try {
                 m.invoke(commandObject, v);
@@ -118,7 +118,7 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
                 ((Command) commandObject).execute();
             } catch (Exception e) {
                 handleException("Error invoking POJO command class : "
-                    + getCommand().getClass(), e, synCtx);
+                    + getCommand(), e, synCtx);
             }
 
         } else {
@@ -129,10 +129,10 @@ public class AnnotatedCommandMediator extends POJOCommandMediator {
                 exeMethod.invoke(commandObject, new Object[]{});
             } catch (NoSuchMethodException e) {
                 handleException("Cannot locate an execute() method on POJO class : " +
-                                getCommand().getClass(), e, synCtx);
+                                getCommand(), e, synCtx);
             } catch (Exception e) {
                 handleException("Error invoking the execute() method on POJO class : " +
-                                getCommand().getClass(), e, synCtx);
+                                getCommand(), e, synCtx);
             }
         }
 

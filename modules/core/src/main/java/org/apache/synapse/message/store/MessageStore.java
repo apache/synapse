@@ -24,6 +24,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.Nameable;
+import org.apache.synapse.message.MessageConsumer;
+import org.apache.synapse.message.MessageProducer;
 import org.apache.synapse.message.processors.MessageProcessor;
 
 import java.util.List;
@@ -35,8 +37,17 @@ import java.util.NoSuchElementException;
  * Message Store is used to store Messages.
  */
 public interface MessageStore extends SynapseArtifact, Nameable, ManagedLifecycle {
+    /**
+     * Returns a Message Producer for this message store. <br/>
+     * @return  A non-null message producer that can produce messages to this message store.
+     */
+    MessageProducer getProducer();
 
-
+    /**
+     * Returns a Message Consumer for this message store. <br/>
+     * @return A non-null message consumer that can read messages from this message store.<br/>
+     */
+    MessageConsumer getConsumer();
 
     /**
      * Inserts the Message into this store if it is possible to do so immediately

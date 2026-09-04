@@ -79,6 +79,10 @@ public class SourceResponseFactory {
 		if (excessHeaders != null) {
 			for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
 				String key = (String) iterator.next();
+				if (PassThroughTransportUtils.isConnectionFramingHeader(key)) {
+					// A duplicate framing header must never be relayed onto the outbound message
+					continue;
+				}
 				for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
 					sourceResponse.addHeader(key, (String) excessVal);
 				}

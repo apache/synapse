@@ -44,6 +44,7 @@ import org.apache.synapse.transport.passthru.connections.TargetConnections;
 import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnection;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -117,7 +118,8 @@ public class PassThroughTransportUtils {
      */
     public static void removeUnwantedHeaders(MessageContext msgContext, TargetConfiguration targetConfiguration) {
         Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-		Map excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+
+        removeUnwantedExcessHeaders(msgContext);
 
         if (headers == null || headers.isEmpty()) {
             return;
@@ -157,6 +159,39 @@ public class PassThroughTransportUtils {
             }
         }
 
+    }
+
+    /**
+     * Headers that frame the message body on the connection, or that control the connection
+     * itself. These are dictated by the transport and must never be carried over from an inbound
+     * message onto the outbound one.
+     *
+     * @param headerName the http header name to test
+     * @return true if the header frames the message or controls the connection
+     */
+    public static boolean isConnectionFramingHeader(String headerName) {
+        return HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName)
+                || HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)
+                || HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName);
+    }
+
+    /**
+     * Remove the connection framing headers from EXCESS_TRANSPORT_HEADERS.
+     *
+     * @param msgContext the Axis2 Message context holding the excess header map
+     */
+    private static void removeUnwantedExcessHeaders(MessageContext msgContext) {
+        Map excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+
+        if (excessHeaders == null || excessHeaders.isEmpty()) {
+            return;
+        }
+
+        for (Object headerName : new ArrayList(excessHeaders.keySet())) {
+            if (headerName instanceof String && isConnectionFramingHeader((String) headerName)) {
+                excessHeaders.remove(headerName);
+            }
+        }
     }
 
     /**

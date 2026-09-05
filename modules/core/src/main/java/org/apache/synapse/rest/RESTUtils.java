@@ -59,10 +59,11 @@ public class RESTUtils {
     }
 
     public static String trimTrailingSlashes(String url) {
-        while (url.endsWith("/")) {
-            url = url.substring(0, url.length() - 1);
+        int end = url.length();
+        while (end > 0 && url.charAt(end - 1) == '/') {
+            end--;
         }
-        return url;
+        return end == url.length() ? url : url.substring(0, end);
     }
 
     public static String getFullRequestPath(MessageContext synCtx) {

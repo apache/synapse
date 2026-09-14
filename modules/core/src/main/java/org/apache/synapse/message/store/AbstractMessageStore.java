@@ -19,6 +19,8 @@
 
 package org.apache.synapse.message.store;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -26,6 +28,8 @@ import org.apache.synapse.core.SynapseEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -59,7 +63,7 @@ public abstract class AbstractMessageStore implements MessageStore {
     /**
      * Message store parameters
      */
-    protected Map<String,Object> parameters;
+    protected Map<String, Object> parameters;
 
     /**
      * Message Store description
@@ -72,13 +76,36 @@ public abstract class AbstractMessageStore implements MessageStore {
     protected String fileName;
 
     /**
+     * Identify whether a given message is enqueued from store
+     */
+    private AtomicLong enqueued = new AtomicLong(0);
+
+    /**
+     * Identify whether a given message is dequeued from store
+     */
+    private AtomicLong dequeued = new AtomicLong(0);
+
+    private final Object messageCountLock = new Object();
+
+    private static final long maxEnDequeuable = Long.MAX_VALUE;
+
+    private AtomicInteger producerId = new AtomicInteger(0);
+    /**
+     * Message consumer id
+     */
+    private AtomicInteger consumerId = new AtomicInteger(0);
+
+    private int maxProducerId = Integer.MAX_VALUE;
+
+    private static final Log log = LogFactory.getLog(AbstractMessageStore.class);
+
+    /**
      * List that holds the MessageStore observers registered with the Message Store
      */
     protected List<MessageStoreObserver> messageStoreObservers =
             new ArrayList<MessageStoreObserver>();
 
     protected Lock lock = new ReentrantLock();
-
 
 
     @Override
@@ -103,37 +130,69 @@ public abstract class AbstractMessageStore implements MessageStore {
 
     @Override
     public void registerObserver(MessageStoreObserver observer) {
-        if(observer != null && !messageStoreObservers.contains(observer)) {
+        if (observer != null && !messageStoreObservers.contains(observer)) {
             messageStoreObservers.add(observer);
         }
     }
 
     @Override
     public void unregisterObserver(MessageStoreObserver observer) {
-        if(observer != null && messageStoreObservers.contains(observer)) {
+        if (observer != null && messageStoreObservers.contains(observer)) {
             messageStoreObservers.remove(observer);
         }
     }
 
     /**
      * Notify Message Addition to the observers
+     *
      * @param messageId of the Message added.
      */
     protected void notifyMessageAddition(String messageId) {
-        for(MessageStoreObserver o : messageStoreObservers) {
+        for (MessageStoreObserver o : messageStoreObservers) {
             o.messageAdded(messageId);
         }
     }
 
     /**
      * Notify Message removal to the observers
+     *
      * @param messageId of the Message added
      */
     protected void notifyMessageRemoval(String messageId) {
-        for(MessageStoreObserver o : messageStoreObservers) {
+        for (MessageStoreObserver o : messageStoreObservers) {
             o.messageRemoved(messageId);
         }
     }
+
+    public int nextProducerId() {
+        int id = producerId.incrementAndGet();
+        if (id == maxProducerId) {
+            log.info("Setting producer ID generator to 0...");
+            producerId.set(0);
+            id = producerId.incrementAndGet();
+        }
+        return id;
+    }
+
+    public int nextConsumerId() {
+        int id = consumerId.incrementAndGet();
+        return id;
+    }
+
+    public void enqueued() {
+        synchronized (messageCountLock) {
+            enqueued.compareAndSet(maxEnDequeuable, 0);
+            enqueued.incrementAndGet();
+        }
+    }
+
+    public void dequeued() {
+        synchronized (messageCountLock) {
+            dequeued.compareAndSet(maxEnDequeuable, 0);
+            dequeued.incrementAndGet();
+        }
+    }
+
     @Override
     public int size() {
         return -1;

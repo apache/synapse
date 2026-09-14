@@ -60,17 +60,17 @@ public class LoadBalanceEndpointSerializationTest extends AbstractTestCase {
                 "<session type=\"simpleClientSession\"/>" +
                 "<loadbalance algorithm=\"org.apache.synapse.endpoints.algorithms.RoundRobin\">" +
                 "<endpoint>" +
-                "<address uri=\"$SYSTEM:LOAD_BALANCE_TEST_ENDPOINT1\">" +
+                "<address uri=\"$SYSTEM:SOAP_TEST_ENDPOINT1\">" +
                 "<enableAddressing/>" +
                 "</address>" +
                 "</endpoint>" +
                 "<endpoint>" +
-                "<address uri=\"$SYSTEM:LOAD_BALANCE_TEST_ENDPOINT2\">" +
+                "<address uri=\"$SYSTEM:SOAP_TEST_ENDPOINT2\">" +
                 "<enableAddressing/>" +
                 "</address>" +
                 "</endpoint>" +
                 "<endpoint>" +
-                "<address uri=\"$SYSTEM:LOAD_BALANCE_TEST_ENDPOINT3\">" +
+                "<address uri=\"$SYSTEM:SOAP_TEST_ENDPOINT3\">" +
                 "<enableAddressing/>" +
                 "</address>" +
                 "</endpoint>" +

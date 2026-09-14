@@ -74,21 +74,21 @@
                 to go through the Synapse source code in the development trunk and make contributions
                 should use a Subversion client to interact with the Synapse code base. To learn more
                 about using Subversion or to download the latest client distributions, please visit
-                the <a href="http://subversion.apache.org">Apache Subversion project website</a>.
+                the <a href="https://subversion.apache.org">Apache Subversion project website</a>.
                 Developers on Unix/Linux based systems may use the command line based SVN client,
                 while the developers on Windows platform can use an appropriate client application
-                like <a href="http://tortoisesvn.net/">TortoiseSVN</a>.
+                like <a href="https://tortoisesvn.net/">TortoiseSVN</a>.
             </p>
             <p>
                 Some useful information on using the Apache Software Foundation's source code
                 repositories can be found among the ASF
-                <a href="http://www.apache.org/dev/version-control.html">developer documentation</a>.
+                <a href="https://www.apache.org/dev/version-control.html">developer documentation</a>.
             </p>
             <subsection name="Checking Out the Source" id="checkout">
                 <p>
                     Synapse development trunk is where all the latest development work takes place.
                     This is located at
-                    <a href="http://svn.apache.org/repos/asf/synapse/trunk/java/">http://svn.apache.org/repos/asf/synapse/trunk/java/</a>.
+                    <a href="https://svn.apache.org/repos/asf/synapse/trunk/java/">https://svn.apache.org/repos/asf/synapse/trunk/java/</a>.
                     Any developer with a Subversion client should be able to checkout the latest
                     source from this SVN location but only Synapse committers are allowed to actually
                     commit source code. Synapse committers should access the above SVN location over
@@ -105,7 +105,7 @@
                     If you want to browse the source code of an older release of Synapse or want
                     to implement a patch for a past release, you may checkout the relevant source
                     tree from one of the available SVN
-                    <a href="http://svn.apache.org/repos/asf/synapse/tags/">tags</a>.
+                    <a href="https://svn.apache.org/repos/asf/synapse/tags/">tags</a>.
                 </p>
             </subsection>
         </section>
@@ -114,7 +114,7 @@
                 Synapse build system is based on Apache Maven. Either Maven2 or Maven3 can be used to
                 build Apache Synapse from source. For information about downloading, installing, and
                 configuring Maven, please go through
-                <a class="externalLink" href="http://maven.apache.org">Maven project website</a>.
+                <a class="externalLink" href="https://maven.apache.org">Maven project website</a>.
             </p>
             <subsection name="Building from Source" id="building">
                 <p>

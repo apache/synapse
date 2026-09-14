@@ -248,7 +248,7 @@
                     place for later reuse. One approach to overcome these difficulties is to use Maven
                     to assemble a custom package. When used correctly, this approach solves all of the
                     issues identified above. In particular Maven's dependency management together with
-                    the excellent <a class="externalLink" href="http://maven.apache.org/plugins/maven-assembly-plugin/">assembly plugin</a>
+                    the excellent <a class="externalLink" href="https://maven.apache.org/plugins/maven-assembly-plugin/">assembly plugin</a>
                     can be used to automatically select the relevant JARs to include and pull them
                     from Maven repositories. The remaining artifacts required to assemble the package
                     can then be easily stored in a source control repository.
@@ -258,11 +258,11 @@
                     only a few simple steps. To begin with, change to the directory where you want to
                     create the project and issue the following command:
                 </p>
-                <div class="command">mvn archetype:generate -DarchetypeCatalog=http://synapse.apache.org</div>
+                <div class="command">mvn archetype:generate -DarchetypeCatalog=https://synapse.apache.org</div>
                 <p>
                     In case of problems, you can try to use the latest version of the archetype catalog:
                 </p>
-                <div class="command">mvn archetype:generate -DarchetypeCatalog=http://svn.apache.org/repos/asf/synapse/trunk/java/src/site/resources</div>
+                <div class="command">mvn archetype:generate -DarchetypeCatalog=https://svn.apache.org/repos/asf/synapse/trunk/java/src/site/resources</div>
                 <p>
                     Finally, if you have build Synapse from sources, you don't need to specify a
                     catalog at all: the archetype is added automatically to the local catalog during
@@ -318,7 +318,7 @@
             </p>
             <ul>
                 <li>
-                    <a class="externalLink" href="http://repo1.maven.org/maven2/org/apache/synapse/synapse-war/">http://repo1.maven.org/maven2/org/apache/synapse/synapse-war/</a>
+                    <a class="externalLink" href="https://repo1.maven.org/maven2/org/apache/synapse/synapse-war/">https://repo1.maven.org/maven2/org/apache/synapse/synapse-war/</a>
                     for released versions.
                 </li>
                 <li>

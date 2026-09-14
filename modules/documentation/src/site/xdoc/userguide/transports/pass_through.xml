@@ -67,7 +67,7 @@
         <section name="Introduction" id="Introduction">
             <p>
                 The Pass Through HTTP transport (PTHTTP transport) was developed by
-                <a href="http://wso2.com">WSO2</a> as a more efficient and more scalable
+                <a href="https://wso2.com">WSO2</a> as a more efficient and more scalable
                 alternative to the standard Non-blocking HTTP transport (NHTTP transport) of
                 Synapse. The PTHTTP transport was later contributed to the Synapse project,
                 and was made the default HTTP transport of the Synapse ESB. All versions of
@@ -104,7 +104,7 @@
             </p>
             <p>
                 Similar to the NHTTP transport, the PTHTTP transport is also based on the Apache
-                HTTP Core NIO library. This library is based on the <a href="http://en.wikipedia.org/wiki/Reactor_pattern">reactor pattern</a>,
+                HTTP Core NIO library. This library is based on the <a href="https://en.wikipedia.org/wiki/Reactor_pattern">reactor pattern</a>,
                 and the PTHTTP transport uses two separate reactor instances:
                 <ul>
                     <li>
@@ -352,7 +352,7 @@
                             All 4 values are required. Keystore paths are resolved relative to the
                             Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
                             Java security and keystores, please refer
-                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            <a href="https://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
                             specification.
                             <br/>
                             <br/>
@@ -389,7 +389,7 @@
                             All 3 values are required. Truststore paths are resolved relative to the
                             Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
                             Java security and truststores, please refer
-                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            <a href="https://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
                             specification.
                             <br/>
                             <br/>
@@ -415,7 +415,7 @@
                         <td>
                             Use this parameter to enable client certificate verification (client
                             authentication). This option provides functionality similar to the
-                            <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">SSLVerifyClient directive</a>
+                            <a href="https://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslverifyclient">SSLVerifyClient directive</a>
                             of Apache HTTPD. Supported values are:
                             <ul>
                                 <li>none: No client certificate is required</li>
@@ -536,7 +536,7 @@
                             All 4 values are required. Keystore paths are resolved relative to the
                             Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
                             Java security and keystores, please refer
-                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            <a href="https://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
                             specification.
                             <br/>
                             <br/>
@@ -573,7 +573,7 @@
                             All 3 values are required. Truststore paths are resolved relative to the
                             Synapse installation (SYNAPSE_HOME) directory. If you are not familiar with
                             Java security and truststores, please refer
-                            <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
+                            <a href="https://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html">Java Cryptography Architecture</a>
                             specification.
                             <br/>
                             <br/>
@@ -607,7 +607,7 @@
                                 <li>AllowAll</li>
                                 <li>Strict</li>
                             </ul>
-                            Please refer <a href="http://synapse.apache.org/apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier</a>
+                            Please refer <a href="https://synapse.apache.org/apidocs/org/apache/synapse/transport/nhttp/HostnameVerifier.html">HostnameVerifier</a>
                             Javadocs to learn more about this feature and the semantics of the above
                             options. The AllowAll option essentially disables hostname verification
                             by accepting all certificates. The Strict option requires the server
@@ -694,8 +694,8 @@
                         <td>CertificateRevocationVerifier</td>
                         <td>
                             Enable revocation status validation of server certificates using
-                            <a href="http://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
-                            <a href="http://www.ietf.org/rfc/rfc5280.txt">CRL</a>. Simply uncommenting
+                            <a href="https://www.ietf.org/rfc/rfc2560.txt">OCSP</a> and
+                            <a href="https://www.ietf.org/rfc/rfc5280.txt">CRL</a>. Simply uncommenting
                             this parameter under the HTTPS sender configuration will activate the
                             feature. Two LRU caches are used to cache CRLs and OCSP responses until
                             they are expired. Two child XML elements are used to configure the cache
@@ -738,7 +738,7 @@
             <subsection name="Apache HTTP Core Settings" id="HttpCoreSettings">
                 <p>
                     Following properties control various facets of
-                    <a href="http://hc.apache.org/httpcomponents-core-ga/index.html">Apache HTTP Core</a>,
+                    <a href="https://hc.apache.org/httpcomponents-core-ga/index.html">Apache HTTP Core</a>,
                     the framework underlying the Pass Through HTTP transport.
                 </p>
                 <table>
@@ -752,7 +752,7 @@
                         <td>http.socket.timeout <a name="http.socket.timeout"/></td>
                         <td>
                             Sets the TCP socket timeout in milliseconds
-                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
+                            (See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
                             This applies to sockets opened by both transport listener and sender.
                             <div class="xmlConf">http.socket.timeout=20000</div>
                         </td>
@@ -800,7 +800,7 @@
                             Determines whether or not I/O interest operations are to be queued and
                             executed asynchronously by the I/O reactor thread or to be applied to
                             the underlying
-                            <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/channels/SelectionKey.html">SelectionKey</a>
+                            <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/nio/channels/SelectionKey.html">SelectionKey</a>
                             immediately. Allowed values are either 'true' or 'false'.
                             <div class="xmlConf">http.nio.interest-ops-queueing=false</div>
                         </td>
@@ -811,10 +811,10 @@
                         <td>http.tcp.nodelay</td>
                         <td>
                             Setting this property to 'true' disables
-                            <a href="http://en.wikipedia.org/wiki/Nagle's_algorithm">Nagle's algorithm</a>
+                            <a href="https://en.wikipedia.org/wiki/Nagle's_algorithm">Nagle's algorithm</a>
                             for the HTTP connections. That is, outgoing data will not be buffered
                             and aggregated together
-                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#TCP_NODELAY">TCP_NODELAY</a>).
+                            (See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#TCP_NODELAY">TCP_NODELAY</a>).
                             <div class="xmlConf">http.tcp.nodelay=true</div>
                         </td>
                         <td>No</td>
@@ -837,7 +837,7 @@
                             for incoming network I/O. This value is only a hint. When set, this is a
                             suggestion to the OS kernel from Synapse about the size of buffers to
                             use for the data to be received over the socket
-                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
+                            (See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
                             If no value is specified, Synapse will use the platform (OS) default.
                             <div class="xmlConf">http.socket.rcv-buffer-size=8192</div>
                         </td>
@@ -851,7 +851,7 @@
                             for outgoing network I/O. This value is only a hint. When set, this is a
                             suggestion to the OS kernel from Synapse about the size of buffers to
                             use for the data to be sent over the socket
-                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
+                            (See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
                             If no value is specified, Synapse will use the platform (OS) default.
                             <div class="xmlConf">http.socket.snd-buffer-size=8192</div>
                         </td>
@@ -864,7 +864,7 @@
                             Specifies the linger-on-close timeout duration (in milliseconds) for the
                             sockets created by the HTTP transport. Setting to 0 or a negative value
                             disables linger-on-close
-                            (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_LINGER">SO_LINGER</a>).
+                            (See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_LINGER">SO_LINGER</a>).
                             <div class="xmlConf">http.socket.linger=5000</div>
                         </td>
                         <td>No</td>
@@ -873,7 +873,7 @@
                     <tr>
                         <td>http.socket.reuseaddr</td>
                         <td>
-                            Sets the <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
+                            Sets the <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_REUSEADDR">SO_REUSEADDR</a>
                             socket option for the sockets created by the HTTP transport. Accepted
                             values are either 'true' or 'false'.
                             <div class="xmlConf">http.socket.reuseaddr=true</div>
@@ -910,7 +910,7 @@
                         <td>
                             Specifies the action to be performed when a malformed input is detected
                             during character set encoding or decoding. Supported values are
-                            'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
+                            'ignore', 'replace' and 'report'. See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
                             for more details on each of these options.
                             <div class="xmlConf">http.malformed.input.action=ignore</div>
                         </td>
@@ -922,7 +922,7 @@
                         <td>
                             Specifies the action to be performed when an un-mappable character is detected
                             during character set encoding or decoding. Supported values are
-                            'ignore', 'replace' and 'report'. See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
+                            'ignore', 'replace' and 'report'. See <a href="https://docs.oracle.com/javase/1.5.0/docs/api/java/nio/charset/CodingErrorAction.html">CodingErrorAction</a>
                             for more details on each of these options.
                             <div class="xmlConf">http.malformed.input.action=ignore</div>
                         </td>
@@ -966,7 +966,7 @@
                             <div class="xmlConf">http.max.connection.per.target=1000</div>
                         </td>
                         <td>No</td>
-                        <td><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Integer.html#MAX_VALUE">Integer.MAX_VALUE</a></td>
+                        <td><a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Integer.html#MAX_VALUE">Integer.MAX_VALUE</a></td>
                     </tr>
                     <tr>
                         <td>http.user.agent.value <a name="http.user.agent.value"/></td>
@@ -1171,7 +1171,7 @@ net.ipv4.ip_local_port_range = 1024 65535</div>
                 Synapse HTTP transports have some advanced logging capabilities built in to them,
                 which can be enabled to obtain more low-level information about how the transports
                 operate. These logging features are based on
-                <a href="http://commons.apache.org/proper/commons-logging/">Apache Commons Logging</a>
+                <a href="https://commons.apache.org/proper/commons-logging/">Apache Commons Logging</a>
                 and Log4J, which constitute the logging framework used by Apache Synapse. Therefore,
                 these features should be enabled from the <strong>SYNAPSE_HOME/lib/log4j.properties</strong>
                 file of the installation.

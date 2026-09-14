@@ -52,7 +52,7 @@
             <ul>
                 <li>
                     We follow the standard
-                    <a href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html">Java coding conventions</a>
+                    <a href="https://www.oracle.com/technetwork/java/codeconvtoc-136057.html">Java coding conventions</a>
                     published by Sun/Oracle. Please stick to these standards whenever writing code
                     for Synapse.
                 </li>
@@ -118,10 +118,10 @@
                     All documentation files and samples should we well-formed XML documents.
                 </li>
                 <li>
-                    We use the <a href="http://maven.apache.org/maven-1.x/plugins/xdoc/">Maven XDoc plugin</a>
+                    We use the <a href="https://maven.apache.org/maven-1.x/plugins/xdoc/">Maven XDoc plugin</a>
                     to generate Synapse documentation and website. Please take some time to go through
                     the documentation of the XDoc plugin and learn and its features. In pariculay,
-                    you should learn the <a href="http://maven.apache.org/doxia/references/xdoc-format.html">XDoc documentation format</a>
+                    you should learn the <a href="https://maven.apache.org/doxia/references/xdoc-format.html">XDoc documentation format</a>
                     and use the standard XDoc tags over HTML whenever possible.
                 </li>
                 <li>

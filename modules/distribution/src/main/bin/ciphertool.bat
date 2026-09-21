@@ -81,9 +81,7 @@ echo Using SYNAPSE_HOME:   %SYNAPSE_HOME%
 echo Using JAVA_HOME:    %JAVA_HOME%
 set _RUNJAVA="%JAVA_HOME%\bin\java"
 
-set JAVA_ENDORSED=".\lib\endorsed";"%JAVA_HOME%\jre\lib\endorsed";"%JAVA_HOME%\lib\endorsed"
-
-%_RUNJAVA% %JAVA_OPTS% -cp "%SYNAPSE_CLASSPATH%"  %_XDEBUG% -Djava.endorsed.dirs=%JAVA_ENDORSED% org.apache.synapse.securevault.tool.CipherTool %*
+%_RUNJAVA% %JAVA_OPTS% -cp "%SYNAPSE_CLASSPATH%"  %_XDEBUG% org.apache.synapse.securevault.tool.CipherTool %*
 endlocal
 :end
 

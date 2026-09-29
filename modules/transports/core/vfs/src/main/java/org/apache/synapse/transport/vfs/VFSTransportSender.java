@@ -33,6 +33,7 @@ import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.ManagementSupport;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -160,6 +161,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 
                 if (replyFile.exists()) {
                     if (replyFile.getType() == FileType.FOLDER) {
+                        validateReplyFileNameFromTransportHeaders(replyFile, msgCtx);
                         if (isUseTempFile) {
                             tempTargetFileName = VFSUtils.generateTempFileName();
                             actualTargetFileName = VFSUtils.getFileName(msgCtx, vfsOutInfo);
@@ -253,6 +255,26 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
             }
         } else {
             handleException("Unable to determine out transport information to send message");
+        }
+    }
+
+    private void validateReplyFileNameFromTransportHeaders(FileObject replyFolder,
+                                                           MessageContext msgCtx)
+            throws FileSystemException, AxisFault {
+
+        String fileName = VFSUtils.getReplyFileNameFromTransportHeaders(msgCtx);
+        if (fileName == null) {
+            return;
+        }
+
+        FileName replyFolderName = replyFolder.getName();
+        FileName resolvedName = fsManager.resolveFile(replyFolder, fileName).getName();
+        if (!replyFolderName.isDescendent(resolvedName)) {
+            handleException("The " + VFSConstants.REPLY_FILE_NAME + " transport header value : " +
+                    VFSUtils.maskURLPassword(fileName) + " resolves to " +
+                    VFSUtils.maskURLPassword(resolvedName.getURI()) +
+                    " which is outside the reply folder : " +
+                    VFSUtils.maskURLPassword(replyFolderName.getURI()));
         }
     }
 

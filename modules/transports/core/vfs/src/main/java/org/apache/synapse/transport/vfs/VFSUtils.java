@@ -68,14 +68,17 @@ public class VFSUtils extends BaseUtils {
         return null;
     }
 
-    public static String getFileName(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
-        String fileName = null;
-
-        // first preference to a custom filename set on the current message context
+    public static String getReplyFileNameFromTransportHeaders(MessageContext msgCtx) {
         Map transportHeaders = (Map) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
         if (transportHeaders != null) {
-            fileName = (String) transportHeaders.get(VFSConstants.REPLY_FILE_NAME);
+            return (String) transportHeaders.get(VFSConstants.REPLY_FILE_NAME);
         }
+        return null;
+    }
+
+    public static String getFileName(MessageContext msgCtx, VFSOutTransportInfo vfsOutInfo) {
+        // first preference to a custom filename set on the current message context
+        String fileName = getReplyFileNameFromTransportHeaders(msgCtx);
 
         // if not, does the service (in its service.xml) specify one?
         if (fileName == null) {

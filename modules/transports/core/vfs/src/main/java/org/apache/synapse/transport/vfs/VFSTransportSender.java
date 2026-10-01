@@ -211,7 +211,8 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                         }
                     } else {
                         handleException("Unsupported reply file type : " + replyFile.getType() +
-                                " for file : " + vfsOutInfo.getOutFileURI());
+                                " for file : " +
+                                VFSUtils.maskURLPassword(vfsOutInfo.getOutFileURI()));
                     }
                 } else {
                     if (isUseTempFile) {
@@ -237,7 +238,7 @@ public class VFSTransportSender extends AbstractTransportSender implements Manag
                 }
             } catch (FileSystemException e) {
                 handleException("Error resolving reply file : " +
-                        vfsOutInfo.getOutFileURI(), e);
+                        VFSUtils.maskURLPassword(vfsOutInfo.getOutFileURI()), e);
             } finally {
                 if (replyFile != null) {
                     try {

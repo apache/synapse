@@ -94,7 +94,7 @@ public class VFSOutTransportInfo implements OutTransportInfo {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Using the fileURI        : " + this.outFileURI);
+            log.debug("Using the fileURI        : " + VFSUtils.maskURLPassword(this.outFileURI));
             log.debug("Using the maxRetryCount  : " + maxRetryCount);
             log.debug("Using the reconnectionTimeout : " + reconnectTimeout);
             log.debug("Using the append         : " + append);

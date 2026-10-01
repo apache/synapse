@@ -129,7 +129,8 @@ public class VFSUtils extends BaseUtils {
             FileObject lockObject = fsManager.resolveFile(fullPath + ".lock");
             if (lockObject.exists()) {
                 log.debug("There seems to be an external lock, aborting the processing of the file "
-                        + fo.getName() + ". This could possibly be due to some other party already "
+                        + maskURLPassword(fo.getName().getURI())
+                        + ". This could possibly be due to some other party already "
                         + "processing this file or the file is still being uploaded");
             } else {
 
@@ -144,7 +145,7 @@ public class VFSUtils extends BaseUtils {
                 } catch (IOException e) {
                     lockObject.delete();
                     log.error("Couldn't create the lock file before processing the file "
-                            + fullPath, e);
+                            + maskURLPassword(fullPath), e);
                     return false;
                 } finally {
                     lockObject.close();
@@ -191,7 +192,7 @@ public class VFSUtils extends BaseUtils {
             }
         } catch (FileSystemException e) {
             log.error("Couldn't release the lock for the file : "
-                    + fo.getName() + " after processing");
+                    + maskURLPassword(fo.getName().getURI()) + " after processing");
         }
     }
 

@@ -390,7 +390,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 }
             }
             
-            NHttpClientConnection conn = ConnectionPool.getConnection(host, port);
+            NHttpClientConnection conn =
+                ConnectionPool.getConnection(url.getProtocol(), host, port);
 
             // Ensure MessageContext has a ClientConnectionDebug attached before we start streaming
             ServerConnectionDebug scd = (ServerConnectionDebug)

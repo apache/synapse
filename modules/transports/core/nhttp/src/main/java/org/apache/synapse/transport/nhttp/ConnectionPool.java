@@ -32,15 +32,41 @@ public class ConnectionPool {
 
     private static final Log log = LogFactory.getLog(ConnectionPool.class);
 
-    /** A map of available connections for reuse. The key selects the host+port of the
-     * connection and the value contains a List of available connections to destination
+    /** A map of available connections for reuse, keyed by the request scheme together
+     * with the host and port actually dialled.
      */
     private static Map<String,List<NHttpClientConnection>> connMap =
             Collections.synchronizedMap(new HashMap<String,List<NHttpClientConnection>>());
 
-    public static NHttpClientConnection getConnection(String host, int port) {
+    /**
+     * Compute the pool key for a connection. The scheme is a mandatory part of the key:
+     * pooled connections may only be reused for requests with identical transport
+     * security characteristics.
+     *
+     * @param scheme the URI scheme of the request (http or https); a null scheme is
+     *               treated as http
+     * @param host   the host actually dialled (the proxy host when proxying)
+     * @param port   the port actually dialled
+     * @return the pool key
+     */
+    static String poolKey(String scheme, String host, int port) {
+        return (scheme == null ? "http" : scheme.toLowerCase(Locale.US))
+                + "://" + host + ":" + Integer.toString(port);
+    }
 
-        String key = host + ":" + Integer.toString(port);
+    /**
+     * @deprecated use {@link #getConnection(String, String, int)} instead. Retained for
+     *             source and binary compatibility only; it assumes the http scheme and
+     *             will therefore never return a connection pooled for an https request.
+     */
+    @Deprecated
+    public static NHttpClientConnection getConnection(String host, int port) {
+        return getConnection("http", host, port);
+    }
+
+    public static NHttpClientConnection getConnection(String scheme, String host, int port) {
+
+        String key = poolKey(scheme, host, port);
         List<NHttpClientConnection> connections = connMap.get(key);
 
         if (connections == null || connections.isEmpty()) {
@@ -81,7 +107,7 @@ public class ConnectionPool {
 
         HttpHost host = (HttpHost) conn.getContext().getAttribute(
             HttpCoreContext.HTTP_TARGET_HOST);
-        String key = host.getHostName() + ":" + Integer.toString(host.getPort());
+        String key = poolKey(host.getSchemeName(), host.getHostName(), host.getPort());
 
         List<NHttpClientConnection> connections = connMap.get(key);
         if (connections == null) {
@@ -128,7 +154,7 @@ public class ConnectionPool {
 
         HttpHost host = (HttpHost) conn.getContext().getAttribute(
             HttpCoreContext.HTTP_TARGET_HOST);
-        String key = host.getHostName() + ":" + Integer.toString(host.getPort());
+        String key = poolKey(host.getSchemeName(), host.getHostName(), host.getPort());
 
         List<NHttpClientConnection> connections = connMap.get(key);
         if (connections != null) {

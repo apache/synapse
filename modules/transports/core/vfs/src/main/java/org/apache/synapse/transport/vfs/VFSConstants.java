@@ -45,6 +45,23 @@ public final class VFSConstants {
     public static final String TRANSPORT_FILE_LOCKING_ENABLED = "enable";
     public static final String TRANSPORT_FILE_LOCKING_DISABLED = "disable";
 
+    /**
+     * Lock release true/false
+     * */
+    public static final String TRANSPORT_AUTO_LOCK_RELEASE = "transport.vfs.AutoLockRelease";
+
+    /**
+     * Lock release interval
+     * */
+    public static final String TRANSPORT_AUTO_LOCK_RELEASE_INTERVAL
+            = "transport.vfs.AutoLockReleaseInterval";
+
+    /**
+     * Age in milliseconds beyond which an existing lock file is treated as abandoned, used when
+     * auto lock release is enabled without an explicit interval.
+     */
+    public static final long DEFAULT_AUTO_LOCK_RELEASE_INTERVAL = 3600000L;
+
     public static final String REPLY_FILE_URI = "transport.vfs.ReplyFileURI";
     public static final String REPLY_FILE_NAME = "transport.vfs.ReplyFileName";
 

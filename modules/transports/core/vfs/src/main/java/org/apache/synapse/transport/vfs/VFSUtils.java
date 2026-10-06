@@ -24,6 +24,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.vfs2.Capability;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -111,6 +112,21 @@ public class VFSUtils extends BaseUtils {
      * @return boolean true if the lock has been acquired or false if not
      */
     public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {
+        return acquireLock(fsManager, fo, null);
+    }
+
+    /**
+     * Acquires a file item lock before processing the item, guaranteeing that the file is not
+     * processed while it is being uploaded and/or the item is not processed by two listeners
+     *
+     * @param fsManager used to resolve the processing file
+     * @param fo representing the processing file item
+     * @param paramDTO the auto lock release settings of the poll table entry, or null to leave
+     *                 an existing lock in place regardless of its age
+     * @return boolean true if the lock has been acquired or false if not
+     */
+    public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo,
+                                                   VFSParamDTO paramDTO) {
 
         // generate a random lock value to ensure that there are no two parties
         // processing the same file
@@ -128,10 +144,15 @@ public class VFSUtils extends BaseUtils {
             }
             FileObject lockObject = fsManager.resolveFile(fullPath + ".lock");
             if (lockObject.exists()) {
-                log.debug("There seems to be an external lock, aborting the processing of the file "
+                long lockAge = getLockAge(lockObject);
+                log.warn("There seems to be an external lock, aborting the processing of the file "
                         + maskURLPassword(fo.getName().getURI())
                         + ". This could possibly be due to some other party already "
-                        + "processing this file or the file is still being uploaded");
+                        + "processing this file or the file is still being uploaded"
+                        + (lockAge >= 0 ? ". The lock file is " + lockAge + "ms old" : ""));
+                if (paramDTO != null && paramDTO.isAutoLockRelease()) {
+                    releaseLock(lockObject, paramDTO.getAutoLockReleaseInterval(), lockAge);
+                }
             } else {
 
                 // write a lock file before starting of the processing, to ensure that the
@@ -193,6 +214,63 @@ public class VFSUtils extends BaseUtils {
         } catch (FileSystemException e) {
             log.error("Couldn't release the lock for the file : "
                     + maskURLPassword(fo.getName().getURI()) + " after processing");
+        }
+    }
+
+    /**
+     * Release a lock file that appears to have been abandoned. The age of the lock is taken from
+     * the file system rather than from the content of the lock file, so a lock written by any
+     * party -- including one that is empty or otherwise unreadable -- is aged out.
+     *
+     * @param lockObject the existing lock file
+     * @param autoLockReleaseInterval age in milliseconds beyond which the lock is released
+     * @param lInterval the age of the lock file, or -1 if it could not be determined
+     */
+    private static void releaseLock(FileObject lockObject, Long autoLockReleaseInterval,
+                                    long lInterval) {
+        if (lInterval < 0) {
+            // the file system cannot report a last modified time, so the age of the lock is
+            // unknown; leave it in place rather than removing a lock that may still be held
+            return;
+        }
+        try {
+            deleteLockFile(lockObject, autoLockReleaseInterval, lInterval);
+        } catch (FileSystemException e) {
+            log.error("Couldn't release the lock file "
+                    + maskURLPassword(lockObject.getName().getURI()), e);
+        }
+    }
+
+    private static void deleteLockFile(FileObject lockObject, Long autoLockReleaseInterval,
+                                       long lInterval) throws FileSystemException {
+        if (autoLockReleaseInterval == null || autoLockReleaseInterval <= lInterval) {
+            try {
+                log.warn("Removing the lock file "
+                        + maskURLPassword(lockObject.getName().getURI()) + " after " + lInterval
+                        + "ms without an update");
+                lockObject.delete();
+            } catch (Exception e) {
+                log.warn("Unable to delete the lock file during auto release cycle.", e);
+            } finally {
+                lockObject.close();
+            }
+        }
+    }
+
+    /**
+     * @param lockObject the lock file whose age is required
+     * @return the age of the lock file in milliseconds, or -1 if the file system cannot report
+     *         a last modified time
+     */
+    private static long getLockAge(FileObject lockObject) {
+        try {
+            if (!lockObject.getFileSystem().hasCapability(Capability.GET_LAST_MODIFIED)) {
+                return -1;
+            }
+            return System.currentTimeMillis() - lockObject.getContent().getLastModifiedTime();
+        } catch (FileSystemException e) {
+            log.debug("Couldn't read the last modified time of the lock file", e);
+            return -1;
         }
     }
 

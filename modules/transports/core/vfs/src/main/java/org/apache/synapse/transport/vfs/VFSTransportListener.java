@@ -227,7 +227,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
 
                     if (fileObject.getType() == FileType.FILE && !isFailedRecord) {
                         if (!entry.isFileLockingEnabled() || (entry.isFileLockingEnabled() &&
-                                VFSUtils.acquireLock(fsManager, fileObject))) {
+                                acquireLock(fsManager, fileObject, entry))) {
                             try {
                                 processFile(entry, fileObject);
                                 entry.setLastPollState(PollTableEntry.SUCCSESSFUL);
@@ -304,7 +304,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
                             }
 
                             if ((!entry.isFileLockingEnabled()
-                                    || (entry.isFileLockingEnabled() && VFSUtils.acquireLock(fsManager, child)))
+                                    || (entry.isFileLockingEnabled() && acquireLock(fsManager, child, entry)))
                                     && !isFailedRecord){
                                 //process the file
                                 try {
@@ -393,6 +393,23 @@ public class VFSTransportListener extends AbstractPollingTransportListener<PollT
         } catch (FileSystemException e) {
             processFailure("Error checking for existence and readability : " + VFSUtils.maskURLPassword(fileURI), e, entry);
         }
+    }
+
+    /**
+     * Acquire the lock of the given file, passing the auto lock release settings configured on
+     * the poll table entry so that an abandoned lock does not keep the file unprocessed.
+     *
+     * @param fsManager used to resolve the lock file
+     * @param fileObject representing the file to be processed
+     * @param entry the PollTableEntry carrying the auto lock release configuration
+     * @return true if the lock has been acquired, false if not
+     */
+    protected boolean acquireLock(FileSystemManager fsManager, FileObject fileObject,
+                                  final PollTableEntry entry) {
+        VFSParamDTO vfsParamDTO = new VFSParamDTO();
+        vfsParamDTO.setAutoLockRelease(entry.getAutoLockRelease());
+        vfsParamDTO.setAutoLockReleaseInterval(entry.getAutoLockReleaseInterval());
+        return VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO);
     }
 
     /**

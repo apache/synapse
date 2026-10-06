@@ -72,6 +72,8 @@ public class PollTableEntry extends AbstractPollTableEntry {
     private int maxRetryCount;
     private long reconnectTimeout;
     private boolean fileLocking;
+    private boolean autoLockRelease;
+    private Long autoLockReleaseInterval;
 
     private String moveAfterMoveFailure;
 
@@ -196,6 +198,22 @@ public class PollTableEntry extends AbstractPollTableEntry {
         return fileLocking;
     }
 
+    public boolean getAutoLockRelease() {
+        return autoLockRelease;
+    }
+
+    public void setAutoLockRelease(boolean autoLockRelease) {
+        this.autoLockRelease = autoLockRelease;
+    }
+
+    public Long getAutoLockReleaseInterval() {
+        return autoLockReleaseInterval;
+    }
+
+    public void setAutoLockReleaseInterval(Long autoLockReleaseInterval) {
+        this.autoLockReleaseInterval = autoLockReleaseInterval;
+    }
+
     public long getReconnectTimeout() {
         return reconnectTimeout;
     }
@@ -279,6 +297,28 @@ public class PollTableEntry extends AbstractPollTableEntry {
                 fileLocking = true;
             } else if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strFileLocking)) {
                 fileLocking = false;
+            }
+
+            String strAutoLockRelease = ParamUtils.getOptionalParam(
+                    params, VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE);
+            autoLockRelease = false;
+            autoLockReleaseInterval = VFSConstants.DEFAULT_AUTO_LOCK_RELEASE_INTERVAL;
+            if (strAutoLockRelease != null) {
+                autoLockRelease = Boolean.parseBoolean(strAutoLockRelease);
+                if (autoLockRelease) {
+                    String strAutoLockReleaseInterval = ParamUtils.getOptionalParam(
+                            params, VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE_INTERVAL);
+                    if (strAutoLockReleaseInterval != null) {
+                        try {
+                            autoLockReleaseInterval = Long.parseLong(strAutoLockReleaseInterval);
+                        } catch (NumberFormatException nfe) {
+                            log.warn("VFS " + VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE_INTERVAL
+                                    + " value is invalid : " + strAutoLockReleaseInterval, nfe);
+                            autoLockReleaseInterval =
+                                    VFSConstants.DEFAULT_AUTO_LOCK_RELEASE_INTERVAL;
+                        }
+                    }
+                }
             }
 
             moveAfterMoveFailure = ParamUtils.getOptionalParam(params,

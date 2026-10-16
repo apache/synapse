@@ -117,7 +117,7 @@ public final class CipherTool {
         Options options = getOptions();
 
         // create the command line parser
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         // parse the command line arguments
         try {

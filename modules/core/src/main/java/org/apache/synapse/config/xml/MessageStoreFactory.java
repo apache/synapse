@@ -29,6 +29,8 @@ import org.apache.synapse.message.processors.MessageProcessor;
 import org.apache.synapse.message.store.InMemoryMessageStore;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.axis2.util.JavaUtils;
+import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 
 
 import javax.xml.XMLConstants;
@@ -56,6 +58,7 @@ public class MessageStoreFactory {
     public static final QName CLASS_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
     public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
     public static final QName SEQUENCE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
+    public static final QName EXPRESSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
 
     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             "parameter");
@@ -98,7 +101,6 @@ public class MessageStoreFactory {
         messageStore.setParameters(getParameters(elem));
 
 
-
         log.info("Successfully created Message Store: " + nameAtt.getAttributeValue());
         return messageStore;
     }
@@ -118,12 +120,52 @@ public class MessageStoreFactory {
                     if (paramValue != null) {
                         parameters.put(paramName.getAttributeValue(), paramValue);
                     }
+                    processExpressionIfExist(prop, parameters);
                 } else {
                     handleException("Invalid MessageStore parameter - Parameter must have a name ");
                 }
             }
         }
         return parameters;
+    }
+
+    /**
+     * If an expression is defined in property, it'll be extracted and populated
+     *
+     * @param prop   xml element read from the synapse parameter. This should be a != null value.
+     * @param params list of processed params from the XML.
+     * @return true if an expression is processed
+     */
+    private static boolean processExpressionIfExist(OMElement prop, Map<String, Object> params) {
+        try {
+            OMAttribute expression = prop.getAttribute(EXPRESSION_Q);
+            if (null != expression) {
+                SynapseXPath synapseXPath = SynapseXPathFactory.getSynapseXPath(prop, EXPRESSION_Q);
+                registerParameter(params, prop.getAttribute(NAME_Q), synapseXPath);
+                return true;
+            }
+        } catch (JaxenException e) {
+            handleException("Error while extracting parameter : " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Register the extracted parameter in the list.
+     *
+     * @param parameters the list of parameters which should be registered.
+     * @param paramName  the name of the parameter.
+     * @param paramValue the value of the parameter.
+     * @param <T>        the type of the parameter.
+     */
+    private static <T> void registerParameter(Map<String, Object> parameters,
+                                              OMAttribute paramName,
+                                              T paramValue) {
+        if (paramName != null && paramValue != null) {
+            parameters.put(paramName.getAttributeValue(), paramValue);
+        } else {
+            handleException("Invalid MessageStore parameter - Parameter must have a name ");
+        }
     }
 
     private static void handleException(String msg) {

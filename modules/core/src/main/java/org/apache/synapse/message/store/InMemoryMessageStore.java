@@ -22,6 +22,8 @@ package org.apache.synapse.message.store;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.message.MessageConsumer;
+import org.apache.synapse.message.MessageProducer;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,10 +37,22 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
     private static final Log log = LogFactory.getLog(InMemoryMessageStore.class);
 
-    /** The map that keeps the stored messages */
+    /**
+     * The map that keeps the stored messages
+     */
     private Queue<MessageContext> messageList = new ConcurrentLinkedQueue<MessageContext>();
 
     private Lock lock = new ReentrantLock();
+
+    @Override
+    public MessageProducer getProducer() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public MessageConsumer getConsumer() {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public boolean offer(MessageContext messageContext) {
@@ -77,7 +91,7 @@ public class InMemoryMessageStore extends AbstractMessageStore {
 
     @Override
     public MessageContext peek() {
-        return messageList.peek();        
+        return messageList.peek();
     }
 
     @Override

@@ -103,7 +103,7 @@ public class POJOCommandMediator extends AbstractMediator {
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("Creating a new instance of POJO class : " + command.getClass());
+            synLog.traceOrDebug("Creating a new instance of POJO class : " + command);
         }
 
         Object commandObject = null;
@@ -112,7 +112,7 @@ public class POJOCommandMediator extends AbstractMediator {
             commandObject = command.newInstance();
         } catch (Exception e) {
             handleException("Error creating an instance of the POJO command class : " +
-                command.getClass(), e, synCtx);
+                command, e, synCtx);
         }
 
         synLog.traceOrDebug("Instance created, setting static and dynamic properties");
@@ -143,7 +143,7 @@ public class POJOCommandMediator extends AbstractMediator {
                 ((Command) commandObject).execute();
             } catch (Exception e) {
                 handleException("Error invoking POJO command class : "
-                    + command.getClass(), e, synCtx);
+                    + command, e, synCtx);
             }
 
         } else {
@@ -153,10 +153,10 @@ public class POJOCommandMediator extends AbstractMediator {
                 exeMethod.invoke(commandObject);
             } catch (NoSuchMethodException e) {
                 handleException("Cannot locate an execute() method on POJO class : " +
-                    command.getClass(), e, synCtx);
+                    command, e, synCtx);
             } catch (Exception e) {
                 handleException("Error invoking the execute() method on POJO class : " +
-                    command.getClass(), e, synCtx);
+                    command, e, synCtx);
             }
         }
 

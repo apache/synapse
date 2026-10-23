@@ -28,6 +28,7 @@ import org.apache.http.impl.nio.DefaultNHttpClientConnection;
 import org.apache.http.nio.NHttpClientEventHandler;
 import org.apache.http.nio.NHttpMessageParserFactory;
 import org.apache.http.nio.NHttpMessageWriterFactory;
+import org.apache.http.nio.reactor.EventMask;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.synapse.transport.passthru.TargetHandler;
@@ -89,6 +90,11 @@ public class SynapseNHttpClientConnection extends DefaultNHttpClientConnection {
     @Override
     public void produceOutput(final NHttpClientEventHandler handler) {
         super.produceOutput(handler);
+        // httpcore 4.4 left write interest armed after a pipelined send, which the nhttp sender
+        // never does. Restore the 4.3.x clearing here; see SynapseNHttpServerConnection for why.
+        if (!this.outbuf.hasData() && this.contentEncoder == null && this.status != CLOSED) {
+            this.session.clearEvent(EventMask.WRITE);
+        }
     }
 
     /**

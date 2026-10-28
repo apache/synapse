@@ -89,7 +89,7 @@ public class SynapseNHttpServerConnectionFactory implements NHttpConnectionFacto
                     ConnSupport.createDecoder(config),
                     ConnSupport.createEncoder(config),
                     config.getMessageConstraints(),
-                    StrictContentLengthStrategy.INSTANCE,
+                    StrictFramingContentLengthStrategy.INSTANCE,
                     StrictContentLengthStrategy.INSTANCE,
                     requestParserFactory,
                     responseWriterFactory,
@@ -103,7 +103,7 @@ public class SynapseNHttpServerConnectionFactory implements NHttpConnectionFacto
                     ConnSupport.createDecoder(config),
                     ConnSupport.createEncoder(config),
                     config.getMessageConstraints(),
-                    StrictContentLengthStrategy.INSTANCE,
+                    StrictFramingContentLengthStrategy.INSTANCE,
                     StrictContentLengthStrategy.INSTANCE,
                     requestParserFactory,
                     responseWriterFactory);

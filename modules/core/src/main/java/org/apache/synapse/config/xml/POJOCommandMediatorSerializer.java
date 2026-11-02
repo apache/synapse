@@ -42,7 +42,7 @@ public class POJOCommandMediatorSerializer extends AbstractMediatorSerializer {
         OMElement pojoCommand = fac.createOMElement("pojoCommand", synNS);
         saveTracingState(pojoCommand, mediator);
 
-        if (mediator.getCommand() != null && mediator.getCommand().getClass().getName() != null) {
+        if (mediator.getCommand() != null && mediator.getCommand().getName() != null) {
             pojoCommand.addAttribute(fac.createOMAttribute(
                 "name", nullNS, mediator.getCommand().getName()));
         } else {

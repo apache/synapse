@@ -24,7 +24,7 @@ import org.apache.synapse.transport.utils.sslcert.Constants;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import javax.security.cert.X509Certificate;
+import java.security.cert.Certificate;
 
 /**
  * This is the adaptor used to plug OCSP/CRL feature to synapse while solving the Jar Hell
@@ -37,7 +37,7 @@ public class SynapseAdaptorForOcspCrl {
     private static final ClassLoader loader = new ParentLastClassLoader(
             Thread.currentThread().getContextClassLoader());
 
-    public void verifyRevocationStatus(X509Certificate[] peerCertificates, Integer cacheSize,
+    public void verifyRevocationStatus(Certificate[] peerCertificates, Integer cacheSize,
                                        Integer cacheDelay) throws CertificateVerificationException {
 
         if (peerCertificates == null || cacheSize == null || cacheDelay == null) {
@@ -46,8 +46,10 @@ public class SynapseAdaptorForOcspCrl {
 
         try {
             Class revocationManagerClass = loader.loadClass(Constants.REVOCATION_MANAGER);
+            // Looked up against the declared parameter type rather than the array's runtime
+            // class, which an SSLSession is free to narrow to X509Certificate[].
             Method method = revocationManagerClass.getMethod(Constants.VERIFY_METHOD,
-                    peerCertificates.getClass());
+                    Certificate[].class);
             Constructor constructor = revocationManagerClass.getConstructor(cacheSize.getClass(),
                     cacheDelay.getClass());
             Object revocationManager = constructor.newInstance(cacheSize, cacheDelay);

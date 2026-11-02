@@ -49,8 +49,7 @@ public abstract class FaultHandler {
             traceOrDebugWarn(traceOn, "FaultHandler executing impl: " + this.getClass().getName());
         }
 
-        try {
-            synCtx.getServiceLog().info("FaultHandler executing impl: " + this.getClass().getName());
+        try {            
             onFault(synCtx);
 
         } catch (SynapseException e) {

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 
 /**
  * The ParentLastClassLoader is needed because the OCSP/CRL feature for synapse uses a dependency
@@ -43,7 +44,17 @@ public class ParentLastClassLoader extends ClassLoader {
     //used to cache already defined classes
     private static final Hashtable<String,Class> classes = new Hashtable<String,Class>();
 
+    /**
+     * Matches the bcprov/bcpkix/bcutil jars the OCSP/CRL feature draws classes from, at any
+     * pinned version, while excluding the legacy bcprov-jdk15 Apache Rampart brings in transitively.
+     */
+    private static final Pattern BOUNCYCASTLE_JAR =
+            Pattern.compile("bc(prov|pkix|util)-jdk[0-9]+on-.*[.]jar");
+
     private File[] jarFiles; // Jar files
+
+    //jars stay open for the life of the loader; see readClassBytes
+    private final Hashtable<String,JarFile> openJars = new Hashtable<String,JarFile>();
 
     public ParentLastClassLoader(ClassLoader parent) {
         super(parent);
@@ -53,13 +64,15 @@ public class ParentLastClassLoader extends ClassLoader {
         }
 
         File dir = new File(libDir);
-        jarFiles = dir.listFiles(new FileFilter() {
+        File[] matched = dir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File f) {
                 return f.getName().startsWith("synapse-nhttp-transport") ||
-                        f.getName().equals("bcprov-jdk15on-1.49.jar");
+                        BOUNCYCASTLE_JAR.matcher(f.getName()).matches();
             }
         });
+        // listFiles yields null when libDir is absent or unreadable.
+        jarFiles = matched != null ? matched : new File[0];
     }
 
     @Override
@@ -72,7 +85,6 @@ public class ParentLastClassLoader extends ClassLoader {
                                               boolean resolve) throws ClassNotFoundException {
 
         try {
-            byte classByte[];
             Class result;
 
             //checks in cached classes
@@ -81,23 +93,10 @@ public class ParentLastClassLoader extends ClassLoader {
                 return result;
             }
 
-            for (File jarFile : jarFiles) {
-                try {
-                    JarFile jar = new JarFile(jarFile);
-                    JarEntry entry = jar.getJarEntry(className.replace(".", "/") + ".class");
-                    InputStream is = jar.getInputStream(entry);
-                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                    int nextValue = is.read();
-                    while (-1 != nextValue) {
-                        byteStream.write(nextValue);
-                        nextValue = is.read();
-                    }
-
-                    classByte = byteStream.toByteArray();
-                    result = defineClass(className, classByte, 0, classByte.length, null);
-                    classes.put(className, result);
-                    break;
-                } catch (Exception ignored) {}
+            byte[] classByte = readClassBytes(className);
+            if (classByte != null) {
+                result = defineClass(className, classByte, 0, classByte.length, null);
+                classes.put(className, result);
             }
 
             if (result != null) {
@@ -109,6 +108,43 @@ public class ParentLastClassLoader extends ClassLoader {
             // didn't find it, try the parent
             return super.loadClass(className, resolve);
         }
+    }
+
+    /**
+     * Reads a class from the first jar that carries it, or returns null if none does. Jars are
+     * opened once and kept open, and entries read buffered, since this runs per class, thousands of times.
+     */
+    private byte[] readClassBytes(String className) {
+        String entryName = className.replace(".", "/") + ".class";
+        for (File jarFile : jarFiles) {
+            try {
+                JarFile jar = openJars.get(jarFile.getPath());
+                if (jar == null) {
+                    jar = new JarFile(jarFile);
+                    openJars.put(jarFile.getPath(), jar);
+                }
+
+                JarEntry entry = jar.getJarEntry(entryName);
+                if (entry == null) {
+                    continue;
+                }
+
+                InputStream is = jar.getInputStream(entry);
+                try {
+                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[8192];
+                    int read = is.read(buffer);
+                    while (-1 != read) {
+                        byteStream.write(buffer, 0, read);
+                        read = is.read(buffer);
+                    }
+                    return byteStream.toByteArray();
+                } finally {
+                    is.close();
+                }
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 }
 

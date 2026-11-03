@@ -80,7 +80,8 @@ public class CRLVerifierTest extends TestCase {
         cache.setCacheValue(crlDistributionPointUrl, x509CRL);
 
         CRLVerifier crlVerifier = new CRLVerifier(cache);
-        RevocationStatus status = crlVerifier.checkRevocationStatus(fakeRevokedCertificate, null);
+        RevocationStatus status = crlVerifier.checkRevocationStatus(fakeRevokedCertificate,
+                fakeCACert);
 
         //the fake crl we created will be checked if the fake certificate is revoked. So the
         // status should be REVOKED.

@@ -22,14 +22,11 @@ package org.apache.synapse.transport.utils.sslcert.ocsp;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
-import org.apache.synapse.transport.utils.sslcert.CertificateVerificationException;
 import org.apache.synapse.transport.utils.sslcert.cache.CacheController;
 import org.apache.synapse.transport.utils.sslcert.cache.CacheManager;
 import org.apache.synapse.transport.utils.sslcert.cache.ManageableCache;
 import org.apache.synapse.transport.utils.sslcert.cache.ManageableCacheValue;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 
 import java.math.BigInteger;
@@ -52,12 +49,10 @@ public class OCSPCache implements ManageableCache {
     private final Map<BigInteger,OCSPCacheValue> hashMap;
     private Iterator<Map.Entry<BigInteger,OCSPCacheValue>> iterator;
     private volatile CacheManager cacheManager;
-    private final OCSPVerifier ocspVerifier;
 
     private OCSPCache() {
         this.hashMap = new ConcurrentHashMap<BigInteger, OCSPCacheValue>();
         this.iterator = hashMap.entrySet().iterator();
-        this.ocspVerifier = new OCSPVerifier(null);
     }
 
     public static OCSPCache getCache() {
@@ -120,28 +115,7 @@ public class OCSPCache implements ManageableCache {
             return;
         }
 
-        try {
-            String serviceUrl = cacheValue.serviceUrl;
-            OCSPReq request = cacheValue.request;
-            OCSPResp response= ocspVerifier.getOCSPResponse(serviceUrl, request);
-
-            if (OCSPResp.SUCCESSFUL != response.getStatus())
-                throw new CertificateVerificationException("OCSP response status not SUCCESSFUL");
-
-            BasicOCSPResp basicResponse = (BasicOCSPResp) response.getResponseObject();
-            SingleResp[] responses = (basicResponse == null) ? null : basicResponse.getResponses();
-
-            if (responses == null)
-                throw new CertificateVerificationException("Cant get OCSP response");
-
-            SingleResp resp = responses[0];
-            this.setCacheValue(cacheValue.serialNumber, resp, request, serviceUrl);
-
-        } catch (Exception e){
-            log.debug("Cant replace old CacheValue with new CacheValue. So remove", e);
-            //If cant be replaced remove.
-            cacheValue.removeThisCacheValue();
-        }
+        cacheValue.removeThisCacheValue();
     }
 
     public synchronized SingleResp getCacheValue(BigInteger serialNumber) {

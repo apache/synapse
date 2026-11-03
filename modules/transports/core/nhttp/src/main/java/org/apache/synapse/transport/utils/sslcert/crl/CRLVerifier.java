@@ -32,8 +32,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.security.cert.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,6 +48,18 @@ public class CRLVerifier implements RevocationVerifier {
 
     private CRLCache cache;
 
+    /**
+     * Tolerance applied to both ends of a CRL's validity window, to allow for clock skew between
+     * this host and the CA that published it.
+     */
+    private static final long CLOCK_SKEW_MILLIS = 5 * 60 * 1000L;
+
+    /**
+     * How old a CRL may be when it carries no nextUpdate, which RFC 5280 section 5.1.2.5
+     * leaves optional.
+     */
+    private static final long MAX_CRL_AGE_MILLIS = 24 * 60 * 60 * 1000L;
+
     public CRLVerifier(CRLCache cache) {
         this.cache = cache;
     }
@@ -54,7 +68,7 @@ public class CRLVerifier implements RevocationVerifier {
      * Checks revocation status (Good, Revoked) of the peer certificate.
      *
      * @param peerCert   peer certificate
-     * @param issuerCert issuer certificate of the peer. not used currently.
+     * @param issuerCert issuer of the peer certificate; every CRL used here is verified against it.
      * @return revocation status of the peer certificate.
      * @throws CertificateVerificationException
      *
@@ -74,9 +88,18 @@ public class CRLVerifier implements RevocationVerifier {
                 X509CRL x509CRL = cache.getCacheValue(crlUrl);
                 if (x509CRL != null) {
                     //If cant be casted, we have used the wrong cache.
-                    RevocationStatus status = getRevocationStatus(x509CRL, peerCert);
-                    log.debug("CRL taken from cache....");
-                    return status;
+                    try {
+                        verifyCRL(x509CRL, issuerCert);
+                        RevocationStatus status = getRevocationStatus(x509CRL, peerCert);
+                        log.debug("CRL taken from cache....");
+                        return status;
+                    } catch (CertificateVerificationException e) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Discarding the cached CRL for " + crlUrl +
+                                    " and downloading it again.", e);
+                        }
+                        cache.removeCacheValue(crlUrl);
+                    }
                 }
             }
 
@@ -84,6 +107,7 @@ public class CRLVerifier implements RevocationVerifier {
             try {
                 X509CRL x509CRL = downloadCRLFromWeb(crlUrl);
                 if (x509CRL != null) {
+                    verifyCRL(x509CRL, issuerCert);
                     if (cache != null) {
                         cache.setCacheValue(crlUrl, x509CRL);
                     }
@@ -105,6 +129,55 @@ public class CRLVerifier implements RevocationVerifier {
             return RevocationStatus.REVOKED;
         } else {
             return RevocationStatus.GOOD;
+        }
+    }
+
+    /**
+     * Verifies a CRL was published by the issuer of the certificate being checked and is still
+     * current, rejecting forged or stale CRLs and indirect CRLs signed by a separate CRL issuer.
+     *
+     * @param x509CRL    the CRL that was fetched or taken from the cache.
+     * @param issuerCert the issuer of the certificate being checked.
+     * @throws CertificateVerificationException if the CRL is not validly signed by that issuer or
+     *                                          is no longer current.
+     */
+    private void verifyCRL(X509CRL x509CRL, X509Certificate issuerCert)
+            throws CertificateVerificationException {
+
+        if (issuerCert == null) {
+            throw new CertificateVerificationException("Cannot verify a CRL without the issuer " +
+                    "certificate");
+        }
+
+        if (!x509CRL.getIssuerX500Principal().equals(issuerCert.getSubjectX500Principal())) {
+            throw new CertificateVerificationException("CRL issuer " +
+                    x509CRL.getIssuerX500Principal() + " is not the issuer of the certificate " +
+                    "being checked");
+        }
+
+        try {
+            x509CRL.verify(issuerCert.getPublicKey());
+        } catch (GeneralSecurityException e) {
+            throw new CertificateVerificationException("CRL is not signed by the issuer of the " +
+                    "certificate being checked", e);
+        }
+
+        long now = System.currentTimeMillis();
+        Date thisUpdate = x509CRL.getThisUpdate();
+        Date nextUpdate = x509CRL.getNextUpdate();
+
+        if (thisUpdate == null) {
+            throw new CertificateVerificationException("CRL does not say when it was issued");
+        }
+        if (thisUpdate.getTime() > now + CLOCK_SKEW_MILLIS) {
+            throw new CertificateVerificationException("CRL is not valid yet. It is dated " +
+                    thisUpdate);
+        }
+        if (nextUpdate != null && nextUpdate.getTime() < now - CLOCK_SKEW_MILLIS) {
+            throw new CertificateVerificationException("CRL expired on " + nextUpdate);
+        } else if (nextUpdate == null && thisUpdate.getTime() < now - MAX_CRL_AGE_MILLIS) {
+            throw new CertificateVerificationException("CRL carries no nextUpdate and is older " +
+                    "than the accepted maximum. It is dated " + thisUpdate);
         }
     }
 

@@ -311,7 +311,7 @@ public class PropertyMediator extends AbstractMediator {
                 case FLOAT      : return Float.parseFloat(value);
                 case INTEGER    : return Integer.parseInt(value);
                 case LONG       : return Long.parseLong(value);
-                case OM         : return SynapseConfigUtils.stringToOM(value);
+                case OM         : return SynapseConfigUtils.stringToOMDisallowingDTD(value);
                 case SHORT      : return Short.parseShort(value);
                 default         : return value;
             }

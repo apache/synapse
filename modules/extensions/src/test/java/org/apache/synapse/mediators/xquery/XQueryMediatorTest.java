@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.xquery;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.mediators.TestUtils;
 
@@ -268,5 +269,24 @@ public class XQueryMediatorTest extends TestCase {
                 " <testing/>");
         assertTrue(mediator.mediate(mc));
         assertEquals("testing", mc.getEnvelope().getBody().getFirstElement().getLocalName());
+    }
+
+    public void testElementVariableRejectsDoctype() throws Exception {
+        MessageContext mc = TestUtils.getTestContext(sampleXml, null);
+        XQueryMediator mediator = new XQueryMediator();
+        List<MediatorVariable> list = new ArrayList<MediatorVariable>();
+        MediatorVariable variable = new MediatorBaseVariable(new QName("payload"));
+        variable.setType(XQItemType.XQITEMKIND_ELEMENT);
+        variable.setValue("<!DOCTYPE root [ <!ENTITY greeting \"hello\"> ]><root>text</root>");
+        list.add(variable);
+        mediator.addAllVariables(list);
+        mediator.setQuerySource(
+                "declare variable $payload as element() external; $payload");
+        try {
+            mediator.mediate(mc);
+            fail("A message-derived value carrying a document type declaration must be rejected");
+        } catch (SynapseException expected) {
+            // expected: the declaration-bearing variable value is rejected as malformed
+        }
     }
 }

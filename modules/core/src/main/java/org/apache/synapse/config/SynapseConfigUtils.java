@@ -792,6 +792,36 @@ public class SynapseConfigUtils {
     }
 
     /**
+     * Builds an {@link OMElement} from a string whose content comes from the message (an XPath
+     * result, a property value, an XQuery variable, ...), parsing it the same way the inbound
+     * message itself is parsed rather than with {@link #stringToOM(String)}'s default settings.
+     * A document type declaration in the string is rejected.
+     *
+     * @param xml the message-derived string to parse
+     * @return the parsed {@link OMElement}, or {@code null} if the input is {@code null}
+     */
+    public static OMElement stringToOMDisallowingDTD(String xml) {
+        if (xml == null) {
+            return null;
+        }
+        try {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
+            inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+            XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(xml));
+            OMElement element = OMXMLBuilderFactory.createStAXOMBuilder(reader).getDocumentElement();
+            if (element != null) {
+                element.build();
+            }
+            return element;
+        } catch (XMLStreamException | OMException e) {
+            handleException("Unable to convert a string to OM Node as the string " +
+                    "is malformed , String : " + xml, e);
+        }
+        return null;
+    }
+
+    /**
      * Construct a fresh SynapseConfiguration instance and registers the observers
      * with it as specified in the synapse.properties file. Use the initial.observers
      * property in the synapse.properties file to specify observers as a comma separated

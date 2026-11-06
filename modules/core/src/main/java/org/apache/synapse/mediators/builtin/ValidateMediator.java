@@ -48,7 +48,9 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Validate a message or an element against a schema
@@ -83,11 +85,16 @@ public class ValidateMediator extends AbstractListMediator {
      */
     private final List<MediatorProperty> explicityFeatures = new ArrayList<MediatorProperty>();
 
-    /**
-     * This is the actual schema instance used to create a new schema
-     * This is a thred-safe instance.
-     */
-    private Schema cachedSchema;
+    /** Upper bound on the number of schema instances kept by one mediator instance. */
+    private static final int MAX_CACHED_SCHEMAS = 100;
+
+    private final Map<List<String>, Schema> cachedSchemas =
+            new LinkedHashMap<List<String>, Schema>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<List<String>, Schema> eldest) {
+                    return size() > MAX_CACHED_SCHEMAS;
+                }
+            };
 
     /**
      * Lock used to ensure thread-safe creation and use of the above Validator
@@ -116,10 +123,12 @@ public class ValidateMediator extends AbstractListMediator {
 
         // flag to check if we need to initialize/re-initialize the schema
         boolean reCreate = false;
-        // if any of the schemas are not loaded, or have expired, load or re-load them
+        // Derive the actual keys for THIS message once, reused below to identify the cached schema and to build it.
+        List<String> resolvedSchemaKeys = new ArrayList<String>(schemaKeys.size());
         for (Value schemaKey : schemaKeys) {
             // Derive actual key from message context
             String propKey = schemaKey.evaluateValue(synCtx);
+            resolvedSchemaKeys.add(propKey);
             Entry dp = synCtx.getConfiguration().getEntryDefinition(propKey);
             if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
@@ -131,16 +140,24 @@ public class ValidateMediator extends AbstractListMediator {
         // This is the reference to the DefaultHandler instance
         ValidateMediatorErrorHandler errorHandler = new ValidateMediatorErrorHandler();
 
+        // the schema this message is validated against: the one its own resolved keys name, not necessarily the one most recently built
+        Schema schemaForMessage;
+
         // do not re-initialize schema unless required
         synchronized (validatorLock) {
-            if (reCreate || cachedSchema == null) {
+
+            if (reCreate) {
+                // A referenced schema is stale, so all cached entries are discarded since other key combinations may share it.
+                cachedSchemas.clear();
+            }
+
+            schemaForMessage = cachedSchemas.get(resolvedSchemaKeys);
+            if (schemaForMessage == null) {
 
                 factory.setErrorHandler(errorHandler);
-                StreamSource[] sources = new StreamSource[schemaKeys.size()];
+                StreamSource[] sources = new StreamSource[resolvedSchemaKeys.size()];
                 int i = 0;
-                for (Value schemaKey : schemaKeys) {
-                    // Derive actual key from message context
-                    String propName = schemaKey.evaluateValue(synCtx);
+                for (String propName : resolvedSchemaKeys) {
                     sources[i++] = SynapseConfigUtils.getStreamSource(synCtx.getEntry(propName));
                 }
                 // load the UserDefined SchemaURIResolver implementations
@@ -152,7 +169,7 @@ public class ValidateMediator extends AbstractListMediator {
                         factory.setResourceResolver(
                                 new SchemaResourceResolver(synCtx.getConfiguration(), resourceMap));
                     }
-                    cachedSchema = factory.newSchema(sources);
+                    schemaForMessage = factory.newSchema(sources);
                 } catch (SAXException e) {
                     handleException("Error creating a new schema objects for " +
                             "schemas : " + schemaKeys.toString(), e, synCtx);
@@ -164,16 +181,23 @@ public class ValidateMediator extends AbstractListMediator {
                 if (errorHandler.isValidationError()) {
                     //reset the errorhandler state
                     errorHandler.setValidationError(false);
-                    cachedSchema = null;
+                    // a schema that failed to build is never published to the cache, so the next message for these keys builds it again
                     handleException("Error creating a new schema objects for schemas : "
                             + schemaKeys.toString(), errorHandler.getSaxParseException(), synCtx);
                 }
+
+                cachedSchemas.put(resolvedSchemaKeys, schemaForMessage);
             }
+        }
+
+        if (schemaForMessage == null) {
+            handleException("Failed to create a schema instance for schemas : "
+                    + schemaKeys.toString(), synCtx);
         }
 
         // no need to synchronize, schema instances are thread-safe
         try {
-            Validator validator = cachedSchema.newValidator();
+            Validator validator = schemaForMessage.newValidator();
             validator.setErrorHandler(errorHandler);
 
             // perform actual validation

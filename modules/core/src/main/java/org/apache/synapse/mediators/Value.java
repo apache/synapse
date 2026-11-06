@@ -26,10 +26,23 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
+import org.jaxen.expr.BinaryExpr;
+import org.jaxen.expr.Expr;
+import org.jaxen.expr.FilterExpr;
+import org.jaxen.expr.FunctionCallExpr;
+import org.jaxen.expr.LocationPath;
+import org.jaxen.expr.PathExpr;
+import org.jaxen.expr.Predicate;
+import org.jaxen.expr.Step;
+import org.jaxen.expr.UnaryExpr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a Value
@@ -39,6 +52,16 @@ import java.util.List;
  */
 public class Value {
     private static final Log log = LogFactory.getLog(Value.class);
+
+    /**
+     * Functions that a re-compiled dynamic ("{{...}}") template parameter expression is not
+     * allowed to call. document() resolves an external resource and evaluate() compiles and
+     * runs a further expression at runtime; neither is evaluated for an expression that was
+     * itself produced from a runtime-derived value. Such a call is reported as an error.
+     */
+    private static final Set<String> RESTRICTED_DYNAMIC_FUNCTIONS =
+            Collections.unmodifiableSet(
+                    new HashSet<String>(Arrays.asList("document", "evaluate")));
 
     /**
      * Name of the value attribute
@@ -195,6 +218,7 @@ public class Value {
 
     public Object evalutePropertyExpression(MessageContext synCtx) {
         SynapseXPath expr = null;
+        SynapseXPath expression;
         try {
             expr = new SynapseXPath(this.keyValue.substring(1, keyValue.length() - 1));
             for (OMNamespace aNamespaceList : namespaceList) {
@@ -202,16 +226,80 @@ public class Value {
             }
 
             String result = expr.stringValueOf(synCtx);
-            SynapseXPath expression = new SynapseXPath(result);
+            expression = new SynapseXPath(result);
             for (OMNamespace aNamespaceList : namespaceList) {
                 expression.addNamespace(aNamespaceList);
             }
-            return expression;
         } catch (Exception e) {
             handleException("Can not evaluate escaped expression : " + expr);
+            return this.expression;
         }
-        return this.expression;
 
+        String restrictedFunction = findRestrictedFunction(expression.getRootExpr());
+        if (restrictedFunction != null) {
+            handleException("The function '" + restrictedFunction + "' is not allowed in a "
+                    + "dynamically evaluated template parameter expression");
+        }
+        return expression;
+    }
+
+    /**
+     * Walks a parsed XPath expression tree and returns the name of the first function call
+     * that is in {@link #RESTRICTED_DYNAMIC_FUNCTIONS}, or {@code null} if there is none. The
+     * whole tree is inspected, including function arguments and step predicates.
+     *
+     * @param node a node of the parsed expression tree (an {@link Expr}, {@link Step} or
+     *             {@link Predicate}); may be {@code null}
+     * @return the restricted function name if one is present, otherwise {@code null}
+     */
+    private String findRestrictedFunction(Object node) {
+        if (node == null) {
+            return null;
+        }
+        if (node instanceof FunctionCallExpr) {
+            FunctionCallExpr call = (FunctionCallExpr) node;
+            String functionName = call.getFunctionName();
+            if (functionName != null && RESTRICTED_DYNAMIC_FUNCTIONS.contains(functionName)) {
+                return functionName;
+            }
+            return findRestrictedFunction(call.getParameters());
+        }
+        if (node instanceof PathExpr) {
+            PathExpr path = (PathExpr) node;
+            String found = findRestrictedFunction(path.getFilterExpr());
+            return found != null ? found : findRestrictedFunction(path.getLocationPath());
+        }
+        if (node instanceof FilterExpr) {
+            FilterExpr filter = (FilterExpr) node;
+            String found = findRestrictedFunction(filter.getExpr());
+            return found != null ? found : findRestrictedFunction(filter.getPredicates());
+        }
+        if (node instanceof BinaryExpr) {
+            BinaryExpr binary = (BinaryExpr) node;
+            String found = findRestrictedFunction(binary.getLHS());
+            return found != null ? found : findRestrictedFunction(binary.getRHS());
+        }
+        if (node instanceof UnaryExpr) {
+            return findRestrictedFunction(((UnaryExpr) node).getExpr());
+        }
+        if (node instanceof LocationPath) {
+            return findRestrictedFunction(((LocationPath) node).getSteps());
+        }
+        if (node instanceof Step) {
+            return findRestrictedFunction(((Step) node).getPredicates());
+        }
+        if (node instanceof Predicate) {
+            return findRestrictedFunction(((Predicate) node).getExpr());
+        }
+        if (node instanceof List) {
+            for (Object child : (List<?>) node) {
+                String found = findRestrictedFunction(child);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     public void setNamespaces(OMElement elem){

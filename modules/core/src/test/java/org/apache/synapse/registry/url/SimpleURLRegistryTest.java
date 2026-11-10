@@ -25,6 +25,7 @@ import org.apache.axiom.om.*;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.NullOutputStream;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.registry.Registry;
 import org.custommonkey.xmlunit.XMLAssert;
@@ -131,6 +132,62 @@ public class SimpleURLRegistryTest extends TestCase {
         assertEquals("ValueOne", ((OMText) node).getText());
     }
 
+    public void testKeyResolutionStaysWithinConfiguredRoot() throws Exception {
+        String rootDir = "target/f013registry/root";
+        String outsideFile = "target/f013registry/outside.xml";
+        String insideFile = rootDir + "/inside.xml";
+        String outsideContent = "<outside-marker/>";
+        String insideContent = "<inside-marker/>";
+
+        new File(rootDir, "sub").mkdirs();
+        writeFile(outsideFile, outsideContent);
+        writeFile(insideFile, insideContent);
+
+        try {
+            Registry reg = new SimpleURLRegistry();
+            Properties props = new Properties();
+            props.put("root", "file:" + rootDir + "/");
+            reg.init(props);
+
+            // control: a plain in-root key keeps resolving.
+            OMNode inRoot = (OMNode) reg.lookup("inside.xml");
+            assertNotNull(inRoot);
+            XMLAssert.assertXMLEqual(insideContent, inRoot.toString());
+
+            // control: an in-root key with a harmless internal ".." that still nets to a
+            // location inside the root must keep resolving -- the fix must not over-block.
+            OMNode viaDotSegment = (OMNode) reg.lookup("sub/../inside.xml");
+            assertNotNull(viaDotSegment);
+            XMLAssert.assertXMLEqual(insideContent, viaDotSegment.toString());
+
+            // every one of these must be refused: none may ever return the out-of-root
+            // resource's content, whether by returning null or by throwing. A literal
+            // "../" string check is not enough -- the file: URL handler that actually
+            // opens the resource decodes percent-escapes and treats '\' as a separator on
+            // Windows, so the containment check must be enforced on the resolved,
+            // canonicalized target, not on the raw key string.
+            String[] escapes = {
+                    "../outside.xml",
+                    "..%2foutside.xml",
+                    "..%2Foutside.xml",
+                    "..%5coutside.xml",
+                    ".%2e%2foutside.xml",
+                    "%2e%2e%2foutside.xml",
+            };
+            for (String key : escapes) {
+                Object result;
+                try {
+                    result = reg.lookup(key);
+                } catch (SynapseException refused) {
+                    continue;
+                }
+                assertNull("key '" + key + "' must not resolve to the out-of-root resource", result);
+            }
+        } finally {
+            FileUtils.deleteQuietly(new File("target/f013registry"));
+        }
+    }
+
     @Override
     public void tearDown() throws Exception {
         FileUtils.deleteQuietly(new File(FILE));
@@ -139,6 +196,13 @@ public class SimpleURLRegistryTest extends TestCase {
 
     private void writeToFile(String content) throws Exception {
         BufferedWriter out = new BufferedWriter(new FileWriter(new File(FILE)));
+        out.write(content);
+        out.flush();
+        out.close();
+    }
+
+    private void writeFile(String path, String content) throws Exception {
+        BufferedWriter out = new BufferedWriter(new FileWriter(new File(path)));
         out.write(content);
         out.flush();
         out.close();

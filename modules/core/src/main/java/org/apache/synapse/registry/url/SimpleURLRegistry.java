@@ -37,6 +37,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -61,9 +62,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             log.debug("==> Repository fetch of resource with key : " + key);
 
         }
-        URL url = SynapseConfigUtils.getURLFromPath(root + key, properties.get(
-                SynapseConstants.SYNAPSE_HOME) != null ?
-                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
+        URL url = resolveWithinRoot(key);
         if (url == null) {
             return null;
         }
@@ -147,9 +146,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         if (log.isDebugEnabled()) {
             log.debug("Perform RegistryEntry lookup for key : " + key);
         }
-        URL url = SynapseConfigUtils.getURLFromPath(root + key, properties.get(
-                SynapseConstants.SYNAPSE_HOME) != null ?
-                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
+        URL url = resolveWithinRoot(key);
         if (url == null) {
             return null;
         }
@@ -234,9 +231,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             entryImpl.setKey("");
             entry = entryImpl;
         }
-        url = SynapseConfigUtils.getURLFromPath(root + entry.getKey(), properties.get(
-                SynapseConstants.SYNAPSE_HOME) != null ?
-                properties.get(SynapseConstants.SYNAPSE_HOME).toString() : "");
+        url = resolveWithinRoot(entry.getKey());
         if (url == null) {
             return null;
         }
@@ -321,6 +316,57 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    /**
+     * Resolve {@code key} against the configured {@link #root} and, for a {@code file} root,
+     * verify that the resolved location does not escape it. The check runs on the
+     * canonicalized, decoded target path rather than on the raw key string, since the key may
+     * arrive percent-encoded, backslash-separated, or otherwise disguised in a way a literal
+     * "../" string match would miss -- while the file: URL handler that will actually open the
+     * resource decodes and normalizes it anyway.
+     */
+    private URL resolveWithinRoot(String key) {
+        Object synapseHomeProp = properties.get(SynapseConstants.SYNAPSE_HOME);
+        String synapseHome = synapseHomeProp != null ? synapseHomeProp.toString() : null;
+        URL url = SynapseConfigUtils.getURLFromPath(root + key, synapseHome);
+        if (url == null) {
+            return null;
+        }
+        if (root != null && !root.isEmpty() && "file".equals(url.getProtocol())) {
+            assertWithinRoot(url, key);
+        }
+        return url;
+    }
+
+    private void assertWithinRoot(URL url, String key) {
+        URL rootUrl;
+        try {
+            rootUrl = new URL(root);
+        } catch (MalformedURLException e) {
+            // root itself isn't a well-formed URL (an unusual configuration already tolerated
+            // by init()); there is nothing reliable to contain against here.
+            return;
+        }
+        try {
+            File target = new File(decodePath(url.getPath())).getCanonicalFile();
+            File rootDir = new File(decodePath(rootUrl.getPath())).getCanonicalFile();
+            String rootPath = rootDir.getPath();
+            String targetPath = target.getPath();
+            if (!targetPath.equals(rootPath) && !targetPath.startsWith(rootPath + File.separator)) {
+                throw new SynapseException(
+                        "Registry key '" + key + "' resolves outside the configured registry root");
+            }
+        } catch (IOException e) {
+            throw new SynapseException(
+                    "Unable to validate registry key '" + key + "' against the configured root", e);
+        }
+    }
+
+    private static String decodePath(String rawPath) throws UnsupportedEncodingException {
+        // URLDecoder is meant for application/x-www-form-urlencoded content, where '+' means
+        // space; escape any literal '+' first so a path legitimately containing one survives.
+        return URLDecoder.decode(rawPath.replace("+", "%2B"), "UTF-8");
     }
 
 }

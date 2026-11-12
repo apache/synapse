@@ -326,7 +326,7 @@ public class PassThroughHttpSSLSender extends PassThroughHttpSender {
                 if (cvConfig != null) {
                     //Do revocation verification of Certificates
                     try {
-                        ocspCrl.verifyRevocationStatus(session.getPeerCertificateChain(),
+                        ocspCrl.verifyRevocationStatus(session.getPeerCertificates(),
                                 cvConfig.getCacheSize(), cvConfig.getCacheDuration());
                     } catch (CertificateVerificationException e) {
                         throw new SSLException("Certificate chain validation failed for host : " +

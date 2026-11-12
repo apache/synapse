@@ -27,7 +27,7 @@ import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPCache;
 import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPVerifier;
 import org.apache.synapse.transport.utils.sslcert.pathvalidation.CertificatePathValidator;
 
-import java.io.ByteArrayInputStream;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 /**
@@ -56,11 +56,11 @@ public class RevocationVerificationManager {
      * This method first tries to verify the given certificate chain using OCSP since OCSP
      * verification is faster. If that fails it tries to do the verification using CRL.
      *
-     * @param peerCertificates  javax.security.cert.X509Certificate[] array of peer
+     * @param peerCertificates  java.security.cert.Certificate[] array of peer
      *                          certificate chain from peer/client.
      * @throws CertificateVerificationException
      */
-    public void verifyRevocationStatus(javax.security.cert.X509Certificate[] peerCertificates)
+    public void verifyRevocationStatus(Certificate[] peerCertificates)
             throws CertificateVerificationException {
 
         X509Certificate[] convertedCertificates = convert(peerCertificates);
@@ -93,31 +93,20 @@ public class RevocationVerificationManager {
     }
 
     /**
-     * @param certs array of javax.security.cert.X509Certificate[] s.
-     * @return the converted array of java.security.cert.X509Certificate[] s.
-     * @throws CertificateVerificationException
+     * @param certs array of java.security.cert.Certificate[] s.
+     * @return the same chain narrowed to java.security.cert.X509Certificate[] s.
+     * @throws CertificateVerificationException if the chain holds a certificate that is not X.509.
      */
-    private X509Certificate[] convert(javax.security.cert.X509Certificate[] certs)
+    private X509Certificate[] convert(Certificate[] certs)
             throws CertificateVerificationException {
         X509Certificate[] certChain = new X509Certificate[certs.length];
-        Throwable exceptionThrown;
         for (int i = 0; i < certs.length; i++) {
-            try {
-                byte[] encoded = certs[i].getEncoded();
-                ByteArrayInputStream bis = new ByteArrayInputStream(encoded);
-                java.security.cert.CertificateFactory cf
-                        = java.security.cert.CertificateFactory.getInstance("X.509");
-                certChain[i]=((X509Certificate)cf.generateCertificate(bis));
-                continue;
-            } catch (java.security.cert.CertificateEncodingException e) {
-                exceptionThrown = e;
-            } catch (javax.security.cert.CertificateEncodingException e) {
-                exceptionThrown = e;
-            } catch (java.security.cert.CertificateException e) {
-                exceptionThrown = e;
+            if (!(certs[i] instanceof X509Certificate)) {
+                throw new CertificateVerificationException("Certificate at index " + i +
+                        " is of type " + certs[i].getType() + "; revocation verification " +
+                        "requires X.509 certificates");
             }
-            throw new CertificateVerificationException("Cant Convert certificates from " +
-                    "javax to java", exceptionThrown);
+            certChain[i] = (X509Certificate) certs[i];
         }
         return certChain;
     }

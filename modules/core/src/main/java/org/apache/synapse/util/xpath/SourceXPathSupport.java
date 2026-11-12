@@ -95,7 +95,7 @@ public class SourceXPathSupport {
             if (result instanceof OMNode) {
                 return (OMNode) result;
             } else if (result instanceof String) {
-                return SynapseConfigUtils.stringToOM((String) result);
+                return SynapseConfigUtils.stringToOMDisallowingDTD((String) result);
             } else {
                 throw new SynapseException("The evaluation of the XPath expression "
                         + xpath + " did not result in an OMNode : " + result, synLog);

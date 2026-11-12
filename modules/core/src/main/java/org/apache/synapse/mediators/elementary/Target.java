@@ -22,17 +22,16 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 
 /**
@@ -150,12 +149,8 @@ public class Target {
                 if (propertyObj instanceof OMElement) {
                     documentElement = (OMElement) propertyObj;
                 } else {
-                    try {
-                        documentElement = AXIOMUtil.stringToOM(propertyObj.toString());
-                    } catch (XMLStreamException e) {
-                        throw new SynapseException("Error while converting property value into" +
-                                " an OMElement");
-                    }
+                    documentElement =
+                            SynapseConfigUtils.stringToOMDisallowingDTD(propertyObj.toString());
                 }
                 insertElement(sourceNodeList, documentElement, synLog);
                 synContext.setProperty(property, documentElement);

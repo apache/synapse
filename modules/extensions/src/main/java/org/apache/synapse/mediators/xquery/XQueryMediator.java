@@ -621,7 +621,7 @@ public class XQueryMediator extends AbstractMediator {
 
         OMElement variableValue = null;
         if (value instanceof String) {
-            variableValue = SynapseConfigUtils.stringToOM((String) value);
+            variableValue = SynapseConfigUtils.stringToOMDisallowingDTD((String) value);
         } else if (value instanceof OMElement) {
             variableValue = (OMElement) value;
         }

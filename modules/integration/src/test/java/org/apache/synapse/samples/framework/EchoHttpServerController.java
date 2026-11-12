@@ -109,8 +109,13 @@ public class EchoHttpServerController extends AbstractBackEndServerController {
                         log.debug("Request entity read; size=" + entityContent.length);
                     }
                     response.setStatusCode(HttpStatus.SC_OK);
+                    // getValue() returns the full header, including any parameters, e.g.
+                    // "text/xml; charset=UTF-8". ContentType.create expects a bare MIME type:
+                    // up to httpcore 4.3.x it accepted the full value unchecked, but 4.4 rejects
+                    // any mime type containing '"', ',' or ';'. parse() is the method that
+                    // understands a complete header value, and it exists in both versions.
                     response.setEntity(new ByteArrayEntity(entityContent,
-                            ContentType.create(entity.getContentType().getValue())));
+                            ContentType.parse(entity.getContentType().getValue())));
                 } else {
                     response.setStatusCode(HttpStatus.SC_NO_CONTENT);
                 }

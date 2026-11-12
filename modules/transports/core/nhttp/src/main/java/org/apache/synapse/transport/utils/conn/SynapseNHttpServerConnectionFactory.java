@@ -95,7 +95,7 @@ public class SynapseNHttpServerConnectionFactory implements NHttpConnectionFacto
                     responseWriterFactory,
                     sourceConnLog);
         } else {
-            return new DefaultNHttpServerConnection(
+            return new SynapseNHttpServerConnection(
                     session,
                     config.getBufferSize(),
                     config.getFragmentSizeHint(),

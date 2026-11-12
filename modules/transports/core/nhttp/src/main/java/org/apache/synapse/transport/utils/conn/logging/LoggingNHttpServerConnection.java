@@ -25,12 +25,12 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.config.MessageConstraints;
 import org.apache.http.entity.ContentLengthStrategy;
-import org.apache.http.impl.nio.DefaultNHttpServerConnection;
 import org.apache.http.nio.NHttpMessageParserFactory;
 import org.apache.http.nio.NHttpMessageWriterFactory;
 import org.apache.http.nio.NHttpServerEventHandler;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.util.ByteBufferAllocator;
+import org.apache.synapse.transport.utils.conn.SynapseNHttpServerConnection;
 
 import java.io.IOException;
 import java.nio.charset.CharsetDecoder;
@@ -41,7 +41,7 @@ import java.nio.charset.CharsetEncoder;
  * additional logging features. This implementation enhances the default connection
  * class by logging all the major events that occur on the connection instance.
  */
-public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
+public class LoggingNHttpServerConnection extends SynapseNHttpServerConnection {
 
     private final Log log;
 

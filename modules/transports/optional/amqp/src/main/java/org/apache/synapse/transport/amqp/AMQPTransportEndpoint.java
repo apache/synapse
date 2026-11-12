@@ -31,8 +31,6 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class AMQPTransportEndpoint extends ProtocolEndpoint {
 
-    private Set<EndpointReference> endpointReferences = new HashSet<EndpointReference>();
-
     private ScheduledExecutorService workerPool;
 
     private AMQPTransportPollingTask pollingTask;
@@ -88,6 +86,6 @@ public class AMQPTransportEndpoint extends ProtocolEndpoint {
     @Override
     public EndpointReference[] getEndpointReferences(AxisService service, String ip)
             throws AxisFault {
-        return endpointReferences.toArray(new EndpointReference[endpointReferences.size()]);
+        return new EndpointReference[0];
     }
 }

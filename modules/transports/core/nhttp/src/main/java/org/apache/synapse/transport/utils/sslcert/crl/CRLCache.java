@@ -47,12 +47,10 @@ public class CRLCache implements ManageableCache {
     private final Map<String, CRLCacheValue> hashMap;
     private Iterator<Map.Entry<String, CRLCacheValue>> iterator;
     private volatile CacheManager cacheManager;
-    private final CRLVerifier crlVerifier;
 
     private CRLCache() {
         hashMap = new ConcurrentHashMap<String, CRLCacheValue>();
         iterator = hashMap.entrySet().iterator();
-        crlVerifier = new CRLVerifier(null);
     }
 
     public static CRLCache getCache() {
@@ -116,15 +114,7 @@ public class CRLCache implements ManageableCache {
             return;
         }
 
-        try {
-            String crlUrl = cacheValue.crlUrl;
-            X509CRL x509CRL = crlVerifier.downloadCRLFromWeb(crlUrl);
-            this.setCacheValue(crlUrl, x509CRL);
-        } catch (Exception e) {
-            log.debug("Cant replace old CacheValue with new CacheValue. So remove", e);
-            //If cant be replaced remove.
-            cacheValue.removeThisCacheValue();
-        }
+        cacheValue.removeThisCacheValue();
     }
 
     public synchronized X509CRL getCacheValue(String crlUrl) {

@@ -124,13 +124,30 @@ public class OCSPVerifierTest extends TestCase {
         OCSPVerifier ocspVerifier = new OCSPVerifier(null);
         Class ocspVerifierClass = ocspVerifier.getClass();
         Method generateOCSPRequest = ocspVerifierClass.getDeclaredMethod("generateOCSPRequest",
-                X509Certificate.class,
-                BigInteger.class);
+                CertificateID.class);
         generateOCSPRequest.setAccessible(true);
 
-        OCSPReq request = (OCSPReq) generateOCSPRequest.invoke(ocspVerifier, caCert,
-                revokedSerialNumber);
+        OCSPReq request = (OCSPReq) generateOCSPRequest.invoke(ocspVerifier,
+                getCertificateID(caCert, revokedSerialNumber));
         return request;
+    }
+
+    /**
+     * Builds the CertID for a certificate, by calling the private generateCertificateID(..)
+     * method in OCSPVerifier through reflection.
+     *
+     * @param caCert       the fake CA certificate.
+     * @param serialNumber the serial number of the certificate being asked about.
+     * @return the CertID identifying that certificate.
+     * @throws Exception
+     */
+    private CertificateID getCertificateID(X509Certificate caCert, BigInteger serialNumber)
+            throws Exception {
+        OCSPVerifier ocspVerifier = new OCSPVerifier(null);
+        Method generateCertificateID = ocspVerifier.getClass().getDeclaredMethod(
+                "generateCertificateID", X509Certificate.class, BigInteger.class);
+        generateCertificateID.setAccessible(true);
+        return (CertificateID) generateCertificateID.invoke(ocspVerifier, caCert, serialNumber);
     }
 
     /**
